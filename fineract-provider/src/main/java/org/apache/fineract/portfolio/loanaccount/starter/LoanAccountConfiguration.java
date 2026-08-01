@@ -39,7 +39,7 @@ import org.apache.fineract.organisation.holiday.domain.HolidayRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
-import org.apache.fineract.organisation.teller.validation.CashierTransactionDataValidator;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
 import org.apache.fineract.portfolio.account.domain.AccountTransferDetailRepository;
@@ -432,7 +432,7 @@ public class LoanAccountConfiguration {
             AccountTransferDetailRepository accountTransferDetailRepository, BusinessEventNotifierService businessEventNotifierService,
             GuarantorDomainService guarantorDomainService, LoanUtilService loanUtilService,
             EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            CodeValueRepositoryWrapper codeValueRepository, CashierTransactionDataValidator cashierTransactionDataValidator,
+            CodeValueRepositoryWrapper codeValueRepository, CashierTxnValidationPort cashierTxnValidationPort,
             GLIMAccountInfoRepository glimRepository, LoanRepository loanRepository,
             RepaymentWithPostDatedChecksAssembler repaymentWithPostDatedChecksAssembler,
             PostDatedChecksRepository postDatedChecksRepository,
@@ -455,7 +455,7 @@ public class LoanAccountConfiguration {
                 accountTransfersReadPlatformService, accountAssociationsReadPlatformService, loanReadPlatformService, fromApiJsonHelper,
                 calendarRepository, loanScheduleHistoryWritePlatformService, loanApplicationValidator, accountAssociationRepository,
                 accountTransferDetailRepository, businessEventNotifierService, guarantorDomainService, loanUtilService,
-                entityDatatableChecksWritePlatformService, codeValueRepository, cashierTransactionDataValidator, glimRepository,
+                entityDatatableChecksWritePlatformService, codeValueRepository, cashierTxnValidationPort, glimRepository,
                 loanRepository, repaymentWithPostDatedChecksAssembler, postDatedChecksRepository,
                 loanRepaymentScheduleInstallmentRepository, loanLifecycleStateMachine, loanAccountLockService, externalIdFactory,
                 loanAccrualTransactionBusinessEventService, errorHandler, loanDownPaymentHandlerService, loanTransactionAssembler,

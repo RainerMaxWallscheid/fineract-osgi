@@ -48,7 +48,7 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi implementation bundle (ADR-022). Export domain/data residual for provider composition root.
+// OSGi implementation bundle (ADR-022). Export starter only (no residual domain/validator leak).
 jar {
     manifest {
         attributes(
@@ -62,12 +62,7 @@ jar {
                         + 'org.apache.fineract.organisation.teller.data,'
                         + 'org.apache.fineract.organisation.teller.exception,'
                         + '*',
-                // Provider residual: entities + cashier txn validator used from loan write path.
-                'Export-Package': 'org.apache.fineract.organisation.teller.domain,'
-                        + 'org.apache.fineract.organisation.teller.domain.model,'
-                        + 'org.apache.fineract.organisation.teller.domain.model.request,'
-                        + 'org.apache.fineract.organisation.teller.validation,'
-                        + 'org.apache.fineract.organisation.teller.serialization',
+                'Export-Package': 'org.apache.fineract.organisation.teller.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.branch.impl'
                 )
     }

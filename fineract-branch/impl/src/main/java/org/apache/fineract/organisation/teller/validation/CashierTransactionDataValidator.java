@@ -33,8 +33,8 @@ import org.apache.fineract.organisation.teller.domain.Teller;
 import org.apache.fineract.organisation.teller.exception.CashierAlreadyAllocated;
 import org.apache.fineract.organisation.teller.exception.CashierDateRangeOutOfTellerDateRangeException;
 import org.apache.fineract.organisation.teller.exception.CashierInsufficientAmountException;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.organisation.teller.service.TellerManagementReadPlatformService;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CashierTransactionDataValidator {
+public class CashierTransactionDataValidator implements CashierTxnValidationPort {
 
     private final TellerManagementReadPlatformService tellerManagementReadPlatformService;
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -109,26 +109,28 @@ public class CashierTransactionDataValidator {
         }
     }
 
-    public void validateOnLoanDisbursal(AppUser user, String currencyCode, BigDecimal transactionAmount) {
-        LocalDate tenantDate = DateUtils.getLocalDateOfTenant();
-        OffsetDateTime tenantDateTime = DateUtils.getOffsetDateTimeOfTenant();
-        if (user.getStaff() != null) {
-            String sql = "SELECT c.id FROM m_cashiers c WHERE c.staff_id = :staffId "
-                    + "AND (CASE WHEN c.full_day THEN :tenantDate BETWEEN c.start_date AND c.end_date "
-                    + "ELSE (:tenantDate BETWEEN c.start_date AND c.end_date AND "
-                    + "TIME(:tenantDateTime) BETWEEN TIME(c.start_time) AND TIME(c.end_time)) END)";
+    @Override
+    public void validateOnLoanDisbursal(final Long staffId, final String currencyCode, final BigDecimal transactionAmount) {
+        if (staffId == null) {
+            return;
+        }
+        final LocalDate tenantDate = DateUtils.getLocalDateOfTenant();
+        final OffsetDateTime tenantDateTime = DateUtils.getOffsetDateTimeOfTenant();
+        final String sql = "SELECT c.id FROM m_cashiers c WHERE c.staff_id = :staffId "
+                + "AND (CASE WHEN c.full_day THEN :tenantDate BETWEEN c.start_date AND c.end_date "
+                + "ELSE (:tenantDate BETWEEN c.start_date AND c.end_date AND "
+                + "TIME(:tenantDateTime) BETWEEN TIME(c.start_time) AND TIME(c.end_time)) END)";
 
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("staffId", user.getStaff().getId());
-            paramMap.put("tenantDate", tenantDate);
-            paramMap.put("tenantDateTime", tenantDateTime);
+        final Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("staffId", staffId);
+        paramMap.put("tenantDate", tenantDate);
+        paramMap.put("tenantDateTime", tenantDateTime);
 
-            try {
-                Long cashierId = jdbcTemplate.queryForObject(sql, paramMap, Long.class);
-                validateSettleCashAndCashOutTransactions(cashierId, currencyCode, transactionAmount);
-            } catch (EmptyResultDataAccessException e) {
-                LOG.error("Problem occurred in validateOnLoanDisbursal function", e);
-            }
+        try {
+            final Long cashierId = jdbcTemplate.queryForObject(sql, paramMap, Long.class);
+            validateSettleCashAndCashOutTransactions(cashierId, currencyCode, transactionAmount);
+        } catch (EmptyResultDataAccessException e) {
+            LOG.error("Problem occurred in validateOnLoanDisbursal function", e);
         }
     }
 }

@@ -5,8 +5,8 @@ Branch cash / teller (cashier allocation and cash settle) — Wave 2 OSGi modula
 
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
-| `fineract-branch-api` | `api/` | `org.apache.fineract.branch.api` | Contracts: service interfaces, DTOs, exceptions, pure enums (`TellerStatus`, `CashierTxnType`) |
-| `fineract-branch-impl` | `impl/` | `org.apache.fineract.branch.impl` | JPA domain, REST, handlers; **OSGi** `BranchOsgiServiceRegistrar` |
+| `fineract-branch-api` | `api/` | `org.apache.fineract.branch.api` | Contracts: service interfaces, DTOs, exceptions, pure enums, **`CashierTxnValidationPort`** |
+| `fineract-branch-impl` | `impl/` | `org.apache.fineract.branch.impl` | JPA, REST, handlers, service impls, starter; **OSGi** `BranchOsgiServiceRegistrar` |
 | `fineract-branch-test` | `test/` | `org.apache.fineract.branch.test` | White-box tests; **Fragment-Host** → `branch.impl` |
 
 No `:fineract-branch` façade. Depend on `-api`; composition roots also take `-impl`.
@@ -14,17 +14,19 @@ No `:fineract-branch` façade. Depend on `-api`; composition roots also take `-i
 ### Module API
 
 - `TellerManagementReadPlatformService`, `TellerWritePlatformService`, `TellerTransactionWritePlatformService`
+- **`CashierTxnValidationPort`** (loan cash disbursal validation)
 - Pure DTOs under `…teller.data`
 - Pure value types: `TellerStatus`, `CashierTxnType` in `…teller.moduleapi`
 - Exceptions under `…teller.exception`
 
-Service **implementations** and Spring wiring remain in **provider** for now (residual). `CashierTransactionDataValidator` lives in **branch-impl** (`…validation`) and is still used from loan write path in provider.
+Service impls + `OrganisationTellerConfiguration` live in **branch-impl**. Loan uses **`CashierTxnValidationPort`** only (no validator / domain types).
 
 ### Consumers
 
 | Module | Depend on |
 |--------|-----------|
-| provider / war / architecture | `-api` + `-impl` (composition root) |
+| provider / war / architecture | `-api` + `-impl` (composition root; Spring classpath) |
+| loan path (in provider) | port on `-api` only for cashier validation |
 
 ```bash
 ./gradlew :fineract-branch-api:jar :fineract-branch-impl:jar :fineract-branch-test:test

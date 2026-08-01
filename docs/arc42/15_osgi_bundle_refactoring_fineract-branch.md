@@ -6,12 +6,12 @@ Wave‑2 module after [document](15_osgi_bundle_refactoring_fineract-document.md
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test + teller service ports; provider residual for service impls + cashier validator) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test + teller ports + residual closed) |
 | **Module** | Branch cash / teller (`m_tellers`, cashiers, cashier txns) |
 | **No façade** | Compose with `:fineract-branch-api` + `:fineract-branch-impl` explicitly |
 
-**Inter-bundle access:** OSGi **Service Registry** (`TellerManagementReadPlatformService`, `TellerWritePlatformService`).  
-**Spring:** REST/handlers in **branch-impl**; service **JpaImpl** + `OrganisationTellerConfiguration` still in **provider**.
+**Inter-bundle access:** OSGi **Service Registry** (`TellerManagementReadPlatformService`, `TellerWritePlatformService`, `CashierTxnValidationPort`).  
+**Spring:** service JpaImpl, REST, handlers, starter, OSGi registrar in **branch-impl**.
 
 ---
 
@@ -21,7 +21,7 @@ Wave‑2 module after [document](15_osgi_bundle_refactoring_fineract-document.md
 |-----------|-----|
 | Size | ~50 main types — clear org aggregate |
 | Hexagonal | Teller/cashier boundary vs loan cash settlement |
-| Consumers | **provider** (service impls + loan cash validation); war |
+| Consumers | **provider** composition root; loan uses **`CashierTxnValidationPort`** only |
 | Caveat | Less “optional extension” value than charge/document |
 
 ---
@@ -39,7 +39,7 @@ fineract-branch/
 | Gradle | Bundle-SymbolicName | Export |
 |--------|---------------------|--------|
 | `:fineract-branch-api` | `org.apache.fineract.branch.api` | `moduleapi`, `service`, `data`, `exception` |
-| `:fineract-branch-impl` | `org.apache.fineract.branch.impl` | `domain` (+ model), `validation`, `serialization` (provider residual) |
+| `:fineract-branch-impl` | `org.apache.fineract.branch.impl` | `starter` only |
 | `:fineract-branch-test` | `org.apache.fineract.branch.test` | Fragment-Host |
 
 ---
@@ -48,22 +48,25 @@ fineract-branch/
 
 | Package | Slice |
 |---------|--------|
-| `…teller.moduleapi` | **api** — package docs; pure `TellerStatus`, `CashierTxnType` |
+| `…teller.moduleapi` | **api** — `TellerStatus`, `CashierTxnType`, **`CashierTxnValidationPort`** |
 | `…teller.service` (interfaces) | **api** |
 | `…teller.data` (pure DTOs) | **api** |
 | `…teller.exception` | **api** |
 | `…teller.domain` (JPA + repos) | **impl** |
-| `…teller.validation` | **impl** — `CashierTransactionDataValidator` |
+| `…teller.service.*Impl` | **impl** |
+| `…teller.validation` | **impl** — `CashierTransactionDataValidator` implements port |
 | REST / handlers / serialization / util | **impl** |
+| `…teller.starter` | **impl** — `OrganisationTellerConfiguration` |
 | `…teller.impl.osgi` | **impl** — `BranchOsgiServiceRegistrar` |
-| provider `*PlatformServiceImpl` / `OrganisationTellerConfiguration` | **provider** |
+
+**Kernel support (residual enabler):** `StaffRepository` + `StaffReadService` interfaces live in **fineract-core** (impls remain in provider) so branch-impl compiles without depending on provider.
 
 ---
 
 ## 4. Steps
 
 ### Step 0 — Baseline ✅
-Inventory: provider teller service impls; loan uses `CashierTransactionDataValidator`; war packaging.
+Inventory: provider teller service impls; loan uses cashier validation; war packaging.
 
 ### Step 1 — Project shells ✅
 `settings.gradle` → api / impl / test; no façade.
@@ -81,17 +84,19 @@ Manifest Export/Import/Fragment-Host.
 Deserializer test + `BranchOsgiServiceRegistrarTest`.
 
 ### Step 6 — OSGi registrar ✅
-`BranchOsgiServiceRegistrar` → read + write teller services (beans from provider Spring).
+`BranchOsgiServiceRegistrar` → read + write teller services + `CashierTxnValidationPort`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |
 |----------|------|
-| provider / war / architecture | **api + impl** (composition root) |
+| provider / war / architecture | **api + impl** (composition root; classpath Spring scan) |
 
-### Step 8 — Semantic residual (open / accepted) ⚠️
-- [ ] Provider still hosts `TellerWritePlatformServiceJpaImpl` / `TellerManagementReadPlatformServiceImpl` / starter config
-- [ ] Loan write path depends on **impl** type `CashierTransactionDataValidator` (not a pure port yet)
-- [ ] Optional follow-up: `CashierTxnValidationPort` on api; move service impls into branch-impl
+### Step 8 — Semantic residual ✅
+- [x] Move `Teller*ServiceImpl` + `OrganisationTellerConfiguration` into **branch-impl**
+- [x] `CashierTxnValidationPort` on api; loan disbursal uses port + `staffId` (not validator / AppUser)
+- [x] `CashierTransactionDataValidator` implements port; internal only
+- [x] Impl **Export-Package** = `starter` only
+- [x] Move `StaffRepository` / `StaffReadService` interfaces to **core** (provider keeps impls)
 
 ### Step 9 — Docs ✅
 This plan + module README + osgi / parent 15 updates.
@@ -111,6 +116,5 @@ This plan + module README + osgi / parent 15 updates.
 
 | Item | Note |
 |------|------|
-| Move provider teller JpaImpl + starter into branch-impl | cleaner OSGi starter export |
-| `CashierTxnValidationPort` for loan settle/cash-out | drop provider compile dep on validator |
-| Port-only access for foreign BCs | no residual domain export |
+| Staff staff module api/impl | further kernel slim — not required for branch residual |
+| ArchUnit: forbid foreign BC import of `…teller.domain` / `…validation` | after freeze update |

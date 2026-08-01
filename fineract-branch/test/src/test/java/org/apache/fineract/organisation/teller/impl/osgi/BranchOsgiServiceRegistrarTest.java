@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.organisation.teller.service.TellerManagementReadPlatformService;
 import org.apache.fineract.organisation.teller.service.TellerWritePlatformService;
 import org.junit.jupiter.api.Test;
@@ -38,10 +39,13 @@ class BranchOsgiServiceRegistrarTest {
         final ObjectProvider<TellerManagementReadPlatformService> read = mock(ObjectProvider.class);
         @SuppressWarnings("unchecked")
         final ObjectProvider<TellerWritePlatformService> write = mock(ObjectProvider.class);
+        @SuppressWarnings("unchecked")
+        final ObjectProvider<CashierTxnValidationPort> cashier = mock(ObjectProvider.class);
         when(read.getIfAvailable()).thenReturn(mock(TellerManagementReadPlatformService.class));
         when(write.getIfAvailable()).thenReturn(mock(TellerWritePlatformService.class));
+        when(cashier.getIfAvailable()).thenReturn(mock(CashierTxnValidationPort.class));
 
-        final BranchOsgiServiceRegistrar registrar = new BranchOsgiServiceRegistrar(read, write);
+        final BranchOsgiServiceRegistrar registrar = new BranchOsgiServiceRegistrar(read, write, cashier);
         assertDoesNotThrow(registrar::afterPropertiesSet);
         assertDoesNotThrow(registrar::destroy);
     }

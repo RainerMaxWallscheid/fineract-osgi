@@ -16,14 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/**
- * Branch / teller Module API (OSGi contracts).
- *
- * <p>Public service interfaces live in {@code …teller.service}; pure DTOs in {@code …teller.data};
- * pure status / txn-type value types and {@link CashierTxnValidationPort} live in this package
- * (no JPA entities on api).
- *
- * <p>OSGi registration (impl): {@code TellerManagementReadPlatformService},
- * {@code TellerWritePlatformService}, {@link CashierTxnValidationPort}.
- */
 package org.apache.fineract.organisation.teller.moduleapi;
+
+import java.math.BigDecimal;
+
+/**
+ * Branch/teller port for cashier cash validation used by foreign BCs (loan disbursal).
+ *
+ * <p>Implementation lives in branch-impl ({@code CashierTransactionDataValidator}). Foreign modules
+ * must not depend on that class or on teller JPA types.
+ */
+public interface CashierTxnValidationPort {
+
+    /**
+     * When the acting staff has an open cashier session, ensure the cashier net cash covers
+     * {@code transactionAmount} for {@code currencyCode}.
+     *
+     * @param staffId
+     *            staff primary key, or {@code null} if the user has no staff assignment (no-op)
+     */
+    void validateOnLoanDisbursal(Long staffId, String currencyCode, BigDecimal transactionAmount);
+}

@@ -66,11 +66,11 @@ Provider bulk-import uses **`ContentStreamPort`**; composition root still api+im
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
-| `fineract-branch-api` | `org.apache.fineract.branch.api` | Teller service interfaces, DTOs, exceptions, pure enums |
-| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + `BranchOsgiServiceRegistrar` |
+| `fineract-branch-api` | `org.apache.fineract.branch.api` | Teller service interfaces, DTOs, exceptions, pure enums, `CashierTxnValidationPort` |
+| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + service impls + starter; `BranchOsgiServiceRegistrar` |
 | `fineract-branch-test` | `org.apache.fineract.branch.test` | Fragment-Host → branch.impl |
 
-Provider hosts service JpaImpl residual; loan cash path uses `CashierTransactionDataValidator` from impl. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
+Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
 
 ## Layout
 

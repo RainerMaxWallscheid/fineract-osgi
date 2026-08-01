@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.organisation.teller.service.TellerManagementReadPlatformService;
 import org.apache.fineract.organisation.teller.service.TellerWritePlatformService;
 import org.slf4j.Logger;
@@ -44,12 +45,15 @@ public class BranchOsgiServiceRegistrar implements InitializingBean, DisposableB
 
     private final ObjectProvider<TellerManagementReadPlatformService> tellerRead;
     private final ObjectProvider<TellerWritePlatformService> tellerWrite;
+    private final ObjectProvider<CashierTxnValidationPort> cashierTxnValidation;
     private final List<Object> registrations = new ArrayList<>();
 
     public BranchOsgiServiceRegistrar(final ObjectProvider<TellerManagementReadPlatformService> tellerRead,
-            final ObjectProvider<TellerWritePlatformService> tellerWrite) {
+            final ObjectProvider<TellerWritePlatformService> tellerWrite,
+            final ObjectProvider<CashierTxnValidationPort> cashierTxnValidation) {
         this.tellerRead = tellerRead;
         this.tellerWrite = tellerWrite;
+        this.cashierTxnValidation = cashierTxnValidation;
     }
 
     @Override
@@ -71,6 +75,7 @@ public class BranchOsgiServiceRegistrar implements InitializingBean, DisposableB
 
             register(context, TellerManagementReadPlatformService.class, tellerRead.getIfAvailable());
             register(context, TellerWritePlatformService.class, tellerWrite.getIfAvailable());
+            register(context, CashierTxnValidationPort.class, cashierTxnValidation.getIfAvailable());
             LOG.info("Registered {} branch OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only branch wiring");
