@@ -501,7 +501,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 |--------|-----------------------------|
 | **provider / ITs** | catalog write/read services + REST live on charge-impl (correct for composition root) |
 
-54. [ ] Wave 1 next modules (rates / tax / …)  
+54. [x] Wave 1 next: **rates** api/impl/test started — [rates plan](15_osgi_bundle_refactoring_fineract-rates.md); tax planned — [tax plan](15_osgi_bundle_refactoring_fineract-tax.md)
 
 **Note:** Domain modules loan + savings + WC + accounting are charge-api-only; product/account charge create paths in provider use `ChargeDefinitionPort`. Loan/savings ArchUnit charge-internal freeze is green.
 

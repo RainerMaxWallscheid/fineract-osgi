@@ -45,8 +45,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
 import org.apache.fineract.portfolio.delinquency.exception.DelinquencyBucketNotFoundException;
-import org.apache.fineract.portfolio.floatingrates.domain.FloatingRate;
-import org.apache.fineract.portfolio.floatingrates.domain.FloatingRateRepositoryWrapper;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
@@ -86,7 +85,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final RateRepositoryWrapper rateRepository;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
     private final FineractEntityAccessUtil fineractEntityAccessUtil;
-    private final FloatingRateRepositoryWrapper floatingRateRepository;
+    private final FloatingRatePort floatingRatePort;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final DelinquencyBucketRepository delinquencyBucketRepository;
@@ -112,11 +111,12 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             final List<Rate> rates = assembleListOfProductRates(command);
             final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser.assembleLoanProductPaymentAllocationRules(command, loanTransactionProcessingStrategyCode);
             final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser.assembleLoanProductCreditAllocationRules(command, loanTransactionProcessingStrategyCode);
-            FloatingRate floatingRate = null;
+            Long floatingRateId = null;
             if (command.parameterExists("floatingRatesId")) {
-                floatingRate = this.floatingRateRepository.findOneWithNotFoundDetection(command.longValueOfParameterNamed("floatingRatesId"));
+                floatingRateId = command.longValueOfParameterNamed("floatingRatesId");
+                this.floatingRatePort.getFloatingRate(floatingRateId); // not-found if missing
             }
-            final LoanProduct loanProduct = loanProductAssembler.assembleFromJson(fund, loanTransactionProcessingStrategyCode, charges, command, this.aprCalculator, floatingRate, rates, loanProductPaymentAllocationRules, loanProductCreditAllocationRules);
+            final LoanProduct loanProduct = loanProductAssembler.assembleFromJson(fund, loanTransactionProcessingStrategyCode, charges, command, this.aprCalculator, floatingRateId, rates, loanProductPaymentAllocationRules, loanProductCreditAllocationRules);
             loanProduct.updateLoanProductInRelatedClasses();
             loanProduct.setTransactionProcessingStrategyName(loanRepaymentScheduleTransactionProcessorFactory.determineProcessor(loanTransactionProcessingStrategyCode).getName());
             if (command.parameterExists("delinquencyBucketId")) {
@@ -171,11 +171,12 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             if (anyChangeInCriticalFloatingRateLinkedParams(command, product) && this.loanRepositoryWrapper.doNonClosedLoanAccountsExistForProduct(product.getId())) {
                 throw new LoanProductCannotBeModifiedDueToNonClosedLoansException(product.getId());
             }
-            FloatingRate floatingRate = null;
+            Long floatingRateId = null;
             if (command.parameterExists("floatingRatesId")) {
-                floatingRate = this.floatingRateRepository.findOneWithNotFoundDetection(command.longValueOfParameterNamed("floatingRatesId"));
+                floatingRateId = command.longValueOfParameterNamed("floatingRatesId");
+                this.floatingRatePort.getFloatingRate(floatingRateId); // not-found if missing
             }
-            final Map<String, Object> changes = loanProductUpdateUtil.update(product, command, this.aprCalculator, floatingRate);
+            final Map<String, Object> changes = loanProductUpdateUtil.update(product, command, this.aprCalculator, floatingRateId);
             if (changes.containsKey("fundId")) {
                 final Long fundId = (Long) changes.get("fundId");
                 final Fund fund = findFundByIdIfProvided(fundId);
@@ -265,7 +266,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
 
     private boolean anyChangeInCriticalFloatingRateLinkedParams(JsonCommand command, LoanProduct product) {
         final boolean isChangeFromFloatingToFlatOrViceVersa = command.isChangeInBooleanParameterNamed("isLinkedToFloatingInterestRates", product.isLinkedToFloatingInterestRate());
-        final boolean isChangeInCriticalFloatingRateParams = product.getFloatingRates() != null && (command.isChangeInLongParameterNamed("floatingRatesId", product.getFloatingRates().getFloatingRate().getId()) || command.isChangeInBigDecimalParameterNamed("interestRateDifferential", product.getFloatingRates().getInterestRateDifferential()));
+        final boolean isChangeInCriticalFloatingRateParams = product.getFloatingRates() != null && (command.isChangeInLongParameterNamed("floatingRatesId", product.getFloatingRates().getFloatingRateId()) || command.isChangeInBigDecimalParameterNamed("interestRateDifferential", product.getFloatingRates().getInterestRateDifferential()));
         return isChangeFromFloatingToFlatOrViceVersa || isChangeInCriticalFloatingRateParams;
     }
 
@@ -355,7 +356,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final FloatingRateRepositoryWrapper floatingRateRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
+        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final FloatingRatePort floatingRatePort, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;
@@ -365,7 +366,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         this.rateRepository = rateRepository;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
-        this.floatingRateRepository = floatingRateRepository;
+        this.floatingRatePort = floatingRatePort;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.businessEventNotifierService = businessEventNotifierService;
         this.delinquencyBucketRepository = delinquencyBucketRepository;

@@ -18,18 +18,23 @@
  */
 package org.apache.fineract.portfolio.floatingrates.starter;
 
+import org.apache.fineract.portfolio.floatingrates.domain.FloatingRateRepository;
 import org.apache.fineract.portfolio.floatingrates.domain.FloatingRateRepositoryWrapper;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.floatingrates.serialization.FloatingRateDataValidator;
+import org.apache.fineract.portfolio.floatingrates.service.FloatingRatePortJpaAdapter;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRateWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRateWritePlatformServiceImpl;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
+@ComponentScan(basePackages = "org.apache.fineract.portfolio.floatingrates.impl.osgi")
 public class FloatingRatesConfiguration {
 
     @Bean
@@ -43,5 +48,11 @@ public class FloatingRatesConfiguration {
     public FloatingRateWritePlatformService floatingRateWritePlatformService(FloatingRateDataValidator fromApiJsonDeserializer,
             FloatingRateRepositoryWrapper floatingRateRepository) {
         return new FloatingRateWritePlatformServiceImpl(fromApiJsonDeserializer, floatingRateRepository);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(FloatingRatePort.class)
+    public FloatingRatePort floatingRatePort(FloatingRateRepository floatingRateRepository) {
+        return new FloatingRatePortJpaAdapter(floatingRateRepository);
     }
 }

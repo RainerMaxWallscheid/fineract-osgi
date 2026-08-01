@@ -29,7 +29,8 @@ dependencies {
             // Charge catalog runtime (explicit api + impl; façade deprecated).
             project(path: ':fineract-charge-api', configuration: 'runtimeElements'),
             project(path: ':fineract-charge-impl', configuration: 'runtimeElements'),
-            project(path: ':fineract-rates', configuration: 'runtimeElements'),
+            project(path: ':fineract-rates-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-rates-impl', configuration: 'runtimeElements'),
             project(path: ':fineract-tax', configuration: 'runtimeElements'),
             project(path: ':fineract-loan', configuration: 'runtimeElements'),
             project(path: ':fineract-savings', configuration: 'runtimeElements'),

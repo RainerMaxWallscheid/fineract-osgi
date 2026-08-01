@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Rates'
+description = 'Fineract Rates Implementation (OSGi impl bundle)'
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
 compileJava {
@@ -26,7 +26,7 @@ compileJava {
 }
 
 configurations {
-    providedRuntime // needed for Spring Boot executable WAR
+    providedRuntime
     providedCompile
     compile() {
         exclude module: 'hibernate-entitymanager'
@@ -48,34 +48,32 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// Configuration for the modernizer plugin
-// https://github.com/andygoossens/gradle-modernizer-plugin
-modernizer {
-    ignoreClassNamePatterns = [
-        '.*AbstractPersistableCustom',
-        '.*EntityTables',
-        '.*domain.*'
-    ]
+// OSGi implementation bundle (ADR-022). Export starter only.
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Rates Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.rates.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Floating rates implementation (JPA, services, REST, Spring wiring)',
+                'Import-Package': 'org.apache.fineract.portfolio.floatingrates.moduleapi,'
+                        + 'org.apache.fineract.portfolio.floatingrates.data,'
+                        + 'org.apache.fineract.portfolio.floatingrates.service,'
+                        + 'org.apache.fineract.portfolio.floatingrates.exception,'
+                        + '*',
+                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.starter',
+                'Automatic-Module-Name': 'org.apache.fineract.rates.impl'
+                )
+    }
 }
 
-// If we are running Gradle within Eclipse to enhance classes with OpenJPA,
-// set the classes directory to point to Eclipse's default build directory
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-rates/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-rates/impl/bin/main")
 }
 
 eclipse {
     project {
         buildCommand([ LaunchConfigHandle: "<project>/.externalToolBuilders/OpenJPA Enhance Builder.launch" ],  'org.eclipse.ui.externaltools.ExternalToolBuilder')
-    }
-}
-
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
     }
 }

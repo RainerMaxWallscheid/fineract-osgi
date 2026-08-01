@@ -69,7 +69,13 @@ include ':fineract-provider'
 include ':fineract-branch'
 include ':fineract-document'
 include ':fineract-investor'
-include ':fineract-rates'
+include ':fineract-rates-api'
+project(':fineract-rates-api').projectDir = file('fineract-rates/api')
+include ':fineract-rates-impl'
+project(':fineract-rates-impl').projectDir = file('fineract-rates/impl')
+include ':fineract-rates-test'
+project(':fineract-rates-test').projectDir = file('fineract-rates/test')
+// No :fineract-rates façade — depend on -api / -impl explicitly.
 include ':fineract-charge-api'
 project(':fineract-charge-api').projectDir = file('fineract-charge/api')
 include ':fineract-charge-impl'

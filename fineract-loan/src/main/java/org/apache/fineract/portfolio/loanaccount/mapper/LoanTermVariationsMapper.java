@@ -32,6 +32,7 @@ import org.apache.fineract.portfolio.common.domain.DayOfWeekType;
 import org.apache.fineract.portfolio.common.domain.NthDayType;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTermVariationsData;
@@ -50,6 +51,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanTermVariationsMapper {
+
+    private final FloatingRatePort floatingRatePort;
+
+    public LoanTermVariationsMapper(final FloatingRatePort floatingRatePort) {
+        this.floatingRatePort = floatingRatePort;
+    }
 
     public BigDecimal constructLoanTermVariations(final FloatingRateDTO floatingRateDTO, final BigDecimal annualNominalInterestRate,
             final List<LoanTermVariationsData> loanTermVariations, final Loan loan) {
@@ -131,7 +138,13 @@ public class LoanTermVariationsMapper {
         BigDecimal interestRate = annualNominalInterestRate;
         if (loan.getLoanProduct().isLinkedToFloatingInterestRate()) {
             floatingRateDTO.resetInterestRateDiff();
-            Collection<FloatingRatePeriodData> applicableRates = loan.getLoanProduct().fetchInterestRates(floatingRateDTO);
+            final Long floatingRateId = loan.getLoanProduct().getLinkedFloatingRateId();
+            final BigDecimal differential = loan.getLoanProduct().getFloatingRates().getInterestRateDifferential();
+            if (differential != null) {
+                floatingRateDTO.addInterestRateDiff(differential);
+            }
+            Collection<FloatingRatePeriodData> applicableRates = floatingRateId == null ? java.util.List.of()
+                    : this.floatingRatePort.fetchInterestRates(floatingRateId, floatingRateDTO);
             LocalDate interestRateStartDate = DateUtils.getBusinessLocalDate();
             for (FloatingRatePeriodData periodData : applicableRates) {
                 LoanTermVariationsData loanTermVariation = new LoanTermVariationsData(

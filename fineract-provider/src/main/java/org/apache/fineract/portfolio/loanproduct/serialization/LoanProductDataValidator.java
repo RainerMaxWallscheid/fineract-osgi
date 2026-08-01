@@ -1006,7 +1006,7 @@ public final class LoanProductDataValidator {
             if ((interestType == null || !interestType.equals(InterestMethod.DECLINING_BALANCE.getValue())) || (isInterestRecalculationEnabled == null || !isInterestRecalculationEnabled)) {
                 baseDataValidator.reset().parameter(IS_LINKED_TO_FLOATING_INTEREST_RATES).failWithCode("supported.only.for.declining.balance.interest.recalculation.enabled", "Floating interest rates are supported only for declining balance and interest recalculation enabled loan products");
             }
-            Long floatingRatesId = loanProduct.getFloatingRates() == null ? null : loanProduct.getFloatingRates().getFloatingRate().getId();
+            Long floatingRatesId = loanProduct.getFloatingRates() == null ? null : loanProduct.getFloatingRates().getFloatingRateId();
             if (this.fromApiJsonHelper.parameterExists(FLOATING_RATES_ID, element)) {
                 floatingRatesId = this.fromApiJsonHelper.extractLongNamed(FLOATING_RATES_ID, element);
             }

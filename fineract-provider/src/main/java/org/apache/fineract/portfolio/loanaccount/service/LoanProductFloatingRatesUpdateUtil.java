@@ -22,20 +22,20 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.portfolio.floatingrates.domain.FloatingRate;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductFloatingRates;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductFloatingRatesUpdateUtil {
-    public Map<? extends String, ?> update(LoanProductFloatingRates loanProductFloatingRates, JsonCommand command, FloatingRate floatingRate) {
+    public Map<? extends String, ?> update(LoanProductFloatingRates loanProductFloatingRates, JsonCommand command, Long floatingRateId) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(20);
-        if (floatingRate != null) {
+        if (floatingRateId != null) {
             final String floatingRatesId = "floatingRatesId";
-            if (loanProductFloatingRates.getFloatingRate() == null || command.isChangeInLongParameterNamed(floatingRatesId, loanProductFloatingRates.getFloatingRate().getId())) {
+            if (loanProductFloatingRates.getFloatingRateId() == null
+                    || command.isChangeInLongParameterNamed(floatingRatesId, loanProductFloatingRates.getFloatingRateId())) {
                 final long newValue = command.longValueOfParameterNamed(floatingRatesId);
                 actualChanges.put(floatingRatesId, newValue);
-                loanProductFloatingRates.setFloatingRate(floatingRate);
+                loanProductFloatingRates.setFloatingRateId(floatingRateId);
             }
         }
         final String interestRateDifferential = "interestRateDifferential";
@@ -69,9 +69,5 @@ public class LoanProductFloatingRatesUpdateUtil {
             loanProductFloatingRates.setFloatingInterestRateCalculationAllowed(newValue);
         }
         return actualChanges;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public LoanProductFloatingRatesUpdateUtil() {
     }
 }

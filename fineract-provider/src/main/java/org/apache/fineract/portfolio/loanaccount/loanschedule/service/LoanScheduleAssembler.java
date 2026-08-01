@@ -82,6 +82,7 @@ import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
@@ -154,6 +155,7 @@ public class LoanScheduleAssembler {
     private final GroupRepositoryWrapper groupRepository;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final FloatingRatesReadPlatformService floatingRatesReadPlatformService;
+    private final FloatingRatePort floatingRatePort;
     private final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator;
     private final CalendarInstanceRepository calendarInstanceRepository;
     private final LoanUtilService loanUtilService;
@@ -379,7 +381,12 @@ public class LoanScheduleAssembler {
             }
             // Do not do anything
             FloatingRateDTO floatingRateDTO = new FloatingRateDTO(isFloatingInterestRate, expectedDisbursementDate, interestRateDiff, baseLendingRatePeriods);
-            Collection<FloatingRatePeriodData> applicableRates = loanProduct.fetchInterestRates(floatingRateDTO);
+            if (loanProduct.getFloatingRates() != null && loanProduct.getFloatingRates().getInterestRateDifferential() != null) {
+                floatingRateDTO.addInterestRateDiff(loanProduct.getFloatingRates().getInterestRateDifferential());
+            }
+            final Long floatingRateId = loanProduct.getLinkedFloatingRateId();
+            Collection<FloatingRatePeriodData> applicableRates = floatingRateId == null ? java.util.List.of()
+                    : this.floatingRatePort.fetchInterestRates(floatingRateId, floatingRateDTO);
             LocalDate interestRateStartDate = DateUtils.getBusinessLocalDate();
             final LocalDate dateValue = null;
             final boolean isSpecificToInstallment = false;
@@ -1273,7 +1280,7 @@ public class LoanScheduleAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleAssembler(final FromJsonHelper fromApiJsonHelper, final LoanProductRepository loanProductRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final LoanChargeAssembler loanChargeAssembler, final LoanScheduleGeneratorFactory loanScheduleFactory, final AprCalculator aprCalculator, final CalendarRepository calendarRepository, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanProductRelatedDetailUpdateUtil relatedDetailUpdateUtil) {
+        public LoanScheduleAssembler(final FromJsonHelper fromApiJsonHelper, final LoanProductRepository loanProductRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final LoanChargeAssembler loanChargeAssembler, final LoanScheduleGeneratorFactory loanScheduleFactory, final AprCalculator aprCalculator, final CalendarRepository calendarRepository, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final FloatingRatePort floatingRatePort, final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanProductRelatedDetailUpdateUtil relatedDetailUpdateUtil) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanProductRepository = loanProductRepository;
         this.applicationCurrencyRepository = applicationCurrencyRepository;
@@ -1287,6 +1294,7 @@ public class LoanScheduleAssembler {
         this.groupRepository = groupRepository;
         this.workingDaysRepository = workingDaysRepository;
         this.floatingRatesReadPlatformService = floatingRatesReadPlatformService;
+        this.floatingRatePort = floatingRatePort;
         this.variableLoanScheduleFromApiJsonValidator = variableLoanScheduleFromApiJsonValidator;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.loanUtilService = loanUtilService;

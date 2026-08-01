@@ -18,12 +18,8 @@
  */
 
 dependencies {
-    // Never use "compile" scope, but make all dependencies either 'implementation', 'runtimeOnly' or 'testCompile'.
-    // Note that we never use 'api', because Fineract at least currently is a simple monolithic application ("WAR"), not a library.
-    // We also (normally should have) no need to ever use 'compileOnly'.
+    api project(path: ':fineract-rates-api')
 
-    // implementation dependencies are directly used (compiled against) in src/main (and src/test)
-    //
     implementation(project(path: ':fineract-core'))
 
     implementation(
@@ -57,16 +53,4 @@ dependencies {
     implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
-    // testCompile dependencies are ONLY used in src/test, not src/main.
-    // Do NOT repeat dependencies which are ALREADY in implementation or runtimeOnly!
-    //
-    testImplementation( 'io.github.classgraph:classgraph' )
-    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'com.jayway.jsonpath', module: 'json-path'
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-        exclude group: 'jakarta.activation'
-        exclude group: 'javax.activation'
-        exclude group: 'org.skyscreamer'
-    }
-    testImplementation ('org.mockito:mockito-inline')
 }

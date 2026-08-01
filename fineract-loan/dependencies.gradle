@@ -29,7 +29,8 @@ dependencies {
     implementation(project(path: ':fineract-accounting'))
     // Charge OSGi Step 8 residual: loan domain uses charge-api only (create via ChargeDefinitionData).
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-rates'))
+    // Rates Step 8: loan uses rates-api only (floatingRateId + FloatingRatePort); no FloatingRate entity.
+    implementation(project(path: ':fineract-rates-api'))
     implementation(project(path: ':fineract-tax'))
 
     implementation(

@@ -30,7 +30,6 @@ import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.portfolio.floatingrates.domain.FloatingRate;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -52,7 +51,7 @@ public class LoanProductUpdateUtil {
     private final LoanProductGuaranteeDetailsAssembler guaranteeDetailsAssembler;
     private final LoanProductGuaranteeDetailsUpdateUtil guaranteeDetailsUpdateUtil;
 
-    public Map<String, Object> update(final LoanProduct loanProduct, final JsonCommand command, final AprCalculator aprCalculator, FloatingRate floatingRate) {
+    public Map<String, Object> update(final LoanProduct loanProduct, final JsonCommand command, final AprCalculator aprCalculator, Long floatingRateId) {
         final Map<String, Object> actualChanges = detailUpdateUtil.updateLoanRepaymentSchedule(loanProduct.getLoanProductRelatedDetail(), command, aprCalculator);
         actualChanges.putAll(minMaxConstraintsUpdateUtil.update(loanProduct.loanProductMinMaxConstraints(), command));
         final String isLinkedToFloatingInterestRates = "isLinkedToFloatingInterestRates";
@@ -67,7 +66,7 @@ public class LoanProductUpdateUtil {
             loanProduct.getLoanProductRelatedDetail().setEnableAccrualActivityPosting(newValue);
         }
         if (loanProduct.isLinkedToFloatingInterestRate()) {
-            actualChanges.putAll(floatingRatesUpdateUtil.update(loanProduct.loanProductFloatingRates(), command, floatingRate));
+            actualChanges.putAll(floatingRatesUpdateUtil.update(loanProduct.loanProductFloatingRates(), command, floatingRateId));
             loanProduct.getLoanProductRelatedDetail().updateForFloatingInterestRates();
             loanProduct.getLoanProductMinMaxConstraints().updateForFloatingInterestRates();
         } else {

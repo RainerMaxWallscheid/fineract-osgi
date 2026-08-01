@@ -27,7 +27,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
-import org.apache.fineract.portfolio.floatingrates.domain.FloatingRateRepositoryWrapper;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleTransactionProcessorFactory;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -77,7 +77,7 @@ public class LoanProductConfiguration {
             LoanProductDataValidator fromApiJsonDeserializer, LoanProductRepository loanProductRepository, AprCalculator aprCalculator,
             FundRepository fundRepository, ChargeDefinitionPort chargeDefinitionPort, RateRepositoryWrapper rateRepository,
             ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
-            FineractEntityAccessUtil fineractEntityAccessUtil, FloatingRateRepositoryWrapper floatingRateRepository,
+            FineractEntityAccessUtil fineractEntityAccessUtil, FloatingRatePort floatingRatePort,
             LoanRepositoryWrapper loanRepositoryWrapper, BusinessEventNotifierService businessEventNotifierService,
             DelinquencyBucketRepository delinquencyBucketRepository,
             LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
@@ -85,7 +85,7 @@ public class LoanProductConfiguration {
             LoanProductAssembler loanProductAssembler, LoanProductUpdateUtil loanProductUpdateUtil) {
         return new LoanProductWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, loanProductRepository, aprCalculator,
                 fundRepository, chargeDefinitionPort, rateRepository, accountMappingWritePlatformService, fineractEntityAccessUtil,
-                floatingRateRepository, loanRepositoryWrapper, businessEventNotifierService, delinquencyBucketRepository,
+                floatingRatePort, loanRepositoryWrapper, businessEventNotifierService, delinquencyBucketRepository,
                 loanRepaymentScheduleTransactionProcessorFactory, advancedPaymentJsonParser, creditAllocationsJsonParser,
                 loanProductAssembler, loanProductUpdateUtil);
     }

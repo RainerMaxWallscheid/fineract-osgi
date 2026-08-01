@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.floatingrates.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 public class FloatingRateNotFoundException extends AbstractPlatformResourceNotFoundException {
 
@@ -31,11 +30,11 @@ public class FloatingRateNotFoundException extends AbstractPlatformResourceNotFo
         super(globalisationMessageCode, "Floating Rate does not exist");
     }
 
-    public FloatingRateNotFoundException(String globalisationMessageCode, EmptyResultDataAccessException e) {
-        super(globalisationMessageCode, "Floating Rate does not exist", e);
+    public FloatingRateNotFoundException(String globalisationMessageCode, Throwable cause) {
+        super(globalisationMessageCode, "Floating Rate does not exist", cause);
     }
 
-    public FloatingRateNotFoundException(Long id, EmptyResultDataAccessException e) {
-        super("error.msg.floatingrate.id.invalid", "Floating Rate with identifier " + id + " does not exist", id, e);
+    public FloatingRateNotFoundException(Long id, Throwable cause) {
+        super("error.msg.floatingrate.id.invalid", "Floating Rate with identifier " + id + " does not exist", id, cause);
     }
 }

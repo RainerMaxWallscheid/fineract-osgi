@@ -32,7 +32,15 @@ Build jars: `./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :finer
 White-box tests: `./gradlew :fineract-charge-test:test`  
 Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).
 
-**Next Wave 1 modules:** rates, tax, document/branch — see [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot).
+### Wave 1: fineract-rates bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-rates-api` | `org.apache.fineract.rates.api` | `FloatingRatePort`, DTOs, service interfaces |
+| `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` |
+| `fineract-rates-test` | `org.apache.fineract.rates.test` | Fragment-Host → rates.impl |
+
+Loan uses **rates-api only** (`floatingRateId` + port). **Next:** **tax** api/impl/test — see [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot).
 
 ## Layout
 
