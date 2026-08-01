@@ -83,7 +83,13 @@ project(':fineract-charge-impl').projectDir = file('fineract-charge/impl')
 include ':fineract-charge-test'
 project(':fineract-charge-test').projectDir = file('fineract-charge/test')
 // No :fineract-charge façade — depend on -api / -impl explicitly.
-include ':fineract-tax'
+include ':fineract-tax-api'
+project(':fineract-tax-api').projectDir = file('fineract-tax/api')
+include ':fineract-tax-impl'
+project(':fineract-tax-impl').projectDir = file('fineract-tax/impl')
+include ':fineract-tax-test'
+project(':fineract-tax-test').projectDir = file('fineract-tax/test')
+// No :fineract-tax façade — depend on -api / -impl explicitly.
 include ':fineract-loan-origination'
 include ':fineract-loan'
 include ':fineract-savings'

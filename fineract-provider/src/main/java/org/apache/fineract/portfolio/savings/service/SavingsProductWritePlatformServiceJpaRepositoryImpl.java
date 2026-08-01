@@ -46,7 +46,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,13 +130,13 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
                 }
             }
             if (changes.containsKey(taxGroupIdParamName)) {
-                final TaxGroup taxGroup = this.savingsProductAssembler.assembleTaxGroup(command);
-                product.setTaxGroup(taxGroup);
-                if (product.withHoldTax() && product.getTaxGroup() == null) {
+                final Long taxGroupId = this.savingsProductAssembler.assembleTaxGroupId(command);
+                product.setTaxGroupId(taxGroupId);
+                if (product.withHoldTax() && product.getTaxGroupId() == null) {
                     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(SAVINGS_PRODUCT_RESOURCE_NAME);
-                    final Long taxGroupId = null;
-                    baseDataValidator.reset().parameter(taxGroupIdParamName).value(taxGroupId).notBlank();
+                    final Long missingTaxGroupId = null;
+                    baseDataValidator.reset().parameter(taxGroupIdParamName).value(missingTaxGroupId).notBlank();
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
             }

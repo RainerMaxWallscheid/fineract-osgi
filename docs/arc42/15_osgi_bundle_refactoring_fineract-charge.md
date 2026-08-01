@@ -558,7 +558,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 | Service impls still in **provider** | Step 3 move is mandatory; scan provider for leftover charge components |
 | Enum duplication (core vs charge) | Single source of truth in api; delete duplicates |
 | `JsonCommand` on write API | Keep write application service in impl; expose only high-level ports to other BCs |
-| Tax dependency | impl may depend on tax-api later; until tax is split, depend on `fineract-tax` monolith |
+| Tax dependency | charge-impl depends on tax-api + tax-impl (TaxGroup entity residual until tax Step 8) |
 | LoanCharge* exceptions in charge module | Do not put on charge-api export; migrate to loan in a follow-up |
 | Nested `projectDir` breaks CI name lists | Keep Gradle names `fineract-charge-api` etc. stable |
 | Equinox not in CI | Manifest + unit tests first; optional Equinox smoke |

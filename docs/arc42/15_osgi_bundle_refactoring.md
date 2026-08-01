@@ -184,7 +184,7 @@ sequenceDiagram
 **Wave 1 status:**
 - **charge** — largely done (api/impl/test; façade removed; chargeId/port retargets). Plan: [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md).
 - **rates** — **complete** (api/impl/test + `FloatingRatePort`; loan **rates-api only** via `floatingRateId`). Plan: [15_osgi_bundle_refactoring_fineract-rates.md](15_osgi_bundle_refactoring_fineract-rates.md).
-- **tax** — planned stub: [15_osgi_bundle_refactoring_fineract-tax.md](15_osgi_bundle_refactoring_fineract-tax.md).
+- **tax** — **complete** (api/impl/test + ports; charge/loan/savings **tax-api only** via catalog ids). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](15_osgi_bundle_refactoring_fineract-tax.md).
 
 Further modules follow the same recipe, ordered by **port clarity**, **size**, **reverse dependency cost**, and **hexagonal value** (replaceable adapters as OSGi services). Metrics below are approximate main-source scale (order of magnitude); re-measure before a PR series.
 
@@ -208,7 +208,7 @@ Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries
 |------|--------|-------------|----------|------------------------|
 | **1** | **`fineract-charge`** | ~40 | **Largely done** — api/impl/test; chargeId/port retargets; façade **removed**; ArchUnit charge freeze green. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort`; composition roots use api+impl |
 | **2** | **`fineract-rates`** | ~20 | **Complete** — api/impl/test + `FloatingRatePort`; loan rates-api only. [rates plan](15_osgi_bundle_refactoring_fineract-rates.md) | `FloatingRatePort` + DTOs / service interfaces |
-| **3** | **`fineract-tax`** | ~30 | **Planned** — empty `moduleapi` package ready; start after rates mechanical green. [tax plan](15_osgi_bundle_refactoring_fineract-tax.md) | Tax component/group ports + DTOs |
+| **3** | **`fineract-tax`** | ~30 | **Complete** — api/impl/test + ports; charge/loan/savings tax-api only. [tax plan](15_osgi_bundle_refactoring_fineract-tax.md) | `TaxCatalogPort` + `ChargeTaxApplicationService` |
 
 - Prefer **charge first** for architectural impact (loan / savings / accounting / investor already depend on it).  
 - Prefer **rates first** for lowest mechanical risk (same steps as command, less consumer rewiring).
@@ -275,8 +275,7 @@ Shared kernel           → core, validation       don't force BC split
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | Wave 1 **tax** api/impl/test — [tax plan](15_osgi_bundle_refactoring_fineract-tax.md) |
-| **Then** | **`fineract-tax`** api/impl/test + consumer retarget — [tax plan](15_osgi_bundle_refactoring_fineract-tax.md) |
+| **Next PR series** | Wave 1 complete for charge/rates/tax; pick next module by [selection criteria](#selection-criteria) |
 | **Then** | `fineract-document` (replaceable adapters as OSGi services) |
 | **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |
 | **Do not start** | loan / provider / full-core split |

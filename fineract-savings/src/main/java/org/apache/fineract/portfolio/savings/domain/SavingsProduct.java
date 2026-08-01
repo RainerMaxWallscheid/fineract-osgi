@@ -91,7 +91,6 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYea
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
 
 @Entity
 @Table(name = "m_savings_product", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "sp_unq_name"),
@@ -196,9 +195,9 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
     @Column(name = "withhold_tax", nullable = false)
     private boolean withHoldTax;
 
-    @ManyToOne
-    @JoinColumn(name = "tax_group_id")
-    private TaxGroup taxGroup;
+    /** Catalog tax group id (column tax_group_id). */
+    @Column(name = "tax_group_id")
+    private Long taxGroupId;
 
     @Column(name = "is_dormancy_tracking_active")
     private Boolean isDormancyTrackingActive;
@@ -222,7 +221,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final boolean lienAllowed, final BigDecimal maxAllowedLienLimit,
             final BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
-            final BigDecimal minOverdraftForInterestCalculation, boolean withHoldTax, TaxGroup taxGroup,
+            final BigDecimal minOverdraftForInterestCalculation, boolean withHoldTax, Long taxGroupId,
             final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat) {
 
         return new SavingsProduct(name, shortName, description, currency, interestRate, interestCompoundingPeriodType,
@@ -230,7 +229,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
                 lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, chargeIds,
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, lienAllowed, maxAllowedLienLimit,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                taxGroup, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
+                taxGroupId, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
     }
 
     protected SavingsProduct() {
@@ -245,11 +244,11 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final Integer lockinPeriodFrequency, final SavingsPeriodFrequencyType lockinPeriodFrequencyType,
             final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Long> chargeIds,
             final boolean allowOverdraft, final BigDecimal overdraftLimit, BigDecimal minBalanceForInterestCalculation, boolean withHoldTax,
-            TaxGroup taxGroup) {
+            Long taxGroupId) {
         this(name, shortName, description, currency, interestRate, interestCompoundingPeriodType, interestPostingPeriodType,
                 interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency,
                 lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, chargeIds, allowOverdraft, overdraftLimit,
-                false, null, false, null, minBalanceForInterestCalculation, null, null, withHoldTax, taxGroup, null, null, null, null);
+                false, null, false, null, minBalanceForInterestCalculation, null, null, withHoldTax, taxGroupId, null, null, null, null);
     }
 
     protected SavingsProduct(final String name, final String shortName, final String description, final MonetaryCurrency currency,
@@ -261,7 +260,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final boolean lienAllowed, final BigDecimal maxAllowedLienLimit,
             BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
-            final BigDecimal minOverdraftForInterestCalculation, final boolean withHoldTax, final TaxGroup taxGroup,
+            final BigDecimal minOverdraftForInterestCalculation, final boolean withHoldTax, final Long taxGroupId,
             final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat) {
 
         this.name = name;
@@ -308,7 +307,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         this.maxAllowedLienLimit = maxAllowedLienLimit;
         this.minBalanceForInterestCalculation = minBalanceForInterestCalculation;
         this.withHoldTax = withHoldTax;
-        this.taxGroup = taxGroup;
+        this.taxGroupId = taxGroupId;
 
         if (isDormancyTrackingActive == null) {
             this.isDormancyTrackingActive = Boolean.FALSE;
@@ -581,12 +580,12 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         }
 
         if (this.withHoldTax) {
-            if (this.taxGroup == null || command.isChangeInLongParameterNamed(taxGroupIdParamName, this.taxGroup.getId())) {
+            if (this.taxGroupId == null || command.isChangeInLongParameterNamed(taxGroupIdParamName, this.taxGroupId)) {
                 final Long newValue = command.longValueOfParameterNamed(taxGroupIdParamName);
                 actualChanges.put(taxGroupIdParamName, newValue);
             }
         } else {
-            this.taxGroup = null;
+            this.taxGroupId = null;
         }
 
         if (command.isChangeInBooleanParameterNamed(isDormancyTrackingActiveParamName, this.isDormancyTrackingActive)) {
@@ -754,12 +753,12 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         return this.minOverdraftForInterestCalculation;
     }
 
-    public TaxGroup getTaxGroup() {
-        return this.taxGroup;
+    public Long getTaxGroupId() {
+        return this.taxGroupId;
     }
 
-    public void setTaxGroup(TaxGroup taxGroup) {
-        this.taxGroup = taxGroup;
+    public void setTaxGroupId(final Long taxGroupId) {
+        this.taxGroupId = taxGroupId;
     }
 
     public boolean withHoldTax() {

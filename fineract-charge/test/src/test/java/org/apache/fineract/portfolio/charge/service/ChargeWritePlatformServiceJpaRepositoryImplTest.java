@@ -38,7 +38,7 @@ import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeDeletedExcep
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.serialization.ChargeDefinitionCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
-import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,7 +54,7 @@ class ChargeWritePlatformServiceJpaRepositoryImplTest {
     private JdbcTemplate jdbcTemplate;
     private ChargeOfficeAccessPort chargeOfficeAccessPort;
     private GLAccountRepositoryWrapper glAccountRepository;
-    private TaxGroupRepositoryWrapper taxGroupRepository;
+    private TaxCatalogPort taxCatalogPort;
     private PaymentTypeRepository paymentTypeRepository;
     private ChargeWritePlatformServiceJpaRepositoryImpl service;
 
@@ -66,10 +66,10 @@ class ChargeWritePlatformServiceJpaRepositoryImplTest {
         jdbcTemplate = mock(JdbcTemplate.class);
         chargeOfficeAccessPort = mock(ChargeOfficeAccessPort.class);
         glAccountRepository = mock(GLAccountRepositoryWrapper.class);
-        taxGroupRepository = mock(TaxGroupRepositoryWrapper.class);
+        taxCatalogPort = mock(TaxCatalogPort.class);
         paymentTypeRepository = mock(PaymentTypeRepository.class);
         service = new ChargeWritePlatformServiceJpaRepositoryImpl(context, deserializer, chargeRepository, jdbcTemplate,
-                chargeOfficeAccessPort, glAccountRepository, taxGroupRepository, paymentTypeRepository);
+                chargeOfficeAccessPort, glAccountRepository, taxCatalogPort, paymentTypeRepository);
     }
 
     @Test

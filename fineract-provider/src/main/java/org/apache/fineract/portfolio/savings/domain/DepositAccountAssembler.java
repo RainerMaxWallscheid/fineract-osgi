@@ -96,8 +96,11 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
+import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.savings.exception.FixedDepositProductNotFoundException;
+import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.savings.exception.RecurringDepositProductNotFoundException;
+import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +125,7 @@ public class DepositAccountAssembler {
 
     private final ExternalIdFactory externalIdFactory;
     private final ConfigurationDomainService configurationDomainService;
+    private final ChargeTaxApplicationService chargeTaxApplicationService;
 
     @Autowired
     public DepositAccountAssembler(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
@@ -133,7 +137,7 @@ public class DepositAccountAssembler {
             final RecurringDepositProductRepository recurringDepositProductRepository,
             final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final PlatformSecurityContext context,
             final PaymentDetailAssembler paymentDetailAssembler, ExternalIdFactory externalIdFactory,
-            final ConfigurationDomainService configurationDomainService) {
+            final ConfigurationDomainService configurationDomainService, final ChargeTaxApplicationService chargeTaxApplicationService) {
 
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.clientRepository = clientRepository;
@@ -150,6 +154,7 @@ public class DepositAccountAssembler {
         this.paymentDetailAssembler = paymentDetailAssembler;
         this.externalIdFactory = externalIdFactory;
         this.configurationDomainService = configurationDomainService;
+        this.chargeTaxApplicationService = chargeTaxApplicationService;
     }
 
     /**
@@ -314,7 +319,7 @@ public class DepositAccountAssembler {
         boolean withHoldTax = product.withHoldTax();
         if (command.parameterExists(withHoldTaxParamName)) {
             withHoldTax = command.booleanPrimitiveValueOfParameterNamed(withHoldTaxParamName);
-            if (withHoldTax && product.getTaxGroup() == null) {
+            if (withHoldTax && product.getTaxGroupId() == null) {
                 throw new UnsupportedParameterException(Arrays.asList(withHoldTaxParamName));
             }
         }
@@ -361,6 +366,7 @@ public class DepositAccountAssembler {
 
         if (account != null) {
             account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+            account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
             account.validateNewApplicationState(depositAccountType.resourceName());
         }
 
@@ -370,11 +376,13 @@ public class DepositAccountAssembler {
     public SavingsAccount assembleFrom(final Long savingsId, DepositAccountType depositAccountType) {
         final SavingsAccount account = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsId, depositAccountType);
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         return account;
     }
 
     public void assignSavingAccountHelpers(final SavingsAccount savingsAccount) {
         savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 
     public DepositAccountTermAndPreClosure assembleAccountTermAndPreClosure(final JsonCommand command,

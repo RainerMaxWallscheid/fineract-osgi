@@ -67,10 +67,11 @@ public class AccountingJournalEntryConfiguration {
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, GLClosureRepository closureRepository,
             GLAccountRepository glAccountRepository, OfficeRepository officeRepository,
             AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
-            BusinessEventNotifierService businessEventNotifierService) {
+            BusinessEventNotifierService businessEventNotifierService,
+            org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         return new AccountingProcessorHelper(glJournalEntryRepository, accountMappingRepository, financialActivityAccountRepository,
                 closureRepository, glAccountRepository, officeRepository, accountTransfersReadPlatformService, chargeDefinitionPort,
-                businessEventNotifierService);
+                businessEventNotifierService, taxCatalogPort);
     }
 
     @Bean
@@ -98,12 +99,14 @@ public class AccountingJournalEntryConfiguration {
             ConfigurationReadPlatformService configurationReadPlatformService, AccountingService accountingService,
             ExternalAssetOwnerRepository externalAssetOwnerRepository,
             LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository,
-            LoanTransactionRepository loanTransactionRepository) {
+            LoanTransactionRepository loanTransactionRepository,
+            org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         return new JournalEntryWritePlatformServiceJpaRepositoryImpl(glClosureRepository, glAccountRepository, glJournalEntryRepository,
                 officeRepositoryWrapper, accountingProcessorForLoanFactory, accountingProcessorForSavingsFactory,
                 accountingProcessorForSharesFactory, helper, fromApiJsonDeserializer, accountingRuleRepository,
                 glAccountReadPlatformService, organisationCurrencyRepository, context, paymentDetailWritePlatformService,
                 financialActivityAccountRepositoryWrapper, accountingProcessorForClientTransactions, configurationReadPlatformService,
-                accountingService, externalAssetOwnerRepository, loanAmortizationAllocationMappingRepository, loanTransactionRepository);
+                accountingService, externalAssetOwnerRepository, loanAmortizationAllocationMappingRepository, loanTransactionRepository,
+                taxCatalogPort);
     }
 }

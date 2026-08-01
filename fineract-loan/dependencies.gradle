@@ -31,7 +31,8 @@ dependencies {
     implementation(project(path: ':fineract-charge-api'))
     // Rates Step 8: loan uses rates-api only (floatingRateId + FloatingRatePort); no FloatingRate entity.
     implementation(project(path: ':fineract-rates-api'))
-    implementation(project(path: ':fineract-tax'))
+    // Tax Step 8: loan uses tax-api only (taxGroupId / taxComponentId + ChargeTaxApplicationService).
+    implementation(project(path: ':fineract-tax-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

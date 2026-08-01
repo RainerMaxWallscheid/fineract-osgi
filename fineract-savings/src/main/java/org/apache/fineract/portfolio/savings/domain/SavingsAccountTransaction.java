@@ -53,7 +53,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumD
 import org.apache.fineract.portfolio.savings.domain.interest.EndOfDayBalance;
 import org.apache.fineract.portfolio.savings.domain.interest.SavingsAccountTransactionDetailsForPostingPeriod;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
-import org.apache.fineract.portfolio.tax.domain.TaxComponent;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentShareData;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -304,7 +304,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction withHoldTax(final SavingsAccount savingsAccount, final Office office, final LocalDate date,
-            final Money amount, final Map<TaxComponent, BigDecimal> taxDetails) {
+            final Money amount, final java.util.Collection<TaxComponentShareData> taxDetails) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
         final Boolean lienTransaction = false;
@@ -357,12 +357,12 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         return sat;
     }
 
-    public static void updateTaxDetails(final Map<TaxComponent, BigDecimal> taxDetails,
+    public static void updateTaxDetails(final java.util.Collection<TaxComponentShareData> taxDetails,
             final SavingsAccountTransaction accountTransaction) {
         if (taxDetails != null) {
-            for (Map.Entry<TaxComponent, BigDecimal> mapEntry : taxDetails.entrySet()) {
-                accountTransaction.getTaxDetails()
-                        .add(new SavingsAccountTransactionTaxDetails(accountTransaction, mapEntry.getKey(), mapEntry.getValue()));
+            for (final TaxComponentShareData share : taxDetails) {
+                accountTransaction.getTaxDetails().add(new SavingsAccountTransactionTaxDetails(accountTransaction,
+                        share.getTaxComponentId(), share.getAmount(), share.getCreditAccountId()));
             }
         }
     }
@@ -655,8 +655,10 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
             for (final SavingsAccountTransactionTaxDetails taxDetails : this.taxDetails) {
                 final Map<String, Object> taxDetailsData = new HashMap<>();
                 taxDetailsData.put("amount", taxDetails.getAmount());
-                if (taxDetails.getTaxComponent().getCreditAccount() != null) {
-                    taxDetailsData.put("creditAccountId", taxDetails.getTaxComponent().getCreditAccount().getId());
+                taxDetailsData.put("taxComponentId", taxDetails.getTaxComponentId());
+                // Prefer share snapshot when present; otherwise accounting resolves via TaxCatalogPort.
+                if (taxDetails.getCreditAccountId() != null) {
+                    taxDetailsData.put("creditAccountId", taxDetails.getCreditAccountId());
                 }
                 taxData.add(taxDetailsData);
             }

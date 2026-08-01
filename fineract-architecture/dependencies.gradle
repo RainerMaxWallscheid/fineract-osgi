@@ -31,7 +31,8 @@ dependencies {
     // Charge OSGi Step 7: analyze api + impl (façade no longer required for ArchUnit classpath).
     testImplementation project(path: ':fineract-charge-api')
     testImplementation project(path: ':fineract-charge-impl')
-    testImplementation project(path: ':fineract-tax')
+    testImplementation project(path: ':fineract-tax-api')
+    testImplementation project(path: ':fineract-tax-impl')
     testImplementation project(path: ':fineract-rates-api')
     testImplementation project(path: ':fineract-rates-impl')
     testImplementation project(path: ':fineract-cob')

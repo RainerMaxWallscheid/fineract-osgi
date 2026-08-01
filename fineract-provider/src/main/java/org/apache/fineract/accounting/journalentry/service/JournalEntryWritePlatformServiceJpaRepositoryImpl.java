@@ -137,6 +137,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     private final ExternalAssetOwnerRepository externalAssetOwnerRepository;
     private final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository;
     private final LoanTransactionRepository loanTransactionRepository;
+    private final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort;
 
     @Transactional
     @Override
@@ -781,9 +782,10 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
                 if (chargeAmount != null && chargeAmount.compareTo(BigDecimal.ZERO) > 0 && !lc.getTaxDetails().isEmpty()) {
                     final List<ChargeTaxDetailDTO> taxDetails = new ArrayList<>();
                     for (LoanChargeTaxDetails taxDetail : lc.getTaxDetails()) {
-                        if (taxDetail.getTaxComponent().getCreditAccount() != null) {
+                        final Long creditAccountId = resolveTaxCreditAccountId(taxDetail.getTaxComponentId());
+                        if (creditAccountId != null) {
                             final BigDecimal proRatedTax = taxDetail.getAmount().multiply(paidAmount, mc).divide(chargeAmount, mc);
-                            taxDetails.add(new ChargeTaxDetailDTO(taxDetail.getTaxComponent().getCreditAccount().getId(), proRatedTax));
+                            taxDetails.add(new ChargeTaxDetailDTO(creditAccountId, proRatedTax));
                         }
                     }
                     loanChargePaidData.setTaxDetails(taxDetails);
@@ -842,7 +844,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     }
 
     @java.lang.SuppressWarnings("all")
-        public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory, final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory, final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper, final JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, final AccountingRuleRepository accountingRuleRepository, final GLAccountReadPlatformService glAccountReadPlatformService, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final PlatformSecurityContext context, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper, final CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions, final ConfigurationReadPlatformService configurationReadPlatformService, final AccountingService accountingService, final ExternalAssetOwnerRepository externalAssetOwnerRepository, final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository, final LoanTransactionRepository loanTransactionRepository) {
+        public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory, final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory, final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper, final JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, final AccountingRuleRepository accountingRuleRepository, final GLAccountReadPlatformService glAccountReadPlatformService, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final PlatformSecurityContext context, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper, final CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions, final ConfigurationReadPlatformService configurationReadPlatformService, final AccountingService accountingService, final ExternalAssetOwnerRepository externalAssetOwnerRepository, final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository, final LoanTransactionRepository loanTransactionRepository, final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         this.glClosureRepository = glClosureRepository;
         this.glAccountRepository = glAccountRepository;
         this.glJournalEntryRepository = glJournalEntryRepository;
@@ -864,5 +866,14 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         this.externalAssetOwnerRepository = externalAssetOwnerRepository;
         this.loanAmortizationAllocationMappingRepository = loanAmortizationAllocationMappingRepository;
         this.loanTransactionRepository = loanTransactionRepository;
+        this.taxCatalogPort = taxCatalogPort;
+    }
+
+    private Long resolveTaxCreditAccountId(final Long taxComponentId) {
+        if (taxComponentId == null || this.taxCatalogPort == null) {
+            return null;
+        }
+        return this.taxCatalogPort.findTaxComponent(taxComponentId)
+                .map(org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData::getCreditAccountId).orElse(null);
     }
 }

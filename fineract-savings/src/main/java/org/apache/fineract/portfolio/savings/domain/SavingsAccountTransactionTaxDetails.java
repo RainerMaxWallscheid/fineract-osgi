@@ -23,10 +23,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 
 @Entity
 @Table(name = "m_savings_account_transaction_tax_details")
@@ -36,24 +36,38 @@ public class SavingsAccountTransactionTaxDetails extends AbstractPersistableCust
     @JoinColumn(name = "savings_transaction_id", nullable = false)
     private SavingsAccountTransaction savingsAccountTransaction;
 
-    @ManyToOne
-    @JoinColumn(name = "tax_component_id", nullable = false)
-    private TaxComponent taxComponent;
+    /** Catalog tax component id (column tax_component_id). */
+    @Column(name = "tax_component_id", nullable = false)
+    private Long taxComponentId;
 
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
+    /** Snapshot for accounting when shares were just computed (not persisted). */
+    @Transient
+    private Long creditAccountId;
+
     protected SavingsAccountTransactionTaxDetails() {}
 
-    public SavingsAccountTransactionTaxDetails(final SavingsAccountTransaction savingsAccountTransaction, final TaxComponent taxComponent,
+    public SavingsAccountTransactionTaxDetails(final SavingsAccountTransaction savingsAccountTransaction, final Long taxComponentId,
             final BigDecimal amount) {
-        this.savingsAccountTransaction = savingsAccountTransaction;
-        this.taxComponent = taxComponent;
-        this.amount = amount;
+        this(savingsAccountTransaction, taxComponentId, amount, null);
     }
 
-    public TaxComponent getTaxComponent() {
-        return this.taxComponent;
+    public SavingsAccountTransactionTaxDetails(final SavingsAccountTransaction savingsAccountTransaction, final Long taxComponentId,
+            final BigDecimal amount, final Long creditAccountId) {
+        this.savingsAccountTransaction = savingsAccountTransaction;
+        this.taxComponentId = taxComponentId;
+        this.amount = amount;
+        this.creditAccountId = creditAccountId;
+    }
+
+    public Long getTaxComponentId() {
+        return this.taxComponentId;
+    }
+
+    public Long getCreditAccountId() {
+        return this.creditAccountId;
     }
 
     public BigDecimal getAmount() {

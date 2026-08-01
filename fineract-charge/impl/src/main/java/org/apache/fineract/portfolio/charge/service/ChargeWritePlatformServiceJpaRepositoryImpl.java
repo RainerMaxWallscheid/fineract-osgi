@@ -40,8 +40,7 @@ import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
-import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -61,7 +60,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     private final JdbcTemplate jdbcTemplate;
     private final ChargeOfficeAccessPort chargeOfficeAccessPort;
     private final GLAccountRepositoryWrapper glAccountRepository;
-    private final TaxGroupRepositoryWrapper taxGroupRepository;
+    private final TaxCatalogPort taxCatalogPort;
     private final PaymentTypeRepository paymentTypeRepository;
 
     @Transactional
@@ -78,9 +77,8 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
                 glAccount = this.glAccountRepository.findOneWithNotFoundDetection(glAccountId);
             }
             final Long taxGroupId = command.longValueOfParameterNamed(ChargesApiConstants.taxGroupIdParamName);
-            TaxGroup taxGroup = null;
             if (taxGroupId != null) {
-                taxGroup = this.taxGroupRepository.findOneWithNotFoundDetection(taxGroupId);
+                this.taxCatalogPort.getTaxGroup(taxGroupId); // not-found if missing
             }
             final boolean enablePaymentType = command.booleanPrimitiveValueOfParameterNamed("enablePaymentType");
             PaymentType paymentType = null;
@@ -90,7 +88,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
                     paymentType = findPaymentTypeWithNotFoundDetection(paymentTypeId);
                 }
             }
-            final Charge charge = Charge.fromJson(command, glAccount, taxGroup, paymentType);
+            final Charge charge = Charge.fromJson(command, glAccount, taxGroupId, paymentType);
             this.chargeRepository.saveAndFlush(charge);
             // check if the office specific products are enabled. If yes, then
             // save this savings product against a specific office
@@ -156,11 +154,10 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
             }
             if (changes.containsKey(ChargesApiConstants.taxGroupIdParamName)) {
                 final Long newValue = command.longValueOfParameterNamed(ChargesApiConstants.taxGroupIdParamName);
-                TaxGroup taxGroup = null;
                 if (newValue != null) {
-                    taxGroup = this.taxGroupRepository.findOneWithNotFoundDetection(newValue);
+                    this.taxCatalogPort.getTaxGroup(newValue); // not-found if missing
                 }
-                chargeForUpdate.setTaxGroup(taxGroup);
+                chargeForUpdate.setTaxGroupId(newValue);
             }
             if (!changes.isEmpty()) {
                 this.chargeRepository.save(chargeForUpdate);
@@ -241,7 +238,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository,
             final JdbcTemplate jdbcTemplate, final ChargeOfficeAccessPort chargeOfficeAccessPort,
-            final GLAccountRepositoryWrapper glAccountRepository, final TaxGroupRepositoryWrapper taxGroupRepository,
+            final GLAccountRepositoryWrapper glAccountRepository, final TaxCatalogPort taxCatalogPort,
             final PaymentTypeRepository paymentTypeRepository) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
@@ -249,7 +246,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         this.jdbcTemplate = jdbcTemplate;
         this.chargeOfficeAccessPort = chargeOfficeAccessPort;
         this.glAccountRepository = glAccountRepository;
-        this.taxGroupRepository = taxGroupRepository;
+        this.taxCatalogPort = taxCatalogPort;
         this.paymentTypeRepository = paymentTypeRepository;
     }
 }

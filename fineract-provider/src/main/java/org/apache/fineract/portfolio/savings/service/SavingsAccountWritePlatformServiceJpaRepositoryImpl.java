@@ -1358,7 +1358,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(withHoldTaxParamName);
             actualChanges.put(withHoldTaxParamName, newValue);
             savingsForUpdate.setWithHoldTax(newValue);
-            if (savingsForUpdate.getTaxGroup() == null) {
+            if (savingsForUpdate.getTaxGroupId() == null) {
                 final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                 final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("account");
                 baseDataValidator.reset().parameter(withHoldTaxParamName).failWithCode("not.supported");

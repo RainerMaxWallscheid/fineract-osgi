@@ -55,10 +55,11 @@ public class InteroperationConfiguration {
             SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             SavingsAccountDomainService savingsAccountService, ConfigurationDomainService configurationDomainService,
             JdbcTemplate jdbcTemplate, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, DatabaseSpecificSQLGenerator sqlGenerator) {
+            DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, DatabaseSpecificSQLGenerator sqlGenerator,
+            org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
         return new InteropServiceImpl(securityContext, interopDataValidator, savingsAccountRepository, savingsAccountTransactionRepository,
                 applicationCurrencyRepository, noteRepository, paymentTypeRepository, identifierRepository, loanRepositoryWrapper,
                 savingsHelper, savingsAccountTransactionSummaryWrapper, savingsAccountService, configurationDomainService, jdbcTemplate,
-                commandsSourceWritePlatformService, toApiJsonSerializer, sqlGenerator);
+                commandsSourceWritePlatformService, toApiJsonSerializer, sqlGenerator, chargeTaxApplicationService);
     }
 }

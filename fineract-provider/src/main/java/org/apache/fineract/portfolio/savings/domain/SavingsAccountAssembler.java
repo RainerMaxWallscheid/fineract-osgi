@@ -77,6 +77,7 @@ import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
+import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +102,7 @@ public class SavingsAccountAssembler {
     private final JdbcTemplate jdbcTemplate;
     private final ConfigurationDomainService configurationDomainService;
     private final ExternalIdFactory externalIdFactory;
+    private final ChargeTaxApplicationService chargeTaxApplicationService;
 
     @Autowired
     public SavingsAccountAssembler(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
@@ -110,7 +112,8 @@ public class SavingsAccountAssembler {
             final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final FromJsonHelper fromApiJsonHelper,
             final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final JdbcTemplate jdbcTemplate,
-            final ConfigurationDomainService configurationDomainService, ExternalIdFactory externalIdFactory) {
+            final ConfigurationDomainService configurationDomainService, ExternalIdFactory externalIdFactory,
+            final ChargeTaxApplicationService chargeTaxApplicationService) {
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsAccountTransactionDataSummaryWrapper = savingsAccountTransactionDataSummaryWrapper;
         this.clientRepository = clientRepository;
@@ -124,6 +127,7 @@ public class SavingsAccountAssembler {
         this.jdbcTemplate = jdbcTemplate;
         this.configurationDomainService = configurationDomainService;
         this.externalIdFactory = externalIdFactory;
+        this.chargeTaxApplicationService = chargeTaxApplicationService;
     }
 
     /**
@@ -319,7 +323,7 @@ public class SavingsAccountAssembler {
         boolean withHoldTax = product.withHoldTax();
         if (command.parameterExists(withHoldTaxParamName)) {
             withHoldTax = command.booleanPrimitiveValueOfParameterNamed(withHoldTaxParamName);
-            if (withHoldTax && product.getTaxGroup() == null) {
+            if (withHoldTax && product.getTaxGroupId() == null) {
                 throw new UnsupportedParameterException(Arrays.asList(withHoldTaxParamName));
             }
         }
@@ -331,6 +335,7 @@ public class SavingsAccountAssembler {
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, maxAllowedLienLimit, lienAllowed,
                 nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax);
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
 
         account.validateNewApplicationState(SAVINGS_ACCOUNT_RESOURCE_NAME);
 
@@ -382,6 +387,7 @@ public class SavingsAccountAssembler {
         }
 
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         return account;
     }
 
@@ -422,6 +428,7 @@ public class SavingsAccountAssembler {
 
     public void setHelpers(final SavingsAccount account) {
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 
     /**
@@ -466,6 +473,7 @@ public class SavingsAccountAssembler {
                 product.isLienAllowed(), product.nominalAnnualInterestRateOverdraft(), product.minOverdraftForInterestCalculation(),
                 product.withHoldTax());
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
 
         account.validateNewApplicationState(SAVINGS_ACCOUNT_RESOURCE_NAME);
 
@@ -476,6 +484,7 @@ public class SavingsAccountAssembler {
 
     public void assignSavingAccountHelpers(final SavingsAccount savingsAccount) {
         savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 
     public void assignSavingAccountHelpers(final SavingsAccountData savingsAccountData) {

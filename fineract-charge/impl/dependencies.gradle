@@ -22,7 +22,8 @@ dependencies {
     api project(path: ':fineract-charge-api')
 
     implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-tax'))
+    // Tax Step 8: charge stores taxGroupId; uses TaxCatalogPort + TaxRead from tax-api.
+    implementation(project(path: ':fineract-tax-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

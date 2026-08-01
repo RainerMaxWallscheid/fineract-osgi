@@ -25,7 +25,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 
 @Entity
 @Table(name = "m_loan_charge_tax_details")
@@ -33,49 +32,42 @@ public class LoanChargeTaxDetails extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "loan_charge_id", nullable = false)
     private LoanCharge loanCharge;
-    @ManyToOne
-    @JoinColumn(name = "tax_component_id", nullable = false)
-    private TaxComponent taxComponent;
+    /** Catalog tax component id (column tax_component_id). */
+    @Column(name = "tax_component_id", nullable = false)
+    private Long taxComponentId;
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
     public LoanChargeTaxDetails() {
     }
 
-    @java.lang.SuppressWarnings("all")
-        public LoanChargeTaxDetails(final LoanCharge loanCharge, final TaxComponent taxComponent, final BigDecimal amount) {
+    public LoanChargeTaxDetails(final LoanCharge loanCharge, final Long taxComponentId, final BigDecimal amount) {
         this.loanCharge = loanCharge;
-        this.taxComponent = taxComponent;
+        this.taxComponentId = taxComponentId;
         this.amount = amount;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setLoanCharge(final LoanCharge loanCharge) {
+    public void setLoanCharge(final LoanCharge loanCharge) {
         this.loanCharge = loanCharge;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setTaxComponent(final TaxComponent taxComponent) {
-        this.taxComponent = taxComponent;
+    public void setTaxComponentId(final Long taxComponentId) {
+        this.taxComponentId = taxComponentId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setAmount(final BigDecimal amount) {
+    public void setAmount(final BigDecimal amount) {
         this.amount = amount;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public LoanCharge getLoanCharge() {
+    public LoanCharge getLoanCharge() {
         return this.loanCharge;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public TaxComponent getTaxComponent() {
-        return this.taxComponent;
+    public Long getTaxComponentId() {
+        return this.taxComponentId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 }

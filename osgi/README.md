@@ -40,7 +40,17 @@ Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bund
 | `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` |
 | `fineract-rates-test` | `org.apache.fineract.rates.test` | Fragment-Host → rates.impl |
 
-Loan uses **rates-api only** (`floatingRateId` + port). **Next:** **tax** api/impl/test — see [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot).
+Loan uses **rates-api only** (`floatingRateId` + port).
+
+### Wave 1: fineract-tax bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-tax-api` | `org.apache.fineract.tax.api` | `TaxCatalogPort`, `ChargeTaxApplicationService`, exceptions |
+| `fineract-tax-impl` | `org.apache.fineract.tax.impl` | JPA + REST + `TaxOsgiServiceRegistrar` |
+| `fineract-tax-test` | `org.apache.fineract.tax.test` | Fragment-Host → tax.impl |
+
+Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + ports). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-tax.md).
 
 ## Layout
 

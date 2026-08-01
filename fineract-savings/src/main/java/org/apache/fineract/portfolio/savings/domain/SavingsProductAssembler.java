@@ -70,8 +70,7 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYea
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
-import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -79,12 +78,12 @@ import org.springframework.stereotype.Component;
 public class SavingsProductAssembler {
 
     private final ChargeDefinitionPort chargeDefinitionPort;
-    private final TaxGroupRepositoryWrapper taxGroupRepository;
+    private final TaxCatalogPort taxCatalogPort;
 
     @Autowired
-    public SavingsProductAssembler(final ChargeDefinitionPort chargeDefinitionPort, final TaxGroupRepositoryWrapper taxGroupRepository) {
+    public SavingsProductAssembler(final ChargeDefinitionPort chargeDefinitionPort, final TaxCatalogPort taxCatalogPort) {
         this.chargeDefinitionPort = chargeDefinitionPort;
-        this.taxGroupRepository = taxGroupRepository;
+        this.taxCatalogPort = taxCatalogPort;
     }
 
     public SavingsProduct assemble(final JsonCommand command) {
@@ -188,7 +187,7 @@ public class SavingsProductAssembler {
                 .bigDecimalValueOfParameterNamedDefaultToNullIfZero(minBalanceForInterestCalculationParamName);
 
         boolean withHoldTax = command.booleanPrimitiveValueOfParameterNamed(withHoldTaxParamName);
-        final TaxGroup taxGroup = assembleTaxGroup(command);
+        final Long taxGroupId = assembleTaxGroupId(command);
 
         final Boolean isDormancyTrackingActive = command.booleanObjectValueOfParameterNamed(isDormancyTrackingActiveParamName);
         final Long daysToInactive = command.longValueOfParameterNamed(daysToInactiveParamName);
@@ -200,7 +199,7 @@ public class SavingsProductAssembler {
                 lockinPeriodFrequency, lockinPeriodFrequencyType, iswithdrawalFeeApplicableForTransfer, accountingRuleType, charges,
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, lienAllowed, maxAllowedLienLimit,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                taxGroup, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
+                taxGroupId, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
     }
 
     public Set<Long> assembleListOfSavingsProductCharges(final JsonCommand command, final String savingsProductCurrencyCode) {
@@ -238,12 +237,11 @@ public class SavingsProductAssembler {
         return chargeIds;
     }
 
-    public TaxGroup assembleTaxGroup(final JsonCommand command) {
+    public Long assembleTaxGroupId(final JsonCommand command) {
         final Long taxGroupId = command.longValueOfParameterNamed(taxGroupIdParamName);
-        TaxGroup taxGroup = null;
         if (taxGroupId != null) {
-            taxGroup = this.taxGroupRepository.findOneWithNotFoundDetection(taxGroupId);
+            this.taxCatalogPort.getTaxGroup(taxGroupId);
         }
-        return taxGroup;
+        return taxGroupId;
     }
 }

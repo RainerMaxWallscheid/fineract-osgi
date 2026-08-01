@@ -57,11 +57,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.SingleLoanChargeRepaymen
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.MoneyHolder;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.TransactionCtx;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidator;
-import org.apache.fineract.portfolio.tax.domain.TaxComponent;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
-import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentShareData;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
-import org.apache.fineract.portfolio.tax.service.TaxUtils;
 
 public class LoanChargeService {
     private final LoanChargeValidator loanChargeValidator;
@@ -70,7 +67,6 @@ public class LoanChargeService {
     private final LoanBalanceService loanBalanceService;
     private final LoanScheduleGeneratorService loanScheduleGeneratorService;
     private final ChargeTaxApplicationService chargeTaxApplicationService;
-    private final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper;
 
     public void recalculateAllCharges(final Loan loan) {
         Set<LoanCharge> charges = loan.getActiveCharges();
@@ -429,17 +425,19 @@ public class LoanChargeService {
         if (taxGroupId == null || loanCharge.getAmount() == null) {
             return;
         }
-        final TaxGroup taxGroup = this.taxGroupRepositoryWrapper.findOneWithNotFoundDetection(taxGroupId);
         LocalDate effectiveDate = loanCharge.getSubmittedOnDate() != null ? loanCharge.getSubmittedOnDate() : DateUtils.getBusinessLocalDate();
-        Map<TaxComponent, BigDecimal> taxSplit = chargeTaxApplicationService.computeTax(taxGroup, loanCharge.getAmount(), effectiveDate, 6);
-        BigDecimal totalTax = TaxUtils.totalTaxAmount(taxSplit);
+        final Collection<TaxComponentShareData> taxShares = chargeTaxApplicationService.computeTax(taxGroupId, loanCharge.getAmount(),
+                effectiveDate, 6);
+        final BigDecimal totalTax = TaxComponentShareData.totalAmount(taxShares);
         if (totalTax.compareTo(BigDecimal.ZERO) == 0) {
             return;
         }
         loanCharge.setTaxAmount(totalTax);
         loanCharge.setAmountOutstanding(loanCharge.calculateOutstanding());
         loanCharge.getTaxDetails().clear();
-        taxSplit.forEach((component, taxAmt) -> loanCharge.getTaxDetails().add(new LoanChargeTaxDetails(loanCharge, component, taxAmt)));
+        for (final TaxComponentShareData share : taxShares) {
+            loanCharge.getTaxDetails().add(new LoanChargeTaxDetails(loanCharge, share.getTaxComponentId(), share.getAmount()));
+        }
     }
 
     public void update(final LoanCharge loanCharge, final BigDecimal amount, final LocalDate dueDate, final Integer numberOfRepayments) {
@@ -913,13 +911,12 @@ public class LoanChargeService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeService(final LoanChargeValidator loanChargeValidator, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanBalanceService loanBalanceService, final LoanScheduleGeneratorService loanScheduleGeneratorService, final ChargeTaxApplicationService chargeTaxApplicationService, final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper) {
+        public LoanChargeService(final LoanChargeValidator loanChargeValidator, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanBalanceService loanBalanceService, final LoanScheduleGeneratorService loanScheduleGeneratorService, final ChargeTaxApplicationService chargeTaxApplicationService) {
         this.loanChargeValidator = loanChargeValidator;
         this.loanTransactionProcessingService = loanTransactionProcessingService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.loanBalanceService = loanBalanceService;
         this.loanScheduleGeneratorService = loanScheduleGeneratorService;
         this.chargeTaxApplicationService = chargeTaxApplicationService;
-        this.taxGroupRepositoryWrapper = taxGroupRepositoryWrapper;
     }
 }

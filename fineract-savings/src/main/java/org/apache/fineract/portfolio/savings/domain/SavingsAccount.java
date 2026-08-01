@@ -120,9 +120,8 @@ import org.apache.fineract.portfolio.savings.exception.SavingsOfficerAssignmentD
 import org.apache.fineract.portfolio.savings.exception.SavingsOfficerUnassignmentDateException;
 import org.apache.fineract.portfolio.savings.exception.SavingsTransferTransactionsCannotBeUndoneException;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
-import org.apache.fineract.portfolio.tax.domain.TaxComponent;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
-import org.apache.fineract.portfolio.tax.service.TaxUtils;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentShareData;
+import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,6 +322,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Transient
     protected SavingsHelper savingsHelper;
     @Transient
+    protected ChargeTaxApplicationService chargeTaxApplicationService;
+    @Transient
     protected List<SavingsAccountTransaction> savingsAccountTransactions = new ArrayList<>();
 
     @Column(name = "deposit_type_enum", insertable = false, updatable = false)
@@ -334,9 +335,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Column(name = "withhold_tax", nullable = false)
     protected boolean withHoldTax;
 
-    @ManyToOne
-    @JoinColumn(name = "tax_group_id")
-    private TaxGroup taxGroup;
+    /** Catalog tax group id (column tax_group_id). */
+    @Column(name = "tax_group_id")
+    private Long taxGroupId;
 
     @Column(name = "accrued_till_date")
     private LocalDate accruedTillDate;
@@ -451,7 +452,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.minBalanceForInterestCalculation = product.minBalanceForInterestCalculation();
         // this.savingsOfficerHistory = null;
         this.withHoldTax = withHoldTax;
-        this.taxGroup = product.getTaxGroup();
+        this.taxGroupId = product.getTaxGroupId();
     }
 
     /**
@@ -463,6 +464,10 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsHelper = savingsHelper;
         this.configurationDomainService = configurationDomainService;
+    }
+
+    public void setChargeTaxApplicationService(final ChargeTaxApplicationService chargeTaxApplicationService) {
+        this.chargeTaxApplicationService = chargeTaxApplicationService;
     }
 
     public void setSavingsAccountTransactions(final List<SavingsAccountTransaction> savingsAccountTransactions) {
@@ -578,12 +583,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     public boolean createWithHoldTransaction(final BigDecimal amount, final LocalDate date, final boolean backdatedTxnsAllowedTill) {
         boolean isTaxAdded = false;
-        if (this.taxGroup != null && amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
-            Map<TaxComponent, BigDecimal> taxSplit = TaxUtils.splitTax(amount, date, this.taxGroup.getTaxGroupMappings(), amount.scale());
-            BigDecimal totalTax = TaxUtils.totalTaxAmount(taxSplit);
+        if (this.taxGroupId != null && amount != null && amount.compareTo(BigDecimal.ZERO) > 0 && this.chargeTaxApplicationService != null) {
+            final java.util.Collection<TaxComponentShareData> taxShares = this.chargeTaxApplicationService.computeTax(this.taxGroupId, amount,
+                    date, amount.scale());
+            final BigDecimal totalTax = TaxComponentShareData.totalAmount(taxShares);
             if (totalTax.compareTo(BigDecimal.ZERO) > 0) {
                 SavingsAccountTransaction withholdTransaction = SavingsAccountTransaction.withHoldTax(this, office(), date,
-                        Money.of(currency, totalTax), taxSplit);
+                        Money.of(currency, totalTax), taxShares);
                 if (backdatedTxnsAllowedTill) {
                     addTransactionToExisting(withholdTransaction);
                 } else {
@@ -597,20 +603,20 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     protected boolean updateWithHoldTransaction(final BigDecimal amount, final SavingsAccountTransaction withholdTransaction) {
         boolean isTaxAdded = false;
-        if (this.taxGroup != null && amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
-            Map<TaxComponent, BigDecimal> taxSplit = TaxUtils.splitTax(amount, withholdTransaction.getTransactionDate(),
-                    this.taxGroup.getTaxGroupMappings(), amount.scale());
-            BigDecimal totalTax = TaxUtils.totalTaxAmount(taxSplit);
+        if (this.taxGroupId != null && amount != null && amount.compareTo(BigDecimal.ZERO) > 0 && this.chargeTaxApplicationService != null) {
+            final java.util.Collection<TaxComponentShareData> taxShares = this.chargeTaxApplicationService.computeTax(this.taxGroupId, amount,
+                    withholdTransaction.getTransactionDate(), amount.scale());
+            final BigDecimal totalTax = TaxComponentShareData.totalAmount(taxShares);
             if (totalTax.compareTo(BigDecimal.ZERO) > 0) {
                 if (withholdTransaction.getId() == null) {
                     withholdTransaction.setAmount(Money.of(currency, totalTax));
                     withholdTransaction.getTaxDetails().clear();
-                    SavingsAccountTransaction.updateTaxDetails(taxSplit, withholdTransaction);
+                    SavingsAccountTransaction.updateTaxDetails(taxShares, withholdTransaction);
                     isTaxAdded = true;
                 } else if (totalTax.compareTo(withholdTransaction.getAmount()) != 0) {
                     withholdTransaction.reverse();
                     SavingsAccountTransaction newWithholdTransaction = SavingsAccountTransaction.withHoldTax(this, office(),
-                            withholdTransaction.getTransactionDate(), Money.of(currency, totalTax), taxSplit);
+                            withholdTransaction.getTransactionDate(), Money.of(currency, totalTax), taxShares);
                     addTransaction(newWithholdTransaction);
                     isTaxAdded = true;
                 }
@@ -1735,7 +1741,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(withHoldTaxParamName);
             actualChanges.put(withHoldTaxParamName, newValue);
             this.withHoldTax = newValue;
-            if (this.withHoldTax && this.taxGroup == null) {
+            if (this.withHoldTax && this.taxGroupId == null) {
                 baseDataValidator.reset().parameter(withHoldTaxParamName).failWithCode("not.supported.for.this.account");
             }
         }
@@ -3313,8 +3319,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return getAccountBalance().subtract(this.getOnHoldFunds()).subtract(this.getSavingsHoldAmount());
     }
 
-    public TaxGroup getTaxGroup() {
-        return this.taxGroup;
+    public Long getTaxGroupId() {
+        return this.taxGroupId;
     }
 
     public boolean withHoldTax() {

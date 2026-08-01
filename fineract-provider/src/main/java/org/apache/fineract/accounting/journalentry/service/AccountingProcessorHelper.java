@@ -96,6 +96,7 @@ public class AccountingProcessorHelper {
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final BusinessEventNotifierService businessEventNotifierService;
+    private final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort;
 
     public LoanDTO populateLoanDtoFromDTO(final org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO accountingBridgeData) {
         final Long loanId = accountingBridgeData.getLoanId();
@@ -224,8 +225,13 @@ public class AccountingProcessorHelper {
                 final List<Map<String, Object>> taxDataList = (List<Map<String, Object>>) map.get("taxDetails");
                 for (final Map<String, Object> taxData : taxDataList) {
                     final BigDecimal taxAmount = (BigDecimal) taxData.get("amount");
-                    final Long creditAccountId = (Long) taxData.get("creditAccountId");
+                    Long creditAccountId = (Long) taxData.get("creditAccountId");
                     final Long debitAccountId = (Long) taxData.get("debitAccountId");
+                    if (creditAccountId == null && taxData.get("taxComponentId") != null && this.taxCatalogPort != null) {
+                        final Long taxComponentId = (Long) taxData.get("taxComponentId");
+                        creditAccountId = this.taxCatalogPort.findTaxComponent(taxComponentId)
+                                .map(org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData::getCreditAccountId).orElse(null);
+                    }
                     taxPayments.add(new TaxPaymentDTO(debitAccountId, creditAccountId, taxAmount));
                 }
             }
@@ -1139,7 +1145,7 @@ public class AccountingProcessorHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService) {
+        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.financialActivityAccountRepository = financialActivityAccountRepository;
@@ -1149,5 +1155,6 @@ public class AccountingProcessorHelper {
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.businessEventNotifierService = businessEventNotifierService;
+        this.taxCatalogPort = taxCatalogPort;
     }
 }

@@ -33,7 +33,7 @@ import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformServiceImp
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
-import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -74,8 +74,8 @@ public class ChargeConfiguration {
     public ChargeWritePlatformService chargeWritePlatformService(PlatformSecurityContext context,
             ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, ChargeRepository chargeRepository,
             JdbcTemplate jdbcTemplate, ChargeOfficeAccessPort chargeOfficeAccessPort, GLAccountRepositoryWrapper glAccountRepository,
-            TaxGroupRepositoryWrapper taxGroupRepository, PaymentTypeRepository paymentTypeRepository) {
+            TaxCatalogPort taxCatalogPort, PaymentTypeRepository paymentTypeRepository) {
         return new ChargeWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, chargeRepository, jdbcTemplate,
-                chargeOfficeAccessPort, glAccountRepository, taxGroupRepository, paymentTypeRepository);
+                chargeOfficeAccessPort, glAccountRepository, taxCatalogPort, paymentTypeRepository);
     }
 }

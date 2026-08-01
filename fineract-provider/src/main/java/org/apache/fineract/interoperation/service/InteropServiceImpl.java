@@ -134,6 +134,7 @@ public class InteropServiceImpl implements InteropService {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
+    private final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService;
 
 
     private static final class KycMapper implements RowMapper<InteropKycData> {
@@ -480,6 +481,7 @@ public class InteropServiceImpl implements InteropService {
         // TODO: error handling
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getAccountId());
         savingsAccount.setHelpers(savingsAccountTransactionSummaryWrapper, savingsHelper, configurationDomainService);
+        savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         ApplicationCurrency requestCurrency = currencyRepository.findOneByCode(request.getAmount().getCurrency());
         if (!savingsAccount.getCurrency().getCode().equals(requestCurrency.getCode())) {
             throw new DifferentCurrenciesException(savingsAccount.getCurrency().getCode(), requestCurrency.getCode());
@@ -566,7 +568,7 @@ public class InteropServiceImpl implements InteropService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteRepository noteRepository, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteRepository noteRepository, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator, final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
         this.securityContext = securityContext;
         this.dataValidator = dataValidator;
         this.savingsAccountRepository = savingsAccountRepository;
@@ -584,5 +586,6 @@ public class InteropServiceImpl implements InteropService {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.sqlGenerator = sqlGenerator;
+        this.chargeTaxApplicationService = chargeTaxApplicationService;
     }
 }

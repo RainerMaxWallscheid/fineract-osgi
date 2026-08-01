@@ -45,7 +45,7 @@ import org.apache.fineract.portfolio.savings.domain.DepositProductAssembler;
 import org.apache.fineract.portfolio.savings.domain.FixedDepositProduct;
 import org.apache.fineract.portfolio.savings.domain.FixedDepositProductRepository;
 import org.apache.fineract.portfolio.savings.exception.FixedDepositProductNotFoundException;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,13 +96,13 @@ public class FixedDepositProductWritePlatformServiceJpaRepositoryImpl implements
                 }
             }
             if (changes.containsKey(taxGroupIdParamName)) {
-                final TaxGroup taxGroup = this.depositProductAssembler.assembleTaxGroup(command);
-                product.setTaxGroup(taxGroup);
-                if (product.withHoldTax() && product.getTaxGroup() == null) {
+                final Long taxGroupId = this.depositProductAssembler.assembleTaxGroupId(command);
+                product.setTaxGroupId(taxGroupId);
+                if (product.withHoldTax() && product.getTaxGroupId() == null) {
                     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-                    final Long taxGroupId = null;
-                    baseDataValidator.reset().parameter(taxGroupIdParamName).value(taxGroupId).notBlank();
+                    final Long missingTaxGroupId = null;
+                    baseDataValidator.reset().parameter(taxGroupIdParamName).value(missingTaxGroupId).notBlank();
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
             }

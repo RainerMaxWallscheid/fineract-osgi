@@ -511,10 +511,9 @@ public class LoanAccountConfiguration {
             final LoanTransactionProcessingService loanTransactionProcessingService,
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanBalanceService loanBalanceService,
             final LoanScheduleGeneratorService loanScheduleGeneratorService,
-            final ChargeTaxApplicationService chargeTaxApplicationService,
-            final org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper taxGroupRepositoryWrapper) {
+            final ChargeTaxApplicationService chargeTaxApplicationService) {
         return new LoanChargeService(loanChargeValidator, loanTransactionProcessingService, loanLifecycleStateMachine, loanBalanceService,
-                loanScheduleGeneratorService, chargeTaxApplicationService, taxGroupRepositoryWrapper);
+                loanScheduleGeneratorService, chargeTaxApplicationService);
     }
 
     @Bean
