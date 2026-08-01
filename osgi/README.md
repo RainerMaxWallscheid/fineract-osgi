@@ -62,6 +62,16 @@ Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + port
 
 Provider bulk-import uses **`ContentStreamPort`**; composition root still api+impl. Plan: [15_osgi_bundle_refactoring_fineract-document.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-document.md).
 
+### Wave 2: fineract-branch bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-branch-api` | `org.apache.fineract.branch.api` | Teller service interfaces, DTOs, exceptions, pure enums |
+| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + `BranchOsgiServiceRegistrar` |
+| `fineract-branch-test` | `org.apache.fineract.branch.test` | Fragment-Host → branch.impl |
+
+Provider hosts service JpaImpl residual; loan cash path uses `CashierTransactionDataValidator` from impl. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
+
 ## Layout
 
 | Path | Purpose |

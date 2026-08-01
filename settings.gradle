@@ -66,7 +66,13 @@ include ':fineract-command-async'
 include ':fineract-command-disruptor'
 include ':fineract-accounting'
 include ':fineract-provider'
-include ':fineract-branch'
+include ':fineract-branch-api'
+project(':fineract-branch-api').projectDir = file('fineract-branch/api')
+include ':fineract-branch-impl'
+project(':fineract-branch-impl').projectDir = file('fineract-branch/impl')
+include ':fineract-branch-test'
+project(':fineract-branch-test').projectDir = file('fineract-branch/test')
+// No :fineract-branch façade — depend on -api / -impl explicitly.
 include ':fineract-document-api'
 project(':fineract-document-api').projectDir = file('fineract-document/api')
 include ':fineract-document-impl'

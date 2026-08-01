@@ -46,8 +46,8 @@ import org.apache.fineract.organisation.teller.data.CashierTransactionsWithSumma
 import org.apache.fineract.organisation.teller.data.TellerData;
 import org.apache.fineract.organisation.teller.data.TellerJournalData;
 import org.apache.fineract.organisation.teller.data.TellerTransactionData;
-import org.apache.fineract.organisation.teller.domain.CashierTxnType;
-import org.apache.fineract.organisation.teller.domain.TellerStatus;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnType;
+import org.apache.fineract.organisation.teller.moduleapi.TellerStatus;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;

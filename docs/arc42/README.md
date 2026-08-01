@@ -24,6 +24,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 15a | [fineract-command pilot plan](15_osgi_bundle_refactoring_fineract-command.md) | Step-by-step OSGi split for the command stack (as-built) |
 | 15b | [fineract-charge split plan](15_osgi_bundle_refactoring_fineract-charge.md) | Wave‑1 charge catalog api/impl/test plan (**complete**) |
 | 15c | [fineract-document split plan](15_osgi_bundle_refactoring_fineract-document.md) | Wave‑2 document/content-store api/impl/test plan (**complete**) |
+| 15d | [fineract-branch split plan](15_osgi_bundle_refactoring_fineract-branch.md) | Wave‑2 branch/teller api/impl/test plan (**complete**; provider residual) |
 
 ## Complementary Artifacts
 

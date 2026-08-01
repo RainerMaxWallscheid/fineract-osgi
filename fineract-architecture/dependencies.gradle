@@ -36,7 +36,8 @@ dependencies {
     testImplementation project(path: ':fineract-rates-api')
     testImplementation project(path: ':fineract-rates-impl')
     testImplementation project(path: ':fineract-cob')
-    testImplementation project(path: ':fineract-branch')
+    testImplementation project(path: ':fineract-branch-api')
+    testImplementation project(path: ':fineract-branch-impl')
 
     testImplementation('com.tngtech.archunit:archunit-junit5')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
