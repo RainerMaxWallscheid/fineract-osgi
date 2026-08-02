@@ -102,7 +102,13 @@ project(':fineract-tax-impl').projectDir = file('fineract-tax/impl')
 include ':fineract-tax-test'
 project(':fineract-tax-test').projectDir = file('fineract-tax/test')
 // No :fineract-tax façade — depend on -api / -impl explicitly.
-include ':fineract-loan-origination'
+include ':fineract-loan-origination-api'
+project(':fineract-loan-origination-api').projectDir = file('fineract-loan-origination/api')
+include ':fineract-loan-origination-impl'
+project(':fineract-loan-origination-impl').projectDir = file('fineract-loan-origination/impl')
+include ':fineract-loan-origination-test'
+project(':fineract-loan-origination-test').projectDir = file('fineract-loan-origination/test')
+// No :fineract-loan-origination façade — depend on -api / -impl explicitly.
 include ':fineract-loan'
 include ':fineract-savings'
 include ':fineract-report'

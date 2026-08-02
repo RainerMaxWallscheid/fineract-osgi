@@ -1,0 +1,80 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Loan Origination Implementation (OSGi impl bundle)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+compileJava {
+    dependsOn ':fineract-avro-schemas:buildJavaSdk'
+}
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+// OSGi implementation bundle (ADR-022). Export starter package for Boot wiring if added later.
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Loan Origination Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.loanorigination.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Loan originator implementation (JPA, REST, handlers, Avro enrichers, Spring)',
+                'Import-Package': 'org.apache.fineract.portfolio.loanorigination.moduleapi,'
+                        + 'org.apache.fineract.portfolio.loanorigination.service,'
+                        + 'org.apache.fineract.portfolio.loanorigination.data,'
+                        + 'org.apache.fineract.portfolio.loanorigination.exception,'
+                        + 'org.apache.fineract.portfolio.loanorigination.api,'
+                        + '*',
+                'Export-Package': 'org.apache.fineract.portfolio.loanorigination.config',
+                'Automatic-Module-Name': 'org.apache.fineract.loanorigination.impl'
+                )
+    }
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-loan-origination/impl/bin/main")
+}
+
+eclipse {
+    project {
+        buildCommand([ LaunchConfigHandle: "<project>/.externalToolBuilders/OpenJPA Enhance Builder.launch" ],  'org.eclipse.ui.externaltools.ExternalToolBuilder')
+    }
+}

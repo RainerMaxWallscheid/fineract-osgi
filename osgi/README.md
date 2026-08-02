@@ -74,6 +74,16 @@ Provider bulk-import uses **`ContentStreamPort`**; composition root still api+im
 
 Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
 
+### Wave 2: fineract-loan-origination bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-loan-origination-api` | `org.apache.fineract.loanorigination.api` | Originator service ports, DTOs (`LoanOriginatorData`), exceptions |
+| `fineract-loan-origination-impl` | `org.apache.fineract.loanorigination.impl` | JPA + REST + Avro enrichers + `LoanOriginationOsgiServiceRegistrar` |
+| `fineract-loan-origination-test` | `org.apache.fineract.loanorigination.test` | Fragment-Host → loanorigination.impl |
+
+Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_bundle_refactoring_fineract-loan-origination.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan-origination.md).
+
 ## Layout
 
 | Path | Purpose |

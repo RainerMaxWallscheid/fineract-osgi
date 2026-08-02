@@ -33,6 +33,8 @@ dependencies {
     implementation(project(path: ':fineract-rates-api'))
     // Tax Step 8: loan uses tax-api only (taxGroupId / taxComponentId + ChargeTaxApplicationService).
     implementation(project(path: ':fineract-tax-api'))
+    // Loan origination: pure DTO LoanOriginatorData on loan-origination-api (no impl).
+    implementation(project(path: ':fineract-loan-origination-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

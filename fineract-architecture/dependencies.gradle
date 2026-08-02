@@ -26,7 +26,8 @@ dependencies {
     testImplementation project(path: ':fineract-accounting')
     testImplementation project(path: ':fineract-progressive-loan')
     testImplementation project(path: ':fineract-working-capital-loan')
-    testImplementation project(path: ':fineract-loan-origination')
+    testImplementation project(path: ':fineract-loan-origination-api')
+    testImplementation project(path: ':fineract-loan-origination-impl')
     testImplementation project(path: ':fineract-investor')
     // Charge OSGi Step 7: analyze api + impl (façade no longer required for ArchUnit classpath).
     testImplementation project(path: ':fineract-charge-api')
