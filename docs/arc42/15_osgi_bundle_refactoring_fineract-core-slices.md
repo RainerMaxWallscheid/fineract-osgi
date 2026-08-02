@@ -5,7 +5,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | **in progress** — slices **businessdate**, **codes**, **organisation**, **monetary**, **security residual** complete |
+| **Status** | **in progress** — slices **businessdate**, **codes**, **organisation** (incl. holiday/workingdays), **monetary**, **security residual** complete |
 | **Rule** | Extract coherent platform slices; **do not** api/impl the whole ~800-type kernel |
 
 ## Why not full core split
@@ -34,15 +34,16 @@
 
 Core has `api project(':fineract-codes-api')` for transitive DTO access.
 
-## Slice 3 — organisation (office / staff) ✅
+## Slice 3 — organisation (office / staff / holiday / working days) ✅
 
 | Project | Role |
 |---------|------|
-| `:fineract-organisation-api` | `OfficeReadPlatformService`, `StaffReadService` |
-| `:fineract-organisation-impl` | Office/staff REST, handlers, write services, `OrganisationOsgiServiceRegistrar` |
-| Residual in core | `Office`/`Staff` entities, repos, wrappers, exceptions, shared DTOs |
+| `:fineract-organisation-api` | Read ports + DTOs: office, staff, holiday, working days |
+| `:fineract-organisation-impl` | REST/handlers/write services/repos wrappers; `OrganisationOsgiServiceRegistrar` |
+| Residual in core | `Office`/`Staff` entities + DTOs; `Holiday`/`WorkingDays` entities, utils, schedule DTOs/enums |
+| Residual in provider | Organisation **provisioning** (loan-product coupling) |
 
-**Consumers:** provider/war compose api+impl; accounting/branch inject organisation-api for office read.
+**Consumers:** provider/war compose api+impl; accounting/branch inject organisation-api for office read; loan/savings inject holiday/working-days repository wrappers from impl via composition root.
 
 ## Slice 4 — monetary (currency admin) ✅
 
@@ -67,7 +68,10 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 
 ## Candidate later slices
 
-None currently scheduled for core; remaining organisation BCs (holiday, working days, etc.) and full Money VO extraction are deferred.
+| Slice | Rationale |
+|-------|-----------|
+| organisation provisioning | Still in provider; couples to loan products |
+| full Money VO extraction | Deferred (kernel residual) |
 
 ## Commands
 

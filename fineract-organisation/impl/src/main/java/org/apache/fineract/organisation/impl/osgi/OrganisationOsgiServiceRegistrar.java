@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformService;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
+import org.apache.fineract.organisation.workingdays.service.WorkingDaysReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -32,7 +34,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
-/** Spring ↔ OSGi bridge for organisation office/staff read ports (core slice). */
+/** Spring ↔ OSGi bridge for organisation office/staff/holiday/working-days read ports. */
 @Component
 public class OrganisationOsgiServiceRegistrar implements InitializingBean, DisposableBean {
 
@@ -40,12 +42,17 @@ public class OrganisationOsgiServiceRegistrar implements InitializingBean, Dispo
 
     private final ObjectProvider<OfficeReadPlatformService> officeRead;
     private final ObjectProvider<StaffReadService> staffRead;
+    private final ObjectProvider<HolidayReadPlatformService> holidayRead;
+    private final ObjectProvider<WorkingDaysReadPlatformService> workingDaysRead;
     private final List<Object> registrations = new ArrayList<>();
 
     public OrganisationOsgiServiceRegistrar(final ObjectProvider<OfficeReadPlatformService> officeRead,
-            final ObjectProvider<StaffReadService> staffRead) {
+            final ObjectProvider<StaffReadService> staffRead, final ObjectProvider<HolidayReadPlatformService> holidayRead,
+            final ObjectProvider<WorkingDaysReadPlatformService> workingDaysRead) {
         this.officeRead = officeRead;
         this.staffRead = staffRead;
+        this.holidayRead = holidayRead;
+        this.workingDaysRead = workingDaysRead;
     }
 
     @Override
@@ -63,6 +70,8 @@ public class OrganisationOsgiServiceRegistrar implements InitializingBean, Dispo
             }
             register(context, OfficeReadPlatformService.class, officeRead.getIfAvailable());
             register(context, StaffReadService.class, staffRead.getIfAvailable());
+            register(context, HolidayReadPlatformService.class, holidayRead.getIfAvailable());
+            register(context, WorkingDaysReadPlatformService.class, workingDaysRead.getIfAvailable());
             LOG.info("Registered {} organisation OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only organisation wiring");

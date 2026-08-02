@@ -37,6 +37,9 @@ dependencies {
             'org.mapstruct:mapstruct',
             'io.github.resilience4j:resilience4j-spring-boot3',
             )
+    implementation ('org.mnode.ical4j:ical4j') {
+        exclude group: 'commons-logging'
+    }
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
     }

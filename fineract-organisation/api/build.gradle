@@ -30,7 +30,11 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.organisation.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.organisation.office.service,'
-                        + 'org.apache.fineract.organisation.staff.service',
+                        + 'org.apache.fineract.organisation.staff.service,'
+                        + 'org.apache.fineract.organisation.holiday.data,'
+                        + 'org.apache.fineract.organisation.holiday.service,'
+                        + 'org.apache.fineract.organisation.workingdays.data,'
+                        + 'org.apache.fineract.organisation.workingdays.service',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.api'
                 )
