@@ -1,21 +1,23 @@
 # fineract-organisation
 
-**Core slice** — office / staff / holiday / working days (ADR-022).
+**Core slice** — office / staff / holiday / working days / provisioning (ADR-022).
 
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
-| `fineract-organisation-api` | `api/` | `org.apache.fineract.organisation.api` | Read ports + admin DTOs (office, staff, holiday, working days) |
-| `fineract-organisation-impl` | `impl/` | `org.apache.fineract.organisation.impl` | REST, handlers, write services, repos wrappers, `OrganisationOsgiServiceRegistrar` |
+| `fineract-organisation-api` | `api/` | `org.apache.fineract.organisation.api` | Read/write ports + pure DTOs / exceptions |
+| `fineract-organisation-impl` | `impl/` | `org.apache.fineract.organisation.impl` | REST, handlers, services, JPA wrappers, `OrganisationOsgiServiceRegistrar` |
 | `fineract-organisation-test` | `test/` | `org.apache.fineract.organisation.test` | Fragment-Host → impl |
 
 ### Residual in `fineract-core`
 
 - `Office` / `Staff` JPA entities, repositories, wrappers, platform exceptions, shared DTOs
-- `Holiday` / `WorkingDays` entities, status/reschedule enums, `HolidayUtil` / `WorkingDaysUtil`, `AdjustedDateDetailsDTO` (loan/savings schedule kernel)
+- `Holiday` / `WorkingDays` entities, status/reschedule enums, schedule utils (`HolidayUtil`, `WorkingDaysUtil`, `AdjustedDateDetailsDTO`)
 
-### Residual in `fineract-provider`
+### Residual in organisation-impl (not pure api)
 
-Organisation **provisioning** remains in provider (loan-product coupling).
+- `ProvisioningCriteriaData` + `ProvisioningCriteriaReadPlatformService` (reference `LoanProductData` from loan-impl)
+- Criteria/category entities and loan-product mapping (`LoanProductProvisionCriteria`)
+- Impl depends on **loan-impl** + **accounting-api** for criteria assembly / entries checks
 
 ```bash
 ./gradlew :fineract-organisation-api:jar :fineract-organisation-impl:jar :fineract-organisation-test:test

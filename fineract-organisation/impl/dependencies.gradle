@@ -23,6 +23,9 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-monetary-api'))
+    // Criteria maps loan products + GL accounts; entries check uses accounting port
+    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-accounting-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

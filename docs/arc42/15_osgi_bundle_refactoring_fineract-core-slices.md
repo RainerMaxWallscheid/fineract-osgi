@@ -34,16 +34,16 @@
 
 Core has `api project(':fineract-codes-api')` for transitive DTO access.
 
-## Slice 3 — organisation (office / staff / holiday / working days) ✅
+## Slice 3 — organisation (office / staff / holiday / working days / provisioning) ✅
 
 | Project | Role |
 |---------|------|
-| `:fineract-organisation-api` | Read ports + DTOs: office, staff, holiday, working days |
-| `:fineract-organisation-impl` | REST/handlers/write services/repos wrappers; `OrganisationOsgiServiceRegistrar` |
+| `:fineract-organisation-api` | Ports + pure DTOs/exceptions: office, staff, holiday, working days, category/criteria write, category data |
+| `:fineract-organisation-impl` | REST/handlers/services/repos; provisioning entities + criteria read DTO residual; `OrganisationOsgiServiceRegistrar` |
 | Residual in core | `Office`/`Staff` entities + DTOs; `Holiday`/`WorkingDays` entities, utils, schedule DTOs/enums |
-| Residual in provider | Organisation **provisioning** (loan-product coupling) |
+| Residual in impl | `ProvisioningCriteriaData` / criteria read (needs `LoanProductData`); `LoanProductProvisionCriteria`; loan-impl + accounting-api deps |
 
-**Consumers:** provider/war compose api+impl; accounting/branch inject organisation-api for office read; loan/savings inject holiday/working-days repository wrappers from impl via composition root.
+**Consumers:** provider/war compose api+impl; accounting/branch inject organisation-api; loan/savings/accounting entries use provisioning ports/entities via composition root.
 
 ## Slice 4 — monetary (currency admin) ✅
 
@@ -70,7 +70,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 
 | Slice | Rationale |
 |-------|-----------|
-| organisation provisioning | Still in provider; couples to loan products |
+| pure criteria ports without loan entities | Needs `LoanProductData` on loan-api first |
 | full Money VO extraction | Deferred (kernel residual) |
 
 ## Commands

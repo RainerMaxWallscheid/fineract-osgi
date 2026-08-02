@@ -19,7 +19,6 @@
 package org.apache.fineract.organisation.provisioning.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 public class ProvisioningCriteriaNotFoundException extends AbstractPlatformResourceNotFoundException {
 
@@ -27,7 +26,7 @@ public class ProvisioningCriteriaNotFoundException extends AbstractPlatformResou
         super("error.msg.provisioning.criteria.id.invalid", "Provisioning Criteria with identifier " + id + " does not exist", id);
     }
 
-    public ProvisioningCriteriaNotFoundException(Long id, EmptyResultDataAccessException e) {
+    public ProvisioningCriteriaNotFoundException(Long id, Exception e) {
         super("error.msg.provisioning.criteria.id.invalid", "Provisioning Criteria with identifier " + id + " does not exist", id, e);
     }
 }

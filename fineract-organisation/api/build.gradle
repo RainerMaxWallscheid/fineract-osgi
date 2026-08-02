@@ -34,7 +34,10 @@ jar {
                         + 'org.apache.fineract.organisation.holiday.data,'
                         + 'org.apache.fineract.organisation.holiday.service,'
                         + 'org.apache.fineract.organisation.workingdays.data,'
-                        + 'org.apache.fineract.organisation.workingdays.service',
+                        + 'org.apache.fineract.organisation.workingdays.service,'
+                        + 'org.apache.fineract.organisation.provisioning.data,'
+                        + 'org.apache.fineract.organisation.provisioning.exception,'
+                        + 'org.apache.fineract.organisation.provisioning.service',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.api'
                 )

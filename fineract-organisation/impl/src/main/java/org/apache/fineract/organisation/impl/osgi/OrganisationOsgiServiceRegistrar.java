@@ -25,6 +25,10 @@ import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformService;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
+import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
+import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryWritePlatformService;
+import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaWritePlatformService;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.organisation.workingdays.service.WorkingDaysReadPlatformService;
 import org.slf4j.Logger;
@@ -34,7 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
-/** Spring ↔ OSGi bridge for organisation office/staff/holiday/working-days read ports. */
+/** Spring ↔ OSGi bridge for organisation read/write ports (office, staff, calendar, provisioning). */
 @Component
 public class OrganisationOsgiServiceRegistrar implements InitializingBean, DisposableBean {
 
@@ -44,15 +48,27 @@ public class OrganisationOsgiServiceRegistrar implements InitializingBean, Dispo
     private final ObjectProvider<StaffReadService> staffRead;
     private final ObjectProvider<HolidayReadPlatformService> holidayRead;
     private final ObjectProvider<WorkingDaysReadPlatformService> workingDaysRead;
+    private final ObjectProvider<ProvisioningCategoryReadPlatformService> categoryRead;
+    private final ObjectProvider<ProvisioningCategoryWritePlatformService> categoryWrite;
+    private final ObjectProvider<ProvisioningCriteriaReadPlatformService> criteriaRead;
+    private final ObjectProvider<ProvisioningCriteriaWritePlatformService> criteriaWrite;
     private final List<Object> registrations = new ArrayList<>();
 
     public OrganisationOsgiServiceRegistrar(final ObjectProvider<OfficeReadPlatformService> officeRead,
             final ObjectProvider<StaffReadService> staffRead, final ObjectProvider<HolidayReadPlatformService> holidayRead,
-            final ObjectProvider<WorkingDaysReadPlatformService> workingDaysRead) {
+            final ObjectProvider<WorkingDaysReadPlatformService> workingDaysRead,
+            final ObjectProvider<ProvisioningCategoryReadPlatformService> categoryRead,
+            final ObjectProvider<ProvisioningCategoryWritePlatformService> categoryWrite,
+            final ObjectProvider<ProvisioningCriteriaReadPlatformService> criteriaRead,
+            final ObjectProvider<ProvisioningCriteriaWritePlatformService> criteriaWrite) {
         this.officeRead = officeRead;
         this.staffRead = staffRead;
         this.holidayRead = holidayRead;
         this.workingDaysRead = workingDaysRead;
+        this.categoryRead = categoryRead;
+        this.categoryWrite = categoryWrite;
+        this.criteriaRead = criteriaRead;
+        this.criteriaWrite = criteriaWrite;
     }
 
     @Override
@@ -72,6 +88,10 @@ public class OrganisationOsgiServiceRegistrar implements InitializingBean, Dispo
             register(context, StaffReadService.class, staffRead.getIfAvailable());
             register(context, HolidayReadPlatformService.class, holidayRead.getIfAvailable());
             register(context, WorkingDaysReadPlatformService.class, workingDaysRead.getIfAvailable());
+            register(context, ProvisioningCategoryReadPlatformService.class, categoryRead.getIfAvailable());
+            register(context, ProvisioningCategoryWritePlatformService.class, categoryWrite.getIfAvailable());
+            register(context, ProvisioningCriteriaReadPlatformService.class, criteriaRead.getIfAvailable());
+            register(context, ProvisioningCriteriaWritePlatformService.class, criteriaWrite.getIfAvailable());
             LOG.info("Registered {} organisation OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only organisation wiring");

@@ -89,7 +89,16 @@ jar {
                         + 'org.apache.fineract.organisation.workingdays.exception,'
                         + 'org.apache.fineract.organisation.workingdays.handler,'
                         + 'org.apache.fineract.organisation.workingdays.service,'
-                        + 'org.apache.fineract.organisation.workingdays.starter',
+                        + 'org.apache.fineract.organisation.workingdays.starter,'
+                        + 'org.apache.fineract.organisation.provisioning.api,'
+                        + 'org.apache.fineract.organisation.provisioning.constants,'
+                        + 'org.apache.fineract.organisation.provisioning.data,'
+                        + 'org.apache.fineract.organisation.provisioning.domain,'
+                        + 'org.apache.fineract.organisation.provisioning.exception,'
+                        + 'org.apache.fineract.organisation.provisioning.handler,'
+                        + 'org.apache.fineract.organisation.provisioning.serialization,'
+                        + 'org.apache.fineract.organisation.provisioning.service,'
+                        + 'org.apache.fineract.organisation.provisioning.starter',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.impl'
                 )
