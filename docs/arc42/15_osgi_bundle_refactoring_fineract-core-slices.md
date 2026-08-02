@@ -5,7 +5,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | **in progress** — slices **businessdate**, **codes**, **organisation** (incl. holiday/workingdays), **monetary**, **security residual** complete |
+| **Status** | **complete** for planned slices — **businessdate**, **codes**, **organisation** (office/staff/holiday/workingdays/provisioning), **monetary**, **security residual** |
 | **Rule** | Extract coherent platform slices; **do not** api/impl the whole ~800-type kernel |
 
 ## Why not full core split

@@ -150,10 +150,15 @@ public final class ArchitecturePackages {
             "..portfolio.client.handler..", //
     };
 
+    /**
+     * Tax packages that are internal to the catalog BC. Public ports live on tax-api under
+     * {@code ..portfolio.tax.service..} ({@code ChargeTaxApplicationService}, read/write platform
+     * services) and {@code ..portfolio.tax.moduleapi..} — those are <em>not</em> listed here.
+     */
     public static final String[] TAX_INTERNAL = { //
-            "..portfolio.tax.domain..", //
-            "..portfolio.tax.service..", //
-            "..portfolio.tax.handler..", //
+            "..portfolio.tax.domain..", // JPA tax entities / repos (impl residual)
+            "..portfolio.tax.handler..", // command handlers (impl)
+            "..portfolio.tax.serialization..", //
     };
 
     /**

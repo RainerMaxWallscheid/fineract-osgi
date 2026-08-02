@@ -76,26 +76,30 @@ All rules use **`FreezingArchRule`**: existing legacy violations are baselined; 
 
 On the first run, violations were written to `archunit_store`. Empty freeze files = rule already **green** (0 violations). Non-empty files = documented legacy debt.
 
-**Baseline after first run (domain-module classpath):**
+**Baseline (domain-module classpath; refresh after OSGi peels):**
 
 | Rule group | Status |
 |--------------|--------|
-| Loan/Savings ↔ Journal | often **green** (0 frozen) |
-| Loan ↔ Savings | often **green** |
-| Accounting → Loan/Savings/Client entities | often **green** |
+| Loan/Savings ↔ Journal | **green** (0 frozen) |
+| Loan ↔ Savings (domain + module-api internals) | **green** |
+| Loan/Savings → Charge entity / write services | **green** (moduleapi only) |
+| Loan → Tax catalog ports (`ChargeTaxApplicationService`, …) | **green** (tax-api service/moduleapi allowed) |
+| Accounting → Loan/Savings/Client entities | **green** / residual frozen where residual |
 | Loan → Client / Group | **frozen** (`Loan.client` / `Loan.group`) |
 | Savings → Client / Group | **frozen** |
 | WC → Client | **frozen** |
-| Accounting domain → `accounting..api..` (e.g. `*JsonInputParams`) | **frozen** (hexagon) |
+| Loan/Investor → Accounting internals | **frozen** residual (entity/repo residual) |
+| Accounting domain → REST packages | **frozen** (hexagon) |
 
-Exact counts: files under `archunit_store/` (non-empty files = debt).
+Exact counts: non-empty files under `archunit_store/` (empty file = rule green).
 
 **Working practice when reducing debt**
 
-1. Replace entity ref with ID/snapshot (canvas [11](11_aggregate_canvas.md)).
-2. `./gradlew :fineract-architecture:test` – freeze store may **shrink** (`allowStoreUpdate=true`).
-3. PR: commit store diff (proof that debt was reduced).
-4. Let store **grow** only with deliberate exception (review + ADR note).
+1. Replace entity ref with ID/snapshot (canvas [11](11_aggregate_canvas.md)) or retarget to `-api` / `moduleapi`.
+2. Refine `ArchitecturePackages` when peels move ports out of “internal” packages (e.g. tax-api `..service..`).
+3. `./gradlew :fineract-architecture:test` – freeze store may **shrink** (`allowStoreUpdate=true`).
+4. PR: commit store diff (proof that debt was reduced); remove orphan freeze files when rule text changes.
+5. Let store **grow** only with deliberate exception (review + ADR note).
 
 ---
 

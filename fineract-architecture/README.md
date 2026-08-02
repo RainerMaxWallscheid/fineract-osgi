@@ -25,8 +25,14 @@ Legacy code still violates that; these tests:
 
 Violations are stored under `src/test/resources/archunit_store/` (see `src/test/resources/archunit.properties`).
 
-- After **fixing** legacy coupling: re-run tests; the store should shrink (allowed by `allowStoreUpdate=true`).
+- After **fixing** legacy coupling or OSGi peels: re-run tests; the store should **shrink** (`allowStoreUpdate=true`).
+- When a rule’s package list / description changes, ArchUnit may create a new freeze id — delete orphan files for the old description.
 - Do **not** grow the store without an explicit architecture decision — a growing store means new debt.
+
+```bash
+# quick debt size (violation lines across freeze files)
+find src/test/resources/archunit_store -type f ! -name stored.rules -exec cat {} \; | wc -l
+```
 
 ## Related docs
 

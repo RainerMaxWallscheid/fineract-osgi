@@ -247,7 +247,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 | **`fineract-working-capital-loan`** | ~340 | **Complete** — api/impl/test; entity residual. [WC plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) |
 | **`fineract-cob`** | ~65 | **Complete** — api/impl/test; entity-typed step residual. [cob plan](15_osgi_bundle_refactoring_fineract-cob.md) |
 | **`fineract-security`** | ~70 | **Complete** — api/impl/test; Spring Security residual. [security plan](15_osgi_bundle_refactoring_fineract-security.md) |
-| **`fineract-core`** | ~800 | Shared kernel — **do not** full api/impl; first slice **businessdate** extracted ([core slices](15_osgi_bundle_refactoring_fineract-core-slices.md)) |
+| **`fineract-core`** | ~800 | Shared kernel — **do not** full api/impl; optional slices extracted ([core slices](15_osgi_bundle_refactoring_fineract-core-slices.md)) |
 | **`fineract-provider`** | ~2500 | Composition root — hosts the Spring↔OSGi bridge; **never** the next pilot |
 
 #### Explicit non-candidates (for OSGi BC split)
@@ -265,18 +265,21 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
 Wave 3 complete         → investor, accounting, savings  ★★★
-Wave 4 progressed       → loan + progressive + WC + cob + security ★★☆
-Core slices progressed  → businessdate + codes ★☆☆ (more optional)
-Huge / core banking     → provider           later
+Wave 4 complete         → loan + progressive + WC + cob + security ★★★
+Core slices complete    → businessdate, codes, organisation
+                          (office/staff/holiday/workingdays/provisioning),
+                          monetary admin, security residual  ★★★
+Huge / core banking     → provider peels optional (useradmin, client, …)
 Shared kernel           → core, validation         don't force BC split
 ```
 
-#### Parallel work after first core slice
+#### After waves + core slices (optional follow-ons)
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | Further core slices (codes, org office, monetary admin) — [core slices plan](15_osgi_bundle_refactoring_fineract-core-slices.md) |
-| **Parallel** | Domain entity residuals (loan / savings / accounting ports) |
+| **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
+| **Optional provider peels** | e.g. `useradministration`, `adhocquery`, `template` (not full provider) |
+| **Residual hardening** | Entity → ID/ports (loan/savings/accounting/client); pure criteria ports after `LoanProductData` on loan-api |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---
