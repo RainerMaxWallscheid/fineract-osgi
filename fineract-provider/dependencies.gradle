@@ -31,7 +31,8 @@ dependencies {
     implementation(project(path: ':fineract-command-audit'))
     implementation(project(path: ':fineract-command-jdbc'))
     implementation(project(path: ':fineract-validation'))
-    implementation(project(path: ':fineract-accounting'))
+    implementation(project(path: ':fineract-accounting-api'))
+    implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-investor-api'))
     implementation(project(path: ':fineract-investor-impl'))
     // Rates OSGi: composition root uses api + impl (no façade).

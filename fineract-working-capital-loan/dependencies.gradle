@@ -24,7 +24,8 @@ dependencies {
     // Loan origination: LoanOriginatorData + ports on api only.
     implementation(project(path: ':fineract-loan-origination-api'))
     implementation(project(path: ':fineract-loan'))
-    implementation(project(path: ':fineract-accounting'))
+    implementation(project(path: ':fineract-accounting-api'))
+    implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-cob'))
     implementation('org.apache.avro:avro')
     implementation(

@@ -25,7 +25,8 @@ dependencies {
     // implementation dependencies are directly used (compiled against) in src/main (and src/test)
     //
     implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-accounting'))
+    implementation(project(path: ':fineract-accounting-api'))
+    implementation(project(path: ':fineract-accounting-impl'))
     // Charge OSGi Step 7: pure api only (ChargeCalculationType via loan charge APIs).
     implementation(project(path: ':fineract-charge-api'))
     implementation(project(path: ':fineract-loan'))

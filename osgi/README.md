@@ -104,6 +104,16 @@ Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-m
 
 Provider journal residual uses entities/`AccountingService` from impl. Plan: [15_osgi_bundle_refactoring_fineract-investor.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-investor.md).
 
+### Wave 3: fineract-accounting bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-accounting-api` | `org.apache.fineract.accounting.api` | Ports, DTOs, exceptions, pure constants |
+| `fineract-accounting-impl` | `org.apache.fineract.accounting.impl` | JPA + REST + helpers + `AccountingOsgiServiceRegistrar` |
+| `fineract-accounting-test` | `org.apache.fineract.accounting.test` | Fragment-Host → accounting.impl |
+
+investor-api uses **api only**; loan/savings/provider use api+impl residual. Plan: [15_osgi_bundle_refactoring_fineract-accounting.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-accounting.md).
+
 ## Layout
 
 | Path | Purpose |

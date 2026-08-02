@@ -64,7 +64,13 @@ include ':fineract-command-jdbc'
 include ':fineract-command-audit'
 include ':fineract-command-async'
 include ':fineract-command-disruptor'
-include ':fineract-accounting'
+include ':fineract-accounting-api'
+project(':fineract-accounting-api').projectDir = file('fineract-accounting/api')
+include ':fineract-accounting-impl'
+project(':fineract-accounting-impl').projectDir = file('fineract-accounting/impl')
+include ':fineract-accounting-test'
+project(':fineract-accounting-test').projectDir = file('fineract-accounting/test')
+// No :fineract-accounting façade — depend on -api / -impl explicitly.
 include ':fineract-provider'
 include ':fineract-branch-api'
 project(':fineract-branch-api').projectDir = file('fineract-branch/api')

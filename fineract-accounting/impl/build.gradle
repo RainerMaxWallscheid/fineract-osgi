@@ -1,0 +1,86 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Accounting Implementation (OSGi impl bundle)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+compileJava {
+    dependsOn ':fineract-avro-schemas:buildJavaSdk'
+    dependsOn ':fineract-accounting-api:jar'
+}
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+// Residual exports for domain modules that still reference entities / helpers.
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Accounting Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.accounting.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Accounting implementation (JPA, REST, product mapping helpers, jobs)',
+                'Import-Package': '*',
+                'Export-Package': 'org.apache.fineract.accounting.glaccount.domain,'
+                        + 'org.apache.fineract.accounting.journalentry.domain,'
+                        + 'org.apache.fineract.accounting.journalentry,'
+                        + 'org.apache.fineract.accounting.closure.domain,'
+                        + 'org.apache.fineract.accounting.financialactivityaccount.domain,'
+                        + 'org.apache.fineract.accounting.financialactivityaccount.exception,'
+                        + 'org.apache.fineract.accounting.producttoaccountmapping.domain,'
+                        + 'org.apache.fineract.accounting.producttoaccountmapping.service,'
+                        + 'org.apache.fineract.accounting.retainedearning.domain,'
+                        + 'org.apache.fineract.accounting.rule.domain,'
+                        + 'org.apache.fineract.accounting.rule.starter',
+                'Automatic-Module-Name': 'org.apache.fineract.accounting.impl'
+                )
+    }
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-accounting/impl/bin/main")
+}
+
+eclipse {
+    project {
+        buildCommand([ LaunchConfigHandle: "<project>/.externalToolBuilders/OpenJPA Enhance Builder.launch" ],  'org.eclipse.ui.externaltools.ExternalToolBuilder')
+    }
+}

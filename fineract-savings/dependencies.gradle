@@ -26,7 +26,8 @@ dependencies {
     //
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-cob'))
-    implementation(project(path: ':fineract-accounting'))
+    implementation(project(path: ':fineract-accounting-api'))
+    implementation(project(path: ':fineract-accounting-impl'))
     // Charge OSGi Step 8 residual: savings domain uses charge-api only (ChargeDefinitionPort).
     implementation(project(path: ':fineract-charge-api'))
     // Rates catalog contracts only (no FloatingRate entity in savings).

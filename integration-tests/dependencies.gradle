@@ -24,7 +24,8 @@ dependencies {
     def providerMainOutput = project(':fineract-provider').extensions.getByType(SourceSetContainer).named('main').get().output
     testImplementation( providerMainOutput,
             project(path: ':fineract-core', configuration: 'runtimeElements'),
-            project(path: ':fineract-accounting', configuration: 'runtimeElements'),
+            project(path: ':fineract-accounting-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-accounting-impl', configuration: 'runtimeElements'),
             project(path: ':fineract-investor-api', configuration: 'runtimeElements'),
             project(path: ':fineract-investor-impl', configuration: 'runtimeElements'),
             // Charge catalog runtime (explicit api + impl; façade deprecated).

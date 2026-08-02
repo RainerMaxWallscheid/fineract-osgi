@@ -21,7 +21,7 @@ dependencies {
     // Shared kernel: exceptions, JsonCommand, ExternalId, Page; HttpStatus used by a few exceptions.
     api project(path: ':fineract-core')
     // JournalEntryData on owner journal DTOs
-    api project(path: ':fineract-accounting')
+    api project(path: ':fineract-accounting-api')
 
     implementation 'org.apache.commons:commons-lang3'
     // Spring Data Page on read ports
