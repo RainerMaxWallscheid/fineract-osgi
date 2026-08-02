@@ -176,6 +176,16 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 
 Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
 
+### Core slice: fineract-codes (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-codes-api` | `org.apache.fineract.codes.api` | Pure DTOs + read ports + swagger models |
+| `fineract-codes-impl` | `org.apache.fineract.codes.impl` | REST/handlers + `CodesOsgiServiceRegistrar` |
+| `fineract-codes-test` | `org.apache.fineract.codes.test` | Fragment-Host → codes.impl |
+
+Entities/exceptions residual in **fineract-core**.
+
 ## Layout
 
 | Path | Purpose |

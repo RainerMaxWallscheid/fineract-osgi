@@ -5,7 +5,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | **in progress** — first slice **businessdate** complete |
+| **Status** | **in progress** — slices **businessdate** + **codes** complete |
 | **Rule** | Extract coherent platform slices; **do not** api/impl the whole ~800-type kernel |
 
 ## Why not full core split
@@ -24,11 +24,20 @@
 
 **Consumers:** provider/war compose api+impl; security/cob/WC add businessdate-api where they inject read ports.
 
+## Slice 2 — codes ✅
+
+| Project | Role |
+|---------|------|
+| `:fineract-codes-api` | `CodeValueData`, `CodeData`, read ports, swagger models (no core dep) |
+| `:fineract-codes-impl` | REST/handlers/services (from provider) + `CodesOsgiServiceRegistrar` |
+| Residual in core | `Code`/`CodeValue` entities, repos, exceptions, `CodeValueMapper` |
+
+Core has `api project(':fineract-codes-api')` for transitive DTO access.
+
 ## Candidate later slices
 
 | Slice | Rationale |
 |-------|-----------|
-| codes / code values | Catalog BC in core today |
 | organisation office/staff | Organisation BC leakage |
 | core security residual | Overlaps `fineract-security` |
 | monetary application (currencies API) | Keep Money VO in kernel; peel admin REST |

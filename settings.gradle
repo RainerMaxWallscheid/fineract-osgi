@@ -55,6 +55,13 @@ project(':fineract-businessdate-impl').projectDir = file('fineract-businessdate/
 include ':fineract-businessdate-test'
 project(':fineract-businessdate-test').projectDir = file('fineract-businessdate/test')
 // Core slice: businessdate extracted from fineract-core (kernel enum BusinessDateType remains in core).
+include ':fineract-codes-api'
+project(':fineract-codes-api').projectDir = file('fineract-codes/api')
+include ':fineract-codes-impl'
+project(':fineract-codes-impl').projectDir = file('fineract-codes/impl')
+include ':fineract-codes-test'
+project(':fineract-codes-test').projectDir = file('fineract-codes/test')
+// Core slice: codes catalog (entities residual in core; DTOs/ports/services in codes-*).
 include ':fineract-architecture'
 include ':fineract-security-api'
 project(':fineract-security-api').projectDir = file('fineract-security/api')

@@ -80,6 +80,8 @@ dependencies {
     implementation project(':fineract-core')
     implementation project(':fineract-businessdate-api')
     implementation project(':fineract-businessdate-impl')
+    implementation project(':fineract-codes-api')
+    implementation project(':fineract-codes-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

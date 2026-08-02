@@ -16,13 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Core'
+description = 'Fineract Codes Implementation (core slice)'
 
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
+compileJava {
+    dependsOn ':fineract-codes-api:jar'
+}
+
 configurations {
-    providedRuntime // needed for Spring Boot executable WAR
+    providedRuntime
     providedCompile
     compile() {
         exclude module: 'hibernate-entitymanager'
@@ -44,33 +48,21 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-compileJava {
-    dependsOn ':fineract-avro-schemas:buildJavaSdk'
-    options.compilerArgs += ['-parameters']
-}
-
-// Configuration for the modernizer plugin
-// https://github.com/andygoossens/gradle-modernizer-plugin
-modernizer {
-    ignoreClassNamePatterns = [
-        '.*AbstractPersistableCustom',
-        '.*EntityTables',
-        '.*domain.*'
-    ]
-}
-
-// If we are running Gradle within Eclipse to enhance classes with OpenJPA,
-// set the classes directory to point to Eclipse's default build directory
-if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-core/bin/main")
-}
-
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Codes Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.codes.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Codes REST, handlers, read/write services',
+                'Import-Package': '*',
+                'Export-Package': 'org.apache.fineract.infrastructure.codes.api,'
+                        + 'org.apache.fineract.infrastructure.codes.handler,'
+                        + 'org.apache.fineract.infrastructure.codes.impl.osgi,'
+                        + 'org.apache.fineract.infrastructure.codes.serialization,'
+                        + 'org.apache.fineract.infrastructure.codes.service',
+                'Automatic-Module-Name': 'org.apache.fineract.codes.impl'
+                )
     }
 }

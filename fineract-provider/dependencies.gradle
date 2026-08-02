@@ -28,6 +28,8 @@ dependencies {
     // Core slice: businessdate application module (kernel enum remains in core).
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-businessdate-impl'))
+    implementation(project(path: ':fineract-codes-api'))
+    implementation(project(path: ':fineract-codes-impl'))
     implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-cob-impl'))
     implementation(project(path: ':fineract-command-api'))

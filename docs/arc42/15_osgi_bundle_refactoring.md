@@ -266,7 +266,7 @@ Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
 Wave 3 complete         → investor, accounting, savings  ★★★
 Wave 4 progressed       → loan + progressive + WC + cob + security ★★☆
-Core slices started     → businessdate extracted ★☆☆ (more slices optional)
+Core slices progressed  → businessdate + codes ★☆☆ (more optional)
 Huge / core banking     → provider           later
 Shared kernel           → core, validation         don't force BC split
 ```
