@@ -94,6 +94,16 @@ Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_b
 
 Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-mix.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-mix.md).
 
+### Wave 3: fineract-investor bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-investor-api` | `org.apache.fineract.investor.api` | Pure ports, DTOs/status enums, exceptions |
+| `fineract-investor-impl` | `org.apache.fineract.investor.impl` | JPA + REST + COB + enrichers + `InvestorOsgiServiceRegistrar` |
+| `fineract-investor-test` | `org.apache.fineract.investor.test` | Fragment-Host → investor.impl |
+
+Provider journal residual uses entities/`AccountingService` from impl. Plan: [15_osgi_bundle_refactoring_fineract-investor.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-investor.md).
+
 ## Layout
 
 | Path | Purpose |

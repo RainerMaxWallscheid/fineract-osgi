@@ -25,7 +25,8 @@ dependencies {
     testImplementation( providerMainOutput,
             project(path: ':fineract-core', configuration: 'runtimeElements'),
             project(path: ':fineract-accounting', configuration: 'runtimeElements'),
-            project(path: ':fineract-investor', configuration: 'runtimeElements'),
+            project(path: ':fineract-investor-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-investor-impl', configuration: 'runtimeElements'),
             // Charge catalog runtime (explicit api + impl; façade deprecated).
             project(path: ':fineract-charge-api', configuration: 'runtimeElements'),
             project(path: ':fineract-charge-impl', configuration: 'runtimeElements'),

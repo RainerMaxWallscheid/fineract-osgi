@@ -80,7 +80,13 @@ project(':fineract-document-impl').projectDir = file('fineract-document/impl')
 include ':fineract-document-test'
 project(':fineract-document-test').projectDir = file('fineract-document/test')
 // No :fineract-document façade — depend on -api / -impl explicitly.
-include ':fineract-investor'
+include ':fineract-investor-api'
+project(':fineract-investor-api').projectDir = file('fineract-investor/api')
+include ':fineract-investor-impl'
+project(':fineract-investor-impl').projectDir = file('fineract-investor/impl')
+include ':fineract-investor-test'
+project(':fineract-investor-test').projectDir = file('fineract-investor/test')
+// No :fineract-investor façade — depend on -api / -impl explicitly.
 include ':fineract-rates-api'
 project(':fineract-rates-api').projectDir = file('fineract-rates/api')
 include ':fineract-rates-impl'

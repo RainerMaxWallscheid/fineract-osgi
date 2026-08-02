@@ -17,13 +17,17 @@
  * under the License.
  */
 
-/**
- * Module API (ADR-021) — the only package other Gradle modules should depend on
- * from this bounded context.
- *
- * <p>Put port interfaces, stable DTOs/IDs and public contract types here.
- * Do not place JPA entities, Spring Data repositories or REST resources in this package.
- *
- * @see docs/arc42/14_module_api_boundaries.md
- */
-package org.apache.fineract.investor.moduleapi;
+dependencies {
+    // Shared kernel: exceptions, JsonCommand, ExternalId, Page; HttpStatus used by a few exceptions.
+    api project(path: ':fineract-core')
+    // JournalEntryData on owner journal DTOs
+    api project(path: ':fineract-accounting')
+
+    implementation 'org.apache.commons:commons-lang3'
+    // Spring Data Page on read ports
+    compileOnly 'org.springframework.data:spring-data-commons'
+    // Exception status constants
+    compileOnly 'org.springframework:spring-web'
+
+    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+}

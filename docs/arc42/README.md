@@ -27,6 +27,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 15d | [fineract-branch split plan](15_osgi_bundle_refactoring_fineract-branch.md) | Wave‑2 branch/teller api/impl/test plan (**complete**) |
 | 15e | [fineract-loan-origination split plan](15_osgi_bundle_refactoring_fineract-loan-origination.md) | Wave‑2 loan-originator api/impl/test plan (**complete**) |
 | 15f | [fineract-mix split plan](15_osgi_bundle_refactoring_fineract-mix.md) | Wave‑2 MIX/XBRL api/impl/test plan (**complete**) |
+| 15g | [fineract-investor split plan](15_osgi_bundle_refactoring_fineract-investor.md) | Wave‑3 investor/external asset-owner api/impl/test plan (**complete**; journal residual) |
 
 ## Complementary Artifacts
 

@@ -234,7 +234,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 | Rank | Module | ~main scale | Why wait |
 |------|--------|-------------|----------|
-| **8** | **`fineract-investor`** | ~100 | Clear investor BC + search; after charge/accounting ports stabilize |
+| **8** | **`fineract-investor`** | ~100 | **Complete** — api/impl/test; pure ports + DTO residual journal. [investor plan](15_osgi_bundle_refactoring_fineract-investor.md) |
 | **9** | **`fineract-accounting`** | ~150 | Central GL/journal; many dependents. Split only when ports are stable |
 | **10** | **`fineract-savings`** | ~180 | Full product BC; needs charge/tax/accounting APIs first |
 
@@ -263,18 +263,19 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 ```text
 Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
-Next                    → Wave 3 investor (or accounting)          ★★☆
+Wave 3 started          → investor               ★★★ complete
+Next Wave 3             → accounting             ★★☆ next
 Many dependents         → accounting             high value, more rewiring
 Huge / core banking     → loan, provider         later
 Shared kernel           → core, validation       don't force BC split
 ```
 
-#### Parallel work after Wave 2 complete
+#### Parallel work after Wave 2 / investor
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | **`fineract-investor`** api/impl/test — [15.6 Wave 3](#wave-3--full-domain-bcs-after-module-api-hardening) |
-| **Parallel** | Optional ArchUnit freezes for completed modules; command façade already removed |
+| **Next PR series** | **`fineract-accounting`** api/impl/test — [15.6 Wave 3](#wave-3--full-domain-bcs-after-module-api-hardening) |
+| **Parallel** | Investor residual: entity-free `AccountingService` port; ArchUnit freezes |
 | **Do not start** | loan / provider / full-core split |
 
 ---
