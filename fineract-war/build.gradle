@@ -98,11 +98,13 @@ dependencies {
     implementation project(':fineract-loan-impl')
     implementation project(':fineract-loan-origination-api')
     implementation project(':fineract-loan-origination-impl')
-    implementation project(':fineract-progressive-loan')
+    implementation project(':fineract-progressive-loan-api')
+    implementation project(':fineract-progressive-loan-impl')
     implementation project(':fineract-savings-api')
     implementation project(':fineract-savings-impl')
     implementation project(':fineract-provider')
-    implementation project(':fineract-working-capital-loan')
+    implementation project(':fineract-working-capital-loan-api')
+    implementation project(':fineract-working-capital-loan-impl')
 }
 
 tasks.withType(Tar) {

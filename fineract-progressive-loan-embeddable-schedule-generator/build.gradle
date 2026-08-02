@@ -29,7 +29,8 @@ var requiredModuleNames = [
         'fineract-core',
         'fineract-loan-api',
         'fineract-loan-impl',
-        'fineract-progressive-loan',
+        'fineract-progressive-loan-api',
+        'fineract-progressive-loan-impl',
 ]
 
 tasks.named('shadowJar', ShadowJar) {

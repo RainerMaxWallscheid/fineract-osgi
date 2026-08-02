@@ -242,8 +242,9 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 | Module | ~main scale | Verdict |
 |--------|-------------|---------|
-| **`fineract-loan`** | ~700 | **Complete (initial)** — api/impl/test; pure ports/DTOs/enums; entity residual for progressive/WC/provider. [loan plan](15_osgi_bundle_refactoring_fineract-loan.md) |
-| **`fineract-progressive-loan` / `fineract-working-capital-loan`** | 80–320 | Product variants of loan — after `fineract-loan` ports (next) |
+| **`fineract-loan`** | ~700 | **Complete** — api/impl/test; entity residual. [loan plan](15_osgi_bundle_refactoring_fineract-loan.md) |
+| **`fineract-progressive-loan`** | ~95 | **Complete** — api/impl/test; schedule residual. [progressive plan](15_osgi_bundle_refactoring_fineract-progressive-loan.md) |
+| **`fineract-working-capital-loan`** | ~340 | **Complete** — api/impl/test; entity residual. [WC plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) |
 | **`fineract-cob`** | ~65 | Orchestration around loan more than a pure BC |
 | **`fineract-security`** | ~65 | Cross-cutting; careful export policy |
 | **`fineract-core`** | ~800 | Shared kernel / platform — extract *slices*, do not “api/impl” the whole module |
@@ -264,19 +265,18 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
 Wave 3 complete         → investor, accounting, savings  ★★★
-Wave 4 started          → loan api/impl/test ★★☆ (entity residual)
-Next                    → progressive / WC split, then cob / security
-Many dependents         → progressive, WC, provider
+Wave 4 progressed       → loan + progressive + WC ★★☆ (entity residual)
+Next                    → cob / security, then core slices
 Huge / core banking     → provider           later
 Shared kernel           → core, validation         don't force BC split
 ```
 
-#### Parallel work after loan split
+#### Parallel work after progressive / WC
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | **`fineract-progressive-loan`** / **`fineract-working-capital-loan`** api/impl/test |
-| **Parallel** | Loan entity residual (pure account ports); accounting/savings residuals |
+| **Next PR series** | **`fineract-cob`** or **`fineract-security`** api/impl/test |
+| **Parallel** | Loan / progressive / WC entity residuals (pure account ports) |
 | **Do not start** | full provider / core split |
 
 ---

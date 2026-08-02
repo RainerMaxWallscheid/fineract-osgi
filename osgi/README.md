@@ -134,6 +134,22 @@ Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_finer
 
 Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_refactoring_fineract-loan.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan.md).
 
+### Wave 4: fineract-progressive-loan bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-progressive-loan-api` | `org.apache.fineract.progressiveloan.api` | Pure ports & calc DTOs |
+| `fineract-progressive-loan-impl` | `org.apache.fineract.progressiveloan.impl` | Schedule engine residual + `ProgressiveLoanOsgiServiceRegistrar` |
+| `fineract-progressive-loan-test` | `org.apache.fineract.progressiveloan.test` | Fragment-Host → progressiveloan.impl |
+
+### Wave 4: fineract-working-capital-loan bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-working-capital-loan-api` | `org.apache.fineract.workingcapitalloan.api` | Pure ports, DTOs, exceptions, pure enums |
+| `fineract-working-capital-loan-impl` | `org.apache.fineract.workingcapitalloan.impl` | Domain + COB residual + `WorkingCapitalLoanOsgiServiceRegistrar` |
+| `fineract-working-capital-loan-test` | `org.apache.fineract.workingcapitalloan.test` | Fragment-Host → workingcapitalloan.impl |
+
 ## Layout
 
 | Path | Purpose |

@@ -18,7 +18,8 @@
  */
 
 dependencies {
-    implementation(project(path: ':fineract-progressive-loan'))
+    implementation(project(path: ':fineract-progressive-loan-api'))
+    implementation(project(path: ':fineract-progressive-loan-impl'))
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-loan-impl'))
     testImplementation(project(path: ':fineract-core'))

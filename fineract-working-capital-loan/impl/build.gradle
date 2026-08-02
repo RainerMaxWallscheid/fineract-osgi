@@ -1,0 +1,124 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Working Capital Loan Implementation (OSGi impl bundle)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+compileJava {
+    dependsOn ':fineract-avro-schemas:buildJavaSdk'
+    dependsOn ':fineract-working-capital-loan-api:jar'
+}
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Working Capital Loan Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.workingcapitalloan.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Working capital loan domain, COB, residual services',
+                'Import-Package': '*',
+                'Export-Package': 'org.apache.fineract.cob.api,'
+                        + 'org.apache.fineract.cob.domain,'
+                        + 'org.apache.fineract.cob.internal,'
+                        + 'org.apache.fineract.cob.workingcapitalloan,'
+                        + 'org.apache.fineract.cob.workingcapitalloan.businessstep,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.workingcapitalloan.transaction,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.accounting,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.api,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.calc,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.data,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.domain,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.handler,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.impl.osgi,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.mapper,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.repository,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.serialization,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.service,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.validator,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.api,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.domain,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.handler,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.mapper,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.repository,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.service,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanbreach.validator,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.api,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.domain,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.handler,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.mapper,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.repository,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.service,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloannearbreach.validator,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.api,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.data,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.domain,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.handler,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.mapper,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.repository,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.serialization,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloanproduct.service',
+                'Automatic-Module-Name': 'org.apache.fineract.workingcapitalloan.impl'
+                )
+    }
+}
+
+modernizer {
+    ignoreClassNamePatterns = [
+        '.*AbstractPersistableCustom',
+        '.*EntityTables',
+        '.*domain.*'
+    ]
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-working-capital-loan/impl/bin/main")
+}
+
+eclipse {
+    project {
+        buildCommand([ LaunchConfigHandle: "<project>/.externalToolBuilders/OpenJPA Enhance Builder.launch" ],  'org.eclipse.ui.externaltools.ExternalToolBuilder')
+    }
+}

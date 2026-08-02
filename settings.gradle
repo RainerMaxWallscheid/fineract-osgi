@@ -153,9 +153,21 @@ include ':fineract-doc'
 include ':fineract-avro-schemas'
 include ':fineract-e2e-tests-core'
 include ':fineract-e2e-tests-runner'
-include 'fineract-progressive-loan'
+include ':fineract-progressive-loan-api'
+project(':fineract-progressive-loan-api').projectDir = file('fineract-progressive-loan/api')
+include ':fineract-progressive-loan-impl'
+project(':fineract-progressive-loan-impl').projectDir = file('fineract-progressive-loan/impl')
+include ':fineract-progressive-loan-test'
+project(':fineract-progressive-loan-test').projectDir = file('fineract-progressive-loan/test')
+// No :fineract-progressive-loan façade — depend on -api / -impl explicitly.
 include 'fineract-progressive-loan-embeddable-schedule-generator'
-include 'fineract-working-capital-loan'
+include ':fineract-working-capital-loan-api'
+project(':fineract-working-capital-loan-api').projectDir = file('fineract-working-capital-loan/api')
+include ':fineract-working-capital-loan-impl'
+project(':fineract-working-capital-loan-impl').projectDir = file('fineract-working-capital-loan/impl')
+include ':fineract-working-capital-loan-test'
+project(':fineract-working-capital-loan-test').projectDir = file('fineract-working-capital-loan/test')
+// No :fineract-working-capital-loan façade — depend on -api / -impl explicitly.
 // NOTE: custom Docker image with all custom modules included
 include ':custom:docker'
 // NOTE: dynamically load custom modules with pattern "custom -> company -> category -> module"
