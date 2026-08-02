@@ -25,7 +25,8 @@ dependencies {
     testImplementation(project(path: ':fineract-loan-origination-api'))
     testImplementation(project(path: ':fineract-accounting-api'))
     testImplementation(project(path: ':fineract-charge-api'))
-    testImplementation(project(path: ':fineract-cob'))
+    testImplementation(project(path: ':fineract-cob-api'))
+    testImplementation(project(path: ':fineract-cob-impl'))
     testImplementation( 'io.github.classgraph:classgraph' )
     testImplementation 'com.google.code.gson:gson'
     testImplementation 'org.mapstruct:mapstruct'

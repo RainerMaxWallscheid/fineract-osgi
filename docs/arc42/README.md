@@ -33,6 +33,8 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 15j | [fineract-loan split plan](15_osgi_bundle_refactoring_fineract-loan.md) | Wave‑4 loan api/impl/test plan (**complete**; entity residual for progressive/WC/provider) |
 | 15k | [fineract-progressive-loan split plan](15_osgi_bundle_refactoring_fineract-progressive-loan.md) | Wave‑4 progressive loan api/impl/test plan (**complete**) |
 | 15l | [fineract-working-capital-loan split plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) | Wave‑4 working-capital loan api/impl/test plan (**complete**) |
+| 15m | [fineract-cob split plan](15_osgi_bundle_refactoring_fineract-cob.md) | Wave‑4 COB api/impl/test plan (**complete**) |
+| 15n | [fineract-security split plan](15_osgi_bundle_refactoring_fineract-security.md) | Wave‑4 security api/impl/test plan (**complete**) |
 
 ## Complementary Artifacts
 

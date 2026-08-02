@@ -150,6 +150,22 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | `fineract-working-capital-loan-impl` | `org.apache.fineract.workingcapitalloan.impl` | Domain + COB residual + `WorkingCapitalLoanOsgiServiceRegistrar` |
 | `fineract-working-capital-loan-test` | `org.apache.fineract.workingcapitalloan.test` | Fragment-Host → workingcapitalloan.impl |
 
+### Wave 4: fineract-cob bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-cob-api` | `org.apache.fineract.cob.api` | Pure ports, DTOs, exceptions |
+| `fineract-cob-impl` | `org.apache.fineract.cob.impl` | Batch residual + `CobOsgiServiceRegistrar` |
+| `fineract-cob-test` | `org.apache.fineract.cob.test` | Fragment-Host → cob.impl |
+
+### Wave 4: fineract-security bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-security-api` | `org.apache.fineract.security.api` | Pure ports, DTOs, exceptions, constants |
+| `fineract-security-impl` | `org.apache.fineract.security.impl` | Filters/OIDC residual + `SecurityOsgiServiceRegistrar` |
+| `fineract-security-test` | `org.apache.fineract.security.test` | Fragment-Host → security.impl |
+
 ## Layout
 
 | Path | Purpose |

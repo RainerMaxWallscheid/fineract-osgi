@@ -49,8 +49,20 @@ buildCache {
 rootProject.name='fineract'
 include ':fineract-core'
 include ':fineract-architecture'
-include ':fineract-security'
-include ':fineract-cob'
+include ':fineract-security-api'
+project(':fineract-security-api').projectDir = file('fineract-security/api')
+include ':fineract-security-impl'
+project(':fineract-security-impl').projectDir = file('fineract-security/impl')
+include ':fineract-security-test'
+project(':fineract-security-test').projectDir = file('fineract-security/test')
+// No :fineract-security façade — depend on -api / -impl explicitly.
+include ':fineract-cob-api'
+project(':fineract-cob-api').projectDir = file('fineract-cob/api')
+include ':fineract-cob-impl'
+project(':fineract-cob-impl').projectDir = file('fineract-cob/impl')
+include ':fineract-cob-test'
+project(':fineract-cob-test').projectDir = file('fineract-cob/test')
+// No :fineract-cob façade — depend on -api / -impl explicitly.
 include ':fineract-validation'
 include ':fineract-command-api'
 project(':fineract-command-api').projectDir = file('fineract-command/api')

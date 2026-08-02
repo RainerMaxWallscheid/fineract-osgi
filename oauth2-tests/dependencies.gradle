@@ -23,7 +23,8 @@ dependencies {
     tomcat 'org.apache.tomcat:tomcat:10.1.55@zip'
     testImplementation( files("$rootDir/fineract-provider/build/classes/java/main/"),
             project(path: ':fineract-provider', configuration: 'runtimeElements'),
-            project(path: ':fineract-security', configuration: 'runtimeElements'),
+            project(path: ':fineract-security-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-security-impl', configuration: 'runtimeElements'),
             'org.junit.jupiter:junit-jupiter-api',
             'org.bouncycastle:bcpkix-jdk18on',
             'org.bouncycastle:bcprov-jdk18on',

@@ -245,8 +245,8 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 | **`fineract-loan`** | ~700 | **Complete** — api/impl/test; entity residual. [loan plan](15_osgi_bundle_refactoring_fineract-loan.md) |
 | **`fineract-progressive-loan`** | ~95 | **Complete** — api/impl/test; schedule residual. [progressive plan](15_osgi_bundle_refactoring_fineract-progressive-loan.md) |
 | **`fineract-working-capital-loan`** | ~340 | **Complete** — api/impl/test; entity residual. [WC plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) |
-| **`fineract-cob`** | ~65 | Orchestration around loan more than a pure BC |
-| **`fineract-security`** | ~65 | Cross-cutting; careful export policy |
+| **`fineract-cob`** | ~65 | **Complete** — api/impl/test; entity-typed step residual. [cob plan](15_osgi_bundle_refactoring_fineract-cob.md) |
+| **`fineract-security`** | ~70 | **Complete** — api/impl/test; Spring Security residual. [security plan](15_osgi_bundle_refactoring_fineract-security.md) |
 | **`fineract-core`** | ~800 | Shared kernel / platform — extract *slices*, do not “api/impl” the whole module |
 | **`fineract-provider`** | ~2500 | Composition root — hosts the Spring↔OSGi bridge; **never** the next pilot |
 
@@ -265,18 +265,18 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
 Wave 3 complete         → investor, accounting, savings  ★★★
-Wave 4 progressed       → loan + progressive + WC ★★☆ (entity residual)
-Next                    → cob / security, then core slices
+Wave 4 progressed       → loan + progressive + WC + cob + security ★★☆
+Next                    → core slices (not full core split), validation stays library
 Huge / core banking     → provider           later
 Shared kernel           → core, validation         don't force BC split
 ```
 
-#### Parallel work after progressive / WC
+#### Parallel work after cob / security
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | **`fineract-cob`** or **`fineract-security`** api/impl/test |
-| **Parallel** | Loan / progressive / WC entity residuals (pure account ports) |
+| **Next PR series** | Optional **core slices** only — do not api/impl the whole `fineract-core` |
+| **Parallel** | Domain entity residuals (loan / savings / accounting ports) |
 | **Do not start** | full provider / core split |
 
 ---

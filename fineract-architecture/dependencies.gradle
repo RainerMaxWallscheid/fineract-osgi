@@ -42,7 +42,8 @@ dependencies {
     testImplementation project(path: ':fineract-tax-impl')
     testImplementation project(path: ':fineract-rates-api')
     testImplementation project(path: ':fineract-rates-impl')
-    testImplementation project(path: ':fineract-cob')
+    testImplementation project(path: ':fineract-cob-api')
+    testImplementation project(path: ':fineract-cob-impl')
     testImplementation project(path: ':fineract-branch-api')
     testImplementation project(path: ':fineract-branch-impl')
 
