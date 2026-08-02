@@ -236,7 +236,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 |------|--------|-------------|----------|
 | **8** | **`fineract-investor`** | ~100 | **Complete** — api/impl/test; pure ports + DTO residual journal. [investor plan](15_osgi_bundle_refactoring_fineract-investor.md) |
 | **9** | **`fineract-accounting`** | ~150 | **Complete** — api/impl/test; entity residual for loan/journal consumers. [accounting plan](15_osgi_bundle_refactoring_fineract-accounting.md) |
-| **10** | **`fineract-savings`** | ~180 | Full product BC; needs charge/tax/accounting APIs first |
+| **10** | **`fineract-savings`** | ~180 | **Complete** — api/impl/test; provider entity residual. [savings plan](15_osgi_bundle_refactoring_fineract-savings.md) |
 
 #### Wave 4 — last (high coupling / composition)
 
@@ -263,20 +263,20 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 ```text
 Wave 1 done             → charge, rates, tax     ★★★ complete
 Wave 2 complete         → document, branch, loan-origination, mix  ★★★
-Wave 3 progressed       → investor, accounting   ★★★ complete
-Next Wave 3             → savings                ★★☆ next
-Many dependents         → savings                high value, more rewiring
-Huge / core banking     → loan, provider         later
-Shared kernel           → core, validation       don't force BC split
+Wave 3 progressed       → investor, accounting, savings  ★★★ complete
+Next                    → Wave 4 loan / progressive / WC ★☆☆ later
+Many dependents         → loan                     high value, more rewiring
+Huge / core banking     → loan, provider           later
+Shared kernel           → core, validation         don't force BC split
 ```
 
-#### Parallel work after Wave 3 investor / accounting
+#### Parallel work after Wave 3 (through savings)
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | **`fineract-savings`** api/impl/test — [15.6 Wave 3](#wave-3--full-domain-bcs-after-module-api-hardening) |
-| **Parallel** | Accounting residual (product-mapping ports); investor journal residual |
-| **Do not start** | loan / provider / full-core split |
+| **Next PR series** | Plan **`fineract-loan`** (or progressive/WC) — [15.6 Wave 4](#wave-4--last-high-coupling--composition) |
+| **Parallel** | Accounting / savings / investor entity residuals |
+| **Do not start** | full provider / core split |
 
 ---
 

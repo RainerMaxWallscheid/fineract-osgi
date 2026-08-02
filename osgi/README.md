@@ -114,6 +114,16 @@ Provider journal residual uses entities/`AccountingService` from impl. Plan: [15
 
 investor-api uses **api only**; loan/savings/provider use api+impl residual. Plan: [15_osgi_bundle_refactoring_fineract-accounting.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-accounting.md).
 
+### Wave 3: fineract-savings bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-savings-api` | `org.apache.fineract.savings.api` | Pure product/application ports, DTOs, exceptions |
+| `fineract-savings-impl` | `org.apache.fineract.savings.impl` | Domain + entity-typed services + COB + `SavingsOsgiServiceRegistrar` |
+| `fineract-savings-test` | `org.apache.fineract.savings.test` | Fragment-Host → savings.impl |
+
+Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_fineract-savings.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-savings.md).
+
 ## Layout
 
 | Path | Purpose |

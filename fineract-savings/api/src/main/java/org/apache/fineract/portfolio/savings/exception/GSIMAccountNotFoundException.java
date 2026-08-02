@@ -16,15 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.portfolio.savings.exception;
 
-dependencies {
-    implementation(project(':custom:acme:note:service'))
-    implementation('org.springframework.boot:spring-boot-starter')
-    testImplementation(project(':fineract-core'))
-    testImplementation(project(':fineract-loan'))
-    testImplementation(project(':fineract-savings-api'))
-    testImplementation(project(':fineract-savings-impl'))
-    testImplementation(project(':fineract-provider'))
-    testImplementation('org.springframework.boot:spring-boot-starter-jdbc')
-    testImplementation('org.springframework.boot:spring-boot-starter-data-jpa')
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
+
+/**
+ * A {@link RuntimeException} thrown when a GSIM account is not found.
+ */
+public class GSIMAccountNotFoundException extends AbstractPlatformResourceNotFoundException {
+
+    public GSIMAccountNotFoundException(final Long gsimId, final Exception e) {
+        super("error.msg.gsim.account.id.invalid", "GSIM account with identifier " + gsimId + " does not exist", gsimId, e);
+    }
 }
