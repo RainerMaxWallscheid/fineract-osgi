@@ -6,10 +6,22 @@ Platform security (auth, 2FA, OIDC) — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-security-api` | `api/` | `org.apache.fineract.security.api` | Pure ports, DTOs, exceptions, constants |
-| `fineract-security-impl` | `impl/` | `org.apache.fineract.security.impl` | Filters, OIDC residual, Spring Security |
+| `fineract-security-impl` | `impl/` | `org.apache.fineract.security.impl` | Filters, OIDC residual, Spring Security, SQL validators |
 | `fineract-security-test` | `test/` | `org.apache.fineract.security.test` | Fragment-Host → impl |
 
-No façade. Provider / oauth2-tests use **api + impl**.
+No façade. Provider / oauth2-tests / war use **api + impl**.
+
+### Kernel residual in `fineract-core`
+
+Types used across the shared kernel stay in core (same packages) to avoid core↔security-api cycles:
+
+- `PlatformSecurityContext`, password encoder / encryptor ports
+- `PlatformUser` domain + repository
+- `SQLBuilder`, SQL injection exception helpers
+- Platform security exceptions used by core mappers / validation
+
+Moved into this module (residual peel): `PlatformUserDetailsService`, `SqlInjectionPreventerService`,
+`ColumnValidator`, `DefaultSqlValidator`, `DefaultInputValidator`.
 
 ```bash
 ./gradlew :fineract-security-api:jar :fineract-security-impl:jar :fineract-security-test:test

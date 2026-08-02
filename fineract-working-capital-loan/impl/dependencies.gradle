@@ -21,6 +21,7 @@ dependencies {
     api project(path: ':fineract-working-capital-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-charge-api'))
     implementation(project(path: ':fineract-loan-origination-api'))

@@ -62,6 +62,19 @@ project(':fineract-codes-impl').projectDir = file('fineract-codes/impl')
 include ':fineract-codes-test'
 project(':fineract-codes-test').projectDir = file('fineract-codes/test')
 // Core slice: codes catalog (entities residual in core; DTOs/ports/services in codes-*).
+
+include ':fineract-organisation-api'
+project(':fineract-organisation-api').projectDir = file('fineract-organisation/api')
+include ':fineract-organisation-impl'
+project(':fineract-organisation-impl').projectDir = file('fineract-organisation/impl')
+include ':fineract-organisation-test'
+project(':fineract-organisation-test').projectDir = file('fineract-organisation/test')
+include ':fineract-monetary-api'
+project(':fineract-monetary-api').projectDir = file('fineract-monetary/api')
+include ':fineract-monetary-impl'
+project(':fineract-monetary-impl').projectDir = file('fineract-monetary/impl')
+include ':fineract-monetary-test'
+project(':fineract-monetary-test').projectDir = file('fineract-monetary/test')
 include ':fineract-architecture'
 include ':fineract-security-api'
 project(':fineract-security-api').projectDir = file('fineract-security/api')

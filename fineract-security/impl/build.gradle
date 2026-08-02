@@ -68,7 +68,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.security.filter,'
                         + 'org.apache.fineract.infrastructure.security.handler,'
                         + 'org.apache.fineract.infrastructure.security.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.security.service',
+                        + 'org.apache.fineract.infrastructure.security.service,'
+                        + 'org.apache.fineract.infrastructure.security.utils',
                 'Automatic-Module-Name': 'org.apache.fineract.security.impl'
                 )
     }

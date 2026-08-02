@@ -21,6 +21,7 @@ dependencies {
     api project(path: ':fineract-accounting-api')
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-organisation-api'))
     implementation(project(path: ':fineract-charge-api'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
