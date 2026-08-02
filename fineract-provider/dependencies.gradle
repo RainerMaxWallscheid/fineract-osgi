@@ -68,6 +68,8 @@ dependencies {
     implementation(project(path: ':fineract-loan-origination-impl'))
     implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-security-impl'))
+    implementation(project(path: ':fineract-useradministration-api'))
+    implementation(project(path: ':fineract-useradministration-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

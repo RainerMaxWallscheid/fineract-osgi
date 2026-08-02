@@ -73,6 +73,13 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | pure criteria ports without loan entities | Needs `LoanProductData` on loan-api first |
 | full Money VO extraction | Deferred (kernel residual) |
 
+## Related provider peels
+
+| Peel | Status |
+|------|--------|
+| `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core |
+
+
 ## Commands
 
 ```bash

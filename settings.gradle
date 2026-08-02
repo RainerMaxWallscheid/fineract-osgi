@@ -83,6 +83,14 @@ project(':fineract-security-impl').projectDir = file('fineract-security/impl')
 include ':fineract-security-test'
 project(':fineract-security-test').projectDir = file('fineract-security/test')
 // No :fineract-security façade — depend on -api / -impl explicitly.
+include ':fineract-useradministration-api'
+project(':fineract-useradministration-api').projectDir = file('fineract-useradministration/api')
+include ':fineract-useradministration-impl'
+project(':fineract-useradministration-impl').projectDir = file('fineract-useradministration/impl')
+include ':fineract-useradministration-test'
+project(':fineract-useradministration-test').projectDir = file('fineract-useradministration/test')
+// No :fineract-useradministration façade — depend on -api / -impl explicitly.
+
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')
 include ':fineract-cob-impl'
