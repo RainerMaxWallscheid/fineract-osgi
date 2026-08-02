@@ -121,7 +121,13 @@ project(':fineract-loan-origination-impl').projectDir = file('fineract-loan-orig
 include ':fineract-loan-origination-test'
 project(':fineract-loan-origination-test').projectDir = file('fineract-loan-origination/test')
 // No :fineract-loan-origination façade — depend on -api / -impl explicitly.
-include ':fineract-loan'
+include ':fineract-loan-api'
+project(':fineract-loan-api').projectDir = file('fineract-loan/api')
+include ':fineract-loan-impl'
+project(':fineract-loan-impl').projectDir = file('fineract-loan/impl')
+include ':fineract-loan-test'
+project(':fineract-loan-test').projectDir = file('fineract-loan/test')
+// No :fineract-loan façade — depend on -api / -impl explicitly.
 include ':fineract-savings-api'
 project(':fineract-savings-api').projectDir = file('fineract-savings/api')
 include ':fineract-savings-impl'

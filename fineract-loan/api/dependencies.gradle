@@ -1,0 +1,44 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+dependencies {
+    // Shared kernel: LoanStatus, monetary, core DTOs, ExternalId, …
+    api project(path: ':fineract-core')
+    // ChargeData / charge catalog on pure loan charge DTOs
+    api project(path: ':fineract-charge-api')
+    // Accounting DTOs used by pure product/account bridge data
+    api project(path: ':fineract-accounting-api')
+    // Loan originator pure DTO on application ports
+    api project(path: ':fineract-loan-origination-api')
+    // Floating rate DTOs on pure product data slices
+    api project(path: ':fineract-rates-api')
+    // Tax identifiers on pure charge tax DTOs
+    api project(path: ':fineract-tax-api')
+
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'com.google.code.gson:gson'
+    implementation 'com.google.guava:guava'
+    implementation 'io.swagger.core.v3:swagger-annotations-jakarta'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    // LoanChargePaidByData uses @Default
+    compileOnly 'org.springframework.integration:spring-integration-core'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
+}

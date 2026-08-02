@@ -1,0 +1,151 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Loan Implementation (OSGi impl bundle)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+compileJava {
+    dependsOn ':fineract-avro-schemas:buildJavaSdk'
+    dependsOn ':fineract-loan-api:jar'
+}
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+// Residual exports for progressive/WC/provider/custom composition roots (entity residual).
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Loan Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.loan.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'Loan domain, entity-typed services, COB steps, schedule, delinquency',
+                'Import-Package': '*',
+                'Export-Package': 'org.apache.fineract.accounting.productaccountmapping.service,'
+                        + 'org.apache.fineract.cob.loan,'
+                        + 'org.apache.fineract.portfolio.collateral.api,'
+                        + 'org.apache.fineract.portfolio.collateral.domain,'
+                        + 'org.apache.fineract.portfolio.collateralmanagement.api,'
+                        + 'org.apache.fineract.portfolio.collateralmanagement.domain,'
+                        + 'org.apache.fineract.portfolio.delinquency.api,'
+                        + 'org.apache.fineract.portfolio.delinquency.data,'
+                        + 'org.apache.fineract.portfolio.delinquency.domain,'
+                        + 'org.apache.fineract.portfolio.delinquency.handler,'
+                        + 'org.apache.fineract.portfolio.delinquency.helper,'
+                        + 'org.apache.fineract.portfolio.delinquency.mapper,'
+                        + 'org.apache.fineract.portfolio.delinquency.service,'
+                        + 'org.apache.fineract.portfolio.delinquency.spi,'
+                        + 'org.apache.fineract.portfolio.delinquency.starter,'
+                        + 'org.apache.fineract.portfolio.delinquency.validator,'
+                        + 'org.apache.fineract.portfolio.interestpauses.api,'
+                        + 'org.apache.fineract.portfolio.interestpauses.handler,'
+                        + 'org.apache.fineract.portfolio.interestpauses.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.api,'
+                        + 'org.apache.fineract.portfolio.loanaccount.command,'
+                        + 'org.apache.fineract.portfolio.loanaccount.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain.arrears,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain.reaging,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain.reamortization,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor,'
+                        + 'org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.impl,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.command,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.domain,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.handler,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.serialization,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.handler,'
+                        + 'org.apache.fineract.portfolio.loanaccount.loanschedule.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.loanschedule.domain,'
+                        + 'org.apache.fineract.portfolio.loanaccount.loanschedule.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.mapper,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.api,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.handler,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.serialization,'
+                        + 'org.apache.fineract.portfolio.loanaccount.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.service.listener,'
+                        + 'org.apache.fineract.portfolio.loanaccount.service.schedule,'
+                        + 'org.apache.fineract.portfolio.loanaccount.starter,'
+                        + 'org.apache.fineract.portfolio.loanproduct,'
+                        + 'org.apache.fineract.portfolio.loanproduct.api,'
+                        + 'org.apache.fineract.portfolio.loanproduct.data,'
+                        + 'org.apache.fineract.portfolio.loanproduct.domain,'
+                        + 'org.apache.fineract.portfolio.loanproduct.handler,'
+                        + 'org.apache.fineract.portfolio.loanproduct.mapper,'
+                        + 'org.apache.fineract.portfolio.loanproduct.service',
+                'Automatic-Module-Name': 'org.apache.fineract.loan.impl'
+                )
+    }
+}
+
+modernizer {
+    ignoreClassNamePatterns = [
+        '.*AbstractPersistableCustom',
+        '.*EntityTables',
+        '.*domain.*'
+    ]
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-loan/impl/bin/main")
+}
+
+eclipse {
+    project {
+        buildCommand([ LaunchConfigHandle: "<project>/.externalToolBuilders/OpenJPA Enhance Builder.launch" ],  'org.eclipse.ui.externaltools.ExternalToolBuilder')
+    }
+}
+
+if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
+    sourceSets {
+        test {
+            java {
+                exclude '**/core/boot/tests/**'
+            }
+        }
+    }
+}

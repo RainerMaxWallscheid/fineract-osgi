@@ -29,7 +29,8 @@ dependencies {
     implementation(project(path: ':fineract-accounting-impl'))
     // Charge OSGi Step 7: pure api only (ChargeCalculationType via loan charge APIs).
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-loan'))
+    implementation(project(path: ':fineract-loan-api'))
+    implementation(project(path: ':fineract-loan-impl'))
     implementation('org.apache.avro:avro')
     implementation(
             project(path: ':fineract-avro-schemas')

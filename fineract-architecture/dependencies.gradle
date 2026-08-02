@@ -21,7 +21,8 @@ dependencies {
     // Domain modules on the test classpath so ArchUnit can analyze production classes.
     // Prefer testImplementation (not implementation) — this module has no runtime/main role.
     testImplementation project(path: ':fineract-core')
-    testImplementation project(path: ':fineract-loan')
+    testImplementation project(path: ':fineract-loan-api')
+    testImplementation project(path: ':fineract-loan-impl')
     testImplementation project(path: ':fineract-savings-api')
     testImplementation project(path: ':fineract-savings-impl')
     testImplementation project(path: ':fineract-accounting-api')

@@ -41,7 +41,8 @@ dependencies {
     // Charge catalog: explicit api + impl (façade :fineract-charge is deprecated for new edges).
     implementation(project(path: ':fineract-charge-api'))
     implementation(project(path: ':fineract-charge-impl'))
-    implementation(project(path: ':fineract-loan'))
+    implementation(project(path: ':fineract-loan-api'))
+    implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-savings-impl'))
     implementation(project(path: ':fineract-branch-api'))

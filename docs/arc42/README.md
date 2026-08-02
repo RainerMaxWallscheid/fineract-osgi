@@ -30,6 +30,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 15g | [fineract-investor split plan](15_osgi_bundle_refactoring_fineract-investor.md) | Wave‑3 investor/external asset-owner api/impl/test plan (**complete**; journal residual) |
 | 15h | [fineract-accounting split plan](15_osgi_bundle_refactoring_fineract-accounting.md) | Wave‑3 accounting GL/journal api/impl/test plan (**complete**; entity residual) |
 | 15i | [fineract-savings split plan](15_osgi_bundle_refactoring_fineract-savings.md) | Wave‑3 savings/deposits api/impl/test plan (**complete**; entity residual) |
+| 15j | [fineract-loan split plan](15_osgi_bundle_refactoring_fineract-loan.md) | Wave‑4 loan api/impl/test plan (**complete**; entity residual for progressive/WC/provider) |
 
 ## Complementary Artifacts
 

@@ -27,7 +27,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 var requiredModuleNames = [
         'fineract-core',
-        'fineract-loan',
+        'fineract-loan-api',
+        'fineract-loan-impl',
         'fineract-progressive-loan',
 ]
 

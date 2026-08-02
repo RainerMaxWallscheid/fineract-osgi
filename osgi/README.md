@@ -124,6 +124,16 @@ investor-api uses **api only**; loan/savings/provider use api+impl residual. Pla
 
 Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_fineract-savings.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-savings.md).
 
+### Wave 4: fineract-loan bundles (complete — entity residual)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-loan-api` | `org.apache.fineract.loan.api` | Pure ports, DTOs, exceptions, selected pure enums |
+| `fineract-loan-impl` | `org.apache.fineract.loan.impl` | Domain + entity residual + COB + `LoanOsgiServiceRegistrar` |
+| `fineract-loan-test` | `org.apache.fineract.loan.test` | Fragment-Host → loan.impl |
+
+Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_refactoring_fineract-loan.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan.md).
+
 ## Layout
 
 | Path | Purpose |
