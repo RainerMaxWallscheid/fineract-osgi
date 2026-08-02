@@ -48,6 +48,13 @@ buildCache {
 
 rootProject.name='fineract'
 include ':fineract-core'
+include ':fineract-businessdate-api'
+project(':fineract-businessdate-api').projectDir = file('fineract-businessdate/api')
+include ':fineract-businessdate-impl'
+project(':fineract-businessdate-impl').projectDir = file('fineract-businessdate/impl')
+include ':fineract-businessdate-test'
+project(':fineract-businessdate-test').projectDir = file('fineract-businessdate/test')
+// Core slice: businessdate extracted from fineract-core (kernel enum BusinessDateType remains in core).
 include ':fineract-architecture'
 include ':fineract-security-api'
 project(':fineract-security-api').projectDir = file('fineract-security/api')

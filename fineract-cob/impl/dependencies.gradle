@@ -23,6 +23,7 @@ dependencies {
     implementation(project(path: ':fineract-avro-schemas'))
     implementation(project(path: ':fineract-validation'))
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-businessdate-api'))
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',

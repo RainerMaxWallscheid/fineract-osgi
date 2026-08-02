@@ -166,6 +166,16 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | `fineract-security-impl` | `org.apache.fineract.security.impl` | Filters/OIDC residual + `SecurityOsgiServiceRegistrar` |
 | `fineract-security-test` | `org.apache.fineract.security.test` | Fragment-Host → security.impl |
 
+### Core slice: fineract-businessdate (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-businessdate-api` | `org.apache.fineract.businessdate.api` | Ports, DTOs, exceptions |
+| `fineract-businessdate-impl` | `org.apache.fineract.businessdate.impl` | JPA/REST + `BusinessDateOsgiServiceRegistrar` |
+| `fineract-businessdate-test` | `org.apache.fineract.businessdate.test` | Fragment-Host → businessdate.impl |
+
+Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
+
 ## Layout
 
 | Path | Purpose |

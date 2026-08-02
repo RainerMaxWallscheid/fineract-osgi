@@ -26,6 +26,9 @@ buildscript {
         fineractJavaProjects = subprojects.findAll{
             [
                 'fineract-core',
+                'fineract-businessdate-api',
+                'fineract-businessdate-impl',
+                'fineract-businessdate-test',
                 'fineract-architecture',
                 'fineract-security-api',
                 'fineract-security-impl',
@@ -100,6 +103,8 @@ buildscript {
                 'fineract-client',
                 'fineract-client-feign',
                 'fineract-core',
+                'fineract-businessdate-api',
+                'fineract-businessdate-impl',
                 'fineract-security-api',
                 'fineract-security-impl',
                 'fineract-cob-api',

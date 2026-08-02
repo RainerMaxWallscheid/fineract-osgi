@@ -21,6 +21,7 @@ dependencies {
     api project(path: ':fineract-security-api')
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-businessdate-api'))
     implementation 'org.postgresql:postgresql'
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

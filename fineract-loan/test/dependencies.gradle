@@ -20,6 +20,7 @@
 dependencies {
     testImplementation(project(path: ':fineract-loan-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation(project(path: ':fineract-businessdate-api'))
     testImplementation(project(path: ':fineract-accounting-api'))
     testImplementation(project(path: ':fineract-charge-api'))
     testImplementation(project(path: ':fineract-tax-api'))
