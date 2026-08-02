@@ -18,16 +18,10 @@
  */
 
 dependencies {
-    // Never use "compile" scope, but make all dependencies either 'implementation', 'runtimeOnly' or 'testCompile'.
-    // Note that we never use 'api', because Fineract at least currently is a simple monolithic application ("WAR"), not a library.
-    // We also (normally should have) no need to ever use 'compileOnly'.
+    api project(path: ':fineract-mix-api')
 
-    // implementation dependencies are directly used (compiled against) in src/main (and src/test)
-    //
-    implementation(
-            project(path: ':fineract-core'),
-            project(path: ':fineract-command-api'),
-            )
+    implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-command-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
@@ -39,7 +33,6 @@ dependencies {
             'org.apache.commons:commons-lang3',
 
             'com.google.guava:guava',
-            // TODO: try to get rid of this as soon as we get hands on the MIX XSD file from 2009; then we can use JAXB
             'com.google.code.gson:gson',
 
             'io.swagger.core.v3:swagger-annotations-jakarta',
@@ -53,16 +46,4 @@ dependencies {
     implementation('org.dom4j:dom4j') {
         exclude group: 'javax.xml.bind'
     }
-    // testCompile dependencies are ONLY used in src/test, not src/main.
-    // Do NOT repeat dependencies which are ALREADY in implementation or runtimeOnly!
-    //
-    testImplementation( 'io.github.classgraph:classgraph' )
-    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'com.jayway.jsonpath', module: 'json-path'
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-        exclude group: 'jakarta.activation'
-        exclude group: 'javax.activation'
-        exclude group: 'org.skyscreamer'
-    }
-    testImplementation ('org.mockito:mockito-inline')
 }

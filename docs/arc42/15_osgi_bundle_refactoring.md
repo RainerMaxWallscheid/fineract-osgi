@@ -228,7 +228,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 | **4** | **`fineract-document`** | ~85 | **Complete** — api/impl/test + `ContentStoreService` / `ContentStreamPort`; provider on ports. [document plan](15_osgi_bundle_refactoring_fineract-document.md) | Do not leak servlet/AWS types into `-api` |
 | **5** | **`fineract-branch`** | ~50 | **Complete** — api/impl/test + teller ports + `CashierTxnValidationPort`; residual closed. [branch plan](15_osgi_bundle_refactoring_fineract-branch.md) | Less “optional extension” value than charge/document |
 | **6** | **`fineract-loan-origination`** | ~60 | **Complete** — api/impl/test; `LoanOriginatorData` on api; loan/WC api-only. [loan-origination plan](15_osgi_bundle_refactoring_fineract-loan-origination.md) | Impl still couples to loan/WC entities for attach/detach |
-| **7** | **`fineract-mix`** | ~35 | Small XBRL/reporting support | Niche; lower strategic value for OSGi services |
+| **7** | **`fineract-mix`** | ~35 | **Complete** — api/impl/test; provider composition root. [mix plan](15_osgi_bundle_refactoring_fineract-mix.md) | Niche XBRL; residual domain export for JDBC scan |
 
 #### Wave 3 — full domain BCs (after Module API hardening)
 
@@ -262,18 +262,18 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 ```text
 Wave 1 done             → charge, rates, tax     ★★★ complete
-Wave 2 progressed       → document, branch, loan-origination  ★★★ complete
-Next Wave 2             → mix                    ★★☆ next
+Wave 2 complete         → document, branch, loan-origination, mix  ★★★
+Next                    → Wave 3 investor (or accounting)          ★★☆
 Many dependents         → accounting             high value, more rewiring
 Huge / core banking     → loan, provider         later
 Shared kernel           → core, validation       don't force BC split
 ```
 
-#### Parallel work after Wave 1 / Wave 2 (document–origination)
+#### Parallel work after Wave 2 complete
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | **`fineract-mix`** api/impl/test — [15.6 Wave 2](#wave-2--strong-hexagonal-medium-size) |
+| **Next PR series** | **`fineract-investor`** api/impl/test — [15.6 Wave 3](#wave-3--full-domain-bcs-after-module-api-hardening) |
 | **Parallel** | Optional ArchUnit freezes for completed modules; command façade already removed |
 | **Do not start** | loan / provider / full-core split |
 

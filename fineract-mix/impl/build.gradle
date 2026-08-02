@@ -16,17 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Mix'
+description = 'Fineract MIX Implementation (OSGi impl bundle)'
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
-compileJava {
-    dependsOn ':fineract-avro-schemas:buildJavaSdk'
-}
-
 configurations {
-    providedRuntime // needed for Spring Boot executable WAR
+    providedRuntime
     providedCompile
     compile() {
         exclude module: 'hibernate-entitymanager'
@@ -48,28 +44,29 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// Configuration for the modernizer plugin
-// https://github.com/andygoossens/gradle-modernizer-plugin
-modernizer {
-    ignoreClassNamePatterns = [
-        '.*AbstractPersistableCustom',
-        '.*EntityTables',
-        '.*domain.*'
-    ]
-}
-
-// If we are running Gradle within Eclipse to enhance classes with OpenJPA,
-// set the classes directory to point to Eclipse's default build directory
-if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-core/bin/main")
-}
-
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
+// OSGi implementation bundle (ADR-022). Domain residual export for provider JdbcConfig scan.
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract MIX Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.mix.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'MIX/XBRL taxonomy mapping & report implementation (JPA, REST, Spring)',
+                'Import-Package': 'org.apache.fineract.mix.moduleapi,'
+                        + 'org.apache.fineract.mix.service,'
+                        + 'org.apache.fineract.mix.data,'
+                        + 'org.apache.fineract.mix.exception,'
+                        + 'org.apache.fineract.mix.command,'
+                        + '*',
+                // provider JdbcConfig scans mix.domain; white-box tests use Builder/impls.
+                'Export-Package': 'org.apache.fineract.mix.domain,'
+                        + 'org.apache.fineract.mix.service',
+                'Automatic-Module-Name': 'org.apache.fineract.mix.impl'
+                )
     }
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-mix/impl/bin/main")
 }

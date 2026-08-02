@@ -84,6 +84,16 @@ Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_o
 
 Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_bundle_refactoring_fineract-loan-origination.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan-origination.md).
 
+### Wave 2: fineract-mix bundles (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-mix-api` | `org.apache.fineract.mix.api` | Taxonomy / mapping / XBRL service interfaces + DTOs |
+| `fineract-mix-impl` | `org.apache.fineract.mix.impl` | JPA + REST + XBRL builder + `MixOsgiServiceRegistrar` |
+| `fineract-mix-test` | `org.apache.fineract.mix.test` | Fragment-Host → mix.impl |
+
+Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-mix.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-mix.md).
+
 ## Layout
 
 | Path | Purpose |

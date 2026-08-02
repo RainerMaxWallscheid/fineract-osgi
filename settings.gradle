@@ -112,7 +112,13 @@ project(':fineract-loan-origination-test').projectDir = file('fineract-loan-orig
 include ':fineract-loan'
 include ':fineract-savings'
 include ':fineract-report'
-include ':fineract-mix'
+include ':fineract-mix-api'
+project(':fineract-mix-api').projectDir = file('fineract-mix/api')
+include ':fineract-mix-impl'
+project(':fineract-mix-impl').projectDir = file('fineract-mix/impl')
+include ':fineract-mix-test'
+project(':fineract-mix-test').projectDir = file('fineract-mix/test')
+// No :fineract-mix façade — depend on -api / -impl explicitly.
 include ':fineract-war'
 include ':integration-tests'
 include ':twofactor-tests'
