@@ -30,6 +30,9 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api'
     // AccountingValidations used by pure helpers if any remain
     api project(path: ':fineract-accounting-api')
+    // Core entity class files reference FetchType/CascadeType; needed to silence
+    // "unknown enum constant" when javac reads those annotations (not a runtime dep).
+    compileOnly 'jakarta.persistence:jakarta.persistence-api'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'org.springframework.data:spring-data-commons'
     compileOnly 'org.springframework:spring-core'
