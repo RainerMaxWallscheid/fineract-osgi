@@ -58,7 +58,8 @@ jar {
                 'Export-Package': 'org.apache.fineract.monetary.impl.osgi,'
                         + 'org.apache.fineract.organisation.monetary.api,'
                         + 'org.apache.fineract.organisation.monetary.handler,'
-                        + 'org.apache.fineract.organisation.monetary.service',
+                        + 'org.apache.fineract.organisation.monetary.service,'
+                        + 'org.apache.fineract.organisation.monetary.starter',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.monetary.impl'
                 )

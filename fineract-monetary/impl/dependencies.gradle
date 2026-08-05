@@ -21,6 +21,10 @@ dependencies {
     api project(path: ':fineract-monetary-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
+    // Currency write checks product catalogs before removing currencies
+    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-savings-api'))
+    implementation(project(path: ':fineract-charge-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

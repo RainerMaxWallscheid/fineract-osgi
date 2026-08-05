@@ -43,8 +43,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncod
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPassword;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPasswordRepository;
@@ -83,9 +82,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImplTest {
     @Mock
     private AppUserPreviousPasswordRepository appUserPreviewPasswordRepository;
     @Mock
-    private StaffRepositoryWrapper staffRepositoryWrapper;
-    @Mock
-    private ClientRepositoryWrapper clientRepositoryWrapper;
+    private StaffRepository staffRepository;
     @Mock
     private ConfigurationDomainService configurationDomainService;
 
