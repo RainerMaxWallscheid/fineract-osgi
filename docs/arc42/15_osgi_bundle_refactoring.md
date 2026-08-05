@@ -278,7 +278,7 @@ Shared kernel           → core, validation         don't force BC split
 | Priority | Action |
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
-| **Optional provider peels** | **`useradministration`**, **`adhocquery` complete**; next e.g. `template`, `notification` |
+| **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template` complete**; next e.g. `notification`, `spm` |
 | **Residual hardening** | Entity → ID/ports (loan/savings/accounting/client); pure criteria ports after `LoanProductData` on loan-api |
 | **Do not start** | full provider / whole-core api/impl |
 

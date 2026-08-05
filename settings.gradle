@@ -97,6 +97,14 @@ project(':fineract-adhocquery-impl').projectDir = file('fineract-adhocquery/impl
 include ':fineract-adhocquery-test'
 project(':fineract-adhocquery-test').projectDir = file('fineract-adhocquery/test')
 // No :fineract-adhocquery façade — depend on -api / -impl explicitly.
+include ':fineract-template-api'
+project(':fineract-template-api').projectDir = file('fineract-template/api')
+include ':fineract-template-impl'
+project(':fineract-template-impl').projectDir = file('fineract-template/impl')
+include ':fineract-template-test'
+project(':fineract-template-test').projectDir = file('fineract-template/test')
+// No :fineract-template façade — depend on -api / -impl explicitly.
+
 
 
 include ':fineract-cob-api'
