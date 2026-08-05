@@ -90,6 +90,14 @@ project(':fineract-useradministration-impl').projectDir = file('fineract-useradm
 include ':fineract-useradministration-test'
 project(':fineract-useradministration-test').projectDir = file('fineract-useradministration/test')
 // No :fineract-useradministration façade — depend on -api / -impl explicitly.
+include ':fineract-adhocquery-api'
+project(':fineract-adhocquery-api').projectDir = file('fineract-adhocquery/api')
+include ':fineract-adhocquery-impl'
+project(':fineract-adhocquery-impl').projectDir = file('fineract-adhocquery/impl')
+include ':fineract-adhocquery-test'
+project(':fineract-adhocquery-test').projectDir = file('fineract-adhocquery/test')
+// No :fineract-adhocquery façade — depend on -api / -impl explicitly.
+
 
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')

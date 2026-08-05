@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.adhocquery.exception;
+description = 'Fineract AdHoc Query test fragment'
 
-import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
 
-/**
- * A {@link RuntimeException} thrown when AdHoc resources are not found.
- */
-public class AdHocNotFoundException extends AbstractPlatformResourceNotFoundException {
-
-    public AdHocNotFoundException(final Long id) {
-        super("error.msg.adhocquery.adhoc.id.invalid", "Adhoc Record with identifier " + id + " does not exist", id);
-    }
-
-    public AdHocNotFoundException(final Long id, EmptyResultDataAccessException e) {
-        super("error.msg.adhocquery.adhoc.id.invalid", "Adhoc Record with identifier " + id + " does not exist", id, e);
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-SymbolicName': 'org.apache.fineract.adhocquery.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.adhocquery.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.adhocquery.test'
+                )
     }
 }
+tasks.named('test').configure { useJUnitPlatform() }
+tasks.named('jar').configure { dependsOn tasks.named('testClasses') }

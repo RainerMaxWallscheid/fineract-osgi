@@ -78,6 +78,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | Peel | Status |
 |------|--------|
 | `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core |
+| `fineract-adhocquery` | **complete** (api/impl/test); self-contained provider peel |
 
 
 ## Commands
