@@ -78,6 +78,8 @@ dependencies {
     implementation(project(path: ':fineract-notification-impl'))
     implementation(project(path: ':fineract-spm-api'))
     implementation(project(path: ':fineract-spm-impl'))
+    implementation(project(path: ':fineract-fund-api'))
+    implementation(project(path: ':fineract-fund-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

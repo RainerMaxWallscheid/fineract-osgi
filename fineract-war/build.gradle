@@ -98,6 +98,8 @@ dependencies {
     implementation project(':fineract-notification-impl')
     implementation project(':fineract-spm-api')
     implementation project(':fineract-spm-impl')
+    implementation project(':fineract-fund-api')
+    implementation project(':fineract-fund-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

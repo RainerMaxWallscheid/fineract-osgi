@@ -118,6 +118,13 @@ project(':fineract-spm-impl').projectDir = file('fineract-spm/impl')
 include ':fineract-spm-test'
 project(':fineract-spm-test').projectDir = file('fineract-spm/test')
 // No :fineract-spm façade — depend on -api / -impl explicitly.
+include ':fineract-fund-api'
+project(':fineract-fund-api').projectDir = file('fineract-fund/api')
+include ':fineract-fund-impl'
+project(':fineract-fund-impl').projectDir = file('fineract-fund/impl')
+include ':fineract-fund-test'
+project(':fineract-fund-test').projectDir = file('fineract-fund/test')
+// No :fineract-fund façade — depend on -api / -impl explicitly.
 
 
 
