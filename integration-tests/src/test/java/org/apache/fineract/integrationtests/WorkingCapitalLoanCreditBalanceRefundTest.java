@@ -36,6 +36,7 @@ import org.apache.fineract.client.models.GetWorkingCapitalLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansLoanIdRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansRequest;
 import org.apache.fineract.integrationtests.client.feign.helpers.FeignExternalEventHelper;
+import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.BusinessDateHelper;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.FineractFeignClientHelper;
@@ -263,7 +264,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
 
     private Long createProduct() {
         final String uniqueName = "WCL Product " + UUID.randomUUID().toString().substring(0, 8);
-        final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+        final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
         final Long productId = productHelper
                 .createWorkingCapitalLoanProduct(
                         new WorkingCapitalLoanProductTestBuilder().withName(uniqueName).withShortName(uniqueShortName).build())

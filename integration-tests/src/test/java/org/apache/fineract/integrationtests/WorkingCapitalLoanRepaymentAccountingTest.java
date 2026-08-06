@@ -38,6 +38,7 @@ import org.apache.fineract.client.models.PostWorkingCapitalLoansLoanIdRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansRequest;
 import org.apache.fineract.integrationtests.client.feign.helpers.FeignAccountHelper;
 import org.apache.fineract.integrationtests.client.feign.helpers.FeignJournalEntryHelper;
+import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.BusinessDateHelper;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.FineractFeignClientHelper;
@@ -309,7 +310,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         AtomicLong loanId = new AtomicLong(0L);
         BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), () -> {
             final String uniqueName = "WCL NoAcct " + UUID.randomUUID().toString().substring(0, 8);
-            final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+            final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
             final Long productId = productHelper
                     .createWorkingCapitalLoanProduct(
                             new WorkingCapitalLoanProductTestBuilder().withName(uniqueName).withShortName(uniqueShortName).build())
@@ -337,7 +338,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
 
     private Long createAccrualWithDeferredRevenueAmortizationProduct() {
         final String uniqueName = "WCL Acct " + UUID.randomUUID().toString().substring(0, 8);
-        final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+        final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
         final Long productId = productHelper.createWorkingCapitalLoanProduct(new WorkingCapitalLoanProductTestBuilder().withName(uniqueName)
                 .withShortName(uniqueShortName).withAccountingRule(AccountingRuleEnum.ACC_DEF_REV_AM)
                 .withFundSourceAccountId(fundSourceAccount.getAccountID().longValue())

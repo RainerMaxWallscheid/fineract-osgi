@@ -643,7 +643,7 @@ public class WorkingCapitalLoanRepaymentTest {
 
     private Long createProduct() {
         final String uniqueName = "WCL Product " + UUID.randomUUID().toString().substring(0, 8);
-        final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+        final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
         final Long productId = productHelper
                 .createWorkingCapitalLoanProduct(
                         new WorkingCapitalLoanProductTestBuilder().withName(uniqueName).withShortName(uniqueShortName).build())
@@ -654,7 +654,7 @@ public class WorkingCapitalLoanRepaymentTest {
 
     private Long createProductWithDiscountAllowed() {
         final String uniqueName = "WCL Product " + UUID.randomUUID().toString().substring(0, 8);
-        final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+        final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
         final Long productId = productHelper.createWorkingCapitalLoanProduct(new WorkingCapitalLoanProductTestBuilder().withName(uniqueName)
                 .withShortName(uniqueShortName).withAllowAttributeOverrides(java.util.Map.of("discountDefault", Boolean.TRUE)).build())
                 .getResourceId();
@@ -664,7 +664,7 @@ public class WorkingCapitalLoanRepaymentTest {
 
     private Long createProductForReferenceSchedule() {
         final String uniqueName = "WCL Excel Product " + UUID.randomUUID().toString().substring(0, 8);
-        final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
+        final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
         final Long productId = productHelper.createWorkingCapitalLoanProduct(new WorkingCapitalLoanProductTestBuilder().withName(uniqueName)
                 .withShortName(uniqueShortName).withRepaymentEvery(1).withRepaymentFrequencyType("DAYS")
                 .withAllowAttributeOverrides(java.util.Map.of("discountDefault", Boolean.TRUE)).build()).getResourceId();
