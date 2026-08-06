@@ -132,6 +132,13 @@ project(':fineract-accountnumberformat-impl').projectDir = file('fineract-accoun
 include ':fineract-accountnumberformat-test'
 project(':fineract-accountnumberformat-test').projectDir = file('fineract-accountnumberformat/test')
 // No :fineract-accountnumberformat façade — depend on -api / -impl explicitly.
+include ':fineract-survey-api'
+project(':fineract-survey-api').projectDir = file('fineract-survey/api')
+include ':fineract-survey-impl'
+project(':fineract-survey-impl').projectDir = file('fineract-survey/impl')
+include ':fineract-survey-test'
+project(':fineract-survey-test').projectDir = file('fineract-survey/test')
+// No :fineract-survey façade — depend on -api / -impl explicitly.
 
 
 

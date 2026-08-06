@@ -84,6 +84,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-spm` | **complete** (api/impl/test); self-contained provider peel; Client/AppUser from core |
 | `fineract-fund` | **complete** (api/impl/test); Fund entity residual in core |
 | `fineract-accountnumberformat` | **complete** (api/impl/test); entity/generator residual in core |
+| `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
 
 
 ## Commands
