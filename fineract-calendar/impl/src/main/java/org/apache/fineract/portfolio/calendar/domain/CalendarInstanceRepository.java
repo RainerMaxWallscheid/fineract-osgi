@@ -24,7 +24,6 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,7 +45,7 @@ public interface CalendarInstanceRepository extends JpaRepository<CalendarInstan
 
     /**
      * @param entityId
-     *            : Id of {@link Client}, {@link Group}, {@link Loan} or {@link SavingsAccount}.
+     *            : Id of {@link Client}, {@link Group}, {@link Loan} or savings account.
      * @param entityTypeId:
      *            {@link CalendarEntityType}
      * @param calendarTypeId:

@@ -146,6 +146,13 @@ project(':fineract-entityaccess-impl').projectDir = file('fineract-entityaccess/
 include ':fineract-entityaccess-test'
 project(':fineract-entityaccess-test').projectDir = file('fineract-entityaccess/test')
 // No :fineract-entityaccess façade — depend on -api / -impl explicitly.
+include ':fineract-calendar-api'
+project(':fineract-calendar-api').projectDir = file('fineract-calendar/api')
+include ':fineract-calendar-impl'
+project(':fineract-calendar-impl').projectDir = file('fineract-calendar/impl')
+include ':fineract-calendar-test'
+project(':fineract-calendar-test').projectDir = file('fineract-calendar/test')
+// No :fineract-calendar façade — depend on -api / -impl explicitly.
 
 
 

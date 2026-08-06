@@ -235,7 +235,8 @@ public class GroupsApiResource {
                     final Collection<LocalDate> recurringDates = calendarReadPlatformService.generateRecurringDates(collectionMeetingCalendar, withHistory, tillDate);
                     final Collection<LocalDate> nextTenRecurringDates = calendarReadPlatformService.generateNextTenRecurringDates(collectionMeetingCalendar);
                     final MeetingData lastMeeting = meetingReadPlatformService.retrieveLastMeeting(collectionMeetingCalendar.getCalendarInstanceId());
-                    final LocalDate recentEligibleMeetingDate = calendarReadPlatformService.generateNextEligibleMeetingDateForCollection(collectionMeetingCalendar, lastMeeting);
+                    final LocalDate lastMeetingDate = lastMeeting == null ? null : lastMeeting.getMeetingDate();
+                    final LocalDate recentEligibleMeetingDate = calendarReadPlatformService.generateNextEligibleMeetingDateForCollection(collectionMeetingCalendar, lastMeetingDate);
                     collectionMeetingCalendar = CalendarData.withRecurringDates(collectionMeetingCalendar, recurringDates, nextTenRecurringDates, recentEligibleMeetingDate);
                 }
             }

@@ -86,6 +86,8 @@ dependencies {
     implementation(project(path: ':fineract-survey-impl'))
     implementation(project(path: ':fineract-entityaccess-api'))
     implementation(project(path: ':fineract-entityaccess-impl'))
+    implementation(project(path: ':fineract-calendar-api'))
+    implementation(project(path: ':fineract-calendar-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

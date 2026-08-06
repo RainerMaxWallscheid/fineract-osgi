@@ -106,6 +106,8 @@ dependencies {
     implementation project(':fineract-survey-impl')
     implementation project(':fineract-entityaccess-api')
     implementation project(':fineract-entityaccess-impl')
+    implementation project(':fineract-calendar-api')
+    implementation project(':fineract-calendar-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')
