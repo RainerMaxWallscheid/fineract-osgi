@@ -19,12 +19,9 @@
 package org.apache.fineract.notification.starter;
 
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
-import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.notification.domain.NotificationMapperRepository;
 import org.apache.fineract.notification.eventandlistener.NotificationEventPublisher;
-import org.apache.fineract.notification.service.NotificationDomainService;
-import org.apache.fineract.notification.service.NotificationDomainServiceImpl;
 import org.apache.fineract.notification.service.NotificationGeneratorReadRepositoryWrapper;
 import org.apache.fineract.notification.service.NotificationGeneratorWritePlatformService;
 import org.apache.fineract.notification.service.NotificationMapperWritePlatformService;
@@ -41,13 +38,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class NotificationConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean(NotificationDomainService.class)
-    public NotificationDomainService notificationDomainService(BusinessEventNotifierService businessEventNotifierService,
-            PlatformSecurityContext context, UserNotificationService userNotificationService) {
-        return new NotificationDomainServiceImpl(businessEventNotifierService, context, userNotificationService);
-    }
 
     @Bean
     @ConditionalOnMissingBean(NotificationReadPlatformService.class)

@@ -80,6 +80,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core |
 | `fineract-adhocquery` | **complete** (api/impl/test); self-contained provider peel |
 | `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl |
+| `fineract-notification` | **complete** (api/impl/test); domain event listeners residual in provider; UserNotificationService in core |
 
 
 ## Commands

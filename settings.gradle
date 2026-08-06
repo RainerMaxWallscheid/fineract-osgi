@@ -104,6 +104,14 @@ project(':fineract-template-impl').projectDir = file('fineract-template/impl')
 include ':fineract-template-test'
 project(':fineract-template-test').projectDir = file('fineract-template/test')
 // No :fineract-template façade — depend on -api / -impl explicitly.
+include ':fineract-notification-api'
+project(':fineract-notification-api').projectDir = file('fineract-notification/api')
+include ':fineract-notification-impl'
+project(':fineract-notification-impl').projectDir = file('fineract-notification/impl')
+include ':fineract-notification-test'
+project(':fineract-notification-test').projectDir = file('fineract-notification/test')
+// No :fineract-notification façade — depend on -api / -impl explicitly.
+
 
 
 

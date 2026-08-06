@@ -94,6 +94,8 @@ dependencies {
     implementation project(':fineract-adhocquery-impl')
     implementation project(':fineract-template-api')
     implementation project(':fineract-template-impl')
+    implementation project(':fineract-notification-api')
+    implementation project(':fineract-notification-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')
