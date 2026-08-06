@@ -37,7 +37,8 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.spm.data.ScorecardData;
 import org.apache.fineract.spm.domain.Scorecard;
 import org.apache.fineract.spm.domain.Survey;
@@ -56,7 +57,7 @@ public class ScorecardApiResource {
     private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
     private final ScorecardService scorecardService;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientRepository clientRepository;
     private final ScorecardReadPlatformService scorecardReadPlatformService;
 
     @GET
@@ -82,7 +83,7 @@ public class ScorecardApiResource {
     public void createScorecard(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @Parameter(description = "scorecardData") final ScorecardData scorecardData) {
         final AppUser appUser = this.securityContext.authenticatedUser();
         final Survey survey = this.spmService.findById(surveyId);
-        final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(scorecardData.getClientId());
+        final Client client = findClient(scorecardData.getClientId());
         this.scorecardService.createScorecard(ScorecardMapper.map(scorecardData, survey, appUser, client));
     }
 
@@ -93,7 +94,7 @@ public class ScorecardApiResource {
     public List<ScorecardData> findBySurveyAndClient(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @PathParam("clientId") @Parameter(description = "Enter clientId") final Long clientId) {
         this.securityContext.authenticatedUser();
         this.spmService.findById(surveyId);
-        this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        findClient(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardBySurveyAndClient(surveyId, clientId);
     }
 
@@ -105,16 +106,20 @@ public class ScorecardApiResource {
     @AlternativeOperationId("findByClient_1")
     public List<ScorecardData> findByClient(@PathParam("clientId") final Long clientId) {
         this.securityContext.authenticatedUser();
-        this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        findClient(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardByClient(clientId);
     }
 
+    private Client findClient(final Long clientId) {
+        return this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+    }
+
     @java.lang.SuppressWarnings("all")
-        public ScorecardApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final ScorecardService scorecardService, final ClientRepositoryWrapper clientRepositoryWrapper, final ScorecardReadPlatformService scorecardReadPlatformService) {
+        public ScorecardApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final ScorecardService scorecardService, final ClientRepository clientRepository, final ScorecardReadPlatformService scorecardReadPlatformService) {
         this.securityContext = securityContext;
         this.spmService = spmService;
         this.scorecardService = scorecardService;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientRepository = clientRepository;
         this.scorecardReadPlatformService = scorecardReadPlatformService;
     }
 }

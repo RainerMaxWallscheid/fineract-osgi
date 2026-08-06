@@ -111,6 +111,13 @@ project(':fineract-notification-impl').projectDir = file('fineract-notification/
 include ':fineract-notification-test'
 project(':fineract-notification-test').projectDir = file('fineract-notification/test')
 // No :fineract-notification façade — depend on -api / -impl explicitly.
+include ':fineract-spm-api'
+project(':fineract-spm-api').projectDir = file('fineract-spm/api')
+include ':fineract-spm-impl'
+project(':fineract-spm-impl').projectDir = file('fineract-spm/impl')
+include ':fineract-spm-test'
+project(':fineract-spm-test').projectDir = file('fineract-spm/test')
+// No :fineract-spm façade — depend on -api / -impl explicitly.
 
 
 
