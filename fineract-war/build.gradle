@@ -110,6 +110,8 @@ dependencies {
     implementation project(':fineract-calendar-impl')
     implementation project(':fineract-meeting-api')
     implementation project(':fineract-meeting-impl')
+    implementation project(':fineract-address-api')
+    implementation project(':fineract-address-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

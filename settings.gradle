@@ -160,6 +160,13 @@ project(':fineract-meeting-impl').projectDir = file('fineract-meeting/impl')
 include ':fineract-meeting-test'
 project(':fineract-meeting-test').projectDir = file('fineract-meeting/test')
 // No :fineract-meeting façade — depend on -api / -impl explicitly.
+include ':fineract-address-api'
+project(':fineract-address-api').projectDir = file('fineract-address/api')
+include ':fineract-address-impl'
+project(':fineract-address-impl').projectDir = file('fineract-address/impl')
+include ':fineract-address-test'
+project(':fineract-address-test').projectDir = file('fineract-address/test')
+// No :fineract-address façade — depend on -api / -impl explicitly.
 
 
 

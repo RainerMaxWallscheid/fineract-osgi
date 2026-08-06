@@ -37,7 +37,8 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientAddress;
 import org.apache.fineract.portfolio.client.domain.ClientAddressRepository;
 import org.apache.fineract.portfolio.client.domain.ClientAddressRepositoryWrapper;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,7 +46,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
     private final PlatformSecurityContext context;
     private final CodeValueRepository codeValueRepository;
     private final ClientAddressRepository clientAddressRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientRepository clientRepository;
     private final AddressRepository addressRepository;
     private final ClientAddressRepositoryWrapper clientAddressRepositoryWrapper;
     private final AddressCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -56,7 +57,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
         context.authenticatedUser();
         fromApiJsonDeserializer.validateForCreate(jsonObject.toString(), false);
         final CodeValue addressTypeIdCodeValue = codeValueRepository.getReferenceById(addressTypeId);
-        final Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
         final Address address = createAddress(jsonObject);
         addressRepository.save(address);
         final ClientAddress clientAddress = createClientAddress(client, jsonObject, addressTypeIdCodeValue, address);
@@ -208,11 +209,11 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddressWritePlatformServiceImpl(final PlatformSecurityContext context, final CodeValueRepository codeValueRepository, final ClientAddressRepository clientAddressRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final AddressRepository addressRepository, final ClientAddressRepositoryWrapper clientAddressRepositoryWrapper, final AddressCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        public AddressWritePlatformServiceImpl(final PlatformSecurityContext context, final CodeValueRepository codeValueRepository, final ClientAddressRepository clientAddressRepository, final ClientRepository clientRepository, final AddressRepository addressRepository, final ClientAddressRepositoryWrapper clientAddressRepositoryWrapper, final AddressCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
         this.context = context;
         this.codeValueRepository = codeValueRepository;
         this.clientAddressRepository = clientAddressRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientRepository = clientRepository;
         this.addressRepository = addressRepository;
         this.clientAddressRepositoryWrapper = clientAddressRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
