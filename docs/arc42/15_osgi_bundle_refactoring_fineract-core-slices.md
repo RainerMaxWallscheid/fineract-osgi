@@ -87,6 +87,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
 | `fineract-entityaccess` | **complete** (api/impl/test); office↔product/charge access; residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); entity residual in core; GroupRepository residual to core |
+| `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl |
 
 
 ## Commands

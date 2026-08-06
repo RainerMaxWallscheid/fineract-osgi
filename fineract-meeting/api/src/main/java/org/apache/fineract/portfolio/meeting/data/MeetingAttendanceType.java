@@ -18,10 +18,8 @@
  */
 package org.apache.fineract.portfolio.meeting.data;
 
-import org.apache.fineract.portfolio.meeting.domain.MeetingAttendance;
-
 /**
- * An enumeration of {@link MeetingAttendance} type.
+ * An enumeration of meeting attendance type.
  */
 public enum MeetingAttendanceType {
 

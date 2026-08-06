@@ -44,7 +44,8 @@ import org.apache.fineract.portfolio.calendar.exception.CalendarInstanceNotFound
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
@@ -69,7 +70,7 @@ final class LegacyMeetingAttendanceListener {
     private final MeetingRepository meetingRepository;
     private final MeetingRepositoryWrapper meetingRepositoryWrapper;
     private final GroupRepository groupRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientRepository clientRepository;
     private final FromJsonHelper fromApiJsonHelper;
 
     @EventListener
@@ -157,7 +158,8 @@ final class LegacyMeetingAttendanceListener {
                     final JsonObject attendanceElement = array.get(i).getAsJsonObject();
                     final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, attendanceElement);
                     final Integer attendanceTypeId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(attendanceTypeParamName, attendanceElement);
-                    final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId, true);
+                    final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+                    client.loadLazyCollections();
                     if (CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.getCalendarInstance().getEntityId())) {
                         throw new ClientNotInGroupException(clientId, meeting.getCalendarInstance().getEntityId());
                     } else if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
@@ -225,14 +227,14 @@ final class LegacyMeetingAttendanceListener {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final FromJsonHelper fromApiJsonHelper) {
+        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepository clientRepository, final FromJsonHelper fromApiJsonHelper) {
         this.configurationDomainService = configurationDomainService;
         this.calendarRepository = calendarRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.meetingRepository = meetingRepository;
         this.meetingRepositoryWrapper = meetingRepositoryWrapper;
         this.groupRepository = groupRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientRepository = clientRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

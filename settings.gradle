@@ -153,6 +153,13 @@ project(':fineract-calendar-impl').projectDir = file('fineract-calendar/impl')
 include ':fineract-calendar-test'
 project(':fineract-calendar-test').projectDir = file('fineract-calendar/test')
 // No :fineract-calendar façade — depend on -api / -impl explicitly.
+include ':fineract-meeting-api'
+project(':fineract-meeting-api').projectDir = file('fineract-meeting/api')
+include ':fineract-meeting-impl'
+project(':fineract-meeting-impl').projectDir = file('fineract-meeting/impl')
+include ':fineract-meeting-test'
+project(':fineract-meeting-test').projectDir = file('fineract-meeting/test')
+// No :fineract-meeting façade — depend on -api / -impl explicitly.
 
 
 
