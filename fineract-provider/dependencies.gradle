@@ -84,6 +84,8 @@ dependencies {
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))
     implementation(project(path: ':fineract-survey-impl'))
+    implementation(project(path: ':fineract-entityaccess-api'))
+    implementation(project(path: ':fineract-entityaccess-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

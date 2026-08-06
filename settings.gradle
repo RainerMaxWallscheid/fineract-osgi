@@ -139,6 +139,13 @@ project(':fineract-survey-impl').projectDir = file('fineract-survey/impl')
 include ':fineract-survey-test'
 project(':fineract-survey-test').projectDir = file('fineract-survey/test')
 // No :fineract-survey façade — depend on -api / -impl explicitly.
+include ':fineract-entityaccess-api'
+project(':fineract-entityaccess-api').projectDir = file('fineract-entityaccess/api')
+include ':fineract-entityaccess-impl'
+project(':fineract-entityaccess-impl').projectDir = file('fineract-entityaccess/impl')
+include ':fineract-entityaccess-test'
+project(':fineract-entityaccess-test').projectDir = file('fineract-entityaccess/test')
+// No :fineract-entityaccess façade — depend on -api / -impl explicitly.
 
 
 
