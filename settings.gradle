@@ -125,6 +125,13 @@ project(':fineract-fund-impl').projectDir = file('fineract-fund/impl')
 include ':fineract-fund-test'
 project(':fineract-fund-test').projectDir = file('fineract-fund/test')
 // No :fineract-fund façade — depend on -api / -impl explicitly.
+include ':fineract-accountnumberformat-api'
+project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
+include ':fineract-accountnumberformat-impl'
+project(':fineract-accountnumberformat-impl').projectDir = file('fineract-accountnumberformat/impl')
+include ':fineract-accountnumberformat-test'
+project(':fineract-accountnumberformat-test').projectDir = file('fineract-accountnumberformat/test')
+// No :fineract-accountnumberformat façade — depend on -api / -impl explicitly.
 
 
 

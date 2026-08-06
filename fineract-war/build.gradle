@@ -100,6 +100,8 @@ dependencies {
     implementation project(':fineract-spm-impl')
     implementation project(':fineract-fund-api')
     implementation project(':fineract-fund-impl')
+    implementation project(':fineract-accountnumberformat-api')
+    implementation project(':fineract-accountnumberformat-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

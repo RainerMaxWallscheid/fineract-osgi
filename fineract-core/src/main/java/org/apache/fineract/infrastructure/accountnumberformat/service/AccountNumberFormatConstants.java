@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.accountnumberformat.service;
 
-import org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData;
-
 public final class AccountNumberFormatConstants {
 
     private AccountNumberFormatConstants() {
@@ -51,8 +49,8 @@ public final class AccountNumberFormatConstants {
     public static final String prefixTypeOptionsParamName = "prefixTypeOptions";
 
     /**
-     * These parameters will match the class level parameters of {@link AccountNumberFormatData}. Where possible, we try
-     * to get response parameters to match those of request parameters.
+     * These parameters will match the class level parameters of AccountNumberFormatData. Where possible, we try to get
+     * response parameters to match those of request parameters.
      */
 
     // Error messages codes
