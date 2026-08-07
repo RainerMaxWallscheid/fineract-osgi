@@ -66,7 +66,6 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -215,8 +214,6 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     private Set<LoanCharge> charges = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<LoanTrancheCharge> trancheCharges = new HashSet<>();
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<LoanCollateral> collateral = null;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<LoanCollateralManagement> loanCollateralManagements = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
@@ -1415,7 +1412,6 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         checkAndFetchLazyCollection(this.loanTransactions);
         checkAndFetchLazyCollection(this.disbursementDetails);
         checkAndFetchLazyCollection(this.loanTermVariations);
-        checkAndFetchLazyCollection(this.collateral);
         checkAndFetchLazyCollection(this.loanOfficerHistory);
         checkAndFetchLazyCollection(this.loanCollateralManagements);
     }
@@ -1805,11 +1801,6 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public Set<LoanTrancheCharge> getTrancheCharges() {
         return this.trancheCharges;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Set<LoanCollateral> getCollateral() {
-        return this.collateral;
     }
 
     @java.lang.SuppressWarnings("all")

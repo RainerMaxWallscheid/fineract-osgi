@@ -114,6 +114,8 @@ dependencies {
     implementation project(':fineract-address-impl')
     implementation project(':fineract-creditbureau-api')
     implementation project(':fineract-creditbureau-impl')
+    implementation project(':fineract-collateral-api')
+    implementation project(':fineract-collateral-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')
