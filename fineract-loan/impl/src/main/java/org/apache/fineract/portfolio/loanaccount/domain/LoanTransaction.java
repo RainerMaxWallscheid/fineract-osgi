@@ -106,8 +106,6 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
     @Column(name = "charge_refund_charge_type", length = 1, unique = true)
     private String chargeRefundChargeType;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "loanTransaction")
-    private Set<LoanCollateralManagement> loanCollateralManagementSet = new HashSet<>();
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "loanTransaction")
     private Set<LoanTransactionToRepaymentScheduleMapping> loanTransactionToRepaymentScheduleMappings = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "fromTransaction")
     private Set<LoanTransactionRelation> loanTransactionRelations = new HashSet<>();
@@ -995,10 +993,6 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
         return this.chargeRefundChargeType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Set<LoanCollateralManagement> getLoanCollateralManagementSet() {
-        return this.loanCollateralManagementSet;
-    }
 
     @java.lang.SuppressWarnings("all")
         public Set<LoanTransactionRelation> getLoanTransactionRelations() {

@@ -28,7 +28,7 @@ import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralTem
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanTransactionData;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
@@ -71,8 +71,8 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
         Set<LoanCollateralManagement> loanCollateralManagementSet = clientCollateralManagement.getLoanCollateralManagementSet();
         List<LoanTransactionData> loanTransactionDataList = new ArrayList<>();
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagementSet) {
-            if (loanCollateralManagement.getLoanTransaction() != null) {
-                Long transactionId = loanCollateralManagement.getLoanTransaction().getId();
+            if (loanCollateralManagement.getLoanTransactionId() != null) {
+                Long transactionId = loanCollateralManagement.getLoanTransactionId();
                 LoanTransaction loanTransaction = this.loanTransactionRepository.findById(transactionId).orElseThrow(() -> new LoanTransactionNotFoundException(transactionId));
                 LoanTransactionData loanTransactionData = LoanTransactionData.instance(loanTransaction.getLoan().getId(), loanTransaction.getCreatedDate().orElse(null), loanTransaction.getOutstandingLoanBalance(), loanTransaction.getPrincipalPortion());
                 loanTransactionDataList.add(loanTransactionData);

@@ -26,8 +26,8 @@ import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralRes
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
 import org.apache.fineract.portfolio.collateralmanagement.exception.LoanCollateralManagementNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,8 @@ public class LoanCollateralManagementReadServiceImpl implements LoanCollateralMa
     public List<LoanCollateralResponseData> getLoanCollateralResponseDataList(Long loanId) {
         Loan loan = this.loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
         List<LoanCollateralResponseData> loanCollateralResponseDataCollection = new ArrayList<>();
-        Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
+        java.util.Collection<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralManagementRepository
+                .findByLoanId(loan.getId());
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
             final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement().getCollaterals();
             BigDecimal quantity = loanCollateralManagement.getQuantity();

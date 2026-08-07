@@ -74,7 +74,8 @@ import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralLifecycleService;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
@@ -126,6 +127,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
     private final LoanScheduleService loanScheduleService;
     private final LoanOriginatorLinkingService loanOriginatorLinkingService;
+    private final LoanCollateralLifecycleService loanCollateralLifecycleService;
 
     @Transactional
     @Override
@@ -139,6 +141,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             this.loanApplicationValidator.validateForCreate(loan);
             // Need to flush to gather loan id
             this.loanRepositoryWrapper.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             // Account number regeneration (need loan id...)
             this.loanAssembler.accountNumberGeneration(command, loan);
             // Save interest recalculation calendar
@@ -254,6 +257,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             this.loanApplicationValidator.validateForModify(loan);
             // TODO: check whether this is needed!
             loan = loanRepository.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             // Save note
             final String submittedOnNote = command.stringValueOfParameterNamed("submittedOnNote");
             createNote(submittedOnNote, loan);
@@ -267,6 +271,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // http://stackoverflow.com/questions/17151757/hibernate-cascade-update-gives-null-pointer/17334374#17334374
             // TODO: check whether this is needed!
             this.loanRepositoryWrapper.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             // Save interest recalculation calendar
             if (loan.isInterestBearingAndInterestRecalculationEnabled() && changes.containsKey(LoanProductConstants.IS_INTEREST_RECALCULATION_ENABLED_PARAMETER_NAME)) {
                 createAndPersistCalendarInstanceForInterestRecalculation(loan);
@@ -442,7 +447,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             this.accountAssociationsRepository.delete(accountAssociations);
         }
         // Note: check if releaseAttachedCollaterals method can be used here
-        Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
+        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan);
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
             BigDecimal quantity = loanCollateralManagement.getQuantity();
             ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
@@ -450,6 +455,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             loanCollateralManagement.setIsReleased(true);
             loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
         }
+        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loanCollateralManagements);
         this.loanRepositoryWrapper.delete(loanId);
         return  //
         //
@@ -560,6 +566,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
             loan.adjustNetDisbursalAmount(loan.getProposedPrincipal());
             loan = loanRepository.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             final String noteText = command.stringValueOfParameterNamed("note");
             createNote(noteText, loan);
             businessEventNotifierService.notifyPostBusinessEvent(new LoanUndoApprovalBusinessEvent(loan));
@@ -613,6 +620,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         final Map<String, Object> changes = loanAssembler.updateLoanApplicationAttributesForRejection(loan, command, currentUser);
         if (!changes.isEmpty()) {
             loanRepositoryWrapper.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             final String noteText = command.stringValueOfParameterNamed("note");
             createNote(noteText, loan);
         }
@@ -648,6 +656,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
         if (!changes.isEmpty()) {
             loanRepositoryWrapper.saveAndFlush(loan);
+            persistPendingCollaterals(loan);
             final String noteText = command.stringValueOfParameterNamed("note");
             createNote(noteText, loan);
         }
@@ -731,6 +740,14 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
+
+    private void persistPendingCollaterals(final Loan loan) {
+        if (loan.getPendingLoanCollaterals() != null) {
+            this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loan.getPendingLoanCollaterals());
+            loan.clearPendingLoanCollaterals();
+        }
+    }
+
     private Optional<Note> createNote(String submittedOnNote, Loan newLoanApplication) {
         if (StringUtils.isNotBlank(submittedOnNote)) {
             final Note note = Note.loanNote(newLoanApplication, submittedOnNote);
@@ -742,14 +759,14 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     private void releaseAttachedCollaterals(Loan loan) {
-        Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
+        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan);
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
             ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
             clientCollateralManagement.updateQuantity(clientCollateralManagement.getQuantity().add(loanCollateralManagement.getQuantity()));
             loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
             loanCollateralManagement.setIsReleased(true);
         }
-        loan.updateLoanCollateral(loanCollateralManagements);
+        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loanCollateralManagements);
     }
 
     private Map<String, Object> undoApproval(final Loan loan) {
@@ -774,7 +791,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final SavingsAccountRepositoryWrapper savingsAccountRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final GSIMReadPlatformService gsimReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService) {
+        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final SavingsAccountRepositoryWrapper savingsAccountRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final GSIMReadPlatformService gsimReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
         this.context = context;
         this.loanApplicationTransitionValidator = loanApplicationTransitionValidator;
         this.loanApplicationValidator = loanApplicationValidator;
@@ -798,5 +815,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.loanDownPaymentTransactionValidator = loanDownPaymentTransactionValidator;
         this.loanScheduleService = loanScheduleService;
         this.loanOriginatorLinkingService = loanOriginatorLinkingService;
+        this.loanCollateralLifecycleService = loanCollateralLifecycleService;
     }
 }

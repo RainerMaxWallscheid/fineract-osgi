@@ -77,7 +77,6 @@ import org.apache.fineract.portfolio.account.domain.StandingInstructionRepositor
 import org.apache.fineract.portfolio.account.domain.StandingInstructionStatus;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.delinquency.domain.LoanDelinquencyAction;
 import org.apache.fineract.portfolio.delinquency.helper.DelinquencyEffectivePauseHelper;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
@@ -134,7 +133,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     private final LoanUtilService loanUtilService;
     private final StandingInstructionRepository standingInstructionRepository;
     private final PostDatedChecksRepository postDatedChecksRepository;
-    private final LoanCollateralManagementRepository loanCollateralManagementRepository;
     private final DelinquencyWritePlatformService delinquencyWritePlatformService;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
     private final ExternalIdFactory externalIdFactory;
@@ -162,15 +160,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Override
     public LoanTransaction makeRepayment(final LoanTransactionType repaymentTransactionType, final Loan loan, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final String noteText, final ExternalId txnExternalId, final boolean isRecoveryRepayment, final String chargeRefundChargeType, boolean isAccountTransfer, HolidayDetailDTO holidayDetailDto, Boolean isHolidayValidationDone) {
         return makeRepayment(repaymentTransactionType, loan, transactionDate, transactionAmount, paymentDetail, noteText, txnExternalId, isRecoveryRepayment, chargeRefundChargeType, isAccountTransfer, holidayDetailDto, isHolidayValidationDone, false);
-    }
-
-    @Transactional
-    @Override
-    public void updateLoanCollateralStatus(Set<LoanCollateralManagement> loanCollateralManagementSet, boolean isReleased) {
-        for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagementSet) {
-            loanCollateralManagement.setIsReleased(isReleased);
-        }
-        this.loanCollateralManagementRepository.saveAll(loanCollateralManagementSet);
     }
 
     @Nullable
@@ -623,26 +612,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     @Override
-    public void updateAndSaveLoanCollateralTransactionsForIndividualAccounts(Loan loan, LoanTransaction loanTransaction) {
-        if (loan.getLoanType().isIndividualAccount()) {
-            Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
-            for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
-                if (loanTransaction != null) {
-                    loanCollateralManagement.setLoanTransactionData(loanTransaction);
-                }
-                ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
-                if (loan.getStatus().isClosed()) {
-                    loanCollateralManagement.setIsReleased(true);
-                    BigDecimal quantity = loanCollateralManagement.getQuantity();
-                    clientCollateralManagement.updateQuantity(clientCollateralManagement.getQuantity().add(quantity));
-                    loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
-                }
-            }
-            this.loanCollateralManagementRepository.saveAll(loanCollateralManagements);
-        }
-    }
-
-    @Override
     public Pair<LoanTransaction, LoanTransaction> makeRefund(final Loan loan, final ScheduleGeneratorDTO scheduleGeneratorDTO, final LoanTransactionType loanTransactionType, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final ExternalId txnExternalId, final Boolean interestRefundCalculationOverride) {
         // Pre-processing business event
         switch (loanTransactionType) {
@@ -807,7 +776,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final NoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final StandingInstructionRepository standingInstructionRepository, final PostDatedChecksRepository postDatedChecksRepository, final LoanCollateralManagementRepository loanCollateralManagementRepository, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final ExternalIdFactory externalIdFactory, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final InterestRefundServiceDelegate interestRefundServiceDelegate, final LoanTransactionValidator loanTransactionValidator, final LoanForeclosureValidator loanForeclosureValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanChargeValidator loanChargeValidator, final LoanRefundService loanRefundService, final LoanAccountService loanAccountService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService, final LoanAccountDomainServiceJpaHelper loanAccountDomainServiceJpaHelper, final LoanJournalEntryPoster journalEntryPoster) {
+        public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final NoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final StandingInstructionRepository standingInstructionRepository, final PostDatedChecksRepository postDatedChecksRepository, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final ExternalIdFactory externalIdFactory, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final InterestRefundServiceDelegate interestRefundServiceDelegate, final LoanTransactionValidator loanTransactionValidator, final LoanForeclosureValidator loanForeclosureValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanChargeValidator loanChargeValidator, final LoanRefundService loanRefundService, final LoanAccountService loanAccountService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService, final LoanAccountDomainServiceJpaHelper loanAccountDomainServiceJpaHelper, final LoanJournalEntryPoster journalEntryPoster) {
         this.loanAccountAssembler = loanAccountAssembler;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanTransactionRepository = loanTransactionRepository;
@@ -819,7 +788,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         this.loanUtilService = loanUtilService;
         this.standingInstructionRepository = standingInstructionRepository;
         this.postDatedChecksRepository = postDatedChecksRepository;
-        this.loanCollateralManagementRepository = loanCollateralManagementRepository;
         this.delinquencyWritePlatformService = delinquencyWritePlatformService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.externalIdFactory = externalIdFactory;

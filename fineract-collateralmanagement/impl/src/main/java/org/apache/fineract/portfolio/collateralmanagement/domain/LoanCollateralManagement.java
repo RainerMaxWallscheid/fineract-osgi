@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.domain;
+package org.apache.fineract.portfolio.collateralmanagement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,9 +25,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.loanaccount.data.LoanCollateralManagementData;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
+/**
+ * Loan↔client-collateral link. Uses FK ids for loan/transaction to avoid static-weaving
+ * cross-module entity relationships with {@link Loan} / {@link LoanTransaction}.
+ */
 @Entity
 @Table(name = "m_loan_collateral_management")
 public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
@@ -35,13 +40,11 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
     @Column(name = "quantity", nullable = false, scale = 5, precision = 20)
     private BigDecimal quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "transaction_id")
-    private LoanTransaction loanTransaction = null;
+    @Column(name = "transaction_id")
+    private Long loanTransactionId;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "loan_id", referencedColumnName = "id", nullable = false)
-    private Loan loan;
+    @Column(name = "loan_id", nullable = false)
+    private Long loanId;
 
     @Column(name = "is_released", nullable = false)
     private boolean isReleased = false;
@@ -64,8 +67,12 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
         this.quantity = quantity;
     }
 
-    public void setLoan(Loan loan) {
-        this.loan = loan;
+    public void setLoan(final Loan loan) {
+        this.loanId = loan == null ? null : loan.getId();
+    }
+
+    public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
     }
 
     public static LoanCollateralManagement from(final ClientCollateralManagement clientCollateralManagement, final BigDecimal quantity) {
@@ -73,10 +80,10 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
     }
 
     public static LoanCollateralManagement fromExisting(final ClientCollateralManagement clientCollateralManagement,
-            final BigDecimal quantity, final Loan loan, final LoanTransaction transaction, final Long id) {
-        LoanCollateralManagement loanCollateralManagementInstance = new LoanCollateralManagement(quantity, clientCollateralManagement);
-        loanCollateralManagementInstance.setLoan(loan);
-        loanCollateralManagementInstance.setLoanTransactionData(transaction);
+            final BigDecimal quantity, final Long loanId, final Long loanTransactionId, final Long id) {
+        final LoanCollateralManagement loanCollateralManagementInstance = new LoanCollateralManagement(quantity, clientCollateralManagement);
+        loanCollateralManagementInstance.setLoanId(loanId);
+        loanCollateralManagementInstance.setLoanTransactionId(loanTransactionId);
         loanCollateralManagementInstance.setId(id);
         return loanCollateralManagementInstance;
     }
@@ -86,7 +93,11 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
     }
 
     public void setLoanTransactionData(final LoanTransaction loanTransaction) {
-        this.loanTransaction = loanTransaction;
+        this.loanTransactionId = loanTransaction == null ? null : loanTransaction.getId();
+    }
+
+    public void setLoanTransactionId(final Long loanTransactionId) {
+        this.loanTransactionId = loanTransactionId;
     }
 
     public void setIsReleased(final boolean isReleased) {
@@ -101,12 +112,12 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
         return this.quantity;
     }
 
-    public Loan getLoanData() {
-        return this.loan;
+    public Long getLoanId() {
+        return this.loanId;
     }
 
-    public LoanTransaction getLoanTransaction() {
-        return this.loanTransaction;
+    public Long getLoanTransactionId() {
+        return this.loanTransactionId;
     }
 
     public ClientCollateralManagement getClientCollateralManagement() {

@@ -71,7 +71,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepositor
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCreditAllocationRule;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanDisbursementDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanPaymentAllocationRule;
@@ -89,7 +89,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleAssembler;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleCalculationPlatformService;
 import org.apache.fineract.portfolio.loanaccount.mapper.LoanChargeMapper;
-import org.apache.fineract.portfolio.loanaccount.mapper.LoanCollateralManagementMapper;
+import org.apache.fineract.portfolio.collateralmanagement.mapper.LoanCollateralManagementMapper;
 import org.apache.fineract.portfolio.loanaccount.service.schedule.LoanScheduleComponent;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -231,7 +231,10 @@ public class LoanAssemblerImpl implements LoanAssembler {
         } else if (group != null) {
             loanApplication = Loan.newGroupLoanApplication(accountNo, group, loanAccountType, loanProduct, fund, loanOfficer, loanPurpose, transactionProcessingStrategy, loanProductRelatedDetail, loanCharges, syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, isEnableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
         } else if (client != null) {
-            loanApplication = Loan.newIndividualLoanApplication(accountNo, client, loanAccountType, loanProduct, fund, loanOfficer, loanPurpose, transactionProcessingStrategy, loanProductRelatedDetail, loanCharges, collateral, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, isEnableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
+            loanApplication = Loan.newIndividualLoanApplication(accountNo, client, loanAccountType, loanProduct, fund, loanOfficer, loanPurpose, transactionProcessingStrategy, loanProductRelatedDetail, loanCharges, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, isEnableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
+            if (collateral != null && !collateral.isEmpty()) {
+                loanApplication.setPendingLoanCollaterals(collateral);
+            }
         } else {
             throw new IllegalStateException("No loan application exists for either a client or group (or both).");
         }
@@ -585,7 +588,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             changes.put(LoanApiConstants.chargesParameterName, loanChargeMapper.map(possiblyModifiedLoanCharges, loan.getCurrency()));
             changes.put(Loan.RECALCULATE_LOAN_SCHEDULE, true);
         }
-        if (command.parameterExists(LoanApiConstants.collateralParameterName) && possiblyModifedLoanCollateralItems != null && possiblyModifedLoanCollateralItems.equals(loan.getLoanCollateralManagements())) {
+        if (command.parameterExists(LoanApiConstants.collateralParameterName) && possiblyModifedLoanCollateralItems != null) {
             changes.put(LoanApiConstants.collateralParameterName, loanCollateralManagementMapper.map(possiblyModifedLoanCollateralItems));
         }
         if (command.isChangeInIntegerParameterNamed(LoanApiConstants.loanTermFrequencyParameterName, loan.getTermFrequency())) {
@@ -686,7 +689,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             if (!StringUtils.isBlank(loanTypeStr) && loanType.isIndividualAccount()) {
                 final String collateralParamName = "collateral";
                 if (changes.containsKey(collateralParamName)) {
-                    loan.updateLoanCollateral(possiblyModifedLoanCollateralItems);
+                    loan.setPendingLoanCollaterals(possiblyModifedLoanCollateralItems);
                 }
             }
         }

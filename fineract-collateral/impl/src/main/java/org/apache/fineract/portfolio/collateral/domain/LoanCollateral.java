@@ -39,9 +39,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 @Table(name = "m_loan_collateral")
 public class LoanCollateral extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "loan_id", nullable = false)
-    private Loan loan;
+    @Column(name = "loan_id", nullable = false)
+    private Long loanId;
 
     @ManyToOne
     @JoinColumn(name = "type_cv_id", nullable = false)
@@ -61,8 +60,8 @@ public class LoanCollateral extends AbstractPersistableCustom<Long> {
         //
     }
 
-    private LoanCollateral(final Loan loan, final CodeValue collateralType, final BigDecimal value, final String description) {
-        this.loan = loan;
+    private LoanCollateral(final Long loanId, final CodeValue collateralType, final BigDecimal value, final String description) {
+        this.loanId = loanId;
         this.type = collateralType;
         this.value = value;
         this.description = StringUtils.defaultIfEmpty(description, null);
@@ -75,13 +74,21 @@ public class LoanCollateral extends AbstractPersistableCustom<Long> {
     }
 
     public void associateWith(final Loan loan) {
-        this.loan = loan;
+        this.loanId = loan == null ? null : loan.getId();
+    }
+
+    public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
+    }
+
+    public Long getLoanId() {
+        return this.loanId;
     }
 
     public static LoanCollateral fromJson(final Loan loan, final CodeValue collateralType, final JsonCommand command) {
         final String description = command.stringValueOfParameterNamed(CollateralJSONinputParams.DESCRIPTION.getValue());
         final BigDecimal value = command.bigDecimalValueOfParameterNamed(CollateralJSONinputParams.VALUE.getValue());
-        return new LoanCollateral(loan, collateralType, value, description);
+        return new LoanCollateral(loan == null ? null : loan.getId(), collateralType, value, description);
     }
 
     public Map<String, Object> update(final JsonCommand command) {

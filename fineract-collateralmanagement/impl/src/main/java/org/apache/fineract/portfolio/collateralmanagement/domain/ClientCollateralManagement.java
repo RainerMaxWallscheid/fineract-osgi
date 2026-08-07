@@ -35,7 +35,6 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.collateralmanagement.api.CollateralManagementJsonInputParams;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
 
 @Entity
 @Table(name = "m_client_collateral_management")

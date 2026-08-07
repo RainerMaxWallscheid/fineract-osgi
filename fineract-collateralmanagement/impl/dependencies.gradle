@@ -48,4 +48,6 @@ dependencies {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    implementation 'org.mapstruct:mapstruct'
+    annotationProcessor 'org.mapstruct:mapstruct-processor'
 }

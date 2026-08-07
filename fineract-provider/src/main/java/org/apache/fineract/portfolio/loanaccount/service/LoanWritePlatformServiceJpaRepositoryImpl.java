@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralLifecycleService;
+
 import static org.apache.fineract.portfolio.loanaccount.domain.Loan.ACTUAL_DISBURSEMENT_DATE;
 import static org.apache.fineract.portfolio.loanaccount.domain.Loan.CLOSED_ON_DATE;
 import static org.apache.fineract.portfolio.loanaccount.domain.Loan.EXTERNAL_ID;
@@ -234,6 +236,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final LoanUpdateCommandFromApiJsonDeserializer loanUpdateCommandFromApiJsonDeserializer;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanAccountDomainService loanAccountDomainService;
+    private final LoanCollateralLifecycleService loanCollateralLifecycleService;
     private final NoteRepository noteRepository;
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanTransactionRelationRepository loanTransactionRelationRepository;
@@ -916,7 +919,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // disable all active standing orders linked to this loan if status changes to closed
         loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, newInterestPaymentWaiverTransaction);
-        loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, newInterestPaymentWaiverTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, newInterestPaymentWaiverTransaction);
         // Finished Notification
         final LoanTransactionBusinessEvent transactionRepaymentEvent = new LoanTransactionInterestPaymentWaiverPostBusinessEvent(newInterestPaymentWaiverTransaction);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
@@ -968,7 +971,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         boolean isAccountTransfer = false;
         LoanTransaction loanTransaction = this.loanAccountDomainService.makeRepayment(repaymentTransactionType, loan, transactionDate, transactionAmount, paymentDetail, noteText, txnExternalId, isRecoveryRepayment, chargeRefundChargeType, isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
         loan = loanTransaction.getLoan();
-        this.loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
         return  //
         //
         //
@@ -1335,7 +1338,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         loanAccountDomainService.setLoanDelinquencyTag(loan, DateUtils.getBusinessLocalDate());
         businessEventNotifierService.notifyPostBusinessEvent(new LoanCloseBusinessEvent(loan));
         // Update loan transaction on repayment.
-        this.loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
         // disable all active standing instructions linked to the loan
         this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         CommandProcessingResult result;
@@ -1392,7 +1395,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // disable all active standing instructions linked to the loan
         this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         // Update loan transaction on repayment.
-        this.loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
         return  //
         //
         //
@@ -2412,9 +2415,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, interestRefundTransaction);
         }
         // Collateral management
-        loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, refundTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, refundTransaction);
         if (interestRefundTransaction != null) {
-            loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTransaction);
+            loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTransaction);
         }
         // Raise business events
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -2514,7 +2517,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         loanAccountDomainService.setLoanDelinquencyTag(loan, transactionDate);
         loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, interestRefundTxn);
-        loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTxn);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTxn);
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         journalEntryPoster.postJournalEntriesForLoanTransaction(interestRefundTxn, false, false);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
@@ -3011,12 +3014,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanTransactionValidator loanTransactionValidator, final LoanUpdateCommandFromApiJsonDeserializer loanUpdateCommandFromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final NoteRepository noteRepository, final LoanTransactionRepository loanTransactionRepository, final LoanTransactionRelationRepository loanTransactionRelationRepository, final LoanAssembler loanAssembler, final CalendarInstanceRepository calendarInstanceRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final HolidayRepositoryWrapper holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final LoanReadPlatformService loanReadPlatformService, final FromJsonHelper fromApiJsonHelper, final CalendarRepository calendarRepository, final LoanScheduleHistoryWritePlatformService loanScheduleHistoryWritePlatformService, final LoanApplicationValidator loanApplicationValidator, final AccountAssociationsRepository accountAssociationRepository, final AccountTransferDetailRepository accountTransferDetailRepository, final BusinessEventNotifierService businessEventNotifierService, final GuarantorDomainService guarantorDomainService, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CodeValueRepositoryWrapper codeValueRepository, final CashierTxnValidationPort cashierTxnValidationPort, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final RepaymentWithPostDatedChecksAssembler repaymentWithPostDatedChecksAssembler, final PostDatedChecksRepository postDatedChecksRepository, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountLockService<LoanAccountLock> loanAccountLockService, final ExternalIdFactory externalIdFactory, final LoanAccrualTransactionBusinessEventService loanAccrualTransactionBusinessEventService, final ErrorHandler errorHandler, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanTransactionAssembler loanTransactionAssembler, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanOfficerValidator loanOfficerValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementService loanDisbursementService, final LoanScheduleService loanScheduleService, final LoanChargeValidator loanChargeValidator, final LoanOfficerService loanOfficerService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanJournalEntryPoster journalEntryPoster, final LoanAdjustmentService loanAdjustmentService, final LoanMapper loanMapper, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService) {
+        public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanTransactionValidator loanTransactionValidator, final LoanUpdateCommandFromApiJsonDeserializer loanUpdateCommandFromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final LoanCollateralLifecycleService loanCollateralLifecycleService, final NoteRepository noteRepository, final LoanTransactionRepository loanTransactionRepository, final LoanTransactionRelationRepository loanTransactionRelationRepository, final LoanAssembler loanAssembler, final CalendarInstanceRepository calendarInstanceRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final HolidayRepositoryWrapper holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final LoanReadPlatformService loanReadPlatformService, final FromJsonHelper fromApiJsonHelper, final CalendarRepository calendarRepository, final LoanScheduleHistoryWritePlatformService loanScheduleHistoryWritePlatformService, final LoanApplicationValidator loanApplicationValidator, final AccountAssociationsRepository accountAssociationRepository, final AccountTransferDetailRepository accountTransferDetailRepository, final BusinessEventNotifierService businessEventNotifierService, final GuarantorDomainService guarantorDomainService, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CodeValueRepositoryWrapper codeValueRepository, final CashierTxnValidationPort cashierTxnValidationPort, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final RepaymentWithPostDatedChecksAssembler repaymentWithPostDatedChecksAssembler, final PostDatedChecksRepository postDatedChecksRepository, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountLockService<LoanAccountLock> loanAccountLockService, final ExternalIdFactory externalIdFactory, final LoanAccrualTransactionBusinessEventService loanAccrualTransactionBusinessEventService, final ErrorHandler errorHandler, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanTransactionAssembler loanTransactionAssembler, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanOfficerValidator loanOfficerValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementService loanDisbursementService, final LoanScheduleService loanScheduleService, final LoanChargeValidator loanChargeValidator, final LoanOfficerService loanOfficerService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanJournalEntryPoster journalEntryPoster, final LoanAdjustmentService loanAdjustmentService, final LoanMapper loanMapper, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService) {
         this.context = context;
         this.loanTransactionValidator = loanTransactionValidator;
         this.loanUpdateCommandFromApiJsonDeserializer = loanUpdateCommandFromApiJsonDeserializer;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanAccountDomainService = loanAccountDomainService;
+        this.loanCollateralLifecycleService = loanCollateralLifecycleService;
         this.noteRepository = noteRepository;
         this.loanTransactionRepository = loanTransactionRepository;
         this.loanTransactionRelationRepository = loanTransactionRelationRepository;

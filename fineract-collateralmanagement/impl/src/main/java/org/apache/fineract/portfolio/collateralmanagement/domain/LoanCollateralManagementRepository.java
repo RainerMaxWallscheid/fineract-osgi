@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.domain;
+package org.apache.fineract.portfolio.collateralmanagement.domain;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +27,7 @@ import org.springframework.data.repository.query.Param;
 public interface LoanCollateralManagementRepository
         extends JpaRepository<LoanCollateralManagement, Long>, JpaSpecificationExecutor<LoanCollateralManagement> {
 
-    @Query("select loanCollaterals from LoanCollateralManagement loanCollaterals where loanCollaterals.loan=:loan")
-    List<LoanCollateralManagement> findByLoan(@Param("loan") Loan loan);
+    @Query("select loanCollaterals from LoanCollateralManagement loanCollaterals where loanCollaterals.loanId = :loanId")
+    List<LoanCollateralManagement> findByLoanId(@Param("loanId") Long loanId);
 
 }

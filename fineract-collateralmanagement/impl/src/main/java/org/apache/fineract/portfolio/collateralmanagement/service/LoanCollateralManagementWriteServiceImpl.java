@@ -23,8 +23,8 @@ import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralDel
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralDeleteResponse;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public class LoanCollateralManagementWriteServiceImpl implements LoanCollateralManagementWriteService {

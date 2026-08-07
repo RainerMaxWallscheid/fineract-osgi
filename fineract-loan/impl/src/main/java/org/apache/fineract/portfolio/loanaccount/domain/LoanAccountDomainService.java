@@ -56,8 +56,6 @@ public interface LoanAccountDomainService {
     LoanTransaction makeRefundForActiveLoan(Long accountId, CommandProcessingResultBuilder builderResult, LocalDate transactionDate,
             BigDecimal transactionAmount, PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId);
 
-    void updateLoanCollateralStatus(Set<LoanCollateralManagement> loanCollateralManagementSet, boolean isReleased);
-
     /**
      * This method is to set a Delinquency Tag If the loan is overdue, If the loan after the repayment transaction is
      * not overdue and It has a Delinquency Tag, It is removed
@@ -95,8 +93,6 @@ public interface LoanAccountDomainService {
     void updateAndSavePostDatedChecksForIndividualAccount(Loan loan, LoanTransaction transaction);
 
     LoanTransaction applyInterestRefund(Loan loan, LoanRefundRequestData loanRefundRequest);
-
-    void updateAndSaveLoanCollateralTransactionsForIndividualAccounts(Loan loan, LoanTransaction transaction);
 
     LoanTransaction createManualInterestRefundWithAmount(Loan loan, LoanTransaction targetTransaction, BigDecimal amount,
             PaymentDetail paymentDetail, ExternalId txnExternalId);

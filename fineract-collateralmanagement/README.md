@@ -8,12 +8,11 @@ Provider peel — client/product/loan collateral management (`portfolio.collater
 | `fineract-collateralmanagement-impl` | `impl/` | `org.apache.fineract.collateralmanagement.impl` | REST, repos, handlers, OSGi registrar |
 | `fineract-collateralmanagement-test` | `test/` | `org.apache.fineract.collateralmanagement.test` | Fragment-Host → impl |
 
-## Residual (loan)
+## Residual closed (loan)
 
-Entity graph stays on `fineract-loan-impl` to avoid loan↔collateralmanagement cycles:
-
-- `CollateralManagementDomain`, `ClientCollateralManagement`, `CollateralManagementJsonInputParams`
-- `LoanCollateralManagement` (+ repository/mapper) under `loanaccount`
+`CollateralManagementDomain`, `ClientCollateralManagement`, `LoanCollateralManagement`,
+constants and repository live in this module. `Loan` / `LoanTransaction` no longer own inverse
+collections; association lifecycle is `LoanCollateralLifecycleService`.
 
 Legacy code-value collateral is `fineract-collateral` (separate peel).
 

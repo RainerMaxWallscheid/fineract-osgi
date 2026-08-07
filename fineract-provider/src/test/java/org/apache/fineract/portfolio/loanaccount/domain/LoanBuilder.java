@@ -113,10 +113,13 @@ public class LoanBuilder {
         // Build a minimal valid loan using reflection to access the protected constructor
         try {
             Loan loan = Loan.newIndividualLoanApplication(accountNo, client, loanType, loanProduct, fund, loanOfficer, loanPurpose,
-                    transactionProcessor, loanRepaymentScheduleDetail, charges, collateral, fixedEmiAmount, disbursementDetails,
+                    transactionProcessor, loanRepaymentScheduleDetail, charges, fixedEmiAmount, disbursementDetails,
                     maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential,
                     rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, enableInstallmentLevelDelinquency,
                     submittedOnDate, allowFullTermForTranche);
+            if (collateral != null && !collateral.isEmpty()) {
+                loan.setPendingLoanCollaterals(collateral);
+            }
 
             if (id != null) {
                 loan.setId(id);

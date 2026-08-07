@@ -40,7 +40,7 @@ import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManag
 import org.apache.fineract.portfolio.collateralmanagement.exception.ClientCollateralCannotBeDeletedException;
 import org.apache.fineract.portfolio.collateralmanagement.exception.ClientCollateralNotFoundException;
 import org.apache.fineract.portfolio.collateralmanagement.exception.CollateralNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
 
 public class ClientCollateralManagementWriteServiceImpl implements ClientCollateralManagementWriteService {
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;

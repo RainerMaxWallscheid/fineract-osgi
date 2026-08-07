@@ -73,7 +73,8 @@ import org.apache.fineract.portfolio.loanaccount.api.LoanTransactionApiConstants
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralLifecycleService;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanDisbursementDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
@@ -104,6 +105,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final ApplicationCurrencyRepository applicationCurrencyRepository;
     private final LoanUtilService loanUtilService;
+    private final LoanCollateralLifecycleService loanCollateralLifecycleService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final CalendarInstanceRepository calendarInstanceRepository;
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
@@ -158,7 +160,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
                 final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.disbursal.account.is.not.approve.not.disbursed.state", defaultUserMessage);
                 baseDataValidator.getDataValidationErrors().add(error);
             }
-            final Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
+            final Set<LoanCollateralManagement> loanCollateralManagements = new java.util.HashSet<>(this.loanCollateralLifecycleService.findByLoan(loan));
             if ((loanCollateralManagements != null && !loanCollateralManagements.isEmpty()) && loan.getLoanType().isIndividualAccount()) {
                 BigDecimal totalCollateral = collectTotalCollateral(loanCollateralManagements);
                 // Validate the loan collateral value against the total disbursed amount after this transaction
@@ -968,13 +970,14 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionValidatorImpl(final FromJsonHelper fromApiJsonHelper, final LoanApplicationValidator fromApiJsonDeserializer, final LoanRepository loanRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final ApplicationCurrencyRepository applicationCurrencyRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CalendarInstanceRepository calendarInstanceRepository, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementValidator loanDisbursementValidator, final CodeValueRepository codeValueRepository, final ConfigurationDomainService configurationDomainService) {
+        public LoanTransactionValidatorImpl(final FromJsonHelper fromApiJsonHelper, final LoanApplicationValidator fromApiJsonDeserializer, final LoanRepository loanRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final ApplicationCurrencyRepository applicationCurrencyRepository, final LoanUtilService loanUtilService, final LoanCollateralLifecycleService loanCollateralLifecycleService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CalendarInstanceRepository calendarInstanceRepository, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementValidator loanDisbursementValidator, final CodeValueRepository codeValueRepository, final ConfigurationDomainService configurationDomainService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanRepository = loanRepository;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.applicationCurrencyRepository = applicationCurrencyRepository;
         this.loanUtilService = loanUtilService;
+        this.loanCollateralLifecycleService = loanCollateralLifecycleService;
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.loanDownPaymentTransactionValidator = loanDownPaymentTransactionValidator;

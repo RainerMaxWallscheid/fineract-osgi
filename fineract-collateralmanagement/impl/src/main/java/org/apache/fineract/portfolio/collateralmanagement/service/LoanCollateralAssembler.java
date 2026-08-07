@@ -30,8 +30,8 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
 import org.apache.fineract.portfolio.collateralmanagement.exception.LoanCollateralManagementNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidAmountOfCollateralQuantity;
 
 public class LoanCollateralAssembler {
@@ -71,7 +71,8 @@ public class LoanCollateralAssembler {
                         updatedClientQuantity = quantity;
                     }
                     clientCollateral.updateQuantity(updatedClientQuantity);
-                    collateralItems.add(LoanCollateralManagement.fromExisting(clientCollateral, quantity, loanCollateralManagement.getLoanData(), loanCollateralManagement.getLoanTransaction(), loanCollateralManagement.getId()));
+                    collateralItems.add(LoanCollateralManagement.fromExisting(clientCollateral, quantity, loanCollateralManagement.getLoanId(),
+                            loanCollateralManagement.getLoanTransactionId(), loanCollateralManagement.getId()));
                 }
             }
         }

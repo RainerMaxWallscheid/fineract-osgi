@@ -61,8 +61,6 @@ jar {
                 'Import-Package': '*',
                 'Export-Package': 'org.apache.fineract.accounting.productaccountmapping.service,'
                         + 'org.apache.fineract.cob.loan,'
-                        + 'org.apache.fineract.portfolio.collateralmanagement.api,'
-                        + 'org.apache.fineract.portfolio.collateralmanagement.domain,'
                         + 'org.apache.fineract.portfolio.delinquency.api,'
                         + 'org.apache.fineract.portfolio.delinquency.data,'
                         + 'org.apache.fineract.portfolio.delinquency.domain,'

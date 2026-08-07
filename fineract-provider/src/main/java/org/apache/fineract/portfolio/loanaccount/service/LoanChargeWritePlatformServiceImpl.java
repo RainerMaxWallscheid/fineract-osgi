@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralLifecycleService;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.math.BigDecimal;
@@ -149,6 +151,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanAccountDomainService loanAccountDomainService;
+    private final LoanCollateralLifecycleService loanCollateralLifecycleService;
     private final LoanChargeRepository loanChargeRepository;
     private final LoanWritePlatformService loanWritePlatformService;
     private final LoanUtilService loanUtilService;
@@ -628,7 +631,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
         LoanTransaction loanTransaction = applyChargeAdjustment(loan, loanCharge, transactionAmount, transactionDate, externalId, paymentDetail);
         // Update loan transaction on repayment.
-        loanAccountDomainService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             final Note note = Note.loanNote(loan, noteText);
@@ -1265,7 +1268,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeWritePlatformServiceImpl(final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanAssembler loanAssembler, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final LoanChargeRepository loanChargeRepository, final LoanWritePlatformService loanWritePlatformService, final LoanUtilService loanUtilService, final LoanChargeReadPlatformService loanChargeReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final AccountTransferDetailRepository accountTransferDetailRepository, final LoanChargeAssembler loanChargeAssembler, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final NoteRepository noteRepository, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeValidator loanChargeValidator, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanAdjustmentService loanAdjustmentService, final LoanChargeService loanChargeService, final LoanJournalEntryPoster loanJournalEntryPoster) {
+        public LoanChargeWritePlatformServiceImpl(final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanAssembler loanAssembler, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final LoanCollateralLifecycleService loanCollateralLifecycleService, final LoanChargeRepository loanChargeRepository, final LoanWritePlatformService loanWritePlatformService, final LoanUtilService loanUtilService, final LoanChargeReadPlatformService loanChargeReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final AccountTransferDetailRepository accountTransferDetailRepository, final LoanChargeAssembler loanChargeAssembler, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final NoteRepository noteRepository, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeValidator loanChargeValidator, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanAdjustmentService loanAdjustmentService, final LoanChargeService loanChargeService, final LoanJournalEntryPoster loanJournalEntryPoster) {
         this.loanChargeApiJsonValidator = loanChargeApiJsonValidator;
         this.loanAssembler = loanAssembler;
         this.chargeDefinitionPort = chargeDefinitionPort;
@@ -1274,6 +1277,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanAccountDomainService = loanAccountDomainService;
+        this.loanCollateralLifecycleService = loanCollateralLifecycleService;
         this.loanChargeRepository = loanChargeRepository;
         this.loanWritePlatformService = loanWritePlatformService;
         this.loanUtilService = loanUtilService;

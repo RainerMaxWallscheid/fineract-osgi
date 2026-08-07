@@ -37,7 +37,7 @@ import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateral
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementReadServiceImpl;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementWriteService;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementWriteServiceImpl;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
+import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
