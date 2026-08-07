@@ -89,6 +89,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-calendar` | **complete** (api/impl/test); entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl |
 | `fineract-address` | **complete** (api/impl/test); AddressData residual in core; ClientAddress on impl |
+| `fineract-creditbureau` | **complete** (api/impl/test); loan product mapping via loan-impl |
 
 
 ## Commands

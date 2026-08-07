@@ -167,6 +167,13 @@ project(':fineract-address-impl').projectDir = file('fineract-address/impl')
 include ':fineract-address-test'
 project(':fineract-address-test').projectDir = file('fineract-address/test')
 // No :fineract-address façade — depend on -api / -impl explicitly.
+include ':fineract-creditbureau-api'
+project(':fineract-creditbureau-api').projectDir = file('fineract-creditbureau/api')
+include ':fineract-creditbureau-impl'
+project(':fineract-creditbureau-impl').projectDir = file('fineract-creditbureau/impl')
+include ':fineract-creditbureau-test'
+project(':fineract-creditbureau-test').projectDir = file('fineract-creditbureau/test')
+// No :fineract-creditbureau façade — depend on -api / -impl explicitly.
 
 
 
