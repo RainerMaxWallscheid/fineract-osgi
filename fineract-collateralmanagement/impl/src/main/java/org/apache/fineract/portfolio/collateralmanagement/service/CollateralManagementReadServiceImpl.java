@@ -30,7 +30,7 @@ public class CollateralManagementReadServiceImpl implements CollateralManagement
     @Override
     public CollateralManagementData getCollateralProduct(Long collateralId) {
         final CollateralManagementDomain collateralManagementDomain = this.collateralManagementRepositoryWrapper.getCollateral(collateralId);
-        return CollateralManagementData.createNew(collateralManagementDomain);
+        return toData(collateralManagementDomain);
     }
 
     @Override
@@ -38,9 +38,14 @@ public class CollateralManagementReadServiceImpl implements CollateralManagement
         final List<CollateralManagementDomain> collateralManagementDomainSet = this.collateralManagementRepositoryWrapper.getAllCollaterals();
         List<CollateralManagementData> collateralManagementDataList = new ArrayList<>();
         for (CollateralManagementDomain collateralManagementDomain : collateralManagementDomainSet) {
-            collateralManagementDataList.add(CollateralManagementData.createNew(collateralManagementDomain));
+            collateralManagementDataList.add(toData(collateralManagementDomain));
         }
         return collateralManagementDataList;
+    }
+
+    private static CollateralManagementData toData(final CollateralManagementDomain domain) {
+        return CollateralManagementData.createNew(domain.getQuality(), domain.getBasePrice(), domain.getUnitType(), domain.getPctToBase(),
+                domain.getCurrency().getCode(), domain.getName(), domain.getId());
     }
 
     @java.lang.SuppressWarnings("all")

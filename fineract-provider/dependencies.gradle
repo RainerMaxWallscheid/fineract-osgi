@@ -96,6 +96,8 @@ dependencies {
     implementation(project(path: ':fineract-creditbureau-impl'))
     implementation(project(path: ':fineract-collateral-api'))
     implementation(project(path: ':fineract-collateral-impl'))
+    implementation(project(path: ':fineract-collateralmanagement-api'))
+    implementation(project(path: ':fineract-collateralmanagement-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

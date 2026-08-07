@@ -38,19 +38,13 @@ public class LoanCollateralManagementReadServiceImpl implements LoanCollateralMa
     private final LoanRepository loanRepository;
 
     @Override
-    public List<LoanCollateralManagement> getLoanCollaterals(Long loanId) {
-        Loan loan = this.loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
-        return this.loanCollateralManagementRepository.findByLoan(loan);
-    }
-
-    @Override
     public LoanCollateralResponseData getLoanCollateralResponseData(Long collateralId) {
         LoanCollateralManagement loanCollateralManagement = this.loanCollateralManagementRepository.findById(collateralId).orElseThrow(() -> new LoanCollateralManagementNotFoundException(collateralId));
         final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement().getCollaterals();
         BigDecimal quantity = loanCollateralManagement.getQuantity();
         BigDecimal total = quantity.multiply(collateralManagementDomain.getBasePrice());
         BigDecimal totalCollateral = total.multiply(collateralManagementDomain.getPctToBase()).divide(BigDecimal.valueOf(100));
-        return LoanCollateralResponseData.instanceOf(loanCollateralManagement, total, totalCollateral);
+        return LoanCollateralResponseData.instanceOf(loanCollateralManagement.getId(), loanCollateralManagement.getQuantity(), total, totalCollateral, loanCollateralManagement.getClientCollateralManagement().getId());
     }
 
     @Override
@@ -63,7 +57,7 @@ public class LoanCollateralManagementReadServiceImpl implements LoanCollateralMa
             BigDecimal quantity = loanCollateralManagement.getQuantity();
             BigDecimal total = quantity.multiply(collateralManagementDomain.getBasePrice());
             BigDecimal totalCollateral = total.multiply(collateralManagementDomain.getPctToBase()).divide(BigDecimal.valueOf(100));
-            loanCollateralResponseDataCollection.add(LoanCollateralResponseData.instanceOf(loanCollateralManagement, total, totalCollateral));
+            loanCollateralResponseDataCollection.add(LoanCollateralResponseData.instanceOf(loanCollateralManagement.getId(), loanCollateralManagement.getQuantity(), total, totalCollateral, loanCollateralManagement.getClientCollateralManagement().getId()));
         }
         return loanCollateralResponseDataCollection;
     }

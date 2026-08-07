@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.math.BigDecimal;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 
 public final class LoanCollateralTemplateData {
     private Long collateralId;
@@ -28,37 +27,39 @@ public final class LoanCollateralTemplateData {
     private BigDecimal quantity;
     private String name;
 
-    public static LoanCollateralTemplateData instanceOf(final ClientCollateralManagement clientCollateralManagement) {
-        return new LoanCollateralTemplateData(clientCollateralManagement.getId(), clientCollateralManagement.getCollaterals().getBasePrice(), clientCollateralManagement.getCollaterals().getPctToBase(), clientCollateralManagement.getQuantity(), clientCollateralManagement.getCollaterals().getName());
+    public static LoanCollateralTemplateData instanceOf(final Long collateralId, final BigDecimal basePrice, final BigDecimal pctToBase,
+            final BigDecimal quantity, final String name) {
+        return new LoanCollateralTemplateData(collateralId, basePrice, pctToBase, quantity, name);
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getCollateralId() {
+    public Long getCollateralId() {
         return this.collateralId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getBasePrice() {
+    public BigDecimal getBasePrice() {
         return this.basePrice;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPctToBase() {
+    public BigDecimal getPctToBase() {
         return this.pctToBase;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getQuantity() {
+    public BigDecimal getQuantity() {
         return this.quantity;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getName() {
+    public String getName() {
         return this.name;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCollateralTemplateData(final Long collateralId, final BigDecimal basePrice, final BigDecimal pctToBase, final BigDecimal quantity, final String name) {
+    public LoanCollateralTemplateData(final Long collateralId, final BigDecimal basePrice, final BigDecimal pctToBase,
+            final BigDecimal quantity, final String name) {
         this.collateralId = collateralId;
         this.basePrice = basePrice;
         this.pctToBase = pctToBase;

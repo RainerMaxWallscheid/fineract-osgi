@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.math.BigDecimal;
 import org.apache.fineract.portfolio.loanaccount.data.LoanCollateralManagementData;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
 
 public final class LoanCollateralResponseData {
     private Long collateralId;
@@ -29,8 +28,9 @@ public final class LoanCollateralResponseData {
     private BigDecimal totalCollateral;
     private Long clientCollateralId;
 
-    public static LoanCollateralResponseData instanceOf(final LoanCollateralManagement loanCollateralManagement, final BigDecimal total, final BigDecimal totalCollateral) {
-        return new LoanCollateralResponseData(loanCollateralManagement.getId(), loanCollateralManagement.getQuantity(), total, totalCollateral, loanCollateralManagement.getClientCollateralManagement().getId());
+    public static LoanCollateralResponseData instanceOf(final Long collateralId, final BigDecimal quantity, final BigDecimal total,
+            final BigDecimal totalCollateral, final Long clientCollateralId) {
+        return new LoanCollateralResponseData(collateralId, quantity, total, totalCollateral, clientCollateralId);
     }
 
     public LoanCollateralManagementData toCommand() {
@@ -38,32 +38,33 @@ public final class LoanCollateralResponseData {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getCollateralId() {
+    public Long getCollateralId() {
         return this.collateralId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getQuantity() {
+    public BigDecimal getQuantity() {
         return this.quantity;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotal() {
+    public BigDecimal getTotal() {
         return this.total;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalCollateral() {
+    public BigDecimal getTotalCollateral() {
         return this.totalCollateral;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getClientCollateralId() {
+    public Long getClientCollateralId() {
         return this.clientCollateralId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCollateralResponseData(final Long collateralId, final BigDecimal quantity, final BigDecimal total, final BigDecimal totalCollateral, final Long clientCollateralId) {
+    public LoanCollateralResponseData(final Long collateralId, final BigDecimal quantity, final BigDecimal total,
+            final BigDecimal totalCollateral, final Long clientCollateralId) {
         this.collateralId = collateralId;
         this.quantity = quantity;
         this.total = total;

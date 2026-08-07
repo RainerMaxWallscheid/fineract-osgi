@@ -49,7 +49,9 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
         Collection<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepositoryWrapper.getCollateralsPerClient(clientId);
         List<LoanCollateralTemplateData> loanCollateralTemplateDataList = new ArrayList<>();
         for (ClientCollateralManagement clientCollateralManagement : clientCollateralManagements) {
-            loanCollateralTemplateDataList.add(LoanCollateralTemplateData.instanceOf(clientCollateralManagement));
+            loanCollateralTemplateDataList.add(LoanCollateralTemplateData.instanceOf(clientCollateralManagement.getId(),
+                    clientCollateralManagement.getCollaterals().getBasePrice(), clientCollateralManagement.getCollaterals().getPctToBase(),
+                    clientCollateralManagement.getQuantity(), clientCollateralManagement.getCollaterals().getName()));
         }
         return loanCollateralTemplateDataList;
     }

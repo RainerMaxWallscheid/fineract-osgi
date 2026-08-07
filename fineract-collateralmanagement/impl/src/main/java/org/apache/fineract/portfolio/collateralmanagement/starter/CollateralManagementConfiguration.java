@@ -21,7 +21,7 @@ package org.apache.fineract.portfolio.collateralmanagement.starter;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepository;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementRepositoryWrapper;
 import org.apache.fineract.portfolio.collateralmanagement.service.ClientCollateralManagementReadService;
@@ -59,9 +59,9 @@ public class CollateralManagementConfiguration {
     @ConditionalOnMissingBean(ClientCollateralManagementWriteService.class)
     public ClientCollateralManagementWriteService clientCollateralManagementWriteService(
             ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper,
-            CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper, ClientRepositoryWrapper clientRepositoryWrapper) {
+            CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper, ClientRepository clientRepository) {
         return new ClientCollateralManagementWriteServiceImpl(clientCollateralManagementRepositoryWrapper,
-                collateralManagementRepositoryWrapper, clientRepositoryWrapper);
+                collateralManagementRepositoryWrapper, clientRepository);
     }
 
     @Bean

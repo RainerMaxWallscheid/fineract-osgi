@@ -16,17 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.collateralmanagement.service;
+description = 'Fineract Collateral Management test fragment'
 
-import java.util.List;
-import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralResponseData;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement;
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
 
-public interface LoanCollateralManagementReadService {
-
-    List<LoanCollateralManagement> getLoanCollaterals(Long loanId);
-
-    LoanCollateralResponseData getLoanCollateralResponseData(Long collateralId);
-
-    List<LoanCollateralResponseData> getLoanCollateralResponseDataList(Long loanId);
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-SymbolicName': 'org.apache.fineract.collateralmanagement.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.collateralmanagement.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.collateralmanagement.test'
+                )
+    }
 }
+tasks.named('test').configure { useJUnitPlatform() }
+tasks.named('jar').configure { dependsOn tasks.named('testClasses') }

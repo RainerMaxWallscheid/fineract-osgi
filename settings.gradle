@@ -181,6 +181,13 @@ project(':fineract-collateral-impl').projectDir = file('fineract-collateral/impl
 include ':fineract-collateral-test'
 project(':fineract-collateral-test').projectDir = file('fineract-collateral/test')
 // No :fineract-collateral façade — depend on -api / -impl explicitly.
+include ':fineract-collateralmanagement-api'
+project(':fineract-collateralmanagement-api').projectDir = file('fineract-collateralmanagement/api')
+include ':fineract-collateralmanagement-impl'
+project(':fineract-collateralmanagement-impl').projectDir = file('fineract-collateralmanagement/impl')
+include ':fineract-collateralmanagement-test'
+project(':fineract-collateralmanagement-test').projectDir = file('fineract-collateralmanagement/test')
+// No :fineract-collateralmanagement façade — depend on -api / -impl explicitly.
 
 
 

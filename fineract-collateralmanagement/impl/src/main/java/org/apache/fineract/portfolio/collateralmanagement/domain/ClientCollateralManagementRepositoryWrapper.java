@@ -22,7 +22,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.exception.ClientCollateralNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -35,24 +36,24 @@ import org.springframework.stereotype.Service;
 public class ClientCollateralManagementRepositoryWrapper {
 
     private final ClientCollateralManagementRepository clientCollateralManagementRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientRepository clientRepository;
     private final LoanProductRepository loanProductRepository;
 
     @Autowired
     public ClientCollateralManagementRepositoryWrapper(final ClientCollateralManagementRepository clientCollateralManagementRepository,
-            final ClientRepositoryWrapper clientRepositoryWrapper, final LoanProductRepository loanProductRepository) {
+            final ClientRepository clientRepository, final LoanProductRepository loanProductRepository) {
         this.clientCollateralManagementRepository = clientCollateralManagementRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientRepository = clientRepository;
         this.loanProductRepository = loanProductRepository;
     }
 
     public List<ClientCollateralManagement> getCollateralsPerClient(final Long clientId) {
-        final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
         return this.clientCollateralManagementRepository.findByClientId(client);
     }
 
     public List<ClientCollateralManagementData> getClientCollateralData(final Long clientId, final Long prodId) {
-        final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
         String currency = null;
         if (prodId != null) {
             final LoanProduct loanProduct = this.loanProductRepository.findById(prodId)

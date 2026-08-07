@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
 
 public final class CollateralManagementData implements Serializable {
     private String quality;
@@ -31,7 +30,8 @@ public final class CollateralManagementData implements Serializable {
     private String name;
     private Long id;
 
-    private CollateralManagementData(final String quality, final BigDecimal basePrice, final String unitType, final BigDecimal pctToBase, final String currency, final String name, final Long id) {
+    private CollateralManagementData(final String quality, final BigDecimal basePrice, final String unitType, final BigDecimal pctToBase,
+            final String currency, final String name, final Long id) {
         this.basePrice = basePrice;
         this.pctToBase = pctToBase;
         this.quality = quality;
@@ -41,42 +41,43 @@ public final class CollateralManagementData implements Serializable {
         this.id = id;
     }
 
-    public static CollateralManagementData createNew(final CollateralManagementDomain collateralManagementDomain) {
-        return new CollateralManagementData(collateralManagementDomain.getQuality(), collateralManagementDomain.getBasePrice(), collateralManagementDomain.getUnitType(), collateralManagementDomain.getPctToBase(), collateralManagementDomain.getCurrency().getCode(), collateralManagementDomain.getName(), collateralManagementDomain.getId());
+    public static CollateralManagementData createNew(final String quality, final BigDecimal basePrice, final String unitType,
+            final BigDecimal pctToBase, final String currency, final String name, final Long id) {
+        return new CollateralManagementData(quality, basePrice, unitType, pctToBase, currency, name, id);
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getQuality() {
+    public String getQuality() {
         return this.quality;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getBasePrice() {
+    public BigDecimal getBasePrice() {
         return this.basePrice;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getUnitType() {
+    public String getUnitType() {
         return this.unitType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPctToBase() {
+    public BigDecimal getPctToBase() {
         return this.pctToBase;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getCurrency() {
+    public String getCurrency() {
         return this.currency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getName() {
+    public String getName() {
         return this.name;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getId() {
+    public Long getId() {
         return this.id;
     }
 }
