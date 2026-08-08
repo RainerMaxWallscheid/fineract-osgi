@@ -195,6 +195,13 @@ project(':fineract-note-impl').projectDir = file('fineract-note/impl')
 include ':fineract-note-test'
 project(':fineract-note-test').projectDir = file('fineract-note/test')
 // No :fineract-note façade — depend on -api / -impl explicitly.
+include ':fineract-hooks-api'
+project(':fineract-hooks-api').projectDir = file('fineract-hooks/api')
+include ':fineract-hooks-impl'
+project(':fineract-hooks-impl').projectDir = file('fineract-hooks/impl')
+include ':fineract-hooks-test'
+project(':fineract-hooks-test').projectDir = file('fineract-hooks/test')
+// No :fineract-hooks façade — depend on -api / -impl explicitly.
 
 
 

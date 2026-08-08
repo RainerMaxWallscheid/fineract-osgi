@@ -100,6 +100,8 @@ dependencies {
     implementation(project(path: ':fineract-collateralmanagement-impl'))
     implementation(project(path: ':fineract-note-api'))
     implementation(project(path: ':fineract-note-impl'))
+    implementation(project(path: ':fineract-hooks-api'))
+    implementation(project(path: ':fineract-hooks-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

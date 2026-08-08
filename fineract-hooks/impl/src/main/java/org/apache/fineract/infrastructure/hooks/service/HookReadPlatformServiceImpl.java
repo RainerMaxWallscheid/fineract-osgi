@@ -43,7 +43,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnMissingBean(value = HookReadPlatformService.class, ignored = HookReadPlatformServiceImpl.class)
-public class HookReadPlatformServiceImpl implements HookReadPlatformService {
+public class HookReadPlatformServiceImpl implements HookReadPlatformService, HookEventQueryService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HookReadPlatformServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;

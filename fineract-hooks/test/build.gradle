@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.hooks.service;
+description = 'Fineract Hooks test fragment'
 
-import java.util.Collection;
-import java.util.List;
-import org.apache.fineract.infrastructure.hooks.data.HookData;
-import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
-import org.apache.fineract.infrastructure.hooks.domain.Hook;
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
 
-public interface HookReadPlatformService {
-
-    Collection<HookData> retrieveAllHooks();
-
-    HookData retrieveHook(Long hookId);
-
-    // TODO: don't leak database domain to the outside world!!!
-    List<Hook> retrieveHooksByEvent(String entityName, String actionName);
-
-    HookDetailsData retrieveNewHookDetails(String templateName);
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-SymbolicName': 'org.apache.fineract.hooks.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.hooks.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.hooks.test'
+                )
+    }
 }
+tasks.named('test').configure { useJUnitPlatform() }
+tasks.named('jar').configure { dependsOn tasks.named('testClasses') }

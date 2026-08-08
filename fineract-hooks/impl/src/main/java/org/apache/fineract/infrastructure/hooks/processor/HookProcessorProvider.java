@@ -40,7 +40,8 @@ public class HookProcessorProvider {
         } else if (templateName.equals(elasticSearchTemplateName)) {
             processor = this.applicationContext.getBean("elasticSearchHookProcessor", ElasticSearchHookProcessor.class);
         } else if (templateName.equals(httpSMSTemplateName)) {
-            processor = this.applicationContext.getBean("messageGatewayHookProcessor", MessageGatewayHookProcessor.class);
+            // Residual in provider until SMS module peels (no compile-time residual type).
+            processor = this.applicationContext.getBean("messageGatewayHookProcessor", HookProcessor.class);
         } else {
             processor = null;
         }

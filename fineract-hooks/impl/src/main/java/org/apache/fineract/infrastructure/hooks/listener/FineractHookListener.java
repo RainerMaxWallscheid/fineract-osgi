@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.hooks.event.HookEvent;
 import org.apache.fineract.infrastructure.hooks.event.HookEventSource;
 import org.apache.fineract.infrastructure.hooks.processor.HookProcessor;
 import org.apache.fineract.infrastructure.hooks.processor.HookProcessorProvider;
-import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
+import org.apache.fineract.infrastructure.hooks.service.HookEventQueryService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ public class FineractHookListener implements HookListener {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractHookListener.class);
     private final HookProcessorProvider hookProcessorProvider;
-    private final HookReadPlatformService hookReadPlatformService;
+    private final HookEventQueryService hookEventQueryService;
 
     @Override
     public void onApplicationEvent(final HookEvent event) {
@@ -47,7 +47,7 @@ public class FineractHookListener implements HookListener {
             final String entityName = hookEventSource.getEntityName();
             final String actionName = hookEventSource.getActionName();
             final String payload = event.getPayload();
-            final List<Hook> hooks = hookReadPlatformService.retrieveHooksByEvent(hookEventSource.getEntityName(), hookEventSource.getActionName());
+            final List<Hook> hooks = hookEventQueryService.retrieveHooksByEvent(hookEventSource.getEntityName(), hookEventSource.getActionName());
             for (final Hook hook : hooks) {
                 final HookProcessor processor = hookProcessorProvider.getProcessor(hook);
                 try {
@@ -62,8 +62,8 @@ public class FineractHookListener implements HookListener {
     }
 
     @java.lang.SuppressWarnings("all")
-        public FineractHookListener(final HookProcessorProvider hookProcessorProvider, final HookReadPlatformService hookReadPlatformService) {
+        public FineractHookListener(final HookProcessorProvider hookProcessorProvider, final HookEventQueryService hookEventQueryService) {
         this.hookProcessorProvider = hookProcessorProvider;
-        this.hookReadPlatformService = hookReadPlatformService;
+        this.hookEventQueryService = hookEventQueryService;
     }
 }

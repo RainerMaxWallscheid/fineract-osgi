@@ -34,7 +34,8 @@ import org.apache.fineract.infrastructure.hooks.domain.Hook;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfiguration;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfigurationRepository;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.template.mapper.TemplateMapper;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ import retrofit2.Callback;
 public class TwilioHookProcessor implements HookProcessor {
     private final HookConfigurationRepository hookConfigurationRepository;
     private final TemplateMergeService templateMergeService;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientRepository clientRepository;
     private final ProcessorHelper processorHelper;
     private final TemplateMapper templateMapper;
 
@@ -92,7 +93,7 @@ public class TwilioHookProcessor implements HookProcessor {
         map.put("BASE_URI", System.getProperty("baseUrl"));
         if (map.containsKey("clientId")) {
             final Long clientId = Long.valueOf(Integer.toString((int) map.get("clientId")));
-            final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+            final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
             final String mobileNo = client.mobileNo();
             if (mobileNo != null && !mobileNo.isEmpty()) {
                 final String compiledMessage = this.templateMergeService.compile(templateMapper.map(hook.getUgdTemplate()), map).replace("<p>", "").replace("</p>", "");
@@ -107,10 +108,12 @@ public class TwilioHookProcessor implements HookProcessor {
     }
 
     @java.lang.SuppressWarnings("all")
-        public TwilioHookProcessor(final HookConfigurationRepository hookConfigurationRepository, final TemplateMergeService templateMergeService, final ClientRepositoryWrapper clientRepositoryWrapper, final ProcessorHelper processorHelper, final TemplateMapper templateMapper) {
+    public TwilioHookProcessor(final HookConfigurationRepository hookConfigurationRepository,
+            final TemplateMergeService templateMergeService, final ClientRepository clientRepository,
+            final ProcessorHelper processorHelper, final TemplateMapper templateMapper) {
         this.hookConfigurationRepository = hookConfigurationRepository;
         this.templateMergeService = templateMergeService;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientRepository = clientRepository;
         this.processorHelper = processorHelper;
         this.templateMapper = templateMapper;
     }
