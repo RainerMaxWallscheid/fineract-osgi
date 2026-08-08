@@ -202,6 +202,13 @@ project(':fineract-hooks-impl').projectDir = file('fineract-hooks/impl')
 include ':fineract-hooks-test'
 project(':fineract-hooks-test').projectDir = file('fineract-hooks/test')
 // No :fineract-hooks façade — depend on -api / -impl explicitly.
+include ':fineract-sms-api'
+project(':fineract-sms-api').projectDir = file('fineract-sms/api')
+include ':fineract-sms-impl'
+project(':fineract-sms-impl').projectDir = file('fineract-sms/impl')
+include ':fineract-sms-test'
+project(':fineract-sms-test').projectDir = file('fineract-sms/test')
+// No :fineract-sms façade — depend on -api / -impl explicitly.
 
 
 

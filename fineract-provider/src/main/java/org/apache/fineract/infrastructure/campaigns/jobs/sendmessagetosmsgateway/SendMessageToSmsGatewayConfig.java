@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.campaigns.jobs.sendmessagetosmsgateway;
 
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
+import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignRepository;
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
@@ -46,6 +47,8 @@ public class SendMessageToSmsGatewayConfig {
     @Autowired
     private SmsMessageRepository smsMessageRepository;
     @Autowired
+    private SmsCampaignRepository smsCampaignRepository;
+    @Autowired
     private NotificationSenderService notificationSenderService;
     @Autowired
     private SmsConfigUtils smsConfigUtils;
@@ -67,6 +70,7 @@ public class SendMessageToSmsGatewayConfig {
 
     @Bean
     public SendMessageToSmsGatewayTasklet sendMessageToSmsGatewayTasklet() {
-        return new SendMessageToSmsGatewayTasklet(smsMessageRepository, notificationSenderService, smsConfigUtils, taskExecutor);
+        return new SendMessageToSmsGatewayTasklet(smsMessageRepository, smsCampaignRepository, notificationSenderService, smsConfigUtils,
+                taskExecutor);
     }
 }

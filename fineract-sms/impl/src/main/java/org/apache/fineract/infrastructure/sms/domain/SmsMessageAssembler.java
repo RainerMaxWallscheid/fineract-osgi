@@ -19,42 +19,44 @@
 package org.apache.fineract.infrastructure.sms.domain;
 
 import com.google.gson.JsonElement;
-import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
-import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignRepository;
-import org.apache.fineract.infrastructure.campaigns.sms.exception.SmsCampaignNotFound;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.sms.SmsApiConstants;
 import org.apache.fineract.infrastructure.sms.exception.SmsNotFoundException;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
+import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
+import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SmsMessageAssembler {
 
     private final SmsMessageRepository smsMessageRepository;
-    private final GroupRepositoryWrapper groupRepository;
-    private final ClientRepositoryWrapper clientRepository;
-    private final StaffRepositoryWrapper staffRepository;
-    private final SmsCampaignRepository smsCampaignRepository;
+    private final GroupRepository groupRepository;
+    private final ClientRepository clientRepository;
+    private final StaffRepository staffRepository;
     private final FromJsonHelper fromApiJsonHelper;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public SmsMessageAssembler(final SmsMessageRepository smsMessageRepository, final GroupRepositoryWrapper groupRepositoryWrapper,
-            final ClientRepositoryWrapper clientRepository, final StaffRepositoryWrapper staffRepository,
-            final FromJsonHelper fromApiJsonHelper, final SmsCampaignRepository smsCampaignRepository) {
+    public SmsMessageAssembler(final SmsMessageRepository smsMessageRepository, final GroupRepository groupRepository,
+            final ClientRepository clientRepository, final StaffRepository staffRepository, final FromJsonHelper fromApiJsonHelper,
+            final JdbcTemplate jdbcTemplate) {
         this.smsMessageRepository = smsMessageRepository;
-        this.groupRepository = groupRepositoryWrapper;
+        this.groupRepository = groupRepository;
         this.clientRepository = clientRepository;
         this.staffRepository = staffRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.smsCampaignRepository = smsCampaignRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public SmsMessage assembleFromJson(final JsonCommand command) {
@@ -66,34 +68,46 @@ public class SmsMessageAssembler {
         String externalId = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.groupIdParamName, element)) {
             final Long groupId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.groupIdParamName, element);
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
+            group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
         }
 
-        SmsCampaign smsCampaign = null;
+        Long campaignId = null;
         boolean isNotification = false;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.campaignIdParamName, element)) {
-            final Long campaignId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.campaignIdParamName, element);
-            smsCampaign = this.smsCampaignRepository.findById(campaignId).orElseThrow(() -> new SmsCampaignNotFound(campaignId));
-            isNotification = smsCampaign.isNotification();
+            campaignId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.campaignIdParamName, element);
+            isNotification = isCampaignNotification(campaignId);
         }
 
         Client client = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.clientIdParamName, element)) {
             final Long clientId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.clientIdParamName, element);
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
             mobileNo = client.mobileNo();
         }
 
         Staff staff = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.staffIdParamName, element)) {
             final Long staffId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.staffIdParamName, element);
-            staff = this.staffRepository.findOneWithNotFoundDetection(staffId);
+            staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
             mobileNo = staff.getMobileNo();
         }
 
         final String message = this.fromApiJsonHelper.extractStringNamed(SmsApiConstants.messageParamName, element);
 
-        return SmsMessage.pendingSms(externalId, group, client, staff, message, mobileNo, smsCampaign, isNotification);
+        return SmsMessage.pendingSms(externalId, group, client, staff, message, mobileNo, campaignId, isNotification);
+    }
+
+    private boolean isCampaignNotification(final Long campaignId) {
+        if (campaignId == null) {
+            return false;
+        }
+        try {
+            final Boolean value = this.jdbcTemplate.queryForObject("select is_notification from sms_campaign where id = ?", Boolean.class,
+                    campaignId);
+            return Boolean.TRUE.equals(value);
+        } catch (final EmptyResultDataAccessException ex) {
+            return false;
+        }
     }
 
     public SmsMessage assembleFromResourceId(final Long resourceId) {

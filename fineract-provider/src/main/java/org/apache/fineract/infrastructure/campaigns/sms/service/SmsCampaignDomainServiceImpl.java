@@ -196,7 +196,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                 if (mobileNo != null) {
                                     mobileNumber = mobileNo.toString();
                                 }
-                                SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign, smsCampaign.isNotification());
+                                SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
                                 Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
                                 smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                                 this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
@@ -249,7 +249,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign, smsCampaign.isNotification());
+                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
                         this.smsMessageRepository.save(smsMessage);
                         Collection<SmsMessage> messages = new ArrayList<>();
                         messages.add(smsMessage);

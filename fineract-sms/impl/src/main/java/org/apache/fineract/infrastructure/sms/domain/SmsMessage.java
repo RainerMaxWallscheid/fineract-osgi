@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -51,9 +50,9 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private Staff staff;
-    @ManyToOne
-    @JoinColumn(name = "campaign_id")
-    private SmsCampaign smsCampaign;
+    /** FK only — SmsCampaign residual stays on provider until campaigns peel. */
+    @Column(name = "campaign_id")
+    private Long campaignId;
     @Column(name = "status_enum", nullable = false)
     private Integer statusType;
     @Column(name = "mobile_no", length = 50)
@@ -67,16 +66,26 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     @Column(name = "is_notification")
     private boolean isNotification;
 
-    public static SmsMessage pendingSms(final String externalId, final Group group, final Client client, final Staff staff, final String message, final String mobileNo, final SmsCampaign smsCampaign, final boolean isNotification) {
-        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff).setStatusType(SmsMessageStatusType.PENDING.getValue()).setMessage(message).setMobileNo(mobileNo).setSmsCampaign(smsCampaign).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
+    public static SmsMessage pendingSms(final String externalId, final Group group, final Client client, final Staff staff,
+            final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
+        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
+                .setStatusType(SmsMessageStatusType.PENDING.getValue()).setMessage(message).setMobileNo(mobileNo)
+                .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage sentSms(final String externalId, final Group group, final Client client, final Staff staff, final String message, final String mobileNo, final SmsCampaign smsCampaign, final boolean isNotification) {
-        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff).setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue()).setMessage(message).setMobileNo(mobileNo).setSmsCampaign(smsCampaign).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
+    public static SmsMessage sentSms(final String externalId, final Group group, final Client client, final Staff staff,
+            final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
+        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
+                .setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue()).setMessage(message).setMobileNo(mobileNo)
+                .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage instance(String externalId, final Group group, final Client client, final Staff staff, final SmsMessageStatusType statusType, final String message, final String mobileNo, final SmsCampaign smsCampaign, final boolean isNotification) {
-        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff).setStatusType(statusType.getValue()).setMessage(message).setMobileNo(mobileNo).setSmsCampaign(smsCampaign).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
+    public static SmsMessage instance(String externalId, final Group group, final Client client, final Staff staff,
+            final SmsMessageStatusType statusType, final String message, final String mobileNo, final Long campaignId,
+            final boolean isNotification) {
+        return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
+                .setStatusType(statusType.getValue()).setMessage(message).setMobileNo(mobileNo).setCampaignId(campaignId)
+                .setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -90,160 +99,126 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getExternalId() {
+    public String getExternalId() {
         return this.externalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Group getGroup() {
+    public Group getGroup() {
         return this.group;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Client getClient() {
+    public Client getClient() {
         return this.client;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Staff getStaff() {
+    public Staff getStaff() {
         return this.staff;
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaign getSmsCampaign() {
-        return this.smsCampaign;
+    public Long getCampaignId() {
+        return this.campaignId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getStatusType() {
+    public Integer getStatusType() {
         return this.statusType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getMobileNo() {
+    public String getMobileNo() {
         return this.mobileNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getMessage() {
+    public String getMessage() {
         return this.message;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getSubmittedOnDate() {
+    public LocalDate getSubmittedOnDate() {
         return this.submittedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDateTime getDeliveredOnDate() {
+    public LocalDateTime getDeliveredOnDate() {
         return this.deliveredOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isNotification() {
+    public boolean isNotification() {
         return this.isNotification;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setExternalId(final String externalId) {
+    public SmsMessage setExternalId(final String externalId) {
         this.externalId = externalId;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setGroup(final Group group) {
+    public SmsMessage setGroup(final Group group) {
         this.group = group;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setClient(final Client client) {
+    public SmsMessage setClient(final Client client) {
         this.client = client;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setStaff(final Staff staff) {
+    public SmsMessage setStaff(final Staff staff) {
         this.staff = staff;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setSmsCampaign(final SmsCampaign smsCampaign) {
-        this.smsCampaign = smsCampaign;
+    public SmsMessage setCampaignId(final Long campaignId) {
+        this.campaignId = campaignId;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setStatusType(final Integer statusType) {
+    public SmsMessage setStatusType(final Integer statusType) {
         this.statusType = statusType;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setMobileNo(final String mobileNo) {
+    public SmsMessage setMobileNo(final String mobileNo) {
         this.mobileNo = mobileNo;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setMessage(final String message) {
+    public SmsMessage setMessage(final String message) {
         this.message = message;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setSubmittedOnDate(final LocalDate submittedOnDate) {
+    public SmsMessage setSubmittedOnDate(final LocalDate submittedOnDate) {
         this.submittedOnDate = submittedOnDate;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setDeliveredOnDate(final LocalDateTime deliveredOnDate) {
+    public SmsMessage setDeliveredOnDate(final LocalDateTime deliveredOnDate) {
         this.deliveredOnDate = deliveredOnDate;
         return this;
     }
 
-    /**
-     * @return {@code this}.
-     */
     @java.lang.SuppressWarnings("all")
-        public SmsMessage setNotification(final boolean isNotification) {
+    public SmsMessage setNotification(final boolean isNotification) {
         this.isNotification = isNotification;
         return this;
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsMessage() {
-    }
+    public SmsMessage() {}
 }

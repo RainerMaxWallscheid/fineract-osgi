@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignConstants;
+import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignRepository;
 import org.apache.fineract.infrastructure.campaigns.sms.exception.ConnectionFailureException;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -55,6 +56,7 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SendMessageToSmsGatewayTasklet.class);
     private final SmsMessageRepository smsMessageRepository;
+    private final SmsCampaignRepository smsCampaignRepository;
     private final NotificationSenderService notificationSenderService;
     private final SmsConfigUtils smsConfigUtils;
     private final ThreadPoolTaskExecutor taskExecutor;
@@ -81,7 +83,8 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
                             smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
                             toSendNotificationMessages.add(smsData);
                         } else {
-                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.getId(), tenantIdentifier, null, null, smsData.getMobileNo(), smsData.getMessage(), smsData.getSmsCampaign().getProviderId());
+                            final Long providerId = resolveProviderId(smsData.getCampaignId());
+                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.getId(), tenantIdentifier, null, null, smsData.getMobileNo(), smsData.getMessage(), providerId);
                             apiQueueResourceDataCollection.add(apiQueueResourceData);
                             smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
                             toSaveMessages.add(smsData);
@@ -141,9 +144,17 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
         }
     }
 
+    private Long resolveProviderId(final Long campaignId) {
+        if (campaignId == null) {
+            return null;
+        }
+        return smsCampaignRepository.findById(campaignId).map(c -> c.getProviderId()).orElse(null);
+    }
+
     @java.lang.SuppressWarnings("all")
-        public SendMessageToSmsGatewayTasklet(final SmsMessageRepository smsMessageRepository, final NotificationSenderService notificationSenderService, final SmsConfigUtils smsConfigUtils, final ThreadPoolTaskExecutor taskExecutor) {
+        public SendMessageToSmsGatewayTasklet(final SmsMessageRepository smsMessageRepository, final SmsCampaignRepository smsCampaignRepository, final NotificationSenderService notificationSenderService, final SmsConfigUtils smsConfigUtils, final ThreadPoolTaskExecutor taskExecutor) {
         this.smsMessageRepository = smsMessageRepository;
+        this.smsCampaignRepository = smsCampaignRepository;
         this.notificationSenderService = notificationSenderService;
         this.smsConfigUtils = smsConfigUtils;
         this.taskExecutor = taskExecutor;
