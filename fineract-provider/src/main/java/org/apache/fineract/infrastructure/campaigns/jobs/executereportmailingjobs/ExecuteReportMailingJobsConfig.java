@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.campaigns.jobs.executereportmailingjobs;
 
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
+import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
@@ -51,6 +52,8 @@ public class ExecuteReportMailingJobsConfig {
     @Autowired
     private ReadReportingService readReportingService;
     @Autowired
+    private ReportRepositoryWrapper reportRepositoryWrapper;
+    @Autowired
     private ReportingProcessServiceProvider reportingProcessServiceProvider;
     @Autowired
     private ReportMailingJobEmailService reportMailingJobEmailService;
@@ -74,6 +77,7 @@ public class ExecuteReportMailingJobsConfig {
     @Bean
     public ExecuteReportMailingJobsTasklet executeReportMailingJobsTasklet() {
         return new ExecuteReportMailingJobsTasklet(reportMailingJobRepository, reportMailingJobValidator, readReportingService,
-                reportingProcessServiceProvider, reportMailingJobEmailService, reportMailingJobRunHistoryRepository, fineractProperties);
+                reportRepositoryWrapper, reportingProcessServiceProvider, reportMailingJobEmailService,
+                reportMailingJobRunHistoryRepository, fineractProperties);
     }
 }

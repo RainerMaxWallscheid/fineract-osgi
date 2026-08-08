@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.domain.Report;
+import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
@@ -64,6 +65,7 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
     private final ReportMailingJobRepository reportMailingJobRepository;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final ReadReportingService readReportingService;
+    private final ReportRepositoryWrapper reportRepositoryWrapper;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
     private final ReportMailingJobEmailService reportMailingJobEmailService;
     private final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository;
@@ -79,7 +81,9 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
             if (nextRunDateTime != null && DateUtils.isBefore(nextRunDateTime, localDateTimeOftenant)) {
                 final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat = ReportMailingJobEmailAttachmentFileFormat.newInstance(reportMailingJob.getEmailAttachmentFileFormat());
                 if (emailAttachmentFileFormat != null && emailAttachmentFileFormat != ReportMailingJobEmailAttachmentFileFormat.INVALID) {
-                    final Report stretchyReport = reportMailingJob.getStretchyReport();
+                    final Long stretchyReportId = reportMailingJob.getStretchyReportId();
+                    final Report stretchyReport = stretchyReportId == null ? null
+                            : reportRepositoryWrapper.findOneThrowExceptionIfNotFound(stretchyReportId);
                     final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
                     final StringBuilder errorLog = new StringBuilder();
                     final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator.validateStretchyReportParamMap(reportMailingJob.getStretchyReportParamMap());
@@ -199,10 +203,11 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRepository reportMailingJobRepository, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository, final FineractProperties fineractProperties) {
+        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRepository reportMailingJobRepository, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportRepositoryWrapper reportRepositoryWrapper, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository, final FineractProperties fineractProperties) {
         this.reportMailingJobRepository = reportMailingJobRepository;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.readReportingService = readReportingService;
+        this.reportRepositoryWrapper = reportRepositoryWrapper;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
         this.reportMailingJobEmailService = reportMailingJobEmailService;
         this.reportMailingJobRunHistoryRepository = reportMailingJobRunHistoryRepository;

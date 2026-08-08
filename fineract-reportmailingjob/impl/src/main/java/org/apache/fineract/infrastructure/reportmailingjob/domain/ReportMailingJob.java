@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
 import org.apache.fineract.infrastructure.reportmailingjob.ReportMailingJobConstants;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobEmailAttachmentFileFormat;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -57,9 +56,9 @@ public class ReportMailingJob extends AbstractAuditableCustom {
     private String emailMessage;
     @Column(name = "email_attachment_file_format", nullable = false)
     private String emailAttachmentFileFormat;
-    @ManyToOne
-    @JoinColumn(name = "stretchy_report_id", nullable = false)
-    private Report stretchyReport;
+    // FK only — Report residual stays on provider (dataqueries) until peeled.
+    @Column(name = "stretchy_report_id", nullable = false)
+    private Long stretchyReportId;
     @Column(name = "stretchy_report_param_map", nullable = true)
     private String stretchyReportParamMap;
     @Column(name = "previous_run_datetime", nullable = true)
@@ -87,8 +86,8 @@ public class ReportMailingJob extends AbstractAuditableCustom {
      *
      * @return ReportMailingJob object
      */
-    public static ReportMailingJob newInstance(final String name, final String description, final LocalDateTime startDateTime, final String recurrence, final String emailRecipients, final String emailSubject, final String emailMessage, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final Report stretchyReport, final String stretchyReportParamMap, final boolean isActive, final AppUser runAsUser) {
-        return new ReportMailingJob().setName(name).setDescription(description).setStartDateTime(startDateTime).setRecurrence(recurrence).setEmailRecipients(emailRecipients).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setStretchyReport(stretchyReport).setStretchyReportParamMap(stretchyReportParamMap).setActive(isActive).setDeleted(false).setRunAsUser(runAsUser);
+    public static ReportMailingJob newInstance(final String name, final String description, final LocalDateTime startDateTime, final String recurrence, final String emailRecipients, final String emailSubject, final String emailMessage, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final Long stretchyReportId, final String stretchyReportParamMap, final boolean isActive, final AppUser runAsUser) {
+        return new ReportMailingJob().setName(name).setDescription(description).setStartDateTime(startDateTime).setRecurrence(recurrence).setEmailRecipients(emailRecipients).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setStretchyReportId(stretchyReportId).setStretchyReportParamMap(stretchyReportParamMap).setActive(isActive).setDeleted(false).setRunAsUser(runAsUser);
     }
 
     /**
@@ -96,7 +95,7 @@ public class ReportMailingJob extends AbstractAuditableCustom {
      *
      * @return ReportMailingJob object
      */
-    public static ReportMailingJob newInstance(JsonCommand jsonCommand, final Report stretchyReport, final AppUser runAsUser) {
+    public static ReportMailingJob newInstance(JsonCommand jsonCommand, final Long stretchyReportId, final AppUser runAsUser) {
         final String name = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.NAME_PARAM_NAME);
         final String description = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.DESCRIPTION_PARAM_NAME);
         final String recurrence = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.RECURRENCE_PARAM_NAME);
@@ -115,7 +114,7 @@ public class ReportMailingJob extends AbstractAuditableCustom {
                 startDateTime = LocalDateTime.parse(startDateTimeString, dateTimeFormatter);
             }
         }
-        return new ReportMailingJob().setName(name).setDescription(description).setStartDateTime(startDateTime).setRecurrence(recurrence).setEmailRecipients(emailRecipients).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setStretchyReport(stretchyReport).setStretchyReportParamMap(stretchyReportParamMap).setNextRunDateTime(startDateTime).setActive(isActive).setDeleted(false).setRunAsUser(runAsUser);
+        return new ReportMailingJob().setName(name).setDescription(description).setStartDateTime(startDateTime).setRecurrence(recurrence).setEmailRecipients(emailRecipients).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setStretchyReportId(stretchyReportId).setStretchyReportParamMap(stretchyReportParamMap).setNextRunDateTime(startDateTime).setActive(isActive).setDeleted(false).setRunAsUser(runAsUser);
     }
 
     /**
@@ -184,10 +183,7 @@ public class ReportMailingJob extends AbstractAuditableCustom {
                 this.startDateTime = newStartDateTime;
             }
         }
-        Long currentStretchyReportId = null;
-        if (this.stretchyReport != null) {
-            currentStretchyReportId = this.stretchyReport.getId();
-        }
+        final Long currentStretchyReportId = this.stretchyReportId;
         if (jsonCommand.isChangeInLongParameterNamed(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME, currentStretchyReportId)) {
             final Long updatedStretchyReportId = jsonCommand.longValueOfParameterNamed(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME);
             actualChanges.put(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME, updatedStretchyReportId);
@@ -252,8 +248,8 @@ public class ReportMailingJob extends AbstractAuditableCustom {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Report getStretchyReport() {
-        return this.stretchyReport;
+        public Long getStretchyReportId() {
+        return this.stretchyReportId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -382,8 +378,8 @@ public class ReportMailingJob extends AbstractAuditableCustom {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ReportMailingJob setStretchyReport(final Report stretchyReport) {
-        this.stretchyReport = stretchyReport;
+        public ReportMailingJob setStretchyReportId(final Long stretchyReportId) {
+        this.stretchyReportId = stretchyReportId;
         return this;
     }
 

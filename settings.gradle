@@ -209,6 +209,13 @@ project(':fineract-sms-impl').projectDir = file('fineract-sms/impl')
 include ':fineract-sms-test'
 project(':fineract-sms-test').projectDir = file('fineract-sms/test')
 // No :fineract-sms façade — depend on -api / -impl explicitly.
+include ':fineract-reportmailingjob-api'
+project(':fineract-reportmailingjob-api').projectDir = file('fineract-reportmailingjob/api')
+include ':fineract-reportmailingjob-impl'
+project(':fineract-reportmailingjob-impl').projectDir = file('fineract-reportmailingjob/impl')
+include ':fineract-reportmailingjob-test'
+project(':fineract-reportmailingjob-test').projectDir = file('fineract-reportmailingjob/test')
+// No :fineract-reportmailingjob façade — depend on -api / -impl explicitly.
 
 
 

@@ -104,6 +104,8 @@ dependencies {
     implementation(project(path: ':fineract-hooks-impl'))
     implementation(project(path: ':fineract-sms-api'))
     implementation(project(path: ':fineract-sms-impl'))
+    implementation(project(path: ':fineract-reportmailingjob-api'))
+    implementation(project(path: ':fineract-reportmailingjob-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

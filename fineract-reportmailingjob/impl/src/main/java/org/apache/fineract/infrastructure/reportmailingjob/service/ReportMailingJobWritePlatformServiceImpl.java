@@ -28,8 +28,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuild
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
-import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.reportmailingjob.ReportMailingJobConstants;
 import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJob;
 import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRepository;
@@ -42,7 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.NonTransientDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,18 +51,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJobWritePlatformService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportMailingJobWritePlatformServiceImpl.class);
-    private final ReportRepositoryWrapper reportRepositoryWrapper;
+    private final JdbcTemplate jdbcTemplate;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final ReportMailingJobRepositoryWrapper reportMailingJobRepositoryWrapper;
     private final ReportMailingJobRepository reportMailingJobRepository;
     private final PlatformSecurityContext platformSecurityContext;
 
     @Autowired
-    public ReportMailingJobWritePlatformServiceImpl(final ReportRepositoryWrapper reportRepositoryWrapper,
+    public ReportMailingJobWritePlatformServiceImpl(final JdbcTemplate jdbcTemplate,
             final ReportMailingJobValidator reportMailingJobValidator,
             final ReportMailingJobRepositoryWrapper reportMailingJobRepositoryWrapper,
             final PlatformSecurityContext platformSecurityContext) {
-        this.reportRepositoryWrapper = reportRepositoryWrapper;
+        this.jdbcTemplate = jdbcTemplate;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.reportMailingJobRepositoryWrapper = reportMailingJobRepositoryWrapper;
         this.reportMailingJobRepository = reportMailingJobRepositoryWrapper.getReportMailingJobRepository();
@@ -73,20 +73,13 @@ public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJo
     @Transactional
     public CommandProcessingResult createReportMailingJob(JsonCommand jsonCommand) {
         try {
-            // validate the create request
             this.reportMailingJobValidator.validateCreateRequest(jsonCommand);
 
             final AppUser appUser = this.platformSecurityContext.authenticatedUser();
+            final Long stretchyReportId = jsonCommand.longValueOfParameterNamed(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME);
+            ensureStretchyReportExists(stretchyReportId);
 
-            // get the stretchy Report object
-            final Report stretchyReport = this.reportRepositoryWrapper.findOneThrowExceptionIfNotFound(
-                    jsonCommand.longValueOfParameterNamed(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME));
-
-            // create an instance of ReportMailingJob class from the JsonCommand
-            // object
-            final ReportMailingJob reportMailingJob = ReportMailingJob.newInstance(jsonCommand, stretchyReport, appUser);
-
-            // save entity
+            final ReportMailingJob reportMailingJob = ReportMailingJob.newInstance(jsonCommand, stretchyReportId, appUser);
             this.reportMailingJobRepository.saveAndFlush(reportMailingJob);
 
             return new CommandProcessingResultBuilder() //
@@ -105,80 +98,46 @@ public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJo
     @Transactional
     public CommandProcessingResult updateReportMailingJob(Long reportMailingJobId, JsonCommand jsonCommand) {
         try {
-            // validate the update request
             this.reportMailingJobValidator.validateUpdateRequest(jsonCommand);
 
-            // retrieve the ReportMailingJob object from the database
             final ReportMailingJob reportMailingJob = this.reportMailingJobRepositoryWrapper
                     .findOneThrowExceptionIfNotFound(reportMailingJobId);
 
             final Map<String, Object> changes = reportMailingJob.update(jsonCommand);
 
-            // get the recurrence rule string
             final String recurrence = reportMailingJob.getRecurrence();
-
-            // get the next run LocalDateTime from the ReportMailingJob entity
             LocalDateTime nextRunDateTime = reportMailingJob.getNextRunDateTime();
 
-            // check if the stretchy report id was updated
             if (changes.containsKey(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME)) {
                 final Long stretchyReportId = (Long) changes.get(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME);
-                final Report stretchyReport = this.reportRepositoryWrapper.findOneThrowExceptionIfNotFound(stretchyReportId);
-
-                // update the stretchy report
-                reportMailingJob.setStretchyReport(stretchyReport);
+                ensureStretchyReportExists(stretchyReportId);
+                reportMailingJob.setStretchyReportId(stretchyReportId);
             }
 
-            // check if the recurrence was updated
             if (changes.containsKey(ReportMailingJobConstants.RECURRENCE_PARAM_NAME)) {
-
-                // go ahead if the recurrence is not null
                 if (StringUtils.isNotBlank(recurrence)) {
-                    // set the start LocalDateTime to the current tenant date time
                     LocalDateTime startDateTime = DateUtils.getLocalDateTimeOfTenant();
-
-                    // check if the start LocalDateTime was updated
                     if (changes.containsKey(ReportMailingJobConstants.START_DATE_TIME_PARAM_NAME)) {
-                        // get the updated start DateTime
                         startDateTime = reportMailingJob.getStartDateTime();
                     }
-
                     startDateTime = reportMailingJob.getStartDateTime();
-
-                    // get the next recurring DateTime
                     final LocalDateTime nextRecurringDateTime = this.createNextRecurringDateTime(recurrence, startDateTime);
-
-                    // update the next run time property
                     reportMailingJob.setNextRunDateTime(nextRecurringDateTime);
-
-                    // check if the next run LocalDateTime is not empty and the
-                    // recurrence is empty
                 } else if (StringUtils.isBlank(recurrence) && (nextRunDateTime != null)) {
-                    // the next run LocalDateTime should be set to null
                     reportMailingJob.setNextRunDateTime(null);
                 }
             }
 
             if (changes.containsKey(ReportMailingJobConstants.START_DATE_TIME_PARAM_NAME)) {
                 final LocalDateTime startDateTime = reportMailingJob.getStartDateTime();
-
-                // initially set the next recurring date time to the new start
-                // date time
                 LocalDateTime nextRecurringDateTime = startDateTime;
-
-                // ensure that the recurrence pattern string is not empty
                 if (StringUtils.isNotBlank(recurrence)) {
-                    // get the next recurring DateTime
                     nextRecurringDateTime = this.createNextRecurringDateTime(recurrence, startDateTime);
                 }
-
-                // update the next run time property
                 reportMailingJob.setNextRunDateTime(nextRecurringDateTime);
             }
 
             if (!changes.isEmpty()) {
-                // save and flush immediately so any data integrity exception
-                // can be handled in the "catch" block
                 this.reportMailingJobRepository.saveAndFlush(reportMailingJob);
             }
 
@@ -198,15 +157,9 @@ public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJo
     @Override
     @Transactional
     public CommandProcessingResult deleteReportMailingJob(Long reportMailingJobId) {
-        // retrieve the ReportMailingJob object from the database
         final ReportMailingJob reportMailingJob = this.reportMailingJobRepositoryWrapper
                 .findOneThrowExceptionIfNotFound(reportMailingJobId);
-
-        // delete the report mailing job by setting the isDeleted property to 1
-        // and altering the name
         reportMailingJob.delete();
-
-        // save the report mailing job entity
         this.reportMailingJobRepository.save(reportMailingJob);
 
         return new CommandProcessingResultBuilder() //
@@ -214,34 +167,35 @@ public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJo
                 .build();
     }
 
-    /**
-     * create the next recurring LocalDateTime from recurrence pattern, start LocalDateTime and current DateTime
-     *
-     * @param recurrencePattern
-     * @param startDateTime
-     * @return LocalDateTime object
-     */
+    private void ensureStretchyReportExists(final Long stretchyReportId) {
+        if (stretchyReportId == null) {
+            throw new PlatformDataIntegrityException("error.msg.report.parameter.id.invalid", "Stretchy report id is required",
+                    ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME);
+        }
+        try {
+            final Integer count = this.jdbcTemplate.queryForObject("select count(*) from stretchy_report where id = ?", Integer.class,
+                    stretchyReportId);
+            if (count == null || count == 0) {
+                throw new PlatformDataIntegrityException("error.msg.report.parameter.id.invalid",
+                        "Report Parameter with identifier " + stretchyReportId + " does not exist",
+                        ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME, stretchyReportId);
+            }
+        } catch (final EmptyResultDataAccessException ex) {
+            throw new PlatformDataIntegrityException("error.msg.report.parameter.id.invalid",
+                    "Report Parameter with identifier " + stretchyReportId + " does not exist",
+                    ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME, stretchyReportId);
+        }
+    }
+
     private LocalDateTime createNextRecurringDateTime(final String recurrencePattern, final LocalDateTime startDateTime) {
         LocalDateTime nextRecurringDateTime = null;
-
-        // the recurrence pattern/rule cannot be empty
         if (StringUtils.isNotBlank(recurrencePattern) && startDateTime != null) {
             final LocalDateTime nextDayLocalDate = startDateTime.plus(Duration.ofDays(1));
             nextRecurringDateTime = CalendarUtils.getNextRecurringDate(recurrencePattern, startDateTime, nextDayLocalDate);
         }
-
         return nextRecurringDateTime;
     }
 
-    /**
-     * Handle any SQL data integrity issue
-     *
-     * @param jsonCommand
-     *            -- JsonCommand object
-     * @param dve
-     *            -- data integrity exception object
-     *
-     **/
     private void handleDataIntegrityIssues(final JsonCommand jsonCommand, final Throwable realCause,
             final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains(ReportMailingJobConstants.NAME_PARAM_NAME)) {
