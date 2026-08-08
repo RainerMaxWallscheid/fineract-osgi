@@ -118,6 +118,8 @@ dependencies {
     implementation project(':fineract-collateral-impl')
     implementation project(':fineract-collateralmanagement-api')
     implementation project(':fineract-collateralmanagement-impl')
+    implementation project(':fineract-note-api')
+    implementation project(':fineract-note-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

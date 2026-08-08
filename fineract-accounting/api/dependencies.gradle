@@ -20,6 +20,8 @@
 dependencies {
     // Shared kernel holds several pure accounting enums/DTOs (GLAccountType, JournalEntryType, GLAccountData, …).
     api project(path: ':fineract-core')
+    // TransactionDetailData references NoteData
+    api project(path: ':fineract-note-api')
 
     implementation 'org.apache.commons:commons-lang3'
     // JournalEntryDataValidator / deserializers on api data package
@@ -28,3 +30,4 @@ dependencies {
 
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }
+

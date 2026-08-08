@@ -18,9 +18,13 @@
  */
 
 dependencies {
-    implementation(project(':fineract-core'))
-    implementation(project(':fineract-note-api'))
-    implementation(project(':fineract-note-impl'))
-    implementation(project(':fineract-provider'))
-    compileOnly('org.springframework.boot:spring-boot-autoconfigure')
+    api project(path: ':fineract-core')
+
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'jakarta.validation:jakarta.validation-api'
+    // NoteNotFoundException wraps EmptyResultDataAccessException
+    compileOnly 'org.springframework:spring-tx'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
 }

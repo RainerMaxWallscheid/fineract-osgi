@@ -20,7 +20,9 @@ package org.apache.fineract.portfolio.note.service;
 
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -41,81 +43,92 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountTransactionNotFoundException;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountRepositoryWrapper;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnMissingBean(value = NoteWritePlatformService.class, ignored = NoteWritePlatformServiceImpl.class)
 public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
-    @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteWritePlatformServiceImpl.class);
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteWritePlatformServiceImpl.class);
+
     private final NoteRepository noteRepository;
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientRepository clientRepository;
     private final GroupRepository groupRepository;
     private final LoanRepositoryWrapper loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
     private final SavingsAccountRepository savingsAccountRepository;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
-    private final ShareAccountRepositoryWrapper shareAccountRepository;
+    private final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
+
+    public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientRepository clientRepository,
+            final GroupRepository groupRepository, final LoanRepositoryWrapper loanRepository,
+            final LoanTransactionRepository loanTransactionRepository, final SavingsAccountRepository savingsAccountRepository,
+            final SavingsAccountTransactionRepository savingsAccountTransactionRepository,
+            final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport) {
+        this.noteRepository = noteRepository;
+        this.clientRepository = clientRepository;
+        this.groupRepository = groupRepository;
+        this.loanRepository = loanRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.savingsAccountRepository = savingsAccountRepository;
+        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
+        this.shareAccountNoteSupport = shareAccountNoteSupport;
+    }
 
     @Override
     public NoteCreateResponse createNote(final NoteCreateRequest request) {
         Note note;
         Long officeId;
         switch (request.getType()) {
-        case CLIENT: 
-            {
-                final var client = this.clientRepository.findOneWithNotFoundDetection(request.getResourceId());
+            case CLIENT -> {
+                final Client client = this.clientRepository.findById(request.getResourceId())
+                        .orElseThrow(() -> new ClientNotFoundException(request.getResourceId()));
                 note = noteRepository.saveAndFlush(Note.clientNote(client, request.getNote()));
                 officeId = client.officeId();
             }
-            break;
-        case GROUP: 
-            {
-                final var group = groupRepository.findById(request.getResourceId()).orElseThrow(() -> new GroupNotFoundException(request.getResourceId()));
+            case GROUP -> {
+                final var group = groupRepository.findById(request.getResourceId())
+                        .orElseThrow(() -> new GroupNotFoundException(request.getResourceId()));
                 note = noteRepository.saveAndFlush(Note.groupNote(group, request.getNote()));
                 officeId = group.officeId();
             }
-            break;
-        case LOAN: 
-            {
+            case LOAN -> {
                 final var loan = loanRepository.findOneWithNotFoundDetection(request.getResourceId());
                 note = noteRepository.saveAndFlush(Note.loanNote(loan, request.getNote()));
                 officeId = loan.getOfficeId();
             }
-            break;
-        case LOAN_TRANSACTION: 
-            {
-                final var loanTransaction = this.loanTransactionRepository.findById(request.getResourceId()).orElseThrow(() -> new LoanTransactionNotFoundException(request.getResourceId()));
-                note = noteRepository.saveAndFlush(Note.loanTransactionNote(loanTransaction.getLoan(), loanTransaction, request.getNote()));
+            case LOAN_TRANSACTION -> {
+                final var loanTransaction = this.loanTransactionRepository.findById(request.getResourceId())
+                        .orElseThrow(() -> new LoanTransactionNotFoundException(request.getResourceId()));
+                note = noteRepository
+                        .saveAndFlush(Note.loanTransactionNote(loanTransaction.getLoan(), loanTransaction, request.getNote()));
                 officeId = loanTransaction.getLoan().getOfficeId();
             }
-            break;
-        case SAVING_ACCOUNT: 
-            {
-                final var savingAccount = savingsAccountRepository.findById(request.getResourceId()).orElseThrow(() -> new SavingsAccountNotFoundException(request.getResourceId()));
+            case SAVING_ACCOUNT -> {
+                final var savingAccount = savingsAccountRepository.findById(request.getResourceId())
+                        .orElseThrow(() -> new SavingsAccountNotFoundException(request.getResourceId()));
                 note = noteRepository.saveAndFlush(Note.savingNote(savingAccount, request.getNote()));
                 officeId = savingAccount.getClient().getOffice().getId();
             }
-            break;
-        case SAVINGS_TRANSACTION: 
-            {
-                final var savingsTransaction = savingsAccountTransactionRepository.findById(request.getResourceId()).orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, request.getResourceId()));
+            case SAVINGS_TRANSACTION -> {
+                final var savingsTransaction = savingsAccountTransactionRepository.findById(request.getResourceId())
+                        .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, request.getResourceId()));
                 final var savingsAccount = savingsTransaction.getSavingsAccount();
                 note = noteRepository.saveAndFlush(Note.savingsTransactionNote(savingsAccount, savingsTransaction, request.getNote()));
                 officeId = savingsAccount.getClient().getOffice().getId();
             }
-            break;
-        case SHARE_ACCOUNT: 
-            {
-                final var shareAccount = shareAccountRepository.findOneWithNotFoundDetection(request.getResourceId());
-                note = noteRepository.saveAndFlush(Note.shareNote(shareAccount, request.getNote()));
-                officeId = shareAccount.getOfficeId();
+            case SHARE_ACCOUNT -> {
+                final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
+                if (support == null) {
+                    throw new NoteResourceNotSupportedException(request.getType().getApiUrl());
+                }
+                final var ref = support.require(request.getResourceId());
+                note = noteRepository.saveAndFlush(Note.shareNote(ref.shareAccountId(), ref.clientId(), request.getNote()));
+                officeId = ref.officeId();
             }
-            break;
-        default: 
-            throw new NoteResourceNotSupportedException(request.getType().getApiUrl());
+            default -> throw new NoteResourceNotSupportedException(request.getType().getApiUrl());
         }
         return NoteCreateResponse.builder().entityId(note.getId()).resourceId(note.getId()).officeId(officeId).build();
     }
@@ -143,74 +156,53 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
         Note note = null;
         Long officeId = null;
         switch (type) {
-        case CLIENT: 
-            {
-                final var client = clientRepository.findOneWithNotFoundDetection(resourceId);
-                note = noteRepository.findByClientAndId(client, noteId);
+            case CLIENT -> {
+                final var client = clientRepository.findById(resourceId).orElseThrow(() -> new ClientNotFoundException(resourceId));
+                note = noteRepository.findByClientIdAndId(client.getId(), noteId);
                 officeId = client.officeId();
             }
-            break;
-        case GROUP: 
-            {
+            case GROUP -> {
                 final var group = groupRepository.findById(resourceId).orElseThrow(() -> new GroupNotFoundException(resourceId));
-                note = noteRepository.findByGroupAndId(group, noteId);
+                note = noteRepository.findByGroupIdAndId(group.getId(), noteId);
                 officeId = group.officeId();
             }
-            break;
-        case LOAN: 
-            {
+            case LOAN -> {
                 final var loan = loanRepository.findOneWithNotFoundDetection(resourceId);
-                note = noteRepository.findByLoanAndId(loan, noteId);
+                note = noteRepository.findByLoanIdAndId(loan.getId(), noteId);
                 officeId = loan.getOfficeId();
             }
-            break;
-        case LOAN_TRANSACTION: 
-            {
-                final var loanTransaction = loanTransactionRepository.findById(resourceId).orElseThrow(() -> new LoanTransactionNotFoundException(resourceId));
-                note = noteRepository.findByLoanTransactionAndId(loanTransaction, noteId);
+            case LOAN_TRANSACTION -> {
+                final var loanTransaction = loanTransactionRepository.findById(resourceId)
+                        .orElseThrow(() -> new LoanTransactionNotFoundException(resourceId));
+                note = noteRepository.findByLoanTransactionIdAndId(loanTransaction.getId(), noteId);
                 officeId = loanTransaction.getLoan().getOfficeId();
             }
-            break;
-        case SAVING_ACCOUNT: 
-            {
-                final var savingAccount = savingsAccountRepository.findById(resourceId).orElseThrow(() -> new SavingsAccountNotFoundException(resourceId));
-                note = noteRepository.findBySavingsAccountAndId(savingAccount, noteId);
+            case SAVING_ACCOUNT -> {
+                final var savingAccount = savingsAccountRepository.findById(resourceId)
+                        .orElseThrow(() -> new SavingsAccountNotFoundException(resourceId));
+                note = noteRepository.findBySavingsAccountIdAndId(savingAccount.getId(), noteId);
                 officeId = savingAccount.getClient().getOffice().getId();
             }
-            break;
-        case SAVINGS_TRANSACTION: 
-            {
-                final var savingsTransaction = savingsAccountTransactionRepository.findById(resourceId).orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, resourceId));
-                note = noteRepository.findBySavingsTransactionAndId(savingsTransaction, noteId);
+            case SAVINGS_TRANSACTION -> {
+                final var savingsTransaction = savingsAccountTransactionRepository.findById(resourceId)
+                        .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, resourceId));
+                note = noteRepository.findBySavingsTransactionIdAndId(savingsTransaction.getId(), noteId);
                 officeId = savingsTransaction.getSavingsAccount().getClient().getOffice().getId();
             }
-            break;
-        case SHARE_ACCOUNT: 
-            {
-                final var shareAccount = shareAccountRepository.findOneWithNotFoundDetection(resourceId);
-                note = noteRepository.findByShareAccountAndId(shareAccount, noteId);
-                officeId = shareAccount.getOfficeId();
+            case SHARE_ACCOUNT -> {
+                final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
+                if (support == null) {
+                    break;
+                }
+                final var ref = support.require(resourceId);
+                note = noteRepository.findByShareAccountIdAndId(ref.shareAccountId(), noteId);
+                officeId = ref.officeId();
             }
-            break;
-        default: 
-            log.error("Not yet implemented: {}", type);
-            break;
+            default -> log.error("Not yet implemented: {}", type);
         }
         if (note == null) {
             throw new NoteNotFoundException(noteId, resourceId, type.name().toLowerCase());
         }
         return Pair.of(note, officeId);
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientRepositoryWrapper clientRepository, final GroupRepository groupRepository, final LoanRepositoryWrapper loanRepository, final LoanTransactionRepository loanTransactionRepository, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ShareAccountRepositoryWrapper shareAccountRepository) {
-        this.noteRepository = noteRepository;
-        this.clientRepository = clientRepository;
-        this.groupRepository = groupRepository;
-        this.loanRepository = loanRepository;
-        this.loanTransactionRepository = loanTransactionRepository;
-        this.savingsAccountRepository = savingsAccountRepository;
-        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
-        this.shareAccountRepository = shareAccountRepository;
     }
 }

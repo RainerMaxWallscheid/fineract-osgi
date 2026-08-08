@@ -16,11 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+description = 'Fineract Note test fragment'
 
-dependencies {
-    implementation(project(':fineract-core'))
-    implementation(project(':fineract-note-api'))
-    implementation(project(':fineract-note-impl'))
-    implementation(project(':fineract-provider'))
-    compileOnly('org.springframework.boot:spring-boot-autoconfigure')
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
+
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-SymbolicName': 'org.apache.fineract.note.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.note.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.note.test'
+                )
+    }
 }
+tasks.named('test').configure { useJUnitPlatform() }
+tasks.named('jar').configure { dependsOn tasks.named('testClasses') }

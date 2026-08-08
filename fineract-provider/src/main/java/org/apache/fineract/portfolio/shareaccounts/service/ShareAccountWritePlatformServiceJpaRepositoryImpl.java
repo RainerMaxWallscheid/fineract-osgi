@@ -218,7 +218,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account, noteText);
+                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
                     this.noteRepository.save(note);
                 }
@@ -257,7 +257,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account, noteText);
+                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
                     this.noteRepository.save(note);
                 }
@@ -290,7 +290,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account, noteText);
+                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
                     this.noteRepository.save(note);
                 }
@@ -443,7 +443,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.saveAndFlush(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account, noteText);
+                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
                     this.noteRepository.save(note);
                 }

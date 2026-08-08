@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
@@ -44,13 +44,12 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountRepositoryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 @ExtendWith(MockitoExtension.class)
 class NoteWritePlatformServiceImplTest {
@@ -58,7 +57,7 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private NoteRepository noteRepository;
     @Mock
-    private ClientRepositoryWrapper clientRepository;
+    private ClientRepository clientRepository;
     @Mock
     private GroupRepository groupRepository;
     @Mock
@@ -70,9 +69,9 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     @Mock
-    private ShareAccountRepositoryWrapper shareAccountRepository;
+    private ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
     @Mock
-    private ShareAccount shareAccount;
+    private ShareAccountNoteSupport shareSupport;
     @Mock
     private SavingsAccountTransaction savingsAccountTransaction;
     @Mock
@@ -89,14 +88,14 @@ class NoteWritePlatformServiceImplTest {
     @BeforeEach
     void setUp() {
         subject = new NoteWritePlatformServiceImpl(noteRepository, clientRepository, groupRepository, loanRepository,
-                loanTransactionRepository, savingsAccountRepository, savingsAccountTransactionRepository, shareAccountRepository);
+                loanTransactionRepository, savingsAccountRepository, savingsAccountTransactionRepository, shareAccountNoteSupport);
     }
 
     @Test
     void createNoteShouldSupportShareAccount() {
         NoteCreateRequest request = NoteCreateRequest.builder().resourceId(10L).type(NoteType.SHARE_ACCOUNT).note("share note").build();
-        when(shareAccountRepository.findOneWithNotFoundDetection(10L)).thenReturn(shareAccount);
-        when(shareAccount.getOfficeId()).thenReturn(7L);
+        when(shareAccountNoteSupport.getIfAvailable()).thenReturn(shareSupport);
+        when(shareSupport.require(10L)).thenReturn(new ShareAccountNoteSupport.ShareAccountNoteRef(10L, 5L, 7L));
         when(noteRepository.saveAndFlush(any(Note.class))).thenReturn(note);
         when(note.getId()).thenReturn(101L);
 
@@ -129,9 +128,9 @@ class NoteWritePlatformServiceImplTest {
     @Test
     void updateNoteShouldSupportShareAccount() {
         NoteUpdateRequest request = NoteUpdateRequest.builder().id(9L).resourceId(10L).type(NoteType.SHARE_ACCOUNT).note("updated").build();
-        when(shareAccountRepository.findOneWithNotFoundDetection(10L)).thenReturn(shareAccount);
-        when(shareAccount.getOfficeId()).thenReturn(7L);
-        when(noteRepository.findByShareAccountAndId(shareAccount, 9L)).thenReturn(note);
+        when(shareAccountNoteSupport.getIfAvailable()).thenReturn(shareSupport);
+        when(shareSupport.require(10L)).thenReturn(new ShareAccountNoteSupport.ShareAccountNoteRef(10L, 5L, 7L));
+        when(noteRepository.findByShareAccountIdAndId(10L, 9L)).thenReturn(note);
         when(note.getNote()).thenReturn("old");
         when(note.update("updated")).thenReturn(Map.of("note", "updated"));
 
@@ -147,7 +146,8 @@ class NoteWritePlatformServiceImplTest {
     void deleteNoteShouldSupportSavingsTransaction() {
         NoteDeleteRequest request = NoteDeleteRequest.builder().id(3L).resourceId(22L).type(NoteType.SAVINGS_TRANSACTION).build();
         when(savingsAccountTransactionRepository.findById(22L)).thenReturn(Optional.of(savingsAccountTransaction));
-        when(noteRepository.findBySavingsTransactionAndId(savingsAccountTransaction, 3L)).thenReturn(note);
+        when(savingsAccountTransaction.getId()).thenReturn(22L);
+        when(noteRepository.findBySavingsTransactionIdAndId(22L, 3L)).thenReturn(note);
         when(savingsAccountTransaction.getSavingsAccount()).thenReturn(savingsAccount);
         when(savingsAccount.getClient()).thenReturn(client);
         when(client.getOffice()).thenReturn(office);

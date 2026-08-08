@@ -16,11 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.portfolio.note.service;
 
-dependencies {
-    implementation(project(':fineract-core'))
-    implementation(project(':fineract-note-api'))
-    implementation(project(':fineract-note-impl'))
-    implementation(project(':fineract-provider'))
-    compileOnly('org.springframework.boot:spring-boot-autoconfigure')
+/**
+ * Residual port for share-account notes while shareaccounts remains on provider.
+ */
+public interface ShareAccountNoteSupport {
+
+    record ShareAccountNoteRef(Long shareAccountId, Long clientId, Long officeId) {}
+
+    ShareAccountNoteRef require(Long shareAccountId);
 }

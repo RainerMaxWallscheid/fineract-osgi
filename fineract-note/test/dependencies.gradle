@@ -18,9 +18,18 @@
  */
 
 dependencies {
-    implementation(project(':fineract-core'))
-    implementation(project(':fineract-note-api'))
-    implementation(project(':fineract-note-impl'))
-    implementation(project(':fineract-provider'))
-    compileOnly('org.springframework.boot:spring-boot-autoconfigure')
+    testImplementation(project(path: ':fineract-note-impl'))
+    testImplementation(project(path: ':fineract-core'))
+    testImplementation(project(path: ':fineract-loan-impl'))
+    testImplementation(project(path: ':fineract-savings-impl'))
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        exclude group: 'jakarta.activation'
+        exclude group: 'javax.activation'
+        exclude group: 'org.skyscreamer'
+    }
+    testImplementation ('org.mockito:mockito-inline')
+    testImplementation 'jakarta.persistence:jakarta.persistence-api'
+    testImplementation 'org.eclipse.persistence:org.eclipse.persistence.jpa'
+    testImplementation 'org.springframework.data:spring-data-jpa'
 }

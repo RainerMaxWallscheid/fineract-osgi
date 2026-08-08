@@ -92,6 +92,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-creditbureau` | **complete** (api/impl/test); loan product mapping via loan-impl |
 | `fineract-collateral` | **complete** (api/impl/test); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
 | `fineract-collateralmanagement` | **complete** (api/impl/test); entity residual **closed** (entities on impl; Loan inverse collection removed) |
+| `fineract-note` | **complete** (api/impl/test); FK-based Note entity; share residual via ShareAccountNoteSupport |
 
 
 ## Commands

@@ -19,13 +19,6 @@
 package org.apache.fineract.portfolio.note.domain;
 
 import java.util.List;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,31 +27,31 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends JpaRepository<Note, Long>, JpaSpecificationExecutor<Note> {
 
-    List<Note> findByLoanId(Long id);
+    List<Note> findByLoanId(Long loanId);
 
-    List<Note> findByClient(Client id);
+    List<Note> findByClientId(Long clientId);
 
-    List<Note> findByGroup(Group group);
+    List<Note> findByGroupId(Long groupId);
 
-    Note findByLoanAndId(Loan loanId, Long id);
+    Note findByLoanIdAndId(Long loanId, Long id);
 
-    Note findByClientAndId(Client client, Long id);
+    Note findByClientIdAndId(Long clientId, Long id);
 
-    Note findByGroupAndId(Group group, Long id);
+    Note findByGroupIdAndId(Long groupId, Long id);
 
-    Note findByLoanTransactionAndId(LoanTransaction loanTransaction, Long id);
+    Note findByLoanTransactionIdAndId(Long loanTransactionId, Long id);
 
-    List<Note> findBySavingsAccount(SavingsAccount savingAccount);
+    List<Note> findBySavingsAccountId(Long savingsAccountId);
 
-    Note findBySavingsAccountAndId(SavingsAccount savingAccount, Long id);
+    Note findBySavingsAccountIdAndId(Long savingsAccountId, Long id);
 
-    @Query("select note from Note note where note.savingsTransaction.id = :savingsTransactionId")
+    @Query("select note from Note note where note.savingsTransactionId = :savingsTransactionId")
     List<Note> findBySavingsTransactionId(@Param("savingsTransactionId") Long savingsTransactionId);
 
-    Note findBySavingsTransactionAndId(SavingsAccountTransaction savingsTransaction, Long id);
+    Note findBySavingsTransactionIdAndId(Long savingsTransactionId, Long id);
 
-    Note findByShareAccountAndId(ShareAccount shareAccount, Long id);
+    Note findByShareAccountIdAndId(Long shareAccountId, Long id);
 
     @Modifying
-    void deleteAllBySavingsAccount(SavingsAccount savingsAccount);
+    void deleteAllBySavingsAccountId(Long savingsAccountId);
 }

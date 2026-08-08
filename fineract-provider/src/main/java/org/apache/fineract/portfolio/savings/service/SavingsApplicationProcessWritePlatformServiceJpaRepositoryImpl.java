@@ -346,7 +346,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-        this.noteRepository.deleteAllBySavingsAccount(account);
+        this.noteRepository.deleteAllBySavingsAccountId(account.getId());
         this.savingAccountRepository.delete(account);
         return  //
         //

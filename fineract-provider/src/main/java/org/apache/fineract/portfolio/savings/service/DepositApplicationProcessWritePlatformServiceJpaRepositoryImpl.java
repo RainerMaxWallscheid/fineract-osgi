@@ -489,7 +489,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-        final List<Note> relatedNotes = this.noteRepository.findBySavingsAccount(account);
+        final List<Note> relatedNotes = this.noteRepository.findBySavingsAccountId(account.getId());
         this.noteRepository.deleteAllInBatch(relatedNotes);
         this.savingAccountRepository.delete(account);
         return  //
