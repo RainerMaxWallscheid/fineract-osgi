@@ -23,7 +23,7 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.config.FineractProperties.FineractExternalEventsProducerJmsProperties;
-import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
+import org.apache.fineract.infrastructure.event.external.config.TaskExecutorConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

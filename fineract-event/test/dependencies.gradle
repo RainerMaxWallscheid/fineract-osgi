@@ -16,14 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.external.config;
 
-public final class TaskExecutorConstant {
-
-    private TaskExecutorConstant() {}
-
-    public static final String EVENT_MARKS_AS_SENT_EXECUTOR_BEAN_NAME = "eventMarksAsSentExecutor";
-
-    /** Bean name for external-event JMS producer executor (wired in event-impl). */
-    public static final String EVENT_TASK_EXECUTOR_BEAN_NAME = "externalEventJmsProducerExecutor";
+dependencies {
+    testImplementation(project(path: ':fineract-event-impl'))
+    testImplementation(project(path: ':fineract-core'))
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        exclude group: 'jakarta.activation'
+        exclude group: 'javax.activation'
+        exclude group: 'org.skyscreamer'
+    }
+    testImplementation ('org.mockito:mockito-inline')
 }

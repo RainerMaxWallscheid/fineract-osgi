@@ -292,6 +292,14 @@ include ':fineract-springbatch-test'
 project(':fineract-springbatch-test').projectDir = file('fineract-springbatch/test')
 // No :fineract-springbatch façade — depend on -api / -impl explicitly.
 
+include ':fineract-event-api'
+project(':fineract-event-api').projectDir = file('fineract-event/api')
+include ':fineract-event-impl'
+project(':fineract-event-impl').projectDir = file('fineract-event/impl')
+include ':fineract-event-test'
+project(':fineract-event-test').projectDir = file('fineract-event/test')
+// No :fineract-event façade — depend on -api / -impl explicitly.
+
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')
 include ':fineract-cob-impl'

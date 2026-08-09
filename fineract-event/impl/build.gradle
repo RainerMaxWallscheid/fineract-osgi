@@ -1,0 +1,75 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Event Implementation (provider peel)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+compileJava {
+    dependsOn ':fineract-event-api:jar'
+    dependsOn ':fineract-avro-schemas:buildJavaSdk'
+}
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Event Implementation',
+                'Bundle-SymbolicName': 'org.apache.fineract.event.impl',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Export-Package': 'org.apache.fineract.infrastructure.event.impl.osgi,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.client,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.deposit,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.group,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.loan.product,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.savings,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.savings.transaction,'
+                        + 'org.apache.fineract.infrastructure.event.external.config,'
+                        + 'org.apache.fineract.infrastructure.event.external.producer.jms,'
+                        + 'org.apache.fineract.infrastructure.event.external.producer.kafka,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.client,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client',
+                'Import-Package': '*',
+                'Automatic-Module-Name': 'org.apache.fineract.event.impl'
+                )
+    }
+}

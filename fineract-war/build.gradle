@@ -146,6 +146,8 @@ dependencies {
     implementation project(':fineract-openapi-impl')
     implementation project(':fineract-springbatch-api')
     implementation project(':fineract-springbatch-impl')
+    implementation project(':fineract-event-api')
+    implementation project(':fineract-event-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

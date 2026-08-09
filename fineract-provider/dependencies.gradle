@@ -126,6 +126,8 @@ dependencies {
     implementation(project(path: ':fineract-openapi-impl'))
     implementation(project(path: ':fineract-springbatch-api'))
     implementation(project(path: ':fineract-springbatch-impl'))
+    implementation(project(path: ':fineract-event-api'))
+    implementation(project(path: ':fineract-event-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))

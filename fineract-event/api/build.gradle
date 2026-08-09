@@ -16,14 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.external.config;
+description = 'Fineract Event API (provider peel)'
 
-public final class TaskExecutorConstant {
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
 
-    private TaskExecutorConstant() {}
-
-    public static final String EVENT_MARKS_AS_SENT_EXECUTOR_BEAN_NAME = "eventMarksAsSentExecutor";
-
-    /** Bean name for external-event JMS producer executor (wired in event-impl). */
-    public static final String EVENT_TASK_EXECUTOR_BEAN_NAME = "externalEventJmsProducerExecutor";
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Event API',
+                'Bundle-SymbolicName': 'org.apache.fineract.event.api',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Export-Package': 'org.apache.fineract.infrastructure.event.external.config',
+                'Import-Package': '*',
+                'Automatic-Module-Name': 'org.apache.fineract.event.api'
+                )
+    }
 }
