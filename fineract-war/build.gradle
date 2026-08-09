@@ -140,6 +140,8 @@ dependencies {
     implementation project(':fineract-instancemode-impl')
     implementation project(':fineract-jobs-api')
     implementation project(':fineract-jobs-impl')
+    implementation project(':fineract-s3-api')
+    implementation project(':fineract-s3-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')

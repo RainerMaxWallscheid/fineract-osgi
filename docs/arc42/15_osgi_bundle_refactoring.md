@@ -278,7 +278,7 @@ Shared kernel           → core, validation         don't force BC split
 | Priority | Action |
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
-| **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs` complete**; next e.g. event / springbatch / s3 |
+| **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3` complete**; next e.g. event / springbatch / openapi |
 | **Residual hardening** | Monetary write residual **closed** (in monetary-impl); entity → ID/ports (loan/savings/client) still deferred; pure criteria ports after `LoanProductData` on loan-api |
 | **Do not start** | full provider / whole-core api/impl |
 

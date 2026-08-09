@@ -120,6 +120,8 @@ dependencies {
     implementation(project(path: ':fineract-instancemode-impl'))
     implementation(project(path: ':fineract-jobs-api'))
     implementation(project(path: ':fineract-jobs-impl'))
+    implementation(project(path: ':fineract-s3-api'))
+    implementation(project(path: ':fineract-s3-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-mix-api'))
