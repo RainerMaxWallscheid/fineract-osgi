@@ -18,10 +18,9 @@
  */
 package org.apache.fineract.infrastructure.jobs.data.partitionedjobs;
 
-import org.apache.fineract.cob.loan.LoanCOBConstant;
-
 public enum PartitionedJob {
-    LOAN_COB(LoanCOBConstant.LOAN_COB_PARTITIONER_STEP);
+    // Keep in sync with org.apache.fineract.cob.loan.LoanCOBConstant.LOAN_COB_PARTITIONER_STEP (provider residual).
+    LOAN_COB("Loan COB partition - Step");
     private final String partitionerStepName;
 
     public static boolean existsByJobName(String jobName) {

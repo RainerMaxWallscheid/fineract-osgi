@@ -102,6 +102,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual on provider |
 | `fineract-bulkimport` | **complete** (api/impl/test); ports/DTOs in core; residual on provider: populator service + share-account import/populators + guarantor import (GuarantorData still on provider) |
 | `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO peeled; constants + servlet filter remain in core |
+| `fineract-jobs` | **complete** (api/impl/test); scheduler domain/REST/Quartz/Batch peeled; residual COB filters, inline COB job types, retained-earning + NPA jobs on provider |
 
 
 ## Commands
