@@ -23,6 +23,11 @@ Public types for foreign BCs:
 
 Impl-only: `…portfolio.charge.domain.Charge`, repositories, write services, handlers.
 
+
+Residual adapters **closed** into charge-impl: `ChargeAccountingDropdownPortAdapter`,
+`ChargeOfficeAccessPortAdapter`. Still on provider: `ConvertChargeDataToSpecificChargeData`
+(needs `ShareAccountChargeData` until share peel).
+
 ```bash
 ./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar
 ./gradlew :fineract-charge-test:test

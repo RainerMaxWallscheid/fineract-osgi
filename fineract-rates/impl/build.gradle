@@ -56,13 +56,20 @@ jar {
                 'Bundle-Name': 'Apache Fineract Rates Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.rates.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Description': 'Floating rates implementation (JPA, services, REST, Spring wiring)',
+                'Bundle-Description': 'Floating rates + loan Rate catalog residual (JPA, services, REST, Spring wiring)',
                 'Import-Package': 'org.apache.fineract.portfolio.floatingrates.moduleapi,'
                         + 'org.apache.fineract.portfolio.floatingrates.data,'
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
                         + 'org.apache.fineract.portfolio.floatingrates.exception,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.starter,'
+                        + 'org.apache.fineract.portfolio.rate.api,'
+                        + 'org.apache.fineract.portfolio.rate.domain,'
+                        + 'org.apache.fineract.portfolio.rate.exception,'
+                        + 'org.apache.fineract.portfolio.rate.handler,'
+                        + 'org.apache.fineract.portfolio.rate.serialization,'
+                        + 'org.apache.fineract.portfolio.rate.service,'
+                        + 'org.apache.fineract.portfolio.rate.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.impl'
                 )
     }

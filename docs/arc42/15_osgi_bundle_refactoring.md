@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Monetary write residual **closed**; configuration.async + TaskExecutor* **closed**; campaigns/hooks residual **closed**; tax residual **closed** (tax-impl); security residual **partial** (services/config resolver → security-impl; AuthorizationServer/Oidc filter chains + TwoFactorServiceImpl remain — jobs/SMS cycles); COB stayed-locked → cob-api; event residual remaining: share + FD/RD; entity → ID/ports still deferred |
+| **Residual hardening** | Tax residual **closed**; security residual **partial** (services closed; filter chains + TwoFactorServiceImpl remain); accounting dropdown + running-balance job **closed**; charge office/accounting adapters **closed**; loan Rate catalog residual **closed** (rates-impl); still: event share/FD/RD, bulkimport share/guarantor, notification domain listeners, accounting processors (loan/savings/shares), accrual write (loan cycle) |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

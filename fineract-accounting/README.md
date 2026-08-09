@@ -18,6 +18,15 @@ No `:fineract-accounting` façade.
 | investor-api | **api only** (`JournalEntryData`) |
 | loan / savings / WC / progressive / branch-impl / investor-impl / provider / war / ITs | **api + impl** (entity residual) |
 
+
+### Residual closed into impl
+
+- `AccountingDropdownReadPlatformServiceImpl`
+- `JournalEntryRunningBalanceUpdateServiceImpl` + account running-balance job
+
+Still residual on provider: loan/savings/shares journal processors, provisioning write,
+product-to-GL write (share mapping helper), accrual write (loan accruals cycle).
+
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test
 ```

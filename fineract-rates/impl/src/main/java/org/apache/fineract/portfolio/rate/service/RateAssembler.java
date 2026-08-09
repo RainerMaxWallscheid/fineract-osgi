@@ -24,11 +24,13 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.rate.domain.RateRepositoryWrapper;
 
 public class RateAssembler {
+    /** Same JSON key as loan product catalog ({@code LoanProductConstants.RATES_PARAM_NAME}). */
+    private static final String RATES_PARAM_NAME = "rates";
+
     private final FromJsonHelper fromApiJsonHelper;
     private final RateRepositoryWrapper rateRepository;
 
@@ -36,8 +38,8 @@ public class RateAssembler {
         final List<Rate> rateItems = new ArrayList<>();
         if (element.isJsonObject()) {
             final JsonObject topLevelJsonElement = element.getAsJsonObject();
-            if (topLevelJsonElement.has(LoanProductConstants.RATES_PARAM_NAME) && topLevelJsonElement.get(LoanProductConstants.RATES_PARAM_NAME).isJsonArray()) {
-                final JsonArray array = topLevelJsonElement.get(LoanProductConstants.RATES_PARAM_NAME).getAsJsonArray();
+            if (topLevelJsonElement.has(RATES_PARAM_NAME) && topLevelJsonElement.get(RATES_PARAM_NAME).isJsonArray()) {
+                final JsonArray array = topLevelJsonElement.get(RATES_PARAM_NAME).getAsJsonArray();
                 List<Long> idList = new ArrayList<>();
                 for (int i = 0; i < array.size(); i++) {
                     final JsonObject rateElement = array.get(i).getAsJsonObject();

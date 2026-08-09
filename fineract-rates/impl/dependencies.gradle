@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-rates-api')
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-command-api'))
+    // Rate residual services use PlatformSecurityContext / AppUser (core) + security validators
+    implementation(project(path: ':fineract-security-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

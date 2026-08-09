@@ -59,9 +59,12 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Accounting implementation (JPA, REST, product mapping helpers, jobs)',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.accounting.glaccount.domain,'
+                'Export-Package': 'org.apache.fineract.accounting.common,'
+                        + 'org.apache.fineract.accounting.glaccount.domain,'
+                        + 'org.apache.fineract.accounting.jobs.accountrunningbalanceupdate,'
                         + 'org.apache.fineract.accounting.journalentry.domain,'
                         + 'org.apache.fineract.accounting.journalentry,'
+                        + 'org.apache.fineract.accounting.journalentry.service,'
                         + 'org.apache.fineract.accounting.closure.domain,'
                         + 'org.apache.fineract.accounting.financialactivityaccount.domain,'
                         + 'org.apache.fineract.accounting.financialactivityaccount.exception,'

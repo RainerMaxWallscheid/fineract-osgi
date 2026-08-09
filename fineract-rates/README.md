@@ -25,6 +25,13 @@ No `:fineract-rates` façade. Depend on `-api`; composition roots also take `-im
 | loan | `-api` only (`floatingRateId` + `FloatingRatePort`) |
 | provider / war / ITs | `-api` + `-impl` |
 
+
+### Loan Rate catalog residual (**closed**)
+
+`portfolio.rate` REST/handlers/services/domain wrappers live in **rates-impl**
+(entity `Rate` + `RateData` remain in core for loan residual coupling).
+Floating rates remain under `portfolio.floatingrates`.
+
 ```bash
 ./gradlew :fineract-rates-api:jar :fineract-rates-impl:jar :fineract-rates-test:test
 ```
