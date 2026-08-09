@@ -99,6 +99,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-campaigns` | **complete** (api/impl/test); Report FKs Long; residual write/domain/jobs on provider (dataqueries ReadReporting/Report + loan event coupling) |
 | `fineract-gcm` | **complete** (api/impl/test); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
 | `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
+| `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual on provider |
 
 
 ## Commands

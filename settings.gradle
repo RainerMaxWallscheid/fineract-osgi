@@ -237,6 +237,13 @@ project(':fineract-dataqueries-impl').projectDir = file('fineract-dataqueries/im
 include ':fineract-dataqueries-test'
 project(':fineract-dataqueries-test').projectDir = file('fineract-dataqueries/test')
 // No :fineract-dataqueries façade — depend on -api / -impl explicitly.
+include ':fineract-configuration-api'
+project(':fineract-configuration-api').projectDir = file('fineract-configuration/api')
+include ':fineract-configuration-impl'
+project(':fineract-configuration-impl').projectDir = file('fineract-configuration/impl')
+include ':fineract-configuration-test'
+project(':fineract-configuration-test').projectDir = file('fineract-configuration/test')
+// No :fineract-configuration façade — depend on -api / -impl explicitly.
 
 
 
