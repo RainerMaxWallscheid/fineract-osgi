@@ -252,8 +252,13 @@ include ':fineract-bulkimport-test'
 project(':fineract-bulkimport-test').projectDir = file('fineract-bulkimport/test')
 // No :fineract-bulkimport façade — depend on -api / -impl explicitly.
 
-
-
+include ':fineract-instancemode-api'
+project(':fineract-instancemode-api').projectDir = file('fineract-instancemode/api')
+include ':fineract-instancemode-impl'
+project(':fineract-instancemode-impl').projectDir = file('fineract-instancemode/impl')
+include ':fineract-instancemode-test'
+project(':fineract-instancemode-test').projectDir = file('fineract-instancemode/test')
+// No :fineract-instancemode façade — depend on -api / -impl explicitly.
 
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')
