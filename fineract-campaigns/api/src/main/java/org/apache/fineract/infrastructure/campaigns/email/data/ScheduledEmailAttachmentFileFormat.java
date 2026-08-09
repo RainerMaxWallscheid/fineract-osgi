@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.campaigns.email.domain;
+package org.apache.fineract.infrastructure.campaigns.email.data;
 
 public enum ScheduledEmailAttachmentFileFormat {
 

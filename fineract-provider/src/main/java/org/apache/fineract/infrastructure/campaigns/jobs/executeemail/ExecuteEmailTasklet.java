@@ -36,11 +36,12 @@ import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaignRe
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessage;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessageRepository;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessageStatusType;
-import org.apache.fineract.infrastructure.campaigns.email.domain.ScheduledEmailAttachmentFileFormat;
+import org.apache.fineract.infrastructure.campaigns.email.data.ScheduledEmailAttachmentFileFormat;
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailMessageJobEmailService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.dataqueries.domain.Report;
+import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.reportmailingjob.helper.IPv4Helper;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
@@ -63,6 +64,7 @@ public class ExecuteEmailTasklet implements Tasklet {
     private final SavingsAccountRepository savingsAccountRepository;
     private final EmailMessageJobEmailService emailMessageJobEmailService;
     private final ReadReportingService readReportingService;
+    private final ReportRepository reportRepository;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final FineractProperties fineractProperties;
 
@@ -80,7 +82,9 @@ public class ExecuteEmailTasklet implements Tasklet {
                     final List<File> attachmentList = new ArrayList<>();
                     final StringBuilder errorLog = new StringBuilder();
                     if (emailAttachmentFileFormat != null && Arrays.asList(ScheduledEmailAttachmentFileFormat.validValues()).contains(emailAttachmentFileFormat.getId())) {
-                        final Report stretchyReport = emailCampaign.getStretchyReport();
+                        final Long stretchyReportId = emailCampaign.getStretchyReportId();
+                        final Report stretchyReport = stretchyReportId == null ? null
+                                : reportRepository.findById(stretchyReportId).orElse(null);
                         final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
                         final HashMap<String, String> reportStretchyParams = reportMailingJobValidator.validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
                         if (reportStretchyParams.containsKey("selectLoan") || reportStretchyParams.containsKey("loanId")) {
@@ -213,13 +217,14 @@ public class ExecuteEmailTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
+        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportRepository reportRepository, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
         this.emailMessageRepository = emailMessageRepository;
         this.emailCampaignRepository = emailCampaignRepository;
         this.loanRepository = loanRepository;
         this.savingsAccountRepository = savingsAccountRepository;
         this.emailMessageJobEmailService = emailMessageJobEmailService;
         this.readReportingService = readReportingService;
+        this.reportRepository = reportRepository;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.fineractProperties = fineractProperties;
     }

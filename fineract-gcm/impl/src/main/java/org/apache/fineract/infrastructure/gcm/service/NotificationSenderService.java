@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.infrastructure.configuration.service.ExternalServicesPropertiesReadPlatformService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.gcm.GcmConstants;
 import org.apache.fineract.infrastructure.gcm.domain.Message;
@@ -40,7 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationSenderService {
     private final SmsMessageRepository smsMessageRepository;
-    private final ExternalServicesPropertiesReadPlatformService propertiesReadPlatformService;
+    private final NotificationConfigurationReadService notificationConfigurationReadService;
 
     public void sendNotification(List<SmsMessage> smsMessages) {
         Map<Long, List<SmsMessage>> notificationByEachClient = getNotificationListByClient(smsMessages);
@@ -66,7 +65,7 @@ public class NotificationSenderService {
     }
 
     public void sendNotification(Long clientId, List<SmsMessage> smsList) {
-        NotificationConfigurationData notificationConfigurationData = propertiesReadPlatformService.getNotificationConfiguration();
+        NotificationConfigurationData notificationConfigurationData = notificationConfigurationReadService.getNotificationConfiguration();
         String registrationId = null;
         for (SmsMessage smsMessage : smsList) {
             try {
@@ -88,8 +87,9 @@ public class NotificationSenderService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public NotificationSenderService(final SmsMessageRepository smsMessageRepository, final ExternalServicesPropertiesReadPlatformService propertiesReadPlatformService) {
+        public NotificationSenderService(final SmsMessageRepository smsMessageRepository,
+            final NotificationConfigurationReadService notificationConfigurationReadService) {
         this.smsMessageRepository = smsMessageRepository;
-        this.propertiesReadPlatformService = propertiesReadPlatformService;
+        this.notificationConfigurationReadService = notificationConfigurationReadService;
     }
 }

@@ -216,6 +216,27 @@ project(':fineract-reportmailingjob-impl').projectDir = file('fineract-reportmai
 include ':fineract-reportmailingjob-test'
 project(':fineract-reportmailingjob-test').projectDir = file('fineract-reportmailingjob/test')
 // No :fineract-reportmailingjob façade — depend on -api / -impl explicitly.
+include ':fineract-campaigns-api'
+project(':fineract-campaigns-api').projectDir = file('fineract-campaigns/api')
+include ':fineract-campaigns-impl'
+project(':fineract-campaigns-impl').projectDir = file('fineract-campaigns/impl')
+include ':fineract-campaigns-test'
+project(':fineract-campaigns-test').projectDir = file('fineract-campaigns/test')
+// No :fineract-campaigns façade — depend on -api / -impl explicitly.
+include ':fineract-gcm-api'
+project(':fineract-gcm-api').projectDir = file('fineract-gcm/api')
+include ':fineract-gcm-impl'
+project(':fineract-gcm-impl').projectDir = file('fineract-gcm/impl')
+include ':fineract-gcm-test'
+project(':fineract-gcm-test').projectDir = file('fineract-gcm/test')
+// No :fineract-gcm façade — depend on -api / -impl explicitly.
+include ':fineract-dataqueries-api'
+project(':fineract-dataqueries-api').projectDir = file('fineract-dataqueries/api')
+include ':fineract-dataqueries-impl'
+project(':fineract-dataqueries-impl').projectDir = file('fineract-dataqueries/impl')
+include ':fineract-dataqueries-test'
+project(':fineract-dataqueries-test').projectDir = file('fineract-dataqueries/test')
+// No :fineract-dataqueries façade — depend on -api / -impl explicitly.
 
 
 

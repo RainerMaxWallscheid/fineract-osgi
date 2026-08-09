@@ -34,12 +34,12 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.campaigns.email.ScheduledEmailConstants;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailCampaignValidator;
+import org.apache.fineract.infrastructure.campaigns.email.data.ScheduledEmailAttachmentFileFormat;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.useradministration.domain.AppUser;
 
@@ -50,9 +50,9 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     private String campaignName;
     @Column(name = "campaign_type", nullable = false)
     private Integer campaignType;
-    @ManyToOne
-    @JoinColumn(name = "business_rule_id", nullable = false)
-    private Report businessRuleId;
+    // FK only — dataqueries Report residual on provider.
+    @Column(name = "business_rule_id", nullable = false)
+    private Long businessRuleId;
     @Column(name = "param_value")
     private String paramValue;
     @Column(name = "status_enum", nullable = false)
@@ -63,9 +63,9 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     private String emailMessage;
     @Column(name = "email_attachment_file_format")
     private String emailAttachmentFileFormat;
-    @ManyToOne
-    @JoinColumn(name = "stretchy_report_id")
-    private Report stretchyReport;
+    // FK only — dataqueries Report residual on provider.
+    @Column(name = "stretchy_report_id")
+    private Long stretchyReportId;
     @Column(name = "stretchy_report_param_map", nullable = true)
     private String stretchyReportParamMap;
     @Column(name = "closedon_date", nullable = true)
@@ -100,7 +100,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     @Column(name = "previous_run_error_message", nullable = true)
     private String previousRunErrorMessage;
 
-    public static EmailCampaign instance(final AppUser submittedBy, final Report businessRuleId, final Report stretchyReport, final JsonCommand command) {
+    public static EmailCampaign instance(final AppUser submittedBy, final Long businessRuleId, final Long stretchyReportId, final JsonCommand command) {
         final String campaignName = command.stringValueOfParameterNamed(EmailCampaignValidator.campaignName);
         final Long campaignType = command.longValueOfParameterNamed(EmailCampaignValidator.campaignType);
         final String paramValue = command.stringValueOfParameterNamed(EmailCampaignValidator.paramValue);
@@ -129,7 +129,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
         } else {
             recurrenceStartDate = null;
         }
-        return new EmailCampaign().setCampaignName(campaignName).setCampaignType(campaignType.intValue()).setBusinessRuleId(businessRuleId).setParamValue(paramValue).setStatus(EmailCampaignStatus.PENDING.getValue()).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setSubmittedOnDate(submittedOnDate).setSubmittedBy(submittedBy).setStretchyReport(stretchyReport).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setRecurrence(recurrence).setRecurrenceStartDate(recurrenceStartDate).setStretchyReportParamMap(stretchyReportParamMap);
+        return new EmailCampaign().setCampaignName(campaignName).setCampaignType(campaignType.intValue()).setBusinessRuleId(businessRuleId).setParamValue(paramValue).setStatus(EmailCampaignStatus.PENDING.getValue()).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setSubmittedOnDate(submittedOnDate).setSubmittedBy(submittedBy).setStretchyReportId(stretchyReportId).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setRecurrence(recurrence).setRecurrenceStartDate(recurrenceStartDate).setStretchyReportParamMap(stretchyReportParamMap);
     }
 
     public Map<String, Object> update(JsonCommand command) {
@@ -154,7 +154,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
             actualChanges.put(EmailCampaignValidator.campaignType, EmailCampaignType.fromInt(newValue));
             this.campaignType = EmailCampaignType.fromInt(newValue).getValue();
         }
-        if (command.isChangeInLongParameterNamed(EmailCampaignValidator.businessRuleId, (this.businessRuleId != null) ? this.businessRuleId.getId() : null)) {
+        if (command.isChangeInLongParameterNamed(EmailCampaignValidator.businessRuleId, this.businessRuleId)) {
             final String newValue = command.stringValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
             actualChanges.put(EmailCampaignValidator.businessRuleId, newValue);
         }
@@ -338,7 +338,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Report getBusinessRuleId() {
+        public Long getBusinessRuleId() {
         return this.businessRuleId;
     }
 
@@ -368,8 +368,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Report getStretchyReport() {
-        return this.stretchyReport;
+        public Long getStretchyReportId() {
+        return this.stretchyReportId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -469,7 +469,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailCampaign setBusinessRuleId(final Report businessRuleId) {
+        public EmailCampaign setBusinessRuleId(final Long businessRuleId) {
         this.businessRuleId = businessRuleId;
         return this;
     }
@@ -523,8 +523,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailCampaign setStretchyReport(final Report stretchyReport) {
-        this.stretchyReport = stretchyReport;
+        public EmailCampaign setStretchyReportId(final Long stretchyReportId) {
+        this.stretchyReportId = stretchyReportId;
         return this;
     }
 

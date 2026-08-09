@@ -108,9 +108,9 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                 throw new SmsCampaignNameAlreadyExistsException(campaignName);
             }
             final Long runReportId = command.longValueOfParameterNamed(SmsCampaignValidator.runReportId);
-            Report report = this.reportRepository.findById(runReportId).orElseThrow(() -> new ReportNotFoundException(runReportId));
+            this.reportRepository.findById(runReportId).orElseThrow(() -> new ReportNotFoundException(runReportId));
             LocalDateTime tenantDateTime = DateUtils.getLocalDateTimeOfTenant();
-            SmsCampaign smsCampaign = SmsCampaign.instance(currentUser, report, command);
+            SmsCampaign smsCampaign = SmsCampaign.instance(currentUser, runReportId, command);
             LocalDateTime recurrenceStartDate = smsCampaign.getRecurrenceStartDate();
             if (recurrenceStartDate != null && DateUtils.isBefore(recurrenceStartDate, tenantDateTime)) {
                 throw new GeneralPlatformDomainRuleException("error.msg.campaign.recurrenceStartDate.in.the.past", "Recurrence start date cannot be the past date.", recurrenceStartDate);
@@ -146,8 +146,8 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             }
             if (changes.containsKey(SmsCampaignValidator.runReportId)) {
                 final Long newValue = command.longValueOfParameterNamed(SmsCampaignValidator.runReportId);
-                final Report reportId = this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
-                smsCampaign.updateBusinessRuleId(reportId);
+                this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
+                smsCampaign.updateBusinessRuleId(newValue);
             }
             if (!changes.isEmpty()) {
                 this.smsCampaignRepository.saveAndFlush(smsCampaign);

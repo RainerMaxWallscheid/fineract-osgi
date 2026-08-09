@@ -95,12 +95,11 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
         final AppUser currentUser = this.context.authenticatedUser();
         this.emailCampaignValidator.validateCreate(command.json());
         final Long businessRuleId = command.longValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
-        final Report businessRule = this.reportRepository.findById(businessRuleId).orElseThrow(() -> new ReportNotFoundException(businessRuleId));
+        this.reportRepository.findById(businessRuleId).orElseThrow(() -> new ReportNotFoundException(businessRuleId));
         final Long reportId = command.longValueOfParameterNamed(EmailCampaignValidator.stretchyReportId);
-        Report report = null;
         Map<String, String> stretchyReportParams = null;
         if (reportId != null) {
-            report = this.reportRepository.findById(reportId).orElseThrow(() -> new ReportNotFoundException(reportId));
+            final Report report = this.reportRepository.findById(reportId).orElseThrow(() -> new ReportNotFoundException(reportId));
             final Set<ReportParameterUsage> reportParameterUsages = report.getReportParameterUsages();
             stretchyReportParams = new HashMap<>();
             if (reportParameterUsages != null && !reportParameterUsages.isEmpty()) {
@@ -109,7 +108,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
                 }
             }
         }
-        EmailCampaign emailCampaign = EmailCampaign.instance(currentUser, businessRule, report, command);
+        EmailCampaign emailCampaign = EmailCampaign.instance(currentUser, businessRuleId, reportId, command);
         if (stretchyReportParams != null) {
             emailCampaign.setStretchyReportParamMap(new Gson().toJson(stretchyReportParams));
         }
@@ -133,8 +132,8 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
             final Map<String, Object> changes = emailCampaign.update(command);
             if (changes.containsKey(EmailCampaignValidator.businessRuleId)) {
                 final Long newValue = command.longValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
-                final Report reportId = this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
-                emailCampaign.setBusinessRuleId(reportId);
+                this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
+                emailCampaign.setBusinessRuleId(newValue);
             }
             if (!changes.isEmpty()) {
                 this.emailCampaignRepository.saveAndFlush(emailCampaign);

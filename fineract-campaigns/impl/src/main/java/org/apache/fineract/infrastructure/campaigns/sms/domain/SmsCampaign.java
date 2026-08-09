@@ -49,7 +49,6 @@ import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarWeekDaysType;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -70,9 +69,9 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
     @Column(name = "provider_id", nullable = true) // null for notifications
     private Long providerId; // defined provider details
 
-    @ManyToOne
-    @JoinColumn(name = "report_id", nullable = false)
-    private Report businessRuleId;
+    // FK only — dataqueries Report residual on provider.
+    @Column(name = "report_id", nullable = false)
+    private Long businessRuleId;
 
     @Column(name = "param_value")
     private String paramValue;
@@ -124,7 +123,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
 
     public SmsCampaign() {}
 
-    private SmsCampaign(final String campaignName, final Integer campaignType, final Integer triggerType, final Report businessRuleId,
+    private SmsCampaign(final String campaignName, final Integer campaignType, final Integer triggerType, final Long businessRuleId,
             final Long providerId, final String paramValue, final String message, final LocalDate submittedOnDate,
             final AppUser submittedBy, final String recurrence, final LocalDateTime recurrenceStartDate, final boolean isNotification) {
         this.campaignName = campaignName;
@@ -143,7 +142,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         this.isNotification = isNotification;
     }
 
-    public static SmsCampaign instance(final AppUser submittedBy, final Report report, final JsonCommand command) {
+    public static SmsCampaign instance(final AppUser submittedBy, final Long reportId, final JsonCommand command) {
         final String campaignName = command.stringValueOfParameterNamed(SmsCampaignValidator.campaignName);
         final Long campaignType = command.longValueOfParameterNamed(SmsCampaignValidator.campaignType);
         final Long triggerType = command.longValueOfParameterNamed(SmsCampaignValidator.triggerType);
@@ -181,7 +180,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
             }
         }
 
-        return new SmsCampaign(campaignName, campaignType.intValue(), triggerType.intValue(), report, providerId, paramValue, message,
+        return new SmsCampaign(campaignName, campaignType.intValue(), triggerType.intValue(), reportId, providerId, paramValue, message,
                 submittedOnDate, submittedBy, recurrence, recurrenceStartDate, isNotification);
     }
 
@@ -216,7 +215,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         }
 
         if (command.isChangeInLongParameterNamed(SmsCampaignValidator.runReportId,
-                this.businessRuleId != null ? this.businessRuleId.getId() : null)) {
+                this.businessRuleId)) {
             final String newValue = command.stringValueOfParameterNamed(SmsCampaignValidator.runReportId);
             actualChanges.put(SmsCampaignValidator.runReportId, newValue);
         }
@@ -451,7 +450,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         return this.approvedOnDate;
     }
 
-    public Report getBusinessRuleId() {
+    public Long getBusinessRuleId() {
         return this.businessRuleId;
     }
 
@@ -499,8 +498,8 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         this.isVisible = isVisible;
     }
 
-    public void updateBusinessRuleId(final Report report) {
-        this.businessRuleId = report;
+    public void updateBusinessRuleId(final Long reportId) {
+        this.businessRuleId = reportId;
     }
 
     public Long getProviderId() {

@@ -18,8 +18,8 @@
  */
 package org.apache.fineract.infrastructure.campaigns.email.data;
 
-import org.apache.fineract.infrastructure.campaigns.email.domain.ScheduledEmailAttachmentFileFormat;
-import org.apache.fineract.infrastructure.campaigns.email.domain.ScheduledEmailStretchyReportParamDateOption;
+import org.apache.fineract.infrastructure.campaigns.email.data.ScheduledEmailAttachmentFileFormat;
+import org.apache.fineract.infrastructure.campaigns.email.data.ScheduledEmailStretchyReportParamDateOption;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
 public final class ScheduledEmailEnumerations {

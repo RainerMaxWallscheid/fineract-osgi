@@ -96,6 +96,9 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-hooks` | **complete** (api/impl/test); ports DTO-only + HookEventQueryService on impl; MessageGatewayHookProcessor residual (SMS/provider); HookEvent residual in core; Template via template-impl |
 | `fineract-sms` | **complete** (api/impl/test); campaignId Long FK; scheduled job residual (campaigns SmsConfigUtils + GCM); MessageGateway residual still on provider |
 | `fineract-reportmailingjob` | **complete** (api/impl/test); stretchyReportId Long FK (dataqueries Report residual); AppUser @ManyToOne (core); ExecuteReportMailingJobs residual in campaigns |
+| `fineract-campaigns` | **complete** (api/impl/test); Report FKs Long; residual write/domain/jobs on provider (dataqueries ReadReporting/Report + loan event coupling) |
+| `fineract-gcm` | **complete** (api/impl/test); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
+| `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
 
 
 ## Commands
