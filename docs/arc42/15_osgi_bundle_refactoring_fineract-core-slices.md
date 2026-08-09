@@ -61,8 +61,9 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | Location | Types |
 |----------|-------|
 | security-api | `PlatformUserDetailsService`, `SqlInjectionPreventerService` (+ existing ports) |
-| security-impl | `ColumnValidator`, `DefaultSqlValidator`, `DefaultInputValidator` |
-| core residual | `PlatformSecurityContext`, password ports, `PlatformUser*`, `SQLBuilder`, kernel exceptions |
+| security-impl | `ColumnValidator`, `DefaultSqlValidator`, `DefaultInputValidator`; residual **closed**: 2FA config, OIDC user resolution, login lockout, temporary-password provider, dynamic JWT issuer resolver, filter-chain diagnostics |
+| core residual | `PlatformSecurityContext`, password ports, `PlatformUser*`, `RoleRepository`, `SQLBuilder`, kernel exceptions |
+| still on provider | `AuthorizationServerConfig` / `OidcFederationSecurityConfig` (jobs COB filters); `TwoFactorServiceImpl` (SMS/campaigns cycle) |
 
 **Consumers:** provider/war/oauth2-tests; savings-impl depends on security-impl for `ColumnValidator`.
 

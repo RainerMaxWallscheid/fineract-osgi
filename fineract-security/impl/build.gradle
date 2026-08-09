@@ -58,9 +58,11 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Security implementation residual',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.security,'
+                'Export-Package': 'org.apache.fineract.infrastructure.core.diagnostics.security,'
+                        + 'org.apache.fineract.infrastructure.security,'
                         + 'org.apache.fineract.infrastructure.security.api,'
                         + 'org.apache.fineract.infrastructure.security.command,'
+                        + 'org.apache.fineract.infrastructure.security.config,'
                         + 'org.apache.fineract.infrastructure.security.converter,'
                         + 'org.apache.fineract.infrastructure.security.data,'
                         + 'org.apache.fineract.infrastructure.security.domain,'

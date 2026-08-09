@@ -60,6 +60,7 @@ dependencies {
         exclude group: 'javax.activation', module: 'activation'
     }
     implementation 'com.sun.mail:jakarta.mail'
+    implementation 'com.github.spullara.mustache.java:compiler'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 

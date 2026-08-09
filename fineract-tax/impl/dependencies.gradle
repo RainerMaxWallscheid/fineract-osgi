@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-tax-api')
 
     implementation(project(path: ':fineract-core'))
+    // Tax residual: TaxAssembler / TaxRead use GLAccount + AccountingDropdownReadPlatformService
+    implementation(project(path: ':fineract-accounting-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
