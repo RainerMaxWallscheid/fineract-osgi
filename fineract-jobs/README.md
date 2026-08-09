@@ -10,12 +10,15 @@ Provider peel — scheduler / batch job infrastructure (ADR-022).
 
 Shared DTOs / `SchedulerJobRunnerReadService` / `JobName` enum remain in **core**.
 
-Residual on provider:
-- COB / progressive-loan API filters
-- Inline COB job REST (`InlineJobApiResource`, `InlineJobType`, `InlineJobExecuteHandler`)
-- `LoanCOBJobParameterProvider`
-- retained-earning job (loan product + accounting coupling)
-- NPA update job
+**Jobs residual closed** — no `infrastructure.jobs` sources remain on provider.
+
+Closed into jobs-impl:
+- Inline job REST + handler (`InlineJobType` resolves executor beans by Spring name)
+- `LoanCOBJobParameterProvider` (uses `COBConstant` from cob-impl)
+- Retained-earning + NPA jobs
+- COB / progressive / WC API filters (lock/executor via Spring `@Qualifier`; `LoanCOBEnabledCondition` on cob-impl)
+
+Kernel: `BodyCachingHttpServletRequestWrapper` moved to **fineract-core**.
 
 ```bash
 ./gradlew :fineract-jobs-api:jar :fineract-jobs-impl:jar :fineract-jobs-test:test

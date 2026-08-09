@@ -31,7 +31,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import org.apache.fineract.cob.data.LoanIdsResponseDTO;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -44,7 +43,7 @@ import org.springframework.stereotype.Component;
 @Tag(name = "Inline Job", description = "")
 public class InlineJobApiResource {
     private final PortfolioCommandSourceWritePlatformService commandWritePlatformService;
-    private final DefaultToApiJsonSerializer<LoanIdsResponseDTO> serializer;
+    private final DefaultToApiJsonSerializer<CommandProcessingResult> serializer;
 
     @POST
     @Path("{jobName}/inline")
@@ -61,7 +60,8 @@ public class InlineJobApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InlineJobApiResource(final PortfolioCommandSourceWritePlatformService commandWritePlatformService, final DefaultToApiJsonSerializer<LoanIdsResponseDTO> serializer) {
+        public InlineJobApiResource(final PortfolioCommandSourceWritePlatformService commandWritePlatformService,
+            final DefaultToApiJsonSerializer<CommandProcessingResult> serializer) {
         this.commandWritePlatformService = commandWritePlatformService;
         this.serializer = serializer;
     }

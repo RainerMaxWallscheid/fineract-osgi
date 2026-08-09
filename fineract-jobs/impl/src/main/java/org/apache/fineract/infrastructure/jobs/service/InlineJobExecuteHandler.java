@@ -36,7 +36,8 @@ public class InlineJobExecuteHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(JsonCommand command) {
         InlineJobType inlineJobType = InlineJobType.getInlineJobType(command.getJobName());
         try {
-            InlineExecutorService inlineJobExecutorService = applicationContext.getBean(inlineJobType.getExecutorServiceClass());
+            InlineExecutorService<?> inlineJobExecutorService = applicationContext.getBean(inlineJobType.getExecutorServiceBeanName(),
+                    InlineExecutorService.class);
             return inlineJobExecutorService.executeInlineJob(command, inlineJobType.getInlineJobName());
         } catch (NoSuchBeanDefinitionException e) {
             throw new JobIsNotFoundOrNotEnabledException(e, inlineJobType.getInlineJobName());

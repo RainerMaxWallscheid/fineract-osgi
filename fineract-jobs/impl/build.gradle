@@ -68,7 +68,11 @@ jar {
                         + 'org.apache.fineract.infrastructure.jobs.service.aggregationjob,'
                         + 'org.apache.fineract.infrastructure.jobs.service.executealldirtyjobs,'
                         + 'org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasebusinessdateby1day,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasecobdateby1day',
+                        + 'org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasecobdateby1day,'
+                        + 'org.apache.fineract.infrastructure.jobs.service.updatenpa,'
+                        + 'org.apache.fineract.infrastructure.jobs.service.retainedearning,'
+                        + 'org.apache.fineract.infrastructure.jobs.service.jobparameterprovider,'
+                        + 'org.apache.fineract.infrastructure.jobs.filter',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.jobs.impl'
                 )

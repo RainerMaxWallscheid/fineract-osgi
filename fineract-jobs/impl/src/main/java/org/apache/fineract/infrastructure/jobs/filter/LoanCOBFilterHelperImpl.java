@@ -21,9 +21,9 @@ package org.apache.fineract.infrastructure.jobs.filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,20 +35,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
-import org.apache.fineract.cob.domain.WorkingCapitalLoanAccountLock;
-import org.apache.fineract.cob.service.AbstractAccountLockService;
-import org.apache.fineract.cob.service.InlineCommonLockableCOBExecutorService;
-import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant;
-import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanRetrieveIdService;
+import org.apache.fineract.cob.service.AccountLockService;
+import org.apache.fineract.cob.service.RetrieveLoanIdService;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
+import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
+import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -56,28 +57,39 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Conditional(LoanCOBEnabledCondition.class)
-public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher implements WorkingCapitalLoanCOBFilterHelper, InitializingBean {
-    private final AbstractAccountLockService<WorkingCapitalLoanAccountLock> loanAccountLockService;
-    private final PlatformSecurityContext context;
-    private final InlineCommonLockableCOBExecutorService<WorkingCapitalLoanAccountLock> inlineLoanCOBExecutorService;
-    private final WorkingCapitalLoanRepository loanRepository;
-    private final FineractProperties fineractProperties;
-    private final WorkingCapitalLoanRetrieveIdService retrieveIdService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
-    public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/working-capital-loans/catch-up");
-    public static final Pattern LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/(?:reschedule)?working-capital-loans/(?:external-id/)?([^/?]+).*");
-    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find();
+public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements LoanCOBFilterHelper, InitializingBean {
+    /** Keep in sync with LoanCOBConstant.INLINE_LOAN_COB_JOB_NAME (provider residual). */
+    private static final String INLINE_LOAN_COB_JOB_NAME = "INLINE_LOAN_COB";
 
-    private Long getLoanId(String pathInfo) {
-        String id = LOAN_PATH_PATTERN.matcher(pathInfo).replaceAll("$1");
-        if (isExternal(pathInfo)) {
-            String externalId = id;
-            return loanRepository.findIdByExternalId(new ExternalId(externalId));
-        } else if (StringUtils.isNumeric(id)) {
-            return Long.valueOf(id);
+    private final GLIMAccountInfoRepository glimAccountInfoRepository;
+    private final AccountLockService<?> loanAccountLockService;
+    private final PlatformSecurityContext context;
+    private final InlineExecutorService<Long> inlineLoanCOBExecutorService;
+    private final LoanRepository loanRepository;
+    private final FineractProperties fineractProperties;
+    private final RetrieveLoanIdService retrieveIdService;
+    private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
+    private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
+    public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/catch-up");
+    public static final Pattern LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/(?:reschedule)?loans/(?:external-id/)?([^/?]+).*");
+    public static final Pattern LOAN_GLIMACCOUNT_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/glimAccount/(\\d+).*");
+    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find() || LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(s).find();
+
+    private Long getLoanId(boolean isGlim, String pathInfo) {
+        if (!isGlim) {
+            String id = LOAN_PATH_PATTERN.matcher(pathInfo).replaceAll("$1");
+            if (isExternal(pathInfo)) {
+                String externalId = id;
+                return loanRepository.findIdByExternalId(new ExternalId(externalId));
+            } else if (isRescheduleLoans(pathInfo)) {
+                return loanRescheduleRequestRepository.getLoanIdByRescheduleRequestId(Long.valueOf(id)).orElse(null);
+            } else if (StringUtils.isNumeric(id)) {
+                return Long.valueOf(id);
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            return Long.valueOf(LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(pathInfo).replaceAll("$1"));
         }
     }
 
@@ -85,14 +97,26 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
         return LOAN_PATH_PATTERN.matcher(pathInfo).matches() && pathInfo.contains("external-id");
     }
 
+    private boolean isRescheduleLoans(String pathInfo) {
+        return LOAN_PATH_PATTERN.matcher(pathInfo).matches() && pathInfo.contains("/v1/rescheduleloans/");
+    }
+
     @Override
     protected boolean isApiMatching(String method, String pathInfo) {
         return HTTP_METHODS.contains(HttpMethod.valueOf(method)) && !IGNORE_LOAN_PATH_PATTERN.matcher(pathInfo).find() && URL_FUNCTION.test(pathInfo);
     }
 
+    private boolean isGlim(String pathInfo) {
+        return LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(pathInfo).matches();
+    }
+
     @Override
     public boolean isBypassUser() {
         return context.authenticatedUser().isBypassUser();
+    }
+
+    private List<Long> getGlimChildLoanIds(Long loanIdFromRequest) {
+        return glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true, BigDecimal.valueOf(loanIdFromRequest));
     }
 
     private boolean isLoanHardLocked(Long... loanIds) {
@@ -171,23 +195,28 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
     private List<Long> getLoanIdsFromApi(String pathInfo) {
         List<Long> loanIds = getLoanIdList(pathInfo);
         if (isLoanHardLocked(loanIds) && !isLockOverrulable(loanIds)) {
-            throw new LoanIdsHardLockedException(loanIds.getFirst());
+            throw new LoanIdsHardLockedException(loanIds.get(0));
         } else {
             return loanIds;
         }
     }
 
     private List<Long> getLoanIdList(String pathInfo) {
-        Long loanIdFromRequest = getLoanId(pathInfo);
+        boolean isGlim = isGlim(pathInfo);
+        Long loanIdFromRequest = getLoanId(isGlim, pathInfo);
         if (loanIdFromRequest == null) {
             return Collections.emptyList();
         }
-        return Collections.singletonList(loanIdFromRequest);
+        if (isGlim) {
+            return getGlimChildLoanIds(loanIdFromRequest);
+        } else {
+            return Collections.singletonList(loanIdFromRequest);
+        }
     }
 
     @Override
     public void executeInlineCob(List<Long> loanIds) {
-        inlineLoanCOBExecutorService.execute(loanIds, WorkingCapitalLoanCOBConstant.INLINE_WORKING_CAPITAL_LOAN_COB_JOB_NAME);
+        inlineLoanCOBExecutorService.execute(loanIds, INLINE_LOAN_COB_JOB_NAME);
     }
 
     @Override
@@ -196,12 +225,18 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanCOBFilterHelperImpl(final AbstractAccountLockService<WorkingCapitalLoanAccountLock> loanAccountLockService, final PlatformSecurityContext context, final InlineCommonLockableCOBExecutorService<WorkingCapitalLoanAccountLock> inlineLoanCOBExecutorService, final WorkingCapitalLoanRepository loanRepository, final FineractProperties fineractProperties, final WorkingCapitalLoanRetrieveIdService retrieveIdService) {
+        public LoanCOBFilterHelperImpl(final GLIMAccountInfoRepository glimAccountInfoRepository,
+            final @Qualifier("loanAccountLockService") AccountLockService<?> loanAccountLockService, final PlatformSecurityContext context,
+            final @Qualifier("inlineLoanCOBExecutorServiceImpl") InlineExecutorService<Long> inlineLoanCOBExecutorService,
+            final LoanRepository loanRepository, final FineractProperties fineractProperties,
+            final RetrieveLoanIdService retrieveIdService, final LoanRescheduleRequestRepository loanRescheduleRequestRepository) {
+        this.glimAccountInfoRepository = glimAccountInfoRepository;
         this.loanAccountLockService = loanAccountLockService;
         this.context = context;
         this.inlineLoanCOBExecutorService = inlineLoanCOBExecutorService;
         this.loanRepository = loanRepository;
         this.fineractProperties = fineractProperties;
         this.retrieveIdService = retrieveIdService;
+        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
     }
 }

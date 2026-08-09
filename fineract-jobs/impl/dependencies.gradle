@@ -27,6 +27,18 @@ dependencies {
     implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-useradministration-impl'))
+    implementation(project(path: ':fineract-cob-api'))
+    implementation(project(path: ':fineract-cob-impl'))
+    implementation(project(path: ':fineract-accounting-api'))
+    implementation(project(path: ':fineract-accounting-impl'))
+    implementation(project(path: ':fineract-loan-api'))
+    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-progressive-loan-api'))
+    implementation(project(path: ':fineract-progressive-loan-impl'))
+    implementation(project(path: ':fineract-working-capital-loan-api'))
+    implementation(project(path: ':fineract-working-capital-loan-impl'))
+    implementation(project(path: ':fineract-dataqueries-api'))
+    implementation(project(path: ':fineract-report'))
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
@@ -40,6 +52,9 @@ dependencies {
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
+            'org.apache.commons:commons-collections4',
+            'com.fasterxml.jackson.core:jackson-databind',
+            'org.apache.httpcomponents:httpcore',
             'io.swagger.core.v3:swagger-annotations-jakarta',
             )
     implementation ('org.quartz-scheduler:quartz') {
