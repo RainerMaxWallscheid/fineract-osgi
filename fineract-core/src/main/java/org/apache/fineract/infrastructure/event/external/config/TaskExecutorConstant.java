@@ -23,7 +23,4 @@ public final class TaskExecutorConstant {
     private TaskExecutorConstant() {}
 
     public static final String EVENT_MARKS_AS_SENT_EXECUTOR_BEAN_NAME = "eventMarksAsSentExecutor";
-
-    /** Bean name for external-event JMS producer executor (wired in event-impl). */
-    public static final String EVENT_TASK_EXECUTOR_BEAN_NAME = "externalEventJmsProducerExecutor";
 }

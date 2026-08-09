@@ -10,7 +10,7 @@ Provider peel — global configuration + external services (ADR-022).
 
 Global configuration entity/ports already in `fineract-core` (`ConfigurationDomainService`, `GlobalConfigurationProperty`, …). This peel hosts **external services** properties and JPA/write implementations.
 
-Residual on provider: `configuration.async` (`SpringAsyncConfig` / catch-up executors — uses provider `TaskExecutorConstant`).
+Residual on provider: **closed** — `SpringAsyncConfig` / catch-up executors live in configuration-impl; `TaskExecutorConstant` / `TaskExecutorConfig` in core.
 
 ```bash
 ./gradlew :fineract-configuration-api:jar :fineract-configuration-impl:jar :fineract-configuration-test:test

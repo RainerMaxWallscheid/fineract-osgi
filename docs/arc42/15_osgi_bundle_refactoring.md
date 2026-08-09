@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Monetary write residual **closed** (in monetary-impl); entity → ID/ports (loan/savings/client) still deferred; pure criteria ports after `LoanProductData` on loan-api |
+| **Residual hardening** | Monetary write residual **closed**; configuration.async + TaskExecutor* **closed** (core/configuration-impl); campaigns residual **closed** (write/jobs/SmsConfigUtils/SMS scheduler → campaigns-impl); hooks MessageGateway residual **closed**; COB stayed-locked events → cob-api + event-impl serializers; event residual remaining: share + FD/RD business events/serializers (entity peel); entity → ID/ports (loan/savings/client) still deferred |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

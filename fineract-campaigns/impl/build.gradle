@@ -61,15 +61,19 @@ jar {
                         + 'org.apache.fineract.infrastructure.campaigns.email.handler,'
                         + 'org.apache.fineract.infrastructure.campaigns.email.service,'
                         + 'org.apache.fineract.infrastructure.campaigns.helper,'
+                        + 'org.apache.fineract.infrastructure.campaigns.jobs.executeemail,'
+                        + 'org.apache.fineract.infrastructure.campaigns.jobs.executereportmailingjobs,'
                         + 'org.apache.fineract.infrastructure.campaigns.jobs.getdeliveryreportsfromsmsgateway,'
                         + 'org.apache.fineract.infrastructure.campaigns.jobs.sendmessagetosmsgateway,'
+                        + 'org.apache.fineract.infrastructure.campaigns.jobs.updateemailoutboundwithcampaignmessage,'
                         + 'org.apache.fineract.infrastructure.campaigns.jobs.updatesmsoutboundwithcampaignmessage,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.api,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.domain,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.handler,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.mapper,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.serialization,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.service',
+                        + 'org.apache.fineract.infrastructure.campaigns.sms.service,'
+                        + 'org.apache.fineract.infrastructure.sms.scheduler',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.campaigns.impl'
                 )

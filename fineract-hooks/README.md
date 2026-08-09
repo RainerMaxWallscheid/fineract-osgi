@@ -8,7 +8,7 @@ Provider peel — webhooks / external event hooks (ADR-022).
 | `fineract-hooks-impl` | `impl/` | `org.apache.fineract.hooks.impl` | Entities, REST, processors, OSGi |
 | `fineract-hooks-test` | `test/` | `org.apache.fineract.hooks.test` | Fragment-Host → impl |
 
-Residual: `MessageGatewayHookProcessor` stays on provider (SMS coupling).
+Residual: **closed** — `MessageGatewayHookProcessor` in hooks-impl (sms + campaigns scheduler).
 `HookEvent` / `HookEventSource` residual in core for command processing.
 
 ```bash

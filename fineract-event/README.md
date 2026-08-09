@@ -13,7 +13,8 @@ Core already holds notifier/ports, ExternalEvent entity/repos, serializers facto
 Residual on provider:
 - share account business events + mappers/serializers (`ShareAccount` still on provider)
 - deposit (FD/RD) business events + mappers/serializers (`FixedDepositAccount`/`RecurringDepositAccount` still on provider)
-- loan `LoanAccountsStayedLocked*` mapper/serializer (COB residual event type)
+
+Closed residual: `LoanAccountsStayedLocked*` types in cob-api; mappers/serializers in event-impl.
 
 ```bash
 ./gradlew :fineract-event-api:jar :fineract-event-impl:jar :fineract-event-test:test

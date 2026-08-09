@@ -93,13 +93,13 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-collateral` | **complete** (api/impl/test); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
 | `fineract-collateralmanagement` | **complete** (api/impl/test); entity residual **closed** (entities on impl; Loan inverse collection removed) |
 | `fineract-note` | **complete** (api/impl/test); FK-based Note entity; share residual via ShareAccountNoteSupport |
-| `fineract-hooks` | **complete** (api/impl/test); ports DTO-only + HookEventQueryService on impl; MessageGatewayHookProcessor residual (SMS/provider); HookEvent residual in core; Template via template-impl |
-| `fineract-sms` | **complete** (api/impl/test); campaignId Long FK; scheduled job residual (campaigns SmsConfigUtils + GCM); MessageGateway residual still on provider |
-| `fineract-reportmailingjob` | **complete** (api/impl/test); stretchyReportId Long FK (dataqueries Report residual); AppUser @ManyToOne (core); ExecuteReportMailingJobs residual in campaigns |
-| `fineract-campaigns` | **complete** (api/impl/test); Report FKs Long; residual write/domain/jobs on provider (dataqueries ReadReporting/Report + loan event coupling) |
+| `fineract-hooks` | **complete** (api/impl/test); ports DTO-only + HookEventQueryService on impl; MessageGatewayHookProcessor **closed** (hooks-impl via sms + campaigns); HookEvent residual in core; Template via template-impl |
+| `fineract-sms` | **complete** (api/impl/test); campaignId Long FK; scheduled job residual **closed** into campaigns-impl (`SmsMessageScheduledJobService`) |
+| `fineract-reportmailingjob` | **complete** (api/impl/test); stretchyReportId Long FK (dataqueries Report residual); AppUser @ManyToOne (core); ExecuteReportMailingJobs in campaigns-impl |
+| `fineract-campaigns` | **complete** (api/impl/test); Report FKs Long; residual write/domain/jobs **closed** (campaigns-impl; dataqueries/gcm/configuration/loan/savings/event) |
 | `fineract-gcm` | **complete** (api/impl/test); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
 | `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
-| `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual on provider |
+| `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
 | `fineract-bulkimport` | **complete** (api/impl/test); ports/DTOs in core; residual on provider: populator service + share-account import/populators + guarantor import (GuarantorData still on provider) |
 | `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO peeled; constants + servlet filter remain in core |
 | `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |

@@ -34,6 +34,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.cob.data,'
                         + 'org.apache.fineract.cob.domain,'
                         + 'org.apache.fineract.cob.exceptions,'
+                        + 'org.apache.fineract.cob.loan,'
                         + 'org.apache.fineract.cob.service',
                 'Automatic-Module-Name': 'org.apache.fineract.cob.api'
                 )

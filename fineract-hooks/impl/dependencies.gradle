@@ -24,6 +24,11 @@ dependencies {
     // UGD template residual entity + template ports
     implementation(project(path: ':fineract-template-api'))
     implementation(project(path: ':fineract-template-impl'))
+    // MessageGatewayHookProcessor → SMS + campaigns scheduler residual
+    implementation(project(path: ':fineract-sms-api'))
+    implementation(project(path: ':fineract-sms-impl'))
+    implementation(project(path: ':fineract-campaigns-api'))
+    implementation(project(path: ':fineract-campaigns-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

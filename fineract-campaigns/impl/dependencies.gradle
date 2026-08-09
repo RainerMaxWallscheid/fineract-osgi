@@ -24,6 +24,14 @@ dependencies {
     implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-sms-api'))
     implementation(project(path: ':fineract-sms-impl'))
+    implementation(project(path: ':fineract-gcm-api'))
+    implementation(project(path: ':fineract-gcm-impl'))
+    implementation(project(path: ':fineract-configuration-api'))
+    implementation(project(path: ':fineract-configuration-impl'))
+    implementation(project(path: ':fineract-dataqueries-api'))
+    implementation(project(path: ':fineract-dataqueries-impl'))
+    implementation(project(path: ':fineract-event-api'))
+    implementation(project(path: ':fineract-event-impl'))
     implementation(project(path: ':fineract-reportmailingjob-api'))
     implementation(project(path: ':fineract-reportmailingjob-impl'))
     implementation(project(path: ':fineract-loan-api'))
@@ -45,6 +53,8 @@ dependencies {
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
+            'org.apache.commons:commons-collections4',
+            'com.github.spullara.mustache.java:compiler',
             'io.swagger.core.v3:swagger-annotations-jakarta',
             'io.github.resilience4j:resilience4j-spring-boot3',
             'com.sun.mail:jakarta.mail',
