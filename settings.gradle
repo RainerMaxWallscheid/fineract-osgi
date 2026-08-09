@@ -276,6 +276,14 @@ include ':fineract-s3-test'
 project(':fineract-s3-test').projectDir = file('fineract-s3/test')
 // No :fineract-s3 façade — depend on -api / -impl explicitly.
 
+include ':fineract-openapi-api'
+project(':fineract-openapi-api').projectDir = file('fineract-openapi/api')
+include ':fineract-openapi-impl'
+project(':fineract-openapi-impl').projectDir = file('fineract-openapi/impl')
+include ':fineract-openapi-test'
+project(':fineract-openapi-test').projectDir = file('fineract-openapi/test')
+// No :fineract-openapi façade — depend on -api / -impl explicitly.
+
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')
 include ':fineract-cob-impl'

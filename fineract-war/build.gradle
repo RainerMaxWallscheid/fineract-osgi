@@ -142,6 +142,8 @@ dependencies {
     implementation project(':fineract-jobs-impl')
     implementation project(':fineract-s3-api')
     implementation project(':fineract-s3-impl')
+    implementation project(':fineract-openapi-api')
+    implementation project(':fineract-openapi-impl')
     implementation project(':fineract-accounting-api')
     implementation project(':fineract-accounting-impl')
     implementation project(':fineract-investor-api')
