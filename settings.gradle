@@ -244,6 +244,13 @@ project(':fineract-configuration-impl').projectDir = file('fineract-configuratio
 include ':fineract-configuration-test'
 project(':fineract-configuration-test').projectDir = file('fineract-configuration/test')
 // No :fineract-configuration façade — depend on -api / -impl explicitly.
+include ':fineract-bulkimport-api'
+project(':fineract-bulkimport-api').projectDir = file('fineract-bulkimport/api')
+include ':fineract-bulkimport-impl'
+project(':fineract-bulkimport-impl').projectDir = file('fineract-bulkimport/impl')
+include ':fineract-bulkimport-test'
+project(':fineract-bulkimport-test').projectDir = file('fineract-bulkimport/test')
+// No :fineract-bulkimport façade — depend on -api / -impl explicitly.
 
 
 
