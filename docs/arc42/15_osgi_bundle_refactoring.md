@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Tax residual **closed**; security residual **partial** (services closed; filter chains + TwoFactorServiceImpl remain); accounting dropdown + running-balance job **closed**; charge office/accounting adapters **closed**; loan Rate catalog residual **closed** (rates-impl); still: event share/FD/RD, bulkimport share/guarantor, notification domain listeners, accounting processors (loan/savings/shares), accrual write (loan cycle) |
+| **Residual hardening** | Commands/maker-checker audit residual **closed** (command-impl); pure journal charge/tax DTOs → accounting-api; loan/savings journal DTOs + GLAccountBalanceHolder → accounting-impl; still: journal write/processors/shares DTOs, event share/FD/RD, bulkimport share/guarantor, notification domain listeners, security filter chains + TwoFactorServiceImpl |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

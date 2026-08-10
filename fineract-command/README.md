@@ -19,6 +19,11 @@ No `:fineract-command` façade (Step 8 closed). Depend on **`fineract-command-ap
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
 Spring remains inside **impl**.  
 
+
+### Residual closed
+
+Maker-checker / audit REST + `AuditReadPlatformService` live in **command-impl** (`org.apache.fineract.commands.*`).
+
 ```bash
 ./gradlew :fineract-command-test:test              # impl white-box
 ./gradlew :fineract-command-jdbc:test              # satellite ITs use integrationtest fixtures
