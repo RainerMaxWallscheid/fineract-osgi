@@ -19,6 +19,7 @@
 
 dependencies {
     api project(path: ':fineract-loan-api')
+    implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-note-api'))
 
     implementation(project(path: ':fineract-core'))

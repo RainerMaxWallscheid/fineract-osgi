@@ -161,6 +161,17 @@ project.afterEvaluate {
     tasks.named('compileJava') {
         dependsOn(generateStaticWeavingPersistenceXml)
 
+        // StaticWeave runs in doLast with runtimeClasspath. The Java plugin only wires
+        // compileClasspath → dependency compileJava; runtimeClasspath often resolves to
+        // project JARs. Without an explicit configuration dependency, those JARs are not
+        // built before this task after a clean, and EclipseLink then reports entities that
+        // extend AbstractPersistableCustom as having "no primary key" (MappedSuperclass
+        // bytecode missing from the weave classpath).
+        def runtimeClasspath = project.configurations.findByName('runtimeClasspath')
+        if (runtimeClasspath != null) {
+            dependsOn(runtimeClasspath)
+        }
+
         doLast {
             File persistenceXml = generatedPersistenceXml.get().asFile
             if (!persistenceXml.exists()) {
@@ -171,6 +182,14 @@ project.afterEvaluate {
             File source = destinationDirectory.get().asFile
             File weavingRoot = persistenceXml.parentFile.parentFile
 
+            // Weave MappedSuperclass types together with entities. EclipseLink puts shared
+            // fetch-group / change-tracking helpers (_persistence_checkFetched,
+            // _persistence_propertyChange, …) on AbstractPersistableCustom; entity accessors
+            // invoke them. Leaving those superclasses unweaved (or restoring them after weave)
+            // produces NoSuchMethodError at runtime.
+            //
+            // Dependents can still weave after a clean because compileJava dependsOn(runtimeClasspath)
+            // above, so project JARs that carry the woven MappedSuperclass (+ @Id) are present.
             project.javaexec {
                 description = 'Performs EclipseLink static weaving of entity classes'
                 mainClass.set('org.eclipse.persistence.tools.weaving.jpa.StaticWeave')

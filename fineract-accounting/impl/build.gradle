@@ -63,6 +63,7 @@ jar {
                         + 'org.apache.fineract.accounting.glaccount.domain,'
                         + 'org.apache.fineract.accounting.jobs.accountrunningbalanceupdate,'
                         + 'org.apache.fineract.accounting.journalentry.api,'
+                        + 'org.apache.fineract.accounting.journalentry.data,'
                         + 'org.apache.fineract.accounting.journalentry.domain,'
                         + 'org.apache.fineract.accounting.journalentry.handler,'
                         + 'org.apache.fineract.accounting.journalentry,'

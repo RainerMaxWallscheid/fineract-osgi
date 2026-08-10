@@ -10,10 +10,11 @@ Provider peel — Excel workbook import (ADR-022).
 
 Public ports `BulkImportWorkbookService` / `BulkImportWorkbookPopulatorService` and main DTOs already live in **core**.
 
-Residual on provider (share / guarantor not peeled):
+Guarantor import residual **closed** (`GuarantorImportHandler` in bulkimport-impl; guarantor DTOs on loan-impl).
+
+Residual on provider (share not peeled):
 - `BulkImportWorkbookPopulatorServiceImpl` (orchestrates all workbook templates; needs share product ports)
 - shared-account import handler + workbook populators
-- `GuarantorImportHandler` (`GuarantorData` still on provider)
 
 ```bash
 ./gradlew :fineract-bulkimport-api:jar :fineract-bulkimport-impl:jar :fineract-bulkimport-test:test

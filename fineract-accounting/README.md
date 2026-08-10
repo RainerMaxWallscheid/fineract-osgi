@@ -28,7 +28,7 @@ Still residual on provider: loan/savings/shares journal processors, provisioning
 product-to-GL write (share mapping helper), accrual write (loan accruals cycle).
 
 
-Residual journal DTOs: pure charge/tax payment DTOs on **api**; loan/savings DTOs + `GLAccountBalanceHolder` on **impl**. Write/processors/shares DTOs remain on provider.
+Residual journal DTOs: pure charge/tax payment DTOs on **api**; loan/savings/**shares** DTOs + `GLAccountBalanceHolder` on **impl** (`ShareAccountTransactionEnumData` in core). Write/processors remain on provider.
 
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test
