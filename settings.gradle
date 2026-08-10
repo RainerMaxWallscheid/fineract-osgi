@@ -300,6 +300,15 @@ include ':fineract-event-test'
 project(':fineract-event-test').projectDir = file('fineract-event/test')
 // No :fineract-event façade — depend on -api / -impl explicitly.
 
+include ':fineract-interoperation-api'
+project(':fineract-interoperation-api').projectDir = file('fineract-interoperation/api')
+include ':fineract-interoperation-impl'
+project(':fineract-interoperation-impl').projectDir = file('fineract-interoperation/impl')
+include ':fineract-interoperation-test'
+project(':fineract-interoperation-test').projectDir = file('fineract-interoperation/test')
+// No :fineract-interoperation façade — depend on -api / -impl explicitly.
+
+
 include ':fineract-cob-api'
 project(':fineract-cob-api').projectDir = file('fineract-cob/api')
 include ':fineract-cob-impl'

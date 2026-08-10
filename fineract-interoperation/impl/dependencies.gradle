@@ -18,49 +18,36 @@
  */
 
 dependencies {
-    api project(path: ':fineract-savings-api')
-
+    api project(path: ':fineract-interoperation-api')
     implementation(project(path: ':fineract-core'))
-    // Interop domain enums live in interoperation-api; entity residual in savings-impl
-    implementation(project(path: ':fineract-interoperation-api'))
-    implementation(project(path: ':fineract-cob-api'))
-    implementation(project(path: ':fineract-cob-impl'))
-    implementation(project(path: ':fineract-accounting-api'))
-    implementation(project(path: ':fineract-accounting-impl'))
-    implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-rates-api'))
-    implementation(project(path: ':fineract-tax-api'))
-    // ColumnValidator (SQL order-by safety) lives in security-impl residual
+    implementation(project(path: ':fineract-command-api'))
+    implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-security-impl'))
+    implementation(project(path: ':fineract-savings-api'))
+    implementation(project(path: ':fineract-savings-impl'))
+    implementation(project(path: ':fineract-loan-api'))
+    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-note-api'))
+    implementation(project(path: ':fineract-note-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
+            'org.springframework.boot:spring-boot-starter-validation',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'org.glassfish.jersey.media:jersey-media-multipart',
-
             'com.google.guava:guava',
             'com.google.code.gson:gson',
-
             'org.apache.commons:commons-lang3',
-
-            'com.jayway.jsonpath:json-path',
-
             'io.swagger.core.v3:swagger-annotations-jakarta',
-
-            'com.squareup.retrofit2:converter-gson',
-
-            'org.springdoc:springdoc-openapi-starter-webmvc-ui',
-            'org.mapstruct:mapstruct',
-
             'io.github.resilience4j:resilience4j-spring-boot3',
             )
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
     }
     implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

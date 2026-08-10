@@ -19,7 +19,6 @@
 package org.apache.fineract.interoperation.data;
 
 import jakarta.validation.constraints.NotNull;
-import org.apache.fineract.interoperation.domain.InteropIdentifier;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 
 public class InteropIdentifierData {
@@ -33,27 +32,19 @@ public class InteropIdentifierData {
         this(idType, idValue, null);
     }
 
-    public static InteropIdentifierData build(InteropIdentifier identifier) {
-        return new InteropIdentifierData(identifier.getType(), identifier.getValue(), identifier.getSubType());
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public InteropIdentifierType getIdType() {
+    public InteropIdentifierType getIdType() {
         return this.idType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getIdValue() {
+    public String getIdValue() {
         return this.idValue;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getSubIdOrType() {
+    public String getSubIdOrType() {
         return this.subIdOrType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public InteropIdentifierData(final InteropIdentifierType idType, final String idValue, final String subIdOrType) {
+    public InteropIdentifierData(final InteropIdentifierType idType, final String idValue, final String subIdOrType) {
         this.idType = idType;
         this.idValue = idValue;
         this.subIdOrType = subIdOrType;

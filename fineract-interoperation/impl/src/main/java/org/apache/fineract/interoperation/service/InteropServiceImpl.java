@@ -54,6 +54,7 @@ import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.interoperation.data.InteropAccountData;
+import org.apache.fineract.interoperation.data.InteropDataFactory;
 import org.apache.fineract.interoperation.data.InteropIdentifierAccountResponseData;
 import org.apache.fineract.interoperation.data.InteropIdentifierRequestData;
 import org.apache.fineract.interoperation.data.InteropIdentifiersResponseData;
@@ -176,7 +177,7 @@ public class InteropServiceImpl implements InteropService {
     @Override
     @Transactional
     public InteropAccountData getAccountDetails(@NonNull String accountId) {
-        return InteropAccountData.build(validateAndGetSavingAccount(accountId));
+        return InteropDataFactory.account(validateAndGetSavingAccount(accountId));
     }
 
     @NonNull
@@ -195,7 +196,7 @@ public class InteropServiceImpl implements InteropService {
             java.time.LocalDateTime transactionDate = t.getTransactionDate().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
             return (transactionsTo == null || transactionsTo.compareTo(transactionDate) > 0) && (transactionsFrom == null || transactionsFrom.compareTo(transactionDate.withHour(23).withMinute(59).withSecond(59)) <= 0);
         };
-        InteropTransactionsData interopTransactionsData = InteropTransactionsData.build(savingsAccount, transFilter);
+        InteropTransactionsData interopTransactionsData = InteropDataFactory.transactions(savingsAccount, transFilter);
         for (InteropTransactionData interopTransactionData : interopTransactionsData.getTransactions()) {
             final List<Note> transactionNotes = noteRepository
                     .findBySavingsTransactionId(Long.valueOf(interopTransactionData.getSavingTransactionId()));
@@ -223,7 +224,7 @@ public class InteropServiceImpl implements InteropService {
     @Transactional
     public InteropIdentifiersResponseData getAccountIdentifiers(@NonNull String accountId) {
         SavingsAccount savingsAccount = validateAndGetSavingAccount(accountId);
-        return InteropIdentifiersResponseData.build(savingsAccount);
+        return InteropDataFactory.identifiers(savingsAccount);
     }
 
     @NonNull

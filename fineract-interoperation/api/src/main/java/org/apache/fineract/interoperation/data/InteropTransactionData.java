@@ -21,16 +21,11 @@ package org.apache.fineract.interoperation.data;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountChargePaidBy;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 
 /**
  * Single savings transaction view for interop. Composes a resource id instead of
- * extending {@code CommandProcessingResult}.
+ * extending {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
  */
 public final class InteropTransactionData {
 
@@ -68,29 +63,6 @@ public final class InteropTransactionData {
         this.bookingDateTime = bookingDateTime;
         this.valueDateTime = valueDateTime;
         this.note = note;
-    }
-
-    public static InteropTransactionData build(SavingsAccountTransaction transaction) {
-        if (transaction == null) {
-            return null;
-        }
-        SavingsAccount savingsAccount = transaction.getSavingsAccount();
-        String transactionId = transaction.getId().toString();
-        SavingsAccountTransactionType transactionType = transaction.getTransactionType();
-        BigDecimal amount = transaction.getAmount();
-        BigDecimal chargeAmount = null;
-        for (SavingsAccountChargePaidBy charge : transaction.getSavingsAccountChargesPaid()) {
-            chargeAmount = MathUtil.add(chargeAmount, charge.getAmount());
-        }
-        String currency = savingsAccount.getCurrency().getCode();
-        BigDecimal runningBalance = transaction.getRunningBalance(savingsAccount.getCurrency()).getAmount();
-        LocalDate bookingDateTime = transaction.getTransactionDate();
-        LocalDate endOfBalanceLocalDate = transaction.getEndOfBalanceDate();
-        LocalDate valueDateTime = endOfBalanceLocalDate == null ? bookingDateTime : endOfBalanceLocalDate;
-        StringBuilder sb = new StringBuilder();
-        sb.append(SavingsEnumerations.transactionType(transactionType).getValue());
-        return new InteropTransactionData(savingsAccount.getId(), savingsAccount.getExternalId().getValue(), transactionId, transactionType,
-                amount, chargeAmount, currency, runningBalance, bookingDateTime, valueDateTime, sb.toString());
     }
 
     public void updateNote(String note) {

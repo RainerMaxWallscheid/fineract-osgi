@@ -19,15 +19,12 @@
 package org.apache.fineract.interoperation.data;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.interoperation.domain.InteropIdentifier;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 /**
  * Account identifiers list response. Composes command-result identifiers instead of
- * extending {@code CommandProcessingResult}.
+ * extending {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
  */
 public final class InteropIdentifiersResponseData {
 
@@ -39,7 +36,7 @@ public final class InteropIdentifiersResponseData {
     @NotNull
     private final List<InteropIdentifierData> identifiers;
 
-    private InteropIdentifiersResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
+    public InteropIdentifiersResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
             @NotNull List<InteropIdentifierData> identifiers) {
         this.resourceId = resourceId;
         this.officeId = officeId;
@@ -48,18 +45,8 @@ public final class InteropIdentifiersResponseData {
         this.identifiers = identifiers;
     }
 
-    private InteropIdentifiersResponseData(@NotNull List<InteropIdentifierData> identifiers) {
+    public InteropIdentifiersResponseData(@NotNull List<InteropIdentifierData> identifiers) {
         this(null, null, null, null, identifiers);
-    }
-
-    public static InteropIdentifiersResponseData build(SavingsAccount account) {
-        List<InteropIdentifierData> result = new ArrayList<>();
-        if (account != null) {
-            for (InteropIdentifier identifier : account.getIdentifiers()) {
-                result.add(InteropIdentifierData.build(identifier));
-            }
-        }
-        return new InteropIdentifiersResponseData(result);
     }
 
     public Long getResourceId() {
