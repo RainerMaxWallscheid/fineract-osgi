@@ -63,10 +63,13 @@ jar {
                         + 'org.apache.fineract.infrastructure.event.business.domain.loan.product,'
                         + 'org.apache.fineract.infrastructure.event.business.domain.savings,'
                         + 'org.apache.fineract.infrastructure.event.business.domain.savings.transaction,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.share,'
                         + 'org.apache.fineract.infrastructure.event.external.config,'
                         + 'org.apache.fineract.infrastructure.event.external.producer.jms,'
                         + 'org.apache.fineract.infrastructure.event.external.producer.kafka,'
                         + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.client,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.fixeddeposit,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.recurringdeposit,'
                         + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.event.impl'

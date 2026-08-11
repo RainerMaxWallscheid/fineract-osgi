@@ -10,11 +10,14 @@ Provider peel — business events + external event producers/serializers (ADR-02
 
 Core already holds notifier/ports, ExternalEvent entity/repos, serializers factory, and job tasklets.
 
-Residual on provider:
-- share account business events + mappers/serializers (`ShareAccount` still on provider)
-- deposit (FD/RD) business events + mappers/serializers (`FixedDepositAccount`/`RecurringDepositAccount` still on provider)
+Residual on provider (entity-typed — entities still hosted in provider):
+- share account business events + mappers/serializers (`ShareAccount` residual)
+- deposit (FD/RD) business events + serializers (`FixedDepositAccount`/`RecurringDepositAccount` residual)
 
-Closed residual: `LoanAccountsStayedLocked*` types in cob-api; mappers/serializers in event-impl.
+Closed residual:
+- `LoanAccountsStayedLocked*` types in cob-api; mappers/serializers in event-impl
+- FD/RD Avro **mappers** → event-impl (DTOs already on savings-api)
+- `ShareProductDividentsCreateBusinessEvent` → event-impl (payload is product id `Long` only)
 
 ```bash
 ./gradlew :fineract-event-api:jar :fineract-event-impl:jar :fineract-event-test:test

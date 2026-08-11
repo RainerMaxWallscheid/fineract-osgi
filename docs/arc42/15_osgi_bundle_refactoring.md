@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Commands audit residual **closed**; journal charge/loan/savings DTOs closed; shares journal DTOs + `ShareAccountTransactionEnumData` **closed** (core/accounting-impl); guarantor DTOs → loan-impl + GuarantorImportHandler → bulkimport-impl; still: bulkimport share residual, event share/FD/RD, journal write/processors, notification listeners, security filter chains + TwoFactorServiceImpl |
+| **Residual hardening** | Commands audit residual **closed**; journal DTOs (charge/loan/savings/shares + `ClientTransactionDTO`) closed; guarantor residual closed; `ClientTransactionType` → core; FD/RD event mappers + `ShareProductDividentsCreateBusinessEvent` → event-impl; still: bulkimport share residual, share/FD/RD entity-typed events + serializers, journal write/processors, notification listeners, security filter chains + TwoFactorServiceImpl |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---
