@@ -75,7 +75,8 @@ jar {
                         + 'org.apache.fineract.accounting.producttoaccountmapping.service,'
                         + 'org.apache.fineract.accounting.retainedearning.domain,'
                         + 'org.apache.fineract.accounting.rule.domain,'
-                        + 'org.apache.fineract.accounting.rule.starter',
+                        + 'org.apache.fineract.accounting.rule.starter,'
+                        + 'org.apache.fineract.accounting.accrual.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.accounting.impl'
                 )
     }

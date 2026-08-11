@@ -31,10 +31,10 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualsProcessingService;
+import org.apache.fineract.portfolio.loanaccount.service.LoanPeriodicAccrualPort;
 
 public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccountingWritePlatformService {
-    private final LoanAccrualsProcessingService loanAccrualsProcessingService;
+    private final LoanPeriodicAccrualPort loanPeriodicAccrualPort;
     private final AccrualAccountingDataValidator accountingDataValidator;
 
     @Override
@@ -42,7 +42,7 @@ public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccount
         this.accountingDataValidator.validateLoanPeriodicAccrualData(command.json());
         LocalDate tillDate = command.localDateValueOfParameterNamed(ACCRUE_TILL_PARAM_NAME);
         try {
-            this.loanAccrualsProcessingService.addPeriodicAccruals(tillDate);
+            this.loanPeriodicAccrualPort.addPeriodicAccruals(tillDate);
         } catch (MultiException e) {
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(PERIODIC_ACCRUAL_ACCOUNTING_RESOURCE_NAME);
@@ -53,8 +53,8 @@ public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccount
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccrualAccountingWritePlatformServiceImpl(final LoanAccrualsProcessingService loanAccrualsProcessingService, final AccrualAccountingDataValidator accountingDataValidator) {
-        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
+        public AccrualAccountingWritePlatformServiceImpl(final LoanPeriodicAccrualPort loanPeriodicAccrualPort, final AccrualAccountingDataValidator accountingDataValidator) {
+        this.loanPeriodicAccrualPort = loanPeriodicAccrualPort;
         this.accountingDataValidator = accountingDataValidator;
     }
 }

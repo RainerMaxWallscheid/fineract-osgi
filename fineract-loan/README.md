@@ -11,6 +11,9 @@ Loan products & accounts — Wave 4 OSGi modularization
 
 No `:fineract-loan` façade.
 
+`LoanPeriodicAccrualPort` (loan-api) + `LoanPeriodicAccrualPortAdapter` (loan-impl) break the
+loan↔accounting residual cycle so accounting-impl can drive periodic accruals without depending on loan-impl.
+
 ### Consumers
 
 | Module | Depend on |
