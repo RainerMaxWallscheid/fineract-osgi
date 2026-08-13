@@ -68,6 +68,7 @@ jar {
                         + 'org.apache.fineract.accounting.journalentry.handler,'
                         + 'org.apache.fineract.accounting.journalentry,'
                         + 'org.apache.fineract.accounting.journalentry.service,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.journalentry,'
                         + 'org.apache.fineract.accounting.closure.domain,'
                         + 'org.apache.fineract.accounting.financialactivityaccount.domain,'
                         + 'org.apache.fineract.accounting.financialactivityaccount.exception,'

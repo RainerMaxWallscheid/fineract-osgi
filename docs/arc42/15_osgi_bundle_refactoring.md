@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Product-to-GL write closed; **journal command handlers + read impl** → accounting-impl via `JournalEntryCommandWritePort` + `LoanTransactionEnumerations` (loan-api); still: bulkimport share residual, share/FD/RD entity-typed events + serializers, journal write/processors, provisioning write, notification listeners, security filter chains + TwoFactorServiceImpl |
+| **Residual hardening** | Journal handlers/read closed; **AccountingProcessorHelper** + client processors + `LoanJournalEntryCreatedBusinessEvent` → accounting-impl; still: bulkimport share residual, share/FD/RD entity-typed events + serializers, loan/savings/share **journal processors** + write service, provisioning write, notification listeners, security filter chains + TwoFactorServiceImpl |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---
