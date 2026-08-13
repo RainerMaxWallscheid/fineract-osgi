@@ -17,6 +17,9 @@ loan↔accounting residual cycle so accounting-impl can drive periodic accruals 
 `LoanProductConstants` lives on **loan-api** (JSON param names). `LoanProductToGLAccountMappingHelper`
 moved to **accounting-impl** with product-to-GL write (no loan entity dependency).
 
+`LoanTransactionEnumerations` (loan-api) exposes transaction-type enum mapping for accounting/journal residual;
+`LoanEnumerations` in loan-impl delegates those methods.
+
 ### Consumers
 
 | Module | Depend on |

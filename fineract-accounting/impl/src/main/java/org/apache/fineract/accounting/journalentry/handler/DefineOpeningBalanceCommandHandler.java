@@ -18,27 +18,25 @@
  */
 package org.apache.fineract.accounting.journalentry.handler;
 
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.journalentry.service.JournalEntryCommandWritePort;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@CommandType(entity = "JOURNALENTRY", action = "REVERSE")
-public class ReverseJournalEntryCommandHandler implements NewCommandSourceHandler {
-    private final JournalEntryWritePlatformService writePlatformService;
+@CommandType(entity = "JOURNALENTRY", action = "DEFINEOPENINGBALANCE")
+public class DefineOpeningBalanceCommandHandler implements NewCommandSourceHandler {
+    private final JournalEntryCommandWritePort writePlatformService;
 
-    @Transactional
     @Override
-    public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.writePlatformService.revertJournalEntry(command);
+    public CommandProcessingResult processCommand(JsonCommand command) {
+        return this.writePlatformService.defineOpeningBalance(command);
     }
 
     @java.lang.SuppressWarnings("all")
-        public ReverseJournalEntryCommandHandler(final JournalEntryWritePlatformService writePlatformService) {
+        public DefineOpeningBalanceCommandHandler(final JournalEntryCommandWritePort writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

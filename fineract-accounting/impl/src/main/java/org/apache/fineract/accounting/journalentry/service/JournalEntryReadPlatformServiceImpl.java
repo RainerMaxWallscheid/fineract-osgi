@@ -54,7 +54,7 @@ import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.apache.fineract.portfolio.loanproduct.service.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
@@ -170,7 +170,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                 }
                 TransactionTypeEnumData transactionTypeEnumData = null;
                 if (PortfolioAccountType.LOAN.equals(PortfolioAccountType.fromInt(entityTypeId))) {
-                    final LoanTransactionEnumData loanTransactionType = LoanEnumerations.transactionType(JdbcSupport.getInteger(rs, "loanTransactionType"));
+                    final LoanTransactionEnumData loanTransactionType = LoanTransactionEnumerations.transactionType(JdbcSupport.getInteger(rs, "loanTransactionType"));
                     transactionTypeEnumData = new TransactionTypeEnumData(loanTransactionType.getId(), loanTransactionType.getCode(), loanTransactionType.getValue());
                 } else if (PortfolioAccountType.SAVINGS.equals(PortfolioAccountType.fromInt(entityTypeId))) {
                     final SavingsAccountTransactionEnumData savingsTransactionType = SavingsEnumerations.transactionType(JdbcSupport.getInteger(rs, "savingsTransactionType"));

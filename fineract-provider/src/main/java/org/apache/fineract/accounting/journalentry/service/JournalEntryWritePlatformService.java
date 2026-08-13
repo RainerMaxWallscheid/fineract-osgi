@@ -30,7 +30,7 @@ import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
-public interface JournalEntryWritePlatformService {
+public interface JournalEntryWritePlatformService extends JournalEntryCommandWritePort {
 
     CommandProcessingResult createJournalEntry(JsonCommand command);
 

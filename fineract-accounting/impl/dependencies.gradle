@@ -24,6 +24,9 @@ dependencies {
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-organisation-api'))
     implementation(project(path: ':fineract-charge-api'))
+    implementation(project(path: ':fineract-note-api'))
+    // ColumnValidator for journal entry SQL order-by safety
+    implementation(project(path: ':fineract-security-impl'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
