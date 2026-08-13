@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.security.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -34,9 +33,7 @@ import org.apache.fineract.infrastructure.security.domain.TFAccessTokenRepositor
 import org.apache.fineract.infrastructure.security.exception.AccessTokenInvalidIException;
 import org.apache.fineract.infrastructure.security.exception.OTPDeliveryMethodInvalidException;
 import org.apache.fineract.infrastructure.security.exception.OTPTokenInvalidException;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
-import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
+import org.apache.fineract.infrastructure.campaigns.sms.service.TwoFactorSmsDeliveryPort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,25 +49,22 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 
     private final AccessTokenGenerationService accessTokenGenerationService;
     private final PlatformEmailService emailService;
-    private final SmsMessageScheduledJobService smsMessageScheduledJobService;
+    private final TwoFactorSmsDeliveryPort twoFactorSmsDeliveryPort;
 
     private final OTPRequestRepository otpRequestRepository;
     private final TFAccessTokenRepository tfAccessTokenRepository;
-    private final SmsMessageRepository smsMessageRepository;
 
     private final TwoFactorConfigurationService configurationService;
 
     @Autowired
     public TwoFactorServiceImpl(AccessTokenGenerationService accessTokenGenerationService, PlatformEmailService emailService,
-            SmsMessageScheduledJobService smsMessageScheduledJobService, OTPRequestRepository otpRequestRepository,
-            TFAccessTokenRepository tfAccessTokenRepository, SmsMessageRepository smsMessageRepository,
-            TwoFactorConfigurationService configurationService) {
+            TwoFactorSmsDeliveryPort twoFactorSmsDeliveryPort, OTPRequestRepository otpRequestRepository,
+            TFAccessTokenRepository tfAccessTokenRepository, TwoFactorConfigurationService configurationService) {
         this.accessTokenGenerationService = accessTokenGenerationService;
         this.emailService = emailService;
-        this.smsMessageScheduledJobService = smsMessageScheduledJobService;
+        this.twoFactorSmsDeliveryPort = twoFactorSmsDeliveryPort;
         this.otpRequestRepository = otpRequestRepository;
         this.tfAccessTokenRepository = tfAccessTokenRepository;
-        this.smsMessageRepository = smsMessageRepository;
         this.configurationService = configurationService;
     }
 
@@ -99,10 +93,8 @@ public class TwoFactorServiceImpl implements TwoFactorService {
             }
             final OTPRequest request = generateNewToken(smsDelivery, extendedAccessToken);
             final String smsText = configurationService.getFormattedSmsTextFor(user, request);
-            SmsMessage smsMessage = SmsMessage.pendingSms(null, null, null, user.getStaff(), smsText, user.getStaff().getMobileNo(), null,
-                    false);
-            this.smsMessageRepository.save(smsMessage);
-            smsMessageScheduledJobService.sendTriggeredMessage(Collections.singleton(smsMessage), configurationService.getSMSProviderId());
+            this.twoFactorSmsDeliveryPort.deliverOtpSms(user.getStaff(), user.getStaff().getMobileNo(), smsText,
+                    configurationService.getSMSProviderId().longValue());
             otpRequestRepository.addOTPRequest(user, request);
             return request;
         } else if (TwoFactorConstants.EMAIL_DELIVERY_METHOD_NAME.equalsIgnoreCase(deliveryMethodName)) {

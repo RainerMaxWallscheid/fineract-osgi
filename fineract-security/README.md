@@ -26,11 +26,11 @@ Moved into this module (residual peel): `PlatformUserDetailsService`, `SqlInject
 
 ### Residual still on provider
 
-- `AuthorizationServerConfig` / `OidcFederationSecurityConfig` (jobs COB filters → jobs-impl; jobs already depends on security-impl)
-- `TwoFactorServiceImpl` (SMS send path → sms/campaigns; both depend on security-impl)
+- `AuthorizationServerConfig` / `OidcFederationSecurityConfig` (composition-root security wiring)
 
-Closed into security-impl: 2FA config, OIDC user resolution, login lockout, temporary-password auth provider,
-dynamic JWT issuer resolver, security filter-chain diagnostics. `RoleRepository` moved to core next to `Role`.
+Closed into security-impl: 2FA config + **`TwoFactorServiceImpl`** (OTP SMS via campaigns-api `TwoFactorSmsDeliveryPort`),
+OIDC user resolution, login lockout, temporary-password auth provider, dynamic JWT issuer resolver,
+security filter-chain diagnostics. `RoleRepository` moved to core next to `Role`.
 
 ```bash
 ./gradlew :fineract-security-api:jar :fineract-security-impl:jar :fineract-security-test:test

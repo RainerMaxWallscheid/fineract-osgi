@@ -12,6 +12,8 @@ Report FKs are Long (`businessRuleId` / `stretchyReportId`). Residual on provide
 SMS/email campaign write, domain service, `SmsConfigUtils`, gateway/email batch jobs, and
 `SmsMessageScheduledJobService` live in campaigns-impl (deps: dataqueries, gcm, configuration, loan, savings, event).
 
+`TwoFactorSmsDeliveryPort` (api) + adapter (impl) deliver 2FA OTP SMS for security-impl.
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```
