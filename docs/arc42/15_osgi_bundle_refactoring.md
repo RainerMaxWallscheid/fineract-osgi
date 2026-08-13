@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Journal DTOs + client transaction residual closed; guarantor closed; event FD/RD mappers + share dividend event closed; **accrual write** + `JournalEntriesApiResource` → accounting-impl via `LoanPeriodicAccrualPort` (loan-api); still: bulkimport share residual, share/FD/RD entity-typed events + serializers, journal write/processors, provisioning write, notification listeners, security filter chains + TwoFactorServiceImpl |
+| **Residual hardening** | Accrual write + journal REST closed; **product-to-GL write** + `LoanProductToGLAccountMappingHelper` → accounting-impl; `LoanProductConstants` → loan-api; still: bulkimport share residual, share/FD/RD entity-typed events + serializers, journal write/processors, provisioning write, notification listeners, security filter chains + TwoFactorServiceImpl |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

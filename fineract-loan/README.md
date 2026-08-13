@@ -14,6 +14,9 @@ No `:fineract-loan` façade.
 `LoanPeriodicAccrualPort` (loan-api) + `LoanPeriodicAccrualPortAdapter` (loan-impl) break the
 loan↔accounting residual cycle so accounting-impl can drive periodic accruals without depending on loan-impl.
 
+`LoanProductConstants` lives on **loan-api** (JSON param names). `LoanProductToGLAccountMappingHelper`
+moved to **accounting-impl** with product-to-GL write (no loan entity dependency).
+
 ### Consumers
 
 | Module | Depend on |

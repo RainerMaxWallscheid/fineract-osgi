@@ -52,6 +52,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.exception,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.service,'
+                        + 'org.apache.fineract.portfolio.loanproduct,'
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
                         + 'org.apache.fineract.portfolio.loanproduct.exception,'
                         + 'org.apache.fineract.portfolio.loanproduct.service',
