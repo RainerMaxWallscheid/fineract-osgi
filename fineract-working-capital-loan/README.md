@@ -11,6 +11,9 @@ Working capital loans — Wave 4 OSGi modularization
 
 No façade. Consumers: **api + impl**.
 
+`AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapitalLoan` lives in **impl**
+(implements `WorkingCapitalLoanAccountingProcessor`; uses accounting-impl `AccountingProcessorHelper`).
+
 ```bash
 ./gradlew :fineract-working-capital-loan-api:jar :fineract-working-capital-loan-impl:jar :fineract-working-capital-loan-test:test
 ```
