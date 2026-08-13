@@ -21,7 +21,6 @@ package org.apache.fineract.accounting.journalentry.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
-import org.apache.fineract.accounting.provisioning.domain.ProvisioningEntry;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
@@ -45,10 +44,6 @@ public interface JournalEntryWritePlatformService extends JournalEntryCommandWri
     CommandProcessingResult defineOpeningBalance(JsonCommand command);
 
     void createJournalEntryForReversedLoanTransaction(LocalDate transactionDate, String loanTransactionId, Long officeId);
-
-    String revertProvisioningJournalEntries(LocalDate reversalTransactionDate, Long entityId, Integer entityType);
-
-    String createProvisioningJournalEntries(ProvisioningEntry entry);
 
     void createJournalEntriesForShares(Map<String, Object> accountingBridgeData);
 

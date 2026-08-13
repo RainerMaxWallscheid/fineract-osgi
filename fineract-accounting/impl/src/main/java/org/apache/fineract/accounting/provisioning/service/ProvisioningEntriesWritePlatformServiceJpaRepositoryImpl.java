@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.provisioning.service.ProvisioningJournalEntryService;
 import org.apache.fineract.accounting.provisioning.data.LoanProductProvisioningEntryData;
 import org.apache.fineract.accounting.provisioning.data.ProvisioningEntryData;
 import org.apache.fineract.accounting.provisioning.domain.LoanProductProvisioningEntry;
@@ -76,7 +76,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     private final ProvisioningCategoryRepository provisioningCategoryRepository;
     private final PlatformSecurityContext platformSecurityContext;
     private final ProvisioningEntryRepository provisioningEntryRepository;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final ProvisioningJournalEntryService provisioningJournalEntryService;
     private final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer;
     private final FromJsonHelper fromApiJsonHelper;
 
@@ -94,7 +94,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     private void revertAndAddJournalEntries(ProvisioningEntryData existingEntryData, ProvisioningEntry requestedEntry) {
         if (existingEntryData != null) {
             validateForCreateJournalEntry(existingEntryData, requestedEntry);
-            this.journalEntryWritePlatformService.revertProvisioningJournalEntries(requestedEntry.getCreatedDate(), existingEntryData.getId(), PortfolioProductType.PROVISIONING.getValue());
+            this.provisioningJournalEntryService.revertProvisioningJournalEntries(requestedEntry.getCreatedDate(), existingEntryData.getId(), PortfolioProductType.PROVISIONING.getValue());
         }
         if (requestedEntry.getLoanProductProvisioningEntries() == null || requestedEntry.getLoanProductProvisioningEntries().size() == 0) {
             requestedEntry.setIsJournalEntryCreated(Boolean.FALSE);
@@ -102,7 +102,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             requestedEntry.setIsJournalEntryCreated(Boolean.TRUE);
         }
         this.provisioningEntryRepository.saveAndFlush(requestedEntry);
-        this.journalEntryWritePlatformService.createProvisioningJournalEntries(requestedEntry);
+        this.provisioningJournalEntryService.createProvisioningJournalEntries(requestedEntry);
     }
 
     private void validateForCreateJournalEntry(ProvisioningEntryData existingEntry, ProvisioningEntry requested) {
@@ -228,7 +228,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductRepository loanProductRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductRepository loanProductRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
         this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
         this.loanProductRepository = loanProductRepository;
@@ -237,7 +237,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         this.provisioningCategoryRepository = provisioningCategoryRepository;
         this.platformSecurityContext = platformSecurityContext;
         this.provisioningEntryRepository = provisioningEntryRepository;
-        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.provisioningJournalEntryService = provisioningJournalEntryService;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }

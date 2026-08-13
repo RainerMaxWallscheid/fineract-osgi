@@ -30,7 +30,7 @@ product-to-GL write (share mapping helper), accrual write (loan accruals cycle).
 
 Residual closed into **impl**: journal DTOs, command handlers, journal REST + read, helper + **loan/savings/share processors & factories** (via `LoanReversalJournalEntryPort`), client processors, accrual write, product-to-GL write, `LoanJournalEntryCreatedBusinessEvent`. Ports on **api**: `JournalEntryCommandWritePort`, `LoanReversalJournalEntryPort`.
 
-Still residual on provider: journal **write service** (+ JPA impl/starter), provisioning write domain/handlers. WC deferred-revenue processor closed into working-capital-loan-impl.
+Still residual on provider: journal **write service** (+ JPA impl/starter). Provisioning write **closed** into impl (`ProvisioningJournalEntryService`). WC processor closed into working-capital-loan-impl.
 
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test
