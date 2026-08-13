@@ -28,9 +28,9 @@ Still residual on provider: loan/savings/shares journal processors, provisioning
 product-to-GL write (share mapping helper), accrual write (loan accruals cycle).
 
 
-Residual closed into **impl**: journal DTOs, command handlers, journal REST + read, **AccountingProcessorHelper** + client transaction processors + `LoanCommonAccountingHelper`, accrual write, product-to-GL write, `LoanJournalEntryCreatedBusinessEvent`. Pure charge/tax payment DTOs and `JournalEntryCommandWritePort` on **api**.
+Residual closed into **impl**: journal DTOs, command handlers, journal REST + read, helper + **loan/savings/share processors & factories** (via `LoanReversalJournalEntryPort`), client processors, accrual write, product-to-GL write, `LoanJournalEntryCreatedBusinessEvent`. Ports on **api**: `JournalEntryCommandWritePort`, `LoanReversalJournalEntryPort`.
 
-Still residual on provider: journal **write service** + loan/savings/share **processors/factories**, provisioning write domain/handlers.
+Still residual on provider: journal **write service** (+ JPA impl/starter), WC deferred-revenue loan processor, provisioning write domain/handlers.
 
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test

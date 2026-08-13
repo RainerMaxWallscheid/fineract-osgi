@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CashBasedAccountingProcessorForLoan implements AccountingProcessorForLoan {
     private final AccountingProcessorHelper helper;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final LoanReversalJournalEntryPort journalEntryWritePlatformService;
     private final LoanCommonAccountingHelper loanCommonAccountingHelper;
 
     @Override
@@ -771,7 +771,7 @@ public class CashBasedAccountingProcessorForLoan implements AccountingProcessorF
     }
 
     @java.lang.SuppressWarnings("all")
-        public CashBasedAccountingProcessorForLoan(final AccountingProcessorHelper helper, final JournalEntryWritePlatformService journalEntryWritePlatformService, final LoanCommonAccountingHelper loanCommonAccountingHelper) {
+        public CashBasedAccountingProcessorForLoan(final AccountingProcessorHelper helper, final LoanReversalJournalEntryPort journalEntryWritePlatformService, final LoanCommonAccountingHelper loanCommonAccountingHelper) {
         this.helper = helper;
         this.journalEntryWritePlatformService = journalEntryWritePlatformService;
         this.loanCommonAccountingHelper = loanCommonAccountingHelper;
