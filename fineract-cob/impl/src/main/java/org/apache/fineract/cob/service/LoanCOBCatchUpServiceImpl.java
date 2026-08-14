@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 public class LoanCOBCatchUpServiceImpl extends CommonCOBCatchUpService<LoanAccountLock> implements LoanCOBCatchUpService {
 
     public LoanCOBCatchUpServiceImpl(AsyncLoanCOBExecutorService asyncLoanCOBExecutorService, JobExecutionQueryPort jobExecutionQueryPort,
-            RetrieveIdService retrieveIdService, LoanAccountLockService accountLockService) {
+            RetrieveLoanIdService retrieveIdService, LoanAccountLockService accountLockService) {
         super(asyncLoanCOBExecutorService, jobExecutionQueryPort, retrieveIdService, accountLockService);
     }
 

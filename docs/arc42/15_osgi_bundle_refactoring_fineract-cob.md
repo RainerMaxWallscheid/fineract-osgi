@@ -16,6 +16,7 @@ Wave‑4 module after progressive/WC
 - Lock REST + business-step config REST closed into impl (`LoanAccountLockApiResource`, `ConfigureBusinessStepApiResource`); `BusinessStepRequest` on api
 - `LoanCOBConstant`, `ResolveLoanCOBCustomJobParametersTasklet`, `StayedLockedLoansTasklet` closed into impl; stranded cob-impl unit tests on cob-test
 - Loan COB catch-up closed into api/impl (`COBCatchUpService`, async executor, catch-up REST); jobs-impl adapts `JobExecutionQueryPort` / `NamedJobLaunchPort`
+- Loan retrieve-id / reload / business-step category closed into loan-impl (next to `RetrieveLoanIdService`)
 - Loan/savings/WC/investor COB adapters depend on api+impl; WC catch-up + item readers stay on provider
 
 ## Commands

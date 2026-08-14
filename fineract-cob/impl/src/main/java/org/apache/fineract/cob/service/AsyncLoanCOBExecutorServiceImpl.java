@@ -33,7 +33,7 @@ public class AsyncLoanCOBExecutorServiceImpl extends AsyncCommonCOBExecutorServi
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncLoanCOBExecutorServiceImpl.class);
 
-    public AsyncLoanCOBExecutorServiceImpl(NamedJobLaunchPort jobLaunchPort, RetrieveIdService retrieveIdService) {
+    public AsyncLoanCOBExecutorServiceImpl(NamedJobLaunchPort jobLaunchPort, RetrieveLoanIdService retrieveIdService) {
         super(jobLaunchPort, retrieveIdService);
     }
 

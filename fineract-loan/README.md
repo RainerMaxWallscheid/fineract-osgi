@@ -6,7 +6,7 @@ Loan products & accounts — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-loan-api` | `api/` | `org.apache.fineract.loan.api` | Pure ports, DTOs, exceptions |
-| `fineract-loan-impl` | `impl/` | `org.apache.fineract.loan.impl` | JPA domain, entity-typed services, schedule, delinquency, COB |
+| `fineract-loan-impl` | `impl/` | `org.apache.fineract.loan.impl` | JPA domain, entity-typed services, schedule, delinquency, COB, retrieve-id residual |
 | `fineract-loan-test` | `test/` | `org.apache.fineract.loan.test` | Fragment-Host → `loan.impl` |
 
 No `:fineract-loan` façade.
