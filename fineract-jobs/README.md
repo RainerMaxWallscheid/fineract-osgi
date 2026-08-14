@@ -4,7 +4,7 @@ Provider peel — scheduler / batch job infrastructure (ADR-022).
 
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
-| `fineract-jobs-api` | `api/` | `org.apache.fineract.jobs.api` | SPI (`JobNameProvider`, `JobParameterProvider`, …), exceptions, constants |
+| `fineract-jobs-api` | `api/` | `org.apache.fineract.jobs.api` | SPI (`JobNameProvider`, `JobParameterProvider`, `JobExecutionQueryPort`, `NamedJobLaunchPort`, …), exceptions, constants |
 | `fineract-jobs-impl` | `impl/` | `org.apache.fineract.jobs.impl` | Domain, Quartz/Batch wiring, REST, OSGi |
 | `fineract-jobs-test` | `test/` | `org.apache.fineract.jobs.test` | Fragment-Host → impl |
 
@@ -17,6 +17,7 @@ Closed into jobs-impl:
 - `LoanCOBJobParameterProvider` (uses `COBConstant` from cob-impl)
 - Retained-earning + NPA jobs
 - COB / progressive / WC API filters (lock/executor via Spring `@Qualifier`; `LoanCOBEnabledCondition` on cob-impl)
+- Catch-up ports (`JobExecutionQueryPort`, `NamedJobLaunchPort`) so cob-impl does not compile against jobs-impl
 
 Kernel: `BodyCachingHttpServletRequestWrapper` moved to **fineract-core**.
 

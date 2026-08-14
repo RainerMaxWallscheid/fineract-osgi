@@ -21,7 +21,7 @@ package org.apache.fineract.cob.service;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.domain.LoanAccountLock;
 import org.apache.fineract.cob.loan.LoanCOBConstant;
-import org.apache.fineract.infrastructure.jobs.domain.JobExecutionRepository;
+import org.apache.fineract.infrastructure.jobs.service.JobExecutionQueryPort;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +29,9 @@ import org.springframework.stereotype.Service;
 @Conditional(LoanCOBEnabledCondition.class)
 public class LoanCOBCatchUpServiceImpl extends CommonCOBCatchUpService<LoanAccountLock> implements LoanCOBCatchUpService {
 
-    public LoanCOBCatchUpServiceImpl(AsyncLoanCOBExecutorService asyncLoanCOBExecutorService, JobExecutionRepository jobExecutionRepository,
-            RetrieveLoanIdService retrieveIdService, LoanAccountLockService accountLockService) {
-        super(asyncLoanCOBExecutorService, jobExecutionRepository, retrieveIdService, accountLockService);
+    public LoanCOBCatchUpServiceImpl(AsyncLoanCOBExecutorService asyncLoanCOBExecutorService, JobExecutionQueryPort jobExecutionQueryPort,
+            RetrieveIdService retrieveIdService, LoanAccountLockService accountLockService) {
+        super(asyncLoanCOBExecutorService, jobExecutionQueryPort, retrieveIdService, accountLockService);
     }
 
     @Override

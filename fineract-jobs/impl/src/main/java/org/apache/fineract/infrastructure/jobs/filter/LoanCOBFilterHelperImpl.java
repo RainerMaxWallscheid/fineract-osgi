@@ -58,7 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Conditional(LoanCOBEnabledCondition.class)
 public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements LoanCOBFilterHelper, InitializingBean {
-    /** Keep in sync with LoanCOBConstant.INLINE_LOAN_COB_JOB_NAME (provider residual). */
+    /** Keep in sync with LoanCOBConstant.INLINE_LOAN_COB_JOB_NAME. */
     private static final String INLINE_LOAN_COB_JOB_NAME = "INLINE_LOAN_COB";
 
     private final GLIMAccountInfoRepository glimAccountInfoRepository;

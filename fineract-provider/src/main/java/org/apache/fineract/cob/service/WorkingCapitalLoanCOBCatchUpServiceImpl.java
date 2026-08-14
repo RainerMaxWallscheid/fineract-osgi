@@ -22,7 +22,7 @@ package org.apache.fineract.cob.service;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.domain.WorkingCapitalLoanAccountLock;
 import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanRetrieveIdService;
-import org.apache.fineract.infrastructure.jobs.domain.JobExecutionRepository;
+import org.apache.fineract.infrastructure.jobs.service.JobExecutionQueryPort;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -33,9 +33,9 @@ public class WorkingCapitalLoanCOBCatchUpServiceImpl extends CommonCOBCatchUpSer
         implements WorkingCapitalLoanCOBCatchUpService {
 
     public WorkingCapitalLoanCOBCatchUpServiceImpl(AsyncWorkingCapitalLoanCOBExecutorService asyncLoanCOBExecutorService,
-            JobExecutionRepository jobExecutionRepository, WorkingCapitalLoanRetrieveIdService retrieveIdService,
+            JobExecutionQueryPort jobExecutionQueryPort, WorkingCapitalLoanRetrieveIdService retrieveIdService,
             AccountLockService<WorkingCapitalLoanAccountLock> accountLockService) {
-        super(asyncLoanCOBExecutorService, jobExecutionRepository, retrieveIdService, accountLockService);
+        super(asyncLoanCOBExecutorService, jobExecutionQueryPort, retrieveIdService, accountLockService);
     }
 
     @Override

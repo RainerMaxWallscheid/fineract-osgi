@@ -32,27 +32,15 @@ import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.data.JobParameterDTO;
-import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
-import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetailRepository;
 import org.apache.fineract.infrastructure.jobs.exception.JobNotFoundException;
-import org.apache.fineract.infrastructure.jobs.service.JobStarter;
+import org.apache.fineract.infrastructure.jobs.service.NamedJobLaunchPort;
 import org.apache.fineract.infrastructure.jobs.service.SchedulerServiceConstants;
-import org.quartz.JobExecutionException;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.configuration.JobLocator;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.scheduling.annotation.Async;
 
 public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncCommonCOBExecutorService.class);
-    private final JobLocator jobLocator;
-    private final ScheduledJobDetailRepository scheduledJobDetailRepository;
-    private final JobStarter jobStarter;
+    private final NamedJobLaunchPort jobLaunchPort;
     private final RetrieveIdService retrieveIdService;
 
     @Override
@@ -66,10 +54,10 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
             if (DateUtils.isBefore(oldestCOBProcessedDate, cobBusinessDate)) {
                 executeLoanCOBDayByDayUntilCOBBusinessDate(oldestCOBProcessedDate, cobBusinessDate);
             }
-        } catch (NoSuchJobException e) {
+        } catch (JobNotFoundException e) {
             // Throwing an error here is useless as it will be swallowed hence it is async method
-            log.error("Job not found: {}", getJobName(), new JobNotFoundException(getJobName(), e));
-        } catch (JobInstanceAlreadyCompleteException | JobRestartException | JobParametersInvalidException | JobExecutionAlreadyRunningException | JobExecutionException e) {
+            log.error("Job not found: {}", getJobName(), e);
+        } catch (RuntimeException e) {
             // Throwing an error here is useless as it will be swallowed hence it is async method
             log.error("Error executing job", e);
         } finally {
@@ -81,9 +69,7 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
 
     public abstract String getJobHumanReadableName();
 
-    private void executeLoanCOBDayByDayUntilCOBBusinessDate(LocalDate oldestCOBProcessedDate, LocalDate cobBusinessDate) throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException, JobExecutionException {
-        Job job = jobLocator.getJob(getJobName());
-        ScheduledJobDetail scheduledJobDetail = scheduledJobDetailRepository.findByJobName(getJobHumanReadableName());
+    private void executeLoanCOBDayByDayUntilCOBBusinessDate(LocalDate oldestCOBProcessedDate, LocalDate cobBusinessDate) {
         LocalDate executingBusinessDate = oldestCOBProcessedDate.plusDays(1);
         String tenantIdentifier = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
         while (!DateUtils.isAfter(executingBusinessDate, cobBusinessDate)) {
@@ -92,16 +78,14 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
             JobParameterDTO tenantParameterDTO = new JobParameterDTO(SchedulerServiceConstants.TENANT_IDENTIFIER, tenantIdentifier);
             Set<JobParameterDTO> jobParameters = new HashSet<>();
             Collections.addAll(jobParameters, jobParameterDTO, jobParameterCatchUpDTO, tenantParameterDTO);
-            jobStarter.run(job, scheduledJobDetail, jobParameters, tenantIdentifier);
+            jobLaunchPort.run(getJobName(), getJobHumanReadableName(), jobParameters, tenantIdentifier);
             executingBusinessDate = executingBusinessDate.plusDays(1);
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public AsyncCommonCOBExecutorService(final JobLocator jobLocator, final ScheduledJobDetailRepository scheduledJobDetailRepository, final JobStarter jobStarter, final RetrieveIdService retrieveIdService) {
-        this.jobLocator = jobLocator;
-        this.scheduledJobDetailRepository = scheduledJobDetailRepository;
-        this.jobStarter = jobStarter;
+        public AsyncCommonCOBExecutorService(final NamedJobLaunchPort jobLaunchPort, final RetrieveIdService retrieveIdService) {
+        this.jobLaunchPort = jobLaunchPort;
         this.retrieveIdService = retrieveIdService;
     }
 }

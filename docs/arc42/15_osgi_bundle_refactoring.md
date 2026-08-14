@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Documented residual set closed. Follow-ups: security configs/tests; LoanJournalEntryPosterImpl; ContentS3Config; Loan COB business steps; loan lock residual; **loan lock REST + business-step config REST** → cob-impl/api. Remaining provider mass: savings/client/share/COB catch-up & batch readers/batch strategies. |
+| **Residual hardening** | Documented residual set closed. Follow-ups: security configs/tests; LoanJournalEntryPosterImpl; ContentS3Config; Loan COB business steps; loan lock residual; lock/business-step REST; LoanCOBConstant + resolve/stayed-locked tasklets; **loan COB catch-up** → cob-impl via jobs-api `JobExecutionQueryPort` / `NamedJobLaunchPort`. Remaining provider mass: savings/client/share/COB item readers/batch strategies. |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

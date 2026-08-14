@@ -28,11 +28,11 @@ import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.infrastructure.jobs.domain.JobExecutionRepository;
+import org.apache.fineract.infrastructure.jobs.service.JobExecutionQueryPort;
 
 public abstract class CommonCOBCatchUpService<T extends AccountLock> implements COBCatchUpService {
     private final AsyncCOBExecutorService asyncLoanCOBExecutorService;
-    private final JobExecutionRepository jobExecutionRepository;
+    private final JobExecutionQueryPort jobExecutionQueryPort;
     private final RetrieveIdService retrieveIdService;
     private final AccountLockService<T> accountLockService;
 
@@ -59,16 +59,16 @@ public abstract class CommonCOBCatchUpService<T extends AccountLock> implements 
 
     @Override
     public IsCatchUpRunningDTO isCatchUpRunning() {
-        LocalDate runningCatchUpBusinessDate = jobExecutionRepository.getBusinessDateOfRunningJobByExecutionParameter(getJobName(), COBConstant.COB_CUSTOM_JOB_PARAMETER_KEY, COBConstant.IS_CATCH_UP_PARAMETER_NAME, "true", COBConstant.BUSINESS_DATE_PARAMETER_NAME);
+        LocalDate runningCatchUpBusinessDate = jobExecutionQueryPort.getBusinessDateOfRunningJobByExecutionParameter(getJobName(), COBConstant.COB_CUSTOM_JOB_PARAMETER_KEY, COBConstant.IS_CATCH_UP_PARAMETER_NAME, "true", COBConstant.BUSINESS_DATE_PARAMETER_NAME);
         return new IsCatchUpRunningDTO(runningCatchUpBusinessDate != null, runningCatchUpBusinessDate);
     }
 
     public abstract String getJobName();
 
     @java.lang.SuppressWarnings("all")
-        public CommonCOBCatchUpService(final AsyncCOBExecutorService asyncLoanCOBExecutorService, final JobExecutionRepository jobExecutionRepository, final RetrieveIdService retrieveIdService, final AccountLockService<T> accountLockService) {
+        public CommonCOBCatchUpService(final AsyncCOBExecutorService asyncLoanCOBExecutorService, final JobExecutionQueryPort jobExecutionQueryPort, final RetrieveIdService retrieveIdService, final AccountLockService<T> accountLockService) {
         this.asyncLoanCOBExecutorService = asyncLoanCOBExecutorService;
-        this.jobExecutionRepository = jobExecutionRepository;
+        this.jobExecutionQueryPort = jobExecutionQueryPort;
         this.retrieveIdService = retrieveIdService;
         this.accountLockService = accountLockService;
     }

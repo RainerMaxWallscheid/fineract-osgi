@@ -38,4 +38,5 @@ dependencies {
     }
     testImplementation ('org.mockito:mockito-inline')
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.batch:spring-batch-core'
 }
