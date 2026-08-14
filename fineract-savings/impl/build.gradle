@@ -61,8 +61,10 @@ jar {
                 'Import-Package': '*',
                 'Export-Package': 'org.apache.fineract.portfolio.savings.domain,'
                         + 'org.apache.fineract.portfolio.savings.service,'
+                        + 'org.apache.fineract.portfolio.interestratechart.data,'
                         + 'org.apache.fineract.portfolio.interestratechart.domain,'
                         + 'org.apache.fineract.portfolio.interestratechart.incentive,'
+                        + 'org.apache.fineract.portfolio.interestratechart.service,'
                         + 'org.apache.fineract.cob.savings,'
                         + 'org.apache.fineract.cob.savings.domain,'
                         + 'org.apache.fineract.interoperation.domain',

@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-savings-api')
 
     implementation(project(path: ':fineract-core'))
+    // Chart REST + command handlers
+    implementation(project(path: ':fineract-command-api'))
     // Interop domain enums live in interoperation-api; entity residual in savings-impl
     implementation(project(path: ':fineract-interoperation-api'))
     implementation(project(path: ':fineract-cob-api'))

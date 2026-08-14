@@ -40,6 +40,7 @@ fineract-savings/
 
 - Provider still binds heavily to `SavingsAccount` / entity-typed write services
 - Optional: pure account ports without entity signatures
+- Interest-rate chart REST, command handlers, read/write services, and validators now live in savings-impl (domain/assemblers were already there)
 
 ## 5. Commands
 
