@@ -95,9 +95,39 @@ public class FeignLoanHelper {
         return createLoanProduct(request);
     }
 
+    /**
+     * Create a loan product, retrying with a fresh short name on duplicate-short-name
+     * collisions. Integration tests share a DB and short names are only 4 characters,
+     * so process-local uniqueness alone is not enough against leftover products.
+     */
     public Long createLoanProduct(PostLoanProductsRequest request) {
-        PostLoanProductsResponse response = ok(() -> fineractClient.loanProducts().createLoanProduct(request));
-        return response.getResourceId();
+        final int maxAttempts = 5;
+        CallFailedRuntimeException lastFailure = null;
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            try {
+                PostLoanProductsResponse response = ok(() -> fineractClient.loanProducts().createLoanProduct(request));
+                return response.getResourceId();
+            } catch (final CallFailedRuntimeException ex) {
+                lastFailure = ex;
+                if (!isDuplicateLoanProductShortName(ex) || attempt == maxAttempts - 1) {
+                    throw ex;
+                }
+                request.shortName(Utils.uniqueRandomStringGenerator("", 4));
+                if (request.getName() != null) {
+                    request.name(Utils.uniqueRandomStringGenerator("LP_", 8));
+                }
+            }
+        }
+        throw lastFailure;
+    }
+
+    private static boolean isDuplicateLoanProductShortName(final CallFailedRuntimeException ex) {
+        final String code = ex.getUserMessageGlobalisationCode();
+        if (code != null && code.contains("duplicate.short.name")) {
+            return true;
+        }
+        final String body = ex.getResponseBody();
+        return body != null && body.contains("error.msg.product.loan.duplicate.short.name");
     }
 
     public GetLoanProductsProductIdResponse retrieveLoanProduct(Long productId) {
