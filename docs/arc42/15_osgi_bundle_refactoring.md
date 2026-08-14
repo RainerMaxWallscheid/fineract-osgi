@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Documented residual set closed. Follow-ups: **SecurityValidationConfig** + security unit tests → security-impl/test; **LoanJournalEntryPosterImpl** → accounting-impl (with journal write). Remaining provider mass is domain residual (savings/loan/client/share/COB/batch), not residual-hardening leftovers. |
+| **Residual hardening** | Documented residual set closed. Follow-ups: security configs/tests; LoanJournalEntryPosterImpl; **ContentS3Config** → document-impl; **Loan COB business steps** → loan-impl. Remaining provider mass: savings/client/share/COB infrastructure/batch strategies. |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

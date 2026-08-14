@@ -36,6 +36,9 @@ dependencies {
     testImplementation 'jakarta.validation:jakarta.validation-api'
     testImplementation ('org.mockito:mockito-inline')
     testImplementation 'com.github.romankh3:image-comparison'
+    // ContentS3ConfigTest
+    testImplementation 'software.amazon.awssdk:s3'
+    testImplementation 'software.amazon.awssdk:auth'
     testImplementation(
             'org.apache.tika:tika-core',
             'org.apache.tika:tika-parser-image-module',
