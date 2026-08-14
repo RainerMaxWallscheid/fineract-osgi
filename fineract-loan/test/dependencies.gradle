@@ -49,4 +49,5 @@ dependencies {
         exclude group: 'org.skyscreamer'
     }
     testImplementation ('org.mockito:mockito-inline')
+    testImplementation 'org.springframework.batch:spring-batch-core'
 }
