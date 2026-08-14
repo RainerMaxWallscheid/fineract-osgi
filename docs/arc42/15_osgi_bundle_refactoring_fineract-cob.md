@@ -23,6 +23,7 @@ Wave‑4 module after progressive/WC
 - Savings retrieve-id impl closed into savings-impl; loan COB manager + partitioner closed into loan-impl
 - WC inline COB job config closed into WC-impl; internal loan COB test API closed into loan-impl
 - Loan COB processors + worker/inline configs closed into loan-impl via loan-api `ProgressiveLoanModelRebuildPort` (adapter in progressive-loan-impl)
+- Remaining COB JUnit business-step tests closed into loan-test; IncreaseCobDate test into jobs-test; unused `LoanIdsResponseDTO` on cob-api. Cucumber stepdefs stay on provider
 - Loan/savings/WC/investor COB adapters depend on api+impl
 
 ## Commands

@@ -20,6 +20,8 @@
 dependencies {
     testImplementation(project(path: ':fineract-jobs-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation(project(path: ':fineract-businessdate-api'))
+    testImplementation 'org.springframework.batch:spring-batch-core'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'

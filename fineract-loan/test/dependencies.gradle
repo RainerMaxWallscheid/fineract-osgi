@@ -50,4 +50,5 @@ dependencies {
     }
     testImplementation ('org.mockito:mockito-inline')
     testImplementation 'org.springframework.batch:spring-batch-core'
+    testImplementation 'org.apache.commons:commons-lang3'
 }
