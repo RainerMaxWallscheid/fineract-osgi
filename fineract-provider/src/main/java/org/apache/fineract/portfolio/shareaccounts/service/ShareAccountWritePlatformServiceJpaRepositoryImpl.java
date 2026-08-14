@@ -38,6 +38,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountApproveBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -73,7 +74,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
             this.shareAccountRepository.saveAndFlush(account);
             generateAccountNumber(account);
             journalEntryWritePlatformService.createJournalEntriesForShares(populateJournalEntries(account, account.getPendingForApprovalSharePurchaseTransactions()));
-            businessEventNotifierService.notifyPostBusinessEvent(new ShareAccountCreateBusinessEvent(account));
+            businessEventNotifierService.notifyPostBusinessEvent(new ShareAccountCreateBusinessEvent(new PortfolioAccountEventData(account.getId(), account.getOfficeId())));
             return  //
             //
             //
@@ -236,7 +237,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
             shareProduct.addSubscribedShares(totalSubsribedShares);
             this.shareProductRepository.save(shareProduct);
             this.journalEntryWritePlatformService.createJournalEntriesForShares(populateJournalEntries(account, journalTransactions));
-            businessEventNotifierService.notifyPostBusinessEvent(new ShareAccountApproveBusinessEvent(account));
+            businessEventNotifierService.notifyPostBusinessEvent(new ShareAccountApproveBusinessEvent(new PortfolioAccountEventData(account.getId(), account.getOfficeId())));
             return  //
             //
             //

@@ -48,11 +48,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.domain.FixedDepositAccount;
-import org.apache.fineract.portfolio.savings.domain.RecurringDepositAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 
 public class NotificationDomainServiceImpl implements NotificationDomainService {
     @java.lang.SuppressWarnings("all")
@@ -134,8 +131,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class FixedDepositAccountCreatedListener implements BusinessEventListener<FixedDepositAccountCreateBusinessEvent> {
         @Override
         public void onBusinessEvent(FixedDepositAccountCreateBusinessEvent event) {
-            FixedDepositAccount fixedDepositAccount = event.get();
-            buildNotification("APPROVE_FIXEDDEPOSITACCOUNT", "fixedDeposit", fixedDepositAccount.getId(), "New fixed deposit account created", "created", context.authenticatedUser().getId(), fixedDepositAccount.officeId());
+            buildNotification("APPROVE_FIXEDDEPOSITACCOUNT", "fixedDeposit", event.get().getAccountId(), "New fixed deposit account created", "created", context.authenticatedUser().getId(), event.get().getOfficeId());
         }
     }
 
@@ -143,8 +139,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class RecurringDepositAccountCreatedListener implements BusinessEventListener<RecurringDepositAccountCreateBusinessEvent> {
         @Override
         public void onBusinessEvent(RecurringDepositAccountCreateBusinessEvent event) {
-            RecurringDepositAccount recurringDepositAccount = event.get();
-            buildNotification("APPROVE_RECURRINGDEPOSITACCOUNT", "recurringDepositAccount", recurringDepositAccount.getId(), "New recurring deposit account created", "created", context.authenticatedUser().getId(), recurringDepositAccount.officeId());
+            buildNotification("APPROVE_RECURRINGDEPOSITACCOUNT", "recurringDepositAccount", event.get().getAccountId(), "New recurring deposit account created", "created", context.authenticatedUser().getId(), event.get().getOfficeId());
         }
     }
 
@@ -257,8 +252,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class ShareAccountCreatedListener implements BusinessEventListener<ShareAccountCreateBusinessEvent> {
         @Override
         public void onBusinessEvent(ShareAccountCreateBusinessEvent event) {
-            ShareAccount shareAccount = event.get();
-            buildNotification("APPROVE_SHAREACCOUNT", "shareAccount", shareAccount.getId(), "New share account created", "created", context.authenticatedUser().getId(), shareAccount.getOfficeId());
+            buildNotification("APPROVE_SHAREACCOUNT", "shareAccount", event.get().getAccountId(), "New share account created", "created", context.authenticatedUser().getId(), event.get().getOfficeId());
         }
     }
 
@@ -266,8 +260,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class ShareAccountApprovedListener implements BusinessEventListener<ShareAccountApproveBusinessEvent> {
         @Override
         public void onBusinessEvent(ShareAccountApproveBusinessEvent event) {
-            ShareAccount shareAccount = event.get();
-            buildNotification("ACTIVATE_SHAREACCOUNT", "shareAccount", shareAccount.getId(), "Share account approved", "approved", context.authenticatedUser().getId(), shareAccount.getOfficeId());
+            buildNotification("ACTIVATE_SHAREACCOUNT", "shareAccount", event.get().getAccountId(), "Share account approved", "approved", context.authenticatedUser().getId(), event.get().getOfficeId());
         }
     }
 

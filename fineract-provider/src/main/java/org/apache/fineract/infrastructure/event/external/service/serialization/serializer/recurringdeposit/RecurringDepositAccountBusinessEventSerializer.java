@@ -43,7 +43,7 @@ public class RecurringDepositAccountBusinessEventSerializer implements BusinessE
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         RecurringDepositAccountBusinessEvent event = (RecurringDepositAccountBusinessEvent) rawEvent;
-        RecurringDepositAccountData data = (RecurringDepositAccountData) service.retrieveOne(DepositAccountType.RECURRING_DEPOSIT, event.get().getId());
+        RecurringDepositAccountData data = (RecurringDepositAccountData) service.retrieveOne(DepositAccountType.RECURRING_DEPOSIT, event.get().getAccountId());
         return mapper.map(data);
     }
 

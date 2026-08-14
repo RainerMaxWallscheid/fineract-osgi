@@ -18,13 +18,13 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.share;
 
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public class ShareAccountApproveBusinessEvent extends ShareAccountBusinessEvent {
+public class ShareAccountCreateBusinessEvent extends ShareAccountBusinessEvent {
 
-    private static final String TYPE = "ShareAccountApproveBusinessEvent";
+    private static final String TYPE = "ShareAccountCreateBusinessEvent";
 
-    public ShareAccountApproveBusinessEvent(ShareAccount value) {
+    public ShareAccountCreateBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 

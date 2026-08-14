@@ -12,9 +12,9 @@ Provider peel — in-app user notifications (ADR-022).
 
 `UserNotificationService` + `NotificationData` stay in core (used by security filter).
 
-### Residual in `fineract-provider`
+### Residual closed
 
-`NotificationDomainServiceImpl` + `NotificationDomainServiceConfiguration` — business-event listeners need Loan/Savings/Share residual entities still hosted in provider.
+`NotificationDomainServiceImpl` + `NotificationDomainServiceConfiguration` → **impl** (listens to loan/savings events and share/FD/RD events carrying `PortfolioAccountEventData`).
 
 ```bash
 ./gradlew :fineract-notification-api:jar :fineract-notification-impl:jar :fineract-notification-test:test

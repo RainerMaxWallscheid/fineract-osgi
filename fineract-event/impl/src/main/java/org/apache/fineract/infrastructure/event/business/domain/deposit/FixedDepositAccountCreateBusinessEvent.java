@@ -18,13 +18,13 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.deposit;
 
-import org.apache.fineract.portfolio.savings.domain.RecurringDepositAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public class RecurringDepositAccountCreateBusinessEvent extends RecurringDepositAccountBusinessEvent {
+public class FixedDepositAccountCreateBusinessEvent extends FixedDepositAccountBusinessEvent {
 
-    private static final String TYPE = "RecurringDepositAccountCreateBusinessEvent";
+    private static final String TYPE = "FixedDepositAccountCreateBusinessEvent";
 
-    public RecurringDepositAccountCreateBusinessEvent(RecurringDepositAccount value) {
+    public FixedDepositAccountCreateBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 

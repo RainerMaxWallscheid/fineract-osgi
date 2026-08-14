@@ -16,20 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.business.domain.deposit;
+package org.apache.fineract.infrastructure.event.business.domain;
 
-import org.apache.fineract.portfolio.savings.domain.FixedDepositAccount;
+/**
+ * Lightweight business-event payload for account create/approve style events so
+ * event types do not depend on residual domain entities (share/FD/RD).
+ */
+public final class PortfolioAccountEventData {
 
-public class FixedDepositAccountCreateBusinessEvent extends FixedDepositAccountBusinessEvent {
+    private final Long accountId;
+    private final Long officeId;
 
-    private static final String TYPE = "FixedDepositAccountCreateBusinessEvent";
-
-    public FixedDepositAccountCreateBusinessEvent(FixedDepositAccount value) {
-        super(value);
+    public PortfolioAccountEventData(final Long accountId, final Long officeId) {
+        this.accountId = accountId;
+        this.officeId = officeId;
     }
 
-    @Override
-    public String getType() {
-        return TYPE;
+    public Long getAccountId() {
+        return this.accountId;
+    }
+
+    public Long getOfficeId() {
+        return this.officeId;
     }
 }

@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.business.domain.deposit;
+package org.apache.fineract.infrastructure.event.business.domain.share;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
-import org.apache.fineract.portfolio.savings.domain.FixedDepositAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public abstract class FixedDepositAccountBusinessEvent extends AbstractBusinessEvent<FixedDepositAccount> {
+public abstract class ShareAccountBusinessEvent extends AbstractBusinessEvent<PortfolioAccountEventData> {
 
-    private static final String CATEGORY = "Deposit";
+    private static final String CATEGORY = "Share";
 
-    public FixedDepositAccountBusinessEvent(FixedDepositAccount value) {
+    public ShareAccountBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 
@@ -36,6 +36,6 @@ public abstract class FixedDepositAccountBusinessEvent extends AbstractBusinessE
 
     @Override
     public Long getAggregateRootId() {
-        return get().getId();
+        return get().getAccountId();
     }
 }

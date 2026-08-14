@@ -42,7 +42,7 @@ public class ShareAccountBusinessEventSerializer implements BusinessEventSeriali
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         ShareAccountBusinessEvent event = (ShareAccountBusinessEvent) rawEvent;
-        ShareAccountData data = service.retrieveOne(event.get().getId(), false);
+        ShareAccountData data = service.retrieveOne(event.get().getAccountId(), false);
         return mapper.map(data);
     }
 

@@ -46,6 +46,7 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 import org.apache.fineract.infrastructure.event.business.domain.deposit.FixedDepositAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.deposit.RecurringDepositAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -175,7 +176,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 this.accountAssociationsRepository.save(accountAssociations);
             }
             final Long savingsId = account.getId();
-            businessEventNotifierService.notifyPostBusinessEvent(new FixedDepositAccountCreateBusinessEvent(account));
+            businessEventNotifierService.notifyPostBusinessEvent(new FixedDepositAccountCreateBusinessEvent(new PortfolioAccountEventData(account.getId(), account.officeId())));
             return  //
             //
             //
@@ -223,7 +224,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             account.updateMaturityDateAndAmount(mc, isPreMatureClosure, isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth);
             account.validateApplicableInterestRate();
             savingAccountRepository.save(account);
-            businessEventNotifierService.notifyPostBusinessEvent(new RecurringDepositAccountCreateBusinessEvent(account));
+            businessEventNotifierService.notifyPostBusinessEvent(new RecurringDepositAccountCreateBusinessEvent(new PortfolioAccountEventData(account.getId(), account.officeId())));
             return  //
             //
             //

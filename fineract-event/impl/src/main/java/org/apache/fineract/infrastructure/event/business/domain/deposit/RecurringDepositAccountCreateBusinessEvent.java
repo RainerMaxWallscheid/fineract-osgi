@@ -16,15 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.business.domain.share;
+package org.apache.fineract.infrastructure.event.business.domain.deposit;
 
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public class ShareAccountCreateBusinessEvent extends ShareAccountBusinessEvent {
+public class RecurringDepositAccountCreateBusinessEvent extends RecurringDepositAccountBusinessEvent {
 
-    private static final String TYPE = "ShareAccountCreateBusinessEvent";
+    private static final String TYPE = "RecurringDepositAccountCreateBusinessEvent";
 
-    public ShareAccountCreateBusinessEvent(ShareAccount value) {
+    public RecurringDepositAccountCreateBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 

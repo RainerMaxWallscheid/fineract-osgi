@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | Provisioning write closed; **`TwoFactorServiceImpl`** → security-impl via `TwoFactorSmsDeliveryPort` (campaigns-api/impl); still: bulkimport share residual, share/FD/RD entity-typed events + serializers, journal **write service**, notification listeners, security filter-chain configs (AuthorizationServer/OIDC) |
+| **Residual hardening** | TwoFactor closed; **share/FD/RD business events** → event-impl (`PortfolioAccountEventData`); **notification domain listeners** → notification-impl; still: bulkimport share residual, share/FD/RD **serializers/mappers** (read services residual), journal **write service**, security filter-chain configs (AuthorizationServer/OIDC) |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

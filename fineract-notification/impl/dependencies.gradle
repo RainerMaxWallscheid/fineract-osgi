@@ -20,6 +20,9 @@
 dependencies {
     api project(path: ':fineract-notification-api')
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-event-impl'))
+    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-savings-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

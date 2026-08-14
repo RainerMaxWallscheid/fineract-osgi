@@ -18,24 +18,18 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.share;
 
-import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public abstract class ShareAccountBusinessEvent extends AbstractBusinessEvent<ShareAccount> {
+public class ShareAccountApproveBusinessEvent extends ShareAccountBusinessEvent {
 
-    private static final String CATEGORY = "Share";
+    private static final String TYPE = "ShareAccountApproveBusinessEvent";
 
-    public ShareAccountBusinessEvent(ShareAccount value) {
+    public ShareAccountApproveBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 
     @Override
-    public String getCategory() {
-        return CATEGORY;
-    }
-
-    @Override
-    public Long getAggregateRootId() {
-        return get().getId();
+    public String getType() {
+        return TYPE;
     }
 }

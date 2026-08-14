@@ -43,7 +43,7 @@ public class FixedDepositAccountBusinessEventSerializer implements BusinessEvent
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         FixedDepositAccountBusinessEvent event = (FixedDepositAccountBusinessEvent) rawEvent;
-        FixedDepositAccountData data = (FixedDepositAccountData) service.retrieveOne(DepositAccountType.FIXED_DEPOSIT, event.get().getId());
+        FixedDepositAccountData data = (FixedDepositAccountData) service.retrieveOne(DepositAccountType.FIXED_DEPOSIT, event.get().getAccountId());
         return mapper.map(data);
     }
 

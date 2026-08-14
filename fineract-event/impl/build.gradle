@@ -57,6 +57,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.event.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.infrastructure.event.impl.osgi,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain,'
                         + 'org.apache.fineract.infrastructure.event.business.domain.client,'
                         + 'org.apache.fineract.infrastructure.event.business.domain.deposit,'
                         + 'org.apache.fineract.infrastructure.event.business.domain.group,'

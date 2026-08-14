@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Residual: business-event listeners need Loan/Savings/Share entities still hosted in provider.
+ * Business-event listeners for in-app notifications (loan/savings/share/deposit events).
  */
 @Configuration
 public class NotificationDomainServiceConfiguration {

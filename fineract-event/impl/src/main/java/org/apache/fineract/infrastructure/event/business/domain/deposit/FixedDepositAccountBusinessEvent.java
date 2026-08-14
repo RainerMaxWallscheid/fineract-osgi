@@ -19,13 +19,13 @@
 package org.apache.fineract.infrastructure.event.business.domain.deposit;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
-import org.apache.fineract.portfolio.savings.domain.RecurringDepositAccount;
+import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccountEventData;
 
-public abstract class RecurringDepositAccountBusinessEvent extends AbstractBusinessEvent<RecurringDepositAccount> {
+public abstract class FixedDepositAccountBusinessEvent extends AbstractBusinessEvent<PortfolioAccountEventData> {
 
     private static final String CATEGORY = "Deposit";
 
-    public RecurringDepositAccountBusinessEvent(RecurringDepositAccount value) {
+    public FixedDepositAccountBusinessEvent(PortfolioAccountEventData value) {
         super(value);
     }
 
@@ -36,6 +36,6 @@ public abstract class RecurringDepositAccountBusinessEvent extends AbstractBusin
 
     @Override
     public Long getAggregateRootId() {
-        return get().getId();
+        return get().getAccountId();
     }
 }
