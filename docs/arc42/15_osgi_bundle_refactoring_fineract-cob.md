@@ -12,7 +12,8 @@ Wave‑4 module after progressive/WC
 ## Residual
 
 - `COBBusinessStepService` / entity-typed step runners stay on impl
-- Loan/savings/WC/investor COB adapters depend on api+impl
+- Loan lock residual closed into impl (`LoanAccountLock`, repos, `LoanLockingServiceImpl`, lock tasklets)
+- Loan/savings/WC/investor COB adapters depend on api+impl; catch-up / item readers stay on provider
 
 ## Commands
 
