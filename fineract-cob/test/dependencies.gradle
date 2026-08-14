@@ -20,6 +20,8 @@
 dependencies {
     testImplementation(project(path: ':fineract-cob-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation(project(path: ':fineract-businessdate-api'))
+    testImplementation(project(path: ':fineract-jobs-api'))
     testImplementation 'com.google.code.gson:gson'
     testImplementation 'com.google.guava:guava'
     testImplementation 'org.apache.commons:commons-lang3'

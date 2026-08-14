@@ -19,7 +19,8 @@ Wave‑4 module after progressive/WC
 - Loan retrieve-id / reload / business-step category closed into loan-impl (next to `RetrieveLoanIdService`)
 - Loan item readers/writers/listeners closed into loan-impl; processors stay on provider (progressive model service)
 - WC catch-up REST/services + WC inline reader/listener closed into working-capital-loan-impl
-- Loan/savings/WC/investor COB adapters depend on api+impl; loan processors + inline executor stay on provider
+- Inline COB executor closed into cob-impl (`InlineCommonLockableCOBExecutorService`, loan impl, build-context tasklet); WC inline executor in WC-impl
+- Loan/savings/WC/investor COB adapters depend on api+impl; loan processors + Spring Batch job configs stay on provider
 
 ## Commands
 
