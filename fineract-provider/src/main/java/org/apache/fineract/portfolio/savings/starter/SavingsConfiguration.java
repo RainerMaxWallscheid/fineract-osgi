@@ -204,8 +204,8 @@ public class SavingsConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(DepositAccountReadPlatformService.class)
-    public DepositAccountReadPlatformService depositAccountReadPlatformService(PlatformSecurityContext context, JdbcTemplate jdbcTemplate,
-            DepositAccountInterestRateChartReadPlatformService chartReadPlatformService,
+    public DepositAccountReadPlatformServiceImpl depositAccountReadPlatformService(PlatformSecurityContext context,
+            JdbcTemplate jdbcTemplate, DepositAccountInterestRateChartReadPlatformService chartReadPlatformService,
             InterestRateChartReadService productChartReadPlatformService,
             PaginationParametersDataValidator paginationParametersDataValidator, DatabaseSpecificSQLGenerator sqlGenerator,
             PaginationHelper paginationHelper, ClientReadPlatformService clientReadPlatformService,
@@ -214,6 +214,7 @@ public class SavingsConfiguration {
             StaffReadService staffReadPlatformService, DepositsDropdownReadPlatformService depositsDropdownReadPlatformService,
             SavingsAccountReadPlatformService savingsAccountReadPlatformService, DropdownReadPlatformService dropdownReadPlatformService,
             CalendarReadPlatformService calendarReadPlatformService, PaymentTypeReadService paymentTypeReadPlatformService) {
+        // Concrete return type so Spring also wires DepositAccountInterestTransferReadService.
         return new DepositAccountReadPlatformServiceImpl(context, jdbcTemplate, chartReadPlatformService, productChartReadPlatformService,
                 paginationParametersDataValidator, sqlGenerator, paginationHelper, clientReadPlatformService, groupReadPlatformService,
                 depositProductReadPlatformService, savingsDropdownReadPlatformService, chargeReadPlatformService, staffReadPlatformService,

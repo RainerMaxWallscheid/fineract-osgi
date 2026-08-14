@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.savings.jobs.transferinteresttosavings;
 
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
-import org.apache.fineract.portfolio.savings.service.DepositAccountReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.DepositAccountInterestTransferReadService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -40,7 +40,7 @@ public class TransferInterestToSavingsConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private DepositAccountReadPlatformService depositAccountReadPlatformService;
+    private DepositAccountInterestTransferReadService depositAccountInterestTransferReadService;
     @Autowired
     private AccountTransfersWritePlatformService accountTransfersWritePlatformService;
 
@@ -58,6 +58,6 @@ public class TransferInterestToSavingsConfig {
 
     @Bean
     public TransferInterestToSavingsTasklet transferInterestToSavingsTasklet() {
-        return new TransferInterestToSavingsTasklet(depositAccountReadPlatformService, accountTransfersWritePlatformService);
+        return new TransferInterestToSavingsTasklet(depositAccountInterestTransferReadService, accountTransfersWritePlatformService);
     }
 }

@@ -96,7 +96,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.CollectionUtils;
 
-public class DepositAccountReadPlatformServiceImpl implements DepositAccountReadPlatformService {
+public class DepositAccountReadPlatformServiceImpl
+        implements DepositAccountReadPlatformService, DepositAccountInterestTransferReadService {
     private static final FixedDepositAccountMapper FIXED_DEPOSIT_ACCOUNT_MAPPER = new FixedDepositAccountMapper();
     private static final RecurringDepositAccountMapper RECURRING_DEPOSIT_ACCOUNT_MAPPER = new RecurringDepositAccountMapper();
     private static final DepositAccountLookupMapper DEPOSIT_ACCOUNT_LOOKUP_MAPPER = new DepositAccountLookupMapper();

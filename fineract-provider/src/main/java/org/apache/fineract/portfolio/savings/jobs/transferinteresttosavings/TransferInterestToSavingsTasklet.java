@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
-import org.apache.fineract.portfolio.savings.service.DepositAccountReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.DepositAccountInterestTransferReadService;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -35,13 +35,13 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class TransferInterestToSavingsTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TransferInterestToSavingsTasklet.class);
-    private final DepositAccountReadPlatformService depositAccountReadPlatformService;
+    private final DepositAccountInterestTransferReadService depositAccountInterestTransferReadService;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         List<Throwable> errors = new ArrayList<>();
-        Collection<AccountTransferDTO> accountTransferData = depositAccountReadPlatformService.retrieveDataForInterestTransfer();
+        Collection<AccountTransferDTO> accountTransferData = depositAccountInterestTransferReadService.retrieveDataForInterestTransfer();
         for (AccountTransferDTO accountTransferDTO : accountTransferData) {
             try {
                 accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
@@ -60,8 +60,8 @@ public class TransferInterestToSavingsTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public TransferInterestToSavingsTasklet(final DepositAccountReadPlatformService depositAccountReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService) {
-        this.depositAccountReadPlatformService = depositAccountReadPlatformService;
+        public TransferInterestToSavingsTasklet(final DepositAccountInterestTransferReadService depositAccountInterestTransferReadService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService) {
+        this.depositAccountInterestTransferReadService = depositAccountInterestTransferReadService;
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
     }
 }

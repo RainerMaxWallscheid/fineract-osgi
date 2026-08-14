@@ -71,7 +71,11 @@ jar {
                         + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.client,'
                         + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.fixeddeposit,'
                         + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.recurringdeposit,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client',
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.share,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.fixeddeposit,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.recurringdeposit,'
+                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.share',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.event.impl'
                 )

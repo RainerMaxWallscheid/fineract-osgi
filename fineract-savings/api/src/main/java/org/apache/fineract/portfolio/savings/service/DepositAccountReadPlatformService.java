@@ -22,11 +22,16 @@ import java.util.Collection;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.data.PaginationParameters;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.DepositAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 
+/**
+ * Read API for fixed/recurring deposit accounts. Interest-to-savings transfer
+ * rows stay on the provider-local
+ * {@code DepositAccountInterestTransferReadService} (uses provider
+ * {@code AccountTransferDTO}).
+ */
 public interface DepositAccountReadPlatformService {
 
     /**
@@ -69,8 +74,6 @@ public interface DepositAccountReadPlatformService {
     Collection<DepositAccountData> retrieveForMaturityUpdate();
 
     SavingsAccountTransactionData retrieveRecurringAccountDepositTransactionTemplate(Long accountId);
-
-    Collection<AccountTransferDTO> retrieveDataForInterestTransfer();
 
     Collection<Map<String, Object>> retriveDataForRDScheduleCreation();
 }
