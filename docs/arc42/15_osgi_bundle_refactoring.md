@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | TwoFactor closed; **share/FD/RD business events** → event-impl; **notification** → notification-impl; **share/FD/RD serializers** → event-impl; **bulkimport** residual closed; **AuthorizationServer + OIDC + basic-auth SecurityConfig** → security-impl; **journal write service** → accounting-impl via `ExternalAssetOwnerJournalPort` (investor-impl adapter; ExternalAssetOwner domain → investor-api) |
+| **Residual hardening** | Documented residual set closed. Follow-ups: **SecurityValidationConfig** + security unit tests → security-impl/test; **LoanJournalEntryPosterImpl** → accounting-impl (with journal write). Remaining provider mass is domain residual (savings/loan/client/share/COB/batch), not residual-hardening leftovers. |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

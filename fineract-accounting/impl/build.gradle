@@ -68,6 +68,8 @@ jar {
                         + 'org.apache.fineract.accounting.journalentry.handler,'
                         + 'org.apache.fineract.accounting.journalentry,'
                         + 'org.apache.fineract.accounting.journalentry.service,'
+                        + 'org.apache.fineract.accounting.journalentry.starter,'
+                        + 'org.apache.fineract.portfolio.loanaccount.service,'
                         + 'org.apache.fineract.accounting.provisioning.starter,'
                         + 'org.apache.fineract.accounting.provisioning.service,'
                         + 'org.apache.fineract.accounting.provisioning.handler,'

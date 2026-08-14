@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.fineract.infrastructure.core.config;
+package org.apache.fineract.infrastructure.security.config;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
