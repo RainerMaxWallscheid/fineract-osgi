@@ -21,31 +21,29 @@ package org.apache.fineract.cob.loan;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.processor.AbstractItemProcessor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
-import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanInterestScheduleModel;
+import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelRebuildPort;
 import org.springframework.lang.NonNull;
 
 public abstract class AbstractLoanItemProcessor extends AbstractItemProcessor<Loan> {
 
-    private final ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService;
+    private final ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort;
 
     public AbstractLoanItemProcessor(COBBusinessStepService cobBusinessStepService,
-            ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService) {
+            ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort) {
         super(cobBusinessStepService);
-        this.progressiveLoanModelProcessingService = progressiveLoanModelProcessingService;
+        this.progressiveLoanModelRebuildPort = progressiveLoanModelRebuildPort;
     }
 
     @Override
     public Loan process(@NonNull Loan loan) throws Exception {
         if (needToRebuildModel(loan)) {
-            progressiveLoanModelProcessingService.recalculateModelAndSave(loan.getId());
+            progressiveLoanModelRebuildPort.recalculateModelAndSave(loan.getId());
         }
         return super.process(loan);
     }
 
     private boolean needToRebuildModel(Loan loan) {
-        return loan.isProgressiveSchedule() && !progressiveLoanModelProcessingService.hasValidModel(loan.getId(),
-                ProgressiveLoanInterestScheduleModel.getModelVersion());
+        return loan.isProgressiveSchedule() && !progressiveLoanModelRebuildPort.hasValidModel(loan.getId());
     }
 
     @Override

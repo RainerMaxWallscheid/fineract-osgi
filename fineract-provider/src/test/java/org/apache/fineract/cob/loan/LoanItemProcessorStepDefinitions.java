@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.TreeMap;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
+import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelRebuildPort;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
@@ -40,9 +40,9 @@ import org.springframework.batch.item.ExecutionContext;
 public class LoanItemProcessorStepDefinitions implements En {
 
     private COBBusinessStepService cobBusinessStepService = mock(COBBusinessStepService.class);
-    private ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService = mock(ProgressiveLoanModelProcessingService.class);
+    private ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort = mock(ProgressiveLoanModelRebuildPort.class);
 
-    private LoanItemProcessor loanItemProcessor = new LoanItemProcessor(cobBusinessStepService, progressiveLoanModelProcessingService);
+    private LoanItemProcessor loanItemProcessor = new LoanItemProcessor(cobBusinessStepService, progressiveLoanModelRebuildPort);
 
     private Loan loan = mock(Loan.class);
 

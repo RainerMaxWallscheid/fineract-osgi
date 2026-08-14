@@ -32,7 +32,7 @@ import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
+import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelRebuildPort;
 import org.apache.fineract.useradministration.domain.AppUserRepositoryWrapper;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -88,7 +88,7 @@ public class LoanCOBWorkerConfiguration {
     private LockingService loanLockingService;
 
     @Autowired
-    private ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService;
+    private ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort;
 
     @Bean(name = LoanCOBConstant.LOAN_COB_WORKER_STEP)
     public Step loanCOBWorkerStep() {
@@ -163,7 +163,7 @@ public class LoanCOBWorkerConfiguration {
     @Bean
     @StepScope
     public LoanItemProcessor cobWorkerItemProcessor() {
-        return new LoanItemProcessor(cobBusinessStepService, progressiveLoanModelProcessingService);
+        return new LoanItemProcessor(cobBusinessStepService, progressiveLoanModelRebuildPort);
     }
 
     @Bean

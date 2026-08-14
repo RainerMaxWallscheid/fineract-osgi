@@ -22,7 +22,8 @@ Wave‑4 module after progressive/WC
 - Inline COB executor closed into cob-impl (`InlineCommonLockableCOBExecutorService`, loan impl, build-context tasklet); WC inline executor in WC-impl
 - Savings retrieve-id impl closed into savings-impl; loan COB manager + partitioner closed into loan-impl
 - WC inline COB job config closed into WC-impl; internal loan COB test API closed into loan-impl
-- Loan/savings/WC/investor COB adapters depend on api+impl; loan processors + loan worker/inline configs stay on provider
+- Loan COB processors + worker/inline configs closed into loan-impl via loan-api `ProgressiveLoanModelRebuildPort` (adapter in progressive-loan-impl)
+- Loan/savings/WC/investor COB adapters depend on api+impl
 
 ## Commands
 

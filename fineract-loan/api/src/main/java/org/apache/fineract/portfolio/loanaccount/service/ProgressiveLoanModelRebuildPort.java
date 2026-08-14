@@ -16,23 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cob.loan;
+package org.apache.fineract.portfolio.loanaccount.service;
 
-import org.apache.fineract.cob.COBBusinessStepService;
-import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
+/**
+ * Narrow loan-api port for progressive-model rebuild used by loan COB processors.
+ * <p>
+ * Avoids loan-impl depending on progressive-loan-impl (progressive-loan-impl already depends on loan-impl).
+ */
+public interface ProgressiveLoanModelRebuildPort {
 
-public class LoanItemProcessor extends AbstractLoanItemProcessor {
+    boolean hasValidModel(Long loanId);
 
-    public LoanItemProcessor(COBBusinessStepService cobBusinessStepService,
-            ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService) {
-        super(cobBusinessStepService, progressiveLoanModelProcessingService);
-    }
-
-    @BeforeStep
-    public void beforeStep(StepExecution stepExecution) {
-        setExecutionContext(stepExecution.getExecutionContext());
-        setBusinessDate(stepExecution);
-    }
+    void recalculateModelAndSave(Long loanId);
 }

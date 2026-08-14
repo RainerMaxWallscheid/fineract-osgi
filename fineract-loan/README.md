@@ -6,13 +6,16 @@ Loan products & accounts — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-loan-api` | `api/` | `org.apache.fineract.loan.api` | Pure ports, DTOs, exceptions |
-| `fineract-loan-impl` | `impl/` | `org.apache.fineract.loan.impl` | JPA domain, entity-typed services, schedule, delinquency, COB, retrieve-id, item readers/writers |
+| `fineract-loan-impl` | `impl/` | `org.apache.fineract.loan.impl` | JPA domain, entity-typed services, schedule, delinquency, COB processors and job configs |
 | `fineract-loan-test` | `test/` | `org.apache.fineract.loan.test` | Fragment-Host → `loan.impl` |
 
 No `:fineract-loan` façade.
 
 `LoanPeriodicAccrualPort` (loan-api) + `LoanPeriodicAccrualPortAdapter` (loan-impl) break the
 loan↔accounting residual cycle so accounting-impl can drive periodic accruals without depending on loan-impl.
+
+`ProgressiveLoanModelRebuildPort` (loan-api) + adapter in progressive-loan-impl let loan COB
+processors live in loan-impl without depending on progressive-loan-impl.
 
 `LoanProductConstants` lives on **loan-api** (JSON param names). `LoanProductToGLAccountMappingHelper`
 moved to **accounting-impl** with product-to-GL write (no loan entity dependency).
