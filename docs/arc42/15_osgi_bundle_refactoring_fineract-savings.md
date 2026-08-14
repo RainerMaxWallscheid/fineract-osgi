@@ -42,6 +42,7 @@ fineract-savings/
 - Optional: pure account ports without entity signatures
 - Interest-rate chart REST, command handlers, read/write services, and validators now live in savings-impl (domain/assemblers were already there)
 - Fixed/recurring deposit product write/read/handlers now live in savings-impl. Savings-product write stays on provider to avoid a savings-impl ↔ entityaccess-impl cycle.
+- Fixed/recurring deposit account entities (and RD schedule/recurring detail) now live in savings-impl next to `SavingsAccount`. Assemblers stay on provider.
 
 ## 5. Commands
 
