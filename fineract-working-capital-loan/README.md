@@ -6,7 +6,7 @@ Working capital loans — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-working-capital-loan-api` | `api/` | `org.apache.fineract.workingcapitalloan.api` | Pure ports, DTOs, exceptions, pure enums |
-| `fineract-working-capital-loan-impl` | `impl/` | `org.apache.fineract.workingcapitalloan.impl` | Domain, COB, residual services |
+| `fineract-working-capital-loan-impl` | `impl/` | `org.apache.fineract.workingcapitalloan.impl` | Domain, COB, catch-up residual |
 | `fineract-working-capital-loan-test` | `test/` | `org.apache.fineract.workingcapitalloan.test` | Fragment-Host → impl |
 
 No façade. Consumers: **api + impl**.

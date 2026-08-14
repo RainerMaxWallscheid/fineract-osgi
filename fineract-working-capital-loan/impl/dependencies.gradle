@@ -32,6 +32,7 @@ dependencies {
     implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-cob-impl'))
+    implementation(project(path: ':fineract-jobs-api'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
