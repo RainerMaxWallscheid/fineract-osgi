@@ -18,10 +18,12 @@
  */
 package org.apache.fineract.infrastructure.jobs.filter;
 
-import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
-import org.springframework.context.annotation.Conditional;
-
-@Conditional(LoanCOBEnabledCondition.class)
+/**
+ * Thin filter type used by security filter-chain ordering. Constructed by
+ * security configs when a {@link LoanCOBFilterHelper} bean is present; the
+ * helper implementation lives in jobs-impl (and is only registered when loan
+ * COB is enabled).
+ */
 public class LoanCOBApiFilter extends COBApiFilter {
 
     public LoanCOBApiFilter(LoanCOBFilterHelper helper) {

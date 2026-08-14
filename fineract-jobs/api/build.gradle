@@ -32,6 +32,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.jobs.api,'
                         + 'org.apache.fineract.infrastructure.jobs.data,'
                         + 'org.apache.fineract.infrastructure.jobs.exception,'
+                        + 'org.apache.fineract.infrastructure.jobs.filter,'
                         + 'org.apache.fineract.infrastructure.jobs.service,'
                         + 'org.apache.fineract.infrastructure.jobs.service.jobname,'
                         + 'org.apache.fineract.infrastructure.jobs.service.jobparameterprovider',

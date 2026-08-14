@@ -30,7 +30,6 @@ import org.apache.fineract.infrastructure.core.service.MDCWrapper;
 import org.apache.fineract.infrastructure.instancemode.filter.FineractInstanceModeApiFilter;
 import org.apache.fineract.infrastructure.jobs.filter.LoanCOBApiFilter;
 import org.apache.fineract.infrastructure.jobs.filter.LoanCOBFilterHelper;
-import org.apache.fineract.infrastructure.jobs.filter.ProgressiveLoanModelCheckerFilter;
 import org.apache.fineract.infrastructure.security.converter.FineractOidcJwtAuthenticationConverter;
 import org.apache.fineract.infrastructure.security.filter.BusinessDateFilter;
 import org.apache.fineract.infrastructure.security.filter.OidcTenantAwareFilter;
@@ -56,6 +55,7 @@ import org.springframework.security.oauth2.server.resource.web.DefaultBearerToke
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Spring Security filter chain for OIDC Federation authentication.
@@ -112,8 +112,13 @@ public class OidcFederationSecurityConfig {
     @Autowired
     private IdempotencyStoreHelper idempotencyStoreHelper;
 
+    /**
+     * Bean from jobs-impl ({@code progressiveLoanModelCheckerFilter}); typed as
+     * {@link OncePerRequestFilter} so security-impl does not depend on jobs-impl.
+     */
     @Autowired
-    private ProgressiveLoanModelCheckerFilter progressiveLoanModelCheckerFilter;
+    @org.springframework.beans.factory.annotation.Qualifier("progressiveLoanModelCheckerFilter")
+    private OncePerRequestFilter progressiveLoanModelCheckerFilter;
 
     @Autowired(required = false)
     private LoanCOBFilterHelper loanCOBFilterHelper;

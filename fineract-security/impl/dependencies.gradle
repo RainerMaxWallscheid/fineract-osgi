@@ -23,6 +23,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-campaigns-api'))
+    // LoanCOBApiFilter / LoanCOBFilterHelper types for AuthorizationServer + OIDC chains
+    implementation(project(path: ':fineract-jobs-api'))
     implementation 'org.postgresql:postgresql'
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
