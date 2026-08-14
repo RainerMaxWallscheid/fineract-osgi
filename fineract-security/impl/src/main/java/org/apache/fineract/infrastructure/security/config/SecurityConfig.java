@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.fineract.infrastructure.core.config;
+package org.apache.fineract.infrastructure.security.config;
 
 import static org.springframework.security.authorization.AuthenticatedAuthorizationManager.fullyAuthenticated;
 import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasAuthority;
@@ -25,6 +25,7 @@ import static org.springframework.security.authorization.AuthorityAuthorizationM
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
+import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
@@ -38,7 +39,6 @@ import org.apache.fineract.infrastructure.core.service.MDCWrapper;
 import org.apache.fineract.infrastructure.instancemode.filter.FineractInstanceModeApiFilter;
 import org.apache.fineract.infrastructure.jobs.filter.LoanCOBApiFilter;
 import org.apache.fineract.infrastructure.jobs.filter.LoanCOBFilterHelper;
-import org.apache.fineract.infrastructure.jobs.filter.ProgressiveLoanModelCheckerFilter;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.filter.TenantAwareBasicAuthenticationFilter;
 import org.apache.fineract.infrastructure.security.filter.TwoFactorAuthenticationFilter;
@@ -73,6 +73,7 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @Configuration
@@ -113,8 +114,13 @@ public class SecurityConfig {
     private LoanCOBFilterHelper loanCOBFilterHelper;
     @Autowired
     private IdempotencyStoreHelper idempotencyStoreHelper;
+    /**
+     * Bean from jobs-impl ({@code progressiveLoanModelCheckerFilter}); typed as
+     * {@link OncePerRequestFilter} so security-impl does not depend on jobs-impl.
+     */
     @Autowired
-    private ProgressiveLoanModelCheckerFilter progressiveLoanModelCheckerFilter;
+    @org.springframework.beans.factory.annotation.Qualifier("progressiveLoanModelCheckerFilter")
+    private OncePerRequestFilter progressiveLoanModelCheckerFilter;
     @Autowired
     private PlatformUserDetailsChecker platformUserDetailsChecker;
 
