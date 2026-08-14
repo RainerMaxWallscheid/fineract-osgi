@@ -279,7 +279,7 @@ Shared kernel           → core, validation         don't force BC split
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh docs when peels land |
 | **Optional provider peels** | **`useradministration`**, **`adhocquery`**, **`template`**, **`notification`**, **`spm`**, **`fund`**, **`accountnumberformat`**, **`survey`**, **`entityaccess`**, **`calendar`**, **`meeting`**, **`address`**, **`creditbureau`**, **`collateral` (legacy)**, **`collateralmanagement`**, **`note`**, **`hooks`**, **`sms`**, **`reportmailingjob`**, **`campaigns`**, **`gcm`**, **`dataqueries`**, **`configuration`**, **`bulkimport`**, **`instancemode`**, **`jobs`**, **`s3`**, **`openapi`**, **`springbatch`**, **`event`**, **`interoperation` complete**; residual share events + optional peels deferred |
-| **Residual hardening** | TwoFactor closed; **share/FD/RD business events** → event-impl; **notification** → notification-impl; **share/FD/RD serializers** → event-impl; **bulkimport** residual closed; **AuthorizationServer + OIDC + basic-auth SecurityConfig** → security-impl (`LoanCOBApiFilter` types → jobs-api; progressive COB filter via bean qualifier); still: journal **write service** (investor cycle residual) |
+| **Residual hardening** | TwoFactor closed; **share/FD/RD business events** → event-impl; **notification** → notification-impl; **share/FD/RD serializers** → event-impl; **bulkimport** residual closed; **AuthorizationServer + OIDC + basic-auth SecurityConfig** → security-impl; **journal write service** → accounting-impl via `ExternalAssetOwnerJournalPort` (investor-impl adapter; ExternalAssetOwner domain → investor-api) |
 | **Do not start** | full provider / whole-core api/impl |
 
 ---

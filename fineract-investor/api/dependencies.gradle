@@ -26,6 +26,13 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3'
     // Spring Data Page on read ports
     compileOnly 'org.springframework.data:spring-data-commons'
+    // ExternalAssetOwner* domain + repository surface for accounting journal port
+    compileOnly 'jakarta.persistence:jakarta.persistence-api'
+    compileOnly 'org.springframework.data:spring-data-jpa'
+    // AbstractAuditableWithUTCDateTimeCustom is woven; javac needs EclipseLink types
+    compileOnly('org.eclipse.persistence:org.eclipse.persistence.jpa') {
+        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
+    }
     // Exception status constants
     compileOnly 'org.springframework:spring-web'
 

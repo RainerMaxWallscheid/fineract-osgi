@@ -41,8 +41,7 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
-import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
-import org.apache.fineract.investor.service.AccountingService;
+import org.apache.fineract.accounting.journalentry.service.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
@@ -96,8 +95,8 @@ public class AccountingJournalEntryConfiguration {
             PlatformSecurityContext context, PaymentDetailWritePlatformService paymentDetailWritePlatformService,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper,
             CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions,
-            ConfigurationReadPlatformService configurationReadPlatformService, AccountingService accountingService,
-            ExternalAssetOwnerRepository externalAssetOwnerRepository,
+            ConfigurationReadPlatformService configurationReadPlatformService,
+            ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort,
             LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository,
             LoanTransactionRepository loanTransactionRepository,
             org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
@@ -106,7 +105,6 @@ public class AccountingJournalEntryConfiguration {
                 accountingProcessorForSharesFactory, helper, fromApiJsonDeserializer, accountingRuleRepository,
                 glAccountReadPlatformService, organisationCurrencyRepository, context, paymentDetailWritePlatformService,
                 financialActivityAccountRepositoryWrapper, accountingProcessorForClientTransactions, configurationReadPlatformService,
-                accountingService, externalAssetOwnerRepository, loanAmortizationAllocationMappingRepository, loanTransactionRepository,
-                taxCatalogPort);
+                externalAssetOwnerJournalPort, loanAmortizationAllocationMappingRepository, loanTransactionRepository, taxCatalogPort);
     }
 }

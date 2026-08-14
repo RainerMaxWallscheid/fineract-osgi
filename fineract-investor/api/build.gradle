@@ -34,6 +34,7 @@ jar {
                 'Bundle-Description': 'External asset owner contracts (ports, DTOs, exceptions)',
                 'Export-Package': 'org.apache.fineract.investor.moduleapi,'
                         + 'org.apache.fineract.investor.service,'
+                        + 'org.apache.fineract.investor.domain,'
                         + 'org.apache.fineract.investor.data,'
                         + 'org.apache.fineract.investor.data.attribute,'
                         + 'org.apache.fineract.investor.data.request,'
