@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +39,13 @@ public class BulkImportOsgiServiceRegistrar implements InitializingBean, Disposa
     private static final Logger LOG = LoggerFactory.getLogger(BulkImportOsgiServiceRegistrar.class);
 
     private final ObjectProvider<BulkImportWorkbookService> workbook;
+    private final ObjectProvider<BulkImportWorkbookPopulatorService> workbookPopulator;
     private final List<Object> registrations = new ArrayList<>();
 
-    public BulkImportOsgiServiceRegistrar(final ObjectProvider<BulkImportWorkbookService> workbook) {
+    public BulkImportOsgiServiceRegistrar(final ObjectProvider<BulkImportWorkbookService> workbook,
+            final ObjectProvider<BulkImportWorkbookPopulatorService> workbookPopulator) {
         this.workbook = workbook;
+        this.workbookPopulator = workbookPopulator;
     }
 
     @Override
@@ -58,6 +62,7 @@ public class BulkImportOsgiServiceRegistrar implements InitializingBean, Disposa
                 return;
             }
             register(context, BulkImportWorkbookService.class, workbook.getIfAvailable());
+            register(context, BulkImportWorkbookPopulatorService.class, workbookPopulator.getIfAvailable());
             LOG.info("Registered {} bulkimport OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only bulkimport wiring");
