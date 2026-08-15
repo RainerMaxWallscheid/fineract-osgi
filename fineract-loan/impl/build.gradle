@@ -75,6 +75,7 @@ jar {
                         + 'org.apache.fineract.portfolio.interestpauses.handler,'
                         + 'org.apache.fineract.portfolio.interestpauses.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.api,'
+                        + 'org.apache.fineract.portfolio.loanaccount.api.request,'
                         + 'org.apache.fineract.portfolio.loanaccount.command,'
                         + 'org.apache.fineract.portfolio.loanaccount.data,'
                         + 'org.apache.fineract.portfolio.loanaccount.domain,'

@@ -133,3 +133,6 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 ./gradlew :fineract-security-api:jar :fineract-security-impl:jar :fineract-security-test:test
 ./gradlew :fineract-core:compileJava :fineract-provider:compileJava
 ```
+
+
+- Leftover pure Spring configs closed into core: `FineractCorsConfiguration`, `FineractStartupValidationConfig`, `SpringConfig`.

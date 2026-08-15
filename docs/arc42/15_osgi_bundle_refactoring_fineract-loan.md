@@ -52,6 +52,7 @@ fineract-loan/
 ---
 
 - Leftover loan interest-pause and reschedule batch `CommandStrategy` classes now live in loan-impl next to leftover `LoanInterestPauseApiResource` / `RescheduleLoansApiResource`. Re-age preview strategies stay (leftover `LoanTransactionsApiResource` on provider).
+- Leftover pure schedule/point-in-time residual closed into loan-impl: `LoanRepaymentScheduleService`, schedule period wrapper, PIT amount DTOs, re-age/re-amortization preview requests, interest-payment-waiver command handler.
 
 ## 4. Commands
 
