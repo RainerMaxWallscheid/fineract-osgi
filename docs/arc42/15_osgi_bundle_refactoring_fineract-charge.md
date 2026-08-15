@@ -612,3 +612,4 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 ---
 
 *Navigation:* [15 playbook](15_osgi_bundle_refactoring.md) · [command pilot](15_osgi_bundle_refactoring_fineract-command.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [14 Module API](14_module_api_boundaries.md)
+- Leftover client-charge read/REST and share-account charge JDBC read closed into charge-impl.
