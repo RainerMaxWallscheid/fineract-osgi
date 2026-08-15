@@ -65,7 +65,6 @@ import org.apache.fineract.portfolio.interestratechart.service.InterestIncentive
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartAssembler;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartDropdownReadService;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartReadService;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
@@ -300,8 +299,8 @@ public class SavingsConfiguration {
     @Bean
     @ConditionalOnMissingBean(GroupSavingsIndividualMonitoringWritePlatformService.class)
     public GroupSavingsIndividualMonitoringWritePlatformService groupSavingsIndividualMonitoringWritePlatformService(
-            PlatformSecurityContext context, GSIMRepositoy gsimAccountRepository, LoanRepository loanRepository) {
-        return new GroupSavingsIndividualMonitoringWritePlatformServiceImpl(context, gsimAccountRepository, loanRepository);
+            PlatformSecurityContext context, GSIMRepositoy gsimAccountRepository) {
+        return new GroupSavingsIndividualMonitoringWritePlatformServiceImpl(context, gsimAccountRepository);
     }
 
     @Bean

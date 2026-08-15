@@ -51,6 +51,7 @@ fineract-savings/
 - Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest/transfer/adhoc jobs stay on provider.
 - `SavingsAccountChargeReadPlatformServiceImpl` now lives in savings-impl after `ChargeDropdownReadPlatformService` moved to charge-api.
 - Transaction validators and leftover `SavingsDropdownReadPlatformServiceImplTest` now live in savings-impl/test. Provider leftover savings `data/` is empty.
+- GSIM write interface/impl now live in savings-impl. Unused `LoanRepository` constructor parameter dropped.
 
 ## 5. Commands
 

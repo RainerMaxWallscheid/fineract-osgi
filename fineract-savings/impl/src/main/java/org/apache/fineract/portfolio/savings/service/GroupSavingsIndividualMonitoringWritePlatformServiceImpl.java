@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.savings.service;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.savings.domain.GSIMRepositoy;
 import org.apache.fineract.portfolio.savings.domain.GroupSavingsIndividualMonitoring;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupSavingsIndividualMonitoringWritePlatformServiceImpl implements GroupSavingsIndividualMonitoringWritePlatformService {
     private final PlatformSecurityContext context;
     private final GSIMRepositoy gsimAccountRepository;
-    private final LoanRepository loanRepository;
 
     @Override
     public GroupSavingsIndividualMonitoring addGSIMAccountInfo(String accountNumber, Group group, BigDecimal parentDeposit, Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
@@ -58,9 +56,8 @@ public class GroupSavingsIndividualMonitoringWritePlatformServiceImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public GroupSavingsIndividualMonitoringWritePlatformServiceImpl(final PlatformSecurityContext context, final GSIMRepositoy gsimAccountRepository, final LoanRepository loanRepository) {
+        public GroupSavingsIndividualMonitoringWritePlatformServiceImpl(final PlatformSecurityContext context, final GSIMRepositoy gsimAccountRepository) {
         this.context = context;
         this.gsimAccountRepository = gsimAccountRepository;
-        this.loanRepository = loanRepository;
     }
 }
