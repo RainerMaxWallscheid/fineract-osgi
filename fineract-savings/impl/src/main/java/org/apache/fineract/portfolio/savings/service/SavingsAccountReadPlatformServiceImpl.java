@@ -42,6 +42,7 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
+import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
@@ -67,13 +68,13 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccrualData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountChargesPaidByData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountSubStatusEnum;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionDataSummaryWrapper;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
+import org.apache.fineract.portfolio.savings.domain.SavingsHelper;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountTransactionNotFoundException;
 import org.apache.fineract.portfolio.tax.data.TaxComponentData;
@@ -91,6 +92,9 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
+    private final ConfigurationDomainService configurationDomainService;
+    private final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper;
+    private final SavingsHelper savingsHelper;
 
     // mappers
     private final SavingsAccountTransactionTemplateMapper transactionTemplateMapper;
@@ -104,18 +108,22 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     private final PaginationHelper paginationHelper;
 
     private final ColumnValidator columnValidator;
-    private final SavingsAccountAssembler savingAccountAssembler;
 
     private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
 
     public SavingsAccountReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate,
-            final SavingsAccountAssembler savingAccountAssembler, PaginationHelper paginationHelper, ColumnValidator columnValidator,
-            DatabaseSpecificSQLGenerator sqlGenerator, SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
-            SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
+            final ConfigurationDomainService configurationDomainService,
+            final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper, final SavingsHelper savingsHelper,
+            final PaginationHelper paginationHelper, final ColumnValidator columnValidator, final DatabaseSpecificSQLGenerator sqlGenerator,
+            final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
+            final SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
         this.context = context;
         this.jdbcTemplate = jdbcTemplate;
         this.sqlGenerator = sqlGenerator;
+        this.configurationDomainService = configurationDomainService;
+        this.savingsAccountTransactionDataSummaryWrapper = savingsAccountTransactionDataSummaryWrapper;
+        this.savingsHelper = savingsHelper;
         this.savingsAccountRepositoryWrapper = savingsAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.transactionTemplateMapper = new SavingsAccountTransactionTemplateMapper();
@@ -125,7 +133,6 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         this.columnValidator = columnValidator;
         this.paginationHelper = paginationHelper;
         this.savingAccountMapperForInterestPosting = new SavingAccountMapperForInterestPosting();
-        this.savingAccountAssembler = savingAccountAssembler;
     }
 
     @Override
@@ -258,9 +265,34 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         List<SavingsAccountData> savingsAccountDataList = this.jdbcTemplate.query(sql, this.savingAccountMapperForInterestPosting, // NOSONAR
                 new Object[] { maxSavingsId, status, pageSize, yesterday });
         for (SavingsAccountData savingsAccountData : savingsAccountDataList) {
-            this.savingAccountAssembler.assembleSavings(savingsAccountData);
+            assembleSavingsForInterestPosting(savingsAccountData);
         }
         return savingsAccountDataList;
+    }
+
+    /** Inlined from leftover SavingsAccountAssembler.assembleSavings (entity assembler stays on provider). */
+    private void assembleSavingsForInterestPosting(final SavingsAccountData account) {
+        final boolean backdatedTxnsAllowedTill = this.configurationDomainService.retrievePivotDateConfig();
+        if (backdatedTxnsAllowedTill && account.getSavingsAccountTransactionData() != null
+                && account.getSummary().getInterestPostedTillDate() != null) {
+            List<SavingsAccountTransactionData> removalList = new ArrayList<>();
+
+            for (int i = 0; i < account.getSavingsAccountTransactionData().size(); i++) {
+                SavingsAccountTransactionData savingsAccountTransaction = account.getSavingsAccountTransactionData().get(i);
+                removalList.add(savingsAccountTransaction);
+                if ((savingsAccountTransaction.isInterestPostingAndNotReversed()
+                        || savingsAccountTransaction.isOverdraftInterestAndNotReversed())
+                        && !savingsAccountTransaction.isReversalTransaction()) {
+                    account.getSummary().setRunningBalanceOnPivotDate(savingsAccountTransaction.getRunningBalance());
+                    account.setLastSavingsAccountTransaction(savingsAccountTransaction);
+                    break;
+                }
+            }
+            account.getSavingsAccountTransactionData().removeAll(removalList);
+        } else {
+            account.getSummary().setRunningBalanceOnPivotDate(BigDecimal.ZERO);
+        }
+        account.setHelpers(this.savingsAccountTransactionDataSummaryWrapper, this.savingsHelper);
     }
 
     private static final class SavingAccountMapperForInterestPosting implements ResultSetExtractor<List<SavingsAccountData>> {
@@ -1302,8 +1334,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     }
 
     @Override
-    public List<SavingsAccrualData> retrievePeriodicAccrualData(LocalDate tillDate, SavingsAccount savings) {
-        Long savingsId = (savings != null) ? savings.getId() : null;
+    public List<SavingsAccrualData> retrievePeriodicAccrualData(LocalDate tillDate, Long savingsId) {
         Integer status = SavingsAccountStatusType.ACTIVE.getValue();
         Integer accountingRule = AccountingRuleType.ACCRUAL_PERIODIC.getValue();
 

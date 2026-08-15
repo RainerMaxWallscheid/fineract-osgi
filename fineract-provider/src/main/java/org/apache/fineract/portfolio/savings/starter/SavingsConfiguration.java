@@ -88,6 +88,7 @@ import org.apache.fineract.portfolio.savings.domain.GSIMRepositoy;
 import org.apache.fineract.portfolio.savings.domain.RecurringDepositAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.RecurringDepositProductRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionDataSummaryWrapper;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountChargeAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
@@ -362,11 +363,14 @@ public class SavingsConfiguration {
     @Bean
     @ConditionalOnMissingBean(SavingsAccountReadPlatformService.class)
     public SavingsAccountReadPlatformService savingsAccountReadPlatformService(PlatformSecurityContext context, JdbcTemplate jdbcTemplate,
-            SavingsAccountAssembler savingAccountAssembler, PaginationHelper paginationHelper, DatabaseSpecificSQLGenerator sqlGenerator,
+            ConfigurationDomainService configurationDomainService,
+            SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper, SavingsHelper savingsHelper,
+            PaginationHelper paginationHelper, DatabaseSpecificSQLGenerator sqlGenerator,
             SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, ColumnValidator columnValidator,
             SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
-        return new SavingsAccountReadPlatformServiceImpl(context, jdbcTemplate, savingAccountAssembler, paginationHelper, columnValidator,
-                sqlGenerator, savingsAccountRepositoryWrapper, savingsAccountTransactionRepository);
+        return new SavingsAccountReadPlatformServiceImpl(context, jdbcTemplate, configurationDomainService,
+                savingsAccountTransactionDataSummaryWrapper, savingsHelper, paginationHelper, columnValidator, sqlGenerator,
+                savingsAccountRepositoryWrapper, savingsAccountTransactionRepository);
     }
 
     @Bean

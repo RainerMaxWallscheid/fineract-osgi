@@ -28,7 +28,6 @@ import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccrualData;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 public interface SavingsAccountReadPlatformService {
 
@@ -74,5 +73,5 @@ public interface SavingsAccountReadPlatformService {
 
     Long retrieveAccountIdByExternalId(ExternalId externalId);
 
-    List<SavingsAccrualData> retrievePeriodicAccrualData(LocalDate tillDate, SavingsAccount savings);
+    List<SavingsAccrualData> retrievePeriodicAccrualData(LocalDate tillDate, Long savingsId);
 }
