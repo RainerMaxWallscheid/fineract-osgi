@@ -46,6 +46,7 @@ fineract-savings/
 - Leftover savings command handlers now live in savings-impl (thin wrappers over write ports already on api/impl).
 - Deposit-account interest-chart read, FD interest-calculation, and `DepositAccountDataValidator` now live in savings-impl.
 - Savings/FD/RD product REST now live in savings-impl. Generic `DropdownReadPlatformService` moved to fineract-core next to `CommonEnumerations`.
+- Savings account transaction/charge/on-hold/internal REST now live in savings-impl. Account-collection REST stays on provider (bulkimport + leftover account associations).
 
 ## 5. Commands
 
