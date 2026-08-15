@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 
@@ -32,14 +32,14 @@ import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 public final class JLGCollectionSheetData {
 
     private final LocalDate dueDate;
-    private final Collection<LoanProductData> loanProducts;
+    private final Collection<LoanProductLookupData> loanProducts;
     @SuppressWarnings("unused")
     private final Collection<SavingsProductData> savingsProducts;
     private final Collection<JLGGroupData> groups;
     private final List<EnumOptionData> attendanceTypeOptions;
     private final Collection<PaymentTypeData> paymentTypeOptions;
 
-    public static JLGCollectionSheetData instance(final LocalDate date, final Collection<LoanProductData> loanProducts,
+    public static JLGCollectionSheetData instance(final LocalDate date, final Collection<LoanProductLookupData> loanProducts,
             final Collection<JLGGroupData> groups, final List<EnumOptionData> attendanceTypeOptions,
             final Collection<PaymentTypeData> paymentTypeOptions) {
         return new JLGCollectionSheetData(date, loanProducts, null, groups, attendanceTypeOptions, paymentTypeOptions);
@@ -52,7 +52,7 @@ public final class JLGCollectionSheetData {
                 data.paymentTypeOptions);
     }
 
-    private JLGCollectionSheetData(LocalDate dueDate, Collection<LoanProductData> loanProducts,
+    private JLGCollectionSheetData(LocalDate dueDate, Collection<LoanProductLookupData> loanProducts,
             Collection<SavingsProductData> savingsProducts, Collection<JLGGroupData> groups, List<EnumOptionData> attendanceTypeOptions,
             final Collection<PaymentTypeData> paymentTypeOptions) {
         this.dueDate = dueDate;
@@ -71,7 +71,7 @@ public final class JLGCollectionSheetData {
         return this.groups;
     }
 
-    public Collection<LoanProductData> getLoanProducts() {
+    public Collection<LoanProductLookupData> getLoanProducts() {
         return this.loanProducts;
     }
 

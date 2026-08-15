@@ -21,7 +21,7 @@ package org.apache.fineract.portfolio.search.starter;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.search.service.SearchReadService;
 import org.apache.fineract.portfolio.search.service.SearchReadServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,9 +35,9 @@ public class SearchConfiguration {
     @Bean
     @ConditionalOnMissingBean(SearchReadService.class)
     public SearchReadService searchReadService(NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            LoanProductReadPlatformService loanProductReadPlatformService, OfficeReadPlatformService officeReadPlatformService,
+            LoanProductLookupReadPort loanProductLookupReadPort, OfficeReadPlatformService officeReadPlatformService,
             DatabaseSpecificSQLGenerator sqlGenerator, SqlValidator sqlValidator) {
-        return new SearchReadServiceImpl(namedParameterJdbcTemplate, loanProductReadPlatformService, officeReadPlatformService,
+        return new SearchReadServiceImpl(namedParameterJdbcTemplate, loanProductLookupReadPort, officeReadPlatformService,
                 sqlGenerator, sqlValidator);
     }
 }

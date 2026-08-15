@@ -59,7 +59,7 @@ import org.apache.fineract.portfolio.group.data.CenterData;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceEnumerations;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceType;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
@@ -115,11 +115,11 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
         JLGCollectionSheetData jlgCollectionSheetData = null;
         JLGCollectionSheetFlatData prevCollectioSheetFlatData = null;
         JLGCollectionSheetFlatData corrCollectioSheetFlatData = null;
-        final Set<LoanProductData> loanProducts = new HashSet<>();
+        final Set<LoanProductLookupData> loanProducts = new HashSet<>();
         if (jlgCollectionSheetFlatData != null) {
             for (final JLGCollectionSheetFlatData collectionSheetFlatData : jlgCollectionSheetFlatData) {
                 if (collectionSheetFlatData.getProductId() != null) {
-                    loanProducts.add(LoanProductData.lookupWithCurrency(collectionSheetFlatData.getProductId(), collectionSheetFlatData.getProductShortName(), collectionSheetFlatData.getCurrency()));
+                    loanProducts.add(LoanProductLookupData.lookupWithCurrency(collectionSheetFlatData.getProductId(), collectionSheetFlatData.getProductShortName(), collectionSheetFlatData.getCurrency()));
                 }
                 corrCollectioSheetFlatData = collectionSheetFlatData;
                 if (firstTime || collectionSheetFlatData.getGroupId().equals(prevGroupId)) {

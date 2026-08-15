@@ -33,10 +33,9 @@ import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.client.domain.ClientEnumerations;
 import org.apache.fineract.portfolio.group.domain.GroupingTypeEnumerations;
-import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountStatusEnumData;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 import org.apache.fineract.portfolio.search.SearchConstants;
@@ -53,7 +52,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class SearchReadServiceImpl implements SearchReadService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final SqlValidator sqlValidator;
@@ -134,8 +133,8 @@ public class SearchReadServiceImpl implements SearchReadService {
             } else if (entityType.equalsIgnoreCase("group") || entityType.equalsIgnoreCase("center")) {
                 entityStatus = GroupingTypeEnumerations.status(entityStatusEnum);
             } else if (entityType.equalsIgnoreCase("loan")) {
-                LoanStatusEnumData loanStatusEnumData = LoanEnumerations.status(entityStatusEnum);
-                entityStatus = LoanEnumerations.status(loanStatusEnumData);
+                final LoanStatus loanStatus = LoanStatus.fromInt(entityStatusEnum);
+                entityStatus = new EnumOptionData(loanStatus.getValue().longValue(), loanStatus.getCode(), loanStatus.name());
             } else if (entityType.equalsIgnoreCase("saving")) {
                 SavingsAccountStatusEnumData savingsAccountStatusEnumData = SavingsEnumerations.status(entityStatusEnum);
                 entityStatus = SavingsEnumerations.status(savingsAccountStatusEnumData);
@@ -149,7 +148,7 @@ public class SearchReadServiceImpl implements SearchReadService {
 
     @Override
     public AdHocSearchQueryData retrieveAdHocQueryTemplate() {
-        final Collection<LoanProductData> loanProducts = loanProductReadPlatformService.retrieveAllLoanProductsForLookup();
+        final Collection<LoanProductLookupData> loanProducts = loanProductLookupReadPort.retrieveAllLoanProductsForLookup();
         final Collection<OfficeData> offices = officeReadPlatformService.retrieveAllOfficesForDropdown();
         return AdHocSearchQueryData.template(loanProducts, offices);
     }
@@ -273,9 +272,9 @@ public class SearchReadServiceImpl implements SearchReadService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SearchReadServiceImpl(final NamedParameterJdbcTemplate namedParameterJdbcTemplate, final LoanProductReadPlatformService loanProductReadPlatformService, final OfficeReadPlatformService officeReadPlatformService, final DatabaseSpecificSQLGenerator sqlGenerator, final SqlValidator sqlValidator) {
+        public SearchReadServiceImpl(final NamedParameterJdbcTemplate namedParameterJdbcTemplate, final LoanProductLookupReadPort loanProductLookupReadPort, final OfficeReadPlatformService officeReadPlatformService, final DatabaseSpecificSQLGenerator sqlGenerator, final SqlValidator sqlValidator) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.officeReadPlatformService = officeReadPlatformService;
         this.sqlGenerator = sqlGenerator;
         this.sqlValidator = sqlValidator;
