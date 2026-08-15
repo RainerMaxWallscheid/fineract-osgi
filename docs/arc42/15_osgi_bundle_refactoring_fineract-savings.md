@@ -61,6 +61,7 @@ fineract-savings/
 - Leftover savings transaction search now lives in savings-impl after leftover `SavingsAccountTransactionsMapper` was extracted from leftover account-read.
 - Leftover account-associations read impl (+ leftover `AccountAssociationType`) now live in core next to leftover associations port/data.
 - Leftover pure account-transfer enums (`AccountTransferType`, recurrence, standing-instruction priority/status/type) now live in core. Transfer job now lives in savings-impl via thin ID-only `InterestTransferData` (leftover `AccountTransferDTO` entity edges stay on provider adapter).
+- Leftover pure account-transfer support types now live in core: `AccountTransferEnumerations`, API/detail constants, thin portfolio/SI DTOs + request params, transfer/SI not-found exceptions, and leftover read ports (`PortfolioAccountReadPlatformService`, `StandingInstructionHistoryReadService`). `StandingInstructionData` stays (leftover `LoanTransactionType`).
 
 ## 5. Commands
 
