@@ -18,14 +18,14 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.service;
 
-import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.dataqueries.data.EntityDataTableChecksData;
-import org.apache.fineract.infrastructure.dataqueries.data.EntityDataTableChecksTemplateData;
+import java.util.List;
+import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 
-public interface EntityDatatableChecksReadService extends EntityDatatableTemplatesReadService {
+/**
+ * Thin leftover datatable-template lookup without leftover loan-product template
+ * edges so consumers can depend on dataqueries-api only.
+ */
+public interface EntityDatatableTemplatesReadService {
 
-    EntityDataTableChecksTemplateData retrieveTemplate();
-
-    Page<EntityDataTableChecksData> retrieveAll(SearchParameters searchParameters, Integer status, String entity, Long productId);
+    List<DatatableData> retrieveTemplates(Integer status, String entity, Long productId);
 }

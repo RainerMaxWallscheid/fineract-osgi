@@ -70,6 +70,7 @@ fineract-savings/
 - Leftover account read Spring beans now wire in core (`AccountReadConfiguration`). Leftover `AccountTransfersCommandWritePort` also carries reverse methods (ID + portfolio type only). Provider leftover `AccountConfiguration` keeps entity write beans only.
 - Leftover transfer-fee-charge job now lives in loan-impl via thin leftover `AccountTransferFundsData` (charge id + installment fields) + leftover funds write port.
 - Leftover `DepositAccountReadPlatformServiceImpl` now lives in savings-impl (JDBC + leftover ports; no assemblers). Leftover interest-transfer adapter now calls leftover `AccountTransferFundsWritePort` instead of leftover entity write service.
+- Leftover `SavingsAccountTemplateReadPlatformServiceImpl` now lives in savings-impl via thin leftover `EntityDatatableTemplatesReadService` on dataqueries-api (avoids dataqueries-impl ↔ savings-impl cycle).
 
 ## 5. Commands
 

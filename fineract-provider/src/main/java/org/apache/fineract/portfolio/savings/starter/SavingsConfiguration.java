@@ -33,6 +33,7 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.apache.fineract.infrastructure.dataqueries.data.DataTableValidator;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableReadService;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
+import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableTemplatesReadService;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
@@ -374,11 +375,11 @@ public class SavingsConfiguration {
             JdbcTemplate jdbcTemplate, ClientReadPlatformService clientReadPlatformService,
             GroupReadPlatformService groupReadPlatformService, SavingsProductReadPlatformService savingProductReadPlatformService,
             StaffReadService staffReadPlatformService, SavingsDropdownReadPlatformService dropdownReadPlatformService,
-            ChargeReadPlatformService chargeReadPlatformService, EntityDatatableChecksReadService entityDatatableChecksReadService,
+            ChargeReadPlatformService chargeReadPlatformService, EntityDatatableTemplatesReadService entityDatatableTemplatesReadService,
             ColumnValidator columnValidator) {
         return new SavingsAccountTemplateReadPlatformServiceImpl(context, jdbcTemplate, clientReadPlatformService, groupReadPlatformService,
                 savingProductReadPlatformService, staffReadPlatformService, dropdownReadPlatformService, chargeReadPlatformService,
-                entityDatatableChecksReadService, columnValidator);
+                entityDatatableTemplatesReadService, columnValidator);
     }
 
     @Bean
