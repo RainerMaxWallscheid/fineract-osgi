@@ -33,3 +33,5 @@ fineract-progressive-loan/
 - Leftover DefaultLoanScheduleGeneratorFactory closed into progressive-loan-impl.
 - Leftover progressive amortization/summary/refund/schedule-generator impls and buy-down/capitalized-income utils closed into progressive-loan-impl.
 - Leftover LoanAccountAutoStarter, LoanTransactionProcessingServiceImpl, and ReprocessLoanTransactionsServiceImpl closed into progressive-loan-impl.
+- Leftover re-age/re-amortize/termination/adjustment services+handlers, LoanTransactionsApiResource, and related batch strategies closed into progressive-loan-impl.
+- Leftover account-details JDBC impl plus loan/bulk/GLIM read impls closed into progressive-loan-impl (WC application read; account-details port+DTO on loan-impl).

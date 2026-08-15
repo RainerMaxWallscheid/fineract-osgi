@@ -62,6 +62,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.accounting.common,'
                         + 'org.apache.fineract.accounting.glaccount.domain,'
                         + 'org.apache.fineract.accounting.jobs.accountrunningbalanceupdate,'
+                        + 'org.apache.fineract.portfolio.loanaccount.jobs.generateloanlossprovisioning,'
                         + 'org.apache.fineract.accounting.journalentry.api,'
                         + 'org.apache.fineract.accounting.journalentry.data,'
                         + 'org.apache.fineract.accounting.journalentry.domain,'
