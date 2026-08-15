@@ -64,6 +64,7 @@ fineract-savings/
 - Leftover pure account-transfer support types now live in core: `AccountTransferEnumerations`, API/detail constants, thin portfolio/SI DTOs + request params, transfer/SI not-found exceptions, and leftover read ports (`PortfolioAccountReadPlatformService`, `StandingInstructionHistoryReadService`). `StandingInstructionData` stays (leftover `LoanTransactionType`).
 - Leftover portfolio-account read impl, SI-history read impl, account-transfer mapper, transfer/SI validators, SI write port, and leftover `ColumnValidator` now live in core. Account-transfer read stays (leftover `OfficeReadPlatformService` on organisation-api). Entity write/assemblers/REST stay.
 - Leftover `OfficeReadPlatformService` now lives in core next to leftover `OfficeData`. Account-transfer read impl, SI data/read port+impl, SI swagger models, and SI-history REST now live in core (`StandingInstructionData` no longer imports leftover `LoanTransactionType`). Entity write/assemblers and transfer/SI command REST stay.
+- Leftover account-transfer REST + swagger, SI REST, and SI create/update/delete command handlers now live in core. Transfer command handlers stay (leftover `AccountTransfersWritePlatformService` still embeds leftover `AccountTransferDTO` / entities).
 
 ## 5. Commands
 
