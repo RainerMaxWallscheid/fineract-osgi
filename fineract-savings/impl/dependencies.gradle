@@ -32,6 +32,8 @@ dependencies {
     implementation(project(path: ':fineract-charge-api'))
     implementation(project(path: ':fineract-rates-api'))
     implementation(project(path: ':fineract-tax-api'))
+    // Product REST templates use CurrencyReadPlatformService
+    implementation(project(path: ':fineract-monetary-api'))
     // ColumnValidator (SQL order-by safety) lives in security-impl residual
     implementation(project(path: ':fineract-security-impl'))
 

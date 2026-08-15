@@ -45,6 +45,7 @@ fineract-savings/
 - Fixed/recurring deposit account entities (and RD schedule/recurring detail) now live in savings-impl next to `SavingsAccount`. Assemblers stay on provider.
 - Leftover savings command handlers now live in savings-impl (thin wrappers over write ports already on api/impl).
 - Deposit-account interest-chart read, FD interest-calculation, and `DepositAccountDataValidator` now live in savings-impl.
+- Savings/FD/RD product REST now live in savings-impl. Generic `DropdownReadPlatformService` moved to fineract-core next to `CommonEnumerations`.
 
 ## 5. Commands
 
