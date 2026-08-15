@@ -35,7 +35,13 @@ dependencies {
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
             'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework.boot:spring-boot-starter-cache',
             'org.springframework.boot:spring-boot-starter-batch',
+            'org.springframework.boot:spring-boot-starter-data-jdbc',
+            'javax.cache:cache-api',
+            'org.reflections:reflections',
+            'org.liquibase:liquibase-core',
+            'org.apache.commons:commons-collections4',
             'org.springframework.batch:spring-batch-integration',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'jakarta.jms:jakarta.jms-api',
@@ -59,6 +65,9 @@ dependencies {
             'io.github.resilience4j:resilience4j-spring-boot3',
             'org.apache.httpcomponents:httpcore',
             )
+    implementation ('org.ehcache:ehcache') {
+        exclude group: 'com.sun.activation'
+    }
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
     }

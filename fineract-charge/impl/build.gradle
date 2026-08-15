@@ -66,7 +66,10 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.charge.starter,'
                         + 'org.apache.fineract.portfolio.client.api,'
                         + 'org.apache.fineract.portfolio.client.service,'
-                        + 'org.apache.fineract.portfolio.shareaccounts.service',
+                        + 'org.apache.fineract.portfolio.shareaccounts.service,'
+                        + 'org.apache.fineract.portfolio.shareproducts.serialization,'
+                        + 'org.apache.fineract.portfolio.shareproducts.service,'
+                        + 'org.apache.fineract.portfolio.shareproducts.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )
     }
