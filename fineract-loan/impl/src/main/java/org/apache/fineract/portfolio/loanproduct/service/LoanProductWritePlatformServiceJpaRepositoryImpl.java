@@ -34,7 +34,7 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.infrastructure.event.business.domain.loan.product.LoanProductCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -84,7 +84,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final RateRepositoryWrapper rateRepository;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final OfficeProductRestrictionService fineractEntityAccessUtil;
     private final FloatingRatePort floatingRatePort;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final BusinessEventNotifierService businessEventNotifierService;
@@ -356,7 +356,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final FloatingRatePort floatingRatePort, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
+        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final OfficeProductRestrictionService fineractEntityAccessUtil, final FloatingRatePort floatingRatePort, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;

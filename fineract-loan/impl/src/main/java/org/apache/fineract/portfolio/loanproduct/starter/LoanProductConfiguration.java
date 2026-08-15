@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.loanproduct.starter;
 
 import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -65,7 +65,7 @@ public class LoanProductConfiguration {
     @ConditionalOnMissingBean(LoanProductReadPlatformService.class)
     public LoanProductReadPlatformService loanProductReadPlatformService(PlatformSecurityContext context, JdbcTemplate jdbcTemplate,
             ChargeReadPlatformService chargeReadPlatformService, RateReadService rateReadService, DatabaseSpecificSQLGenerator sqlGenerator,
-            FineractEntityAccessUtil fineractEntityAccessUtil, DelinquencyReadPlatformService delinquencyReadPlatformService,
+            OfficeProductRestrictionService fineractEntityAccessUtil, DelinquencyReadPlatformService delinquencyReadPlatformService,
             LoanProductRepository loanProductRepository) {
         return new LoanProductReadPlatformServiceImpl(context, jdbcTemplate, chargeReadPlatformService, rateReadService, sqlGenerator,
                 fineractEntityAccessUtil, delinquencyReadPlatformService, loanProductRepository);
@@ -77,7 +77,7 @@ public class LoanProductConfiguration {
             LoanProductDataValidator fromApiJsonDeserializer, LoanProductRepository loanProductRepository, AprCalculator aprCalculator,
             FundRepository fundRepository, ChargeDefinitionPort chargeDefinitionPort, RateRepositoryWrapper rateRepository,
             ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
-            FineractEntityAccessUtil fineractEntityAccessUtil, FloatingRatePort floatingRatePort,
+            OfficeProductRestrictionService fineractEntityAccessUtil, FloatingRatePort floatingRatePort,
             LoanRepositoryWrapper loanRepositoryWrapper, BusinessEventNotifierService businessEventNotifierService,
             DelinquencyBucketRepository delinquencyBucketRepository,
             LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,

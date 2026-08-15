@@ -37,7 +37,7 @@ import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingValidations;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingHelper;
+import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingValidator;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -58,7 +58,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanCapitalizedIncomeStr
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCapitalizedIncomeType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeOffBehaviour;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleTransactionProcessorFactory;
-import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.impl.AdvancedPaymentScheduleTransactionProcessor;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleProcessingType;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
@@ -135,7 +134,7 @@ public final class LoanProductDataValidator {
     private final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory;
     private final AdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser;
     private final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
-    private final ProductToGLAccountMappingHelper productToGLAccountMappingHelper;
+    private final ProductToGLAccountMappingValidator productToGLAccountMappingHelper;
 
     public void validateForCreate(final JsonCommand command) {
         String json = command.json();
@@ -506,22 +505,22 @@ public final class LoanProductDataValidator {
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE, element)) {
             loanScheduleProcessingType = this.fromApiJsonHelper.extractStringNamed(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE, element);
             baseDataValidator.reset().parameter(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE).value(loanScheduleProcessingType).isOneOfEnumValues(LoanScheduleProcessingType.class);
-            if (LoanScheduleProcessingType.VERTICAL.equals(LoanScheduleProcessingType.valueOf(loanScheduleProcessingType)) && !AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+            if (LoanScheduleProcessingType.VERTICAL.equals(LoanScheduleProcessingType.valueOf(loanScheduleProcessingType)) && !LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
                 baseDataValidator.reset().parameter(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE).failWithCode("supported.only.for.progressive.loan.schedule.handling", "Vertical repayment schedule processing is only available with `Advanced payment allocation` strategy");
             }
         }
-        if (AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && LoanScheduleProcessingType.HORIZONTAL.name().equals(loanScheduleProcessingType)) {
+        if (LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && LoanScheduleProcessingType.HORIZONTAL.name().equals(loanScheduleProcessingType)) {
             advancedPaymentAllocationsValidator.checkGroupingOfAllocationRules(advancedPaymentAllocationsJsonParser.assembleLoanProductPaymentAllocationRules(command, transactionProcessingStrategyCode));
         }
         final Integer recurringMoratoriumOnPrincipalPeriods = this.fromApiJsonHelper.extractIntegerWithLocaleNamed("recurringMoratoriumOnPrincipalPeriods", element);
         validateRepaymentPeriodWithGraceSettings(numberOfRepayments, graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged, recurringMoratoriumOnPrincipalPeriods, baseDataValidator);
-        if (AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES, element)) {
+        if (LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES, element)) {
             String[] supportedTransactionsForInterestRefund = this.fromApiJsonHelper.extractArrayNamed(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES, element);
             Arrays.stream(supportedTransactionsForInterestRefund).forEach(value -> baseDataValidator.reset().parameter(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES).value(value).isOneOfEnumValues(LoanSupportedInterestRefundTypes.class));
         } else if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES, element)) {
             baseDataValidator.reset().parameter(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES).failWithCode("supported.only.for.progressive.loan.schedule.handling", "Automatic interest refund functionality is only supported for Progressive loans");
         }
-        if (AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, element)) {
+        if (LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, element)) {
             String chargeOffBehaviour = this.fromApiJsonHelper.extractStringNamed(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, element);
             baseDataValidator.reset().parameter(LoanProductConstants.CHARGE_OFF_BEHAVIOUR).value(chargeOffBehaviour).isOneOfEnumValues(LoanChargeOffBehaviour.class);
         } else if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, element)) {
@@ -1236,10 +1235,10 @@ public final class LoanProductDataValidator {
         if (this.fromApiJsonHelper.parameterExists(ADVANCED_PAYMENT_ALLOCATIONS, element) && LoanScheduleProcessingType.HORIZONTAL.name().equals(loanScheduleProcessingType)) {
             allocationRules = advancedPaymentAllocationsJsonParser.assembleLoanProductPaymentAllocationRules(command, transactionProcessingStrategyCode);
         }
-        if (LoanScheduleProcessingType.HORIZONTAL.name().equals(loanScheduleProcessingType) && AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+        if (LoanScheduleProcessingType.HORIZONTAL.name().equals(loanScheduleProcessingType) && LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
             advancedPaymentAllocationsValidator.checkGroupingOfAllocationRules(allocationRules);
         }
-        if (LoanScheduleProcessingType.VERTICAL.equals(LoanScheduleProcessingType.valueOf(loanScheduleProcessingType)) && !AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+        if (LoanScheduleProcessingType.VERTICAL.equals(LoanScheduleProcessingType.valueOf(loanScheduleProcessingType)) && !LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
             baseDataValidator.reset().parameter(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE).failWithCode("supported.only.for.progressive.loan.schedule.handling", "Vertical repayment schedule processing is only available with `Advanced payment allocation` strategy");
         }
         final Integer recurringMoratoriumOnPrincipalPeriods = this.fromApiJsonHelper.extractIntegerWithLocaleNamed("recurringMoratoriumOnPrincipalPeriods", element);
@@ -1794,9 +1793,9 @@ public final class LoanProductDataValidator {
             final Integer fixedLength = this.fromApiJsonHelper.extractIntegerNamed(LoanProductConstants.FIXED_LENGTH, element, locale);
             baseDataValidator.reset().parameter(LoanProductConstants.FIXED_LENGTH).value(fixedLength).ignoreIfNull().integerGreaterThanZero();
             if (fixedLength != null) {
-                if (!AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
-                    final String errorMsg = "Fixed Length configuration is only allowed with " + AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY + " strategy";
-                    throw new GeneralPlatformDomainRuleException("error.msg.fixed.length.only.supported.for.advanced.payment.allocation", errorMsg, AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
+                if (!LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+                    final String errorMsg = "Fixed Length configuration is only allowed with " + LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY + " strategy";
+                    throw new GeneralPlatformDomainRuleException("error.msg.fixed.length.only.supported.for.advanced.payment.allocation", errorMsg, LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
                 }
                 if (thereIsInterest) {
                     final String errorMsg = "Fixed Length configuration is only allowed for zero interest products";
@@ -1817,10 +1816,10 @@ public final class LoanProductDataValidator {
         if (loanScheduleType == null || baseDataValidator.hasError()) {
             return;
         }
-        if (!LoanScheduleType.PROGRESSIVE.equals(LoanScheduleType.valueOf(loanScheduleType)) && AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+        if (!LoanScheduleType.PROGRESSIVE.equals(LoanScheduleType.valueOf(loanScheduleType)) && LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
             baseDataValidator.reset().parameter(LoanProductConstants.LOAN_SCHEDULE_PROCESSING_TYPE).failWithCode("supported.only.for.progressive.loan.schedule.type", "Progressive repayment schedule processing is only available with `Advanced payment allocation` strategy");
         }
-        if (LoanScheduleType.PROGRESSIVE.equals(LoanScheduleType.valueOf(loanScheduleType)) && !AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
+        if (LoanScheduleType.PROGRESSIVE.equals(LoanScheduleType.valueOf(loanScheduleType)) && !LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode)) {
             baseDataValidator.reset().parameter(LoanProductConstants.LOAN_SCHEDULE_TYPE).failWithCode("supported.only.with.advanced.payment.allocation.strategy", loanScheduleType + " loan schedule type is not available with " + transactionProcessingStrategyCode + " strategy");
         }
     }
@@ -1863,7 +1862,7 @@ public final class LoanProductDataValidator {
             final String capitalizedIncomeType = this.fromApiJsonHelper.extractStringNamed(LoanProductConstants.CAPITALIZED_INCOME_TYPE_PARAM_NAME, element);
             baseDataValidator.reset().parameter(LoanProductConstants.CAPITALIZED_INCOME_TYPE_PARAM_NAME).value(capitalizedIncomeType).isOneOfEnumValues(LoanCapitalizedIncomeType.class);
         }
-        if (AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.ENABLE_INCOME_CAPITALIZATION_PARAM_NAME, element)) {
+        if (LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.ENABLE_INCOME_CAPITALIZATION_PARAM_NAME, element)) {
             Boolean enableIncomeCapitalization = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.ENABLE_INCOME_CAPITALIZATION_PARAM_NAME, element);
             baseDataValidator.reset().parameter(LoanProductConstants.ENABLE_INCOME_CAPITALIZATION_PARAM_NAME).value(enableIncomeCapitalization).ignoreIfNull().validateForBooleanValue();
             if (enableIncomeCapitalization) {
@@ -1902,7 +1901,7 @@ public final class LoanProductDataValidator {
             final String buyDownFeeIncomeType = this.fromApiJsonHelper.extractStringNamed(LoanProductConstants.BUY_DOWN_FEE_INCOME_TYPE_PARAM_NAME, element);
             baseDataValidator.reset().parameter(LoanProductConstants.BUY_DOWN_FEE_INCOME_TYPE_PARAM_NAME).value(buyDownFeeIncomeType).isOneOfEnumValues(LoanBuyDownFeeIncomeType.class);
         }
-        if (AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.ENABLE_BUY_DOWN_FEE_PARAM_NAME, element)) {
+        if (LoanProductConstants.ADVANCED_PAYMENT_ALLOCATION_STRATEGY.equals(transactionProcessingStrategyCode) && this.fromApiJsonHelper.parameterExists(LoanProductConstants.ENABLE_BUY_DOWN_FEE_PARAM_NAME, element)) {
             Boolean enableBuyDownFee = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.ENABLE_BUY_DOWN_FEE_PARAM_NAME, element);
             baseDataValidator.reset().parameter(LoanProductConstants.ENABLE_BUY_DOWN_FEE_PARAM_NAME).value(enableBuyDownFee).ignoreIfNull().validateForBooleanValue();
             if (enableBuyDownFee) {
@@ -1939,7 +1938,7 @@ public final class LoanProductDataValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductDataValidator(final FromJsonHelper fromApiJsonHelper, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ProductToGLAccountMappingHelper productToGLAccountMappingHelper) {
+        public LoanProductDataValidator(final FromJsonHelper fromApiJsonHelper, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ProductToGLAccountMappingValidator productToGLAccountMappingHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanRepaymentScheduleTransactionProcessorFactory = loanRepaymentScheduleTransactionProcessorFactory;
         this.advancedPaymentAllocationsJsonParser = advancedPaymentAllocationsJsonParser;

@@ -23,6 +23,8 @@ dependencies {
     implementation(project(path: ':fineract-note-api'))
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-entityaccess-api'))
+    implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-cob-api'))

@@ -54,7 +54,7 @@ import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundEx
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductToGLAccountMappingHelper {
+public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappingValidator {
     protected static final List<GLAccountType> ASSET_LIABILITY_TYPES = List.of(GLAccountType.ASSET, GLAccountType.LIABILITY);
     private static final Integer GL_ACCOUNT_EXPENSE_TYPE = 5;
     protected final GLAccountRepository accountRepository;

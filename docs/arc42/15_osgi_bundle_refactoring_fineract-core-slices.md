@@ -93,6 +93,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | collectionsheet residual (pure) | pure DTOs/requests, write port, handlers, deserializers in core; JLGCollectionSheetData + read/write impl + REST stay (LoanProductData on loan-impl) |
 | postdated-check residual (pure) | data/status/exceptions/ports/handlers/REST in core; entity/repo/assembler/impl/config in loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
+| loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate repo/wrapper in core |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException in core; app bootstrap configs stay on provider |
 | share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub, products REST/constants/not-found, ShareProduct domain (+ market price/repos) in core; entity write/read/serializer stay on provider |
 | share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |

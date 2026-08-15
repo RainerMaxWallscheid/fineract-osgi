@@ -36,7 +36,7 @@ import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
@@ -83,7 +83,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final RateReadService rateReadService;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final OfficeProductRestrictionService fineractEntityAccessUtil;
     private final DelinquencyReadPlatformService delinquencyReadPlatformService;
     private final LoanProductRepository loanProductRepository;
 
@@ -640,7 +640,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate, final ChargeReadPlatformService chargeReadPlatformService, final RateReadService rateReadService, final DatabaseSpecificSQLGenerator sqlGenerator, final FineractEntityAccessUtil fineractEntityAccessUtil, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanProductRepository loanProductRepository) {
+        public LoanProductReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate, final ChargeReadPlatformService chargeReadPlatformService, final RateReadService rateReadService, final DatabaseSpecificSQLGenerator sqlGenerator, final OfficeProductRestrictionService fineractEntityAccessUtil, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanProductRepository loanProductRepository) {
         this.context = context;
         this.jdbcTemplate = jdbcTemplate;
         this.chargeReadPlatformService = chargeReadPlatformService;
