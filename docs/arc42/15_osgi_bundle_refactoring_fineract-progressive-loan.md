@@ -30,3 +30,4 @@ fineract-progressive-loan/
 ./gradlew :fineract-provider:compileJava
 ```
 - Leftover test-profile InternalLoanInformationApiResource closed into progressive-loan-impl (AdvancedPaymentDataMapper).
+- Leftover DefaultLoanScheduleGeneratorFactory closed into progressive-loan-impl.
