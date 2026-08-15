@@ -36,14 +36,17 @@ public final class AccountTransferFundsData {
     private final Long toAccountId;
     private final String description;
     private final Integer toTransferType;
+    private final Long chargeId;
+    private final Integer loanInstallmentNumber;
     private final Integer transferType;
     private final boolean isRegularTransaction;
     private final boolean isExceptionForBalanceCheck;
 
     public AccountTransferFundsData(final LocalDate transactionDate, final BigDecimal transactionAmount,
             final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType, final Long fromAccountId,
-            final Long toAccountId, final String description, final Integer toTransferType, final Integer transferType,
-            final boolean isRegularTransaction, final boolean isExceptionForBalanceCheck) {
+            final Long toAccountId, final String description, final Integer toTransferType, final Long chargeId,
+            final Integer loanInstallmentNumber, final Integer transferType, final boolean isRegularTransaction,
+            final boolean isExceptionForBalanceCheck) {
         this.transactionDate = transactionDate;
         this.transactionAmount = transactionAmount;
         this.fromAccountType = fromAccountType;
@@ -52,6 +55,8 @@ public final class AccountTransferFundsData {
         this.toAccountId = toAccountId;
         this.description = description;
         this.toTransferType = toTransferType;
+        this.chargeId = chargeId;
+        this.loanInstallmentNumber = loanInstallmentNumber;
         this.transferType = transferType;
         this.isRegularTransaction = isRegularTransaction;
         this.isExceptionForBalanceCheck = isExceptionForBalanceCheck;
@@ -87,6 +92,14 @@ public final class AccountTransferFundsData {
 
     public Integer getToTransferType() {
         return this.toTransferType;
+    }
+
+    public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    public Integer getLoanInstallmentNumber() {
+        return this.loanInstallmentNumber;
     }
 
     public Integer getTransferType() {

@@ -47,6 +47,7 @@ fineract-loan/
 - Progressive / WC / custom still bind to `Loan` entities and domain processors
 - Many enums remain under `…domain` on impl (optional later: lift pure enums to api)
 - Optional: pure account ports without entity signatures
+- Leftover transfer-fee-charge job now lives in loan-impl via thin leftover `AccountTransferFundsData` + leftover `AccountTransferFundsWritePort` (provider adapter builds leftover `AccountTransferDTO`)
 
 ---
 

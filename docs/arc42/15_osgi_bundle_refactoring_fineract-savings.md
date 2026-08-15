@@ -68,6 +68,7 @@ fineract-savings/
 - Leftover transfer create/refund/undo command handlers now live in core via thin leftover `AccountTransfersCommandWritePort`. Provider leftover `AccountTransfersWritePlatformService` extends that port and keeps leftover `AccountTransferDTO` / entity methods.
 - Leftover execute-SI job now lives in core via thin `AccountTransferFundsData` + leftover `AccountTransferFundsWritePort` (provider adapter builds leftover `AccountTransferDTO`). Leftover `InsufficientAccountBalanceException` now lives in core next to leftover savings exceptions used by the job.
 - Leftover account read Spring beans now wire in core (`AccountReadConfiguration`). Leftover `AccountTransfersCommandWritePort` also carries reverse methods (ID + portfolio type only). Provider leftover `AccountConfiguration` keeps entity write beans only.
+- Leftover transfer-fee-charge job now lives in loan-impl via thin leftover `AccountTransferFundsData` (charge id + installment fields) + leftover funds write port.
 
 ## 5. Commands
 

@@ -40,8 +40,9 @@ public class AccountTransferFundsWritePortAdapter implements AccountTransferFund
     public void transferFunds(final AccountTransferFundsData data) {
         final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(data.getTransactionDate(), data.getTransactionAmount(),
                 data.getFromAccountType(), data.getToAccountType(), data.getFromAccountId(), data.getToAccountId(), data.getDescription(),
-                null, null, null, null, data.getToTransferType(), null, null, data.getTransferType(), null, null, ExternalId.empty(), null,
-                null, null, data.isRegularTransaction(), data.isExceptionForBalanceCheck());
+                null, null, null, null, data.getToTransferType(), data.getChargeId(), data.getLoanInstallmentNumber(),
+                data.getTransferType(), null, null, ExternalId.empty(), null, null, null, data.isRegularTransaction(),
+                data.isExceptionForBalanceCheck());
         this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
     }
 }

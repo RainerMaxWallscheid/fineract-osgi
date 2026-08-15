@@ -97,8 +97,8 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
                 final boolean isExceptionForBalanceCheck = false;
                 final AccountTransferFundsData fundsData = new AccountTransferFundsData(transactionDate, transactionAmount,
                         data.getFromAccountType(), data.getToAccountType(), data.getFromAccount().getId(), data.getToAccount().getId(),
-                        data.getName() + " Standing instruction trasfer ", data.toTransferType(), data.getTransferType().getValue(),
-                        isRegularTransaction, isExceptionForBalanceCheck);
+                        data.getName() + " Standing instruction trasfer ", data.toTransferType(), null, null,
+                        data.getTransferType().getValue(), isRegularTransaction, isExceptionForBalanceCheck);
                 final boolean transferCompleted = transferAmount(errors, fundsData, data.getId());
                 if (transferCompleted) {
                     final String updateQuery = "UPDATE m_account_transfer_standing_instructions SET last_run_date = ? where id = ?";
