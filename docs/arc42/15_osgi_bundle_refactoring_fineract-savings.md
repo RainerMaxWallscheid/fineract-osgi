@@ -50,6 +50,7 @@ fineract-savings/
 - Savings and recurring-deposit account-collection REST now live in savings-impl (bulkimport ports are in core). FD account REST stays (leftover `AccountAssociationsReadPlatformService`).
 - Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest/transfer/adhoc jobs stay on provider.
 - `SavingsAccountChargeReadPlatformServiceImpl` now lives in savings-impl after `ChargeDropdownReadPlatformService` moved to charge-api.
+- Transaction validators and leftover `SavingsDropdownReadPlatformServiceImplTest` now live in savings-impl/test. Provider leftover savings `data/` is empty.
 
 ## 5. Commands
 
