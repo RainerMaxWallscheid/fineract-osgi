@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class FineractEntityAccessUtil {
+public class FineractEntityAccessUtil implements OfficeProductRestrictionService {
 
     private final PlatformSecurityContext context;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
@@ -66,6 +66,7 @@ public class FineractEntityAccessUtil {
         this.fineractEntityToEntityMappingRepository = fineractEntityToEntityMappingRepository;
     }
 
+    @Override
     @Transactional
     public void checkConfigurationAndAddProductResrictionsForUserOffice(final FineractEntityAccessType fineractEntityAccessType,
             final Long productOrChargeId) {
@@ -101,6 +102,7 @@ public class FineractEntityAccessUtil {
 
     }
 
+    @Override
     public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType fineractEntityType) {
         return this.fineractEntityAccessReadService
                 .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(fineractEntityType);

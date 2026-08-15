@@ -41,7 +41,7 @@ fineract-savings/
 - Provider still binds heavily to `SavingsAccount` / entity-typed write services
 - Optional: pure account ports without entity signatures
 - Interest-rate chart REST, command handlers, read/write services, and validators now live in savings-impl (domain/assemblers were already there)
-- Fixed/recurring deposit product write/read/handlers now live in savings-impl. Savings-product read now lives in savings-impl via leftover `FineractEntityAccessReadService` office SQL port. Savings-product write stays on provider to avoid a savings-impl ↔ entityaccess-impl cycle.
+- Fixed/recurring deposit product write/read/handlers now live in savings-impl. Savings-product read/write now live in savings-impl via leftover entityaccess-api office ports (`FineractEntityAccessReadService` / `OfficeProductRestrictionService`).
 - Fixed/recurring deposit account entities (and RD schedule/recurring detail) now live in savings-impl next to `SavingsAccount`. Assemblers stay on provider.
 - Leftover savings command handlers now live in savings-impl (thin wrappers over write ports already on api/impl).
 - Deposit-account interest-chart read, FD interest-calculation, and `DepositAccountDataValidator` now live in savings-impl.
@@ -57,7 +57,7 @@ fineract-savings/
 - Leftover savings batch strategies (apply/get/transaction/adjust/charge/pay-charge) now live in savings-impl next to leftover savings REST. `DisburseToSavingsCommandStrategy` stays (leftover `LoansApiResource`).
 - Leftover `AccountAssociationsReadPlatformService` + `AccountAssociationsData` now live in core. FD account REST lives in savings-impl; associations impl stays on provider.
 - Leftover `ConvertChargeDataToSpecificChargeData` now lives in core next to leftover `ChargeData` / leftover savings and share charge DTOs.
-- Leftover savings-product read now lives in savings-impl. Office-product SQL clause is on leftover `FineractEntityAccessReadService` (entityaccess-api); leftover product write stays (entityaccess-impl still depends on savings-impl for product existence checks).
+- Leftover savings-product read/write now live in savings-impl. Office-product SQL clause is on leftover `FineractEntityAccessReadService`; office product restriction is leftover `OfficeProductRestrictionService` (entityaccess-api; impl is leftover `FineractEntityAccessUtil`).
 
 ## 5. Commands
 

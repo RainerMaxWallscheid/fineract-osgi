@@ -37,7 +37,7 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
@@ -58,7 +58,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
     private final SavingsProductDataValidator fromApiJsonDataValidator;
     private final SavingsProductAssembler savingsProductAssembler;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final OfficeProductRestrictionService officeProductRestrictionService;
 
     /*
      * Guaranteed to throw an exception no matter what the data integrity issue is.
@@ -101,7 +101,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             // check if the office specific products are enabled. If yes, then
             // save this savings product against a specific office
             // i.e. this savings product is specific for this office.
-            fineractEntityAccessUtil.checkConfigurationAndAddProductResrictionsForUserOffice(FineractEntityAccessType.OFFICE_ACCESS_TO_SAVINGS_PRODUCTS, product.getId());
+            officeProductRestrictionService.checkConfigurationAndAddProductResrictionsForUserOffice(FineractEntityAccessType.OFFICE_ACCESS_TO_SAVINGS_PRODUCTS, product.getId());
             return  //
             //
             new CommandProcessingResultBuilder().withEntityId(product.getId()).build();
@@ -172,12 +172,12 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
     }
 
     @java.lang.SuppressWarnings("all")
-        public SavingsProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsProductRepository savingProductRepository, final SavingsProductDataValidator fromApiJsonDataValidator, final SavingsProductAssembler savingsProductAssembler, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil) {
+        public SavingsProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsProductRepository savingProductRepository, final SavingsProductDataValidator fromApiJsonDataValidator, final SavingsProductAssembler savingsProductAssembler, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final OfficeProductRestrictionService officeProductRestrictionService) {
         this.context = context;
         this.savingProductRepository = savingProductRepository;
         this.fromApiJsonDataValidator = fromApiJsonDataValidator;
         this.savingsProductAssembler = savingsProductAssembler;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
-        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+        this.officeProductRestrictionService = officeProductRestrictionService;
     }
 }
