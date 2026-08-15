@@ -33,7 +33,6 @@ import org.apache.fineract.portfolio.account.domain.AccountTransferType;
 import org.apache.fineract.portfolio.account.domain.StandingInstructionType;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
 /**
  * Immutable data object representing a savings account.
@@ -226,10 +225,11 @@ public final class StandingInstructionData {
     public Integer toTransferType() {
         Integer transferType = null;
         AccountTransferType accountTransferType = getTransferType();
+        // Stable loan transaction type codes (LoanTransactionType.CHARGE_PAYMENT / REPAYMENT).
         if (accountTransferType.isChargePayment()) {
-            transferType = LoanTransactionType.CHARGE_PAYMENT.getValue();
+            transferType = 17;
         } else if (accountTransferType.isLoanRepayment()) {
-            transferType = LoanTransactionType.REPAYMENT.getValue();
+            transferType = 2;
         }
         return transferType;
     }
