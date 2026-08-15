@@ -75,9 +75,8 @@ public class ShareAccountsConfiguration {
 
     @Bean(value = "SHAREACCOUNT_COMMANDSERVICE")
     @ConditionalOnMissingBean(AccountsCommandsService.class)
-    public AccountsCommandsService accountsCommandsService(FromJsonHelper fromApiJsonHelper,
-            ShareAccountDataSerializer shareAccountDataSerializer) {
-        return new ShareAccountCommandsServiceImpl(fromApiJsonHelper, shareAccountDataSerializer);
+    public AccountsCommandsService accountsCommandsService(FromJsonHelper fromApiJsonHelper) {
+        return new ShareAccountCommandsServiceImpl(fromApiJsonHelper);
     }
 
     @Bean

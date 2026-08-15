@@ -33,8 +33,6 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.client.data.ClientTransactionData;
 import org.apache.fineract.portfolio.client.domain.ClientEnumerations;
-import org.apache.fineract.portfolio.client.domain.ClientTransaction;
-import org.apache.fineract.portfolio.client.domain.ClientTransactionRepository;
 import org.apache.fineract.portfolio.client.domain.ClientTransactionType;
 import org.apache.fineract.portfolio.client.exception.ClientTransactionNotFoundException;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
@@ -50,7 +48,6 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final ClientTransactionMapper clientTransactionMapper = new ClientTransactionMapper();
     private final PaginationHelper paginationHelper;
-    private final ClientTransactionRepository clientTransactionRepository;
 
 
     private static final class ClientTransactionMapper implements RowMapper<ClientTransactionData> {
@@ -165,15 +162,21 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
 
     @Override
     public Long retrieveTransactionIdByExternalId(ExternalId transactionExternalId) {
-        final ClientTransaction clientTransaction = clientTransactionRepository.findByExternalId(transactionExternalId);
-        return clientTransaction == null ? null : clientTransaction.getId();
+        if (transactionExternalId == null || transactionExternalId.isEmpty()) {
+            return null;
+        }
+        try {
+            return this.jdbcTemplate.queryForObject("select tr.id from m_client_transaction tr where tr.external_id = ?", Long.class,
+                    transactionExternalId.getValue());
+        } catch (final EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientTransactionReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final PaginationHelper paginationHelper, final ClientTransactionRepository clientTransactionRepository) {
+        public ClientTransactionReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final PaginationHelper paginationHelper) {
         this.jdbcTemplate = jdbcTemplate;
         this.sqlGenerator = sqlGenerator;
         this.paginationHelper = paginationHelper;
-        this.clientTransactionRepository = clientTransactionRepository;
     }
 }

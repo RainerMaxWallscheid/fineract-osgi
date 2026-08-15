@@ -24,11 +24,9 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.accounts.service.AccountsCommandsService;
-import org.apache.fineract.portfolio.shareaccounts.serialization.ShareAccountDataSerializer;
 
 public class ShareAccountCommandsServiceImpl implements AccountsCommandsService {
     private final FromJsonHelper fromApiJsonHelper;
-    private final ShareAccountDataSerializer shareAccountDataSerializer;
 
     @Override
     public Object handleCommand(Long accountId, String command, String jsonBody) {
@@ -70,8 +68,7 @@ public class ShareAccountCommandsServiceImpl implements AccountsCommandsService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper, final ShareAccountDataSerializer shareAccountDataSerializer) {
+        public ShareAccountCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.shareAccountDataSerializer = shareAccountDataSerializer;
     }
 }
