@@ -22,23 +22,23 @@ import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.portfolio.account.service.AccountTransfersCommandWritePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@CommandType(entity = "ACCOUNTTRANSFER", action = "UNDO")
-public class UndoAccountTransferCommandHandler implements NewCommandSourceHandler {
-    private final AccountTransfersWritePlatformService writePlatformService;
+@CommandType(entity = "ACCOUNTTRANSFER", action = "CREATE")
+public class CreateAccountTransferCommandHandler implements NewCommandSourceHandler {
+    private final AccountTransfersCommandWritePort writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.writePlatformService.undo(command);
+        return this.writePlatformService.create(command);
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoAccountTransferCommandHandler(final AccountTransfersWritePlatformService writePlatformService) {
+        public CreateAccountTransferCommandHandler(final AccountTransfersCommandWritePort writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }
