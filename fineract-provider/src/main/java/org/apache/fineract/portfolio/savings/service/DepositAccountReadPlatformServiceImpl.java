@@ -33,7 +33,6 @@ import java.util.Set;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.PaginationParameters;
 import org.apache.fineract.infrastructure.core.data.PaginationParametersDataValidator;
-import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.Page;
@@ -43,10 +42,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
-import org.apache.fineract.portfolio.account.PortfolioAccountType;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.savings.data.InterestTransferData;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
-import org.apache.fineract.portfolio.account.domain.AccountTransferType;
 import org.apache.fineract.portfolio.calendar.data.CalendarData;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
@@ -370,7 +367,7 @@ public class DepositAccountReadPlatformServiceImpl
     }
 
     @Override
-    public Collection<AccountTransferDTO> retrieveDataForInterestTransfer() {
+    public Collection<InterestTransferData> retrieveDataForInterestTransfer() {
         final StringBuilder sqlBuilder = new StringBuilder(300);
         AccountTransferMapper mapper = new AccountTransferMapper();
         sqlBuilder.append("SELECT ");
@@ -1338,12 +1335,11 @@ public class DepositAccountReadPlatformServiceImpl
     }
 
 
-    private static class AccountTransferMapper implements RowMapper<AccountTransferDTO> {
+    private static class AccountTransferMapper implements RowMapper<InterestTransferData> {
         public static final String FROM_ACC = "fromAcc";
         public static final String TO_ACC = "toAcc";
         public static final String AMOUNT = "amount";
         public static final String TRANSACTION_DATE = "transactionDate";
-        public static final String TRANSFER_INTEREST_TO_SAVINGS = "transfer interest to savings";
         private final String schemaSql;
 
         AccountTransferMapper() {
@@ -1357,14 +1353,15 @@ public class DepositAccountReadPlatformServiceImpl
         }
 
         @Override
-        public AccountTransferDTO mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
+        public InterestTransferData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
             final Long fromAccountId = rs.getLong(FROM_ACC);
             final Long toAccountId = rs.getLong(TO_ACC);
             final BigDecimal transactionAmount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, AMOUNT);
             final boolean isRegularTransaction = false;
             final boolean isExceptionForBalanceCheck = false;
             final LocalDate transactionDate = JdbcSupport.getLocalDate(rs, TRANSACTION_DATE);
-            return new AccountTransferDTO(transactionDate, transactionAmount, PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, fromAccountId, toAccountId, TRANSFER_INTEREST_TO_SAVINGS, null, null, null, null, null, null, null, AccountTransferType.INTEREST_TRANSFER.getValue(), null, null, ExternalId.empty(), null, null, null, isRegularTransaction, isExceptionForBalanceCheck);
+            return new InterestTransferData(transactionDate, transactionAmount, fromAccountId, toAccountId, isRegularTransaction,
+                    isExceptionForBalanceCheck);
         }
     }
 

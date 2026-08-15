@@ -18,15 +18,13 @@
  */
 package org.apache.fineract.portfolio.savings.service;
 
-import java.util.Collection;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.savings.data.InterestTransferData;
 
 /**
- * Provider-local residual: interest transfer uses {@link AccountTransferDTO}, which
- * still embeds domain entities and cannot leave the provider with the main deposit
- * read port.
+ * Writes interest-to-savings transfers without exposing leftover provider
+ * {@code AccountTransferDTO} entity edges to savings-impl.
  */
-public interface DepositAccountInterestTransferReadService {
+public interface InterestTransferWritePort {
 
-    Collection<AccountTransferDTO> retrieveDataForInterestTransfer();
+    void transferInterest(InterestTransferData data);
 }

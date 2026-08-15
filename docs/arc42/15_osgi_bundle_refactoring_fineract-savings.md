@@ -48,19 +48,19 @@ fineract-savings/
 - Savings/FD/RD product REST now live in savings-impl. Generic `DropdownReadPlatformService` moved to fineract-core next to `CommonEnumerations`.
 - Savings account transaction/charge/on-hold/internal REST now live in savings-impl. Account-collection REST stays on provider (bulkimport + leftover account associations).
 - Savings and recurring-deposit account-collection REST now live in savings-impl (bulkimport ports are in core). FD account REST now lives in savings-impl after leftover `AccountAssociationsReadPlatformService` moved to core.
-- Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest jobs now live in savings-impl. Transfer stays on provider. Adhoc job moved to adhocquery-impl.
+- Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest jobs now live in savings-impl. Transfer job now lives in savings-impl via thin `InterestTransferData` + leftover read/write ports (provider adapter builds leftover `AccountTransferDTO`). Adhoc job moved to adhocquery-impl.
 - `SavingsAccountChargeReadPlatformServiceImpl` now lives in savings-impl after `ChargeDropdownReadPlatformService` moved to charge-api.
 - Transaction validators and leftover `SavingsDropdownReadPlatformServiceImplTest` now live in savings-impl/test. Provider leftover savings `data/` is empty.
 - GSIM write interface/impl now live in savings-impl. Unused `LoanRepository` constructor parameter dropped.
 - Savings accrual write port is on savings-api and the accrual job lives in savings-impl. Accrual write impl stays on provider (leftover assembler).
-- Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer stays (leftover `AccountTransferDTO` / leftover account-transfer write). Adhoc job now lives in adhocquery-impl (not leftover savings).
+- Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer job now lives in savings-impl (thin `InterestTransferData` + leftover `DepositAccountInterestTransferReadService` / `InterestTransferWritePort`; provider adapter wraps leftover account-transfer write). Adhoc job now lives in adhocquery-impl (not leftover savings).
 - Leftover savings batch strategies (apply/get/transaction/adjust/charge/pay-charge) now live in savings-impl next to leftover savings REST. `DisburseToSavingsCommandStrategy` stays (leftover `LoansApiResource`).
 - Leftover `AccountAssociationsReadPlatformService` + `AccountAssociationsData` + leftover `AccountAssociationType` + leftover associations read impl now live in core. FD account REST lives in savings-impl.
 - Leftover `ConvertChargeDataToSpecificChargeData` now lives in core next to leftover `ChargeData` / leftover savings and share charge DTOs.
 - Leftover savings-product read/write now live in savings-impl. Office-product SQL clause is on leftover `FineractEntityAccessReadService`; office product restriction is leftover `OfficeProductRestrictionService` (entityaccess-api; impl is leftover `FineractEntityAccessUtil`).
 - Leftover savings transaction search now lives in savings-impl after leftover `SavingsAccountTransactionsMapper` was extracted from leftover account-read.
 - Leftover account-associations read impl (+ leftover `AccountAssociationType`) now live in core next to leftover associations port/data.
-- Leftover pure account-transfer enums (`AccountTransferType`, recurrence, standing-instruction priority/status/type) now live in core. Transfer job still stays (leftover `AccountTransferDTO` embeds leftover entities).
+- Leftover pure account-transfer enums (`AccountTransferType`, recurrence, standing-instruction priority/status/type) now live in core. Transfer job now lives in savings-impl via thin ID-only `InterestTransferData` (leftover `AccountTransferDTO` entity edges stay on provider adapter).
 
 ## 5. Commands
 
