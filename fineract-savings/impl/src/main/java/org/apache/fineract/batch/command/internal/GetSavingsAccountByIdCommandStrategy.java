@@ -34,7 +34,7 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.portfolio.savings.api.SavingsAccountsApiResource;
 import org.apache.fineract.portfolio.savings.api.SavingsApiSetConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -73,7 +73,7 @@ public class GetSavingsAccountByIdCommandStrategy implements CommandStrategy {
         SavingsAccountData savingsAccountData = savingsAccountsApiResource.retrieveOne(savingsAccountId, Boolean.parseBoolean(staffInSelectedOfficeOnly), chargeStatus, associations, uriInfo);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final String responseBody = toApiJsonSerializer.serialize(settings, savingsAccountData, SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
-        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(batchRequest.getHeaders());
+        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(Response.Status.OK.getStatusCode()).setBody(responseBody).setHeaders(batchRequest.getHeaders());
     }
 
     @java.lang.SuppressWarnings("all")

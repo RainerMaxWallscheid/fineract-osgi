@@ -29,7 +29,7 @@ import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.portfolio.savings.api.SavingsAccountTransactionsApiResource;
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,7 +52,7 @@ public class SavingsAccountAdjustTransactionCommandStrategy implements CommandSt
         Long savingsAccountId = Long.parseLong(pathParameters.get(1));
         Long transactionId = Long.parseLong(pathParameters.get(3));
         final String responseBody = savingsAccountTransactionsApiResource.adjustTransaction(savingsAccountId, transactionId, command, batchRequest.getBody());
-        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(batchRequest.getHeaders());
+        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(Response.Status.OK.getStatusCode()).setBody(responseBody).setHeaders(batchRequest.getHeaders());
     }
 
     @java.lang.SuppressWarnings("all")

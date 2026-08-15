@@ -28,7 +28,7 @@ import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.portfolio.savings.api.SavingsAccountChargesApiResource;
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,7 +57,7 @@ public class PaySavingsAccountChargeCommandStrategy implements CommandStrategy {
         // URL: savingsaccounts/{savingsAccountId}/charges/{savingsAccountChargeId}?command=paycharge
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         if (pathParameters.size() < 4) {
-            response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
+            response.setStatusCode(Response.Status.NOT_IMPLEMENTED.getStatusCode());
             response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
@@ -71,12 +71,12 @@ public class PaySavingsAccountChargeCommandStrategy implements CommandStrategy {
             final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
             command = queryParameters.get("command");
         } else {
-            response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
+            response.setStatusCode(Response.Status.NOT_IMPLEMENTED.getStatusCode());
             response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
         final String responseBody = savingsAccountChargesApiResource.payOrWaiveSavingsAccountCharge(savingsAccountId, savingsAccountChargeId, command, request.getBody());
-        response.setStatusCode(HttpStatus.SC_OK);
+        response.setStatusCode(Response.Status.OK.getStatusCode());
         response.setBody(responseBody);
         return response;
     }

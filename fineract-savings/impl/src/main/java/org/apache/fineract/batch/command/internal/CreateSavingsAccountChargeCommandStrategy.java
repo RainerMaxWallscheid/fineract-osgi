@@ -26,7 +26,7 @@ import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.portfolio.savings.api.SavingsAccountChargesApiResource;
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,7 +53,7 @@ public class CreateSavingsAccountChargeCommandStrategy implements CommandStrateg
         final Long savingsAccountId = Long.parseLong(pathParameters.get(1));
         // Create a new charge for a savings account
         responseBody = savingsAccountChargesApiResource.addSavingsAccountCharge(savingsAccountId, request.getBody());
-        response.setStatusCode(HttpStatus.SC_OK);
+        response.setStatusCode(Response.Status.OK.getStatusCode());
         // Set the body of the response after Charge has been successfully created
         response.setBody(responseBody);
         return response;

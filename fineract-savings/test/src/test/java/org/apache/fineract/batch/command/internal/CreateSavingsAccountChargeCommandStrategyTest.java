@@ -24,12 +24,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.portfolio.savings.api.SavingsAccountChargesApiResource;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -45,7 +44,7 @@ public class CreateSavingsAccountChargeCommandStrategyTest {
     @Test
     public void testExecuteSuccessScenario() {
         final TestContext testContext = new TestContext();
-        final Long savingsAccountId = Long.valueOf(RandomStringUtils.randomNumeric(4));
+        final Long savingsAccountId = 1234L;
         final BatchRequest batchRequest = getBatchRequest(savingsAccountId);
         final String responseBody = "myResponseBody";
 
@@ -54,7 +53,7 @@ public class CreateSavingsAccountChargeCommandStrategyTest {
 
         BatchResponse batchResponse = testContext.subjectToTest.execute(batchRequest, testContext.uriInfo);
 
-        assertEquals(HttpStatus.SC_OK, batchResponse.getStatusCode());
+        assertEquals(Response.Status.OK.getStatusCode(), batchResponse.getStatusCode());
         assertSame(responseBody, batchResponse.getBody());
         assertEquals(batchRequest.getRequestId(), batchResponse.getRequestId());
         assertEquals(batchRequest.getHeaders(), batchResponse.getHeaders());
@@ -74,10 +73,10 @@ public class CreateSavingsAccountChargeCommandStrategyTest {
         final BatchRequest br = new BatchRequest();
         String relativeUrl = "savingsaccounts/" + savingsAccountId + "/charges";
 
-        br.setRequestId(Long.valueOf(RandomStringUtils.randomNumeric(5)));
+        br.setRequestId(10001L);
         br.setRelativeUrl(relativeUrl);
         br.setMethod(HttpMethod.POST);
-        br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
+        br.setReference(20002L);
         br.setBody("{\"chargeId\":\"1\",\"amount\":\"100\"}");
 
         return br;

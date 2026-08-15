@@ -54,6 +54,7 @@ fineract-savings/
 - GSIM write interface/impl now live in savings-impl. Unused `LoanRepository` constructor parameter dropped.
 - Savings accrual write port is on savings-api and the accrual job lives in savings-impl. Accrual write impl stays on provider (leftover assembler).
 - Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer stays (leftover `AccountTransferDTO` / leftover account-transfer write). Adhoc job now lives in adhocquery-impl (not leftover savings).
+- Leftover savings batch strategies (apply/get/transaction/adjust/charge/pay-charge) now live in savings-impl next to leftover savings REST. `DisburseToSavingsCommandStrategy` stays (leftover `LoansApiResource`).
 
 ## 5. Commands
 

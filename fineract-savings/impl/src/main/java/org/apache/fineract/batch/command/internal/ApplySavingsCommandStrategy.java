@@ -23,7 +23,7 @@ import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.portfolio.savings.api.SavingsAccountsApiResource;
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,7 +48,7 @@ public class ApplySavingsCommandStrategy implements CommandStrategy {
         // Calls 'submitApplication' function from 'SavingsAccountsApiResource' to Apply Savings to an existing client
         String responseBody = savingsAccountsApiResource.submitApplication(request.getBody());
         // Sets the body of the response after savings is successfully applied
-        return new BatchResponse().setRequestId(request.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(request.getHeaders());
+        return new BatchResponse().setRequestId(request.getRequestId()).setStatusCode(Response.Status.OK.getStatusCode()).setBody(responseBody).setHeaders(request.getHeaders());
     }
 
     @java.lang.SuppressWarnings("all")
