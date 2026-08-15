@@ -73,6 +73,7 @@ fineract-savings/
 - Leftover `SavingsAccountTemplateReadPlatformServiceImpl` now lives in savings-impl via thin leftover `EntityDatatableTemplatesReadService` on dataqueries-api (avoids dataqueries-impl ↔ savings-impl cycle).
 - Leftover `SavingsAccountReadPlatformServiceImpl` now lives in savings-impl. Interest-posting pivot enrichment is inlined (no leftover `SavingsAccountAssembler`); `retrievePeriodicAccrualData` takes `Long savingsId` only.
 - Leftover `InterestTransferWritePortAdapter` now lives in savings-impl (thin funds write port only). Leftover `CreateAccountTransferCommandStrategy` (+ unit test) now lives in core next to leftover account-transfer REST.
+- Leftover share-account entity/serializer/note residual closed into savings-impl (linked savings account; read stays: leftover `ShareAccountChargeReadPlatformService` on charge-impl; write/schedular stay: leftover `AccountNumberGenerator` + leftover assembler).
 
 ## 5. Commands
 

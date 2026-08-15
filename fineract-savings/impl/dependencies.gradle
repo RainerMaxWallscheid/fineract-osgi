@@ -30,6 +30,8 @@ dependencies {
     implementation(project(path: ':fineract-accounting-api'))
     implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-charge-api'))
+    // Leftover ShareAccountNoteSupportImpl
+    implementation(project(path: ':fineract-note-api'))
     implementation(project(path: ':fineract-rates-api'))
     implementation(project(path: ':fineract-tax-api'))
     // Product REST templates use CurrencyReadPlatformService
