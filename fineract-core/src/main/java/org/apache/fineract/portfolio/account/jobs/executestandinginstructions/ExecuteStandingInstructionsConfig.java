@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.account.jobs.executestandinginstructions;
 
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.portfolio.account.service.AccountTransferFundsWritePort;
 import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -48,7 +48,7 @@ public class ExecuteStandingInstructionsConfig {
     @Autowired
     private DatabaseSpecificSQLGenerator sqlGenerator;
     @Autowired
-    private AccountTransfersWritePlatformService accountTransfersWritePlatformService;
+    private AccountTransferFundsWritePort accountTransferFundsWritePort;
 
     @Bean
     protected Step executeStandingInstructionsStep() {
@@ -65,6 +65,6 @@ public class ExecuteStandingInstructionsConfig {
     @Bean
     public ExecuteStandingInstructionsTasklet executeStandingInstructionsTasklet() {
         return new ExecuteStandingInstructionsTasklet(standingInstructionReadPlatformService, jdbcTemplate, sqlGenerator,
-                accountTransfersWritePlatformService);
+                accountTransferFundsWritePort);
     }
 }

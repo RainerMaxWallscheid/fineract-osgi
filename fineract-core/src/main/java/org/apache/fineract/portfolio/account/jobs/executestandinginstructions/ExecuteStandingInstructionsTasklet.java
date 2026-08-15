@@ -20,28 +20,25 @@ package org.apache.fineract.portfolio.account.jobs.executestandinginstructions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformServiceUnavailableException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.account.data.AccountTransferFundsData;
 import org.apache.fineract.portfolio.account.data.StandingInstructionData;
 import org.apache.fineract.portfolio.account.data.StandingInstructionDuesData;
 import org.apache.fineract.portfolio.account.domain.AccountTransferRecurrenceType;
 import org.apache.fineract.portfolio.account.domain.StandingInstructionStatus;
 import org.apache.fineract.portfolio.account.domain.StandingInstructionType;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.portfolio.account.service.AccountTransferFundsWritePort;
 import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformService;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.DefaultScheduledDateGenerator;
-import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.ScheduledDateGenerator;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -51,15 +48,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ExecuteStandingInstructionsTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteStandingInstructionsTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteStandingInstructionsTasklet.class);
     private final StandingInstructionReadPlatformService standingInstructionReadPlatformService;
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
-    private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
+    private final AccountTransferFundsWritePort accountTransferFundsWritePort;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        Collection<StandingInstructionData> instructionData = standingInstructionReadPlatformService.retrieveAll(StandingInstructionStatus.ACTIVE.getValue());
+        Collection<StandingInstructionData> instructionData = standingInstructionReadPlatformService
+                .retrieveAll(StandingInstructionStatus.ACTIVE.getValue());
         List<Throwable> errors = new ArrayList<>();
         for (StandingInstructionData data : instructionData) {
             boolean isDueForTransfer = false;
@@ -67,7 +65,6 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
             StandingInstructionType instructionType = data.getInstructionType();
             LocalDate transactionDate = DateUtils.getBusinessLocalDate();
             if (recurrenceType.isPeriodicRecurrence()) {
-                final ScheduledDateGenerator scheduledDateGenerator = new DefaultScheduledDateGenerator();
                 PeriodFrequencyType frequencyType = data.getRecurrenceFrequency();
                 LocalDate startDate = data.getValidFrom();
                 if (frequencyType.isMonthly()) {
@@ -81,11 +78,13 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
                         startDate = startDate.plusYears(1);
                     }
                 }
-                isDueForTransfer = scheduledDateGenerator.isDateFallsInSchedule(frequencyType, data.getRecurrenceInterval(), startDate, transactionDate);
+                isDueForTransfer = isDateFallsInSchedule(frequencyType, data.getRecurrenceInterval(), startDate, transactionDate);
             }
             BigDecimal transactionAmount = data.getAmount();
-            if (PortfolioAccountType.LOAN.equals(data.getToAccountType()) && (recurrenceType.isDuesRecurrence() || (isDueForTransfer && instructionType.isDuesAmoutTransfer()))) {
-                StandingInstructionDuesData standingInstructionDuesData = standingInstructionReadPlatformService.retriveLoanDuesData(data.getToAccount().getId());
+            if (PortfolioAccountType.LOAN.equals(data.getToAccountType())
+                    && (recurrenceType.isDuesRecurrence() || (isDueForTransfer && instructionType.isDuesAmoutTransfer()))) {
+                StandingInstructionDuesData standingInstructionDuesData = standingInstructionReadPlatformService
+                        .retriveLoanDuesData(data.getToAccount().getId());
                 if (data.getInstructionType().isDuesAmoutTransfer()) {
                     transactionAmount = standingInstructionDuesData.totalDueAmount();
                 }
@@ -94,11 +93,13 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
                 }
             }
             if (isDueForTransfer && transactionAmount != null && transactionAmount.compareTo(BigDecimal.ZERO) > 0) {
-                final SavingsAccount fromSavingsAccount = null;
                 final boolean isRegularTransaction = true;
                 final boolean isExceptionForBalanceCheck = false;
-                AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, transactionAmount, data.getFromAccountType(), data.getToAccountType(), data.getFromAccount().getId(), data.getToAccount().getId(), data.getName() + " Standing instruction trasfer ", null, null, null, null, data.toTransferType(), null, null, data.getTransferType().getValue(), null, null, ExternalId.empty(), null, null, fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);
-                final boolean transferCompleted = transferAmount(errors, accountTransferDTO, data.getId());
+                final AccountTransferFundsData fundsData = new AccountTransferFundsData(transactionDate, transactionAmount,
+                        data.getFromAccountType(), data.getToAccountType(), data.getFromAccount().getId(), data.getToAccount().getId(),
+                        data.getName() + " Standing instruction trasfer ", data.toTransferType(), data.getTransferType().getValue(),
+                        isRegularTransaction, isExceptionForBalanceCheck);
+                final boolean transferCompleted = transferAmount(errors, fundsData, data.getId());
                 if (transferCompleted) {
                     final String updateQuery = "UPDATE m_account_transfer_standing_instructions SET last_run_date = ? where id = ?";
                     jdbcTemplate.update(updateQuery, transactionDate, data.getId());
@@ -111,23 +112,29 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private boolean transferAmount(final List<Throwable> errors, final AccountTransferDTO accountTransferDTO, final Long instructionId) {
+    private boolean transferAmount(final List<Throwable> errors, final AccountTransferFundsData fundsData, final Long instructionId) {
         boolean transferCompleted = true;
         StringBuilder errorLog = new StringBuilder();
-        StringBuilder updateQuery = new StringBuilder("INSERT INTO m_account_transfer_standing_instructions_history (standing_instruction_id, " + sqlGenerator.escape("status") + ", amount,execution_time, error_log) VALUES (");
+        StringBuilder updateQuery = new StringBuilder(
+                "INSERT INTO m_account_transfer_standing_instructions_history (standing_instruction_id, " + sqlGenerator.escape("status")
+                        + ", amount,execution_time, error_log) VALUES (");
         try {
-            accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            accountTransferFundsWritePort.transferFunds(fundsData);
         } catch (final PlatformApiDataValidationException e) {
-            errors.add(new Exception("Validation exception while transfering funds for standing Instruction id" + instructionId + " from " + accountTransferDTO.getFromAccountId() + " to " + accountTransferDTO.getToAccountId(), e));
+            errors.add(new Exception("Validation exception while transfering funds for standing Instruction id" + instructionId + " from "
+                    + fundsData.getFromAccountId() + " to " + fundsData.getToAccountId(), e));
             errorLog.append("Validation exception while trasfering funds ").append(e.getDefaultUserMessage());
         } catch (final InsufficientAccountBalanceException e) {
-            errors.add(new Exception("InsufficientAccountBalance Exception while trasfering funds for standing Instruction id" + instructionId + " from " + accountTransferDTO.getFromAccountId() + " to " + accountTransferDTO.getToAccountId(), e));
+            errors.add(new Exception("InsufficientAccountBalance Exception while trasfering funds for standing Instruction id"
+                    + instructionId + " from " + fundsData.getFromAccountId() + " to " + fundsData.getToAccountId(), e));
             errorLog.append("InsufficientAccountBalance Exception ");
         } catch (final AbstractPlatformServiceUnavailableException e) {
-            errors.add(new Exception("Platform exception while trasfering funds for standing Instruction id" + instructionId + " from " + accountTransferDTO.getFromAccountId() + " to " + accountTransferDTO.getToAccountId(), e));
+            errors.add(new Exception("Platform exception while trasfering funds for standing Instruction id" + instructionId + " from "
+                    + fundsData.getFromAccountId() + " to " + fundsData.getToAccountId(), e));
             errorLog.append("Platform exception while trasfering funds ").append(e.getDefaultUserMessage());
         } catch (Exception e) {
-            errors.add(new Exception("Unhandled System Exception while trasfering funds for standing Instruction id" + instructionId + " from " + accountTransferDTO.getFromAccountId() + " to " + accountTransferDTO.getToAccountId(), e));
+            errors.add(new Exception("Unhandled System Exception while trasfering funds for standing Instruction id" + instructionId
+                    + " from " + fundsData.getFromAccountId() + " to " + fundsData.getToAccountId(), e));
             errorLog.append("Exception while trasfering funds ").append(e.getMessage());
         }
         updateQuery.append(instructionId).append(",");
@@ -137,7 +144,7 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
         } else {
             updateQuery.append("\'success\'").append(",");
         }
-        updateQuery.append(accountTransferDTO.getTransactionAmount().doubleValue());
+        updateQuery.append(fundsData.getTransactionAmount().doubleValue());
         updateQuery.append(", now(),");
         updateQuery.append("\'").append(errorLog).append("\')");
         jdbcTemplate.update(updateQuery.toString());
@@ -145,14 +152,61 @@ public class ExecuteStandingInstructionsTasklet implements Tasklet {
     }
 
     public boolean isDueForTransfer(StandingInstructionDuesData standingInstructionDuesData) {
-        return standingInstructionDuesData.dueDate() != null && !standingInstructionDuesData.dueDate().isAfter(LocalDate.now(DateUtils.getDateTimeZoneOfTenant()));
+        return standingInstructionDuesData.dueDate() != null
+                && !standingInstructionDuesData.dueDate().isAfter(LocalDate.now(DateUtils.getDateTimeZoneOfTenant()));
+    }
+
+    /**
+     * Schedule membership check previously delegated to leftover loan
+     * {@code DefaultScheduledDateGenerator}.
+     */
+    private static boolean isDateFallsInSchedule(final PeriodFrequencyType frequency, final int repaidEvery, final LocalDate startDate,
+            final LocalDate date) {
+        boolean isScheduledDate = false;
+        switch (frequency) {
+            case DAYS:
+                int diff = DateUtils.getExactDifferenceInDays(startDate, date);
+                isScheduledDate = (diff % repaidEvery) == 0;
+            break;
+            case WEEKS:
+                int weekDiff = DateUtils.getExactDifference(startDate, date, ChronoUnit.WEEKS);
+                isScheduledDate = (weekDiff % repaidEvery) == 0;
+                if (isScheduledDate) {
+                    LocalDate modifiedDate = startDate.plusWeeks(weekDiff);
+                    isScheduledDate = DateUtils.isEqual(modifiedDate, date);
+                }
+            break;
+            case MONTHS:
+                int monthDiff = DateUtils.getExactDifference(startDate, date, ChronoUnit.MONTHS);
+                isScheduledDate = (monthDiff % repaidEvery) == 0;
+                if (isScheduledDate) {
+                    LocalDate modifiedDate = startDate.plusMonths(monthDiff);
+                    isScheduledDate = DateUtils.isEqual(modifiedDate, date);
+                }
+            break;
+            case YEARS:
+                int yearDiff = DateUtils.getExactDifference(startDate, date, ChronoUnit.YEARS);
+                isScheduledDate = (yearDiff % repaidEvery) == 0;
+                if (isScheduledDate) {
+                    LocalDate modifiedDate = startDate.plusYears(yearDiff);
+                    isScheduledDate = DateUtils.isEqual(modifiedDate, date);
+                }
+            break;
+            case INVALID:
+            break;
+            case WHOLE_TERM:
+            break;
+        }
+        return isScheduledDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteStandingInstructionsTasklet(final StandingInstructionReadPlatformService standingInstructionReadPlatformService, final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final AccountTransfersWritePlatformService accountTransfersWritePlatformService) {
+    public ExecuteStandingInstructionsTasklet(final StandingInstructionReadPlatformService standingInstructionReadPlatformService,
+            final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator,
+            final AccountTransferFundsWritePort accountTransferFundsWritePort) {
         this.standingInstructionReadPlatformService = standingInstructionReadPlatformService;
         this.jdbcTemplate = jdbcTemplate;
         this.sqlGenerator = sqlGenerator;
-        this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
+        this.accountTransferFundsWritePort = accountTransferFundsWritePort;
     }
 }
