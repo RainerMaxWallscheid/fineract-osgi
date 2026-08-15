@@ -20,6 +20,7 @@
 dependencies {
     api project(path: ':fineract-address-api')
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-codes-api'))
 
     implementation(

@@ -131,7 +131,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
     }
 
     @Override
-    public CommandProcessingResult addClientFamilyMember(final Client client, final JsonCommand command) {
+    public CommandProcessingResult addFamilyMembersDuringClientCreate(final long clientId, final JsonCommand command) {
 
         Long relationshipId = null;
         CodeValue relationship = null;
@@ -152,8 +152,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
 
         this.context.authenticatedUser();
 
-        // Client
-        // client=clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
 
         ClientFamilyMembers familyMember = new ClientFamilyMembers();
 
@@ -224,7 +223,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
                     date = LocalDate.parse(member.get("dateOfBirth").getAsString(), formatter);
                     dateOfBirth = date;
                 } catch (DateTimeParseException e) {
-                    LOG.error("Problem occurred in addClientFamilyMember function", e);
+                    LOG.error("Problem occurred in addFamilyMembersDuringClientCreate function", e);
                 }
 
                 /*

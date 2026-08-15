@@ -289,7 +289,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 this.addressWritePlatformService.addNewClientAddress(newClient, command);
             }
             if (command.arrayOfParameterNamed("familyMembers") != null) {
-                this.clientFamilyMembersWritePlatformService.addClientFamilyMember(newClient, command);
+                this.clientFamilyMembersWritePlatformService.addFamilyMembersDuringClientCreate(newClient.getId(), command);
             }
             if (command.parameterExists(ClientApiConstants.datatables)) {
                 this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getValue(), EntityTables.CLIENT.getName(), newClient.getId(), null, command.arrayOfParameterNamed(ClientApiConstants.datatables));
