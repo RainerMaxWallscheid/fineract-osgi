@@ -44,6 +44,7 @@ fineract-savings/
 - Fixed/recurring deposit product write/read/handlers now live in savings-impl. Savings-product write stays on provider to avoid a savings-impl ↔ entityaccess-impl cycle.
 - Fixed/recurring deposit account entities (and RD schedule/recurring detail) now live in savings-impl next to `SavingsAccount`. Assemblers stay on provider.
 - Leftover savings command handlers now live in savings-impl (thin wrappers over write ports already on api/impl).
+- Deposit-account interest-chart read, FD interest-calculation, and `DepositAccountDataValidator` now live in savings-impl.
 
 ## 5. Commands
 
