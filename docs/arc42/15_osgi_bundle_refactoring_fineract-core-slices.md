@@ -88,7 +88,8 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
 | client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
-| client residual (pure write/read/REST) | family/identifiers/transactions REST + pure support types + JDBC txn read in core; address REST/handlers/read in address-impl; main clients/charges REST + write impls stay on provider |
+| client residual (pure write/read/REST) | family/identifiers/transactions REST + search v2 + ClientChargeData + pure support types + JDBC txn read in core; address REST/handlers/read in address-impl; main clients/charges REST + write/read impls stay on provider |
+| group residual (pure) | exceptions, GroupTypes/enumerations, level/role repos+wrappers, write ports, level/roles JDBC reads, validators, GroupsLevelApiResource, handlers (except collection-sheet) in core; Centers/Groups REST + entity write/read stay on provider |
 | share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub, products REST/constants/not-found in core; entity write/read stay on provider |
 | share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
 | `fineract-entityaccess` | **complete** (api/impl/test); office↔product/charge access; residual consumers in provider |
