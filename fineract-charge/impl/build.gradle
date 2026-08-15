@@ -65,6 +65,7 @@ jar {
                         + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.charge.starter,'
                         + 'org.apache.fineract.portfolio.client.api,'
+                        + 'org.apache.fineract.portfolio.client.domain,'
                         + 'org.apache.fineract.portfolio.client.service,'
                         + 'org.apache.fineract.portfolio.shareaccounts.service,'
                         + 'org.apache.fineract.portfolio.shareproducts.serialization,'

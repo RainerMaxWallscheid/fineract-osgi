@@ -27,6 +27,8 @@ dependencies {
     implementation(project(path: ':fineract-tax-api'))
     // Residual adapters: accounting dropdown + office entity access
     implementation(project(path: ':fineract-accounting-api'))
+    // Leftover client charge/transaction write: JournalEntryWritePlatformService
+    implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-entityaccess-api'))
     implementation(project(path: ':fineract-entityaccess-impl'))
 
