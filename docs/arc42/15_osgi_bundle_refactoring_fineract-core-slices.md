@@ -140,3 +140,4 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 - Leftover Holiday/WorkingDays repositories, wrappers, and not-found exceptions closed into core.
 - Leftover HikariCpConfig, CompatibilityConfig, JPAConfig, and JerseyConfig closed into core.
 - Leftover JdbcTransactionConfig and AbandonedConnectionCleanupShutdownListener closed into core.
+- Leftover TransactionBoundCacheManager closed into core.

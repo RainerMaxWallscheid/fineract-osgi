@@ -89,6 +89,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor,'
                         + 'org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.impl,'
                         + 'org.apache.fineract.portfolio.loanaccount.guarantor,'
+                        + 'org.apache.fineract.portfolio.loanaccount.guarantor.api,'
                         + 'org.apache.fineract.portfolio.loanaccount.guarantor.command,'
                         + 'org.apache.fineract.portfolio.loanaccount.guarantor.data,'
                         + 'org.apache.fineract.portfolio.loanaccount.guarantor.domain,'
