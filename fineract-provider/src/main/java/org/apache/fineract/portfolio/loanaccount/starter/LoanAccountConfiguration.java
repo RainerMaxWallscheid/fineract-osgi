@@ -50,6 +50,7 @@ import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatfo
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDropdownReadPlatformService;
@@ -386,12 +387,12 @@ public class LoanAccountConfiguration {
     @Bean
     @ConditionalOnMissingBean(LoanUtilService.class)
     public LoanUtilService loanUtilService(ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository,
-            CalendarInstanceRepository calendarInstanceRepository, ConfigurationDomainService configurationDomainService,
+            CalendarInstanceLookupPort calendarInstanceRepository, ConfigurationDomainService configurationDomainService,
             HolidayRepository holidayRepository, WorkingDaysRepositoryWrapper workingDaysRepository,
             LoanScheduleGeneratorFactory loanScheduleFactory, FloatingRatesReadPlatformService floatingRatesReadPlatformService,
-            CalendarReadPlatformService calendarReadPlatformService, NoteRepository noteRepository) {
+            CalendarReadPlatformService calendarReadPlatformService) {
         return new LoanUtilService(applicationCurrencyRepository, calendarInstanceRepository, configurationDomainService, holidayRepository,
-                workingDaysRepository, loanScheduleFactory, floatingRatesReadPlatformService, calendarReadPlatformService, noteRepository);
+                workingDaysRepository, loanScheduleFactory, floatingRatesReadPlatformService, calendarReadPlatformService);
     }
 
     @Bean

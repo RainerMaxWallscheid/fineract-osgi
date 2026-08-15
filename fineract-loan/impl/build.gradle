@@ -113,6 +113,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.jobs.addaccrualentries,'
                         + 'org.apache.fineract.portfolio.loanaccount.jobs.addperiodicaccrualentriesforloanswithincomepostedastransactions,'
                         + 'org.apache.fineract.portfolio.loanaccount.jobs.applychargetooverdueloaninstallment,'
+                        + 'org.apache.fineract.portfolio.loanaccount.jobs.applyholidaystoloans,'
                         + 'org.apache.fineract.portfolio.loanaccount.jobs.generateloanlossprovisioning,'
                         + 'org.apache.fineract.portfolio.loanaccount.jobs.recalculateinterestforloan,'
                         + 'org.apache.fineract.portfolio.loanaccount.starter,'

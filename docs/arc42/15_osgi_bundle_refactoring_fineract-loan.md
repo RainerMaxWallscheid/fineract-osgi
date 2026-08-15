@@ -55,6 +55,7 @@ fineract-loan/
 - Leftover pure schedule/point-in-time residual closed into loan-impl: `LoanRepaymentScheduleService`, schedule period wrapper, PIT amount DTOs, re-age/re-amortization preview requests, interest-payment-waiver command handler.
 - Leftover pure loan officer/summary residual closed into loan-impl: officer service/validator, interest-refund delegate, cumulative summary providers, adjustment port+parameter, PIT request DTOs, provisioning-criteria exception.
 - Leftover loanaccount residual closed into loan-impl: foreclosure/schedule validators, disbursement assemblers, PIT API+port, accrual/buy-down/capitalized-income event services, LoanAccountServiceImpl, bulk-loan DTOs+read port, domain helper, schedule-history impls, accrual/overdue-charge/recalculate-interest jobs.
+- Leftover LoanUtilService closed into loan-impl after Holiday/WorkingDays repos moved to core; expected-disbursement validator, apply-holidays job, and PIT impl followed (calendar via CalendarInstanceLookupPort).
 
 ## 4. Commands
 

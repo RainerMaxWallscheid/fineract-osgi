@@ -37,7 +37,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarHistory;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -54,18 +54,16 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleGeneratorFactory;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
 
 public class LoanUtilService implements ILoanUtilService {
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
     private final HolidayRepository holidayRepository;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final LoanScheduleGeneratorFactory loanScheduleFactory;
     private final FloatingRatesReadPlatformService floatingRatesReadPlatformService;
     private final CalendarReadPlatformService calendarReadPlatformService;
-    private final NoteRepository noteRepository;
 
     @Override
     public ScheduleGeneratorDTO buildScheduleGeneratorDTO(final Loan loan, final LocalDate recalculateFrom) {
@@ -269,7 +267,7 @@ public class LoanUtilService implements ILoanUtilService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanUtilService(final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final LoanScheduleGeneratorFactory loanScheduleFactory, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final CalendarReadPlatformService calendarReadPlatformService, final NoteRepository noteRepository) {
+        public LoanUtilService(final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final LoanScheduleGeneratorFactory loanScheduleFactory, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final CalendarReadPlatformService calendarReadPlatformService) {
         this.applicationCurrencyRepository = applicationCurrencyRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.configurationDomainService = configurationDomainService;
@@ -278,6 +276,5 @@ public class LoanUtilService implements ILoanUtilService {
         this.loanScheduleFactory = loanScheduleFactory;
         this.floatingRatesReadPlatformService = floatingRatesReadPlatformService;
         this.calendarReadPlatformService = calendarReadPlatformService;
-        this.noteRepository = noteRepository;
     }
 }
