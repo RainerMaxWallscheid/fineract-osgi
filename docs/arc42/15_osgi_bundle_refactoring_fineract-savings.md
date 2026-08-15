@@ -58,6 +58,7 @@ fineract-savings/
 - Leftover `AccountAssociationsReadPlatformService` + `AccountAssociationsData` now live in core. FD account REST lives in savings-impl; associations impl stays on provider.
 - Leftover `ConvertChargeDataToSpecificChargeData` now lives in core next to leftover `ChargeData` / leftover savings and share charge DTOs.
 - Leftover savings-product read/write now live in savings-impl. Office-product SQL clause is on leftover `FineractEntityAccessReadService`; office product restriction is leftover `OfficeProductRestrictionService` (entityaccess-api; impl is leftover `FineractEntityAccessUtil`).
+- Leftover savings transaction search now lives in savings-impl after leftover `SavingsAccountTransactionsMapper` was extracted from leftover account-read.
 
 ## 5. Commands
 
