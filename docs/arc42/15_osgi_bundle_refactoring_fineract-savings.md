@@ -48,12 +48,12 @@ fineract-savings/
 - Savings/FD/RD product REST now live in savings-impl. Generic `DropdownReadPlatformService` moved to fineract-core next to `CommonEnumerations`.
 - Savings account transaction/charge/on-hold/internal REST now live in savings-impl. Account-collection REST stays on provider (bulkimport + leftover account associations).
 - Savings and recurring-deposit account-collection REST now live in savings-impl (bulkimport ports are in core). FD account REST stays (leftover `AccountAssociationsReadPlatformService`).
-- Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest jobs now live in savings-impl. Transfer/adhoc jobs stay on provider.
+- Peelable leftover savings jobs (annual fee, RD schedule, due charges, maturity, dormant) now live in savings-impl. Accrual/post-interest jobs now live in savings-impl. Transfer stays on provider. Adhoc job moved to adhocquery-impl.
 - `SavingsAccountChargeReadPlatformServiceImpl` now lives in savings-impl after `ChargeDropdownReadPlatformService` moved to charge-api.
 - Transaction validators and leftover `SavingsDropdownReadPlatformServiceImplTest` now live in savings-impl/test. Provider leftover savings `data/` is empty.
 - GSIM write interface/impl now live in savings-impl. Unused `LoanRepository` constructor parameter dropped.
 - Savings accrual write port is on savings-api and the accrual job lives in savings-impl. Accrual write impl stays on provider (leftover assembler).
-- Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer stays (leftover `AccountTransferDTO` / leftover account-transfer write). Adhoc stays (not savings; leftover `AdHocReadPlatformService`).
+- Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer stays (leftover `AccountTransferDTO` / leftover account-transfer write). Adhoc job now lives in adhocquery-impl (not leftover savings).
 
 ## 5. Commands
 

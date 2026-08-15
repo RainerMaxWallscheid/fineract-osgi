@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.savings.jobs.generateadhocclientschhedule;
+package org.apache.fineract.adhocquery.jobs.generateadhocclientschhedule;
 
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
