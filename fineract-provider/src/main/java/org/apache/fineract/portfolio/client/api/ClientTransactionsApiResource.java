@@ -51,7 +51,6 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.data.ClientTransactionData;
-import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.exception.ClientTransactionNotFoundException;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
@@ -249,8 +248,7 @@ public class ClientTransactionsApiResource {
     }
 
     private Long resolveTransactionId(ExternalId transactionExternalId) {
-        ClientTransaction clientTransaction = clientTransactionReadPlatformService.retrieveTransactionByExternalId(transactionExternalId);
-        return !Objects.isNull(clientTransaction) ? clientTransaction.getId() : null;
+        return clientTransactionReadPlatformService.retrieveTransactionIdByExternalId(transactionExternalId);
     }
 
     private boolean is(final String commandParam, final String commandValue) {

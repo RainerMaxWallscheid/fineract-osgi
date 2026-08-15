@@ -23,7 +23,6 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.portfolio.client.data.ClientTransactionData;
-import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ClientTransactionReadPlatformService {
@@ -37,6 +36,6 @@ public interface ClientTransactionReadPlatformService {
     @Transactional(readOnly = true)
     ClientTransactionData retrieveTransaction(Long clientId, Long transactionId);
 
-    ClientTransaction retrieveTransactionByExternalId(ExternalId transactionExternalId);
+    Long retrieveTransactionIdByExternalId(ExternalId transactionExternalId);
 
 }

@@ -164,8 +164,9 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
     }
 
     @Override
-    public ClientTransaction retrieveTransactionByExternalId(ExternalId transactionExternalId) {
-        return clientTransactionRepository.findByExternalId(transactionExternalId);
+    public Long retrieveTransactionIdByExternalId(ExternalId transactionExternalId) {
+        final ClientTransaction clientTransaction = clientTransactionRepository.findByExternalId(transactionExternalId);
+        return clientTransaction == null ? null : clientTransaction.getId();
     }
 
     @java.lang.SuppressWarnings("all")
