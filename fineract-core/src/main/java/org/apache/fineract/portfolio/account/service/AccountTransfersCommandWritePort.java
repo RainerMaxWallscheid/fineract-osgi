@@ -18,12 +18,14 @@
  */
 package org.apache.fineract.portfolio.account.service;
 
+import java.util.Collection;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.portfolio.account.PortfolioAccountType;
 
 /**
- * Command-facing account-transfer writes without leftover provider
- * {@code AccountTransferDTO} entity edges so transfer handlers can live in core.
+ * Command and reverse-facing account-transfer writes without leftover provider
+ * {@code AccountTransferDTO} entity edges.
  */
 public interface AccountTransfersCommandWritePort {
 
@@ -32,4 +34,10 @@ public interface AccountTransfersCommandWritePort {
     CommandProcessingResult refundByTransfer(JsonCommand command);
 
     CommandProcessingResult undo(JsonCommand command);
+
+    void reverseTransfersWithFromAccountType(Long accountNumber, PortfolioAccountType accountTypeId);
+
+    void reverseAllTransactions(Long accountId, PortfolioAccountType accountTypeId);
+
+    void reverseTransfersWithFromAccountTransactions(Collection<Long> fromTransactionIds, PortfolioAccountType accountTypeId);
 }

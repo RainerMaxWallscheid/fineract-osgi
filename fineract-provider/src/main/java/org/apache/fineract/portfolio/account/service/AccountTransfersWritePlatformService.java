@@ -18,20 +18,17 @@
  */
 package org.apache.fineract.portfolio.account.service;
 
-import java.util.Collection;
-import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
 import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
 
+/**
+ * Leftover provider account-transfer write surface. Command/reverse methods are
+ * on leftover {@link AccountTransfersCommandWritePort}; entity-DTO methods stay
+ * here until {@code AccountTransferDTO} is thinned.
+ */
 public interface AccountTransfersWritePlatformService extends AccountTransfersCommandWritePort {
 
-    void reverseTransfersWithFromAccountType(Long accountNumber, PortfolioAccountType accountTypeId);
-
     Long transferFunds(AccountTransferDTO accountTransferDTO);
-
-    void reverseAllTransactions(Long accountId, PortfolioAccountType accountTypeId);
-
-    void reverseTransfersWithFromAccountTransactions(Collection<Long> fromTransactionIds, PortfolioAccountType accountTypeId);
 
     AccountTransferDetails repayLoanWithTopup(AccountTransferDTO accountTransferDTO);
 }
