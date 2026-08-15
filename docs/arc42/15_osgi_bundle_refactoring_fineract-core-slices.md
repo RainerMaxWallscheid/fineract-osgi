@@ -88,6 +88,8 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
 | client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
+| client residual (pure write) | `ClientWritePlatformService` / charge / identifier / transaction write ports + command handlers in core; family (entity) + address handlers stay on provider |
+| share product residual (pure) | write port, dropdown read, exceptions, command handlers in core; entity write/read stay on provider |
 | `fineract-entityaccess` | **complete** (api/impl/test); office↔product/charge access; residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl |
