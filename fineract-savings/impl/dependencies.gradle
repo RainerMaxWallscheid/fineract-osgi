@@ -38,6 +38,10 @@ dependencies {
     implementation(project(path: ':fineract-security-impl'))
     // Office-scoped product SQL clauses for leftover product read
     implementation(project(path: ':fineract-entityaccess-api'))
+    // Deposit account read templates use CalendarReadPlatformService
+    implementation(project(path: ':fineract-calendar-api'))
+    // Staff lookup for deposit account templates
+    implementation(project(path: ':fineract-organisation-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
