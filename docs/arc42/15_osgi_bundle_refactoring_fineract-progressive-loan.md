@@ -29,3 +29,4 @@ fineract-progressive-loan/
 ./gradlew :fineract-progressive-loan-api:jar :fineract-progressive-loan-impl:jar :fineract-progressive-loan-test:test
 ./gradlew :fineract-provider:compileJava
 ```
+- Leftover test-profile InternalLoanInformationApiResource closed into progressive-loan-impl (AdvancedPaymentDataMapper).

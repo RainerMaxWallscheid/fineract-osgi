@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.core.service;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
-import org.apache.fineract.infrastructure.jobs.service.JobRegisterServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -34,8 +33,8 @@ public class AbandonedConnectionCleanupShutdownListener implements ApplicationLi
     private static final Logger LOG = LoggerFactory.getLogger(AbandonedConnectionCleanupShutdownListener.class);
 
     /**
-     * @see JobRegisterServiceImpl#onApplicationEvent(ContextClosedEvent) doc re. why we use ContextClosedEvent instead
-     *      of ContextStoppedEvent
+     * @see org.apache.fineract.infrastructure.jobs.service.JobRegisterServiceImpl#onApplicationEvent(ContextClosedEvent)
+     *      doc re. why we use ContextClosedEvent instead of ContextStoppedEvent
      */
     @Override
     public void onApplicationEvent(@SuppressWarnings("unused") ContextClosedEvent event) {

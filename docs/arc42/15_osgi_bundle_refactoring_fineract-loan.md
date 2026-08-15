@@ -64,3 +64,4 @@ fineract-loan/
 ./gradlew :fineract-loan-api:jar :fineract-loan-impl:jar :fineract-loan-test:test
 ./gradlew :fineract-progressive-loan:compileJava :fineract-working-capital-loan:compileJava :fineract-provider:compileJava
 ```
+- Leftover LoanChargeReadPlatformServiceImpl and GuarantorAccountSummaryData closed into loan-impl.
