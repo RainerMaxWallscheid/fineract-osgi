@@ -20,6 +20,9 @@
 dependencies {
     testImplementation(project(path: ':fineract-dataqueries-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'jakarta.ws.rs:jakarta.ws.rs-api'
+    testImplementation 'org.apache.commons:commons-lang3'
+    testImplementation 'org.apache.httpcomponents:httpcore'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'
