@@ -89,8 +89,8 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
 | client residual (pure write/read/REST) | family/identifiers/transactions REST + pure support types + JDBC txn read in core; address REST/handlers/read in address-impl; main clients/charges REST + write impls stay on provider |
-| share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub in core; entity write/read stay on provider |
-| share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub + ShareAccountApiConstants in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
+| share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub, products REST/constants/not-found in core; entity write/read stay on provider |
+| share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
 | `fineract-entityaccess` | **complete** (api/impl/test); office↔product/charge access; residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl |
