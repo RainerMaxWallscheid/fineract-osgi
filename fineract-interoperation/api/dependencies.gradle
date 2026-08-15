@@ -28,5 +28,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
+
+    // MonetaryCurrency from core is EclipseLink-woven; javac needs weaving interfaces on classpath
+    compileOnly('org.eclipse.persistence:org.eclipse.persistence.jpa') {
+        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
+    }
     compileOnly 'org.springframework:spring-tx'
 }
