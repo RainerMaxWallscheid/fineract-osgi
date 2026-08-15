@@ -56,6 +56,7 @@ fineract-savings/
 - Post-interest job now lives in savings-impl next to leftover `SavingsSchedularInterestPosterTask` and leftover read port. Transfer stays (leftover `AccountTransferDTO` / leftover account-transfer write). Adhoc job now lives in adhocquery-impl (not leftover savings).
 - Leftover savings batch strategies (apply/get/transaction/adjust/charge/pay-charge) now live in savings-impl next to leftover savings REST. `DisburseToSavingsCommandStrategy` stays (leftover `LoansApiResource`).
 - Leftover `AccountAssociationsReadPlatformService` + `AccountAssociationsData` now live in core. FD account REST lives in savings-impl; associations impl stays on provider.
+- Leftover `ConvertChargeDataToSpecificChargeData` now lives in core next to leftover `ChargeData` / leftover savings and share charge DTOs.
 
 ## 5. Commands
 
