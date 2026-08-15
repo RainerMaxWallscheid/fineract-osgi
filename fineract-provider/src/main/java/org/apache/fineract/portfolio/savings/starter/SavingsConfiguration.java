@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.DatatableReadServi
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
+import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -439,8 +440,8 @@ public class SavingsConfiguration {
     @Bean
     @ConditionalOnMissingBean(SavingsProductReadPlatformService.class)
     public SavingsProductReadPlatformService savingsProductReadPlatformService(PlatformSecurityContext context, JdbcTemplate jdbcTemplate,
-            FineractEntityAccessUtil fineractEntityAccessUtil) {
-        return new SavingsProductReadPlatformServiceImpl(context, jdbcTemplate, fineractEntityAccessUtil);
+            FineractEntityAccessReadService fineractEntityAccessReadService) {
+        return new SavingsProductReadPlatformServiceImpl(context, jdbcTemplate, fineractEntityAccessReadService);
     }
 
     @Bean

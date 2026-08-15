@@ -37,6 +37,12 @@ public interface FineractEntityAccessReadService {
 
     String getSQLQueryInClauseIDList_ForChargesForOffice(Long officeId, boolean includeAllOffices);
 
+    /**
+     * When office-specific products are enabled, returns a SQL IN-list of product/charge IDs for the current user's
+     * office; otherwise an empty string.
+     */
+    String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType fineractEntityType);
+
     Collection<FineractEntityRelationData> retrieveAllSupportedMappingTypes();
 
     Collection<FineractEntityToEntityMappingData> retrieveOneMapping(Long mapId);

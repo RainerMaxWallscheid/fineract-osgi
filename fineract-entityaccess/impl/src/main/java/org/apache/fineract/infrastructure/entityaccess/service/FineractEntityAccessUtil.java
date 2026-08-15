@@ -102,26 +102,8 @@ public class FineractEntityAccessUtil {
     }
 
     public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType fineractEntityType) {
-        String inClause = "";
-
-        final GlobalConfigurationProperty property = this.globalConfigurationRepository
-                .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.OFFICE_SPECIFIC_PRODUCTS_ENABLED);
-
-        if (property.isEnabled()) {
-            // Get 'SQL In Clause' for fetching only products/charges that are
-            // relevant for current user's office
-            if (fineractEntityType.equals(FineractEntityType.SAVINGS_PRODUCT)) {
-                inClause = fineractEntityAccessReadService
-                        .getSQLQueryInClauseIDList_ForSavingsProductsForOffice(this.context.authenticatedUser().getOffice().getId(), false);
-            } else if (fineractEntityType.equals(FineractEntityType.LOAN_PRODUCT)) {
-                inClause = fineractEntityAccessReadService
-                        .getSQLQueryInClauseIDList_ForLoanProductsForOffice(this.context.authenticatedUser().getOffice().getId(), false);
-            } else if (fineractEntityType.equals(FineractEntityType.CHARGE)) {
-                inClause = fineractEntityAccessReadService
-                        .getSQLQueryInClauseIDList_ForChargesForOffice(this.context.authenticatedUser().getOffice().getId(), false);
-            }
-        }
-        return inClause;
+        return this.fineractEntityAccessReadService
+                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(fineractEntityType);
     }
 
 }

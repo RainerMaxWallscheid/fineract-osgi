@@ -24,6 +24,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
+import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
+import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelationData;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
@@ -47,13 +50,16 @@ public class FineractEntityAccessReadServiceImpl implements FineractEntityAccess
     private final JdbcTemplate jdbcTemplate;
     private static final Logger LOG = LoggerFactory.getLogger(FineractEntityAccessReadServiceImpl.class);
     private final FineractEntityRelationRepositoryWrapper fineractEntityRelationRepository;
+    private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
 
     @Autowired
     public FineractEntityAccessReadServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate,
-            final FineractEntityRelationRepositoryWrapper fineractEntityRelationRepository) {
+            final FineractEntityRelationRepositoryWrapper fineractEntityRelationRepository,
+            final GlobalConfigurationRepositoryWrapper globalConfigurationRepository) {
         this.context = context;
         this.jdbcTemplate = jdbcTemplate;
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
+        this.globalConfigurationRepository = globalConfigurationRepository;
     }
 
     /*
@@ -175,6 +181,24 @@ public class FineractEntityAccessReadServiceImpl implements FineractEntityAccess
         Long relId = fineractEntityRelation.getId();
 
         return getSQLQueryInClause_WithListOfIDsForEntityAccess(firstEntityType, relId, officeId, includeAllOffices);
+    }
+
+    @Override
+    public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(final FineractEntityType fineractEntityType) {
+        String inClause = "";
+        final GlobalConfigurationProperty property = this.globalConfigurationRepository
+                .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.OFFICE_SPECIFIC_PRODUCTS_ENABLED);
+        if (property.isEnabled()) {
+            if (fineractEntityType.equals(FineractEntityType.SAVINGS_PRODUCT)) {
+                inClause = getSQLQueryInClauseIDList_ForSavingsProductsForOffice(this.context.authenticatedUser().getOffice().getId(),
+                        false);
+            } else if (fineractEntityType.equals(FineractEntityType.LOAN_PRODUCT)) {
+                inClause = getSQLQueryInClauseIDList_ForLoanProductsForOffice(this.context.authenticatedUser().getOffice().getId(), false);
+            } else if (fineractEntityType.equals(FineractEntityType.CHARGE)) {
+                inClause = getSQLQueryInClauseIDList_ForChargesForOffice(this.context.authenticatedUser().getOffice().getId(), false);
+            }
+        }
+        return inClause;
     }
 
     @Override

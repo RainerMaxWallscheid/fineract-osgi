@@ -26,7 +26,7 @@ import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -42,7 +42,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     private final JdbcTemplate jdbcTemplate;
     private final SavingProductMapper savingsProductRowMapper = new SavingProductMapper();
     private final SavingProductLookupMapper savingsProductLookupsRowMapper = new SavingProductLookupMapper();
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final FineractEntityAccessReadService fineractEntityAccessReadService;
 
     @Override
     public Collection<SavingsProductData> retrieveAll() {
@@ -50,7 +50,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         String sql = "select " + this.savingsProductRowMapper.schema() + "where sp.deposit_type_enum = ?";
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
-        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
+        String inClause = fineractEntityAccessReadService
+                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
         if (inClause != null && !inClause.trim().isEmpty()) {
             sql += " and sp.id in ( " + inClause + " ) ";
         }
@@ -62,7 +63,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         String sql = "select " + this.savingsProductLookupsRowMapper.schema() + " where sp.deposit_type_enum = ? ";
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
-        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
+        String inClause = fineractEntityAccessReadService
+                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
         if (inClause != null && !inClause.trim().isEmpty()) {
             sql += " and id in ( " + inClause + " ) ";
         }
@@ -206,7 +208,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         boolean inClauseAdded = false;
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
-        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
+        String inClause = fineractEntityAccessReadService
+                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
         if (inClause != null && !inClause.trim().isEmpty()) {
             sql += " where id in ( " + inClause + " ) ";
             inClauseAdded = true;
@@ -235,7 +238,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.currency_code= ? ";
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
-        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
+        String inClause = fineractEntityAccessReadService
+                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.SAVINGS_PRODUCT);
         if (inClause != null && !inClause.trim().isEmpty()) {
             sql += " and id in ( " + inClause + " ) ";
         }
@@ -243,9 +247,10 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     }
 
     @java.lang.SuppressWarnings("all")
-        public SavingsProductReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate, final FineractEntityAccessUtil fineractEntityAccessUtil) {
+        public SavingsProductReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate,
+            final FineractEntityAccessReadService fineractEntityAccessReadService) {
         this.context = context;
         this.jdbcTemplate = jdbcTemplate;
-        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+        this.fineractEntityAccessReadService = fineractEntityAccessReadService;
     }
 }
