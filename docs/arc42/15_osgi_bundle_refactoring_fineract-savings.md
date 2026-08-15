@@ -52,6 +52,7 @@ fineract-savings/
 - `SavingsAccountChargeReadPlatformServiceImpl` now lives in savings-impl after `ChargeDropdownReadPlatformService` moved to charge-api.
 - Transaction validators and leftover `SavingsDropdownReadPlatformServiceImplTest` now live in savings-impl/test. Provider leftover savings `data/` is empty.
 - GSIM write interface/impl now live in savings-impl. Unused `LoanRepository` constructor parameter dropped.
+- Savings accrual write port is on savings-api and the accrual job lives in savings-impl. Accrual write impl stays on provider (leftover assembler).
 
 ## 5. Commands
 
