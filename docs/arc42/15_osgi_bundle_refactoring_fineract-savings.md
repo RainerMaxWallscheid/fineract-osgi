@@ -47,6 +47,7 @@ fineract-savings/
 - Deposit-account interest-chart read, FD interest-calculation, and `DepositAccountDataValidator` now live in savings-impl.
 - Savings/FD/RD product REST now live in savings-impl. Generic `DropdownReadPlatformService` moved to fineract-core next to `CommonEnumerations`.
 - Savings account transaction/charge/on-hold/internal REST now live in savings-impl. Account-collection REST stays on provider (bulkimport + leftover account associations).
+- Savings and recurring-deposit account-collection REST now live in savings-impl (bulkimport ports are in core). FD account REST stays (leftover `AccountAssociationsReadPlatformService`).
 
 ## 5. Commands
 
