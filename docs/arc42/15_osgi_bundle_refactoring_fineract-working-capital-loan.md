@@ -20,6 +20,7 @@ fineract-working-capital-loan/
 
 ## Residual
 
+- Leftover working-capital-loan batch `CommandStrategy` classes (+ unit tests) now live in working-capital-loan-impl/test next to leftover WC loan REST.
 - Large account/product entity graph on impl
 - Some DTOs/ports stay on impl until pure enum/DTO graph is closed
 
