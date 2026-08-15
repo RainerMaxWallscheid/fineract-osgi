@@ -136,3 +136,4 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 
 
 - Leftover pure Spring configs closed into core: `FineractCorsConfiguration`, `FineractStartupValidationConfig`, `SpringConfig`.
+- Leftover pure MetricsConfig + OkHttp3Config closed into core.
