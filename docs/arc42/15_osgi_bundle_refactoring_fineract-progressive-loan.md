@@ -31,3 +31,4 @@ fineract-progressive-loan/
 ```
 - Leftover test-profile InternalLoanInformationApiResource closed into progressive-loan-impl (AdvancedPaymentDataMapper).
 - Leftover DefaultLoanScheduleGeneratorFactory closed into progressive-loan-impl.
+- Leftover progressive amortization/summary/refund/schedule-generator impls and buy-down/capitalized-income utils closed into progressive-loan-impl.

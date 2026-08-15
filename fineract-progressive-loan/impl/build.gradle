@@ -71,6 +71,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.repository,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.data,'
                         + 'org.apache.fineract.portfolio.loanaccount.service,'
+                        + 'org.apache.fineract.portfolio.loanaccount.util,'
                         + 'org.apache.fineract.portfolio.loanaccount.starter,'
                         + 'org.apache.fineract.portfolio.loanproduct.calc,'
                         + 'org.apache.fineract.portfolio.loanproduct.calc.converter,'
