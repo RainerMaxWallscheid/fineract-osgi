@@ -40,6 +40,16 @@ dependencies {
     implementation(project(path: ':fineract-dataqueries-impl'))
     // Leftover ClientsApiResourceSwagger: ClientAddressRequest
     implementation(project(path: ':fineract-address-impl'))
+    // Leftover LoansApiResource + client/share read + validators
+    implementation(project(path: ':fineract-codes-api'))
+    implementation(project(path: ':fineract-collateralmanagement-api'))
+    implementation(project(path: ':fineract-collateralmanagement-impl'))
+    implementation(project(path: ':fineract-loan-origination-api'))
+    implementation(project(path: ':fineract-calendar-api'))
+    implementation(project(path: ':fineract-calendar-impl'))
+    implementation(project(path: ':fineract-entityaccess-impl'))
+    implementation(project(path: ':fineract-monetary-api'))
+    implementation(project(path: ':fineract-charge-impl'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
@@ -60,6 +70,11 @@ dependencies {
             'org.mapstruct:mapstruct',
             'io.github.resilience4j:resilience4j-spring-boot3',
             )
+    implementation ('org.mnode.ical4j:ical4j') {
+        exclude group: 'commons-logging'
+        exclude group: 'javax.activation'
+        exclude group: 'com.sun.mail', module: 'javax.mail'
+    }
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
