@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.service;
+package org.apache.fineract.portfolio.charge.moduleapi;
 
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;

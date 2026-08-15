@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeAppliesTo;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;

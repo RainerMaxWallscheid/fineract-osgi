@@ -25,7 +25,7 @@ import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformSer
 import org.apache.fineract.portfolio.charge.domain.ChargeRepository;
 import org.apache.fineract.portfolio.charge.serialization.ChargeDefinitionCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.charge.service.ChargeAccountingDropdownPort;
-import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.charge.service.ChargeOfficeAccessPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
