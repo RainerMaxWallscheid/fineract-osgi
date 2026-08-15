@@ -58,8 +58,11 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Progressive loan schedule, EMI model, capitalized income residual',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.portfolio.accountdetails.service,'
+                'Export-Package': 'org.apache.fineract.batch.command.internal,'
+                        + 'org.apache.fineract.portfolio.accountdetails.service,'
+                        + 'org.apache.fineract.portfolio.client.api,'
                         + 'org.apache.fineract.portfolio.configuration,'
+                        + 'org.apache.fineract.portfolio.group.api,'
                         + 'org.apache.fineract.portfolio.delinquency.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.api,'
                         + 'org.apache.fineract.portfolio.loanaccount.domain,'

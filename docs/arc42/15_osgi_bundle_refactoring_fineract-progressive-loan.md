@@ -35,3 +35,4 @@ fineract-progressive-loan/
 - Leftover LoanAccountAutoStarter, LoanTransactionProcessingServiceImpl, and ReprocessLoanTransactionsServiceImpl closed into progressive-loan-impl.
 - Leftover re-age/re-amortize/termination/adjustment services+handlers, LoanTransactionsApiResource, and related batch strategies closed into progressive-loan-impl.
 - Leftover account-details JDBC impl plus loan/bulk/GLIM read impls closed into progressive-loan-impl (WC application read; account-details port+DTO on loan-impl).
+- Leftover client/groups/centers REST, swagger, and client batch strategies closed into progressive-loan-impl (can compose loan-impl + savings-impl).

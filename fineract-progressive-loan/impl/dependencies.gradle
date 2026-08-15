@@ -33,6 +33,13 @@ dependencies {
     implementation(project(path: ':fineract-rates-api'))
     // Leftover account-details impl: WorkingCapitalLoanApplicationReadPlatformService
     implementation(project(path: ':fineract-working-capital-loan-impl'))
+    // Leftover client/groups REST: savings account/GSIM read
+    implementation(project(path: ':fineract-savings-impl'))
+    // Leftover groups/centers REST: meetings + datatable checks
+    implementation(project(path: ':fineract-meeting-api'))
+    implementation(project(path: ':fineract-dataqueries-impl'))
+    // Leftover ClientsApiResourceSwagger: ClientAddressRequest
+    implementation(project(path: ':fineract-address-impl'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
