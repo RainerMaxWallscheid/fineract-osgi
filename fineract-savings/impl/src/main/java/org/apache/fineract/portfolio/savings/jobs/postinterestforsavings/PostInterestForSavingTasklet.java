@@ -27,7 +27,6 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
@@ -73,14 +72,14 @@ public class PostInterestForSavingTasklet implements Tasklet {
             long finish = System.currentTimeMillis();
             log.debug("Done fetching Data within {} milliseconds", finish - start);
             queue.add(savingsAccounts);
-            if (!CollectionUtils.isEmpty(queue)) {
+            if (!queue.isEmpty()) {
                 do {
                     int totalFilteredRecords = savingsAccounts.size();
                     log.debug("Starting Interest posting - total records - {}", totalFilteredRecords);
                     List<SavingsAccountData> queueElement = queue.element();
                     maxSavingsIdInList = queueElement.get(queueElement.size() - 1).getId();
                     postInterest(queue.remove(), threadPoolSize, backdatedTxnsAllowedTill, pageSize, maxSavingsIdInList, queue);
-                } while (!CollectionUtils.isEmpty(queue));
+                } while (!queue.isEmpty());
             }
         }
         return RepeatStatus.FINISHED;
