@@ -26,7 +26,6 @@ apply plugin: 'com.gorylenko.gradle-git-properties'
 apply plugin: 'io.swagger.core.v3.swagger-gradle-plugin'
 apply plugin: 'com.google.cloud.tools.jib'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'se.thinkcode.cucumber-runner'
 apply plugin: 'com.docktape.swagger-brake'
 
 swaggerBrake {
@@ -51,8 +50,6 @@ checkBreakingChanges.onlyIf {
     }
     exists && existsApiNew
 }
-
-check.dependsOn('cucumber')
 
 // Static weaving is now configured in gradle/static-weaving.gradle
 // This ensures consistent configuration across all modules with JPA entities
@@ -99,9 +96,6 @@ configurations {
     providedCompile
     implementation
     testImplementation
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
     compile() {
         exclude module: 'hibernate-entitymanager'
         exclude module: 'hibernate-validator'
@@ -122,25 +116,31 @@ configurations {
 
 dependencies {
     implementation project(':fineract-core')
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    // Spins up a real PostgreSQL for self-contained persistence tests (e.g. JpaJdbcSameTransactionVisibilityTest) that
-    // need a real EclipseLink EntityManagerFactory against a real database. Skipped automatically when Docker is absent.
-    testImplementation 'org.testcontainers:postgresql:1.20.4'
-    testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
-    testImplementation 'org.mockito:mockito-core'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.14.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.14.4'
-    testImplementation 'org.junit.platform:junit-platform-commons:1.14.4'
-    testImplementation 'org.junit.platform:junit-platform-engine:1.14.4'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.14.4'
-    testImplementation 'org.junit.platform:junit-platform-suite-api:1.14.4'
-    testImplementation 'org.junit.platform:junit-platform-suite-commons:1.14.4'
-    testImplementation 'org.junit.platform:junit-platform-suite-engine:1.14.4'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-suite:1.14.4'
+    // Composition-root inventory tests only (ApiVerificationTest); no cucumber or testcontainers on provider.
+    testImplementation platform('org.junit:junit-bom:5.14.4')
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.platform', module: 'junit-platform-suite'
+        exclude group: 'org.junit.platform', module: 'junit-platform-suite-api'
+        exclude group: 'org.junit.platform', module: 'junit-platform-suite-engine'
+        exclude group: 'org.junit.platform', module: 'junit-platform-suite-commons'
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.liquibase:liquibase-core'
+}
+
+// Keep JUnit on the monorepo-cached 5.14 line even when other BOMs request 5.12.
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.junit.jupiter') {
+            details.useVersion '5.14.4'
+            details.because 'provider inventory tests use monorepo-cached JUnit 5.14'
+        } else if (details.requested.group == 'org.junit.platform') {
+            details.useVersion '1.14.4'
+            details.because 'provider inventory tests use monorepo-cached JUnit Platform 1.14'
+        }
+    }
 }
 
 apply from: 'dependencies.gradle'
@@ -389,18 +389,6 @@ tasks.register('migrateDatabase') {
             }
         }
     }
-}
-
-cucumber {
-    tags = 'not @ignore'
-    main = 'io.cucumber.core.cli.Main'
-    shorten = 'argfile'
-    plugin = [
-        'pretty',
-        'html:build/reports/cucumber/report.html',
-        'json:build/reports/cucumber/report.json',
-        'junit:build/reports/cucumber/report.xml'
-    ]
 }
 
 tasks.jib.dependsOn(bootJar, resolve, generateGitProperties)

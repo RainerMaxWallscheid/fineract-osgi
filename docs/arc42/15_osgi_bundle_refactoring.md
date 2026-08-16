@@ -298,7 +298,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 
 **Sensible follow-ons (not more provider Java peels):**
 
-1. **Provider hygiene** — drop dead cucumber plugin/`check.dependsOn('cucumber')` (0 scenarios) and unused test-only deps if desired.
+1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
 3. **OSGi hardening** — manifests, Fragment-Host, service registration for already-split api/impl/test modules.
 4. **Core residual inventory** — only after a fresh inventory of non-kernel types still in `fineract-core`.
