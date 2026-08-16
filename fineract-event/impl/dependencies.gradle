@@ -32,6 +32,8 @@ dependencies {
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-impl'))
     implementation(project(path: ':fineract-monetary-api'))
+    // External event config API uses CommandDispatcher / CommandHandler
+    implementation(project(path: ':fineract-command-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter',
@@ -47,6 +49,12 @@ dependencies {
             'com.google.guava:guava',
             'org.apache.commons:commons-collections4',
             'org.apache.commons:commons-lang3',
+            'io.github.classgraph:classgraph',
+            'jakarta.ws.rs:jakarta.ws.rs-api',
+            'io.swagger.core.v3:swagger-annotations-jakarta',
+            'com.fasterxml.jackson.core:jackson-databind',
+            'jakarta.validation:jakarta.validation-api',
+            'io.github.resilience4j:resilience4j-spring-boot3',
             )
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'

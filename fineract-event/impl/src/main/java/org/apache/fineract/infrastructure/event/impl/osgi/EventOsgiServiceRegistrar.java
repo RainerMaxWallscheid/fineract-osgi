@@ -34,8 +34,8 @@ import org.springframework.stereotype.Component;
 /**
  * Spring ↔ OSGi bridge for external event producers.
  * <p>
- * Core ports (BusinessEventNotifierService, ExternalEventProducer, serializers factory) remain in core;
- * this peel hosts domain-specific events, mappers/serializers, and JMS/Kafka producers.
+ * Core residual: notifier, outbox entity/service, serializer SPI, producer port+noop.
+ * This peel hosts domain events, mappers/serializers, JMS/Kafka producers, config REST, and send/purge jobs.
  */
 @Component
 public class EventOsgiServiceRegistrar implements InitializingBean, DisposableBean {

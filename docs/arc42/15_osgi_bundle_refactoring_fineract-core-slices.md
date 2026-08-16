@@ -84,7 +84,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 |------|-------------|----------------|
 | `infrastructure.core` | ~284 | **Shared kernel** — tenant, config, DB, Jersey, exceptions, serialization |
 | `portfolio.client` | ~112 | **Domain residual** — pure/client satellite REST/handlers/domain already here; `Client` entity is still a kernel hub |
-| `infrastructure.event` | ~87 | **Mixed** — notifier/bus ports are kernel; external-event jobs/config/API look peelable toward `fineract-event` |
+| `infrastructure.event` | ~61 | **Mixed residual** — notifier/outbox write path kernel; jobs/config/API peeled to event-impl |
 | `portfolio.shares*` + accounts/products | ~81 | **Domain residual** — pure share residual intentionally parked in core; entity write/read still elsewhere |
 | `portfolio.group` | ~74 | **Domain residual** — pure group residual; `Group` entity + centers/groups write still composition-coupled |
 | `portfolio.account` | ~60 | **Domain residual** — account-transfer/SI pure + REST; entity write adapters cross loan/savings |
@@ -109,7 +109,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; `PaymentType` entity/repo/not-found residual in core |
 | **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
 | **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; write impl residual in progressive-loan-impl |
-| **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | Jobs/config/API/repos still in core while producers already live in event-impl — consolidate carefully to avoid notifier cycles |
+| **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
 | **5** | **Account transfer / SI pure+REST** | ~60 | new module or savings/loan-owned | Cross-product (loan+savings); entity write adapters remain hard |
 | **6** | **Shares pure residual** | ~81 | new `fineract-shares` | Large; entity write/read/job residual still composition-coupled |
 | **7** | **Group pure residual** | ~74 | new `fineract-group` | `Group` entity + progressive-loan composition roots still bind centers/groups write |
@@ -132,7 +132,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; entity residual in core).  
 2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
 3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl).  
-4. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
+4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
+5. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
 
 ## Related provider peels
 
@@ -180,7 +181,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
 | `fineract-springbatch` | **complete** (api/impl/test); remote job messaging (JMS/Kafka/Spring events); PropertyService port remains in core |
-| `fineract-event` | **complete** (api/impl/test); domain business events + external producers/serializers; residual share + loan stayed-locked on provider; core keeps ports/repos |
+| `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |
 
 
 ## Commands

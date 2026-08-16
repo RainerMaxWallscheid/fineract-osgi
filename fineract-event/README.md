@@ -8,10 +8,15 @@ Provider peel — business events + external event producers/serializers (ADR-02
 | `fineract-event-impl` | `impl/` | `org.apache.fineract.event.impl` | Domain business events, Avro mappers/serializers, JMS/Kafka producers, OSGi |
 | `fineract-event-test` | `test/` | `org.apache.fineract.event.test` | Fragment-Host → impl |
 
-Core already holds notifier/ports, ExternalEvent entity/repos, serializers factory, and job tasklets.
+Core residual (kernel outbox path): notifier/ports, `ExternalEvent` entity/repos, `ExternalEventService`, serializer SPI/factory, message factories, producer port + noop.
+
+This peel also hosts external-event **jobs**, **configuration REST**, startup validation, and internal test APIs (moved from core).
 
 Residual on provider:
 - share/FD/RD **mappers/serializers** (need residual read services: `ShareAccountReadPlatformService`, `DepositAccountReadPlatformService`, share product read)
+
+Closed residual (core → event-impl):
+- External event configuration REST/handlers/DTOs + validation + send/purge jobs + task executor
 
 Closed residual:
 - `LoanAccountsStayedLocked*` types in cob-api; mappers/serializers in event-impl
