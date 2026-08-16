@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-security-api')
 
     implementation(project(path: ':fineract-core'))
+    // UserNotificationService port (impl residual in notification-impl)
+    implementation(project(path: ':fineract-notification-api'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-campaigns-api'))
     // LoanCOBApiFilter / LoanCOBFilterHelper types for AuthorizationServer + OIDC chains

@@ -122,7 +122,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
 | **15** | **Delinquency catalog entities** | ~6 | `fineract-loan-impl` | **Done** — `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + enums next to repos; WC already depends on loan-impl |
 | **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
-| **17** | **Notification leftover** | ~2 | `fineract-notification` api | Next leftover — `UserNotificationService` + `NotificationData`; security-impl injects the port |
+| **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | Next leftover — `InteropIdentifierType` (other interop enums already on interop-api) |
 
 ### Explicitly **do not** peel as “core residual”
@@ -155,8 +155,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
 15. **Delinquency catalog entities** ✅ (`DelinquencyBucket`/`Range` + enums → loan-impl; WC already on loan-impl).  
 16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api).  
-17. **Notification leftover** — next (`UserNotificationService` + `NotificationData` → notification-api).  
-18. **Interop identifier type** — leftover (`InteropIdentifierType` → interop-api).
+17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
+18. **Interop identifier type** — next leftover (`InteropIdentifierType` → interop-api).
 
 ## Related provider peels
 
@@ -165,7 +165,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core |
 | `fineract-adhocquery` | **complete** (api/impl/test); leftover generate-adhoc-client-schedule job closed into impl |
 | `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl |
-| `fineract-notification` | **complete** (api/impl/test); domain event listeners residual in provider; UserNotificationService in core |
+| `fineract-notification` | **complete** (api/impl/test); `UserNotificationService` + `NotificationData` on notification-api; security-impl api-only |
 | `fineract-spm` | **complete** (api/impl/test); self-contained provider peel; Client/AppUser from core |
 | `fineract-fund` | **complete** (api/impl/test); Fund entity residual in core |
 | `fineract-accountnumberformat` | **complete** (api/impl/test); entity/generator residual in core |

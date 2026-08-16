@@ -8,9 +8,11 @@ Provider peel — in-app user notifications (ADR-022).
 | `fineract-notification-impl` | `impl/` | `org.apache.fineract.notification.impl` | REST, JPA, JMS/ActiveMQ, write path, `NotificationOsgiServiceRegistrar` |
 | `fineract-notification-test` | `test/` | `org.apache.fineract.notification.test` | Fragment-Host → impl |
 
-### Residual in `fineract-core`
+### Module API
 
-`UserNotificationService` + `NotificationData` stay in core (used by security filter).
+- `UserNotificationService` + `NotificationData` (security filter is **notification-api only**)
+- `NotificationReadPlatformService` / `NotificationWritePlatformService`
+- `NotificationEventPublisher`
 
 ### Residual closed
 
