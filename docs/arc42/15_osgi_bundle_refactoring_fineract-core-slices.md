@@ -107,7 +107,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | Rank | Candidate | ~types | Target | Why / risk |
 |------|-----------|--------|--------|------------|
 | **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; `PaymentType` entity/repo/not-found residual in core |
-| **2** | **Search** | ~18 | new `fineract-search` or dataqueries-adjacent | Already port-thinned (`LoanProductLookupReadPort`); low entity mass |
+| **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
 | **3** | **Collection sheet** | ~29 | new `fineract-collectionsheet` | Pure residual package; write impl stays behind ports on loan/savings |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | Jobs/config/API/repos still in core while producers already live in event-impl — consolidate carefully to avoid notifier cycles |
 | **5** | **Account transfer / SI pure+REST** | ~60 | new module or savings/loan-owned | Cross-product (loan+savings); entity write adapters remain hard |
@@ -130,7 +130,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 ### Suggested order of attack
 
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; entity residual in core).  
-2. **Search** (if payment-type proves the consumer retarget pattern).  
+2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
 3. **Collection sheet** (package move behind existing ports).  
 4. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
 
