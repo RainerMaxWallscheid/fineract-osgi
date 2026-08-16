@@ -146,6 +146,13 @@ project(':fineract-collectionsheet-impl').projectDir = file('fineract-collection
 include ':fineract-collectionsheet-test'
 project(':fineract-collectionsheet-test').projectDir = file('fineract-collectionsheet/test')
 // No :fineract-collectionsheet façade — depend on -api / -impl explicitly.
+include ':fineract-accounttransfer-api'
+project(':fineract-accounttransfer-api').projectDir = file('fineract-accounttransfer/api')
+include ':fineract-accounttransfer-impl'
+project(':fineract-accounttransfer-impl').projectDir = file('fineract-accounttransfer/impl')
+include ':fineract-accounttransfer-test'
+project(':fineract-accounttransfer-test').projectDir = file('fineract-accounttransfer/test')
+// No :fineract-accounttransfer façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'

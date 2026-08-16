@@ -18,31 +18,21 @@
  */
 
 dependencies {
-    api project(path: ':fineract-interoperation-api')
+    api project(path: ':fineract-accounttransfer-api')
     implementation(project(path: ':fineract-core'))
-    // Account transfer / SI ports and shared DTOs
-    implementation(project(path: ':fineract-accounttransfer-api'))
-    implementation(project(path: ':fineract-command-api'))
-    implementation(project(path: ':fineract-security-api'))
-    implementation(project(path: ':fineract-security-impl'))
-    implementation(project(path: ':fineract-savings-api'))
-    implementation(project(path: ':fineract-savings-impl'))
-    implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
-    implementation(project(path: ':fineract-note-api'))
-    implementation(project(path: ':fineract-note-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
             'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework:spring-jdbc',
+            'org.springframework.boot:spring-boot-starter-batch',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'org.glassfish.jersey.media:jersey-media-multipart',
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
             'io.swagger.core.v3:swagger-annotations-jakarta',
-            'io.github.resilience4j:resilience4j-spring-boot3',
             )
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
@@ -50,6 +40,5 @@ dependencies {
     implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

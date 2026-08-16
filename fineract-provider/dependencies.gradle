@@ -86,6 +86,8 @@ dependencies {
     implementation(project(path: ':fineract-search-impl'))
     implementation(project(path: ':fineract-collectionsheet-api'))
     implementation(project(path: ':fineract-collectionsheet-impl'))
+    implementation(project(path: ':fineract-accounttransfer-api'))
+    implementation(project(path: ':fineract-accounttransfer-impl'))
     implementation(project(path: ':fineract-accountnumberformat-api'))
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))

@@ -87,7 +87,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `infrastructure.event` | ~61 | **Mixed residual** — notifier/outbox write path kernel; jobs/config/API peeled to event-impl |
 | `portfolio.shares*` + accounts/products | ~81 | **Domain residual** — pure share residual intentionally parked in core; entity write/read still elsewhere |
 | `portfolio.group` | ~74 | **Domain residual** — pure group residual; `Group` entity + centers/groups write still composition-coupled |
-| `portfolio.account` | ~60 | **Domain residual** — account-transfer/SI pure + REST; entity write adapters cross loan/savings |
+| `portfolio.account` | ~4 | **Peeled** → `fineract-accounttransfer` api/impl/test; kernel residual `PortfolioAccountType`/`PortfolioAccountData`/`AccountTransferData`/`AccountTransfersReadPlatformService` (savings txn coupling); write entities in progressive-loan-impl |
 | `organisation.*` | ~51 | **Kernel residual** — entities/DTOs kept after organisation-api/impl slice (by design) |
 | `portfolio.savings` (kernel math/DTOs) | ~42 | **Shared kernel-ish** — compounding/posting math + shared savings DTOs used by savings-impl |
 | `portfolio.collectionsheet` | 0 | **Peeled** → `fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl |
@@ -110,7 +110,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
 | **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
-| **5** | **Account transfer / SI pure+REST** | ~60 | new module or savings/loan-owned | Cross-product (loan+savings); entity write adapters remain hard |
+| **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
 | **6** | **Shares pure residual** | ~81 | new `fineract-shares` | Large; entity write/read/job residual still composition-coupled |
 | **7** | **Group pure residual** | ~74 | new `fineract-group` | `Group` entity + progressive-loan composition roots still bind centers/groups write |
 | **8** | **Client pure residual** | ~112 | new `fineract-clients` (domain) | Highest value long-term; highest risk — `Client` is a shared hub; only after paymenttype/search pilot |
@@ -133,7 +133,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
 3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl).  
 4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
-5. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
+5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
+6. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
 
 ## Related provider peels
 
@@ -182,6 +183,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
 | `fineract-springbatch` | **complete** (api/impl/test); remote job messaging (JMS/Kafka/Spring events); PropertyService port remains in core |
 | `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |
+| `fineract-accounttransfer` | **complete** (api/impl/test); ports/enums/DTOs + REST/handlers/reads/SI job; write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 
 
 ## Commands

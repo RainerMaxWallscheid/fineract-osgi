@@ -18,22 +18,11 @@
  */
 
 dependencies {
+    // EnumOptionData, CurrencyData, ClientData, OfficeData, Page, JsonCommand
     api project(path: ':fineract-core')
-    // Account transfer / SI ports and shared DTOs
-    api project(path: ':fineract-accounttransfer-api')
-
-    implementation 'org.apache.commons:commons-lang3'
-    implementation 'jakarta.validation:jakarta.validation-api'
-    implementation 'com.google.code.gson:gson'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
-
-    // MonetaryCurrency from core is EclipseLink-woven; javac needs weaving interfaces on classpath
-    compileOnly('org.eclipse.persistence:org.eclipse.persistence.jpa') {
-        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
-    }
+    compileOnly 'jakarta.ws.rs:jakarta.ws.rs-api'
     compileOnly 'org.springframework:spring-tx'
 }
