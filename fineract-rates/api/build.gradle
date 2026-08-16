@@ -31,11 +31,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract Rates API',
                 'Bundle-SymbolicName': 'org.apache.fineract.rates.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Description': 'Floating rates contracts (Module API ports, DTOs, read/write service interfaces, exceptions)',
+                'Bundle-Description': 'Floating rates + loan Rate catalog contracts (ports, DTOs, read/write interfaces, exceptions)',
                 'Export-Package': 'org.apache.fineract.portfolio.floatingrates.moduleapi,'
                         + 'org.apache.fineract.portfolio.floatingrates.data,'
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
-                        + 'org.apache.fineract.portfolio.floatingrates.exception',
+                        + 'org.apache.fineract.portfolio.floatingrates.exception,'
+                        + 'org.apache.fineract.portfolio.rate.data,'
+                        + 'org.apache.fineract.portfolio.rate.service',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.api'
                 )

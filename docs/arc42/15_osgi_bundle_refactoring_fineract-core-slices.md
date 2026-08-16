@@ -117,6 +117,9 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; entity residual loan-impl |
 | **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
 | **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; `ProductNotFoundException` residual core |
+| **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; entity + PaymentDetailData residual core |
+| **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
+| **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | Next leftover — `TaxComponentRequest`/`TaxGroupRequest` only used by tax-impl REST; fat `TaxGroupData` stays (SavingsAccountData cycle) |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -142,7 +145,10 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
 9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).  
 10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).  
-11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).
+11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).  
+12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; entity residual core).  
+13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
+14. **Tax request DTOs** — next leftover (`Tax*Request` → tax-api; fat `TaxGroupData` stays for SavingsAccountData).
 
 ## Related provider peels
 
@@ -164,7 +170,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | search residual | SearchApiResource + SearchRead JDBC + AdHocSearchQueryData in core via LoanProductLookupReadPort (loan-impl adapter) |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); entity/repo/assembler/impl/config residual loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
-| loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate repo/wrapper in core |
+| loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate entity/repo residual in core; `RateData` + Rate read/write ports on rates-api |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException in core; app bootstrap configs stay on provider |
 | share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub, products REST/constants/not-found, ShareProduct domain (+ market price/repos) in core; entity write/read/serializer stay on provider |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException, jdbc/jersey/cache/jpa/liquibase helpers, auditors, password encoder, AccountNumberFormatRepositoryWrapper, CalendarInstance repos in core; app bootstrap (Web/Liquibase-only) stay on provider |
@@ -198,6 +204,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
 | `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |
+| `fineract-paymentdetail` | **complete** (api/impl/test); write port/impl/assembler; PaymentDetail entity/repo + PaymentDetailData residual core |
+| `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
 
 
 ## Commands

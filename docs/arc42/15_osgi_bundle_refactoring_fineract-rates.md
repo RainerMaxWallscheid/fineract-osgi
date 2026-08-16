@@ -6,7 +6,7 @@ Wave‑1 module after [charge](15_osgi_bundle_refactoring_fineract-charge.md)
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test + `FloatingRatePort`; loan **rates-api only** via `floatingRateId`) |
+| **Status** | **complete** — Steps **0–9** + Rate catalog close-in (`RateData` / `RateReadService` / `RateWriteService` on rates-api) |
 | **Module** | Floating Rates catalog (`m_floating_rates`) |
 | **No façade** | Compose with `:fineract-rates-api` + `:fineract-rates-impl` explicitly |
 
@@ -40,7 +40,7 @@ fineract-rates/
 
 | Gradle | Bundle-SymbolicName | Export |
 |--------|---------------------|--------|
-| `:fineract-rates-api` | `org.apache.fineract.rates.api` | `moduleapi`, `data`, `service` (interfaces), `exception` |
+| `:fineract-rates-api` | `org.apache.fineract.rates.api` | floating `moduleapi`/`data`/`service`/`exception` + Rate `data`/`service` |
 | `:fineract-rates-impl` | `org.apache.fineract.rates.impl` | `starter` only |
 | `:fineract-rates-test` | `org.apache.fineract.rates.test` | Fragment-Host |
 
@@ -54,6 +54,8 @@ fineract-rates/
 | `…floatingrates.data` | **api** — pure DTOs |
 | `…floatingrates.service` (interfaces) | **api** |
 | `…floatingrates.exception` | **api** |
+| `…rate.data` (`RateData`) | **api** |
+| `…rate.service` (`RateReadService`, `RateWriteService`) | **api** |
 | `…floatingrates.domain` | **impl** — JPA + repositories |
 | `…floatingrates.service.*Impl` | **impl** |
 | `…floatingrates.handler` / `api` / `serialization` | **impl** |
@@ -83,13 +85,13 @@ Manifest Export/Import/Fragment-Host on jars.
 `FloatingRatePortJpaAdapterTest` under rates-test.
 
 ### Step 6 — OSGi registrar ✅
-`RatesOsgiServiceRegistrar` → `FloatingRatePort`.
+`RatesOsgiServiceRegistrar` → `FloatingRatePort` + `RateReadService` + `RateWriteService`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |
 |----------|------|
 | savings | **api only** |
-| loan | **api only** (`floatingRateId` + `FloatingRatePort`) |
+| loan | **api only** (`floatingRateId` + `FloatingRatePort`; `RateData` / `RateReadService`) |
 | provider / war / ITs | api + impl (composition root) |
 | architecture | api + impl (classpath) |
 
@@ -100,6 +102,10 @@ Manifest Export/Import/Fragment-Host on jars.
 
 ### Step 9 — Docs ✅
 This plan + module README + osgi table update.
+
+### Rate catalog close-in ✅
+`RateData` + `RateReadService` / `RateWriteService` moved to rates-api (loan already **rates-api only**).
+Residual in core: `Rate` entity, `RateAppliesTo`, repo/wrapper, `RateNotFoundException` (loan `@ManyToOne`).
 
 ---
 

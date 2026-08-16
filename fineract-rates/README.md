@@ -16,20 +16,23 @@ No `:fineract-rates` façade. Depend on `-api`; composition roots also take `-im
 - `FloatingRatePort` / `FloatingRateDefinitionData`
 - `FloatingRatesReadPlatformService`, `FloatingRateWritePlatformService` interfaces
 - Pure DTOs under `…floatingrates.data`
+- `RateReadService` / `RateWriteService` + `RateData` (loan Rate catalog)
 
 ### Consumers
 
 | Module | Depend on |
 |--------|-----------|
 | savings | `-api` only |
-| loan | `-api` only (`floatingRateId` + `FloatingRatePort`) |
+| loan | `-api` only (`floatingRateId` + `FloatingRatePort`; `RateData` / `RateReadService`) |
 | provider / war / ITs | `-api` + `-impl` |
 
 
-### Loan Rate catalog residual (**closed**)
+### Loan Rate catalog residual
 
-`portfolio.rate` REST/handlers/services/domain wrappers live in **rates-impl**
-(entity `Rate` + `RateData` remain in core for loan residual coupling).
+`portfolio.rate` REST/handlers/assembler/read-write impls live in **rates-impl**.
+`RateData` + read/write ports live in **rates-api**.
+Entity `Rate` + `RateAppliesTo` + repo/wrapper + `RateNotFoundException` remain in **core**
+(loan `@ManyToOne Rate` coupling).
 Floating rates remain under `portfolio.floatingrates`.
 
 ```bash

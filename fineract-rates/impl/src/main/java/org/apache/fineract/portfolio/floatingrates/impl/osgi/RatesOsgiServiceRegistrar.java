@@ -24,6 +24,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.rate.service.RateReadService;
+import org.apache.fineract.portfolio.rate.service.RateWriteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -32,7 +34,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
- * Spring ↔ OSGi bridge for Floating Rates (ADR-022 / rates plan).
+ * Spring ↔ OSGi bridge for Floating Rates + loan Rate catalog (ADR-022 / rates plan).
  *
  * <p>Uses reflection so this class loads under plain Spring Boot without OSGi on the classpath.
  */
@@ -42,10 +44,15 @@ public class RatesOsgiServiceRegistrar implements InitializingBean, DisposableBe
     private static final Logger LOG = LoggerFactory.getLogger(RatesOsgiServiceRegistrar.class);
 
     private final ObjectProvider<FloatingRatePort> floatingRatePort;
+    private final ObjectProvider<RateReadService> rateReadService;
+    private final ObjectProvider<RateWriteService> rateWriteService;
     private final List<Object> registrations = new ArrayList<>();
 
-    public RatesOsgiServiceRegistrar(final ObjectProvider<FloatingRatePort> floatingRatePort) {
+    public RatesOsgiServiceRegistrar(final ObjectProvider<FloatingRatePort> floatingRatePort,
+            final ObjectProvider<RateReadService> rateReadService, final ObjectProvider<RateWriteService> rateWriteService) {
         this.floatingRatePort = floatingRatePort;
+        this.rateReadService = rateReadService;
+        this.rateWriteService = rateWriteService;
     }
 
     @Override
@@ -66,6 +73,8 @@ public class RatesOsgiServiceRegistrar implements InitializingBean, DisposableBe
             }
 
             register(context, FloatingRatePort.class, floatingRatePort.getIfAvailable());
+            register(context, RateReadService.class, rateReadService.getIfAvailable());
+            register(context, RateWriteService.class, rateWriteService.getIfAvailable());
             LOG.info("Registered {} rates OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only rates wiring");
