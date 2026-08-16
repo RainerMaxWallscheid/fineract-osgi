@@ -20,12 +20,10 @@ package org.apache.fineract.infrastructure.core;
 
 import io.cucumber.java8.En;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class InstanceTypeStepDefinitions implements En {
 
-    @Autowired
-    private FineractProperties fineractProperties;
+    private final FineractProperties fineractProperties = CucumberFineractProperties.INSTANCE;
 
     public InstanceTypeStepDefinitions() {
         Given("Set every Fineract instance type to false", () -> {

@@ -20,28 +20,32 @@ package org.apache.fineract.infrastructure.core.jersey;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
-import org.apache.fineract.TestConfiguration;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.infrastructure.core.jersey.converter.ExternalIdJsonConverter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
 
-@SpringBootTest
-@ContextConfiguration(classes = TestConfiguration.class)
 public class CommandProcessingResultSerializationTest {
 
-    @Autowired
     private MappingJackson2HttpMessageConverter converter;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new JerseyJacksonConverterConfig().objectMapper(List.of(), List.of(),
+                List.of(new ExternalIdJsonConverter()));
+        this.converter = new MappingJackson2HttpMessageConverter(objectMapper);
+    }
 
     @Test
     public void testCommandProcessingResultSerialization() throws IOException {

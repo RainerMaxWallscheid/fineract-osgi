@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.core.service.migration.TenantDatabaseS
 import org.apache.fineract.infrastructure.core.service.migration.TenantDatabaseUpgradeService;
 import org.apache.fineract.infrastructure.core.service.migration.TenantPasswordEncryptionTask;
 import org.apache.fineract.infrastructure.core.service.tenant.TenantDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -54,8 +53,7 @@ public class LiquibaseStepDefinitions implements En {
     private TenantDataSourceFactory tenantDataSourceFactory;
     private TenantDetailsService tenantDetailsService;
     private TenantDatabaseStateVerifier databaseStateVerifier;
-    @Autowired
-    private FineractProperties fineractProperties;
+    private final FineractProperties fineractProperties = CucumberFineractProperties.INSTANCE;
     private ExtendedSpringLiquibaseFactory liquibaseFactory;
     private ExtendedSpringLiquibase initialTenantStoreLiquibase;
     private ExtendedSpringLiquibase tenantStoreLiquibase;

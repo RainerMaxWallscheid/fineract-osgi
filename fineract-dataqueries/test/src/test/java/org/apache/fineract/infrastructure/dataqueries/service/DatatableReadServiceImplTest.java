@@ -22,57 +22,86 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.stream.Stream;
-import org.apache.fineract.TestConfiguration;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseType;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseTypeResolver;
+import org.apache.fineract.infrastructure.core.service.database.RoutingDataSource;
+import org.apache.fineract.infrastructure.dataqueries.data.DataTableValidator;
 import org.apache.fineract.infrastructure.dataqueries.data.ResultsetColumnHeaderData;
 import org.apache.fineract.infrastructure.dataqueries.exception.DatatableNotFoundException;
+import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.infrastructure.security.service.SqlValidator;
+import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
+import org.apache.fineract.portfolio.search.service.SearchUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.test.context.ContextConfiguration;
 
-@SpringBootTest
-@ContextConfiguration(classes = TestConfiguration.class)
-
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DatatableReadServiceImplTest {
 
-    @Autowired
+    @Mock
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
+    @Mock
     private GenericDataService genericDataService;
 
     @Mock
     private DatabaseTypeResolver databaseTypeResolver;
 
     @Mock
-    private DatabaseSpecificSQLGenerator sqlGenerator;
+    private PlatformSecurityContext context;
 
-    @Autowired
+    @Mock
+    private DataTableValidator dataTableValidator;
+
+    @Mock
+    private SqlValidator sqlValidator;
+
+    @Mock
+    private ColumnValidator columnValidator;
+
+    @Mock
+    private RoutingDataSource routingDataSource;
+
+    private DatabaseSpecificSQLGenerator sqlGenerator;
     private DatatableReadService underTest;
+
+    @BeforeEach
+    void setUp() {
+        when(databaseTypeResolver.isPostgreSQL()).thenReturn(true);
+        when(databaseTypeResolver.databaseType()).thenReturn(DatabaseType.POSTGRESQL);
+        sqlGenerator = new DatabaseSpecificSQLGenerator(databaseTypeResolver, routingDataSource);
+        SearchUtil searchUtil = new SearchUtil(sqlValidator);
+        DatatableUtil datatableUtil = new DatatableUtil(searchUtil, jdbcTemplate, sqlValidator, context, genericDataService, sqlGenerator,
+                columnValidator);
+        underTest = new DatatableReadServiceImpl(jdbcTemplate, sqlGenerator, context, genericDataService, dataTableValidator, sqlValidator,
+                searchUtil, datatableUtil);
+    }
 
     @Test
     public void testSqlInjectionCaughtQueryDataTable() {
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(1);
+        stubTextHeaders();
 
         assertThrows(PlatformApiDataValidationException.class, () -> {
             underTest.queryDataTable("table", "cf1", "vf1", "' or 1=1");
@@ -82,6 +111,7 @@ public class DatatableReadServiceImplTest {
     @Test
     public void testSqlInjectionCaughtQueryDataTable2() {
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(1);
+        stubTextHeaders();
 
         assertThrows(PlatformApiDataValidationException.class, () -> {
             underTest.queryDataTable("table", "cf1", "vf1", "1; DROP TABLE m_loan; SELECT");
@@ -97,22 +127,7 @@ public class DatatableReadServiceImplTest {
                 .thenReturn(sqlRS);
         when(sqlRS.next()).thenReturn(true).thenReturn(false);
         when(sqlRS.getObject(anyString())).thenReturn("value1").thenReturn("value2");
-        when(sqlGenerator.buildSelect(anyCollection(), nullable(String.class), eq(false))).thenReturn("SELECT \"rc1\", \"rc2\"");
-        when(sqlGenerator.buildFrom(anyString(), nullable(String.class), eq(false))).thenReturn("FROM \"table\"");
-        when(sqlGenerator.escape(anyString())).thenReturn("\"cf1\"");
-        when(sqlGenerator.alias(anyString(), nullable(String.class))).thenReturn("\"cf1\"");
-        when(databaseTypeResolver.isPostgreSQL()).thenReturn(true);
-        when(databaseTypeResolver.databaseType()).thenReturn(DatabaseType.POSTGRESQL);
-        DatabaseType dialect = databaseTypeResolver.databaseType();
-
-        ResultsetColumnHeaderData cf1 = ResultsetColumnHeaderData.detailed("cf1", "text", 10L, false, false, emptyList(), null, false,
-                false, dialect);
-        ResultsetColumnHeaderData rc1 = ResultsetColumnHeaderData.detailed("rc1", "text", 10L, false, false, emptyList(), null, false,
-                false, dialect);
-        ResultsetColumnHeaderData rc2 = ResultsetColumnHeaderData.detailed("rc2", "text", 10L, false, false, emptyList(), null, false,
-                false, dialect);
-
-        when(genericDataService.fillResultsetColumnHeaders("table")).thenReturn(List.of(cf1, rc1, rc2));
+        stubTextHeaders();
 
         List<JsonObject> results = underTest.queryDataTable("table", "cf1", "vf1", "rc1,rc2");
 
@@ -139,15 +154,13 @@ public class DatatableReadServiceImplTest {
     @MethodSource("provideParameters")
     public void testQueryDataTableInvalidParameterError(String columnType, String errorMessage) {
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(1);
-        when(databaseTypeResolver.databaseType()).thenReturn(DatabaseType.POSTGRESQL);
-
-        DatabaseType dialect = databaseTypeResolver.databaseType();
+        DatabaseType dialect = DatabaseType.POSTGRESQL;
         ResultsetColumnHeaderData cf1 = ResultsetColumnHeaderData.detailed("cf1", columnType, 10L, false, false, emptyList(), null, false,
                 false, dialect);
-        ResultsetColumnHeaderData rc1 = ResultsetColumnHeaderData.detailed("rc1", "text", 10L, false, false, emptyList(), null, false,
-                false, dialect);
-        ResultsetColumnHeaderData rc2 = ResultsetColumnHeaderData.detailed("rc2", "text", 10L, false, false, emptyList(), null, false,
-                false, dialect);
+        ResultsetColumnHeaderData rc1 = ResultsetColumnHeaderData.detailed("rc1", "text", 10L, false, false, emptyList(), null, false, false,
+                dialect);
+        ResultsetColumnHeaderData rc2 = ResultsetColumnHeaderData.detailed("rc2", "text", 10L, false, false, emptyList(), null, false, false,
+                dialect);
         when(genericDataService.fillResultsetColumnHeaders("table")).thenReturn(List.of(cf1, rc1, rc2));
 
         PlatformApiDataValidationException thrown = assertThrows(PlatformApiDataValidationException.class,
@@ -155,6 +168,17 @@ public class DatatableReadServiceImplTest {
 
         assertEquals(1, thrown.getErrors().size());
         assertEquals(errorMessage, thrown.getErrors().get(0).getUserMessageGlobalisationCode());
+    }
+
+    private void stubTextHeaders() {
+        DatabaseType dialect = DatabaseType.POSTGRESQL;
+        ResultsetColumnHeaderData cf1 = ResultsetColumnHeaderData.detailed("cf1", "text", 10L, false, false, emptyList(), null, false, false,
+                dialect);
+        ResultsetColumnHeaderData rc1 = ResultsetColumnHeaderData.detailed("rc1", "text", 10L, false, false, emptyList(), null, false, false,
+                dialect);
+        ResultsetColumnHeaderData rc2 = ResultsetColumnHeaderData.detailed("rc2", "text", 10L, false, false, emptyList(), null, false, false,
+                dialect);
+        when(genericDataService.fillResultsetColumnHeaders("table")).thenReturn(List.of(cf1, rc1, rc2));
     }
 
     private static Stream<Arguments> provideParameters() {
