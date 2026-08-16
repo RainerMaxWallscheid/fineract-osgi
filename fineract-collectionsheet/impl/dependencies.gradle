@@ -20,6 +20,9 @@
 dependencies {
     api project(path: ':fineract-collectionsheet-api')
     implementation(project(path: ':fineract-core'))
+    // Payment detail write port (entity residual in core)
+    implementation(project(path: ':fineract-paymentdetail-api'))
+    implementation(project(path: ':fineract-paymentdetail-impl'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
 

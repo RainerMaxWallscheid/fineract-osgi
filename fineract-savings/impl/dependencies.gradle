@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-savings-api')
 
     implementation(project(path: ':fineract-core'))
+    // Payment detail write port (entity residual in core)
+    implementation(project(path: ':fineract-paymentdetail-api'))
     // Client pure ports/DTOs (entity residual stays in core)
     implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types

@@ -22,6 +22,8 @@ dependencies {
     api project(path: ':fineract-charge-api')
 
     implementation(project(path: ':fineract-core'))
+    // Payment detail write port (entity residual in core)
+    implementation(project(path: ':fineract-paymentdetail-api'))
     // Generic products REST ports (share product read facade)
     implementation(project(path: ':fineract-products-api'))
     // Client pure ports/DTOs (entity residual stays in core)

@@ -100,6 +100,8 @@ dependencies {
     implementation(project(path: ':fineract-transfer-impl'))
     implementation(project(path: ':fineract-products-api'))
     implementation(project(path: ':fineract-products-impl'))
+    implementation(project(path: ':fineract-paymentdetail-api'))
+    implementation(project(path: ':fineract-paymentdetail-impl'))
     implementation(project(path: ':fineract-accountnumberformat-api'))
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))

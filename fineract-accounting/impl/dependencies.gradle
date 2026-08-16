@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-accounting-api')
 
     implementation(project(path: ':fineract-core'))
+    // Payment detail write port (entity residual in core)
+    implementation(project(path: ':fineract-paymentdetail-api'))
     // Share product/account ports and pure DTOs
     implementation(project(path: ':fineract-shares-api'))
     // Account transfer / SI ports and shared DTOs

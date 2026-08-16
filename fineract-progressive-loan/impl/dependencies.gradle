@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-progressive-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    // Payment detail write port (entity residual in core)
+    implementation(project(path: ':fineract-paymentdetail-api'))
+    implementation(project(path: ':fineract-paymentdetail-impl'))
     // Generic products REST ports (share product read facade)
     implementation(project(path: ':fineract-products-api'))
     // Client office/group transfer ports + validator
