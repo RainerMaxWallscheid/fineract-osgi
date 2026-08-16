@@ -39,3 +39,4 @@ fineract-progressive-loan/
 - Leftover account-transfer/associations entities and guarantor domain closed into progressive-loan-impl (Loan + SavingsAccount binding; detail/SI assemblers and write stay).
 - Leftover LoansApiResource + loan batch, schedule/validators, client/share read, and transfer write port closed into progressive-loan-impl.
 - Leftover write/assembler residual closed into progressive-loan-impl. Provider now holds only the Spring Boot composition root.
+- Leftover batch/service tests for already-moved progressive production closed into progressive-loan-test.

@@ -68,4 +68,5 @@ fineract-loan/
 - Leftover LoanAccrualActivityProcessingServiceImpl and LoanAccrualsProcessingServiceImpl closed into loan-impl.
 - Leftover guarantor JDBC read and GuarantorsApiResource closed into loan-impl.
 - Leftover LoanChargeAssembler and reschedule preview/write impls closed into loan-impl.
+- Leftover loan-charge batch strategy tests closed into loan-test.
 - Leftover AccountSummaryCollectionData, AccountDetailsReadPlatformService, and LoansApiResourceSwagger closed into loan-impl.

@@ -63,3 +63,4 @@ Mechanical split + registrar + consumer Gradle.
 ./gradlew :fineract-loan:compileJava :fineract-provider:compileJava
 ```
 - Leftover generate-loan-loss-provisioning job closed into accounting-impl.
+- Leftover generate-loan-loss-provisioning tasklet test closed into accounting-test.
