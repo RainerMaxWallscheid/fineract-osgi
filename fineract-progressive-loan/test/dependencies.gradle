@@ -25,6 +25,13 @@ dependencies {
     testImplementation(project(path: ':fineract-loan-api'))
     testImplementation(project(path: ':fineract-loan-impl'))
     testImplementation(project(path: ':fineract-savings-impl'))
+    // Leftover test compile after peels (PaymentDetailWritePlatformService, account-transfer ports)
+    testImplementation(project(path: ':fineract-paymentdetail-api'))
+    testImplementation(project(path: ':fineract-accounttransfer-api'))
+    // ClientReadPlatformService / ClientMapper / GroupReadPlatformService
+    testImplementation(project(path: ':fineract-clients-api'))
+    testImplementation(project(path: ':fineract-clients-impl'))
+    testImplementation(project(path: ':fineract-group-api'))
     testImplementation(project(path: ':fineract-accounting-api'))
     testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-charge-api'))
