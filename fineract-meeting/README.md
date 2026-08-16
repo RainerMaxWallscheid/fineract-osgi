@@ -10,6 +10,9 @@ Provider peel — group/center meetings and attendance (ADR-022).
 
 Depends on `fineract-calendar-api/impl` (`CalendarInstance` association) and core `Client` / `Group` repositories.
 
+Attendance leftover **closed**: `MeetingAttendanceType`, `MeetingAttendanceEnumerations`, and
+`MeetingAttendanceDropdownReadService` live on **meeting-api** (collectionsheet-impl is api-only).
+
 ```bash
 ./gradlew :fineract-meeting-api:jar :fineract-meeting-impl:jar :fineract-meeting-test:test
 ```
