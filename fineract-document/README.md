@@ -18,6 +18,7 @@ No `:fineract-document` façade.
 - Pure request/response DTOs and command types
 - Content-store exceptions
 - `EntityImageIdAdapter` (client/staff image FK SPI; impls in clients-impl / organisation-impl)
+- Unused image leftovers closed from core: `ImageNotFoundException`, `ImageUploadException`, `ImageDataURLNotValidException`, `Base64EncodedImage`
 
 Adapters: `FileContentStoreService`, `S3ContentStoreService`, `ContentPipe` (impl only — do not leak AWS types into api).
 

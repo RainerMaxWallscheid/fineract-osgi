@@ -16,23 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.core.domain;
+package org.apache.fineract.infrastructure.documentmanagement.exception;
 
-public class Base64EncodedImage {
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-    private final String base64EncodedString;
-    private final String fileExtension;
+public class ImageUploadException extends AbstractPlatformDomainRuleException {
 
-    public Base64EncodedImage(final String base64EncodedString, final String fileExtension) {
-        this.base64EncodedString = base64EncodedString;
-        this.fileExtension = fileExtension;
-    }
-
-    public String getBase64EncodedString() {
-        return this.base64EncodedString;
-    }
-
-    public String getFileExtension() {
-        return this.fileExtension;
+    public ImageUploadException(String badMimeType) {
+        super("error.msg.image.type.upload", "Only image files of type GIF,PNG and JPG are allowed, but not: " + badMimeType);
     }
 }

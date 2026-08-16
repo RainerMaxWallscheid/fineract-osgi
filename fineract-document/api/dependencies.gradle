@@ -23,6 +23,7 @@ dependencies {
     api project(path: ':fineract-command-api')
 
     // DTOs use validation / Jackson / Swagger annotations (no Spring runtime on api).
+    compileOnly 'org.springframework:spring-tx'
     compileOnly 'jakarta.validation:jakarta.validation-api'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'

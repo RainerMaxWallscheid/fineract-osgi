@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.core.exception;
+package org.apache.fineract.infrastructure.documentmanagement.exception;
 
-public class ImageUploadException extends AbstractPlatformDomainRuleException {
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-    public ImageUploadException(String badMimeType) {
-        super("error.msg.image.type.upload", "Only image files of type GIF,PNG and JPG are allowed, but not: " + badMimeType);
+public class ImageDataURLNotValidException extends AbstractPlatformDomainRuleException {
+
+    public ImageDataURLNotValidException() {
+        super("error.msg.dataURL.save", "Only GIF, PNG and JPEG Data URL's are allowed");
     }
 }

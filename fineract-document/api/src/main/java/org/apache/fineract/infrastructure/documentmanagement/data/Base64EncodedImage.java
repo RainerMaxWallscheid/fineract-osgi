@@ -16,11 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.core.exception;
+package org.apache.fineract.infrastructure.documentmanagement.data;
 
-public class ImageDataURLNotValidException extends AbstractPlatformDomainRuleException {
+public class Base64EncodedImage {
 
-    public ImageDataURLNotValidException() {
-        super("error.msg.dataURL.save", "Only GIF, PNG and JPEG Data URL's are allowed");
+    private final String base64EncodedString;
+    private final String fileExtension;
+
+    public Base64EncodedImage(final String base64EncodedString, final String fileExtension) {
+        this.base64EncodedString = base64EncodedString;
+        this.fileExtension = fileExtension;
+    }
+
+    public String getBase64EncodedString() {
+        return this.base64EncodedString;
+    }
+
+    public String getFileExtension() {
+        return this.fileExtension;
     }
 }
