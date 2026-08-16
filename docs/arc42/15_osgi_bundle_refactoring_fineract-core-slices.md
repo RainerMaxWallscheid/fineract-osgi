@@ -5,7 +5,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** for planned slices — **businessdate**, **codes**, **organisation** (office/staff/holiday/workingdays/provisioning), **monetary**, **security residual** |
+| **Status** | **complete** for planned slices + ranked leftover close-ins 1–30 — remaining `~802` core types are **kernel / hub residual** |
 | **Rule** | Extract coherent platform slices; **do not** api/impl the whole ~800-type kernel |
 
 ## Why not full core split
@@ -76,7 +76,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 
 ## Core residual inventory (post-provider floor)
 
-Inventory after the provider composition-root floor closed (`~1180` main Java types in `fineract-core`; `~90` tests). This is **not** a mandate to peel everything; it ranks residual **domain** mass still living in the shared kernel.
+Inventory after the provider composition-root floor closed (`~1180` main Java types in `fineract-core`; `~90` tests). Ranked leftover close-ins 1–30 brought core to **`~802` main / `~77` tests**. Remaining mass is kernel / hub / fund-style residual — **not** a mandate to peel further.
 
 ### Snapshot by area
 
@@ -136,6 +136,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **28** | **Charge convert leftover** | 1 | `fineract-charge` api | **Done** — `ConvertChargeDataToSpecificChargeData` on charge-api (savings-impl + progressive-loan already api-only); fat charge/savings/share DTOs residual core |
 | **29** | **Unused image leftovers** | 4 | `fineract-document` api | **Done** — `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api; no remaining consumers |
 | **30** | **Unused JobParametersDTO** | 1 | `fineract-jobs` api | **Done** — unused wrapper on jobs-api; `JobParameterDTO` residual core (`CustomJobParameterRepository`) |
+| **31** | **Kernel floor** | ~802 | stay in core | **Done (documented)** — no further cycle-safe leftover; remaining mass is kernel, hub, or fund-style residual |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -149,6 +150,16 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | Savings compounding math + shared savings DTOs | Used as kernel by savings-impl |
 | Global configuration / security context ports residual | Cross-cutting |
 | `FineractInstanceModeConstants` | Used by core event conditions; moving would cycle core↔instancemode-api |
+| `LoanStatus` | Hub residual — cob, accounttransfer, organisation, search, calendar, savings plus loan/progressive/WC/investor |
+| `AccountType` / `AccountEnumerations` | Hub residual — savings-impl, loan-impl, progressive-loan, interop-api |
+| `JobExecutionException` | Used by businessdate-api; moving would pull jobs-api (and loan-api) into businessdate-api |
+| `JobName` / `StepName` / `SchedulerJobRunnerReadService` + job DTOs / `CustomJobParameter*` | Command/batch pipeline in core |
+| `ProductNotFoundException` | Used by residual `ShareProductRepositoryWrapper` in core |
+| `AddressData` | Used by residual `ClientData` in core |
+| `TaxGroupData` / fat tax DTOs | Used by residual `SavingsAccountData` / `ChargeData` |
+| `ChargeData` / `ChargeTimeType` | Kernel DTO/enum residual; `ChargeParameterUpdateNotSupportedException` used by residual `Rate` |
+| `SearchUtil` + advanced-query DTOs | Used by dataqueries + savings |
+| Fund-style entities | `PaymentType`, `PaymentDetail`, `Fund`, `Rate`, `Client`, `Group` (+ wrappers/exceptions) |
 
 ### Suggested order of attack
 
@@ -181,7 +192,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api).  
 28. **Charge convert leftover** ✅ (`ConvertChargeDataToSpecificChargeData` → charge-api).  
 29. **Unused image leftovers** ✅ (`Image*` exceptions + `Base64EncodedImage` → document-api).  
-30. **Unused JobParametersDTO** ✅ (`JobParametersDTO` → jobs-api; `JobParameterDTO` residual core).
+30. **Unused JobParametersDTO** ✅ (`JobParametersDTO` → jobs-api; `JobParameterDTO` residual core).  
+31. **Kernel floor** ✅ (documented — no further cycle-safe leftover without inventing core↔module-api cycles).
 
 ## Related provider peels
 
@@ -255,6 +267,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-charge` convert leftover close-in | **complete**; `ConvertChargeDataToSpecificChargeData` on charge-api; `ChargeData` / savings+share charge DTOs residual core |
 | `fineract-document` unused image close-in | **complete**; `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api |
 | `fineract-jobs` unused JobParametersDTO close-in | **complete**; `JobParametersDTO` on jobs-api; `JobParameterDTO` residual core |
+| kernel floor | **documented**; remaining `~802` core types are kernel / hub / fund-style residual — do not invent peels |
 
 
 ## Commands
