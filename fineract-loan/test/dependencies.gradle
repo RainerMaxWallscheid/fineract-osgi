@@ -24,7 +24,13 @@ dependencies {
     testImplementation(project(path: ':fineract-core'))
     testImplementation(project(path: ':fineract-businessdate-api'))
     testImplementation(project(path: ':fineract-accounting-api'))
+    testImplementation(project(path: ':fineract-accounting-impl'))
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'jakarta.validation:jakarta.validation-api'
+    testImplementation 'org.hibernate.validator:hibernate-validator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation(project(path: ':fineract-charge-api'))
+    testImplementation(project(path: ':fineract-charge-impl'))
     testImplementation(project(path: ':fineract-tax-api'))
     testImplementation(project(path: ':fineract-tax-impl'))
     testImplementation(project(path: ':fineract-rates-api'))

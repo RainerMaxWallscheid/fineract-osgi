@@ -32,8 +32,15 @@ dependencies {
     testImplementation(project(path: ':fineract-note-impl'))
     testImplementation(project(path: ':fineract-collateralmanagement-impl'))
     testImplementation(project(path: ':fineract-working-capital-loan-impl'))
+    testImplementation(project(path: ':fineract-fund-api'))
+    testImplementation(project(path: ':fineract-cob-api'))
+    testImplementation(project(path: ':fineract-cob-impl'))
+    testImplementation(project(path: ':fineract-calendar-impl'))
+    testImplementation(project(path: ':fineract-organisation-api'))
+    testImplementation(project(path: ':fineract-branch-api'))
     testImplementation 'org.springframework:spring-jdbc'
     testImplementation 'org.springframework.security:spring-security-core'
+    testCompileOnly 'com.github.spotbugs:spotbugs-annotations'
     testImplementation( 'io.github.classgraph:classgraph' )
     testImplementation 'com.google.code.gson:gson'
     testImplementation 'com.google.guava:guava'

@@ -20,9 +20,21 @@
 dependencies {
     testImplementation(project(path: ':fineract-dataqueries-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation(project(path: ':fineract-codes-api'))
+    testImplementation(project(path: ':fineract-report'))
     testImplementation 'jakarta.ws.rs:jakarta.ws.rs-api'
     testImplementation 'org.apache.commons:commons-lang3'
     testImplementation 'org.apache.httpcomponents:httpcore'
+    testImplementation 'com.google.code.gson:gson'
+    testImplementation 'org.glassfish.jersey.core:jersey-common'
+    testImplementation 'org.springframework:spring-jdbc'
+    testImplementation 'org.springframework.security:spring-security-core'
+    testImplementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
+        exclude group: 'org.hibernate'
+    }
+    testImplementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
+        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
+    }
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'
