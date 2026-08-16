@@ -300,7 +300,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 
 1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
-3. **OSGi hardening** — manifests, Fragment-Host, service registration for already-split api/impl/test modules.
+3. **OSGi hardening** — manifests, Fragment-Host, Equinox resolve for already-split api/impl/test modules. Catalog of BSN + registrar: [`osgi/README.md`](../../osgi/README.md).
 4. **Core residual inventory (done)** — leftover close-ins 1–30 closed; remaining `~802` types **are** the shared kernel. See [core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel). Do not peel further leftovers.
 
 

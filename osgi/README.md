@@ -5,6 +5,93 @@ See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 
 **Architecture (target):** domain modules split into **api / impl / test** bundles; inter-bundle access only via the **OSGi Service Registry** (not Karaf Features). Spring may remain inside impl bundles. Decisions: [ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-023](../docs/arc42/decisions/ADR-023-fineract-command-module-naming.md) (command module naming). Playbook: [15 OSGi Bundle Refactoring](../docs/arc42/15_osgi_bundle_refactoring.md).
 
+**Catalog status:** complete for every Gradle `api` / `impl` / `test` split (waves 1–4, core slices, leftover peels 1–30). Each impl registers ports via `*OsgiServiceRegistrar`. Each `*-test` is `Fragment-Host` → the matching impl unless noted. Domain consumers depend on **api only**; `fineract-provider` / `fineract-war` compose **api + impl**.
+
+Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` where `<stem>` is the module name with hyphens removed (`loan-origination` → `loanorigination`). Copy jars into `osgi/bundles/` for Equinox resolve experiments.
+
+### Catalog (all splits)
+
+| Gradle module | BSN stem | Registrar |
+|---------------|----------|-----------|
+| `fineract-command` | `command` | `CommandOsgiServiceRegistrar` (+ `fineract-command-integrationtest`, not a fragment) |
+| `fineract-charge` | `charge` | `ChargeOsgiServiceRegistrar` |
+| `fineract-rates` | `rates` | `RatesOsgiServiceRegistrar` |
+| `fineract-tax` | `tax` | `TaxOsgiServiceRegistrar` |
+| `fineract-document` | `document` | `DocumentOsgiServiceRegistrar` |
+| `fineract-branch` | `branch` | `BranchOsgiServiceRegistrar` |
+| `fineract-loan-origination` | `loanorigination` | `LoanOriginationOsgiServiceRegistrar` |
+| `fineract-mix` | `mix` | `MixOsgiServiceRegistrar` |
+| `fineract-investor` | `investor` | `InvestorOsgiServiceRegistrar` |
+| `fineract-accounting` | `accounting` | `AccountingOsgiServiceRegistrar` |
+| `fineract-savings` | `savings` | `SavingsOsgiServiceRegistrar` |
+| `fineract-loan` | `loan` | `LoanOsgiServiceRegistrar` |
+| `fineract-progressive-loan` | `progressiveloan` | `ProgressiveLoanOsgiServiceRegistrar` |
+| `fineract-working-capital-loan` | `workingcapitalloan` | `WorkingCapitalLoanOsgiServiceRegistrar` |
+| `fineract-cob` | `cob` | `CobOsgiServiceRegistrar` |
+| `fineract-security` | `security` | `SecurityOsgiServiceRegistrar` |
+| `fineract-businessdate` | `businessdate` | `BusinessDateOsgiServiceRegistrar` |
+| `fineract-codes` | `codes` | `CodesOsgiServiceRegistrar` |
+| `fineract-organisation` | `organisation` | `OrganisationOsgiServiceRegistrar` |
+| `fineract-monetary` | `monetary` | `MonetaryOsgiServiceRegistrar` |
+| `fineract-useradministration` | `useradministration` | `UserAdministrationOsgiServiceRegistrar` |
+| `fineract-adhocquery` | `adhocquery` | `AdhocQueryOsgiServiceRegistrar` |
+| `fineract-template` | `template` | `TemplateOsgiServiceRegistrar` |
+| `fineract-notification` | `notification` | `NotificationOsgiServiceRegistrar` |
+| `fineract-spm` | `spm` | `SpmOsgiServiceRegistrar` |
+| `fineract-fund` | `fund` | `FundOsgiServiceRegistrar` |
+| `fineract-paymenttype` | `paymenttype` | `PaymentTypeOsgiServiceRegistrar` |
+| `fineract-search` | `search` | `SearchOsgiServiceRegistrar` |
+| `fineract-collectionsheet` | `collectionsheet` | `CollectionSheetOsgiServiceRegistrar` |
+| `fineract-accounttransfer` | `accounttransfer` | `AccountTransferOsgiServiceRegistrar` |
+| `fineract-shares` | `shares` | `SharesOsgiServiceRegistrar` |
+| `fineract-group` | `group` | `GroupOsgiServiceRegistrar` |
+| `fineract-clients` | `clients` | `ClientsOsgiServiceRegistrar` |
+| `fineract-postdatedchecks` | `postdatedchecks` | `PostDatedChecksOsgiServiceRegistrar` |
+| `fineract-transfer` | `transfer` | `TransferOsgiServiceRegistrar` |
+| `fineract-products` | `products` | `ProductsOsgiServiceRegistrar` |
+| `fineract-paymentdetail` | `paymentdetail` | `PaymentDetailOsgiServiceRegistrar` |
+| `fineract-cache` | `cache` | `CacheOsgiServiceRegistrar` |
+| `fineract-accountnumberformat` | `accountnumberformat` | `AccountNumberFormatOsgiServiceRegistrar` |
+| `fineract-survey` | `survey` | `SurveyOsgiServiceRegistrar` |
+| `fineract-entityaccess` | `entityaccess` | `EntityAccessOsgiServiceRegistrar` |
+| `fineract-calendar` | `calendar` | `CalendarOsgiServiceRegistrar` |
+| `fineract-meeting` | `meeting` | `MeetingOsgiServiceRegistrar` |
+| `fineract-address` | `address` | `AddressOsgiServiceRegistrar` |
+| `fineract-creditbureau` | `creditbureau` | `CreditBureauOsgiServiceRegistrar` |
+| `fineract-collateral` | `collateral` | `CollateralOsgiServiceRegistrar` |
+| `fineract-collateralmanagement` | `collateralmanagement` | `CollateralManagementOsgiServiceRegistrar` |
+| `fineract-note` | `note` | `NoteOsgiServiceRegistrar` |
+| `fineract-hooks` | `hooks` | `HooksOsgiServiceRegistrar` |
+| `fineract-sms` | `sms` | `SmsOsgiServiceRegistrar` |
+| `fineract-reportmailingjob` | `reportmailingjob` | `ReportMailingJobOsgiServiceRegistrar` |
+| `fineract-campaigns` | `campaigns` | `CampaignsOsgiServiceRegistrar` |
+| `fineract-gcm` | `gcm` | `GcmOsgiServiceRegistrar` |
+| `fineract-dataqueries` | `dataqueries` | `DataqueriesOsgiServiceRegistrar` |
+| `fineract-configuration` | `configuration` | `ConfigurationOsgiServiceRegistrar` |
+| `fineract-bulkimport` | `bulkimport` | `BulkImportOsgiServiceRegistrar` |
+| `fineract-instancemode` | `instancemode` | `InstanceModeOsgiServiceRegistrar` (no ports) |
+| `fineract-jobs` | `jobs` | `JobsOsgiServiceRegistrar` |
+| `fineract-s3` | `s3` | `S3OsgiServiceRegistrar` |
+| `fineract-openapi` | `openapi` | `OpenApiOsgiServiceRegistrar` (no ports) |
+| `fineract-springbatch` | `springbatch` | `SpringBatchOsgiServiceRegistrar` |
+| `fineract-event` | `event` | `EventOsgiServiceRegistrar` |
+| `fineract-interoperation` | `interoperation` | `InteroperationOsgiServiceRegistrar` |
+
+### Not split (do not invent api/impl/test)
+
+| Module | Role |
+|--------|------|
+| `fineract-core` | Shared kernel ([core slices standing rule](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)) |
+| `fineract-validation` | Bean Validation library |
+| `fineract-report` | Reporting SPI |
+| `fineract-avro-schemas` | Generated published-language schemas |
+| `fineract-architecture` | ArchUnit rules only |
+| `fineract-command-jdbc` / `-async` / `-disruptor` / `-audit` | Command satellites (already modular; no BSN) |
+| `fineract-provider` | Composition root — never the next pilot |
+| `fineract-war` | Optional WAR packaging |
+
+Wave-by-wave notes below are historical detail for the first splits. Later peels follow the same recipe; use the catalog table for BSN / registrar.
+
 ### Pilot: fineract-command bundles
 
 | Artifact | Bundle-SymbolicName |
@@ -185,6 +272,26 @@ Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bund
 | `fineract-codes-test` | `org.apache.fineract.codes.test` | Fragment-Host → codes.impl |
 
 Entities/exceptions residual in **fineract-core**.
+
+### Core slice: fineract-organisation (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-organisation-api` | `org.apache.fineract.organisation.api` | Office / staff / holiday / working-days / provisioning ports |
+| `fineract-organisation-impl` | `org.apache.fineract.organisation.impl` | REST/handlers + `OrganisationOsgiServiceRegistrar` |
+| `fineract-organisation-test` | `org.apache.fineract.organisation.test` | Fragment-Host → organisation.impl |
+
+Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. Plan: [core slices](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
+
+### Core slice: fineract-monetary (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-monetary-api` | `org.apache.fineract.monetary.api` | Currency read/write ports, admin DTOs |
+| `fineract-monetary-impl` | `org.apache.fineract.monetary.impl` | REST/handlers + `MonetaryOsgiServiceRegistrar` |
+| `fineract-monetary-test` | `org.apache.fineract.monetary.test` | Fragment-Host → monetary.impl |
+
+`Money` / `CurrencyData` residual in **fineract-core**.
 
 ## Layout
 

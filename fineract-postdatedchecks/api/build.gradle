@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Group API (core residual peel)'
+description = 'Fineract Post-Dated Checks API (core residual peel)'
 
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
@@ -26,13 +26,14 @@ jar {
     manifest {
         attributes(
                 'Bundle-ManifestVersion': '2',
-                'Bundle-Name': 'Apache Fineract Group API',
-                'Bundle-SymbolicName': 'org.apache.fineract.group.api',
+                'Bundle-Name': 'Apache Fineract Post-Dated Checks API',
+                'Bundle-SymbolicName': 'org.apache.fineract.postdatedchecks.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.group.api,'
-                        + 'org.apache.fineract.portfolio.group.service',
+                'Export-Package': 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.data,'
+                        + 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.exception,'
+                        + 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service',
                 'Import-Package': '*',
-                'Automatic-Module-Name': 'org.apache.fineract.group.api'
+                'Automatic-Module-Name': 'org.apache.fineract.postdatedchecks.api'
                 )
     }
 }
