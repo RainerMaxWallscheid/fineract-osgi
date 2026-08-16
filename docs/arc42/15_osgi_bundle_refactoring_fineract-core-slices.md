@@ -5,12 +5,25 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** for planned slices + ranked leftover close-ins 1–30 — remaining `~802` core types are **kernel / hub residual** |
-| **Rule** | Extract coherent platform slices; **do not** api/impl the whole ~800-type kernel |
+| **Status** | **complete** — slices + leftover close-ins 1–30; remaining `~802` types are the **shared kernel** (rank 31) |
+| **Rule** | Treat `fineract-core` as the shared kernel. **Do not** api/impl it. **Do not** peel remaining leftovers. New domain goes in `*-api` / `*-impl`. |
+
+## Standing rule: fineract-core is the shared kernel
+
+This is **policy**, not a leftover backlog. After leftover close-ins 1–30, remaining `fineract-core` (`~802` main / `~77` tests) **is** the shared kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14.7](14_module_api_boundaries.md)). Rank 31 is the floor.
+
+| Do | Do not |
+|----|--------|
+| Depend on core from domain modules (**one-way**) | Depend from core on a domain `*-api` if that cycles (`core → module-api → core`) |
+| Put **new** ports, DTOs, REST, and handlers in the owning `*-api` / `*-impl` | Move leftover hub / fund-style types out of core to “thin” it |
+| Keep residual entities next to residual core DTOs that import them | Invent extra `*-api` consumers (e.g. organisation / calendar / search → loan-api) just to relocate `LoanStatus` |
+| Grow core only with true platform types (tenant, Money, exceptions, serialization, command / batch metamodel) | Add new business aggregates or write paths to core |
+
+Inventory and ranks 1–30 below are **historical**. They are not a mandate to peel further.
 
 ## Why not full core split
 
-`fineract-core` is the **shared kernel** ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)): tenant context, Money-related types, platform exceptions, serialization helpers. A wholesale api/impl split forces every domain module through a huge residual graph and risks Gradle cycles.
+`fineract-core` is the **shared kernel**: tenant context, Money-related types, platform exceptions, serialization helpers, plus accepted hub / fund-style residual that other modules already compile against. A wholesale api/impl split forces every domain module through a huge residual graph and risks Gradle cycles.
 
 ## Slice 1 — businessdate ✅
 
@@ -76,7 +89,7 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 
 ## Core residual inventory (post-provider floor)
 
-Inventory after the provider composition-root floor closed (`~1180` main Java types in `fineract-core`; `~90` tests). Ranked leftover close-ins 1–30 brought core to **`~802` main / `~77` tests**. Remaining mass is kernel / hub / fund-style residual — **not** a mandate to peel further.
+Inventory after the provider composition-root floor closed (`~1180` main Java types in `fineract-core`; `~90` tests). Ranked leftover close-ins 1–30 brought core to **`~802` main / `~77` tests**. Remaining mass is the **shared kernel** (platform + hub / fund-style residual). **Standing rule:** leave it in core.
 
 ### Snapshot by area
 
@@ -102,7 +115,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `portfolio.transfer` | 0 | **Peeled** → `fineract-transfer` api/impl/test; write impl residual progressive-loan |
 | `portfolio.repaymentwithpostdatedchecks` | 0 | **Peeled** → `fineract-postdatedchecks` api/impl/test; entity/assembler/write residual in loan-impl |
 
-### Ranked next peels (if pursuing more core work)
+### Ranked leftover peels (closed)
 
 | Rank | Candidate | ~types | Target | Why / risk |
 |------|-----------|--------|--------|------------|
@@ -136,7 +149,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **28** | **Charge convert leftover** | 1 | `fineract-charge` api | **Done** — `ConvertChargeDataToSpecificChargeData` on charge-api (savings-impl + progressive-loan already api-only); fat charge/savings/share DTOs residual core |
 | **29** | **Unused image leftovers** | 4 | `fineract-document` api | **Done** — `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api; no remaining consumers |
 | **30** | **Unused JobParametersDTO** | 1 | `fineract-jobs` api | **Done** — unused wrapper on jobs-api; `JobParameterDTO` residual core (`CustomJobParameterRepository`) |
-| **31** | **Kernel floor** | ~802 | stay in core | **Done (documented)** — no further cycle-safe leftover; remaining mass is kernel, hub, or fund-style residual |
+| **31** | **Kernel floor** | ~802 | stay in core | **Standing rule** — remaining mass **is** the shared kernel; do not invent further leftover peels |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -161,7 +174,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `SearchUtil` + advanced-query DTOs | Used by dataqueries + savings |
 | Fund-style entities | `PaymentType`, `PaymentDetail`, `Fund`, `Rate`, `Client`, `Group` (+ wrappers/exceptions) |
 
-### Suggested order of attack
+### Closed leftover order
 
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; entity residual in core).  
 2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
@@ -193,7 +206,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 28. **Charge convert leftover** ✅ (`ConvertChargeDataToSpecificChargeData` → charge-api).  
 29. **Unused image leftovers** ✅ (`Image*` exceptions + `Base64EncodedImage` → document-api).  
 30. **Unused JobParametersDTO** ✅ (`JobParametersDTO` → jobs-api; `JobParameterDTO` residual core).  
-31. **Kernel floor** ✅ (documented — no further cycle-safe leftover without inventing core↔module-api cycles).
+31. **Kernel floor** ✅ (`fineract-core` **is** the shared kernel — standing rule; no further leftover peels).
 
 ## Related provider peels
 
@@ -267,7 +280,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-charge` convert leftover close-in | **complete**; `ConvertChargeDataToSpecificChargeData` on charge-api; `ChargeData` / savings+share charge DTOs residual core |
 | `fineract-document` unused image close-in | **complete**; `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api |
 | `fineract-jobs` unused JobParametersDTO close-in | **complete**; `JobParametersDTO` on jobs-api; `JobParameterDTO` residual core |
-| kernel floor | **documented**; remaining `~802` core types are kernel / hub / fund-style residual — do not invent peels |
+| kernel floor | **standing rule**; remaining `~802` core types **are** the shared kernel — do not invent leftover peels |
 
 
 ## Commands

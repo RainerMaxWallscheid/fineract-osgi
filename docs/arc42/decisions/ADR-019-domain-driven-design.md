@@ -30,7 +30,7 @@ Without DDD vocabulary, aggregate boundaries, ubiquitous language, and context m
 | **Ubiquitous language** | Domain terms in code, commands, Gherkin, arc42 (Loan Application, Disbursement, Journal Entry, Maturity, Tenant, …) |
 | **Context map** | Canonically documented in [10 Domain Context Map](../10_domain_context_map.md); integration via commands, domain/business events, hooks, GL mappings, account associations – not free entity sharing across module boundaries |
 | **Anti-corruption layer** | Adapters to external AI, payment/interop, import/bulk, legacy JSON (`JsonCommand`) → type-safe commands/DTOs |
-| **Shared kernel (narrow)** | `fineract-core` infrastructure + few truly shared concepts (Money/Currency, Office, Permissions) – keep deliberately small |
+| **Shared kernel** | `fineract-core` as-is: platform types (Money/Currency, Tenant, ExternalId, Permissions, command metamodel) plus accepted hub / fund-style residual after leftover peels. **Growth** stays narrow — new aggregates go in domain `*-api` / `*-impl`, not core ([core slices standing rule](../15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)) |
 
 Full context map, subdomain classification, and migration order: **[Chapter 10 – Domain Context Map](../10_domain_context_map.md)** (D1).
 

@@ -115,7 +115,7 @@ Rules:
 1. **OSGi services** – lookup of interfaces defined in `-api`  
 2. **Exported api packages** – types of the public contract only  
 3. **Domain / business events** – published language ([12 Event Catalog](12_event_catalog.md))  
-4. **Shared kernel** – narrow types in `fineract-core` ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md))
+4. **Shared kernel** – `fineract-core` as-is ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel))
 
 ### Forbidden between domain bundles
 
@@ -247,7 +247,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 | **`fineract-working-capital-loan`** | ~340 | **Complete** — api/impl/test; entity residual. [WC plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) |
 | **`fineract-cob`** | ~65 | **Complete** — api/impl/test; entity-typed step residual. [cob plan](15_osgi_bundle_refactoring_fineract-cob.md) |
 | **`fineract-security`** | ~70 | **Complete** — api/impl/test; Spring Security residual. [security plan](15_osgi_bundle_refactoring_fineract-security.md) |
-| **`fineract-core`** | ~800 | Shared kernel — **do not** full api/impl; optional slices extracted ([core slices](15_osgi_bundle_refactoring_fineract-core-slices.md)) |
+| **`fineract-core`** | ~802 | **Shared kernel** — **do not** full api/impl; leftover peels 1–30 closed; remaining types stay ([core slices](15_osgi_bundle_refactoring_fineract-core-slices.md)) |
 | **`fineract-provider`** | ~2500 | Composition root — hosts the Spring↔OSGi bridge; **never** the next pilot |
 
 #### Explicit non-candidates (for OSGi BC split)
@@ -280,7 +280,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 | Priority | Action |
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh module READMEs when manifests change |
-| **Optional deferred domain work** | Not leftover provider Java. Fresh core residual inventory: [core slices — Core residual inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). Done: **paymenttype**, **search**. Next: **collectionsheet**; avoid client/group/shares until more pilots land |
+| **Optional deferred domain work** | Not leftover provider Java. Not leftover core peels. `fineract-core` **is** the shared kernel ([standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)). Leftover close-ins 1–30 closed. |
 | **Composition-root floor (done)** | See [15.6.1](#1561-composition-root-floor-provider) |
 | **Do not start** | full provider / whole-core api/impl; moving Liquibase master chain or boot classes “just because” |
 
@@ -301,7 +301,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
 3. **OSGi hardening** — manifests, Fragment-Host, service registration for already-split api/impl/test modules.
-4. **Core residual inventory (done)** — ranked non-kernel residual in core; see [core slices inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). **Payment-type** and **search** peels done. Next optional: collectionsheet.
+4. **Core residual inventory (done)** — leftover close-ins 1–30 closed; remaining `~802` types **are** the shared kernel. See [core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel). Do not peel further leftovers.
 
 
 ---

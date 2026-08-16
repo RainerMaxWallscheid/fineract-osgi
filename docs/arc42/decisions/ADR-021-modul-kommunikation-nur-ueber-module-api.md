@@ -29,7 +29,7 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 | **Module API** | `..moduleapi..` | **Only** allowed domain interface for *other* modules (ports, commands/queries as interfaces, stable DTOs/IDs) |
 | **REST API** | `..api..` (historical) | Driving adapter HTTP – **not** for module-to-module |
 | **Internal** | `..domain..`, `..service..`, `..handler..`, `..starter..`, repositories, mapper impls | Module-internal only |
-| **Shared kernel** | deliberately narrow in `fineract-core` | Money, Tenant, ExternalId, Permissions, command metamodel – no business aggregate |
+| **Shared kernel** | `fineract-core` as-is (~802 types after leftover peels 1–30) | Platform: Money, Tenant, ExternalId, Permissions, command/batch metamodel, exceptions, serialization. Hub / fund-style residual (`Client`, `Group`, `PaymentType`, `LoanStatus`, …) **stays** — moving it creates `core ↔ module-api` cycles. **New** business aggregates and write paths go in `*-api` / `*-impl`, not core. |
 
 ```text
 ┌─────────────────┐         moduleapi / Events          ┌─────────────────┐
@@ -43,7 +43,7 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 
 1. **Module API** (`..moduleapi..`) – ports + stable transfer objects  
 2. **Domain / business events** (published language, see event catalog)  
-3. **Shared kernel** (narrow)  
+3. **Shared kernel** (`fineract-core` as-is; **growth** stays narrow)  
 4. **Avro / external event schemas** for asynchronous downstream integrations  
 
 #### Forbidden (target; legacy frozen via ArchUnit)
@@ -77,21 +77,27 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 |--------|------------|
 | Misuse REST `..api..` as module API | Confuses driving adapter ↔ port; rejected |
 | Microservices per module immediately | too expensive; Module API scales in the monolith and toward OSGi |
-| Share everything in `fineract-core` | Shared kernel explodes; rejected |
+| Share everything in `fineract-core` | Shared kernel explodes; rejected for **new** work |
+| Peel remaining `~802` leftover types from `fineract-core` | No cycle-safe leftover; rejected — [rank 31 kernel floor](../15_osgi_bundle_refactoring_fineract-core-slices.md) |
+| Full api/impl split of `fineract-core` | Rejected — [ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md) / [15](../15_osgi_bundle_refactoring.md) |
 | Code review only without ArchUnit | Regressions uncontrolled |
 
 ### Consequences
 
 - **+** Clear context boundaries, better testability, OSGi-ready ports  
 - **+** Fits context map, event catalog, entity ArchUnit rules  
+- **+** Standing floor: `fineract-core` **is** the shared kernel; leftover peels are closed  
 - **−** Existing code violates rules heavily → **FreezingArchRule** until strangler takes hold  
 - **−** Teams must define a port in `moduleapi` first for cross-module features  
+- **−** The as-is kernel is larger than a textbook DDD shared kernel; **growth** stays narrow  
 
 ### Non-Goals
 
 - Immediate rename of all REST `api` packages  
 - Big-bang extraction of all service interfaces  
 - Provider shell may wire modules (composition root) – it is not a domain module under this rule  
+- Further leftover close-ins from `fineract-core` into `*-api` unless a type is unused **and** cycle-safe  
+- `fineract-core` depending on domain `*-api` in a way that cycles (`core → module-api → core`)  
 
 ### Enforcement
 
@@ -105,7 +111,8 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 - [ADR-019 DDD](ADR-019-domain-driven-design.md) – context map without entity sharing  
 - [ADR-002 OSGi](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) – exportable contracts  
 - [ADR-022 OSGi api/impl/test + services](ADR-022-osgi-api-impl-test-bundles-services.md) – physical bundle split; Service Registry (no Karaf Features)  
-- [10 Context Map](../10_domain_context_map.md)
+- [10 Context Map](../10_domain_context_map.md)  
+- [15o Core slices / shared-kernel standing rule](../15_osgi_bundle_refactoring_fineract-core-slices.md)
 
 ---
 

@@ -58,7 +58,7 @@ Examples (scaffolds present):
 - `org.apache.fineract.portfolio.savings.moduleapi`
 - `org.apache.fineract.portfolio.charge.moduleapi`
 - `org.apache.fineract.accounting.moduleapi`
-- `org.apache.fineract.portfolio.client.moduleapi` (when client module extracted; until then core package)
+- `org.apache.fineract.portfolio.client.moduleapi`
 
 ---
 
@@ -108,7 +108,7 @@ Legacy violations: **freeze store**. New internal imports → build red. Reduce 
 |-----------|--------|
 | **Domain modules** (loan, savings, accounting, …) | only foreign `moduleapi` (+ events, shared kernel) |
 | **fineract-provider** | Composition root: may wire modules; new business logic still belongs in domain modules |
-| **fineract-core** | Shared kernel + infrastructure – not a “dump” for aggregates |
+| **fineract-core** | **Shared kernel** as-is (`~802` types after leftover peels 1–30). Domain modules may import it (**one-way**). Core must not take `*-api` deps that cycle. **Not** a dump for **new** aggregates — those belong in domain `*-api` / `*-impl`. Do not peel remaining hub / fund-style residuals ([core slices — standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)). |
 
 ---
 
@@ -117,6 +117,7 @@ Legacy violations: **freeze store**. New internal imports → build red. Reduce 
 - [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)  
 - [ADR-022 OSGi api/impl/test + services](decisions/ADR-022-osgi-api-impl-test-bundles-services.md)  
 - [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md)  
+- [15o Core slices / shared-kernel standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md)  
 - [ADR-017 Hexagon](decisions/ADR-017-hexagonale-architektur.md)  
 - [10 Context Map](10_domain_context_map.md)  
 - [13 ArchUnit Entity Rules](13_archunit_bounded_context_rules.md)  

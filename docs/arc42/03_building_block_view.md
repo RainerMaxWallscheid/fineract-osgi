@@ -133,7 +133,7 @@ flowchart TB
 
 | Module | Role |
 |--------|------|
-| **fineract-core** | Shared infrastructure: legacy commands, config, ThreadLocal/tenant helpers, various platform services |
+| **fineract-core** | **Shared kernel** — tenant/context, Money, command/batch, platform exceptions, serialization, plus accepted hub / fund-style residual. Not a domain module and not a leftover backlog ([core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)) |
 | **fineract-security** | AuthN/Z, tenant-aware filters, OIDC, 2FA, login/user-details APIs |
 | **fineract-command** | New type-safe command stack (dispatcher, handler API, hooks) |
 | **fineract-command-async** | Asynchronous dispatcher variant |

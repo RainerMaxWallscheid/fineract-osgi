@@ -19,7 +19,7 @@ It fulfills evolution stage **D1** from [ADR-019](decisions/ADR-019-domain-drive
 |---------|----------------------------|
 | **Gradle module ≠ bounded context** | Modules are physical cuts; BCs are linguistic and model boundaries. One BC can span multiple modules (e.g. Loan Servicing); one module can host parts of several legacy contexts (`fineract-core`). |
 | **Integration without entity sharing** | Across context boundaries: **IDs**, **published language** (commands, Avro/business events, application DTOs) – do not import JPA entities of foreign domains. |
-| **Shared kernel kept narrow** | Only true cross-cutting concepts (Money/Currency, Tenant/BusinessDate, ExternalId, permission metamodel, event envelope). Not “everything in `fineract-core`”. |
+| **Shared kernel is `fineract-core`** | Remaining `fineract-core` (`~802` types) **is** the shared kernel. **Growth** stays narrow: new aggregates go in domain `*-api` / `*-impl`, not core. Do not peel leftover hub / fund-style residuals. |
 | **Accounting remains the ledger** | Journal/GL is its own context and a **projection** from domain events – not replaced by the event store ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)). |
 | **Incremental** | The context map steers strangler migration; no big-bang microservice cut. |
 
@@ -33,7 +33,7 @@ It fulfills evolution stage **D1** from [ADR-019](decisions/ADR-019-domain-drive
 | **C/S** | Customer / Supplier | Explicit supply relationship (downstream as customer) |
 | **CF** | Conformist | Downstream largely adopts the upstream model unchanged |
 | **ACL** | Anti-Corruption Layer | Translation of foreign/external models into the own model |
-| **SK** | Shared Kernel | Narrowly shared types/packages – keep deliberately small |
+| **SK** | Shared Kernel | `fineract-core` as-is; **growth** stays narrow (no new aggregates in core) |
 | **PROC** | Process / Orchestration | Context orchestrates multiple aggregates without own product truth |
 
 ---
@@ -94,7 +94,7 @@ It fulfills evolution stage **D1** from [ADR-019](decisions/ADR-019-domain-drive
 | **Interop (Payments)** | External payment/identifier protocol → ACL in front of Savings/Client | `interoperation` (provider/savings) |
 | **Document Management** | Attachments and metadata on entity IDs | `fineract-document` |
 | **Identity & Access** | Users, roles, permissions, OIDC, 2FA | `fineract-security`, `useradministration` |
-| **Platform / Shared Kernel** | Tenant, command pipeline, validation, event envelope, codes | `fineract-core` (goal: slim down), `fineract-command*`, `fineract-validation`, `fineract-avro-schemas` |
+| **Platform / Shared Kernel** | Tenant, command pipeline, validation, event envelope, plus accepted hub / fund-style residual | `fineract-core` (**is** the SK; leftover floor), `fineract-command*`, `fineract-validation`, `fineract-avro-schemas` |
 
 ---
 
@@ -130,14 +130,18 @@ Classification steers **investment intensity** (model quality, ES priority, team
 | **Supporting Subdomain** | Client/Group, Accounting, Products/Charges/Tax, Organisation, Branch, Transfers, Investor, Collateral, Share, COB, Reporting | Essential for operations; Accounting is *critical* but regulatorily standardisable |
 | **Generic Subdomain** | Security/IAM, Documents, Platform/Tenant, Command infra, Validation, Notifications, Interop ACL | Standardise, keep thin, swappable adapters |
 
-### Shared kernel (narrow)
+### Shared kernel (`fineract-core`)
 
-| Allowed in SK | Not in SK |
-|---------------|-------------|
-| `Money` / `Currency` / monetary primitives | `Client`, `Loan`, `SavingsAccount` entities |
-| `ExternalId`, tenant/business-date context | Portfolio write services |
-| Identity VOs: `ClientId`, `OfficeId`, `StaffId`, `LoanId`, … | Full JPA graphs of foreign domains |
-| Permission/command metamodel, event envelope (`MessageV1`) | Accounting journal logic |
+`fineract-core` **is** the shared kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)). After leftover peels 1–30, remaining `~802` types stay.
+
+| In the kernel (as-is) | Do not add to the kernel |
+|-----------------------|--------------------------|
+| `Money` / `Currency` / monetary primitives, tenant / business-date context, `ExternalId` | New bounded-context REST, handlers, write services |
+| Permission / command / batch metamodel, event envelope (`MessageV1`), platform exceptions | New business aggregates (put them in `*-api` / `*-impl`) |
+| Hub residuals (`LoanStatus`, `AccountType`, `ChargeData`, …) | New module-api ports invented only to “thin” core |
+| Fund-style entities (`Client`, `Group`, `PaymentType`, `Fund`, `Rate`, Office/Staff residual) | `Loan` / `SavingsAccount` write graphs — those belong in loan / savings modules |
+
+**Growth stays narrow.** The leftover floor is accepted; it is not a license to dump new aggregates into core.
 
 ---
 
@@ -259,7 +263,7 @@ Organisation ──► Client/Group ──► Loan / Savings ──► Accountin
 | Deviation | Problem | Target |
 |------------|---------|------|
 | `Loan` holds JPA `@ManyToOne` on `Client` / `Group` / `LoanProduct` | Object-graph coupling across context boundaries | IDs only + ProductSnapshot / read projection |
-| `Client` / `Group` / parts of Organisation in `fineract-core` | Shared kernel too fat | Own party/organisation module or clear packages with ports |
+| `Client` / `Group` / parts of Organisation in `fineract-core` | Fund-style residual after peels | **Stay** — owning modules exist (`fineract-clients` / `fineract-group` / `fineract-organisation`); entities remain kernel to avoid `core ↔ module-api` cycles |
 | God aggregates (`Loan` ~2k LOC, `SavingsAccount` ~3k+ LOC) | Unclear invariants; ES streams unwieldy | Snapshot + events; optional root splits (e.g. RescheduleRequest) |
 | Accounting mapping code under loan packages | Context leak | Mapping in accounting context; loan publishes business events |
 | Account Transfer as implicit service coupling | Distributed transactions without clear orchestration | Process manager / saga via application ports |
@@ -335,13 +339,13 @@ Here the **recommended roots** for reviews and ES streams.
 | Documents | `fineract-document` | high |
 | Reporting / MIX | `fineract-report`, `fineract-mix` | medium |
 | COB | `fineract-cob` | high (orchestration) |
-| Client & Group | core + provider `portfolio/client`, `portfolio/group` | **low** – extraction prioritised |
-| Organisation | core/provider `organisation/*` | low–medium |
-| Share Accounts | provider/core | low |
-| Account Transfer | provider `portfolio/account` | low |
-| Interop | provider `interoperation` | medium (ACL candidate) |
+| Client & Group | `fineract-clients`, `fineract-group` (+ Client/Group entity residual in core) | high (modules exist; entity residual is kernel) |
+| Organisation | `fineract-organisation` (+ Office/Staff/Holiday residual in core) | high |
+| Share Accounts | `fineract-shares` (+ ShareProduct JPA residual in core) | high |
+| Account Transfer | `fineract-accounttransfer` | high |
+| Interop | `fineract-interoperation` | medium (ACL candidate) |
 | IAM | `fineract-security` | high |
-| Platform / SK | `fineract-core`, `fineract-command*` | overloaded – slim down |
+| Platform / SK | `fineract-core`, `fineract-command*`, `fineract-validation` | accepted leftover floor — do not slim by leftover peels |
 
 ---
 
@@ -356,14 +360,14 @@ Aligned with [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) (ES0�
 | Event-store port, envelope, tenant, optimistic concurrency | ES0 |
 | This chapter + glossary terms | D1 |
 | Dependency rule (domain without REST/broker APIs) | ADR-017 |
-| Slim shared kernel (identity VOs instead of entity sharing) | D3 preparation |
+| Shared kernel leftover floor (`fineract-core` as-is) | [core slices rank 31](15_osgi_bundle_refactoring_fineract-core-slices.md) — do not peel leftovers |
 
 ### Business priority order
 
 | Prio | Context | Rationale |
 |:----:|---------|------------|
 | 1 | **Charge Catalog + Tax + Rates** | Small; ideal ES/hexagon pilot |
-| 2 | **Client & Group** | Upstream of portfolio; wrongly in SK today; high structural leverage |
+| 2 | **Client & Group** | Upstream of portfolio; modules exist (`fineract-clients` / `fineract-group`); entity residual stays in the kernel |
 | 3 | **Organisation** | Upstream for client/COB/schedule |
 | 4 | **Accounting as projection context** | Module exists; event consumption before loan ES cutover |
 | 5 | **Savings & Deposits** | Clearer than loan; second ES core |

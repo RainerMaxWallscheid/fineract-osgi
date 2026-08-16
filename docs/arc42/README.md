@@ -35,7 +35,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 15l | [fineract-working-capital-loan split plan](15_osgi_bundle_refactoring_fineract-working-capital-loan.md) | Wave‑4 working-capital loan api/impl/test plan (**complete**) |
 | 15m | [fineract-cob split plan](15_osgi_bundle_refactoring_fineract-cob.md) | Wave‑4 COB api/impl/test plan (**complete**) |
 | 15n | [fineract-security split plan](15_osgi_bundle_refactoring_fineract-security.md) | Wave‑4 security api/impl/test plan (**complete**) |
-| 15o | [fineract-core slices plan](15_osgi_bundle_refactoring_fineract-core-slices.md) | Optional core slices (**businessdate** complete; not full core split) |
+| 15o | [fineract-core slices plan](15_osgi_bundle_refactoring_fineract-core-slices.md) | Optional slices + leftover close-ins 1–30 **complete**; remaining core **is** the shared kernel (rank 31). Do not full core split. |
 
 ## Complementary Artifacts
 

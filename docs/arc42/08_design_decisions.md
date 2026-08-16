@@ -107,6 +107,8 @@ flowchart TB
 | Karaf as mandatory runtime | deferred | Equinox first; Karaf possibly distribution later |
 | Karaf Features as inter-bundle contract | rejected | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md): OSGi **Service Registry** only |
 | Remove Spring before OSGi refactor | rejected | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [ADR-003](decisions/ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) |
+| Full api/impl of `fineract-core` | rejected | Shared kernel; leftover floor is policy ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [core slices](15_osgi_bundle_refactoring_fineract-core-slices.md)) |
+| Further leftover peels from `fineract-core` | rejected | Rank 31 — no cycle-safe leftover |
 | UI in core | rejected | [ADR-010](decisions/ADR-010-headless-rest-api-keine-ui-im-scope.md) |
 | Blockchain/RTGS in core | rejected | Upstream out of scope |
 
@@ -164,7 +166,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 |-------|---------------|--------|
 | Equinox embedded vs. sidecar | final process model | Prod image layout |
 | Bundle signing PKI | who signs, how verified | Prod hot deploy |
-| Wave 4 follow-up | Domain Wave 4 **complete**; core slices = businessdate + codes (entity residual for codes stays in core) — [core slices](15_osgi_bundle_refactoring_fineract-core-slices.md) | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [15](15_osgi_bundle_refactoring.md) |
+| Wave 4 follow-up | Domain Wave 4 **complete**; leftover peels 1–30 **complete**; `fineract-core` **is** the shared kernel (rank 31) — [core slices](15_osgi_bundle_refactoring_fineract-core-slices.md) | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [15](15_osgi_bundle_refactoring.md) |
 | Outbox for external events | exactly vs. at-least-once UX | Enterprise integration |
 | Sync AI products | which products fail-closed default | Lending policy |
 | Helm chart | timing vs. raw manifests | Platform teams |

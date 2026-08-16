@@ -155,7 +155,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **SACCO** | F | *Savings and Credit Cooperative* – typical user group in the microfinance context. → [02](02_context_and_scope.md) |
 | **Service Tracker** | T | OSGi helper for tracking service availability (bind/unbind). |
 | **SLO** | B | *Service Level Objective* – targeted operational metric (latency, availability). → [07](07_quality_attributes.md) |
-| **Shared Kernel (SK)** | A | DDD: tightly limited, jointly used model parts (Money, Tenant, IDs) – keep deliberately small. → [10](10_domain_context_map.md), [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Shared Kernel (SK)** | A | DDD: jointly used types in `fineract-core`. As-is leftover (`~802` types) **is** the kernel; **growth** stays narrow (no new business aggregates in core). → [10](10_domain_context_map.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [core slices](15_osgi_bundle_refactoring_fineract-core-slices.md) |
 | **Spring Boot** | T | Application framework of the Fineract core; retained per ADR-003. → [08](08_design_decisions.md) |
 | **Spring Events** | T | In-process events; default for local job distribution without broker. |
 | **Supporting Subdomain** | A | DDD: needed for operation, but not the strategic core (Client, Accounting, Products, COB, …). → [10](10_domain_context_map.md) |
@@ -184,7 +184,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | Name | Short description |
 |------|-------------------|
 | `fineract-provider` | Bootable server, REST, wiring |
-| `fineract-core` | Infrastructure, legacy commands, shared core parts |
+| `fineract-core` | Shared kernel (platform + accepted hub / fund-style residual). Do not full api/impl; do not peel leftovers. |
 | `fineract-command` | New command stack |
 | `fineract-command-async` / `-disruptor` / `-jdbc` / `-audit` | Optional command implementation variants |
 | `fineract-loan` / `fineract-savings` / `fineract-accounting` / … | Domain modules |
