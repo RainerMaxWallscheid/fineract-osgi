@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-meeting-api')
     implementation(project(path: ':fineract-core'))
+    // Client pure ports/DTOs (entity residual stays in core)
+    implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))

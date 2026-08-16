@@ -83,7 +83,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | Area | ~main types | Classification |
 |------|-------------|----------------|
 | `infrastructure.core` | ~284 | **Shared kernel** — tenant, config, DB, Jersey, exceptions, serialization |
-| `portfolio.client` | ~112 | **Domain residual** — pure/client satellite REST/handlers/domain already here; `Client` entity is still a kernel hub |
+| `portfolio.client` | ~44 | **Peeled** → `fineract-clients` api/impl/test; Client entity/DTO residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `infrastructure.event` | ~61 | **Mixed residual** — notifier/outbox write path kernel; jobs/config/API peeled to event-impl |
 | `portfolio.shares*` + accounts/products | ~19 | **Peeled** → `fineract-shares` api/impl/test; product JPA + status/charge DTO residual in core; write/read residual charge/savings/progressive |
 | `portfolio.group` | ~36 | **Peeled** → `fineract-group` api/impl/test; entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
@@ -113,7 +113,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
 | **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; product JPA residual core; account write residual progressive; product write residual charge |
 | **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; entity+DTO residual core; Centers/Groups REST + write residual progressive |
-| **8** | **Client pure residual** | ~112 | new `fineract-clients` (domain) | Highest value long-term; highest risk — `Client` is a shared hub; only after paymenttype/search pilot |
+| **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -136,7 +136,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; product JPA residual core).  
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; entity residual core).  
-8. Only then consider **client** — each is a multi-PR program, not a leftover peel.
+8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).
 
 ## Related provider peels
 
@@ -152,7 +152,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
 | client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
-| client residual (pure write/read/REST) | family/identifiers/transactions REST + search v2 + ClientChargeData + validators + internal client REST + family/nonperson/transfer domain + family/identifier write impls + ClientMapper + pure support types + JDBC txn read in core; address REST/handlers/read in address-impl; main clients/charges REST + charge/txn entity write + main client write/read stay on provider |
+| `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `fineract-group` | **complete** (api/impl/test); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
 | `fineract-collectionsheet` | **complete** (api/impl/test); ports/commands/DTOs + REST/handlers/deserializers/read; write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | SearchApiResource + SearchRead JDBC + AdHocSearchQueryData in core via LoanProductLookupReadPort (loan-impl adapter) |
@@ -188,6 +188,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-accounttransfer` | **complete** (api/impl/test); ports/enums/DTOs + REST/handlers/reads/SI job; write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 | `fineract-shares` | **complete** (api/impl/test); ports/DTOs/REST/handlers/reads/dividend job; ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
 | `fineract-group` | **complete** (api/impl/test); ports/handlers/JDBC reads/roles write/levels REST; Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
+| `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; main Clients REST/write residual progressive |
 
 
 ## Commands

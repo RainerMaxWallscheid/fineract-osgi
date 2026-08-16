@@ -22,6 +22,9 @@ dependencies {
     api project(path: ':fineract-charge-api')
 
     implementation(project(path: ':fineract-core'))
+    // Client pure ports/DTOs (entity residual stays in core)
+    implementation(project(path: ':fineract-clients-api'))
+    implementation(project(path: ':fineract-clients-impl'))
     // Share product/account ports and pure DTOs
     implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-shares-impl'))

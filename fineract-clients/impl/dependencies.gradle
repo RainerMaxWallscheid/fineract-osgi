@@ -18,51 +18,31 @@
  */
 
 dependencies {
-    api project(path: ':fineract-working-capital-loan-api')
-
+    api project(path: ':fineract-clients-api')
     implementation(project(path: ':fineract-core'))
-    // Client pure ports/DTOs (entity residual stays in core)
-    implementation(project(path: ':fineract-clients-api'))
-    implementation(project(path: ':fineract-fund-api'))
-    implementation(project(path: ':fineract-monetary-api'))
-    implementation(project(path: ':fineract-businessdate-api'))
-    implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-loan-origination-api'))
-    implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
-    implementation(project(path: ':fineract-accounting-api'))
-    implementation(project(path: ':fineract-accounting-impl'))
-    implementation(project(path: ':fineract-cob-api'))
-    implementation(project(path: ':fineract-cob-impl'))
-    implementation(project(path: ':fineract-jobs-api'))
-    implementation('org.apache.avro:avro')
-    implementation(project(path: ':fineract-avro-schemas'))
+    implementation(project(path: ':fineract-command-api'))
+    implementation(project(path: ':fineract-validation'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
-            'org.springframework.batch:spring-batch-integration',
-            'org.springframework:spring-context-support',
+            'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework:spring-jdbc',
+            'org.springframework.boot:spring-boot-starter-batch',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'org.glassfish.jersey.media:jersey-media-multipart',
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
-            'com.jayway.jsonpath:json-path',
             'io.swagger.core.v3:swagger-annotations-jakarta',
-            'com.squareup.retrofit2:converter-gson',
-            'org.springdoc:springdoc-openapi-starter-webmvc-ui',
-            'org.mapstruct:mapstruct',
-            'io.github.resilience4j:resilience4j-spring-boot3',
-            // Batch command strategies use org.apache.http.HttpStatus
-            'org.apache.httpcomponents:httpcore',
             )
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
     }
     implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
+    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    implementation 'org.mapstruct:mapstruct'
+    annotationProcessor 'org.mapstruct:mapstruct-processor'
 }

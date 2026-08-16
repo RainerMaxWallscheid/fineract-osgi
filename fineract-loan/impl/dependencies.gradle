@@ -24,6 +24,8 @@ dependencies {
     implementation(project(path: ':fineract-validation'))
 
     implementation(project(path: ':fineract-core'))
+    // Client pure ports/DTOs (entity residual stays in core)
+    implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     // Account transfer / SI ports and shared DTOs

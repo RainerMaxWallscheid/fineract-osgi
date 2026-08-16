@@ -92,6 +92,8 @@ dependencies {
     implementation(project(path: ':fineract-shares-impl'))
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-group-impl'))
+    implementation(project(path: ':fineract-clients-api'))
+    implementation(project(path: ':fineract-clients-impl'))
     implementation(project(path: ':fineract-accountnumberformat-api'))
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))

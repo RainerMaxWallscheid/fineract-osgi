@@ -167,6 +167,13 @@ project(':fineract-group-impl').projectDir = file('fineract-group/impl')
 include ':fineract-group-test'
 project(':fineract-group-test').projectDir = file('fineract-group/test')
 // No :fineract-group façade — depend on -api / -impl explicitly.
+include ':fineract-clients-api'
+project(':fineract-clients-api').projectDir = file('fineract-clients/api')
+include ':fineract-clients-impl'
+project(':fineract-clients-impl').projectDir = file('fineract-clients/impl')
+include ':fineract-clients-test'
+project(':fineract-clients-test').projectDir = file('fineract-clients/test')
+// No :fineract-clients façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'
