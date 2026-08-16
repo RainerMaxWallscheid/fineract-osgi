@@ -23,8 +23,17 @@ dependencies {
     testImplementation(project(path: ':fineract-businessdate-api'))
     testImplementation(project(path: ':fineract-loan-api'))
     testImplementation(project(path: ':fineract-loan-impl'))
+    testImplementation(project(path: ':fineract-savings-impl'))
     testImplementation(project(path: ':fineract-accounting-api'))
+    testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-charge-api'))
+    testImplementation(project(path: ':fineract-charge-impl'))
+    testImplementation(project(path: ':fineract-dataqueries-impl'))
+    testImplementation(project(path: ':fineract-note-impl'))
+    testImplementation(project(path: ':fineract-collateralmanagement-impl'))
+    testImplementation(project(path: ':fineract-working-capital-loan-impl'))
+    testImplementation 'org.springframework:spring-jdbc'
+    testImplementation 'org.springframework.security:spring-security-core'
     testImplementation( 'io.github.classgraph:classgraph' )
     testImplementation 'com.google.code.gson:gson'
     testImplementation 'com.google.guava:guava'

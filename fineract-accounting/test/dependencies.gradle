@@ -21,6 +21,7 @@ dependencies {
     testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-core'))
     testImplementation(project(path: ':fineract-organisation-impl'))
+    testImplementation(project(path: ':fineract-loan-api'))
 
     testImplementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
