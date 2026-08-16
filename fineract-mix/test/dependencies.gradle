@@ -20,6 +20,10 @@
 dependencies {
     testImplementation(project(path: ':fineract-mix-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'io.cucumber:cucumber-java8'
+    testImplementation 'io.cucumber:cucumber-java'
+    testImplementation 'commons-io:commons-io'
+    testImplementation 'org.springframework:spring-jdbc'
 
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

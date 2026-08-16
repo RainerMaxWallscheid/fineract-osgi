@@ -22,6 +22,11 @@ dependencies {
     testImplementation(project(path: ':fineract-core'))
     testImplementation(project(path: ':fineract-command-api'))
     testImplementation(project(path: ':fineract-command-jdbc'))
+    testImplementation 'io.cucumber:cucumber-java8'
+    testImplementation 'io.cucumber:cucumber-java'
+    testImplementation 'commons-io:commons-io'
+    testImplementation 'com.google.code.gson:gson'
+    testImplementation 'com.google.guava:guava'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'

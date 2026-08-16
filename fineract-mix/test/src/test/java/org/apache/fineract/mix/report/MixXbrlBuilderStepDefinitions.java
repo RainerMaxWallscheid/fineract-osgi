@@ -33,7 +33,6 @@ import org.apache.fineract.mix.data.MixReportXBRLNamespaceData;
 import org.apache.fineract.mix.data.MixTaxonomyData;
 import org.apache.fineract.mix.service.MixReportXBRLBuilder;
 import org.apache.fineract.mix.service.MixReportXBRLNamespaceReadServiceImpl;
-import org.apache.fineract.template.service.TemplateServiceStepDefinitions;
 import org.mockito.ArgumentMatchers;
 
 public class MixXbrlBuilderStepDefinitions implements En {
@@ -76,7 +75,7 @@ public class MixXbrlBuilderStepDefinitions implements En {
 
         Then("/^The XBRL result should match (.*)$/", (String file) -> {
             String expected = IOUtils.resourceToString("results/" + file, StandardCharsets.UTF_8,
-                    TemplateServiceStepDefinitions.class.getClassLoader());
+                    MixXbrlBuilderStepDefinitions.class.getClassLoader());
             assertEquals(expected.trim(), result.trim());
         });
     }
