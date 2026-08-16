@@ -137,6 +137,10 @@ dependencies {
     testImplementation 'org.apache.httpcomponents.core5:httpcore5'
     testImplementation 'io.cucumber:cucumber-java8'
     testImplementation 'io.cucumber:cucumber-java'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'com.zaxxer:HikariCP'
+    testImplementation 'org.postgresql:postgresql'
     implementation('org.apache.avro:avro')
     implementation(
             project(path: ':fineract-avro-schemas')

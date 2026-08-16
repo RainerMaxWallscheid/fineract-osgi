@@ -22,6 +22,8 @@ dependencies {
     testImplementation(project(path: ':fineract-core'))
     testImplementation(project(path: ':fineract-businessdate-api'))
     testImplementation(project(path: ':fineract-cob-api'))
+    testImplementation(project(path: ':fineract-cob-impl'))
+    testImplementation 'jakarta.servlet:jakarta.servlet-api'
     testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-loan-impl'))
     testImplementation(project(path: ':fineract-report'))

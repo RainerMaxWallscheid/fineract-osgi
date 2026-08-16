@@ -33,7 +33,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import com.sun.research.ws.wadl.HTTPMethods;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -151,7 +150,7 @@ class LoanCOBApiFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         given(request.getPathInfo()).willReturn("/v1/jobs/2/inline");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -174,7 +173,7 @@ class LoanCOBApiFilterTest {
         ThreadLocalContextUtil.setBusinessDates(businessDates);
 
         given(request.getPathInfo()).willReturn("/v1/loans/invalid2LoanId/charges");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -196,7 +195,7 @@ class LoanCOBApiFilterTest {
         AppUser appUser = mock(AppUser.class);
 
         given(request.getPathInfo()).willReturn("/v1/jobs/2/inline");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -221,7 +220,7 @@ class LoanCOBApiFilterTest {
         ThreadLocalContextUtil.setBusinessDates(businessDates);
 
         given(request.getPathInfo()).willReturn("/v1/loans/2/charges");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -250,7 +249,7 @@ class LoanCOBApiFilterTest {
         ThreadLocalContextUtil.setBusinessDates(businessDates);
         String uuid = UUID.randomUUID().toString();
         given(request.getPathInfo()).willReturn("/v1/loans/external-id/" + uuid + "/charges");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -280,7 +279,7 @@ class LoanCOBApiFilterTest {
         ThreadLocalContextUtil.setBusinessDates(businessDates);
         Long resourceId = 123L;
         given(request.getPathInfo()).willReturn("/v1/rescheduleloans/" + resourceId + "/charges");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -315,7 +314,7 @@ class LoanCOBApiFilterTest {
         given(result.getId()).willReturn(2L);
         given(result.getLastClosedBusinessDate()).willReturn(businessDate.minusDays(2));
         given(request.getPathInfo()).willReturn("/v1/loans/2?command=approve");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -348,7 +347,7 @@ class LoanCOBApiFilterTest {
         COBIdAndLastClosedBusinessDate result = mock(COBIdAndLastClosedBusinessDate.class);
         given(result.getId()).willReturn(2L);
         given(request.getPathInfo()).willReturn("/v1/loans/2?command=approve");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -373,7 +372,7 @@ class LoanCOBApiFilterTest {
         AppUser appUser = mock(AppUser.class);
 
         given(request.getPathInfo()).willReturn("/v1/loans");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -393,7 +392,7 @@ class LoanCOBApiFilterTest {
         AppUser appUser = mock(AppUser.class);
 
         given(request.getPathInfo()).willReturn("/v1/loans/catch-up");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -414,7 +413,7 @@ class LoanCOBApiFilterTest {
         AppUser appUser = mock(AppUser.class);
 
         given(request.getPathInfo()).willReturn("/v1/loans/2/charges");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
@@ -436,7 +435,7 @@ class LoanCOBApiFilterTest {
         AppUser appUser = mock(AppUser.class);
 
         given(request.getPathInfo()).willReturn("/v1/loans/glimAccount/2");
-        given(request.getMethod()).willReturn(HTTPMethods.POST.value());
+        given(request.getMethod()).willReturn("POST");
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
