@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-progressive-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    // Share product/account ports and pure DTOs
+    implementation(project(path: ':fineract-shares-api'))
+    implementation(project(path: ':fineract-shares-impl'))
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
     implementation(project(path: ':fineract-accounttransfer-impl'))

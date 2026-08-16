@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-bulkimport-api')
     implementation(project(path: ':fineract-core'))
+    // Share product/account ports and pure DTOs
+    implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-document-api'))

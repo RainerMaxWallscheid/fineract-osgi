@@ -153,6 +153,13 @@ project(':fineract-accounttransfer-impl').projectDir = file('fineract-accounttra
 include ':fineract-accounttransfer-test'
 project(':fineract-accounttransfer-test').projectDir = file('fineract-accounttransfer/test')
 // No :fineract-accounttransfer façade — depend on -api / -impl explicitly.
+include ':fineract-shares-api'
+project(':fineract-shares-api').projectDir = file('fineract-shares/api')
+include ':fineract-shares-impl'
+project(':fineract-shares-impl').projectDir = file('fineract-shares/impl')
+include ':fineract-shares-test'
+project(':fineract-shares-test').projectDir = file('fineract-shares/test')
+// No :fineract-shares façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'

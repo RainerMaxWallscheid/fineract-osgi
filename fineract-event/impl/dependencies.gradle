@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-event-api')
     implementation(project(path: ':fineract-core'))
+    // Share product/account ports and pure DTOs
+    implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-avro-schemas'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-document-impl'))

@@ -1,0 +1,49 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Shares API (core residual peel)'
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
+
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Shares API',
+                'Bundle-SymbolicName': 'org.apache.fineract.shares.api',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Export-Package': 'org.apache.fineract.portfolio.accounts.api,'
+                        + 'org.apache.fineract.portfolio.accounts.constants,'
+                        + 'org.apache.fineract.portfolio.accounts.data,'
+                        + 'org.apache.fineract.portfolio.accounts.data.request,'
+                        + 'org.apache.fineract.portfolio.accounts.exceptions,'
+                        + 'org.apache.fineract.portfolio.accounts.service,'
+                        + 'org.apache.fineract.portfolio.shareaccounts.data,'
+                        + 'org.apache.fineract.portfolio.shareaccounts.exceptions,'
+                        + 'org.apache.fineract.portfolio.shareaccounts.service,'
+                        + 'org.apache.fineract.portfolio.shareproducts.constants,'
+                        + 'org.apache.fineract.portfolio.shareproducts.data,'
+                        + 'org.apache.fineract.portfolio.shareproducts.exception,'
+                        + 'org.apache.fineract.portfolio.shareproducts.service',
+                'Import-Package': '*',
+                'Automatic-Module-Name': 'org.apache.fineract.shares.api'
+                )
+    }
+}
