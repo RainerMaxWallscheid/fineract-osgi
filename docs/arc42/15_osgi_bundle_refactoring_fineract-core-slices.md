@@ -135,6 +135,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **27** | **Calendar leftover** | ~2 | `fineract-calendar` api | **Done** — `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; loan-impl api-only; entity/`CalendarData` residual core |
 | **28** | **Charge convert leftover** | 1 | `fineract-charge` api | **Done** — `ConvertChargeDataToSpecificChargeData` on charge-api (savings-impl + progressive-loan already api-only); fat charge/savings/share DTOs residual core |
 | **29** | **Unused image leftovers** | 4 | `fineract-document` api | **Done** — `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api; no remaining consumers |
+| **30** | **Unused JobParametersDTO** | 1 | `fineract-jobs` api | **Done** — unused wrapper on jobs-api; `JobParameterDTO` residual core (`CustomJobParameterRepository`) |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -179,7 +180,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 26. **Leftover module tests** ✅ (`ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test).  
 27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api).  
 28. **Charge convert leftover** ✅ (`ConvertChargeDataToSpecificChargeData` → charge-api).  
-29. **Unused image leftovers** ✅ (`Image*` exceptions + `Base64EncodedImage` → document-api).
+29. **Unused image leftovers** ✅ (`Image*` exceptions + `Base64EncodedImage` → document-api).  
+30. **Unused JobParametersDTO** ✅ (`JobParametersDTO` → jobs-api; `JobParameterDTO` residual core).
 
 ## Related provider peels
 
@@ -223,7 +225,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
 | `fineract-bulkimport` | **complete** (api/impl/test); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; `LookupModeTest` on bulkimport-test; populator impl residual provider (share) |
 | `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO + `FineractInstanceModeApiFilter` on api; constants residual in core |
-| `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
+| `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); unused `JobParametersDTO` on jobs-api; `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
 | `fineract-springbatch` | **complete** (api/impl/test); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
@@ -252,6 +254,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-calendar` leftover close-in | **complete**; `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; entity/`CalendarData` residual core |
 | `fineract-charge` convert leftover close-in | **complete**; `ConvertChargeDataToSpecificChargeData` on charge-api; `ChargeData` / savings+share charge DTOs residual core |
 | `fineract-document` unused image close-in | **complete**; `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api |
+| `fineract-jobs` unused JobParametersDTO close-in | **complete**; `JobParametersDTO` on jobs-api; `JobParameterDTO` residual core |
 
 
 ## Commands

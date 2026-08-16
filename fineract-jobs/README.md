@@ -9,6 +9,7 @@ Provider peel — scheduler / batch job infrastructure (ADR-022).
 | `fineract-jobs-test` | `test/` | `org.apache.fineract.jobs.test` | Fragment-Host → impl |
 
 Shared DTOs / `SchedulerJobRunnerReadService` / `JobName` enum remain in **core**.
+Unused `JobParametersDTO` is on jobs-api (`JobParameterDTO` stays residual in core for `CustomJobParameterRepository`).
 
 **Jobs residual closed** — no `infrastructure.jobs` sources remain on provider.
 
