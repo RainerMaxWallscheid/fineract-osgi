@@ -188,6 +188,13 @@ project(':fineract-transfer-impl').projectDir = file('fineract-transfer/impl')
 include ':fineract-transfer-test'
 project(':fineract-transfer-test').projectDir = file('fineract-transfer/test')
 // No :fineract-transfer façade — depend on -api / -impl explicitly.
+include ':fineract-products-api'
+project(':fineract-products-api').projectDir = file('fineract-products/api')
+include ':fineract-products-impl'
+project(':fineract-products-impl').projectDir = file('fineract-products/impl')
+include ':fineract-products-test'
+project(':fineract-products-test').projectDir = file('fineract-products/test')
+// No :fineract-products façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'

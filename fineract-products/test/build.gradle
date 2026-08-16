@@ -16,14 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+description = 'Fineract Products test fragment'
 
-dependencies {
-    // EnumOptionData, CurrencyData, ClientData, OfficeData, Page, JsonCommand
-    api project(path: ':fineract-core')
-    api project(path: ':fineract-products-api')
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
-    compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
-    compileOnly 'jakarta.ws.rs:jakarta.ws.rs-api'
-    compileOnly 'org.springframework:spring-tx'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply from: 'dependencies.gradle'
+
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-SymbolicName': 'org.apache.fineract.products.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.products.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.products.test'
+                )
+    }
 }
+tasks.named('test').configure { useJUnitPlatform() }
+tasks.named('jar').configure { dependsOn tasks.named('testClasses') }

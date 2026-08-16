@@ -116,6 +116,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
 | **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; entity residual loan-impl |
 | **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
+| **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; `ProductNotFoundException` residual core |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -140,7 +141,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; entity residual core).  
 8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
 9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).  
-10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).
+10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).  
+11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).
 
 ## Related provider peels
 
@@ -195,6 +197,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; main Clients REST/write residual progressive |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
+| `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |
 
 
 ## Commands

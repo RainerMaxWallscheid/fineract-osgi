@@ -18,10 +18,9 @@
  */
 
 dependencies {
-    api project(path: ':fineract-shares-api')
+    api project(path: ':fineract-products-api')
     implementation(project(path: ':fineract-core'))
-    // Generic products REST ports (share product read facade)
-    implementation(project(path: ':fineract-products-api'))
+    implementation(project(path: ':fineract-command-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
