@@ -126,7 +126,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
 | **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; `CacheType`/`PlatformCache`/runtime manager residual core |
 | **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
-| **21** | **Entity image adapter** | 1 | `fineract-document` api | Next leftover — `EntityImageIdAdapter`; clients-impl + organisation-impl |
+| **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
+| **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | Next leftover — `PropertyService` + `SpringBatchJobConstants`; cob/loan/WC/jobs |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -162,7 +163,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
 19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).  
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
-21. **Entity image adapter** — next leftover (`EntityImageIdAdapter` → document-api).
+21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
+22. **Spring Batch PropertyService** — next leftover (`PropertyService` + job constants → springbatch-api).
 
 ## Related provider peels
 
@@ -226,6 +228,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
 | `fineract-cache` | **complete** (api/impl/test); write port/DTOs + REST/handler/impl; CacheType/PlatformCache/runtime manager residual core |
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
+| `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 
 
 ## Commands

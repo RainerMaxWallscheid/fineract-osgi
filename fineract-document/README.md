@@ -17,6 +17,7 @@ No `:fineract-document` façade.
 - Document & image read/write service interfaces
 - Pure request/response DTOs and command types
 - Content-store exceptions
+- `EntityImageIdAdapter` (client/staff image FK SPI; impls in clients-impl / organisation-impl)
 
 Adapters: `FileContentStoreService`, `S3ContentStoreService`, `ContentPipe` (impl only — do not leak AWS types into api).
 

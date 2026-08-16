@@ -22,6 +22,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-validation'))
+    // EntityImageIdAdapter for Client image FK
+    implementation(project(path: ':fineract-document-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

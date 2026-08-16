@@ -57,7 +57,7 @@ fineract-document/
 | REST, handlers, domain, mappers, events | **impl** |
 | `…document.impl.osgi` | **impl** — `DocumentOsgiServiceRegistrar` |
 
-**Not in this module:** `EntityImageIdAdapter` lives in **fineract-core** (kernel trick).
+`EntityImageIdAdapter` lives on **document-api** (client/staff image FK SPI).
 
 ---
 
