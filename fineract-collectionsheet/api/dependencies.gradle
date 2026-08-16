@@ -18,8 +18,10 @@
  */
 
 dependencies {
-    // EnumOptionData, CurrencyData, LoanProductLookupData, SavingsProductData, PaymentDetail
+    // EnumOptionData, CurrencyData, SavingsProductData, PaymentDetail
     api project(path: ':fineract-core')
+    // LoanProductLookupData on JLG collection-sheet DTOs
+    api project(path: ':fineract-loan-api')
     // PaymentTypeData on collection-sheet DTOs
     api project(path: ':fineract-paymenttype-api')
     compileOnly 'com.github.spotbugs:spotbugs-annotations'

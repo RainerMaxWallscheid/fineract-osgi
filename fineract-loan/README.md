@@ -27,6 +27,9 @@ Delinquency catalog entities (`DelinquencyBucket`, `DelinquencyRange`,
 `DelinquencyMinimumPaymentPeriodAndRule`) and their type enums live in **loan-impl**
 next to the catalog repos. WC-impl already depends on loan-impl for that residual.
 
+`LoanProductLookupData` + `LoanProductLookupReadPort` live on **loan-api**
+(search-api / collectionsheet-api consume the lookup DTO; adapter residual loan-impl).
+
 ### Consumers
 
 | Module | Depend on |

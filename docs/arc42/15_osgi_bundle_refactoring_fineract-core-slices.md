@@ -125,6 +125,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
 | **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; `CacheType`/`PlatformCache`/runtime manager residual core |
+| **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
+| **21** | **Entity image adapter** | 1 | `fineract-document` api | Next leftover — `EntityImageIdAdapter`; clients-impl + organisation-impl |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -158,7 +160,9 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api).  
 17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
 18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
-19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).
+19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).  
+20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
+21. **Entity image adapter** — next leftover (`EntityImageIdAdapter` → document-api).
 
 ## Related provider peels
 
@@ -177,7 +181,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `fineract-group` | **complete** (api/impl/test); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
 | `fineract-collectionsheet` | **complete** (api/impl/test); ports/commands/DTOs + REST/handlers/deserializers/read; write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
-| search residual | SearchApiResource + SearchRead JDBC + AdHocSearchQueryData in core via LoanProductLookupReadPort (loan-impl adapter) |
+| search residual | **closed** into fineract-search; `LoanProductLookupReadPort` + lookup DTO on loan-api; adapter residual loan-impl |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); entity/repo/assembler/impl/config residual loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
 | loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate entity/repo residual in core; `RateData` + Rate read/write ports on rates-api |
@@ -221,6 +225,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-meeting` attendance close-in | **complete**; `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
 | `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
 | `fineract-cache` | **complete** (api/impl/test); write port/DTOs + REST/handler/impl; CacheType/PlatformCache/runtime manager residual core |
+| loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
 
 
 ## Commands

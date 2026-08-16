@@ -20,6 +20,8 @@
 dependencies {
     // EnumOptionData on SearchData
     api project(path: ':fineract-core')
+    // LoanProductLookupData on AdHocSearchQueryData
+    api project(path: ':fineract-loan-api')
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
