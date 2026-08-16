@@ -34,6 +34,8 @@ dependencies {
     implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
+    // CalendarInstanceLookupPort (CalendarInstance residual in core)
+    implementation(project(path: ':fineract-calendar-api'))
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
     // Collection sheet bulk command types on LoanWritePlatformService

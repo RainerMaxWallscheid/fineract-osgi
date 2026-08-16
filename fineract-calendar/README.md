@@ -4,7 +4,7 @@ Provider peel — collection/meeting calendars (ADR-022).
 
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
-| `fineract-calendar-api` | `api/` | `org.apache.fineract.calendar.api` | Read/write/dropdown ports, exceptions, command |
+| `fineract-calendar-api` | `api/` | `org.apache.fineract.calendar.api` | Read/write/dropdown ports, exceptions, command, `CalendarRequest`, `CalendarInstanceLookupPort` |
 | `fineract-calendar-impl` | `impl/` | `org.apache.fineract.calendar.impl` | REST, repos, handlers, services, starter, OSGi registrar |
 | `fineract-calendar-test` | `test/` | `org.apache.fineract.calendar.test` | Fragment-Host → impl |
 

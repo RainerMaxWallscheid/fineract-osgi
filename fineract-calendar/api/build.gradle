@@ -30,6 +30,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.calendar.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.portfolio.calendar.command,'
+                        + 'org.apache.fineract.portfolio.calendar.data.request,'
                         + 'org.apache.fineract.portfolio.calendar.exception,'
                         + 'org.apache.fineract.portfolio.calendar.service',
                 'Import-Package': '*',
