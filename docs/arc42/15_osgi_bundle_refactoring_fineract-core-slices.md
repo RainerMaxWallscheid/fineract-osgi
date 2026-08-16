@@ -129,6 +129,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
 | **23** | **Bulk import ports** | ~5 | `fineract-bulkimport` api | **Done** — workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
+| **24** | **Loan leftover ports** | ~2 | `fineract-loan` api | **Done** — `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -166,7 +167,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
 22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
-23. **Bulk import ports** ✅ (workbook ports + DTOs → bulkimport-api).
+23. **Bulk import ports** ✅ (workbook ports + DTOs → bulkimport-api).  
+24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).
 
 ## Related provider peels
 
@@ -233,6 +235,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-bulkimport` port close-in | **complete**; workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
+| loan leftover ports close-in | **complete**; `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 
 
 ## Commands

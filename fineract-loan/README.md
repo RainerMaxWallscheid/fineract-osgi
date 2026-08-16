@@ -30,6 +30,9 @@ next to the catalog repos. WC-impl already depends on loan-impl for that residua
 `LoanProductLookupData` + `LoanProductLookupReadPort` live on **loan-api**
 (search-api / collectionsheet-api consume the lookup DTO; adapter residual loan-impl).
 
+`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` live on **loan-api**.
+`LoanStatus` remains residual in **core**.
+
 ### Consumers
 
 | Module | Depend on |
