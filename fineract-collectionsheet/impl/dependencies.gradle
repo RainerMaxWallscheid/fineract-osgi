@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-collectionsheet-api')
     implementation(project(path: ':fineract-core'))
+    // Group/center ports and pure service types
+    implementation(project(path: ':fineract-group-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

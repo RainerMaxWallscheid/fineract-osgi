@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-progressive-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    // Group/center ports and pure service types
+    implementation(project(path: ':fineract-group-api'))
+    implementation(project(path: ':fineract-group-impl'))
     // Share product/account ports and pure DTOs
     implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-shares-impl'))

@@ -18,26 +18,21 @@
  */
 
 dependencies {
-    api project(path: ':fineract-note-api')
+    api project(path: ':fineract-group-api')
     implementation(project(path: ':fineract-core'))
-    // Group/center ports and pure service types
-    implementation(project(path: ':fineract-group-api'))
-    implementation(project(path: ':fineract-command-api'))
-    // Factory helpers + write service resolve loan/savings aggregates
-    implementation(project(path: ':fineract-loan-impl'))
-    implementation(project(path: ':fineract-savings-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
             'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework:spring-jdbc',
+            'org.springframework.boot:spring-boot-starter-batch',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'org.glassfish.jersey.media:jersey-media-multipart',
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
             'io.swagger.core.v3:swagger-annotations-jakarta',
-            'io.github.resilience4j:resilience4j-spring-boot3',
             )
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'

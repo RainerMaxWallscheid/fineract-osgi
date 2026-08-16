@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-campaigns-api')
     implementation(project(path: ':fineract-core'))
+    // Group/center ports and pure service types
+    implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-sms-api'))

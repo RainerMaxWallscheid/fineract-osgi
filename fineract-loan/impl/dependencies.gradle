@@ -24,6 +24,8 @@ dependencies {
     implementation(project(path: ':fineract-validation'))
 
     implementation(project(path: ':fineract-core'))
+    // Group/center ports and pure service types
+    implementation(project(path: ':fineract-group-api'))
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
     // Collection sheet bulk command types on LoanWritePlatformService
