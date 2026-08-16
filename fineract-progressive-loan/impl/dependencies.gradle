@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-progressive-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    // Collection sheet ports/DTOs/commands + deserializers/validator/read (write impl residual here)
+    implementation(project(path: ':fineract-collectionsheet-api'))
+    implementation(project(path: ':fineract-collectionsheet-impl'))
     implementation(project(path: ':fineract-note-api'))
     implementation(project(path: ':fineract-note-impl'))
     implementation(project(path: ':fineract-accounting-api'))

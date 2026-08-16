@@ -139,6 +139,13 @@ project(':fineract-search-impl').projectDir = file('fineract-search/impl')
 include ':fineract-search-test'
 project(':fineract-search-test').projectDir = file('fineract-search/test')
 // No :fineract-search façade — depend on -api / -impl explicitly.
+include ':fineract-collectionsheet-api'
+project(':fineract-collectionsheet-api').projectDir = file('fineract-collectionsheet/api')
+include ':fineract-collectionsheet-impl'
+project(':fineract-collectionsheet-impl').projectDir = file('fineract-collectionsheet/impl')
+include ':fineract-collectionsheet-test'
+project(':fineract-collectionsheet-test').projectDir = file('fineract-collectionsheet/test')
+// No :fineract-collectionsheet façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'

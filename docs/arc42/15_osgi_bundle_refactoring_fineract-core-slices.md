@@ -90,7 +90,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `portfolio.account` | ~60 | **Domain residual** — account-transfer/SI pure + REST; entity write adapters cross loan/savings |
 | `organisation.*` | ~51 | **Kernel residual** — entities/DTOs kept after organisation-api/impl slice (by design) |
 | `portfolio.savings` (kernel math/DTOs) | ~42 | **Shared kernel-ish** — compounding/posting math + shared savings DTOs used by savings-impl |
-| `portfolio.collectionsheet` | ~29 | **Domain residual** — pure REST/DTO/handlers; write impl stays loan/savings-bound |
+| `portfolio.collectionsheet` | 0 | **Peeled** → `fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl |
 | `infrastructure.dataqueries` residual | ~27 | **Kernel residual** — shared datatable/report DTOs after dataqueries peel |
 | `portfolio.paymenttype` | ~24 | **Strong peel candidate** — coherent entity+REST+handlers package |
 | `commands` | ~23 | **Shared kernel** — command pipeline (alongside `fineract-command*`) |
@@ -108,7 +108,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 |------|-----------|--------|--------|------------|
 | **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; `PaymentType` entity/repo/not-found residual in core |
 | **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
-| **3** | **Collection sheet** | ~29 | new `fineract-collectionsheet` | Pure residual package; write impl stays behind ports on loan/savings |
+| **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | Jobs/config/API/repos still in core while producers already live in event-impl — consolidate carefully to avoid notifier cycles |
 | **5** | **Account transfer / SI pure+REST** | ~60 | new module or savings/loan-owned | Cross-product (loan+savings); entity write adapters remain hard |
 | **6** | **Shares pure residual** | ~81 | new `fineract-shares` | Large; entity write/read/job residual still composition-coupled |
@@ -131,7 +131,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; entity residual in core).  
 2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
-3. **Collection sheet** (package move behind existing ports).  
+3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl).  
 4. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
 
 ## Related provider peels
@@ -149,8 +149,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
 | client residual (pure write/read/REST) | family/identifiers/transactions REST + search v2 + ClientChargeData + validators + internal client REST + family/nonperson/transfer domain + family/identifier write impls + ClientMapper + pure support types + JDBC txn read in core; address REST/handlers/read in address-impl; main clients/charges REST + charge/txn entity write + main client write/read stay on provider |
-| group residual (pure) | exceptions, GroupTypes/enumerations, level/role repos+wrappers, write ports, level/roles JDBC reads, center/group JDBC reads, roles write impl, validators, GroupsLevelApiResource, handlers (incl. collection-sheet) + AllGroupTypesDataMapper in core; Centers/Groups REST + grouping-types write stay on provider |
-| collectionsheet residual (pure) | pure DTOs/requests, write port, handlers, deserializers, JLGCollectionSheetData, read impl, REST in core (thin LoanProductLookupData); write impl stays (loan/savings) |
+| group residual (pure) | exceptions, GroupTypes/enumerations, level/role repos+wrappers, write ports, level/roles JDBC reads, center/group JDBC reads, roles write impl, validators, GroupsLevelApiResource, handlers + AllGroupTypesDataMapper in core (SAVECOLLECTIONSHEET handlers moved to collectionsheet-impl); Centers/Groups REST + grouping-types write stay on provider |
+| `fineract-collectionsheet` | **complete** (api/impl/test); ports/commands/DTOs + REST/handlers/deserializers/read; write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | SearchApiResource + SearchRead JDBC + AdHocSearchQueryData in core via LoanProductLookupReadPort (loan-impl adapter) |
 | postdated-check residual (pure) | data/status/exceptions/ports/handlers/REST in core; entity/repo/assembler/impl/config in loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
