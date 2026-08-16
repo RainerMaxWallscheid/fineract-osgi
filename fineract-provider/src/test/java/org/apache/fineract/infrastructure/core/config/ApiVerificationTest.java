@@ -18,45 +18,54 @@
  */
 package org.apache.fineract.infrastructure.core.config;
 
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import jakarta.ws.rs.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.fineract.AbstractSpringTest;
-import org.apache.fineract.infrastructure.core.jersey.JerseyConfig;
 import org.assertj.core.api.SoftAssertions;
 import org.glassfish.jersey.server.model.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 
-public class ApiVerificationTest extends AbstractSpringTest {
-
-    @Autowired
-    private JerseyConfig jerseyConfig;
+/**
+ * Composition-root API inventory: scans the full provider classpath for JAX-RS {@link Path} types without the Spring
+ * Boot test harness.
+ */
+public class ApiVerificationTest {
 
     @Test
     public void testAllApiClassesAreNamedAsApiResource() {
-        Set<Class<?>> registeredClasses = jerseyConfig.getClasses();
-
         SoftAssertions assertions = new SoftAssertions();
-        registeredClasses.stream().filter(this::isApi).forEach(apiClass -> verifyApiNaming(apiClass, assertions));
+        for (Class<?> apiClass : scanApiClasses()) {
+            verifyApiNaming(apiClass, assertions);
+        }
         assertions.assertAll();
+    }
+
+    @Test
+    public void testAllApisAreVersioned() {
+        SoftAssertions assertions = new SoftAssertions();
+        for (Class<?> apiClass : scanApiClasses()) {
+            verifyApiIsVersioned(apiClass, assertions);
+        }
+        assertions.assertAll();
+    }
+
+    private Set<Class<?>> scanApiClasses() {
+        try (ScanResult scanResult = new ClassGraph().enableClassInfo().enableAnnotationInfo().acceptPackages("org.apache.fineract")
+                .scan()) {
+            return scanResult.getClassesWithAnnotation(Path.class.getName()).stream().filter(ClassInfo::isStandardClass)
+                    .filter(ci -> !ci.isAbstract()).map(ClassInfo::loadClass).filter(this::isApi).collect(Collectors.toSet());
+        }
     }
 
     private void verifyApiNaming(Class<?> apiClass, SoftAssertions assertions) {
         String apiClassName = ClassUtils.getUserClass(apiClass).getName();
         String msg = "API class '%s' should have the postfix 'ApiResource'".formatted(apiClassName);
         assertions.assertThat(apiClassName).as(msg).endsWith("ApiResource");
-    }
-
-    @Test
-    public void testAllApisAreVersioned() {
-        Set<Class<?>> registeredClasses = jerseyConfig.getClasses();
-
-        SoftAssertions assertions = new SoftAssertions();
-        registeredClasses.stream().filter(this::isApi).forEach(apiClass -> verifyApiIsVersioned(apiClass, assertions));
-        assertions.assertAll();
     }
 
     private boolean isApi(Class<?> c) {
