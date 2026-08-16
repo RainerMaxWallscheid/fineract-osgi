@@ -22,6 +22,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     // Generic products REST ports (share product read facade)
     implementation(project(path: ':fineract-products-api'))
+    // Bulk import ports/DTOs on accounts REST
+    implementation(project(path: ':fineract-bulkimport-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

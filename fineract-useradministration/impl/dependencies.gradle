@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-useradministration-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
+    // Bulk import ports/DTOs on users REST
+    implementation(project(path: ':fineract-bulkimport-api'))
     // Office/staff residual entities + read ports for user templates
     implementation(project(path: ':fineract-organisation-api'))
 

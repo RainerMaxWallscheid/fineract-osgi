@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-organisation-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
+    // Bulk import ports/DTOs on office/staff REST
+    implementation(project(path: ':fineract-bulkimport-api'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-monetary-api'))
     // Criteria maps loan products + GL accounts; entries check uses accounting port

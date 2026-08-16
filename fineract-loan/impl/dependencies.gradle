@@ -26,6 +26,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     // Payment detail write port (entity residual in core)
     implementation(project(path: ':fineract-paymentdetail-api'))
+    // Bulk import ports/DTOs on guarantor REST
+    implementation(project(path: ':fineract-bulkimport-api'))
     // Post-dated check ports/DTOs (entity residual in loan-impl)
     implementation(project(path: ':fineract-postdatedchecks-api'))
     // Client pure ports/DTOs (entity residual stays in core)

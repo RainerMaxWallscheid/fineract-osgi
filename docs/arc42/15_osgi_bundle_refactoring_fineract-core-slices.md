@@ -128,6 +128,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
 | **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
+| **23** | **Bulk import ports** | ~5 | `fineract-bulkimport` api | **Done** — workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -164,7 +165,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).  
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
-22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).
+22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
+23. **Bulk import ports** ✅ (workbook ports + DTOs → bulkimport-api).
 
 ## Related provider peels
 
@@ -206,7 +208,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-gcm` | **complete** (api/impl/test); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
 | `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
 | `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
-| `fineract-bulkimport` | **complete** (api/impl/test); ports/DTOs in core; residual on provider: populator service + share-account import/populators + guarantor import (GuarantorData still on provider) |
+| `fineract-bulkimport` | **complete** (api/impl/test); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; populator impl residual provider (share) |
 | `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO peeled; constants + servlet filter remain in core |
 | `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
@@ -230,6 +232,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
 | `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
+| `fineract-bulkimport` port close-in | **complete**; workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 
 
 ## Commands

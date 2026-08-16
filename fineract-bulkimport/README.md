@@ -8,7 +8,10 @@ Provider peel — Excel workbook import (ADR-022).
 | `fineract-bulkimport-impl` | `impl/` | `org.apache.fineract.bulkimport.impl` | Handlers, populators, domain, REST, OSGi |
 | `fineract-bulkimport-test` | `test/` | `org.apache.fineract.bulkimport.test` | Fragment-Host → impl |
 
-Public ports `BulkImportWorkbookService` / `BulkImportWorkbookPopulatorService` and main DTOs already live in **core**.
+Public ports `BulkImportWorkbookService` / `BulkImportWorkbookPopulatorService` and
+`GlobalEntityType` / `ImportData` / `LookupMode` live on **bulkimport-api**.
+REST consumers (loan, savings, organisation, accounting, shares, useradmin, progressive-loan)
+depend on bulkimport-api only.
 
 Guarantor import residual **closed** (`GuarantorImportHandler` in bulkimport-impl; guarantor DTOs on loan-impl).
 

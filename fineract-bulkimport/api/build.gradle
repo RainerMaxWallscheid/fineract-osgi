@@ -33,7 +33,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.bulkimport.data,'
                         + 'org.apache.fineract.infrastructure.bulkimport.exceptions,'
                         + 'org.apache.fineract.infrastructure.bulkimport.importhandler,'
-                        + 'org.apache.fineract.infrastructure.bulkimport.populator',
+                        + 'org.apache.fineract.infrastructure.bulkimport.populator,'
+                        + 'org.apache.fineract.infrastructure.bulkimport.service',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.bulkimport.api'
                 )
