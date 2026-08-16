@@ -17,6 +17,7 @@ No `:fineract-tax` façade.
 - `ChargeTaxApplicationService.computeTax(taxGroupId, …)`
 - `TaxReadPlatformService` / `TaxWritePlatformService`
 - `TaxUtils` (DTO / core-data helpers)
+- Request DTOs: `TaxComponentRequest`, `TaxGroupRequest`, `TaxGroupComponent`
 
 ### Consumers
 
@@ -28,6 +29,8 @@ No `:fineract-tax` façade.
 
 Residual **closed**: `TaxAssembler`, read/write platform services, and `TaxConfiguration` live in tax-impl
 (depends on accounting-api for dropdown port; GLAccount residual in core).
+Request DTOs live in **tax-api**. Fat tax DTOs (`TaxGroupData`, `TaxComponentData`, …) remain in **core**
+(`SavingsAccountData` / `ChargeData` coupling).
 
 ```bash
 ./gradlew :fineract-tax-api:jar :fineract-tax-impl:jar :fineract-tax-test:test

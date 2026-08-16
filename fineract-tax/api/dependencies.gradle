@@ -22,4 +22,5 @@ dependencies {
     api project(path: ':fineract-core')
 
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
 }

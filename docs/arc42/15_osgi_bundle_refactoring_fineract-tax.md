@@ -6,7 +6,7 @@ Wave‑1 module after [rates](15_osgi_bundle_refactoring_fineract-rates.md)
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test + `TaxCatalogPort` / `ChargeTaxApplicationService`; charge/loan/savings **tax-api only** via catalog ids) |
+| **Status** | **complete** — Steps **0–9** + request DTO close-in (`Tax*Request` on tax-api; fat tax DTOs residual core) |
 | **Module** | Tax component / tax group catalog (`m_tax_component`, `m_tax_group`) |
 | **No façade** | Compose with `:fineract-tax-api` + `:fineract-tax-impl` explicitly |
 
@@ -27,7 +27,7 @@ fineract-tax/
 
 | Gradle | Bundle-SymbolicName | Export |
 |--------|---------------------|--------|
-| `:fineract-tax-api` | `org.apache.fineract.tax.api` | `moduleapi`, `service` (interfaces + DTO TaxUtils), `exception`, `api` (constants) |
+| `:fineract-tax-api` | `org.apache.fineract.tax.api` | `moduleapi`, `service` (interfaces + DTO TaxUtils), `exception`, `api` (constants), `request` |
 | `:fineract-tax-impl` | `org.apache.fineract.tax.impl` | `domain` (provider residual), `starter` |
 | `:fineract-tax-test` | `org.apache.fineract.tax.test` | Fragment-Host |
 
@@ -40,7 +40,8 @@ fineract-tax/
 | `…tax.moduleapi` | **api** — `TaxCatalogPort`, definition + share data |
 | `…tax.service` (`TaxRead`/`TaxWrite`/`ChargeTaxApplicationService`/`TaxUtils` DTO) | **api** |
 | `…tax.exception` | **api** |
-| core `…tax.data` / `…tax.request` | **fineract-core** (transitional) |
+| `…tax.request` | **api** — `TaxComponentRequest`, `TaxGroupRequest`, `TaxGroupComponent` |
+| core `…tax.data` | **fineract-core** (cycle-bound: `TaxGroupData` on SavingsAccountData / ChargeData) |
 | `…tax.domain` | **impl** |
 | `…tax.service` (impls, `TaxEntityUtils`, port adapter) | **impl** |
 | REST / handlers / mappers / serialization | **impl** |
@@ -77,6 +78,7 @@ Mechanical api/impl/test + `TaxCatalogPort` + OSGi registrar + consumer Gradle.
 
 | Item | Note |
 |------|------|
-| Move `TaxAssembler` / platform service impls into tax-impl | cleaner OSGi starter export |
-| Move fat core tax DTOs into tax-api | further kernel slimming |
+| Move `TaxAssembler` / platform service impls into tax-impl | **closed** (already on tax-impl) |
+| Move request DTOs into tax-api | **closed** |
+| Move fat core tax DTOs into tax-api | blocked — `TaxGroupData` used by `SavingsAccountData` / `ChargeData` in core |
 | Snapshot `creditAccountId` on tax detail rows | avoid catalog lookup at journal time |

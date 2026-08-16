@@ -31,11 +31,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Tax API',
                 'Bundle-SymbolicName': 'org.apache.fineract.tax.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Description': 'Tax catalog contracts (Module API ports, service interfaces, constants, exceptions)',
+                'Bundle-Description': 'Tax catalog contracts (Module API ports, service interfaces, request DTOs, constants, exceptions)',
                 'Export-Package': 'org.apache.fineract.portfolio.tax.moduleapi,'
                         + 'org.apache.fineract.portfolio.tax.service,'
                         + 'org.apache.fineract.portfolio.tax.exception,'
-                        + 'org.apache.fineract.portfolio.tax.api',
+                        + 'org.apache.fineract.portfolio.tax.api,'
+                        + 'org.apache.fineract.portfolio.tax.request',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.tax.api'
                 )

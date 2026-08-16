@@ -119,7 +119,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; `ProductNotFoundException` residual core |
 | **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; entity + PaymentDetailData residual core |
 | **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
-| **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | Next leftover — `TaxComponentRequest`/`TaxGroupRequest` only used by tax-impl REST; fat `TaxGroupData` stays (SavingsAccountData cycle) |
+| **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
+| **15** | **Delinquency catalog entities** | ~6 | loan-impl or new module | Next leftover — `DelinquencyBucket`/`Range` not imported by other core types, but shared loan-impl + WC-impl |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -148,7 +149,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).  
 12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; entity residual core).  
 13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
-14. **Tax request DTOs** — next leftover (`Tax*Request` → tax-api; fat `TaxGroupData` stays for SavingsAccountData).
+14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
+15. **Delinquency catalog entities** — next leftover (`DelinquencyBucket`/`Range` in core; shared loan + WC).
 
 ## Related provider peels
 
@@ -206,6 +208,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |
 | `fineract-paymentdetail` | **complete** (api/impl/test); write port/impl/assembler; PaymentDetail entity/repo + PaymentDetailData residual core |
 | `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
+| `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |
 
 
 ## Commands
