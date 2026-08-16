@@ -135,6 +135,8 @@ dependencies {
     }
     testImplementation ('org.mockito:mockito-inline')
     testImplementation 'org.apache.httpcomponents.core5:httpcore5'
+    testImplementation 'io.cucumber:cucumber-java8'
+    testImplementation 'io.cucumber:cucumber-java'
     implementation('org.apache.avro:avro')
     implementation(
             project(path: ':fineract-avro-schemas')
