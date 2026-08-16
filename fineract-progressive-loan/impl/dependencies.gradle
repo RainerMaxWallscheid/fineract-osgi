@@ -21,6 +21,9 @@ dependencies {
     api project(path: ':fineract-progressive-loan-api')
 
     implementation(project(path: ':fineract-core'))
+    // Client office/group transfer ports + validator
+    implementation(project(path: ':fineract-transfer-api'))
+    implementation(project(path: ':fineract-transfer-impl'))
     // Post-dated check ports/DTOs (entity residual in loan-impl)
     implementation(project(path: ':fineract-postdatedchecks-api'))
     // Client pure ports/DTOs (entity residual stays in core)

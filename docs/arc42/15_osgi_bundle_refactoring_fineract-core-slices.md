@@ -99,7 +99,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `batch` | ~19 | **Shared kernel** — batch API framework |
 | `portfolio.search` | ~18 | **Peel candidate** — REST/JDBC already thinned via `LoanProductLookupReadPort` |
 | `useradministration` residual | ~14 | **Kernel residual** — AppUser/Role residual after useradmin peel |
-| `portfolio.transfer` | ~13 | **Thin residual** — transfer ports/handlers; entity write still client-bound |
+| `portfolio.transfer` | 0 | **Peeled** → `fineract-transfer` api/impl/test; write impl residual progressive-loan |
 | `portfolio.repaymentwithpostdatedchecks` | 0 | **Peeled** → `fineract-postdatedchecks` api/impl/test; entity/assembler/write residual in loan-impl |
 
 ### Ranked next peels (if pursuing more core work)
@@ -115,6 +115,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; entity+DTO residual core; Centers/Groups REST + write residual progressive |
 | **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
 | **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; entity residual loan-impl |
+| **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -138,7 +139,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; product JPA residual core).  
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; entity residual core).  
 8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
-9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).
+9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).  
+10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).
 
 ## Related provider peels
 
@@ -152,7 +154,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-fund` | **complete** (api/impl/test); Fund entity residual in core |
 | `fineract-accountnumberformat` | **complete** (api/impl/test); entity/generator residual in core |
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
-| client office/group transfer residual | pure types + `TransferWritePlatformService` + command handlers in core; entity write impl stays on provider |
+| `fineract-transfer` | **complete** (api/impl/test); write impl residual progressive-loan |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
 | `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `fineract-group` | **complete** (api/impl/test); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
@@ -192,6 +194,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-group` | **complete** (api/impl/test); ports/handlers/JDBC reads/roles write/levels REST; Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
 | `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; main Clients REST/write residual progressive |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
+| `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
 
 
 ## Commands

@@ -96,6 +96,8 @@ dependencies {
     implementation(project(path: ':fineract-clients-impl'))
     implementation(project(path: ':fineract-postdatedchecks-api'))
     implementation(project(path: ':fineract-postdatedchecks-impl'))
+    implementation(project(path: ':fineract-transfer-api'))
+    implementation(project(path: ':fineract-transfer-impl'))
     implementation(project(path: ':fineract-accountnumberformat-api'))
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))
