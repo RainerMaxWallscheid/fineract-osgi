@@ -131,6 +131,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **23** | **Bulk import ports** | ~5 | `fineract-bulkimport` api | **Done** — workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 | **24** | **Loan leftover ports** | ~2 | `fineract-loan` api | **Done** — `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 | **25** | **Instance-mode API filter** | 1 | `fineract-instancemode` api | **Done** — `FineractInstanceModeApiFilter` on instancemode-api (security-impl api-only); `FineractInstanceModeConstants` residual core (event conditions) |
+| **26** | **Leftover module tests** | 2 | `fineract-clients-test` / `fineract-bulkimport-test` | **Done** — `ClientDataValidatorTest` + `LookupModeTest` next to the already-moved production types |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -171,7 +172,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
 23. **Bulk import ports** ✅ (workbook ports + DTOs → bulkimport-api).  
 24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).  
-25. **Instance-mode API filter** ✅ (`FineractInstanceModeApiFilter` → instancemode-api; constants residual core).
+25. **Instance-mode API filter** ✅ (`FineractInstanceModeApiFilter` → instancemode-api; constants residual core).  
+26. **Leftover module tests** ✅ (`ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test).
 
 ## Related provider peels
 
@@ -213,7 +215,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-gcm` | **complete** (api/impl/test); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
 | `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
 | `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
-| `fineract-bulkimport` | **complete** (api/impl/test); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; populator impl residual provider (share) |
+| `fineract-bulkimport` | **complete** (api/impl/test); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; `LookupModeTest` on bulkimport-test; populator impl residual provider (share) |
 | `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO + `FineractInstanceModeApiFilter` on api; constants residual in core |
 | `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
@@ -223,7 +225,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-accounttransfer` | **complete** (api/impl/test); ports/enums/DTOs + REST/handlers/reads/SI job; write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 | `fineract-shares` | **complete** (api/impl/test); ports/DTOs/REST/handlers/reads/dividend job; ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
 | `fineract-group` | **complete** (api/impl/test); ports/handlers/JDBC reads/roles write/levels REST; Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
-| `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; main Clients REST/write residual progressive |
+| `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
 | `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |
@@ -240,6 +242,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-bulkimport` port close-in | **complete**; workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 | loan leftover ports close-in | **complete**; `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 | `fineract-instancemode` filter close-in | **complete**; `FineractInstanceModeApiFilter` on instancemode-api; `FineractInstanceModeConstants` residual core |
+| leftover module tests close-in | **complete**; `ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test |
 
 
 ## Commands

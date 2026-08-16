@@ -6,7 +6,7 @@ Provider peel — Excel workbook import (ADR-022).
 |----------------|------|-----|------|
 | `fineract-bulkimport-api` | `api/` | `org.apache.fineract.bulkimport.api` | Constants, SPI interfaces, extra DTOs |
 | `fineract-bulkimport-impl` | `impl/` | `org.apache.fineract.bulkimport.impl` | Handlers, populators, domain, REST, OSGi |
-| `fineract-bulkimport-test` | `test/` | `org.apache.fineract.bulkimport.test` | Fragment-Host → impl |
+| `fineract-bulkimport-test` | `test/` | `org.apache.fineract.bulkimport.test` | Fragment-Host → impl; `LookupModeTest` |
 
 Public ports `BulkImportWorkbookService` / `BulkImportWorkbookPopulatorService` and
 `GlobalEntityType` / `ImportData` / `LookupMode` live on **bulkimport-api**.

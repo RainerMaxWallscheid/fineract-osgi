@@ -6,7 +6,7 @@ Core residual peel — client pure REST/handlers/services (ADR-022).
 |----------------|------|-----|------|
 | `fineract-clients-api` | `api/` | `org.apache.fineract.clients.api` | Ports, pure DTOs/requests, search v2 API types |
 | `fineract-clients-impl` | `impl/` | `org.apache.fineract.clients.impl` | Family/identifiers/transactions REST, handlers, pure write/read impls, search, OSGi |
-| `fineract-clients-test` | `test/` | `org.apache.fineract.clients.test` | Fragment-Host → impl |
+| `fineract-clients-test` | `test/` | `org.apache.fineract.clients.test` | Fragment-Host → impl; `ClientDataValidatorTest` |
 
 ### Residual
 
