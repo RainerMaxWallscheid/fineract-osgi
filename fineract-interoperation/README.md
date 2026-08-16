@@ -11,8 +11,8 @@ Provider peel — Mojaloop / interoperation (Hathor) API (ADR-022).
 ### Residual
 
 - `InteropIdentifier` entity stays in **savings-impl** (`@ManyToOne` SavingsAccount)
-- `InteropIdentifierType` stays in **core** (shared identifier resolution)
-- Pure domain enums live in **interoperation-api**; savings-impl depends on interoperation-api for those types
+- `InteropIdentifierType` and the other pure domain enums live in **interoperation-api**
+  (savings-impl already depends on interoperation-api)
 
 ```bash
 ./gradlew :fineract-interoperation-api:jar :fineract-interoperation-impl:jar :fineract-interoperation-test:test

@@ -123,7 +123,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **15** | **Delinquency catalog entities** | ~6 | `fineract-loan-impl` | **Done** — `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + enums next to repos; WC already depends on loan-impl |
 | **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
 | **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
-| **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | Next leftover — `InteropIdentifierType` (other interop enums already on interop-api) |
+| **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
+| **19** | **Cache admin REST** | ~15 | new module or stay kernel | Next leftover — REST/handler/write; `CacheType`/`PlatformCache` used by configuration + security |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -156,7 +157,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 15. **Delinquency catalog entities** ✅ (`DelinquencyBucket`/`Range` + enums → loan-impl; WC already on loan-impl).  
 16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api).  
 17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
-18. **Interop identifier type** — next leftover (`InteropIdentifierType` → interop-api).
+18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
+19. **Cache admin REST** — next leftover (REST/handler/write; `CacheType`/`PlatformCache` stay if configuration/security couple).
 
 ## Related provider peels
 
@@ -217,6 +219,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |
 | delinquency catalog close-in | **complete**; `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + type enums on loan-impl next to repos |
 | `fineract-meeting` attendance close-in | **complete**; `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
+| `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
 
 
 ## Commands
