@@ -18,34 +18,22 @@
  */
 
 dependencies {
-    api project(path: ':fineract-security-api')
-
+    api project(path: ':fineract-cache-api')
     implementation(project(path: ':fineract-core'))
-    // UserNotificationService port (impl residual in notification-impl)
-    implementation(project(path: ':fineract-notification-api'))
-    // Cache switch write port (entity/runtime residual in core)
-    implementation(project(path: ':fineract-cache-api'))
-    implementation(project(path: ':fineract-businessdate-api'))
-    implementation(project(path: ':fineract-campaigns-api'))
-    // LoanCOBApiFilter / LoanCOBFilterHelper types for AuthorizationServer + OIDC chains
-    implementation(project(path: ':fineract-jobs-api'))
-    implementation 'org.postgresql:postgresql'
+    implementation(project(path: ':fineract-command-api'))
+
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
-            'org.springframework.boot:spring-boot-starter-oauth2-authorization-server',
-            'org.springframework.boot:spring-boot-starter-oauth2-resource-server',
-            'org.springframework.boot:spring-boot-starter-oauth2-client',
+            'org.springframework.boot:spring-boot-starter-validation',
             'org.springframework.boot:spring-boot-starter-cache',
             'jakarta.ws.rs:jakarta.ws.rs-api',
             'org.glassfish.jersey.media:jersey-media-multipart',
             'com.google.guava:guava',
             'com.google.code.gson:gson',
             'org.apache.commons:commons-lang3',
-            'com.jayway.jsonpath:json-path',
             'io.swagger.core.v3:swagger-annotations-jakarta',
-            'org.springdoc:springdoc-openapi-starter-webmvc-ui',
-            'org.mapstruct:mapstruct',
+            'io.github.resilience4j:resilience4j-spring-boot3',
             )
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
@@ -53,22 +41,5 @@ dependencies {
     implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
         exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
     }
-    implementation('org.owasp.esapi:esapi') {
-        exclude group: 'org.slf4j'
-        exclude group: 'log4j'
-        exclude group: 'commons-logging'
-        exclude group: 'commons-collections'
-        exclude group: 'commons-lang'
-        exclude group: 'spotbugs-annotations'
-        exclude group: 'xml-apis'
-    }
-    implementation ('org.apache.commons:commons-email') {
-        exclude group: 'com.sun.mail', module: 'javax.mail'
-        exclude group: 'javax.activation', module: 'activation'
-    }
-    implementation 'com.sun.mail:jakarta.mail'
-    implementation 'com.github.spullara.mustache.java:compiler'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    annotationProcessor 'org.mapstruct:mapstruct-processor'
-
 }

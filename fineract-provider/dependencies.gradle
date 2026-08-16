@@ -136,6 +136,8 @@ dependencies {
     implementation(project(path: ':fineract-dataqueries-impl'))
     implementation(project(path: ':fineract-configuration-api'))
     implementation(project(path: ':fineract-configuration-impl'))
+    implementation(project(path: ':fineract-cache-api'))
+    implementation(project(path: ':fineract-cache-impl'))
     implementation(project(path: ':fineract-bulkimport-api'))
     implementation(project(path: ':fineract-bulkimport-impl'))
     implementation(project(path: ':fineract-instancemode-api'))

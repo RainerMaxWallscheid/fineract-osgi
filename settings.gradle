@@ -202,6 +202,13 @@ project(':fineract-paymentdetail-impl').projectDir = file('fineract-paymentdetai
 include ':fineract-paymentdetail-test'
 project(':fineract-paymentdetail-test').projectDir = file('fineract-paymentdetail/test')
 // No :fineract-paymentdetail façade — depend on -api / -impl explicitly.
+include ':fineract-cache-api'
+project(':fineract-cache-api').projectDir = file('fineract-cache/api')
+include ':fineract-cache-impl'
+project(':fineract-cache-impl').projectDir = file('fineract-cache/impl')
+include ':fineract-cache-test'
+project(':fineract-cache-test').projectDir = file('fineract-cache/test')
+// No :fineract-cache façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'
