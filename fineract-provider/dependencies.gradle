@@ -80,6 +80,8 @@ dependencies {
     implementation(project(path: ':fineract-spm-impl'))
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-fund-impl'))
+    implementation(project(path: ':fineract-paymenttype-api'))
+    implementation(project(path: ':fineract-paymenttype-impl'))
     implementation(project(path: ':fineract-accountnumberformat-api'))
     implementation(project(path: ':fineract-accountnumberformat-impl'))
     implementation(project(path: ':fineract-survey-api'))

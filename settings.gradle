@@ -125,6 +125,13 @@ project(':fineract-fund-impl').projectDir = file('fineract-fund/impl')
 include ':fineract-fund-test'
 project(':fineract-fund-test').projectDir = file('fineract-fund/test')
 // No :fineract-fund façade — depend on -api / -impl explicitly.
+include ':fineract-paymenttype-api'
+project(':fineract-paymenttype-api').projectDir = file('fineract-paymenttype/api')
+include ':fineract-paymenttype-impl'
+project(':fineract-paymenttype-impl').projectDir = file('fineract-paymenttype/impl')
+include ':fineract-paymenttype-test'
+project(':fineract-paymenttype-test').projectDir = file('fineract-paymenttype/test')
+// No :fineract-paymenttype façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'

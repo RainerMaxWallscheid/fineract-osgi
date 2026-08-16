@@ -28,6 +28,8 @@ dependencies {
     implementation(project(path: ':fineract-validation'))
     // Core slice: pure CodeValueData / catalog ports (entities residual stay in this module).
     api project(path: ':fineract-codes-api')
+    // Payment type catalog ports/DTOs (entity residual stays in this module).
+    api project(path: ':fineract-paymenttype-api')
 
 
     // implementation dependencies are directly used (compiled against) in src/main (and src/test)

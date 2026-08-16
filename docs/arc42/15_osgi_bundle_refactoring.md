@@ -301,7 +301,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
 3. **OSGi hardening** — manifests, Fragment-Host, service registration for already-split api/impl/test modules.
-4. **Core residual inventory (done)** — ranked non-kernel residual in core; see [core slices inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). Next code step if desired: payment-type pilot peel.
+4. **Core residual inventory (done)** — ranked non-kernel residual in core; see [core slices inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). **Payment-type pilot peel done** (`fineract-paymenttype` api/impl/test; entity residual in core). Next optional: search / collectionsheet.
 
 
 ---
