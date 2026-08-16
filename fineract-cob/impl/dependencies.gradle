@@ -25,6 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-jobs-api'))
+    // SpringBatchJobConstants on COB execution context
+    implementation(project(path: ':fineract-springbatch-api'))
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',

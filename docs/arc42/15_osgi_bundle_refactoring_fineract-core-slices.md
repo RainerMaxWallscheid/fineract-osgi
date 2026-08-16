@@ -127,7 +127,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; `CacheType`/`PlatformCache`/runtime manager residual core |
 | **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
 | **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
-| **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | Next leftover — `PropertyService` + `SpringBatchJobConstants`; cob/loan/WC/jobs |
+| **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -164,7 +164,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).  
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
-22. **Spring Batch PropertyService** — next leftover (`PropertyService` + job constants → springbatch-api).
+22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).
 
 ## Related provider peels
 
@@ -211,7 +211,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
-| `fineract-springbatch` | **complete** (api/impl/test); remote job messaging (JMS/Kafka/Spring events); PropertyService port remains in core |
+| `fineract-springbatch` | **complete** (api/impl/test); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |
 | `fineract-accounttransfer` | **complete** (api/impl/test); ports/enums/DTOs + REST/handlers/reads/SI job; write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 | `fineract-shares` | **complete** (api/impl/test); ports/DTOs/REST/handlers/reads/dividend job; ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
@@ -229,6 +229,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-cache` | **complete** (api/impl/test); write port/DTOs + REST/handler/impl; CacheType/PlatformCache/runtime manager residual core |
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
 | `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
+| `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 
 
 ## Commands

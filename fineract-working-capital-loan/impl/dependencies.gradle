@@ -37,6 +37,8 @@ dependencies {
     implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-cob-impl'))
     implementation(project(path: ':fineract-jobs-api'))
+    // PropertyService on WC COB partitioner / worker config
+    implementation(project(path: ':fineract-springbatch-api'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
