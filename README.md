@@ -158,7 +158,7 @@ How to run using Docker or Podman
 ---
 
 It is possible to do a 'one-touch' installation of Fineract using containers (AKA "Docker") for dev/test convenience and local/offline demos.
-This includes the database running in the container.
+This includes the database running in the container. Compose files live under [`docker/`](docker/README.md).
 
 As prerequisites, you must have `docker` and `docker-compose` installed on your machine; see
 [Docker Install](https://docs.docker.com/install/) and [Docker Compose Install](https://docs.docker.com/compose/install/).
