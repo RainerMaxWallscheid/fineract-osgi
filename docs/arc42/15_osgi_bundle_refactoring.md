@@ -280,7 +280,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 | Priority | Action |
 |----------|--------|
 | **Stabilize** | Keep ArchUnit freeze store shrinking; refresh module READMEs when manifests change |
-| **Optional deferred domain work** | Not leftover provider Java. Only if inventory shows value: residual types still in **core** that are not shared kernel; deferred share-event / niche packages; security config residual called out in module docs |
+| **Optional deferred domain work** | Not leftover provider Java. Fresh core residual inventory: [core slices — Core residual inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). Top peel candidates: **paymenttype** → **search** → **collectionsheet**; avoid client/group/shares until pilots land |
 | **Composition-root floor (done)** | See [15.6.1](#1561-composition-root-floor-provider) |
 | **Do not start** | full provider / whole-core api/impl; moving Liquibase master chain or boot classes “just because” |
 
@@ -301,7 +301,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
 3. **OSGi hardening** — manifests, Fragment-Host, service registration for already-split api/impl/test modules.
-4. **Core residual inventory** — only after a fresh inventory of non-kernel types still in `fineract-core`.
+4. **Core residual inventory (done)** — ranked non-kernel residual in core; see [core slices inventory](15_osgi_bundle_refactoring_fineract-core-slices.md#core-residual-inventory-post-provider-floor). Next code step if desired: payment-type pilot peel.
 
 
 ---

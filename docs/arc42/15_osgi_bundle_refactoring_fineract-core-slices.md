@@ -74,6 +74,66 @@ Wave-4 `fineract-security` already held auth/2FA/OIDC. Core residual peel:
 | pure criteria ports without loan entities | Needs `LoanProductData` on loan-api first |
 | full Money VO extraction | Deferred (kernel residual) |
 
+## Core residual inventory (post-provider floor)
+
+Inventory after the provider composition-root floor closed (`~1180` main Java types in `fineract-core`; `~90` tests). This is **not** a mandate to peel everything; it ranks residual **domain** mass still living in the shared kernel.
+
+### Snapshot by area
+
+| Area | ~main types | Classification |
+|------|-------------|----------------|
+| `infrastructure.core` | ~284 | **Shared kernel** — tenant, config, DB, Jersey, exceptions, serialization |
+| `portfolio.client` | ~112 | **Domain residual** — pure/client satellite REST/handlers/domain already here; `Client` entity is still a kernel hub |
+| `infrastructure.event` | ~87 | **Mixed** — notifier/bus ports are kernel; external-event jobs/config/API look peelable toward `fineract-event` |
+| `portfolio.shares*` + accounts/products | ~81 | **Domain residual** — pure share residual intentionally parked in core; entity write/read still elsewhere |
+| `portfolio.group` | ~74 | **Domain residual** — pure group residual; `Group` entity + centers/groups write still composition-coupled |
+| `portfolio.account` | ~60 | **Domain residual** — account-transfer/SI pure + REST; entity write adapters cross loan/savings |
+| `organisation.*` | ~51 | **Kernel residual** — entities/DTOs kept after organisation-api/impl slice (by design) |
+| `portfolio.savings` (kernel math/DTOs) | ~42 | **Shared kernel-ish** — compounding/posting math + shared savings DTOs used by savings-impl |
+| `portfolio.collectionsheet` | ~29 | **Domain residual** — pure REST/DTO/handlers; write impl stays loan/savings-bound |
+| `infrastructure.dataqueries` residual | ~27 | **Kernel residual** — shared datatable/report DTOs after dataqueries peel |
+| `portfolio.paymenttype` | ~24 | **Strong peel candidate** — coherent entity+REST+handlers package |
+| `commands` | ~23 | **Shared kernel** — command pipeline (alongside `fineract-command*`) |
+| `portfolio.calendar` residual | ~23 | **Kernel residual** — entities/repos after calendar peel |
+| `accounting` residual | ~21 | **Kernel residual** — thin shared accounting DTOs/enums after accounting peel |
+| `batch` | ~19 | **Shared kernel** — batch API framework |
+| `portfolio.search` | ~18 | **Peel candidate** — REST/JDBC already thinned via `LoanProductLookupReadPort` |
+| `useradministration` residual | ~14 | **Kernel residual** — AppUser/Role residual after useradmin peel |
+| `portfolio.transfer` | ~13 | **Thin residual** — transfer ports/handlers; entity write still client-bound |
+| `portfolio.repaymentwithpostdatedchecks` | ~11 | **Thin residual** — pure ports/REST; entity already in loan-impl |
+
+### Ranked next peels (if pursuing more core work)
+
+| Rank | Candidate | ~types | Target | Why / risk |
+|------|-----------|--------|--------|------------|
+| **1** | **Payment type** | ~24 | new `fineract-paymenttype` api/impl/test | Self-contained admin catalog; clear REST/handlers/entity; consumers (accounting/charge/loan/savings) can take api |
+| **2** | **Search** | ~18 | new `fineract-search` or dataqueries-adjacent | Already port-thinned (`LoanProductLookupReadPort`); low entity mass |
+| **3** | **Collection sheet** | ~29 | new `fineract-collectionsheet` | Pure residual package; write impl stays behind ports on loan/savings |
+| **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | Jobs/config/API/repos still in core while producers already live in event-impl — consolidate carefully to avoid notifier cycles |
+| **5** | **Account transfer / SI pure+REST** | ~60 | new module or savings/loan-owned | Cross-product (loan+savings); entity write adapters remain hard |
+| **6** | **Shares pure residual** | ~81 | new `fineract-shares` | Large; entity write/read/job residual still composition-coupled |
+| **7** | **Group pure residual** | ~74 | new `fineract-group` | `Group` entity + progressive-loan composition roots still bind centers/groups write |
+| **8** | **Client pure residual** | ~112 | new `fineract-clients` (domain) | Highest value long-term; highest risk — `Client` is a shared hub; only after paymenttype/search pilot |
+
+### Explicitly **do not** peel as “core residual”
+
+| Stay in core | Reason |
+|--------------|--------|
+| `infrastructure.core/**` | Shared kernel |
+| `commands/**`, `batch/**` | Platform command/batch framework |
+| Money / currency entities (monetary residual) | Kernel VO/entity residual by design |
+| Organisation entity residual | Unlocks loan/savings holiday/office without cycles |
+| Calendar/meeting entity residual | Shared by loan/group/COB |
+| Savings compounding math + shared savings DTOs | Used as kernel by savings-impl |
+| Global configuration / security context ports residual | Cross-cutting |
+
+### Suggested order of attack
+
+1. **Pilot-type pilot** (command-sized, mirrors charge/rates).  
+2. **Search** (if payment-type proves the consumer retarget pattern).  
+3. **Collection sheet** (package move behind existing ports).  
+4. Only then consider **shares** or **client** — each is a multi-PR program, not a leftover peel.
+
 ## Related provider peels
 
 | Peel | Status |
