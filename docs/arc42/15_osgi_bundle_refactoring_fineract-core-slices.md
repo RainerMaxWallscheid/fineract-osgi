@@ -120,7 +120,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; entity + PaymentDetailData residual core |
 | **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
 | **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
-| **15** | **Delinquency catalog entities** | ~6 | loan-impl or new module | Next leftover — `DelinquencyBucket`/`Range` not imported by other core types, but shared loan-impl + WC-impl |
+| **15** | **Delinquency catalog entities** | ~6 | `fineract-loan-impl` | **Done** — `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + enums next to repos; WC already depends on loan-impl |
+| — | Remaining core | | | Kernel / cycle / notifier — fat tax DTOs, event outbox, Client/Group/Rate/PaymentDetail hubs |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -150,7 +151,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; entity residual core).  
 13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
 14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
-15. **Delinquency catalog entities** — next leftover (`DelinquencyBucket`/`Range` in core; shared loan + WC).
+15. **Delinquency catalog entities** ✅ (`DelinquencyBucket`/`Range` + enums → loan-impl; WC already on loan-impl).
 
 ## Related provider peels
 
@@ -209,6 +210,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-paymentdetail` | **complete** (api/impl/test); write port/impl/assembler; PaymentDetail entity/repo + PaymentDetailData residual core |
 | `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
 | `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |
+| delinquency catalog close-in | **complete**; `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + type enums on loan-impl next to repos |
 
 
 ## Commands

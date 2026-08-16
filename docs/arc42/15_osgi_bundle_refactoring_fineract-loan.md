@@ -57,6 +57,7 @@ fineract-loan/
 - Leftover loanaccount residual closed into loan-impl: foreclosure/schedule validators, disbursement assemblers, PIT API+port, accrual/buy-down/capitalized-income event services, LoanAccountServiceImpl, bulk-loan DTOs+read port, domain helper, schedule-history impls, accrual/overdue-charge/recalculate-interest jobs.
 - Leftover LoanUtilService closed into loan-impl after Holiday/WorkingDays repos moved to core; expected-disbursement validator, apply-holidays job, and PIT impl followed (calendar via CalendarInstanceLookupPort).
 - Leftover loan charge/bulk/disbursement REST, charge batch strategies closed into loan-impl.
+- Leftover delinquency catalog residual closed into loan-impl: `DelinquencyBucket`, `DelinquencyRange`, `DelinquencyMinimumPaymentPeriodAndRule`, and bucket/frequency/minimum-payment enums (WC already depends on loan-impl).
 
 ## 4. Commands
 

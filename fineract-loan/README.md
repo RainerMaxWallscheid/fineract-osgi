@@ -23,6 +23,10 @@ moved to **accounting-impl** with product-to-GL write (no loan entity dependency
 `LoanTransactionEnumerations` (loan-api) exposes transaction-type enum mapping for accounting/journal residual;
 `LoanEnumerations` in loan-impl delegates those methods.
 
+Delinquency catalog entities (`DelinquencyBucket`, `DelinquencyRange`,
+`DelinquencyMinimumPaymentPeriodAndRule`) and their type enums live in **loan-impl**
+next to the catalog repos. WC-impl already depends on loan-impl for that residual.
+
 ### Consumers
 
 | Module | Depend on |
