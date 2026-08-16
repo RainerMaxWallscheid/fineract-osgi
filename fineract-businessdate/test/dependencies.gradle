@@ -20,6 +20,19 @@
 dependencies {
     testImplementation(project(path: ':fineract-businessdate-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'org.mapstruct:mapstruct'
+    testImplementation 'jakarta.validation:jakarta.validation-api'
+    testImplementation 'org.hibernate.validator:hibernate-validator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework:spring-tx'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    testImplementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
+        exclude group: 'org.hibernate'
+    }
+    testImplementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
+        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
+    }
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'

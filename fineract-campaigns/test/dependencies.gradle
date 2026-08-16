@@ -20,6 +20,8 @@
 dependencies {
     testImplementation(project(path: ':fineract-campaigns-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'org.springframework:spring-jdbc'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'

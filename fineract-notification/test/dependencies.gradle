@@ -20,6 +20,8 @@
 dependencies {
     testImplementation(project(path: ':fineract-notification-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'org.springframework:spring-jms'
+    testImplementation 'jakarta.jms:jakarta.jms-api'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'

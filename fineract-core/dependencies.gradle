@@ -134,6 +134,7 @@ dependencies {
         exclude group: 'com.zaxxer', module: 'HikariCP-java7'
     }
     testImplementation ('org.mockito:mockito-inline')
+    testImplementation 'org.apache.httpcomponents.core5:httpcore5'
     implementation('org.apache.avro:avro')
     implementation(
             project(path: ':fineract-avro-schemas')
