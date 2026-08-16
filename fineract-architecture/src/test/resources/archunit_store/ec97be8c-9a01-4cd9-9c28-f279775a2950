@@ -1,0 +1,1 @@
+Method <org.apache.fineract.accounting.journalentry.service.JournalEntryReadPlatformServiceImpl$GLJournalEntryMapper.mapRow(java.sql.ResultSet, int)> calls method <org.apache.fineract.portfolio.savings.service.SavingsEnumerations.transactionType(int)> in (JournalEntryReadPlatformServiceImpl.java:176)

@@ -1,0 +1,2 @@
+Method <org.apache.fineract.accounting.journalentry.data.ClientTransactionDTO.isChargePayment()> calls method <org.apache.fineract.portfolio.client.domain.ClientTransactionType.getValue()> in (ClientTransactionDTO.java:47)
+Method <org.apache.fineract.accounting.journalentry.data.ClientTransactionDTO.isChargePayment()> gets field <org.apache.fineract.portfolio.client.domain.ClientTransactionType.PAY_CHARGE> in (ClientTransactionDTO.java:47)

@@ -39,8 +39,9 @@ public final class ArchitecturePackages {
     public static final String GROUP_DOMAIN = "..portfolio.group.domain..";
     public static final String CHARGE_DOMAIN = "..portfolio.charge.domain..";
     public static final String TAX_DOMAIN = "..portfolio.tax.domain..";
-    public static final String ACCOUNTING_DOMAIN = "..accounting..domain..";
-    public static final String JOURNAL_ENTRY_DOMAIN = "..accounting.journalentry.domain..";
+    /** Accounting BC only — not {@code ..workingcapitalloan.accounting..} (loan-owned processors). */
+    public static final String ACCOUNTING_DOMAIN = "org.apache.fineract.accounting..domain..";
+    public static final String JOURNAL_ENTRY_DOMAIN = "org.apache.fineract.accounting.journalentry.domain..";
     public static final String WORKING_CAPITAL_DOMAIN = "..portfolio.workingcapitalloan.domain..";
     public static final String LOAN_ORIGINATION_DOMAIN = "..portfolio.loanorigination.domain..";
 
@@ -72,7 +73,7 @@ public final class ArchitecturePackages {
     };
 
     public static final String[] ACCOUNTING_OWNED = { //
-            "..accounting..", //
+            "org.apache.fineract.accounting..", //
     };
 
     public static final String[] CHARGE_OWNED = { //
@@ -113,10 +114,10 @@ public final class ArchitecturePackages {
     };
 
     public static final String[] ACCOUNTING_INTERNAL = { //
-            "..accounting..domain..", //
-            "..accounting..service..", //
-            "..accounting..handler..", //
-            "..accounting..serialization..", //
+            "org.apache.fineract.accounting..domain..", //
+            "org.apache.fineract.accounting..service..", //
+            "org.apache.fineract.accounting..handler..", //
+            "org.apache.fineract.accounting..serialization..", //
     };
 
     /**
@@ -171,7 +172,7 @@ public final class ArchitecturePackages {
      */
     public static final String[] REST_RESOURCE_PACKAGES = { //
             "..portfolio..api..", //
-            "..accounting..api..", //
+            "org.apache.fineract.accounting..api..", //
             "..organisation..api..", //
             "..useradministration..api..", //
             "..spm..api..", //

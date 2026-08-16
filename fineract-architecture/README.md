@@ -21,6 +21,8 @@ Legacy code still violates that; these tests:
 ./gradlew :fineract-architecture:test
 ```
 
+The test worker needs **2g** heap (`maxHeapSize` in this module’s `build.gradle`). Default heap OOMs while building the class graph.
+
 ## Freeze store
 
 Violations are stored under `src/test/resources/archunit_store/` (see `src/test/resources/archunit.properties`).
@@ -28,6 +30,7 @@ Violations are stored under `src/test/resources/archunit_store/` (see `src/test/
 - After **fixing** legacy coupling or OSGi peels: re-run tests; the store should **shrink** (`allowStoreUpdate=true`).
 - When a rule’s package list / description changes, ArchUnit may create a new freeze id — delete orphan files for the old description.
 - Do **not** grow the store without an explicit architecture decision — a growing store means new debt.
+- Keep `freeze.refreeze=false`. `true` overwrites the store with whatever is current and hides new debt.
 
 ```bash
 # quick debt size (violation lines across freeze files)

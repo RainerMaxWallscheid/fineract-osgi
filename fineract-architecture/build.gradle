@@ -49,3 +49,8 @@ tasks.matching { it.name.startsWith('enhance') || it.name.contains('weave') || i
 license {
     exclude '**/archunit_store/**'
 }
+
+// Class graph of loan/savings/accounting/charge/investor impls OOM'd the default worker heap.
+tasks.named('test').configure {
+    maxHeapSize = '2g'
+}

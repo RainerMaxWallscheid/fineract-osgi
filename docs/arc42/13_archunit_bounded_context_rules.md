@@ -76,22 +76,23 @@ All rules use **`FreezingArchRule`**: existing legacy violations are baselined; 
 
 On the first run, violations were written to `archunit_store`. Empty freeze files = rule already **green** (0 violations). Non-empty files = documented legacy debt.
 
-**Baseline (domain-module classpath; refresh after OSGi peels):**
+**Baseline (domain-module classpath; refreshed after leftover peels + shares rename):**
 
 | Rule group | Status |
 |--------------|--------|
 | Loan/Savings ↔ Journal | **green** (0 frozen) |
-| Loan ↔ Savings (domain + module-api internals) | **green** |
 | Loan/Savings → Charge entity / write services | **green** (moduleapi only) |
-| Loan → Tax catalog ports (`ChargeTaxApplicationService`, …) | **green** (tax-api service/moduleapi allowed) |
-| Accounting → Loan/Savings/Client entities | **green** / residual frozen where residual |
+| Loan → Tax catalog ports | **green** (tax-api service/moduleapi allowed) |
+| Accounting BC (`org.apache.fineract.accounting..` only — not WC `…accounting…` processors) | **green** / residual frozen |
 | Loan → Client / Group | **frozen** (`Loan.client` / `Loan.group`) |
 | Savings → Client / Group | **frozen** |
 | WC → Client | **frozen** |
-| Loan/Investor → Accounting internals | **frozen** residual (entity/repo residual) |
-| Accounting domain → REST packages | **frozen** (hexagon) |
+| Loan ↔ Savings internals (guarantor / on-hold) | **frozen** residual |
+| Loan/Investor → Accounting internals | **frozen** residual |
 
-Exact counts: non-empty files under `archunit_store/` (empty file = rule green).
+Exact counts: **1171** frozen violation lines in **17** non-empty files (15 empty = rule green). Previous store (658 lines) was stale after peels and could not be imported without a 2g test heap.
+
+`ACCOUNTING_OWNED` / `ACCOUNTING_INTERNAL` use `org.apache.fineract.accounting..` so loan-owned `…workingcapitalloan.accounting…` is not treated as the Accounting BC.
 
 **Working practice when reducing debt**
 
