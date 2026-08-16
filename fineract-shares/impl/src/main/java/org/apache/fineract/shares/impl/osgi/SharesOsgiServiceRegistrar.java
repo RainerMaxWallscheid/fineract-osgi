@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shares.impl.osgi;
+package org.apache.fineract.shares.impl.osgi;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import org.apache.fineract.portfolio.accounts.service.AccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.PurchasedSharesReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductWritePlatformService;
+import org.apache.fineract.shares.accounts.service.AccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;

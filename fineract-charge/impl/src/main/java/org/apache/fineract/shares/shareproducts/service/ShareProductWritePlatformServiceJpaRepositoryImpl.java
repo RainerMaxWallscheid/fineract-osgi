@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import com.google.gson.JsonElement;
 import jakarta.persistence.PersistenceException;
@@ -33,13 +33,13 @@ import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityEx
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareProductDividentsCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
-import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividendPayOutDetails;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividentPayOutDetailsRepositoryWrapper;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
-import org.apache.fineract.portfolio.shareproducts.exception.DividentProcessingException;
-import org.apache.fineract.portfolio.shareproducts.serialization.ShareProductDataSerializer;
+import org.apache.fineract.shares.shareproducts.constants.ShareProductApiConstants;
+import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductDividendPayOutDetails;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductDividentPayOutDetailsRepositoryWrapper;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.apache.fineract.shares.shareproducts.exception.DividentProcessingException;
+import org.apache.fineract.shares.shareproducts.serialization.ShareProductDataSerializer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 

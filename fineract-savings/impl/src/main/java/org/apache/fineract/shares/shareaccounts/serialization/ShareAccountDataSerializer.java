@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.serialization;
+package org.apache.fineract.shares.shareaccounts.serialization;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,7 +48,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
@@ -61,13 +61,13 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountCharge;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountChargePaidBy;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountCharge;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountChargePaidBy;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountTransaction;
+import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

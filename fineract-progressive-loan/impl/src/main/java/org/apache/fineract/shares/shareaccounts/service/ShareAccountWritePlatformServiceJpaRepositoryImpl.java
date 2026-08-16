@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
@@ -43,17 +43,17 @@ import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccou
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
-import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionEnumData;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountChargePaidBy;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountRepositoryWrapper;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
-import org.apache.fineract.portfolio.shareaccounts.serialization.ShareAccountDataSerializer;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionEnumData;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountChargePaidBy;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepositoryWrapper;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountTransaction;
+import org.apache.fineract.shares.shareaccounts.serialization.ShareAccountDataSerializer;
+import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.accounts.data;
+package org.apache.fineract.shares.accounts.data;
 
 public interface AccountData {
 

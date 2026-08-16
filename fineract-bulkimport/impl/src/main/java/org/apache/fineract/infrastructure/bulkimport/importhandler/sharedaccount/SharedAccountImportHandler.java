@@ -33,8 +33,8 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountChargeData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountChargeData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;

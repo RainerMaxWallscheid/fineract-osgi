@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.accounts.constants;
+package org.apache.fineract.shares.accounts.constants;
 
 public interface AccountsApiConstants {
 

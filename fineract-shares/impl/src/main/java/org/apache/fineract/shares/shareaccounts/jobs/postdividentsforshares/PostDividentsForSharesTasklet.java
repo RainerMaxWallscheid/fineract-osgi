@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.jobs.postdividentsforshares;
+package org.apache.fineract.shares.shareaccounts.jobs.postdividentsforshares;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;

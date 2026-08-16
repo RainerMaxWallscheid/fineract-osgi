@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.accounts.service;
+package org.apache.fineract.shares.accounts.service;
 
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.portfolio.accounts.data.AccountData;
+import org.apache.fineract.shares.accounts.data.AccountData;
 
 public interface AccountReadPlatformService {
 

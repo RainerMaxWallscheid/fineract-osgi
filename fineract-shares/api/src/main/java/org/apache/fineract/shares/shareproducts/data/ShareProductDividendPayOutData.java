@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.data;
+package org.apache.fineract.shares.shareproducts.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountDividendData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountDividendData;
 
 public class ShareProductDividendPayOutData {
 

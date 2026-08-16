@@ -43,9 +43,9 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountApplicationTimel
 import org.apache.fineract.portfolio.savings.data.SavingsAccountStatusEnumData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountSubStatusEnumData;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountApplicationTimelineData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
-import org.apache.fineract.portfolio.shareaccounts.service.SharesEnumerations;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountApplicationTimelineData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountStatusEnumData;
+import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

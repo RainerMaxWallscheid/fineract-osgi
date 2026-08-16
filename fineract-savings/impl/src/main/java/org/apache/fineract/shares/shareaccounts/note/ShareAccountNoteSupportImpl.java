@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.note;
+package org.apache.fineract.shares.shareaccounts.note;
 
 import org.apache.fineract.portfolio.note.service.ShareAccountNoteSupport;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountRepositoryWrapper;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepositoryWrapper;
 import org.springframework.stereotype.Component;
 
 /** Residual bridge while shareaccounts remains on provider. */

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts;
+package org.apache.fineract.shares.shareproducts;
 
 import java.util.Arrays;
 

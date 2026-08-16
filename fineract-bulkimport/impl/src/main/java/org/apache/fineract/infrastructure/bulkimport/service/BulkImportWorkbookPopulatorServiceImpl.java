@@ -104,7 +104,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.DepositProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
 import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.service.RoleReadPlatformService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;

@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendDetails;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendRepository;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendDetails;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendRepository;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendStatusType;
 import org.springframework.transaction.annotation.Transactional;
 
 public class ShareAccountSchedularServiceImpl implements ShareAccountSchedularService {

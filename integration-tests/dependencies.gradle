@@ -45,7 +45,15 @@ dependencies {
             project(path: ':fineract-progressive-loan-impl', configuration: 'runtimeElements'),
             // Working-capital-loan: needed on test JVM for WC product builders / enums (not only cargo WAR).
             project(path: ':fineract-working-capital-loan-api', configuration: 'runtimeElements'),
-            project(path: ':fineract-working-capital-loan-impl', configuration: 'runtimeElements')
+            project(path: ':fineract-working-capital-loan-impl', configuration: 'runtimeElements'),
+            // Peel-era types used directly by ITs (ShareAccountStatusType is in core;
+            // ExternalEventResponse in event-impl; TrapDoor uses configuration-impl)
+            project(path: ':fineract-shares-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-event-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-event-impl', configuration: 'runtimeElements'),
+            project(path: ':fineract-configuration-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-configuration-impl', configuration: 'runtimeElements'),
+            project(path: ':fineract-note-api', configuration: 'runtimeElements')
             )
 
     // Retrofit client for existing tests

@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductDividendPayOutData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductDividendPayOutData;
 
 public interface ShareProductDividendReadPlatformService {
 

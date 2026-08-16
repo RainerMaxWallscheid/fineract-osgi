@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.domain;
+package org.apache.fineract.shares.shareproducts.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -40,7 +40,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductMarketPriceData;
 
 @SuppressWarnings("serial")
 @Entity

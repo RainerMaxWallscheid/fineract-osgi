@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.jobs.postdividentsforshares;
+package org.apache.fineract.shares.shareaccounts.jobs.postdividentsforshares;
 
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;

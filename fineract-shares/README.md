@@ -1,6 +1,8 @@
 # fineract-shares
 
 Core residual peel — share products, share accounts, generic accounts API (ADR-022).
+Java packages live under `org.apache.fineract.shares` (`shareaccounts`,
+`shareproducts`, `accounts`), not `org.apache.fineract.portfolio`.
 
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|

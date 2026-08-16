@@ -16,15 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
-import org.apache.fineract.portfolio.shareaccounts.domain.PurchasedSharesStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountStatusType;
-import org.apache.fineract.portfolio.shareproducts.SharePeriodFrequencyType;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividendStatusType;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountStatusEnumData;
+import org.apache.fineract.shares.shareaccounts.domain.PurchasedSharesStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountStatusType;
+import org.apache.fineract.shares.shareproducts.SharePeriodFrequencyType;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductDividendStatusType;
 
 public final class SharesEnumerations {
 

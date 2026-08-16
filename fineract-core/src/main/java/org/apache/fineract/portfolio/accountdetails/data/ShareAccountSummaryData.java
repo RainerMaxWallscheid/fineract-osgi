@@ -20,8 +20,8 @@ package org.apache.fineract.portfolio.accountdetails.data;
 
 import java.io.Serializable;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountApplicationTimelineData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountApplicationTimelineData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountStatusEnumData;
 
 public class ShareAccountSummaryData implements Serializable {
     private final Long id;

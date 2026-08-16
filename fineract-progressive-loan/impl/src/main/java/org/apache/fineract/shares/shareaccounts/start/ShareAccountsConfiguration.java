@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.start;
+package org.apache.fineract.shares.shareaccounts.start;
 
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
@@ -26,32 +26,32 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
-import org.apache.fineract.portfolio.accounts.constants.AccountsApiConstants;
-import org.apache.fineract.portfolio.accounts.service.AccountsCommandsService;
+import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
+import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendRepository;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountRepositoryWrapper;
-import org.apache.fineract.portfolio.shareaccounts.serialization.ShareAccountDataSerializer;
-import org.apache.fineract.portfolio.shareaccounts.service.PurchasedSharesReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.PurchasedSharesReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountChargeReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountChargeReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountCommandsServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularServiceImpl;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendRepository;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepositoryWrapper;
+import org.apache.fineract.shares.shareaccounts.serialization.ShareAccountDataSerializer;
+import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountChargeReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountChargeReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountCommandsServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularServiceImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformServiceJpaRepositoryImpl;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;

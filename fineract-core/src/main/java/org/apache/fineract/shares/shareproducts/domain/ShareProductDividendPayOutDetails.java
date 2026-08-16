@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.domain;
+package org.apache.fineract.shares.shareproducts.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendDetails;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendDetails;
 
 @Entity
 @Table(name = "m_share_product_dividend_pay_out")

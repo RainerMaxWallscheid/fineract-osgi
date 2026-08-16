@@ -57,7 +57,7 @@ import org.apache.fineract.integrationtests.common.shares.ShareAccountTransactio
 import org.apache.fineract.integrationtests.common.shares.ShareProductHelper;
 import org.apache.fineract.integrationtests.common.shares.ShareProductTransactionHelper;
 import org.apache.fineract.integrationtests.savings.base.BaseSavingsIntegrationTest;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountStatusType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import com.google.gson.JsonElement;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
-import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
+import org.apache.fineract.shares.shareproducts.constants.ShareProductApiConstants;
 
 public class ShareProductCommandsServiceImpl implements ProductCommandsService {
     private final FromJsonHelper fromApiJsonHelper;

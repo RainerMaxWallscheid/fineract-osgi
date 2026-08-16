@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.domain;
+package org.apache.fineract.shares.shareproducts.domain;
 
-import org.apache.fineract.portfolio.shareproducts.exception.DividendNotFoundException;
+import org.apache.fineract.shares.shareproducts.exception.DividendNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

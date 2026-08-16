@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.starter;
+package org.apache.fineract.shares.shareproducts.starter;
 
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingReadPlatformService;
@@ -29,19 +29,19 @@ import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividentPayOutDetailsRepositoryWrapper;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
-import org.apache.fineract.portfolio.shareproducts.serialization.ShareProductDataSerializer;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductCommandsServiceImpl;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendAssembler;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductWritePlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductWritePlatformServiceJpaRepositoryImpl;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductDividentPayOutDetailsRepositoryWrapper;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.apache.fineract.shares.shareproducts.serialization.ShareProductDataSerializer;
+import org.apache.fineract.shares.shareproducts.service.ShareProductCommandsServiceImpl;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendAssembler;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareproducts.service.ShareProductReadPlatformServiceImpl;
+import org.apache.fineract.shares.shareproducts.service.ShareProductWritePlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductWritePlatformServiceJpaRepositoryImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

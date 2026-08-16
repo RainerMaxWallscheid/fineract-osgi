@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.api;
+package org.apache.fineract.shares.shareproducts.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,10 +42,10 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountDividendData;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductDividendPayOutData;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountDividendData;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareproducts.data.ShareProductDividendPayOutData;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/shareproduct/{productId}/dividend")

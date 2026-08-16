@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 

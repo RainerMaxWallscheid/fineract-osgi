@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.bulkimport.populator.ClientSheetPopula
 import org.apache.fineract.infrastructure.bulkimport.populator.SavingsAccountSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.SharedProductsSheetPopulator;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.SpreadsheetVersion;

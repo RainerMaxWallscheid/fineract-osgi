@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.domain;
+package org.apache.fineract.shares.shareaccounts.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -42,7 +42,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
+import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
 import org.apache.fineract.useradministration.domain.AppUser;
 
 @Entity

@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import com.google.gson.JsonElement;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
-import org.apache.fineract.portfolio.accounts.service.AccountsCommandsService;
+import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 
 public class ShareAccountCommandsServiceImpl implements AccountsCommandsService {
     private final FromJsonHelper fromApiJsonHelper;

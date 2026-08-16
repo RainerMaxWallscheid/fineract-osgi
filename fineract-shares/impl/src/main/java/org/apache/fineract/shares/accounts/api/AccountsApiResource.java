@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.accounts.api;
+package org.apache.fineract.shares.accounts.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,10 +52,10 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.accounts.data.AccountData;
-import org.apache.fineract.portfolio.accounts.data.request.AccountRequest;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.accounts.data.AccountData;
+import org.apache.fineract.shares.accounts.data.request.AccountRequest;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;

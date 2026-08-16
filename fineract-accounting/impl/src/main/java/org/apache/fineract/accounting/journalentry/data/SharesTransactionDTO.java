@@ -21,7 +21,7 @@ package org.apache.fineract.accounting.journalentry.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionEnumData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionEnumData;
 
 public class SharesTransactionDTO {
     private final Long officeId;

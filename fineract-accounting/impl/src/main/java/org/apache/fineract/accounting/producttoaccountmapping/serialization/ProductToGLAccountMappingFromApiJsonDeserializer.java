@@ -38,7 +38,7 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
+import org.apache.fineract.shares.shareproducts.constants.ShareProductApiConstants;
 import org.springframework.stereotype.Component;
 
 /**

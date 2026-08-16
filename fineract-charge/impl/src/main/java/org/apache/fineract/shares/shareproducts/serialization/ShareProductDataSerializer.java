@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.serialization;
+package org.apache.fineract.shares.shareproducts.serialization;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,10 +49,10 @@ import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductMarketPrice;
+import org.apache.fineract.shares.shareproducts.constants.ShareProductApiConstants;
+import org.apache.fineract.shares.shareproducts.data.ShareProductMarketPriceData;
+import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductMarketPrice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

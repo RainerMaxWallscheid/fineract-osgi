@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,14 +27,14 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionData;
-import org.apache.fineract.portfolio.shareaccounts.domain.PurchasedSharesStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDividendDetails;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
-import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividendPayOutDetails;
-import org.apache.fineract.portfolio.shareproducts.exception.ShareAccountsNotFoundException;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionData;
+import org.apache.fineract.shares.shareaccounts.domain.PurchasedSharesStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendDetails;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.domain.ShareProductDividendPayOutDetails;
+import org.apache.fineract.shares.shareproducts.exception.ShareAccountsNotFoundException;
 
 public class ShareProductDividendAssembler {
     private final ShareProductReadPlatformService shareProductReadPlatformService;

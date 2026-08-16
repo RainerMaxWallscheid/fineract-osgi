@@ -16,21 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shares.impl.osgi;
+package org.apache.fineract.shares.impl.osgi;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.fineract.portfolio.accounts.service.AccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.PurchasedSharesReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountSchedularService;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductWritePlatformService;
+import org.apache.fineract.shares.accounts.service.AccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductWritePlatformService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 

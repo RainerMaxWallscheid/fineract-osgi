@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.data;
+package org.apache.fineract.shares.shareaccounts.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

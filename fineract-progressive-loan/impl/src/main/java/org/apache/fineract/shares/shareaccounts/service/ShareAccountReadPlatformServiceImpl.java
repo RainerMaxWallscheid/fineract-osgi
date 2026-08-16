@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -36,9 +36,9 @@ import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.accountdetails.data.ShareAccountSummaryData;
-import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
-import org.apache.fineract.portfolio.accounts.data.AccountData;
-import org.apache.fineract.portfolio.accounts.exceptions.ShareAccountNotFoundException;
+import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.shares.accounts.data.AccountData;
+import org.apache.fineract.shares.accounts.exceptions.ShareAccountNotFoundException;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.charge.util.ConvertChargeDataToSpecificChargeData;
@@ -50,17 +50,17 @@ import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformSe
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountApplicationTimelineData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountChargeData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountDividendData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionData;
-import org.apache.fineract.portfolio.shareaccounts.domain.PurchasedSharesStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountStatusType;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDropdownReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountApplicationTimelineData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountChargeData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountDividendData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountStatusEnumData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionData;
+import org.apache.fineract.shares.shareaccounts.domain.PurchasedSharesStatusType;
+import org.apache.fineract.shares.shareaccounts.domain.ShareAccountStatusType;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductMarketPriceData;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

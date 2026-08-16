@@ -98,7 +98,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `infrastructure.core` | ~284 | **Shared kernel** — tenant, config, DB, Jersey, exceptions, serialization |
 | `portfolio.client` | ~44 | **Peeled** → `fineract-clients` api/impl/test; Client entity/DTO residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `infrastructure.event` | ~61 | **Mixed residual** — notifier/outbox write path kernel; jobs/config/API peeled to event-impl |
-| `portfolio.shares*` + accounts/products | ~19 | **Peeled** → `fineract-shares` api/impl/test; product JPA + status/charge DTO residual in core; write/read residual charge/savings/progressive |
+| `org.apache.fineract.shares.*` | ~19 | **Peeled** → `fineract-shares` api/impl/test (packages under `shares.shareaccounts` / `shares.shareproducts` / `shares.accounts`); product JPA + status/charge DTO residual in core; write/read residual charge/savings/progressive |
 | `portfolio.group` | ~36 | **Peeled** → `fineract-group` api/impl/test; entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
 | `portfolio.account` | ~4 | **Peeled** → `fineract-accounttransfer` api/impl/test; kernel residual `PortfolioAccountType`/`PortfolioAccountData`/`AccountTransferData`/`AccountTransfersReadPlatformService` (savings txn coupling); write entities in progressive-loan-impl |
 | `organisation.*` | ~51 | **Kernel residual** — entities/DTOs kept after organisation-api/impl slice (by design) |

@@ -20,7 +20,7 @@ package org.apache.fineract.infrastructure.event.external.service.serialization.
 
 import org.apache.fineract.avro.share.v1.ShareProductDataV1;
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.support.AvroMapperConfig;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
 import org.mapstruct.Mapper;
 
 @Mapper(config = AvroMapperConfig.class)

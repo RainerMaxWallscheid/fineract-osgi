@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.domain;
+package org.apache.fineract.shares.shareaccounts.domain;
 
 public enum PurchasedSharesStatusType {
 

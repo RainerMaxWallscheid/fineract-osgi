@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.shareaccounts.service.SharesEnumerations;
-import org.apache.fineract.portfolio.shareproducts.SharePeriodFrequencyType;
+import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
+import org.apache.fineract.shares.shareproducts.SharePeriodFrequencyType;
 
 public class ShareProductDropdownReadPlatformServiceImpl implements ShareProductDropdownReadPlatformService {
     @Override

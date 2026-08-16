@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -45,9 +45,9 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.exception.ProductNotFoundException;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.service.SharesEnumerations;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
+import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductMarketPriceData;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

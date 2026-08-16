@@ -25,8 +25,8 @@ import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountBusinessEvent;
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.share.ShareAccountDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.accounts.api;
+package org.apache.fineract.shares.accounts.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;

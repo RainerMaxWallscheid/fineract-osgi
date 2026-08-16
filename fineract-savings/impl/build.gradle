@@ -65,9 +65,9 @@ jar {
                         + 'org.apache.fineract.portfolio.interestratechart.domain,'
                         + 'org.apache.fineract.portfolio.interestratechart.incentive,'
                         + 'org.apache.fineract.portfolio.interestratechart.service,'
-                        + 'org.apache.fineract.portfolio.shareaccounts.domain,'
-                        + 'org.apache.fineract.portfolio.shareaccounts.note,'
-                        + 'org.apache.fineract.portfolio.shareaccounts.serialization,'
+                        + 'org.apache.fineract.shares.shareaccounts.domain,'
+                        + 'org.apache.fineract.shares.shareaccounts.note,'
+                        + 'org.apache.fineract.shares.shareaccounts.serialization,'
                         + 'org.apache.fineract.cob.savings,'
                         + 'org.apache.fineract.cob.savings.domain,'
                         + 'org.apache.fineract.interoperation.domain',

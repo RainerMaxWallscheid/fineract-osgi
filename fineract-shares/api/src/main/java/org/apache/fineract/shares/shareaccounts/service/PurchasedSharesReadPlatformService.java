@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareaccounts.service;
+package org.apache.fineract.shares.shareaccounts.service;
 
 import java.util.Collection;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionData;
 
 public interface PurchasedSharesReadPlatformService {
 

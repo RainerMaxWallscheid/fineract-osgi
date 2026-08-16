@@ -67,10 +67,10 @@ jar {
                         + 'org.apache.fineract.portfolio.client.api,'
                         + 'org.apache.fineract.portfolio.client.domain,'
                         + 'org.apache.fineract.portfolio.client.service,'
-                        + 'org.apache.fineract.portfolio.shareaccounts.service,'
-                        + 'org.apache.fineract.portfolio.shareproducts.serialization,'
-                        + 'org.apache.fineract.portfolio.shareproducts.service,'
-                        + 'org.apache.fineract.portfolio.shareproducts.starter',
+                        + 'org.apache.fineract.shares.shareaccounts.service,'
+                        + 'org.apache.fineract.shares.shareproducts.serialization,'
+                        + 'org.apache.fineract.shares.shareproducts.service,'
+                        + 'org.apache.fineract.shares.shareproducts.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )
     }

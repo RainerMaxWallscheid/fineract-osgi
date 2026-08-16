@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.constants;
+package org.apache.fineract.shares.shareproducts.constants;
 
 public interface ShareProductApiConstants {
 

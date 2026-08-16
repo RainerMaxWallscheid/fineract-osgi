@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.shareproducts.service;
+package org.apache.fineract.shares.shareproducts.service;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -32,10 +32,10 @@ import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountDividendData;
-import org.apache.fineract.portfolio.shareaccounts.service.SharesEnumerations;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductDividendPayOutData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountDividendData;
+import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductDividendPayOutData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 

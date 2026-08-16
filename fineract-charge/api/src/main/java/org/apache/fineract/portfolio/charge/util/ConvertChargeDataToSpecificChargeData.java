@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
-import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountChargeData;
+import org.apache.fineract.shares.shareaccounts.data.ShareAccountChargeData;
 
 public final class ConvertChargeDataToSpecificChargeData {
 

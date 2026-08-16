@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.event.business.domain.share.ShareProdu
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.share.ShareProductDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
-import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import org.apache.fineract.shares.shareproducts.data.ShareProductData;
 import org.springframework.stereotype.Component;
 
 @Component

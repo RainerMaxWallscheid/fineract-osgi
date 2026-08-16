@@ -47,7 +47,7 @@ It fulfills evolution stage **D1** from [ADR-019](decisions/ADR-019-domain-drive
 | **Loan Servicing** | Lifecycle and account management of active loans | Disbursement, Schedule, Repayment, Write-off, Reschedule, Delinquency, Charge-off | `fineract-loan`, `fineract-progressive-loan`, `fineract-working-capital-loan`, `portfolio/loanaccount` |
 | **Loan Origination** | Application, assessment, approval, handoff to servicing | Application, Underwriting, Approval, Scoring | `fineract-loan-origination` (+ application-submit parts in loan legacy) |
 | **Savings & Deposits** | Savings deposits, fixed and recurring deposit contracts | Deposit, Withdrawal, Interest Posting, Hold, Maturity, Pre-Closure, GSIM | `fineract-savings` |
-| **Share Accounts** | Cooperative/membership shares | Share Product, Subscription, Dividend | `portfolio/shareaccounts`, `shareproducts` (provider/core) |
+| **Share Accounts** | Cooperative/membership shares | Share Product, Subscription, Dividend | `fineract-shares` (`org.apache.fineract.shares.*`; product JPA residual in core) |
 | **Account Transfer** | Cross-account movements (process context) | Account Transfer, Standing Instruction, Loan from Savings | `portfolio/account` (provider) |
 
 **Loan Servicing – internal modules (no separate deploy cut required):**
