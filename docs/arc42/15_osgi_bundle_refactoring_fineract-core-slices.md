@@ -133,6 +133,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **25** | **Instance-mode API filter** | 1 | `fineract-instancemode` api | **Done** — `FineractInstanceModeApiFilter` on instancemode-api (security-impl api-only); `FineractInstanceModeConstants` residual core (event conditions) |
 | **26** | **Leftover module tests** | 2 | `fineract-clients-test` / `fineract-bulkimport-test` | **Done** — `ClientDataValidatorTest` + `LookupModeTest` next to the already-moved production types |
 | **27** | **Calendar leftover** | ~2 | `fineract-calendar` api | **Done** — `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; loan-impl api-only; entity/`CalendarData` residual core |
+| **28** | **Charge convert leftover** | 1 | `fineract-charge` api | **Done** — `ConvertChargeDataToSpecificChargeData` on charge-api (savings-impl + progressive-loan already api-only); fat charge/savings/share DTOs residual core |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -175,7 +176,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).  
 25. **Instance-mode API filter** ✅ (`FineractInstanceModeApiFilter` → instancemode-api; constants residual core).  
 26. **Leftover module tests** ✅ (`ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test).  
-27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api).
+27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api).  
+28. **Charge convert leftover** ✅ (`ConvertChargeDataToSpecificChargeData` → charge-api).
 
 ## Related provider peels
 
@@ -246,6 +248,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-instancemode` filter close-in | **complete**; `FineractInstanceModeApiFilter` on instancemode-api; `FineractInstanceModeConstants` residual core |
 | leftover module tests close-in | **complete**; `ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test |
 | `fineract-calendar` leftover close-in | **complete**; `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; entity/`CalendarData` residual core |
+| `fineract-charge` convert leftover close-in | **complete**; `ConvertChargeDataToSpecificChargeData` on charge-api; `ChargeData` / savings+share charge DTOs residual core |
 
 
 ## Commands

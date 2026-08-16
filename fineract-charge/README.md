@@ -5,7 +5,7 @@ Charge Catalog bounded context — OSGi modularization **complete** (Steps 0–9
 
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
-| `fineract-charge-api` | `api/` | `org.apache.fineract.charge.api` | **Export-Package** `moduleapi` + catalog `exception` |
+| `fineract-charge-api` | `api/` | `org.apache.fineract.charge.api` | **Export-Package** `moduleapi` + catalog `exception` + `util` |
 | `fineract-charge-impl` | `impl/` | `org.apache.fineract.charge.impl` | JPA catalog, write/read impls, REST, Spring; **Export-Package** `starter` only |
 | `fineract-charge-test` | `test/` | `org.apache.fineract.charge.test` | White-box tests; **Fragment-Host** → `org.apache.fineract.charge.impl` |
 
@@ -25,8 +25,8 @@ Impl-only: `…portfolio.charge.domain.Charge`, repositories, write services, ha
 
 
 Residual adapters **closed** into charge-impl: `ChargeAccountingDropdownPortAdapter`,
-`ChargeOfficeAccessPortAdapter`. Still on provider: `ConvertChargeDataToSpecificChargeData`
-(needs `ShareAccountChargeData` until share peel).
+`ChargeOfficeAccessPortAdapter`. `ConvertChargeDataToSpecificChargeData` is on charge-api
+(`ChargeData` / savings+share charge DTOs remain residual in core).
 
 ```bash
 ./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar
