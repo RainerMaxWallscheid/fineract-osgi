@@ -26,7 +26,7 @@ jobs:
       TZ: Asia/Kolkata
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
       IMAGE_NAME: fineract
-      COMPOSE_FILE: docker-compose-mariadb-test.yml
+      COMPOSE_FILE: docker/docker-compose-mariadb-test.yml
       DOCKER_LOG_DIR: ci-logs/mariadb-shard-${{ matrix.shard_index }}
       AWS_ENDPOINT_URL: http://localhost:4566
       AWS_ACCESS_KEY_ID: localstack
@@ -129,10 +129,10 @@ jobs:
 
             if [ "$module" = ":oauth2-tests" ]; then
               target_auth_mode="oauth2"
-              compose_args=(-f "$COMPOSE_FILE" -f docker-compose-oauth2-test.yml)
+              compose_args=(-f "$COMPOSE_FILE" -f docker/docker-compose-oauth2-test.yml)
             elif [ "$module" = ":twofactor-tests" ]; then
               target_auth_mode="twofactor"
-              compose_args=(-f "$COMPOSE_FILE" -f docker-compose-twofactor-test.yml)
+              compose_args=(-f "$COMPOSE_FILE" -f docker/docker-compose-twofactor-test.yml)
             fi
 
             if [ "$FINERACT_AUTH_MODE" != "$target_auth_mode" ]; then

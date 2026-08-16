@@ -11,7 +11,7 @@ The task `:integration-tests:waitForFineract` waits for Actuator health until Fi
 ### Default: MariaDB (`localhost:3306`)
 
 ```bash
-docker compose -f docker-compose-mariadb-test.yml up -d
+docker compose -f docker/docker-compose-mariadb-test.yml up -d
 # wait until MariaDB accepts connections, then:
 ./gradlew :integration-tests:test
 ```
@@ -21,14 +21,14 @@ Credentials expected by Cargo (default JVM args): user `root`, password `mysql`,
 ### Alternative: MySQL
 
 ```bash
-docker compose -f docker-compose-mysql-test.yml up -d
+docker compose -f docker/docker-compose-mysql-test.yml up -d
 ./gradlew :integration-tests:test -PdbType=mysql
 ```
 
 ### Alternative: PostgreSQL (`localhost:5432`)
 
 ```bash
-docker compose -f docker-compose-postgresql-test.yml up -d
+docker compose -f docker/docker-compose-postgresql-test.yml up -d
 # or use a local Postgres with DBs/users matching Cargo JVM args
 ./gradlew :integration-tests:test -PdbType=postgresql
 ```
@@ -53,7 +53,7 @@ Override any of these as environment variables.
 | Symptom | Typical root cause |
 |---------|-------------------|
 | Timeout after 600s | Fineract never became healthy — **read** `integration-tests/build/cargo/integration-tests-output.log` |
-| `Connection refused` (MariaDB/MySQL) | No DB on `:3306` — start `docker-compose-mariadb-test.yml` |
+| `Connection refused` (MariaDB/MySQL) | No DB on `:3306` — start `docker/docker-compose-mariadb-test.yml` |
 | `Configuration not found for external event …` | New `*BusinessEvent` missing from `m_external_event_configuration` (Liquibase) — see arc42 [12.9](../docs/arc42/12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db) |
 | Port already in use | Previous Cargo not stopped: `./gradlew :integration-tests:cargoStopLocal` |
 

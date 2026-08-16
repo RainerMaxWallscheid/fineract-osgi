@@ -17,15 +17,17 @@
 #
 
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!
+version: "3.8"
+
 services:
   db:
     extends:
-      file: ./config/docker/compose/postgresql.yml
+      file: ../config/docker/compose/postgresql.yml
       service: postgresql
 
-  fineract:
+  fineract-manager:
     extends:
-      file: ./config/docker/compose/fineract-custom.yml
+      file: ../config/docker/compose/fineract.yml
       service: fineract
     ports:
       - "8443:8443"
@@ -33,7 +35,28 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - ./config/docker/env/fineract.env
-      - ./config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-manager.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
+      - ../config/docker/env/aws.env
+      - ../config/docker/env/kafka-client-msk.env
+
+  fineract-worker:
+    extends:
+      file: ../config/docker/compose/fineract.yml
+      service: fineract
+    deploy:
+      mode: replicated
+      replicas: 2
+    ports:
+      - "8444-8445:8443"
+    depends_on:
+      fineract-manager:
+        condition: service_healthy
+    env_file:
+      - ../config/docker/env/fineract-worker.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
+      - ../config/docker/env/aws.env
+      - ../config/docker/env/kafka-client-msk.env
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!
-      - ./config/docker/env/fineract-postgresql.env

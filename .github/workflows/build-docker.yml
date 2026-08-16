@@ -19,9 +19,9 @@ jobs:
         db_type: [mariadb, postgresql]
         include:
           - db_type: mariadb
-            compose_file: docker-compose.yml
+            compose_file: docker/docker-compose.yml
           - db_type: postgresql
-            compose_file: docker-compose-postgresql.yml
+            compose_file: docker/docker-compose-postgresql.yml
 
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}

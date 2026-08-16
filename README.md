@@ -168,7 +168,7 @@ Alternatively, you can also use [Podman](https://github.com/containers/libpod)
 (e.g. via `pip3 install podman-compose`) instead of Docker.
 
 > [!CAUTION]
-> Our images are NOT production-ready. For example, notice how the `test` Spring profile is enabled via `fineract-common.env`, included by `docker-compose.yml`, but `test` must not be enabled in production. YOU are responsible for securing your production instances. See [How to run for production](#how-to-run-for-production).
+> Our images are NOT production-ready. For example, notice how the `test` Spring profile is enabled via `fineract-common.env`, included by `docker/docker-compose.yml`, but `test` must not be enabled in production. YOU are responsible for securing your production instances. See [How to run for production](#how-to-run-for-production).
 
 To run a new Fineract instance on Linux you can simply:
 ```bash
@@ -186,7 +186,7 @@ Install the Loki log driver and start:
 ```bash
 docker plugin install grafana/loki-docker-driver:latest \
   --alias loki --grant-all-permissions
-docker compose -f docker-compose-development.yml up -d
+docker compose -f docker/docker-compose-development.yml up -d
 ```
 The Fineract (back-end) should be running at https://localhost:8443/fineract-provider/ now.
 Wait for https://localhost:8443/fineract-provider/actuator/health to return `{"status":"UP"}`.
@@ -200,7 +200,7 @@ download the driver from the vendor and either build your own Docker image on to
 via a Docker volume, or install it from the OS package manager inside a custom image.
 
 You must specify the tenants database JDBC URL by passing it to the `fineract` container via environment
-variables; please consult the [`docker-compose.yml`](docker-compose.yml) for exact details how to specify those.
+variables; please consult the [`docker/docker-compose.yml`](docker/docker-compose.yml) for exact details how to specify those.
 
 The logfiles and the Java Flight Recorder output are available in `PROJECT_ROOT/build/fineract/logs`. If you use IntelliJ then you can double-click on the `.jfr` file and open it with the IDE. You can also download [Azul Mission Control](https://www.azul.com/products/components/azul-mission-control/) to analyze the Java Flight Recorder file.
 
@@ -311,7 +311,7 @@ In case of a large deployment with millions of accounts, the Close of Business D
 
 ### ActiveMQ
 
-JMS based messaging is disabled by default. In `docker-compose-postgresql-activemq.yml` an example is shown, where ActiveMQ is enabled. In that configuration one Spring Batch Manager instance and two Spring Batch Worker instances are created.
+JMS based messaging is disabled by default. In `docker/docker-compose-postgresql-activemq.yml` an example is shown, where ActiveMQ is enabled. In that configuration one Spring Batch Manager instance and two Spring Batch Worker instances are created.
 Spring based events should be disabled and jms based event handling should be enabled. Furthermore, proper broker JMS URL should be configured.
 
 ```bash
@@ -324,10 +324,10 @@ For additional ActiveMQ related configuration please take a look to the `applica
 
 ### Kafka
 
-Kafka support is also disabled by default. In `docker-compose-postgresql-kafka.yml` an example is shown, where self-hosted Kafka is enabled for both External Events and Spring Batch Remote Job execution.
+Kafka support is also disabled by default. In `docker/docker-compose-postgresql-kafka.yml` an example is shown, where self-hosted Kafka is enabled for both External Events and Spring Batch Remote Job execution.
 
 During the development Fineract was tested with PLAINTEXT Kafka brokers without authentication and with AWS MSK using IAM authentication. The extra [JAR file](https://github.com/aws/aws-msk-iam-auth/releases) required for IAM authentication is already added to the classpath.
-An example MSK setup can be found in `docker-compose-postgresql-kafka-msk.yml`.
+An example MSK setup can be found in `docker/docker-compose-postgresql-kafka-msk.yml`.
 
 The full list of supported Kafka related properties is documented in the [Fineract Platform documentation](https://fineract.apache.org/docs/stable/).
 

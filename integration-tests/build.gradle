@@ -141,7 +141,7 @@ tasks.register('waitForFineract') {
             dbHint = 'MySQL (localhost:3306, -PdbType=mysql)'
             dbPort = 3306
         } else {
-            dbHint = 'MariaDB (localhost:3306, default; or docker compose -f docker-compose-mariadb-test.yml up -d)'
+            dbHint = 'MariaDB (localhost:3306, default; or docker compose -f docker/docker-compose-mariadb-test.yml up -d)'
             dbPort = 3306
         }
 
@@ -157,7 +157,7 @@ tasks.register('waitForFineract') {
                     "Expected: ${dbHint}\n" +
                     "Cargo log: ${file("$buildDir/cargo/integration-tests-output.log").absolutePath}\n" +
                     "Examples:\n" +
-                    "  docker compose -f docker-compose-mariadb-test.yml up -d\n" +
+                    "  docker compose -f docker/docker-compose-mariadb-test.yml up -d\n" +
                     "  ./gradlew :integration-tests:test -PdbType=postgresql   # if PostgreSQL is already running\n" +
                     "Root cause of previous Cargo failure is often: Connection refused to the tenant/DB host.")
         }

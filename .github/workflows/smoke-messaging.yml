@@ -19,9 +19,9 @@ jobs:
       matrix:
         include:
           - messaging: ActiveMQ
-            compose_file: docker-compose-postgresql-activemq.yml
+            compose_file: docker/docker-compose-postgresql-activemq.yml
           - messaging: Kafka
-            compose_file: docker-compose-postgresql-kafka.yml
+            compose_file: docker/docker-compose-postgresql-kafka.yml
 
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}

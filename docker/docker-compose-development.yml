@@ -31,33 +31,33 @@ x-logging: &default-logging
 services:
   loki:
     extends:
-      file: ./config/docker/compose/observability.yml
+      file: ../config/docker/compose/observability.yml
       service: loki
 
   prometheus:
     extends:
-      file: ./config/docker/compose/observability.yml
+      file: ../config/docker/compose/observability.yml
       service: prometheus
     depends_on:
       - loki
 
   grafana:
     extends:
-      file: ./config/docker/compose/observability.yml
+      file: ../config/docker/compose/observability.yml
       service: grafana
     depends_on:
       - loki
 
   tempo:
     extends:
-      file: ./config/docker/compose/observability.yml
+      file: ../config/docker/compose/observability.yml
       service: tempo
     depends_on:
       - loki
 
   db:
     extends:
-      file: ./config/docker/compose/postgresql.yml
+      file: ../config/docker/compose/postgresql.yml
       service: postgresql
     depends_on:
       - loki
@@ -66,7 +66,7 @@ services:
   fineract:
     container_name: fineract-development
     extends:
-      file: ./config/docker/compose/fineract.yml
+      file: ../config/docker/compose/fineract.yml
       service: fineract
     ports:
       - "8443:8443"
@@ -77,15 +77,15 @@ services:
       loki:
         condition: service_started
     env_file:
-      - ./config/docker/env/aws.env
-      - ./config/docker/env/fineract.env
-      - ./config/docker/env/fineract-common.env
-      - ./config/docker/env/fineract-postgresql.env
-      - ./config/docker/env/tracing.env
-      - ./config/docker/env/oltp.env
-      - ./config/docker/env/prometheus.env
-      # - ./config/docker/env/cloudwatch.env
-      - ./config/docker/env/debug.env
+      - ../config/docker/env/aws.env
+      - ../config/docker/env/fineract.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
+      - ../config/docker/env/tracing.env
+      - ../config/docker/env/oltp.env
+      - ../config/docker/env/prometheus.env
+      # - ../config/docker/env/cloudwatch.env
+      - ../config/docker/env/debug.env
     logging: *default-logging
     networks:
      default:

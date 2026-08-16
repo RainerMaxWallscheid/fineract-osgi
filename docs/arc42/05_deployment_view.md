@@ -4,7 +4,7 @@ The Deployment View describes **where** and **how** the building blocks from [Ch
 
 **Focus**: Infrastructure nodes, deployables, ports, configuration, and typical topologies – no product UI details.
 
-**Note**: The shipped `docker-compose*.yml` files and example manifests are primarily intended for **development and tests**. Production deployments need hardened secrets, TLS, backups, and capacity planning.
+**Note**: The shipped `docker/docker-compose*.yml` files and example manifests are primarily intended for **development and tests**. Production deployments need hardened secrets, TLS, backups, and capacity planning.
 
 ---
 
@@ -103,8 +103,8 @@ Connection pool (HikariCP) via `FINERACT_HIKARI_*` (see `fineract-common.env`).
 
 | Broker | Compose | Use |
 |--------|---------|-----|
-| **Apache Kafka** | `docker-compose-postgresql-kafka.yml` | Remote job messages + external events |
-| **ActiveMQ** | `docker-compose-postgresql-activemq.yml` | JMS-based job/event distribution |
+| **Apache Kafka** | `docker/docker-compose-postgresql-kafka.yml` | Remote job messages + external events |
+| **ActiveMQ** | `docker/docker-compose-postgresql-activemq.yml` | JMS-based job/event distribution |
 
 Without a broker, manager and worker typically run **in the same process** (single node) with Spring events.
 
@@ -201,7 +201,7 @@ Env templates in the repository:
 
 **Reference files**:
 
-- `docker-compose.yml` / `docker-compose-postgresql.yml`
+- `docker/docker-compose.yml` / `docker/docker-compose-postgresql.yml`
 - `config/docker/compose/fineract.yml`, `postgresql.yml`
 - `config/docker/env/fineract.env`, `fineract-common.env`, `fineract-postgresql.env`
 
@@ -229,7 +229,7 @@ flowchart TB
 
 ```bash
 # Build image (project-specific Gradle/Docker workflow)
-docker compose -f docker-compose-postgresql.yml up -d
+docker compose -f docker/docker-compose-postgresql.yml up -d
 ```
 
 ### Characteristics
@@ -243,12 +243,12 @@ docker compose -f docker-compose-postgresql.yml up -d
 
 | File | Focus |
 |------|-------|
-| `docker-compose-postgresql.yml` | Standard PostgreSQL |
-| `docker-compose-mysql.yml` / `mariadb.yml` | Alternative DBs |
-| `docker-compose-development.yml` | Dev-oriented configuration |
-| `docker-compose-oauth2-test.yml` | OAuth2/OIDC tests |
-| `docker-compose-twofactor-test.yml` | 2FA tests |
-| `docker-compose-web-app.yml` / `community-app.yml` | UI alongside API |
+| `docker/docker-compose-postgresql.yml` | Standard PostgreSQL |
+| `docker/docker-compose-mysql.yml` / `docker/docker-compose-mariadb.yml` | Alternative DBs |
+| `docker/docker-compose-development.yml` | Dev-oriented configuration |
+| `docker/docker-compose-oauth2-test.yml` | OAuth2/OIDC tests |
+| `docker/docker-compose-twofactor-test.yml` | 2FA tests |
+| `docker/docker-compose-web-app.yml` / `docker/docker-compose-community-app.yml` | UI alongside API |
 
 ---
 
@@ -256,7 +256,7 @@ docker compose -f docker-compose-postgresql.yml up -d
 
 **Purpose**: distributed COB / remote jobs, load distribution of the batch plane.
 
-**Reference**: `docker-compose-postgresql-kafka.yml` (analogous ActiveMQ variant).
+**Reference**: `docker/docker-compose-postgresql-kafka.yml` (analogous ActiveMQ variant).
 
 ### Topology
 

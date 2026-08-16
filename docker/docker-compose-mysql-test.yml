@@ -63,9 +63,9 @@ services:
       mock-oauth2-server:
         condition: service_started
     env_file:
-      - ./config/docker/env/fineract.env
-      - ./config/docker/env/fineract-common.env
-      - ./config/docker/env/fineract-mysql.env
+      - ../config/docker/env/fineract.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-mysql.env
     environment:
       AWS_ACCESS_KEY_ID: localstack
       AWS_SECRET_ACCESS_KEY: localstack

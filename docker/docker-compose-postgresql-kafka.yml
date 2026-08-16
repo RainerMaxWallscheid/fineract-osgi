@@ -17,31 +17,52 @@
 #
 
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!
-version: "3.8"
-
+version: "3.7"
 services:
-  activemq:
-    extends:
-      file: ./config/docker/compose/activemq.yml
-      service: activemq
+  kafka:
+    image: "apache/kafka:4.2.0-rc2"
+    ports:
+      - "9092:9092"
+    env_file:
+      - ../config/docker/env/kafka-server.env
 
   db:
     extends:
-      file: ./config/docker/compose/postgresql.yml
+      file: ../config/docker/compose/postgresql.yml
       service: postgresql
 
-  fineract:
+  fineract-manager:
     extends:
-      file: ./config/docker/compose/fineract.yml
+      file: ../config/docker/compose/fineract.yml
       service: fineract
     ports:
       - "8443:8443"
     depends_on:
       db:
         condition: service_healthy
+      kafka:
+        condition: service_started
     env_file:
-      - ./config/docker/env/fineract.env
-      - ./config/docker/env/fineract-common.env
-      - ./config/docker/env/fineract-postgresql.env
-      - ./config/docker/env/activemq.env
+      - ../config/docker/env/fineract-manager.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
+      - ../config/docker/env/kafka-client.env
+
+  fineract-worker:
+    extends:
+      file: ../config/docker/compose/fineract.yml
+      service: fineract
+    deploy:
+      mode: replicated
+      replicas: 2
+    ports:
+      - "8444-8445:8443"
+    depends_on:
+      fineract-manager:
+        condition: service_healthy
+    env_file:
+      - ../config/docker/env/fineract-worker.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
+      - ../config/docker/env/kafka-client.env
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!

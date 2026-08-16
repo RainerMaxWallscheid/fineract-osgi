@@ -16,27 +16,27 @@
 # under the License.
 #
 
-
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!
+version: "3.8"
+
 services:
 
   db:
     extends:
-      file: ./config/docker/compose/postgresql.yml
+      file: ../config/docker/compose/postgresql.yml
       service: postgresql
 
   fineract:
     extends:
-      file: ./config/docker/compose/fineract.yml
+      file: ../config/docker/compose/fineract.yml
       service: fineract
     ports:
       - "8443:8443"
-      - "5000:5000"
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - ./config/docker/env/fineract.env
-      - ./config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract.env
+      - ../config/docker/env/fineract-common.env
+      - ../config/docker/env/fineract-postgresql.env
 # FOR TESTING PURPOSES ONLY! NOT SUITABLE FOR PRODUCTION USAGE!
-      - ./config/docker/env/fineract-postgresql.env

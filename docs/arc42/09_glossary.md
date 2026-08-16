@@ -65,7 +65,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **Deployable** | B | Runtime artifact (container image, JAR, bundle) rolled out on infrastructure. → [05](05_deployment_view.md) |
 | **Domain-Driven Design (DDD)** | A | Domain modeling with bounded contexts, aggregates, ubiquitous language, and domain events. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **Disruptor** | T | LMAX Disruptor – optional high-performance, non-blocking command-dispatcher variant. |
-| **Docker Compose** | B | Orchestration of local multi-container setups; reference files `docker-compose*.yml`. → [05](05_deployment_view.md) |
+| **Docker Compose** | B | Orchestration of local multi-container setups; reference files `docker/docker-compose*.yml`. → [05](05_deployment_view.md) |
 | **DTO** | T | *Data Transfer Object* – typed payload between API, command, and domain (goal of the new command stack). |
 | **DTO Composition** | A | Specialized API DTOs hold shared fields as component or flat copy instead of inheritance; wire JSON stays flat. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
 | **EclipseLink** | T | JPA provider in fineract-osgi (instead of Hibernate); static weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
