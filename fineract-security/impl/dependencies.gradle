@@ -25,6 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-notification-api'))
     // Cache switch write port (entity/runtime residual in core)
     implementation(project(path: ':fineract-cache-api'))
+    // FineractInstanceModeApiFilter servlet filter surface for AuthorizationServer + OIDC + basic chains
+    implementation(project(path: ':fineract-instancemode-api'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-campaigns-api'))
     // LoanCOBApiFilter / LoanCOBFilterHelper types for AuthorizationServer + OIDC chains

@@ -130,6 +130,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
 | **23** | **Bulk import ports** | ~5 | `fineract-bulkimport` api | **Done** — workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 | **24** | **Loan leftover ports** | ~2 | `fineract-loan` api | **Done** — `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
+| **25** | **Instance-mode API filter** | 1 | `fineract-instancemode` api | **Done** — `FineractInstanceModeApiFilter` on instancemode-api (security-impl api-only); `FineractInstanceModeConstants` residual core (event conditions) |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -142,6 +143,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | Calendar/meeting entity residual | Shared by loan/group/COB |
 | Savings compounding math + shared savings DTOs | Used as kernel by savings-impl |
 | Global configuration / security context ports residual | Cross-cutting |
+| `FineractInstanceModeConstants` | Used by core event conditions; moving would cycle core↔instancemode-api |
 
 ### Suggested order of attack
 
@@ -168,7 +170,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
 22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
 23. **Bulk import ports** ✅ (workbook ports + DTOs → bulkimport-api).  
-24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).
+24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).  
+25. **Instance-mode API filter** ✅ (`FineractInstanceModeApiFilter` → instancemode-api; constants residual core).
 
 ## Related provider peels
 
@@ -211,7 +214,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-dataqueries` | **complete** (api/impl/test); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
 | `fineract-configuration` | **complete** (api/impl/test); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
 | `fineract-bulkimport` | **complete** (api/impl/test); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; populator impl residual provider (share) |
-| `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO peeled; constants + servlet filter remain in core |
+| `fineract-instancemode` | **complete** (api/impl/test); test-profile REST + swagger DTO + `FineractInstanceModeApiFilter` on api; constants residual in core |
 | `fineract-jobs` | **complete** (api/impl/test); residual **closed** (filters + inline + retained-earning + NPA); `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
@@ -236,6 +239,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-bulkimport` port close-in | **complete**; workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api |
 | loan leftover ports close-in | **complete**; `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
+| `fineract-instancemode` filter close-in | **complete**; `FineractInstanceModeApiFilter` on instancemode-api; `FineractInstanceModeConstants` residual core |
 
 
 ## Commands

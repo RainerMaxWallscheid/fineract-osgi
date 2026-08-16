@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Spring ↔ OSGi bridge for instance-mode peel.
  * <p>
- * Public mode constants and servlet filter remain in core; this peel only hosts the test-profile REST resource.
+ * Public mode constants remain in core; the servlet filter lives on instancemode-api. This peel hosts the test-profile REST resource.
  * No application service ports are registered yet.
  */
 @Component

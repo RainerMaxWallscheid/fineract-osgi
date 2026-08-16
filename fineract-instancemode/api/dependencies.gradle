@@ -20,5 +20,12 @@
 dependencies {
     api project(path: ':fineract-core')
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
+    // FineractInstanceModeApiFilter servlet filter surface for security-impl
+    compileOnly 'org.springframework:spring-web'
+    compileOnly 'org.springframework:spring-context'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+    compileOnly 'jakarta.ws.rs:jakarta.ws.rs-api'
+    compileOnly 'org.apache.httpcomponents:httpcore'
+    compileOnly 'org.apache.commons:commons-lang3'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

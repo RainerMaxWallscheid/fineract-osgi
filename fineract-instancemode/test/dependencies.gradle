@@ -20,6 +20,9 @@
 dependencies {
     testImplementation(project(path: ':fineract-instancemode-impl'))
     testImplementation(project(path: ':fineract-core'))
+    testImplementation 'jakarta.servlet:jakarta.servlet-api'
+    testImplementation 'org.springframework:spring-web'
+    testImplementation 'org.apache.httpcomponents.core5:httpcore5'
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         exclude group: 'jakarta.activation'
