@@ -24,6 +24,8 @@ dependencies {
     implementation(project(path: ':fineract-validation'))
 
     implementation(project(path: ':fineract-core'))
+    // Post-dated check ports/DTOs (entity residual in loan-impl)
+    implementation(project(path: ':fineract-postdatedchecks-api'))
     // Client pure ports/DTOs (entity residual stays in core)
     implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types

@@ -100,7 +100,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `portfolio.search` | ~18 | **Peel candidate** — REST/JDBC already thinned via `LoanProductLookupReadPort` |
 | `useradministration` residual | ~14 | **Kernel residual** — AppUser/Role residual after useradmin peel |
 | `portfolio.transfer` | ~13 | **Thin residual** — transfer ports/handlers; entity write still client-bound |
-| `portfolio.repaymentwithpostdatedchecks` | ~11 | **Thin residual** — pure ports/REST; entity already in loan-impl |
+| `portfolio.repaymentwithpostdatedchecks` | 0 | **Peeled** → `fineract-postdatedchecks` api/impl/test; entity/assembler/write residual in loan-impl |
 
 ### Ranked next peels (if pursuing more core work)
 
@@ -114,6 +114,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; product JPA residual core; account write residual progressive; product write residual charge |
 | **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; entity+DTO residual core; Centers/Groups REST + write residual progressive |
 | **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
+| **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; entity residual loan-impl |
 
 ### Explicitly **do not** peel as “core residual”
 
@@ -136,7 +137,8 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; product JPA residual core).  
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; entity residual core).  
-8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).
+8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
+9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).
 
 ## Related provider peels
 
@@ -156,7 +158,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-group` | **complete** (api/impl/test); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
 | `fineract-collectionsheet` | **complete** (api/impl/test); ports/commands/DTOs + REST/handlers/deserializers/read; write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | SearchApiResource + SearchRead JDBC + AdHocSearchQueryData in core via LoanProductLookupReadPort (loan-impl adapter) |
-| postdated-check residual (pure) | data/status/exceptions/ports/handlers/REST in core; entity/repo/assembler/impl/config in loan-impl |
+| `fineract-postdatedchecks` | **complete** (api/impl/test); entity/repo/assembler/impl/config residual loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
 | loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate repo/wrapper in core |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException in core; app bootstrap configs stay on provider |
@@ -189,6 +191,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-shares` | **complete** (api/impl/test); ports/DTOs/REST/handlers/reads/dividend job; ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
 | `fineract-group` | **complete** (api/impl/test); ports/handlers/JDBC reads/roles write/levels REST; Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
 | `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; main Clients REST/write residual progressive |
+| `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
 
 
 ## Commands

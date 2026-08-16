@@ -174,6 +174,13 @@ project(':fineract-clients-impl').projectDir = file('fineract-clients/impl')
 include ':fineract-clients-test'
 project(':fineract-clients-test').projectDir = file('fineract-clients/test')
 // No :fineract-clients façade — depend on -api / -impl explicitly.
+include ':fineract-postdatedchecks-api'
+project(':fineract-postdatedchecks-api').projectDir = file('fineract-postdatedchecks/api')
+include ':fineract-postdatedchecks-impl'
+project(':fineract-postdatedchecks-impl').projectDir = file('fineract-postdatedchecks/impl')
+include ':fineract-postdatedchecks-test'
+project(':fineract-postdatedchecks-test').projectDir = file('fineract-postdatedchecks/test')
+// No :fineract-postdatedchecks façade — depend on -api / -impl explicitly.
 include ':fineract-accountnumberformat-api'
 project(':fineract-accountnumberformat-api').projectDir = file('fineract-accountnumberformat/api')
 include ':fineract-accountnumberformat-impl'
