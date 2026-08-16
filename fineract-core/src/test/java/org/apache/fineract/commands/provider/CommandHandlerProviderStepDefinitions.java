@@ -24,12 +24,10 @@ import io.cucumber.java8.En;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class CommandHandlerProviderStepDefinitions implements En {
 
-    @Autowired
-    private CommandHandlerProvider commandHandlerProvider;
+    private final CommandHandlerProvider commandHandlerProvider = CommandHandlerProviderFixtures.createProvider();
 
     private NewCommandSourceHandler commandHandler;
 

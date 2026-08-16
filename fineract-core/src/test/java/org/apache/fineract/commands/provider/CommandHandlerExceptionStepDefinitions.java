@@ -22,12 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.cucumber.java8.En;
 import org.apache.fineract.commands.exception.UnsupportedCommandException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class CommandHandlerExceptionStepDefinitions implements En {
 
-    @Autowired
-    private CommandHandlerProvider commandHandlerProvider;
+    private final CommandHandlerProvider commandHandlerProvider = CommandHandlerProviderFixtures.createProvider();
 
     private String entity;
 
