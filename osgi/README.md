@@ -327,6 +327,14 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | `fineract-notification-impl` | `org.apache.fineract.notification.impl` | REST/JPA/JMS + `NotificationOsgiServiceRegistrar` / `NotificationOsgiBundleActivator` |
 | `fineract-notification-test` | `org.apache.fineract.notification.test` | Fragment-Host → notification.impl |
 
+### Provider peel: fineract-spm (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-spm-api` | `org.apache.fineract.spm.api` | DTOs, exceptions, `ScorecardReadPlatformService`, constants |
+| `fineract-spm-impl` | `org.apache.fineract.spm.impl` | REST/JPA + `SpmOsgiServiceRegistrar` / `SpmOsgiBundleActivator` |
+| `fineract-spm-test` | `org.apache.fineract.spm.test` | Fragment-Host → spm.impl |
+
 ## Manifest check
 
 ```bash
@@ -383,7 +391,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, useradministration, adhocquery, template, and notification ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, useradministration, adhocquery, template, notification, and SPM ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

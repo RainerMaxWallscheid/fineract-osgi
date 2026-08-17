@@ -216,7 +216,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-adhocquery` | **complete** (api/impl/test); leftover generate-adhoc-client-schedule job closed into impl; Equinox `AdhocQueryOsgiBundleActivator` (`AdHocReadPlatformService`) |
 | `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl; Equinox `TemplateOsgiBundleActivator` (`TemplateMergeService`) |
 | `fineract-notification` | **complete** (api/impl/test); Equinox `NotificationOsgiBundleActivator` (`UserNotificationService`); security-impl api-only |
-| `fineract-spm` | **complete** (api/impl/test); self-contained provider peel; Client/AppUser from core |
+| `fineract-spm` | **complete** (api/impl/test); Equinox `SpmOsgiBundleActivator` (`ScorecardReadPlatformService`); Client/AppUser from core |
 | `fineract-fund` | **complete** (api/impl/test); Fund entity residual in core |
 | `fineract-accountnumberformat` | **complete** (api/impl/test); entity/generator residual in core |
 | `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
