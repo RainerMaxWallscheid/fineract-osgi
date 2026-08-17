@@ -58,7 +58,13 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.cob.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'COB implementation residual',
-                'Import-Package': '*',
+                'Bundle-Activator': 'org.apache.fineract.cob.impl.osgi.CobOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.cob.service,'
+                        + 'org.apache.fineract.cob.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.cob.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.cob.impl'
                 )

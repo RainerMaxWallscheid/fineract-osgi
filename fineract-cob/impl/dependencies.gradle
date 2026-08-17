@@ -59,6 +59,7 @@ dependencies {
         exclude group: 'org.hibernate.validator', module: 'hibernate-validator'
         exclude group: 'jakarta.activation', module: 'jakarta.activation-api'
     }
+    compileOnly 'org.osgi:osgi.core:8.0.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation 'io.github.classgraph:classgraph'

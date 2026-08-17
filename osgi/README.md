@@ -242,7 +242,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-cob-api` | `org.apache.fineract.cob.api` | Pure ports, DTOs, exceptions |
-| `fineract-cob-impl` | `org.apache.fineract.cob.impl` | Batch residual + `CobOsgiServiceRegistrar` |
+| `fineract-cob-impl` | `org.apache.fineract.cob.impl` | Batch residual + `CobOsgiServiceRegistrar` / `CobOsgiBundleActivator` |
 | `fineract-cob-test` | `org.apache.fineract.cob.test` | Fragment-Host → cob.impl |
 
 ### Wave 4: fineract-security bundles (complete)
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, loan, progressive-loan, and working-capital-loan ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, loan, progressive-loan, working-capital-loan, and cob ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

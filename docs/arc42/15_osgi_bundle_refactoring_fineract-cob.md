@@ -5,7 +5,7 @@ Wave‑4 module after progressive/WC
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test; entity-typed step residual) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test; entity-typed step residual); Equinox `CobOsgiBundleActivator` (`ConfigJobParameterService`) |
 | **Module** | COB job parameters, partitions, business-step DTOs/exceptions |
 | **No façade** | Compose with `:fineract-cob-api` + `:fineract-cob-impl` |
 
