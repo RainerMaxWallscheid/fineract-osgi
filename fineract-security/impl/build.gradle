@@ -58,20 +58,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Security implementation residual',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.core.diagnostics.security,'
-                        + 'org.apache.fineract.infrastructure.security,'
-                        + 'org.apache.fineract.infrastructure.security.api,'
-                        + 'org.apache.fineract.infrastructure.security.command,'
-                        + 'org.apache.fineract.infrastructure.security.config,'
-                        + 'org.apache.fineract.infrastructure.security.converter,'
-                        + 'org.apache.fineract.infrastructure.security.data,'
-                        + 'org.apache.fineract.infrastructure.security.domain,'
-                        + 'org.apache.fineract.infrastructure.security.exception,'
-                        + 'org.apache.fineract.infrastructure.security.filter,'
-                        + 'org.apache.fineract.infrastructure.security.handler,'
-                        + 'org.apache.fineract.infrastructure.security.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.security.service,'
-                        + 'org.apache.fineract.infrastructure.security.utils',
+                'Export-Package': 'org.apache.fineract.infrastructure.security.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.security.impl'
                 )
     }

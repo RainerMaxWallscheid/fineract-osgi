@@ -59,18 +59,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Savings/deposit implementation (JPA, services, COB steps)',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.portfolio.savings.domain,'
-                        + 'org.apache.fineract.portfolio.savings.service,'
-                        + 'org.apache.fineract.portfolio.interestratechart.data,'
-                        + 'org.apache.fineract.portfolio.interestratechart.domain,'
-                        + 'org.apache.fineract.portfolio.interestratechart.incentive,'
-                        + 'org.apache.fineract.portfolio.interestratechart.service,'
-                        + 'org.apache.fineract.shares.shareaccounts.domain,'
-                        + 'org.apache.fineract.shares.shareaccounts.note,'
-                        + 'org.apache.fineract.shares.shareaccounts.serialization,'
-                        + 'org.apache.fineract.cob.savings,'
-                        + 'org.apache.fineract.cob.savings.domain,'
-                        + 'org.apache.fineract.interoperation.domain',
+                'Export-Package': 'org.apache.fineract.portfolio.savings.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.savings.impl'
                 )
     }

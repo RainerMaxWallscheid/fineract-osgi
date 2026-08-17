@@ -115,11 +115,13 @@ Without a broker, manager and worker typically run **in the same process** (sing
 | **Framework** | Eclipse Equinox (`org.eclipse.osgi`) |
 | **Start** | `osgi/start-equinox.sh` or Gradle task `equinoxStart` |
 | **Console** | Port **2501** (Equinox console) |
-| **Config** | `osgi/equinox/config.ini` |
-| **Bundles** | `osgi/bundles/` |
+| **Config template** | `osgi/equinox/config.ini` |
+| **Configuration area** | `osgi/config/` (`-configuration` must be this directory) |
+| **Bundles** | `osgi/bundles/` (fill with `./gradlew osgiStageBundles`) |
+| **Manifest check** | `./gradlew checkOsgiManifests` |
 | **Logs** | `osgi/logs/equinox.log` |
 
-Production target picture: Equinox **embedded** in the Fineract process (or as a dedicated sidecar only for bundle management in later iterations). Currently: workspace scaffold under `osgi/` and `docs/arc42/osgi.gradle`.
+Production target picture: Equinox **embedded** in the Fineract process (or as a dedicated sidecar only for bundle management in later iterations). Currently: workspace scaffold under `osgi/` and root `osgi.gradle`.
 
 ### 5.2.5 Observability Stack (Optional)
 
@@ -390,12 +392,13 @@ flowchart TB
 
 ```
 osgi/
-  start-equinox.sh          # Start script
+  start-equinox.sh          # Start script (-configuration config/)
+  check-manifests.py        # BSN / Fragment-Host / Export-Package guard
   equinox/
-    config.ini              # Framework + Fineract mode flags
+    config.ini              # Framework + Fineract mode template
     org.eclipse.osgi-*.jar  # Framework JAR (provide)
-  bundles/                  # Installable feature JARs
-  config/                   # OSGi configuration area
+  bundles/                  # Staged api / impl / core JARs
+  config/                   # Equinox configuration area
   logs/                     # equinox.log
 ```
 
@@ -413,14 +416,15 @@ osgi/
 ### Start
 
 ```bash
+./gradlew osgiStageBundles   # optional: fill osgi/bundles + osgi/config/config.ini
 ./osgi/start-equinox.sh
 # java -Xmx2g -XX:+UseG1GC \
 #   -jar osgi/equinox/org.eclipse.osgi-*.jar \
 #   -console 2501 -clean \
-#   -configuration osgi/equinox/config.ini
+#   -configuration osgi/config
 ```
 
-Gradle alternative (`docs/arc42/osgi.gradle`): task `equinoxStart` with main class `org.eclipse.osgi.launch.Equinox`.
+Gradle alternative (root `osgi.gradle`): task `equinoxStart` runs the same script.
 
 ### Deployment Rules for Bundles
 

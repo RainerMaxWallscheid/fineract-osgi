@@ -41,5 +41,11 @@ docs/**/build/
 docs/**/.asciidoctor/
 
 # OSGi runtime artifacts (scaffold under osgi/ is tracked)
-osgi/logs/*.log
+osgi/logs/**
+!osgi/logs/.gitkeep
+osgi/bundles/**
+!osgi/bundles/.gitkeep
+osgi/config/**
+!osgi/config/.gitkeep
 osgi/equinox/*.jar
+osgi/equinox/configuration/

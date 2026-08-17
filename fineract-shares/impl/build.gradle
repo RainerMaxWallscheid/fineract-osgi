@@ -55,14 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Shares Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.shares.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.shares.impl.osgi,'
-                        + 'org.apache.fineract.shares.accounts.api,'
-                        + 'org.apache.fineract.shares.shareaccounts.handler,'
-                        + 'org.apache.fineract.shares.shareaccounts.jobs.postdividentsforshares,'
-                        + 'org.apache.fineract.shares.shareaccounts.service,'
-                        + 'org.apache.fineract.shares.shareproducts.api,'
-                        + 'org.apache.fineract.shares.shareproducts.handler,'
-                        + 'org.apache.fineract.shares.shareproducts.service',
+                'Export-Package': 'org.apache.fineract.shares.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.shares.impl'
                 )

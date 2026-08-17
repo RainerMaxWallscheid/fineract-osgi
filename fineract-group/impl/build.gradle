@@ -55,11 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Group Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.group.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.group.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.group.api,'
-                        + 'org.apache.fineract.portfolio.group.handler,'
-                        + 'org.apache.fineract.portfolio.group.serialization,'
-                        + 'org.apache.fineract.portfolio.group.service',
+                'Export-Package': 'org.apache.fineract.portfolio.group.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.group.impl'
                 )

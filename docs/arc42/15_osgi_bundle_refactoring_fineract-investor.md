@@ -67,7 +67,7 @@ Mechanical split + registrar + consumer Gradle.
 - [x] Pure ports + DTOs on api
 - [x] provider / war / ITs = api + **impl**
 - [ ] Optional: redesign `AccountingService` without `Loan` / entity params so journal can use ports only
-- [ ] Optional: shrink impl Export-Package after journal residual closes
+- [x] Impl Export-Package is registrar-only (`…investor.impl.osgi`)
 
 ### Notes
 - EclipseLink static weave: `:fineract-investor-impl:compileJava` depends on `:fineract-investor-api:jar` so `@Enumerated` enums resolve across jars.

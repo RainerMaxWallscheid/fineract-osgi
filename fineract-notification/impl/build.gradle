@@ -55,13 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Notification Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.notification.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.notification.impl.osgi,'
-                        + 'org.apache.fineract.notification.api,'
-                        + 'org.apache.fineract.notification.config,'
-                        + 'org.apache.fineract.notification.domain,'
-                        + 'org.apache.fineract.notification.eventandlistener,'
-                        + 'org.apache.fineract.notification.service,'
-                        + 'org.apache.fineract.notification.starter',
+                'Export-Package': 'org.apache.fineract.notification.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.notification.impl'
                 )

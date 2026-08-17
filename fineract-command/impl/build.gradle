@@ -54,13 +54,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.command.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
-                'Export-Package': 'org.apache.fineract.command.impl.config,'
-                        + 'org.apache.fineract.command.starter,'
-                        + 'org.apache.fineract.commands.api,'
-                        + 'org.apache.fineract.commands.data,'
-                        + 'org.apache.fineract.commands.data.request,'
-                        + 'org.apache.fineract.commands.service,'
-                        + 'org.apache.fineract.commands.starter',
+                'Export-Package': 'org.apache.fineract.command.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.command.impl'
                 )
     }

@@ -55,13 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Interoperation Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.interoperation.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.interoperation.impl.osgi,'
-                        + 'org.apache.fineract.interoperation.api,'
-                        + 'org.apache.fineract.interoperation.domain,'
-                        + 'org.apache.fineract.interoperation.handler,'
-                        + 'org.apache.fineract.interoperation.serialization,'
-                        + 'org.apache.fineract.interoperation.service,'
-                        + 'org.apache.fineract.interoperation.starter',
+                'Export-Package': 'org.apache.fineract.interoperation.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.interoperation.impl'
                 )

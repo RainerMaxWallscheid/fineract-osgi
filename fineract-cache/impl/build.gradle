@@ -55,11 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Cache Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.cache.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.cache.api,'
-                        + 'org.apache.fineract.infrastructure.cache.command,'
-                        + 'org.apache.fineract.infrastructure.cache.handler,'
-                        + 'org.apache.fineract.infrastructure.cache.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.cache.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.cache.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.cache.impl'
                 )

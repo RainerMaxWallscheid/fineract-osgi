@@ -1157,6 +1157,8 @@ tasks.withType(org.cyclonedx.gradle.CyclonedxDirectTask).configureEach {
     skipConfigs.set(['.*eclipse.*', '.*swt.*'])
 }
 
+apply from: 'osgi.gradle'
+
 tasks.register('printSourceSetInformation') {
     doLast {
         sourceSets.each { srcSet ->

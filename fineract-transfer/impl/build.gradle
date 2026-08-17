@@ -55,9 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Client Transfer Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.transfer.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.transfer.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.transfer.data,'
-                        + 'org.apache.fineract.portfolio.transfer.handler',
+                'Export-Package': 'org.apache.fineract.portfolio.transfer.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.transfer.impl'
                 )

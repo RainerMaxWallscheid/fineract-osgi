@@ -55,8 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract S3 Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.s3.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.s3.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.s3',
+                'Export-Package': 'org.apache.fineract.infrastructure.s3.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.s3.impl'
                 )

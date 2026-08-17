@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract AdHoc Query Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.adhocquery.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.adhocquery.impl.osgi,'
-                        + 'org.apache.fineract.adhocquery.api,'
-                        + 'org.apache.fineract.adhocquery.domain,'
-                        + 'org.apache.fineract.adhocquery.handler,'
-                        + 'org.apache.fineract.adhocquery.service,'
-                        + 'org.apache.fineract.adhocquery.starter',
+                'Export-Package': 'org.apache.fineract.adhocquery.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.adhocquery.impl'
                 )

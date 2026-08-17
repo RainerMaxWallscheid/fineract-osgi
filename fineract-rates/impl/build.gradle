@@ -48,7 +48,7 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi implementation bundle (ADR-022). Export starter only.
+// OSGi implementation bundle (ADR-022). Export the registrar package only.
 jar {
     manifest {
         attributes(
@@ -62,14 +62,7 @@ jar {
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
                         + 'org.apache.fineract.portfolio.floatingrates.exception,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.starter,'
-                        + 'org.apache.fineract.portfolio.rate.api,'
-                        + 'org.apache.fineract.portfolio.rate.domain,'
-                        + 'org.apache.fineract.portfolio.rate.exception,'
-                        + 'org.apache.fineract.portfolio.rate.handler,'
-                        + 'org.apache.fineract.portfolio.rate.serialization,'
-                        + 'org.apache.fineract.portfolio.rate.service,'
-                        + 'org.apache.fineract.portfolio.rate.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.impl'
                 )
     }

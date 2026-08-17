@@ -300,7 +300,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 
 1. **Provider hygiene (done for cucumber)** — dead cucumber plugin/`check.dependsOn('cucumber')`, cucumber test deps, and leftover testcontainers/suite-only test deps removed; provider tests are ClassGraph inventory only.
 2. **ArchUnit** — shrink freeze store entries for closed modules.
-3. **OSGi hardening** — manifests, Fragment-Host, Equinox resolve for already-split api/impl/test modules. Catalog of BSN + registrar: [`osgi/README.md`](../../osgi/README.md).
+3. **OSGi hardening** — impl `Export-Package` is registrar-only (`*.impl.osgi`); `osgi/check-manifests.py` / `./gradlew checkOsgiManifests` guards BSN, Fragment-Host, and split packages; `./gradlew osgiStageBundles` copies api/impl/core jars and writes `osgi/config/config.ini`. Remaining Equinox resolve blockers: five allow-listed api-api type splits + `fineract-core` has no export list. Catalog: [`osgi/README.md`](../../osgi/README.md).
 4. **Core residual inventory (done)** — leftover close-ins 1–30 closed; remaining `~802` types **are** the shared kernel. See [core slices standing rule](15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel). Do not peel further leftovers.
 
 
@@ -326,7 +326,7 @@ Domain peels (waves 1–4, core slices, and residual hardening of provider Java/
 |------|------------|
 | Gradle project | `fineract-<name>-api` / `-impl` / `-test` |
 | Bundle-SymbolicName | `org.apache.fineract.<name>.api` / `.impl` / `.test` |
-| Export packages | `org.apache.fineract…moduleapi` (+ explicit contract packages) |
+| Export packages | api: `org.apache.fineract…moduleapi` (+ explicit contract packages); impl: registrar package only (`*.impl.osgi`) |
 | Service interface | Prefer the Module API port type itself |
 
 Exact symbolic names may be refined in B1 tooling; keep them stable once published.

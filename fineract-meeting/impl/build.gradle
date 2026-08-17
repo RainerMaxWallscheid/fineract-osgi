@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Meeting Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.meeting.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.meeting.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.meeting.api,'
-                        + 'org.apache.fineract.portfolio.meeting.domain,'
-                        + 'org.apache.fineract.portfolio.meeting.handler,'
-                        + 'org.apache.fineract.portfolio.meeting.listener,'
-                        + 'org.apache.fineract.portfolio.meeting.service',
+                'Export-Package': 'org.apache.fineract.portfolio.meeting.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.meeting.impl'
                 )

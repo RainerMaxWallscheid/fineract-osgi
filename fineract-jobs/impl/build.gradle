@@ -55,24 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Jobs Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.jobs.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.jobs.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.jobs.api,'
-                        + 'org.apache.fineract.infrastructure.jobs.config,'
-                        + 'org.apache.fineract.infrastructure.jobs.data,'
-                        + 'org.apache.fineract.infrastructure.jobs.data.partitionedjobs,'
-                        + 'org.apache.fineract.infrastructure.jobs.domain,'
-                        + 'org.apache.fineract.infrastructure.jobs.handler,'
-                        + 'org.apache.fineract.infrastructure.jobs.service,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.jobname,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.jobparameterprovider,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.aggregationjob,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.executealldirtyjobs,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasebusinessdateby1day,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasecobdateby1day,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.updatenpa,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.retainedearning,'
-                        + 'org.apache.fineract.infrastructure.jobs.service.jobparameterprovider,'
-                        + 'org.apache.fineract.infrastructure.jobs.filter',
+                'Export-Package': 'org.apache.fineract.infrastructure.jobs.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.jobs.impl'
                 )

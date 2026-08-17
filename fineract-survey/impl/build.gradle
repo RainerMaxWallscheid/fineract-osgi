@@ -55,11 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Survey Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.survey.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.survey.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.survey.api,'
-                        + 'org.apache.fineract.infrastructure.survey.domain,'
-                        + 'org.apache.fineract.infrastructure.survey.handler,'
-                        + 'org.apache.fineract.infrastructure.survey.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.survey.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.survey.impl'
                 )

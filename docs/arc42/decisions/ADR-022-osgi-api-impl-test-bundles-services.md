@@ -25,7 +25,7 @@ Without an explicit decision, teams risk either a big-bang Spring removal or int
 
 - Bundles publish and consume **OSGi services** registered under interfaces from the **api** bundle.
 - Consumers never depend on another module’s **impl** types at compile time (Gradle `implementation` of a foreign `-impl` is forbidden for domain modules).
-- Package **Export-Package** is limited to api / shared-kernel contracts; impl packages stay private.
+- Package **Export-Package** is limited to api / shared-kernel contracts; impl packages stay private except the `*OsgiServiceRegistrar` package (`*.impl.osgi`).
 - Optional services: bind via Service Tracker / Declarative Services; missing service → **degradation**, not total failure ([ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
 
 #### 2. Explicit non-goal: Apache Karaf Features (and similar feature install models)
@@ -48,7 +48,7 @@ fineract-<name>/
 | Bundle | Role | OSGi rules |
 |--------|------|------------|
 | **`-api`** | Ports (`moduleapi`), stable DTOs/IDs, service interfaces | **Export-Package** contract packages only; no Spring, JPA, REST, EclipseLink |
-| **`-impl`** | Domain, handlers, adapters, Spring configuration | Implements and **registers** OSGi services; imports api; does **not** export internal packages to other domain modules |
+| **`-impl`** | Domain, handlers, adapters, Spring configuration | Implements and **registers** OSGi services; imports api; exports only the registrar package (`*.impl.osgi`) |
 | **`-test`** | Unit / white-box tests | **`Fragment-Host`** points at the **impl** host (primary); pure contract tests may stay non-fragment on `-api` |
 
 #### 4. Test bundles use Fragment-Host

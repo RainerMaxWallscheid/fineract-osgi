@@ -6,7 +6,7 @@ OSGi **implementation** bundle for the Charge Catalog ([ADR-022](../../docs/arc4
 |--|--|
 | Gradle project | `:fineract-charge-impl` |
 | Bundle-SymbolicName | `org.apache.fineract.charge.impl` |
-| Export-Package | `…charge.starter` only (not domain / services) |
+| Export-Package | `…charge.impl.osgi` only (registrar; not domain / services) |
 | Spring | **yes** (allowed inside impl) |
 
 ## Contents

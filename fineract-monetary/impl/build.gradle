@@ -55,11 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Monetary Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.monetary.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.monetary.impl.osgi,'
-                        + 'org.apache.fineract.organisation.monetary.api,'
-                        + 'org.apache.fineract.organisation.monetary.handler,'
-                        + 'org.apache.fineract.organisation.monetary.service,'
-                        + 'org.apache.fineract.organisation.monetary.starter',
+                'Export-Package': 'org.apache.fineract.monetary.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.monetary.impl'
                 )

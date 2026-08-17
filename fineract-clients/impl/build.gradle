@@ -55,16 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Clients Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.clients.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.client.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.client.api,'
-                        + 'org.apache.fineract.portfolio.client.api.v2.search,'
-                        + 'org.apache.fineract.portfolio.client.adapter,'
-                        + 'org.apache.fineract.portfolio.client.handler,'
-                        + 'org.apache.fineract.portfolio.client.mapper,'
-                        + 'org.apache.fineract.portfolio.client.serialization,'
-                        + 'org.apache.fineract.portfolio.client.service,'
-                        + 'org.apache.fineract.portfolio.client.service.search,'
-                        + 'org.apache.fineract.portfolio.client.service.search.mapper',
+                'Export-Package': 'org.apache.fineract.portfolio.client.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.clients.impl'
                 )

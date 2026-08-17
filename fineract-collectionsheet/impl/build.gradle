@@ -55,13 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Collection Sheet Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.collectionsheet.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.collectionsheet.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.api,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.data,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.handler,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.serialization,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.service,'
-                        + 'org.apache.fineract.portfolio.collectionsheet.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.collectionsheet.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.collectionsheet.impl'
                 )

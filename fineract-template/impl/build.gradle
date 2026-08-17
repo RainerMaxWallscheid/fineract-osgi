@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Template Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.template.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.template.impl.osgi,'
-                        + 'org.apache.fineract.template.api,'
-                        + 'org.apache.fineract.template.domain,'
-                        + 'org.apache.fineract.template.handler,'
-                        + 'org.apache.fineract.template.mapper,'
-                        + 'org.apache.fineract.template.service',
+                'Export-Package': 'org.apache.fineract.template.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.template.impl'
                 )

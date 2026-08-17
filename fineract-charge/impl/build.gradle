@@ -50,7 +50,7 @@ apply from: 'dependencies.gradle'
 
 // OSGi implementation bundle (ADR-022 / charge plan Step 4).
 // Do not export domain / service packages — other BCs use charge-api + Service Registry.
-// Export starter only so Spring Boot / audit tooling can see ChargeConfiguration if needed.
+// Export the registrar package only (Spring Boot does not need OSGi Export-Package).
 jar {
     manifest {
         attributes(
@@ -63,14 +63,7 @@ jar {
                         + 'org.apache.fineract.portfolio.charge.domain,'
                         + 'org.apache.fineract.portfolio.charge.exception,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.charge.starter,'
-                        + 'org.apache.fineract.portfolio.client.api,'
-                        + 'org.apache.fineract.portfolio.client.domain,'
-                        + 'org.apache.fineract.portfolio.client.service,'
-                        + 'org.apache.fineract.shares.shareaccounts.service,'
-                        + 'org.apache.fineract.shares.shareproducts.serialization,'
-                        + 'org.apache.fineract.shares.shareproducts.service,'
-                        + 'org.apache.fineract.shares.shareproducts.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.charge.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )
     }

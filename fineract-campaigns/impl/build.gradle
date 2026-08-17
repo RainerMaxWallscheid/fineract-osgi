@@ -55,25 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Campaigns Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.campaigns.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.campaigns.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.campaigns.email.api,'
-                        + 'org.apache.fineract.infrastructure.campaigns.email.domain,'
-                        + 'org.apache.fineract.infrastructure.campaigns.email.handler,'
-                        + 'org.apache.fineract.infrastructure.campaigns.email.service,'
-                        + 'org.apache.fineract.infrastructure.campaigns.helper,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.executeemail,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.executereportmailingjobs,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.getdeliveryreportsfromsmsgateway,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.sendmessagetosmsgateway,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.updateemailoutboundwithcampaignmessage,'
-                        + 'org.apache.fineract.infrastructure.campaigns.jobs.updatesmsoutboundwithcampaignmessage,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.api,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.domain,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.handler,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.mapper,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.serialization,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.service,'
-                        + 'org.apache.fineract.infrastructure.sms.scheduler',
+                'Export-Package': 'org.apache.fineract.infrastructure.campaigns.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.campaigns.impl'
                 )

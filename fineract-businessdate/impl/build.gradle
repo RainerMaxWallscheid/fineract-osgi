@@ -57,12 +57,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Business date JPA, REST, handlers',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.businessdate.api,'
-                        + 'org.apache.fineract.infrastructure.businessdate.domain,'
-                        + 'org.apache.fineract.infrastructure.businessdate.handler,'
-                        + 'org.apache.fineract.infrastructure.businessdate.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.businessdate.mapper,'
-                        + 'org.apache.fineract.infrastructure.businessdate.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.businessdate.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.businessdate.impl'
                 )
     }

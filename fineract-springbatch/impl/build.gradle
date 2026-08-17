@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Spring Batch Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.springbatch.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.springbatch.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.springbatch,'
-                        + 'org.apache.fineract.infrastructure.springbatch.messagehandler,'
-                        + 'org.apache.fineract.infrastructure.springbatch.messagehandler.jms,'
-                        + 'org.apache.fineract.infrastructure.springbatch.messagehandler.kafka,'
-                        + 'org.apache.fineract.infrastructure.springbatch.messagehandler.spring',
+                'Export-Package': 'org.apache.fineract.infrastructure.springbatch.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.springbatch.impl'
                 )

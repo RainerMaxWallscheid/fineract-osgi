@@ -57,11 +57,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Codes REST, handlers, read/write services',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.codes.api,'
-                        + 'org.apache.fineract.infrastructure.codes.handler,'
-                        + 'org.apache.fineract.infrastructure.codes.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.codes.serialization,'
-                        + 'org.apache.fineract.infrastructure.codes.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.codes.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.codes.impl'
                 )
     }

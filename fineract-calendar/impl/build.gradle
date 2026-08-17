@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Calendar Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.calendar.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.calendar.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.calendar.api,'
-                        + 'org.apache.fineract.portfolio.calendar.domain,'
-                        + 'org.apache.fineract.portfolio.calendar.handler,'
-                        + 'org.apache.fineract.portfolio.calendar.service,'
-                        + 'org.apache.fineract.portfolio.calendar.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.calendar.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.calendar.impl'
                 )

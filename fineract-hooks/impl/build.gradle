@@ -55,15 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Hooks Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.hooks.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.hooks.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.hooks.api,'
-                        + 'org.apache.fineract.infrastructure.hooks.command,'
-                        + 'org.apache.fineract.infrastructure.hooks.domain,'
-                        + 'org.apache.fineract.infrastructure.hooks.handler,'
-                        + 'org.apache.fineract.infrastructure.hooks.listener,'
-                        + 'org.apache.fineract.infrastructure.hooks.mapper,'
-                        + 'org.apache.fineract.infrastructure.hooks.processor,'
-                        + 'org.apache.fineract.infrastructure.hooks.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.hooks.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.hooks.impl'
                 )

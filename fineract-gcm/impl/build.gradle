@@ -55,9 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract GCM Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.gcm.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.gcm.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.gcm.domain,'
-                        + 'org.apache.fineract.infrastructure.gcm.service',
+                'Export-Package': 'org.apache.fineract.infrastructure.gcm.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.gcm.impl'
                 )

@@ -48,7 +48,7 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi implementation bundle (ADR-022). Export starter only (when present).
+// OSGi implementation bundle (ADR-022). Export the registrar package only.
 jar {
     manifest {
         attributes(
@@ -62,14 +62,7 @@ jar {
                         + 'org.apache.fineract.portfolio.tax.api,'
                         + '*',
                 // Domain residual still consumed by charge/loan/savings until Step 8 taxGroupId.
-                'Export-Package': 'org.apache.fineract.portfolio.tax.api,'
-                        + 'org.apache.fineract.portfolio.tax.domain,'
-                        + 'org.apache.fineract.portfolio.tax.handler,'
-                        + 'org.apache.fineract.portfolio.tax.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.tax.mapper,'
-                        + 'org.apache.fineract.portfolio.tax.serialization,'
-                        + 'org.apache.fineract.portfolio.tax.service,'
-                        + 'org.apache.fineract.portfolio.tax.starter',
+                'Export-Package': 'org.apache.fineract.portfolio.tax.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.tax.impl'
                 )
     }

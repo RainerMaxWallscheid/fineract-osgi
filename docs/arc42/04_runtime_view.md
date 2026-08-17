@@ -165,7 +165,7 @@ Target state: new features and OSGi-bound handlers prefer the new stack; legacy 
 
 ## 4.4 Scenario 3: OSGi Bundle Lifecycle
 
-fineract-osgi uses **Eclipse Equinox** as the OSGi framework (see `osgi/` and `docs/arc42/osgi.gradle`). At runtime, feature bundles (e.g. AI scoring, dynamic product config) can be installed, started, and stopped without redeploying the entire core.
+fineract-osgi uses **Eclipse Equinox** as the OSGi framework (see `osgi/` and root `osgi.gradle`). At runtime, feature bundles (e.g. AI scoring, dynamic product config) can be installed, started, and stopped without redeploying the entire core.
 
 ### Flow: Bundle Start
 

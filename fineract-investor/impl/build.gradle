@@ -67,10 +67,7 @@ jar {
                         + 'org.apache.fineract.investor.exception,'
                         + '*',
                 // provider journal path residual: entities + AccountingService + repositories
-                'Export-Package': 'org.apache.fineract.investor.domain,'
-                        + 'org.apache.fineract.investor.service,'
-                        + 'org.apache.fineract.investor.config,'
-                        + 'org.apache.fineract.investor.enricher',
+                'Export-Package': 'org.apache.fineract.investor.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.investor.impl'
                 )
     }

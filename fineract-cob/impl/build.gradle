@@ -59,20 +59,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'COB implementation residual',
                 'Import-Package': '*',
-                'Export-Package': 'org.apache.fineract.cob,'
-                        + 'org.apache.fineract.cob.api,'
-                        + 'org.apache.fineract.cob.common,'
-                        + 'org.apache.fineract.cob.conditions,'
-                        + 'org.apache.fineract.cob.converter,'
-                        + 'org.apache.fineract.cob.data,'
-                        + 'org.apache.fineract.cob.domain,'
-                        + 'org.apache.fineract.cob.impl.osgi,'
-                        + 'org.apache.fineract.cob.listener,'
-                        + 'org.apache.fineract.cob.processor,'
-                        + 'org.apache.fineract.cob.resolver,'
-                        + 'org.apache.fineract.cob.service,'
-                        + 'org.apache.fineract.cob.tasklet,'
-                        + 'org.apache.fineract.core.exceptionmapper',
+                'Export-Package': 'org.apache.fineract.cob.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.cob.impl'
                 )
     }

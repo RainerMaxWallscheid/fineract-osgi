@@ -6,7 +6,7 @@ Charge Catalog bounded context — OSGi modularization **complete** (Steps 0–9
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-charge-api` | `api/` | `org.apache.fineract.charge.api` | **Export-Package** `moduleapi` + catalog `exception` + `util` |
-| `fineract-charge-impl` | `impl/` | `org.apache.fineract.charge.impl` | JPA catalog, write/read impls, REST, Spring; **Export-Package** `starter` only |
+| `fineract-charge-impl` | `impl/` | `org.apache.fineract.charge.impl` | JPA catalog, write/read impls, REST, Spring; **Export-Package** registrar only (`…charge.impl.osgi`) |
 | `fineract-charge-test` | `test/` | `org.apache.fineract.charge.test` | White-box tests; **Fragment-Host** → `org.apache.fineract.charge.impl` |
 
 There is **no** `:fineract-charge` façade. Depend on `-api` and (composition roots only) `-impl`.

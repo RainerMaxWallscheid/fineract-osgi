@@ -56,32 +56,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Event Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.event.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.event.impl.osgi,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.client,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.deposit,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.group,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.loan.product,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.savings,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.savings.transaction,'
-                        + 'org.apache.fineract.infrastructure.event.business.domain.share,'
-                        + 'org.apache.fineract.infrastructure.event.external.api,'
-                        + 'org.apache.fineract.infrastructure.event.external.command,'
-                        + 'org.apache.fineract.infrastructure.event.external.config,'
-                        + 'org.apache.fineract.infrastructure.event.external.data,'
-                        + 'org.apache.fineract.infrastructure.event.external.handler,'
-                        + 'org.apache.fineract.infrastructure.event.external.jobs,'
-                        + 'org.apache.fineract.infrastructure.event.external.producer.jms,'
-                        + 'org.apache.fineract.infrastructure.event.external.producer.kafka,'
-                        + 'org.apache.fineract.infrastructure.event.external.service,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.client,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.fixeddeposit,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.recurringdeposit,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.mapper.share,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.fixeddeposit,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.recurringdeposit,'
-                        + 'org.apache.fineract.infrastructure.event.external.service.serialization.serializer.share',
+                'Export-Package': 'org.apache.fineract.infrastructure.event.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.event.impl'
                 )

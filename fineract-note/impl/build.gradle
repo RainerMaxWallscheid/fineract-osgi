@@ -55,12 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Note Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.note.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.note.impl.osgi,'
-                        + 'org.apache.fineract.portfolio.note.api,'
-                        + 'org.apache.fineract.portfolio.note.domain,'
-                        + 'org.apache.fineract.portfolio.note.handler,'
-                        + 'org.apache.fineract.portfolio.note.listener,'
-                        + 'org.apache.fineract.portfolio.note.service',
+                'Export-Package': 'org.apache.fineract.portfolio.note.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.note.impl'
                 )

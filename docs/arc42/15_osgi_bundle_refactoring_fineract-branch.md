@@ -95,7 +95,7 @@ Deserializer test + `BranchOsgiServiceRegistrarTest`.
 - [x] Move `Teller*ServiceImpl` + `OrganisationTellerConfiguration` into **branch-impl**
 - [x] `CashierTxnValidationPort` on api; loan disbursal uses port + `staffId` (not validator / AppUser)
 - [x] `CashierTransactionDataValidator` implements port; internal only
-- [x] Impl **Export-Package** = `starter` only
+- [x] Impl **Export-Package** = registrar package only (`…teller.impl.osgi`)
 - [x] Move `StaffRepository` / `StaffReadService` interfaces to **core** (provider keeps impls)
 
 ### Step 9 — Docs ✅
