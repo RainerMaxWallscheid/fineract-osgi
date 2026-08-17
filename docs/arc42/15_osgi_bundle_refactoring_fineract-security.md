@@ -5,7 +5,7 @@ Wave‑4 module after cob
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test; Spring Security residual) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test; Spring Security residual); Equinox `SecurityOsgiBundleActivator` (`AccessTokenGenerationService`) |
 | **Module** | Access tokens, 2FA config ports, auth DTOs/exceptions |
 | **No façade** | Compose with `:fineract-security-api` + `:fineract-security-impl` |
 

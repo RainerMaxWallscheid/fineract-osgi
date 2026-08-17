@@ -6,7 +6,7 @@ Platform security (auth, 2FA, OIDC) — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-security-api` | `api/` | `org.apache.fineract.security.api` | Pure ports, DTOs, exceptions, constants |
-| `fineract-security-impl` | `impl/` | `org.apache.fineract.security.impl` | Filters, OIDC residual, Spring Security, SQL validators |
+| `fineract-security-impl` | `impl/` | `org.apache.fineract.security.impl` | Filters, OIDC residual, Spring Security, SQL validators; Equinox `SecurityOsgiBundleActivator` |
 | `fineract-security-test` | `test/` | `org.apache.fineract.security.test` | Fragment-Host → impl |
 
 No façade. Provider / oauth2-tests / war use **api + impl**.

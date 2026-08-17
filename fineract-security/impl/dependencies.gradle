@@ -70,6 +70,7 @@ dependencies {
     }
     implementation 'com.sun.mail:jakarta.mail'
     implementation 'com.github.spullara.mustache.java:compiler'
+    compileOnly 'org.osgi:osgi.core:8.0.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 

@@ -57,7 +57,10 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.security.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Security implementation residual',
-                'Import-Package': '*',
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.security.impl.osgi.SecurityOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.security.service,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.security.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.security.impl'
                 )
