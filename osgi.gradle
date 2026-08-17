@@ -64,8 +64,10 @@ tasks.register('osgiStageBundles') {
             } else if (p.name.endsWith('-api')) {
                 startLevel = 3
             }
-            // Paths are relative to osgi/ (start-equinox.sh cds there).
-            entries << "reference:file:bundles/${jar.name}@${startLevel}:start"
+            // Absolute file: URLs to the staged copy. Relative paths resolve
+            // against osgi.install.area (osgi/equinox), not the working dir.
+            def staged = new File(dest, jar.name)
+            entries << "reference:file:${staged.absolutePath}@${startLevel}:start"
         }
         def template = file('osgi/equinox/config.ini')
         def configDir = file('osgi/config')
@@ -86,4 +88,12 @@ tasks.register('equinoxStart', Exec) {
     description = 'Start the Equinox console (osgi/start-equinox.sh)'
     workingDir = rootDir
     commandLine 'bash', 'osgi/start-equinox.sh'
+}
+
+tasks.register('equinoxResolveSmoke', Exec) {
+    group = 'verification'
+    description = 'Stage catalog jars and capture a bounded Equinox ss/diag smoke'
+    dependsOn osgiStageBundles
+    workingDir = rootDir
+    commandLine 'python3', 'osgi/resolve-smoke.py'
 }

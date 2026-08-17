@@ -309,6 +309,8 @@ Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export
 |------|---------|
 | `start-equinox.sh` | Start Equinox console on port **2501** (`-configuration` = `config/` directory) |
 | `check-manifests.py` | Static BSN / Fragment-Host / Export-Package guard |
+| `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
+| `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
 | `equinox/config.ini` | Framework + Fineract mode **template** |
 | `equinox/org.eclipse.osgi-*.jar` | Framework JAR (**not** in git; download locally) |
 | `bundles/` | Staged api / impl / core JARs (`:osgiStageBundles`) |
@@ -329,7 +331,17 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + `osgi.bundles`). Start levels: core `@2`, api `@3`, impl `@4`. This does **not** yet prove a full Equinox resolve: residual same-package leftovers in core stay unpublished, and third-party Import-Package wiring is still unproven.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory.
+
+## Resolve smoke
+
+```bash
+./gradlew equinoxResolveSmoke
+# or, after staging:
+python3 osgi/resolve-smoke.py
+```
+
+Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the staged catalog, and resolves it (does **not** start impl bundles). Writes `osgi/logs/resolve-smoke.txt`. Exit 0 means every staged jar installed. INSTALLED fineract bundles are listed (third-party Import-Package and unpublished core leftovers). Pass `--strict` to fail when any `org.apache.fineract.*` bundle is INSTALLED.
 
 ## Start
 

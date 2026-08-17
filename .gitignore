@@ -49,3 +49,4 @@ osgi/config/**
 !osgi/config/.gitkeep
 osgi/equinox/*.jar
 osgi/equinox/configuration/
+osgi/*.class
