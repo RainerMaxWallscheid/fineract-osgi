@@ -21,7 +21,7 @@
 
 tasks.register('checkOsgiManifests', Exec) {
     group = 'verification'
-    description = 'Fail on duplicate BSN, missing Fragment-Host, split packages, or a stale core export list'
+    description = 'Fail on duplicate BSN, missing Fragment-Host, split packages, a stale core export list, or incomplete api Import-Package'
     workingDir = rootDir
     commandLine 'python3', 'osgi/check-manifests.py'
 }

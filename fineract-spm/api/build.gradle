@@ -33,7 +33,8 @@ jar {
                         + 'org.apache.fineract.spm.exception,'
                         + 'org.apache.fineract.spm.service,'
                         + 'org.apache.fineract.spm.util',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.spm.api'
                 )
     }

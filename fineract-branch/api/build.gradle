@@ -36,7 +36,14 @@ jar {
                         + 'org.apache.fineract.organisation.teller.service,'
                         + 'org.apache.fineract.organisation.teller.data,'
                         + 'org.apache.fineract.organisation.teller.exception',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.data,'
+                        + 'org.apache.fineract.organisation.office.data,'
+                        + 'org.apache.fineract.organisation.staff.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.branch.api'
                 )
     }

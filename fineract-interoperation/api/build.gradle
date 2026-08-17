@@ -34,7 +34,16 @@ jar {
                         + 'org.apache.fineract.interoperation.exception,'
                         + 'org.apache.fineract.interoperation.service,'
                         + 'org.apache.fineract.interoperation.util',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.serialization,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.domain,'
+                        + 'org.apache.fineract.portfolio.accountdetails.domain,'
+                        + 'org.apache.fineract.portfolio.savings,'
+                        + 'org.apache.fineract.portfolio.savings.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.interoperation.api'
                 )
     }

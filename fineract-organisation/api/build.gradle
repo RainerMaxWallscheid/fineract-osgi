@@ -38,7 +38,10 @@ jar {
                         + 'org.apache.fineract.organisation.provisioning.data,'
                         + 'org.apache.fineract.organisation.provisioning.exception,'
                         + 'org.apache.fineract.organisation.provisioning.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.api'
                 )
     }

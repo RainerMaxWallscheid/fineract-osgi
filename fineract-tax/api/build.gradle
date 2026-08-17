@@ -37,7 +37,12 @@ jar {
                         + 'org.apache.fineract.portfolio.tax.exception,'
                         + 'org.apache.fineract.portfolio.tax.api,'
                         + 'org.apache.fineract.portfolio.tax.request',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.organisation.monetary.domain,'
+                        + 'org.apache.fineract.portfolio.tax.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.tax.api'
                 )
     }

@@ -36,7 +36,14 @@ jar {
                         + 'org.apache.fineract.portfolio.account.domain,'
                         + 'org.apache.fineract.portfolio.account.exception,'
                         + 'org.apache.fineract.portfolio.account.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.office.data,'
+                        + 'org.apache.fineract.portfolio.client.data,'
+                        + 'org.apache.fineract.portfolio.common.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.accounttransfer.api'
                 )
     }

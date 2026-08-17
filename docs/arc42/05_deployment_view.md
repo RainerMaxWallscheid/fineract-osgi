@@ -393,7 +393,7 @@ flowchart TB
 ```
 osgi/
   start-equinox.sh          # Start script (-configuration config/)
-  check-manifests.py        # BSN / Fragment-Host / Export-Package guard
+  check-manifests.py        # BSN / Fragment-Host / Export-Package / api Import-Package guard
   equinox/
     config.ini              # Framework + Fineract mode template
     org.eclipse.osgi-*.jar  # Framework JAR (provide)

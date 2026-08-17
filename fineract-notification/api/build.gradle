@@ -33,7 +33,8 @@ jar {
                         + 'org.apache.fineract.notification.data,'
                         + 'org.apache.fineract.notification.eventandlistener,'
                         + 'org.apache.fineract.notification.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.service,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.notification.api'
                 )
     }

@@ -34,7 +34,9 @@ jar {
                         + 'org.apache.fineract.template.domain,'
                         + 'org.apache.fineract.template.exception,'
                         + 'org.apache.fineract.template.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.template.api'
                 )
     }

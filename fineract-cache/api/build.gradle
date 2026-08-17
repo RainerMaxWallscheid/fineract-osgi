@@ -31,7 +31,8 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.infrastructure.cache.data,'
                         + 'org.apache.fineract.infrastructure.cache.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.cache.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.cache.api'
                 )
     }

@@ -39,7 +39,13 @@ jar {
                         + 'org.apache.fineract.investor.data.attribute,'
                         + 'org.apache.fineract.investor.data.request,'
                         + 'org.apache.fineract.investor.exception',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.accounting.journalentry.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.domain,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.investor.api'
                 )
     }

@@ -45,6 +45,21 @@ jar {
                         + 'org.apache.fineract.portfolio.workingcapitalloanproduct.domain,'
                         + 'org.apache.fineract.portfolio.workingcapitalloanproduct.exception,'
                         + 'org.apache.fineract.portfolio.workingcapitalloanproduct.service',
+                'Import-Package': 'org.apache.fineract.infrastructure.codes.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.domain,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.data,'
+                        + 'org.apache.fineract.portfolio.charge.data,'
+                        + 'org.apache.fineract.portfolio.charge.moduleapi,'
+                        + 'org.apache.fineract.portfolio.delinquency.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.data,'
+                        + 'org.apache.fineract.portfolio.loanorigination.data,'
+                        + 'org.apache.fineract.portfolio.paymentdetail.data,'
+                        + 'org.apache.fineract.portfolio.paymenttype.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.workingcapitalloan.api'
                 )
     }

@@ -30,6 +30,9 @@ Fails on:
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
     or does not match unique kernel source packages
+  * api Import-Package that omits an org.apache.fineract package the sources
+    import when that package is exported by another scanned bundle
+    (`*` is not DynamicImport-Package; Gradle writes the header literally)
 
 Historical same-package type splits used to live in KNOWN_API_SPLITS.
 That map is empty after the loan/jobs, charge/savings, and
@@ -66,8 +69,14 @@ ATTR_KEYS = (
     "Bundle-SymbolicName",
     "Fragment-Host",
     "Export-Package",
+    "Import-Package",
     "Bundle-Version",
     "Automatic-Module-Name",
+)
+
+IMPORT_TYPE_RE = re.compile(
+    r"^import\s+(?:static\s+)?(org\.apache\.fineract(?:\.[A-Za-z0-9_]+)+(?:\.\*)?)\s*;",
+    re.MULTILINE,
 )
 
 ATTR_RE = {
@@ -109,6 +118,29 @@ def java_source_packages(src_root: Path) -> set[str]:
         rel = source.parent.relative_to(src_root)
         if rel.parts:
             packages.add(".".join(rel.parts))
+    return packages
+
+
+def imported_package(qualified: str) -> str:
+    parts = qualified.split(".")
+    if parts and parts[-1] == "*":
+        parts = parts[:-1]
+    else:
+        while parts and parts[-1][:1].isupper():
+            parts.pop()
+    return ".".join(parts)
+
+
+def java_imported_packages(src_root: Path) -> set[str]:
+    packages: set[str] = set()
+    if not src_root.is_dir():
+        return packages
+    for source in src_root.rglob("*.java"):
+        text = source.read_text(encoding="utf-8")
+        for match in IMPORT_TYPE_RE.finditer(text):
+            package = imported_package(match.group(1))
+            if package:
+                packages.add(package)
     return packages
 
 
@@ -157,6 +189,7 @@ def load_row(build: Path, layout_role: str) -> dict:
         "bsn": attrs.get("Bundle-SymbolicName"),
         "fragment_host": attrs.get("Fragment-Host"),
         "exports": parse_export_packages(attrs.get("Export-Package")),
+        "imports": parse_export_packages(attrs.get("Import-Package")),
     }
 
 
@@ -280,6 +313,24 @@ def main() -> int:
             warnings.append(
                 f"allow-list stale: {package} (stems {sorted(expected)}) is no longer a split; "
                 "remove it from KNOWN_API_SPLITS"
+            )
+
+    exported_packages = set(exporters)
+    for row in rows:
+        if row["layout_role"] != "api":
+            continue
+        src_root = ROOT / Path(row["path"]).parent / "src" / "main" / "java"
+        own = java_source_packages(src_root)
+        used = java_imported_packages(src_root)
+        declared = {package for package in row["imports"] if package != "*"}
+        required = sorted(
+            package for package in used if package in exported_packages and package not in own
+        )
+        missing = [package for package in required if package not in declared]
+        if missing:
+            errors.append(
+                f"{row['path']}: Import-Package missing exported packages used by api sources: "
+                + ", ".join(missing)
             )
 
     kernel_rows = [row for row in rows if row["layout_role"] == "kernel"]

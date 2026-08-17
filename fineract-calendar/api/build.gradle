@@ -33,7 +33,11 @@ jar {
                         + 'org.apache.fineract.portfolio.calendar.data.request,'
                         + 'org.apache.fineract.portfolio.calendar.exception,'
                         + 'org.apache.fineract.portfolio.calendar.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.portfolio.calendar.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.calendar.api'
                 )
     }

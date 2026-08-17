@@ -301,14 +301,14 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, new split packages, and a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
 | `start-equinox.sh` | Start Equinox console on port **2501** (`-configuration` = `config/` directory) |
-| `check-manifests.py` | Static BSN / Fragment-Host / Export-Package guard |
+| `check-manifests.py` | Static BSN / Fragment-Host / Export-Package / api Import-Package guard |
 | `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
 | `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
 | `equinox/config.ini` | Framework + Fineract mode **template** |

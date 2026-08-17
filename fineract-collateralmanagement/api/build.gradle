@@ -32,7 +32,9 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.collateralmanagement.data,'
                         + 'org.apache.fineract.portfolio.collateralmanagement.exception,'
                         + 'org.apache.fineract.portfolio.collateralmanagement.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.portfolio.loanaccount.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.collateralmanagement.api'
                 )
     }

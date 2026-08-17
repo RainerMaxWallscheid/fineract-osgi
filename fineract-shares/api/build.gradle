@@ -42,7 +42,23 @@ jar {
                         + 'org.apache.fineract.shares.shareproducts.data,'
                         + 'org.apache.fineract.shares.shareproducts.exception,'
                         + 'org.apache.fineract.shares.shareproducts.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.accounting.common,'
+                        + 'org.apache.fineract.accounting.glaccount.data,'
+                        + 'org.apache.fineract.accounting.producttoaccountmapping.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.jersey.serializer.legacy,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.data,'
+                        + 'org.apache.fineract.portfolio.accountdetails.data,'
+                        + 'org.apache.fineract.portfolio.charge.data,'
+                        + 'org.apache.fineract.portfolio.products.data,'
+                        + 'org.apache.fineract.portfolio.savings.data,'
+                        + 'org.apache.fineract.shares.shareaccounts.domain,'
+                        + 'org.apache.fineract.shares.shareproducts,'
+                        + 'org.apache.fineract.shares.shareproducts.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.shares.api'
                 )
     }

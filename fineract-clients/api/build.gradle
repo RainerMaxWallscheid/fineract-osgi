@@ -36,7 +36,18 @@ jar {
                         + 'org.apache.fineract.portfolio.client.service.search,'
                         + 'org.apache.fineract.portfolio.client.service.search.domain,'
                         + 'org.apache.fineract.portfolio.client.service.search.mapper',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.codes.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.domain,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.data,'
+                        + 'org.apache.fineract.portfolio.charge.data,'
+                        + 'org.apache.fineract.portfolio.client.api,'
+                        + 'org.apache.fineract.portfolio.paymentdetail.data,'
+                        + 'org.apache.fineract.portfolio.paymenttype.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.clients.api'
                 )
     }

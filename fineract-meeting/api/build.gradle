@@ -34,7 +34,13 @@ jar {
                         + 'org.apache.fineract.portfolio.meeting.data,'
                         + 'org.apache.fineract.portfolio.meeting.exception,'
                         + 'org.apache.fineract.portfolio.meeting.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.portfolio.calendar.data,'
+                        + 'org.apache.fineract.portfolio.calendar.domain,'
+                        + 'org.apache.fineract.portfolio.client.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.meeting.api'
                 )
     }

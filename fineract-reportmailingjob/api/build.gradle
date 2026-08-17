@@ -33,7 +33,12 @@ jar {
                         + 'org.apache.fineract.infrastructure.reportmailingjob.data,'
                         + 'org.apache.fineract.infrastructure.reportmailingjob.exception,'
                         + 'org.apache.fineract.infrastructure.reportmailingjob.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.infrastructure.dataqueries.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.reportmailingjob.api'
                 )
     }

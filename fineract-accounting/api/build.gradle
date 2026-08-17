@@ -70,7 +70,21 @@ jar {
                         + 'org.apache.fineract.accounting.rule.exception,'
                         + 'org.apache.fineract.accounting.rule.service,'
                         + 'org.apache.fineract.accounting.trialbalance.exception',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.accounting.glaccount.api,'
+                        + 'org.apache.fineract.accounting.glaccount.domain,'
+                        + 'org.apache.fineract.accounting.producttoaccountmapping.data,'
+                        + 'org.apache.fineract.infrastructure.codes.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.organisation.monetary.data,'
+                        + 'org.apache.fineract.organisation.office.data,'
+                        + 'org.apache.fineract.portfolio,'
+                        + 'org.apache.fineract.portfolio.note.data,'
+                        + 'org.apache.fineract.portfolio.paymentdetail.data,'
+                        + 'org.apache.fineract.portfolio.savings,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.accounting.api'
                 )
     }

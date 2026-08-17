@@ -35,7 +35,11 @@ jar {
                         + 'org.apache.fineract.infrastructure.sms.exception,'
                         + 'org.apache.fineract.infrastructure.sms.param,'
                         + 'org.apache.fineract.infrastructure.sms.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.service,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.sms.api'
                 )
     }

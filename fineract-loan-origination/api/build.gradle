@@ -37,7 +37,11 @@ jar {
                         + 'org.apache.fineract.portfolio.loanorigination.data,'
                         + 'org.apache.fineract.portfolio.loanorigination.exception,'
                         + 'org.apache.fineract.portfolio.loanorigination.api',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.codes.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.loanorigination.api'
                 )
     }

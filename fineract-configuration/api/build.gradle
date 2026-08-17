@@ -33,7 +33,13 @@ jar {
                         + 'org.apache.fineract.infrastructure.configuration.data,'
                         + 'org.apache.fineract.infrastructure.configuration.exception,'
                         + 'org.apache.fineract.infrastructure.configuration.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.campaigns.sms.data,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.jersey.serializer,'
+                        + 'org.apache.fineract.infrastructure.gcm.service,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.configuration.api'
                 )
     }

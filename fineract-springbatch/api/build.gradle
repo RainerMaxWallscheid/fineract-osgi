@@ -33,7 +33,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.springbatch.messagehandler.conditions.jms,'
                         + 'org.apache.fineract.infrastructure.springbatch.messagehandler.conditions.kafka,'
                         + 'org.apache.fineract.infrastructure.springbatch.messagehandler.conditions.spring',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.springbatch.api'
                 )
     }

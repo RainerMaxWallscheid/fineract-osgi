@@ -42,7 +42,9 @@ jar {
                         + 'org.apache.fineract.infrastructure.documentmanagement.api,'
                         + 'org.apache.fineract.infrastructure.documentmanagement.adapter,'
                         + 'org.apache.fineract.infrastructure.documentmanagement.command',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.document.api'
                 )
     }

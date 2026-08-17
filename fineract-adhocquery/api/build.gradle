@@ -34,7 +34,10 @@ jar {
                         + 'org.apache.fineract.adhocquery.domain,'
                         + 'org.apache.fineract.adhocquery.exception,'
                         + 'org.apache.fineract.adhocquery.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.adhocquery.api'
                 )
     }

@@ -35,7 +35,11 @@ jar {
                         + 'org.apache.fineract.infrastructure.entityaccess.domain,'
                         + 'org.apache.fineract.infrastructure.entityaccess.exception,'
                         + 'org.apache.fineract.infrastructure.entityaccess.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.codes.domain,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.entityaccess.api'
                 )
     }

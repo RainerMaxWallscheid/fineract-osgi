@@ -37,7 +37,9 @@ jar {
                         + 'org.apache.fineract.mix.data,'
                         + 'org.apache.fineract.mix.exception,'
                         + 'org.apache.fineract.mix.command',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.mix.api'
                 )
     }

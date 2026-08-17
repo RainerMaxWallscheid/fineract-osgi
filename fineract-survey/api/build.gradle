@@ -32,7 +32,10 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.survey.api,'
                         + 'org.apache.fineract.infrastructure.survey.data,'
                         + 'org.apache.fineract.infrastructure.survey.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.dataqueries.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.survey.api'
                 )
     }

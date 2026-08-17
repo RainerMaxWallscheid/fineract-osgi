@@ -31,7 +31,11 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.portfolio.search.data,'
                         + 'org.apache.fineract.portfolio.search.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.organisation.office.data,'
+                        + 'org.apache.fineract.portfolio.loanproduct.data,'
+                        + 'org.apache.fineract.portfolio.search,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.search.api'
                 )
     }

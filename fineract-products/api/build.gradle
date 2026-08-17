@@ -32,7 +32,8 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.products.constants,'
                         + 'org.apache.fineract.portfolio.products.data,'
                         + 'org.apache.fineract.portfolio.products.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.service,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.products.api'
                 )
     }

@@ -36,7 +36,12 @@ jar {
                         + 'org.apache.fineract.infrastructure.businessdate.data.service,'
                         + 'org.apache.fineract.infrastructure.businessdate.exception,'
                         + 'org.apache.fineract.infrastructure.businessdate.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.businessdate.domain,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.jersey.serializer.legacy,'
+                        + 'org.apache.fineract.infrastructure.jobs.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.businessdate.api'
                 )
     }

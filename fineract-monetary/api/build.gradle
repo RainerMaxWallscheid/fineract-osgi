@@ -32,7 +32,8 @@ jar {
                 'Export-Package': 'org.apache.fineract.organisation.monetary.command,'
                         + 'org.apache.fineract.organisation.monetary.data,'
                         + 'org.apache.fineract.organisation.monetary.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.monetary.api'
                 )
     }

@@ -30,7 +30,9 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.paymentdetail.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.portfolio.paymentdetail.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.portfolio.paymentdetail.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.paymentdetail.api'
                 )
     }

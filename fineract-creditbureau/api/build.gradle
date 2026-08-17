@@ -32,7 +32,10 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.creditbureau.data,'
                         + 'org.apache.fineract.infrastructure.creditbureau.exception,'
                         + 'org.apache.fineract.infrastructure.creditbureau.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.creditbureau.api'
                 )
     }

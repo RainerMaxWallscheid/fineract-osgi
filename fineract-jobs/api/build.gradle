@@ -36,7 +36,13 @@ jar {
                         + 'org.apache.fineract.infrastructure.jobs.service,'
                         + 'org.apache.fineract.infrastructure.jobs.service.jobname,'
                         + 'org.apache.fineract.infrastructure.jobs.service.jobparameterprovider',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.http,'
+                        + 'org.apache.fineract.portfolio.loanaccount.exception,'
+                        + 'org.apache.fineract.useradministration.exception,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.jobs.api'
                 )
     }

@@ -31,7 +31,9 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.portfolio.fund.data,'
                         + 'org.apache.fineract.portfolio.fund.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.fund.api'
                 )
     }

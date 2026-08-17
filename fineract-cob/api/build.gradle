@@ -36,6 +36,12 @@ jar {
                         + 'org.apache.fineract.cob.exceptions,'
                         + 'org.apache.fineract.cob.loan,'
                         + 'org.apache.fineract.cob.service',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.domain,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.cob.api'
                 )
     }

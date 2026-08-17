@@ -32,7 +32,10 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.accountnumberformat.data,'
                         + 'org.apache.fineract.infrastructure.accountnumberformat.exception,'
                         + 'org.apache.fineract.infrastructure.accountnumberformat.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.accountnumberformat.domain,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.accountnumberformat.api'
                 )
     }

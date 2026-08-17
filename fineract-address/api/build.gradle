@@ -33,7 +33,11 @@ jar {
                         + 'org.apache.fineract.portfolio.address.exception,'
                         + 'org.apache.fineract.portfolio.address.filter,'
                         + 'org.apache.fineract.portfolio.address.service',
-                'Import-Package': '*',
+                'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.portfolio.client.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.address.api'
                 )
     }
