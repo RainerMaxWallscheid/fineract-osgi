@@ -55,7 +55,7 @@ fineract-document/
 | `…documentmanagement.data` / `exception` / `command` / constants | **api** |
 | FS/S3 services, detectors, policies, processors, util, config | **impl** |
 | REST, handlers, domain, mappers, events | **impl** |
-| `…document.impl.osgi` | **impl** — `DocumentOsgiServiceRegistrar` |
+| `…document.impl.osgi` | **impl** — `DocumentOsgiServiceRegistrar` (Spring) + `DocumentOsgiBundleActivator` (Equinox start) |
 
 `EntityImageIdAdapter` lives on **document-api** (client/staff image FK SPI).
 
@@ -82,7 +82,8 @@ Manifest Export/Import/Fragment-Host.
 Existing contentstore/document tests + registrar smoke test under document-test.
 
 ### Step 6 — OSGi registrar ✅
-`DocumentOsgiServiceRegistrar` → `ContentStoreService`, `DocumentReadPlatformService`, `DocumentWritePlatformService`.
+`DocumentOsgiServiceRegistrar` (Spring path) → `ContentStoreService`, `ContentStreamPort`, document read/write.  
+`DocumentOsgiBundleActivator` (Equinox start; Spring-free empty store + JDK pipe) → `ContentStoreService`, `ContentStreamPort`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |
