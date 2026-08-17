@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Fund Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.fund.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.fund.impl.osgi.FundOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.fund.service,'
+                        + 'org.apache.fineract.portfolio.fund.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.fund.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.fund.impl'
                 )
     }
