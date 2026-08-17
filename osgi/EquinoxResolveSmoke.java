@@ -51,7 +51,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort",
             "org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort",
             "org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService",
-            "org.apache.fineract.mix.service.MixTaxonomyReadService"
+            "org.apache.fineract.mix.service.MixTaxonomyReadService",
+            "org.apache.fineract.investor.service.DelayedSettlementAttributeService"
     };
 
     private EquinoxResolveSmoke() {}

@@ -186,7 +186,7 @@ Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-m
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-investor-api` | `org.apache.fineract.investor.api` | Pure ports, DTOs/status enums, exceptions |
-| `fineract-investor-impl` | `org.apache.fineract.investor.impl` | JPA + REST + COB + enrichers + `InvestorOsgiServiceRegistrar` |
+| `fineract-investor-impl` | `org.apache.fineract.investor.impl` | JPA + REST + `InvestorOsgiServiceRegistrar` / `InvestorOsgiBundleActivator` |
 | `fineract-investor-test` | `org.apache.fineract.investor.test` | Fragment-Host → investor.impl |
 
 Provider journal residual uses entities/`AccountingService` from impl. Plan: [15_osgi_bundle_refactoring_fineract-investor.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-investor.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, and Wave-2 (document / branch / loan-origination / mix) ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, and investor ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

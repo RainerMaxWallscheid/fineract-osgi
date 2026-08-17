@@ -54,14 +54,14 @@ fineract-investor/
 | `…investor.exception` (not mappers) | **api** |
 | entity-typed ports (`AccountingService`, loan transfer services), *Impl, handlers | **impl** |
 | domain / REST / enrichers / cob / config | **impl** |
-| `…investor.impl.osgi` | **impl** — `InvestorOsgiServiceRegistrar` |
+| `…investor.impl.osgi` | **impl** — `InvestorOsgiServiceRegistrar` (Spring) + `InvestorOsgiBundleActivator` (Equinox start) |
 
 ---
 
 ## 4. Steps
 
 ### Step 0–7, 9 ✅
-Mechanical split + registrar + consumer Gradle.
+Mechanical split + registrar + Equinox `InvestorOsgiBundleActivator` (`DelayedSettlementAttributeService`) + consumer Gradle.
 
 ### Step 8 — Residual ✅ / open follow-ups
 - [x] Pure ports + DTOs on api
