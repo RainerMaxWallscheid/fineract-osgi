@@ -6,7 +6,7 @@ GL / journal / product-to-account mapping — Wave 3 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-accounting-api` | `api/` | `org.apache.fineract.accounting.api` | Ports, DTOs, exceptions, pure constants |
-| `fineract-accounting-impl` | `impl/` | `org.apache.fineract.accounting.impl` | JPA domain, REST, helpers, jobs; **OSGi** `AccountingOsgiServiceRegistrar` |
+| `fineract-accounting-impl` | `impl/` | `org.apache.fineract.accounting.impl` | JPA domain, REST, helpers, jobs; Equinox `AccountingOsgiBundleActivator` |
 | `fineract-accounting-test` | `test/` | `org.apache.fineract.accounting.test` | Fragment-Host → `accounting.impl` |
 
 No `:fineract-accounting` façade.

@@ -196,7 +196,7 @@ Provider journal residual uses entities/`AccountingService` from impl. Plan: [15
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-accounting-api` | `org.apache.fineract.accounting.api` | Ports, DTOs, exceptions, pure constants |
-| `fineract-accounting-impl` | `org.apache.fineract.accounting.impl` | JPA + REST + helpers + `AccountingOsgiServiceRegistrar` |
+| `fineract-accounting-impl` | `org.apache.fineract.accounting.impl` | JPA + REST + `AccountingOsgiServiceRegistrar` / `AccountingOsgiBundleActivator` |
 | `fineract-accounting-test` | `org.apache.fineract.accounting.test` | Fragment-Host → accounting.impl |
 
 investor-api uses **api only**; loan/savings/provider use api+impl residual. Plan: [15_osgi_bundle_refactoring_fineract-accounting.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-accounting.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, and investor ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, investor, and accounting ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
