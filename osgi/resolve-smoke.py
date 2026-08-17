@@ -17,18 +17,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Bounded Equinox resolve smoke (ADR-022).
+"""Bounded Equinox resolve / start smoke (ADR-022).
 
 Compiles and runs ``EquinoxResolveSmoke`` against the staged api/impl/core
-catalog. Installs bundles and resolves them; does not start fineract
-implementations. Writes ``osgi/logs/resolve-smoke.txt``. Exit 0 if every
-staged jar installed. INSTALLED (unresolved) fineract bundles are reported
-but do not fail the smoke unless ``--strict`` is passed.
+catalog. Installs and resolves bundles. ``--start`` also starts them (no
+Spring, so ``*OsgiServiceRegistrar`` does not fire) and probes pilot ports
+in the Service Registry. Writes ``osgi/logs/resolve-smoke.txt``.
 
 Usage:
     python3 osgi/resolve-smoke.py
     python3 osgi/resolve-smoke.py --strict
+    python3 osgi/resolve-smoke.py --start --strict
     ./gradlew equinoxResolveSmoke
+    ./gradlew equinoxStartSmoke
 """
 
 from __future__ import annotations
@@ -77,7 +78,12 @@ def main() -> int:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="fail if any org.apache.fineract.* bundle is INSTALLED",
+        help="fail if any org.apache.fineract.* bundle is INSTALLED (or not ACTIVE with --start)",
+    )
+    parser.add_argument(
+        "--start",
+        action="store_true",
+        help="start staged bundles after resolve and probe pilot OSGi services",
     )
     args = parser.parse_args()
     require_staged()
@@ -86,6 +92,9 @@ def main() -> int:
         raise SystemExit(f"Missing {SOURCE}")
 
     (OSGI_DIR / "logs").mkdir(parents=True, exist_ok=True)
+    java_args = [str(OSGI_DIR)]
+    if args.start:
+        java_args.append("--start")
     with tempfile.TemporaryDirectory(prefix="equinox-smoke-classes-") as tmp:
         compile_cmd = ["javac", "--release", "21", "-cp", str(equinox), "-d", tmp, str(SOURCE)]
         compiled = subprocess.run(compile_cmd, capture_output=True, text=True)
@@ -93,7 +102,7 @@ def main() -> int:
             sys.stderr.write(compiled.stderr)
             raise SystemExit("javac EquinoxResolveSmoke.java failed")
         run = subprocess.run(
-            ["java", "-cp", f"{tmp}{os.pathsep}{equinox}", "EquinoxResolveSmoke", str(OSGI_DIR)],
+            ["java", "-cp", f"{tmp}{os.pathsep}{equinox}", "EquinoxResolveSmoke", *java_args],
             capture_output=True,
             text=True,
         )
@@ -106,13 +115,22 @@ def main() -> int:
     if run.returncode != 0:
         return run.returncode
     if args.strict:
-        installed = [
-            line
-            for line in output.splitlines()
-            if line.startswith("INSTALLED org.apache.fineract.")
-        ]
-        if installed:
-            return 1
+        if args.start:
+            not_active = [
+                line
+                for line in output.splitlines()
+                if line.startswith(("INSTALLED org.apache.fineract.", "RESOLVED org.apache.fineract."))
+            ]
+            if not_active:
+                return 1
+        else:
+            installed = [
+                line
+                for line in output.splitlines()
+                if line.startswith("INSTALLED org.apache.fineract.")
+            ]
+            if installed:
+                return 1
     return 0
 
 

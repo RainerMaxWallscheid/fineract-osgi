@@ -34,17 +34,32 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
- * Install the staged catalog and resolve it. Does not start fineract bundles
- * (no Spring / DS). Prints one {@code STATE BSN} line per bundle.
+ * Install the staged catalog and resolve it. With {@code --start}, also start
+ * every non-system bundle and probe a few Module API ports in the Service
+ * Registry. Starting does not run Spring, so registrars do not fire.
  */
 public final class EquinoxResolveSmoke {
     private static final Pattern BUNDLE_REF = Pattern
             .compile("reference:file:([^@,\\s]+)(?:@[^,]*)?");
 
+    private static final String[] PILOT_PORTS = {
+            "org.apache.fineract.command.core.CommandDispatcher",
+            "org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort"
+    };
+
     private EquinoxResolveSmoke() {}
 
     public static void main(String[] args) throws Exception {
-        Path osgiDir = Path.of(args.length > 0 ? args[0] : ".").toAbsolutePath();
+        boolean start = false;
+        String dirArg = ".";
+        for (String arg : args) {
+            if ("--start".equals(arg)) {
+                start = true;
+            } else if (!arg.startsWith("-")) {
+                dirArg = arg;
+            }
+        }
+        Path osgiDir = Path.of(dirArg).toAbsolutePath();
         Path configIni = osgiDir.resolve("config").resolve("config.ini");
         if (!Files.isRegularFile(configIni)) {
             System.err.println("Missing " + configIni + " — run ./gradlew osgiStageBundles");
@@ -81,6 +96,21 @@ public final class EquinoxResolveSmoke {
             wiring.resolveBundles(null);
         }
 
+        int startFailures = 0;
+        if (start) {
+            for (Bundle bundle : ctx.getBundles()) {
+                if (bundle.getBundleId() == 0) {
+                    continue;
+                }
+                try {
+                    bundle.start();
+                } catch (Exception ex) {
+                    startFailures++;
+                    System.err.println("START_FAIL " + bundle.getSymbolicName() + " " + ex.getMessage());
+                }
+            }
+        }
+
         List<Bundle> bundles = new ArrayList<>(List.of(ctx.getBundles()));
         bundles.sort(Comparator.comparing(b -> String.valueOf(b.getSymbolicName())));
         int fineract = 0;
@@ -102,12 +132,20 @@ public final class EquinoxResolveSmoke {
                 }
             }
         }
+        if (start) {
+            for (String typeName : PILOT_PORTS) {
+                var refs = ctx.getServiceReferences(typeName, null);
+                int count = refs == null ? 0 : refs.length;
+                System.out.println("SERVICE " + typeName + " " + count);
+            }
+        }
         System.out.println("SUMMARY staged=" + locations.size() + " fineract=" + fineract
                 + " INSTALLED=" + installed + " RESOLVED=" + resolved + " ACTIVE=" + active
-                + " installFailures=" + installFailures);
+                + " installFailures=" + installFailures + " startFailures=" + startFailures
+                + " started=" + start);
         framework.stop();
         framework.waitForStop(10_000);
-        System.exit(installFailures == 0 ? 0 : 1);
+        System.exit(installFailures == 0 && startFailures == 0 ? 0 : 1);
     }
 
     private static List<String> parseBundleLocations(String ini) {

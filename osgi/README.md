@@ -341,7 +341,15 @@ Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `
 python3 osgi/resolve-smoke.py
 ```
 
-Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the staged catalog, and resolves it (does **not** start impl bundles). Writes `osgi/logs/resolve-smoke.txt`. Exit 0 means every staged jar installed. INSTALLED fineract bundles are listed (third-party Import-Package and unpublished core leftovers). Pass `--strict` to fail when any `org.apache.fineract.*` bundle is INSTALLED.
+Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the staged catalog, and resolves it. Writes `osgi/logs/resolve-smoke.txt`. Exit 0 means every staged jar installed. Pass `--strict` to fail when any `org.apache.fineract.*` bundle is INSTALLED.
+
+```bash
+./gradlew equinoxStartSmoke
+# or, after staging:
+python3 osgi/resolve-smoke.py --start --strict
+```
+
+Starts every staged bundle after resolve (no Spring, so `*OsgiServiceRegistrar` does not fire) and prints `SERVICE <port> <count>` for the command and charge pilot ports. `--strict` then requires every fineract bundle to be ACTIVE.
 
 ## Start
 
