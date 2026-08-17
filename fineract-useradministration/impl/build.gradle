@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract User Administration Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.useradministration.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.useradministration.impl.osgi.UserAdministrationOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.useradministration.service,'
+                        + 'org.apache.fineract.useradministration.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.useradministration.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.useradministration.impl'
                 )
     }

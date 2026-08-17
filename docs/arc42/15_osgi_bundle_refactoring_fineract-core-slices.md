@@ -212,7 +212,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 | Peel | Status |
 |------|--------|
-| `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core |
+| `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core; Equinox `UserAdministrationOsgiBundleActivator` (`PasswordValidationPolicyReadPlatformService`) |
 | `fineract-adhocquery` | **complete** (api/impl/test); leftover generate-adhoc-client-schedule job closed into impl |
 | `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl |
 | `fineract-notification` | **complete** (api/impl/test); `UserNotificationService` + `NotificationData` on notification-api; security-impl api-only |

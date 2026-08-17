@@ -293,6 +293,16 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 
 `Money` / `CurrencyData` residual in **fineract-core**.
 
+### Provider peel: fineract-useradministration (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-useradministration-api` | `org.apache.fineract.useradministration.api` | Read/write ports + password policy DTO |
+| `fineract-useradministration-impl` | `org.apache.fineract.useradministration.impl` | REST/handlers + `UserAdministrationOsgiServiceRegistrar` / `UserAdministrationOsgiBundleActivator` |
+| `fineract-useradministration-test` | `org.apache.fineract.useradministration.test` | Fragment-Host → useradministration.impl |
+
+`AppUser` / `Role` / `Permission` and shared DTOs residual in **fineract-core**.
+
 ## Manifest check
 
 ```bash
@@ -349,7 +359,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, and core-slice ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, and useradministration ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
