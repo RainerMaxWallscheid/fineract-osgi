@@ -19,7 +19,7 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 | 3c Naming (ADR-023) | **done** | Dropped `fineract-command-core*`; BSN `command.api` / `command.impl` |
 | 4 OSGi manifests | **done** | BSN + Export/Import/Fragment-Host on jars |
 | 5 Fragment-Host test | **done** | `:fineract-command-test` under `fineract-command/test` (Fragment-Host); shared fixtures in `:fineract-command-integrationtest` |
-| 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
+| 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (Spring path) + `CommandOsgiBundleActivator` (Equinox start; Spring-free empty registry) |
 | 7 Satellites → api | **done** | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
 | 8 Consumer retarget | **done** | Façade removed; core/mix/document-api only; provider api+impl; cob no dep |
 | 9 Docs / acceptance | **done** | This plan + READMEs + ADR-023 + `osgi/README.md` |

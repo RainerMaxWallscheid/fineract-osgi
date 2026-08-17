@@ -53,7 +53,8 @@ jar {
                 'Bundle-Name': 'Apache Fineract Command Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.command.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
+                'Bundle-Activator': 'org.apache.fineract.command.impl.osgi.CommandOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
                 'Export-Package': 'org.apache.fineract.command.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.command.impl'
                 )
