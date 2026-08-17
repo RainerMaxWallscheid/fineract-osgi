@@ -74,7 +74,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService",
             "org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService",
             "org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService",
-            "org.apache.fineract.portfolio.search.service.SearchReadService"
+            "org.apache.fineract.portfolio.search.service.SearchReadService",
+            "org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService"
     };
 
     private EquinoxResolveSmoke() {}

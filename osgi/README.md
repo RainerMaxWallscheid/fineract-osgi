@@ -395,6 +395,16 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 
 `SearchUtil` / advanced-query DTOs residual in **fineract-core**. Equinox registers `SearchReadService` (`retriveMatchingData` / ad-hoc match → empty, template → null).
 
+### Provider peel: fineract-collectionsheet (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-collectionsheet-api` | `org.apache.fineract.collectionsheet.api` | Ports, constants, commands, pure DTOs |
+| `fineract-collectionsheet-impl` | `org.apache.fineract.collectionsheet.impl` | REST/handlers + `CollectionSheetOsgiServiceRegistrar` / `CollectionSheetOsgiBundleActivator` |
+| `fineract-collectionsheet-test` | `org.apache.fineract.collectionsheet.test` | Fragment-Host → collectionsheet.impl |
+
+Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `CollectionSheetWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `CollectionSheetReadPlatformService` (leftover core `SavingsProductData` in split package `…savings.data`).
+
 ## Manifest check
 
 ```bash

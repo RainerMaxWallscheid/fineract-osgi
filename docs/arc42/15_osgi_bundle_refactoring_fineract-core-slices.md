@@ -121,7 +121,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 |------|-----------|--------|--------|------------|
 | **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); `PaymentType` entity/repo/not-found residual in core |
 | **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
-| **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; write impl residual in progressive-loan-impl |
+| **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
 | **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
 | **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; product JPA residual core; account write residual progressive; product write residual charge |
@@ -178,7 +178,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); entity residual in core).  
 2. **Search** ✅ (`fineract-search` api/impl/test; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core).  
-3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl).  
+3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl).  
 4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
 5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; product JPA residual core).  
@@ -224,7 +224,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
 | `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `fineract-group` | **complete** (api/impl/test); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
-| `fineract-collectionsheet` | **complete** (api/impl/test); ports/commands/DTOs + REST/handlers/deserializers/read; write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
+| `fineract-collectionsheet` | **complete** (api/impl/test); Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | **closed** into fineract-search; `LoanProductLookupReadPort` + lookup DTO on loan-api; adapter residual loan-impl |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); entity/repo/assembler/impl/config residual loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
