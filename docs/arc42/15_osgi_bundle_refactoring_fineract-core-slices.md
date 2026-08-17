@@ -63,7 +63,7 @@ Core has `api project(':fineract-codes-api')` for transitive DTO access.
 | Project | Role |
 |---------|------|
 | `:fineract-monetary-api` | Currency read/write ports, admin DTOs, `CurrencyUpdateCommand` |
-| `:fineract-monetary-impl` | `CurrenciesApiResource`, handlers, read impls, `MonetaryOsgiServiceRegistrar` |
+| `:fineract-monetary-impl` | `CurrenciesApiResource`, handlers, read impls, `MonetaryOsgiServiceRegistrar` / `MonetaryOsgiBundleActivator` |
 | Residual in core | `Money` / `CurrencyData` / currency entities, `CurrencyMapper` |
 | Impl coupling | Currency write checks loan/savings/charge product catalogs (loan-impl + savings-api + charge-api) |
 

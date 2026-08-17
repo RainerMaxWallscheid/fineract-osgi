@@ -62,7 +62,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService",
             "org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService",
             "org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService",
-            "org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService"
+            "org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService",
+            "org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService"
     };
 
     private EquinoxResolveSmoke() {}
