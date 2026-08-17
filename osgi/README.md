@@ -206,7 +206,7 @@ investor-api uses **api only**; loan/savings/provider use api+impl residual. Pla
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-savings-api` | `org.apache.fineract.savings.api` | Pure product/application ports, DTOs, exceptions |
-| `fineract-savings-impl` | `org.apache.fineract.savings.impl` | Domain + entity-typed services + COB + `SavingsOsgiServiceRegistrar` |
+| `fineract-savings-impl` | `org.apache.fineract.savings.impl` | Domain + COB + `SavingsOsgiServiceRegistrar` / `SavingsOsgiBundleActivator` |
 | `fineract-savings-test` | `org.apache.fineract.savings.test` | Fragment-Host → savings.impl |
 
 Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_fineract-savings.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-savings.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, investor, and accounting ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, and Wave-3 ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

@@ -58,7 +58,11 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.savings.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Savings/deposit implementation (JPA, services, COB steps)',
-                'Import-Package': '*',
+                'Bundle-Activator': 'org.apache.fineract.portfolio.savings.impl.osgi.SavingsOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.savings.service,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.savings.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.savings.impl'
                 )
