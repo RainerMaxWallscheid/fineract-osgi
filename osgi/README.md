@@ -365,6 +365,16 @@ Entity / generator residual in **fineract-core**.
 
 Datatable ports come from **fineract-core**. Equinox registers `ReadLikelihoodService` only (`retrieveAll` → empty, `retrieve` → null). Did not register `ReadSurveyService` (one thin port; `GenericResultsetData` is already imported from dataqueries-api).
 
+### Provider peel: fineract-transfer (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-transfer-api` | `org.apache.fineract.transfer.api` | Write port, event type, constants, exceptions |
+| `fineract-transfer-impl` | `org.apache.fineract.transfer.impl` | Handlers/validator + `TransferOsgiServiceRegistrar` / `TransferOsgiBundleActivator` |
+| `fineract-transfer-test` | `org.apache.fineract.transfer.test` | Fragment-Host → transfer.impl |
+
+Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `TransferWritePlatformService` only (`CommandProcessingResult.empty()`).
+
 ## Manifest check
 
 ```bash
