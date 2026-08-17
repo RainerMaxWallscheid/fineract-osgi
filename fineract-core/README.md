@@ -15,6 +15,11 @@ After leftover close-ins 1–30, remaining types (`~802` main / `~77` tests)
 Standing rule and inventory:
 [docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
 
+OSGi: Bundle-SymbolicName `org.apache.fineract.core`. `Export-Package` is the unique
+kernel packages (packages already exported by a `*-api` bundle stay unpublished
+here so Equinox does not see a split). Residual same-package leftovers remain
+on the Spring Boot flat classpath.
+
 ```bash
 ./gradlew :fineract-core:compileJava :fineract-core:compileTestJava
 ```

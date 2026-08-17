@@ -7,7 +7,7 @@ See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 
 **Catalog status:** complete for every Gradle `api` / `impl` / `test` split (waves 1–4, core slices, leftover peels 1–30). Each impl registers ports via `*OsgiServiceRegistrar`. Each `*-test` is `Fragment-Host` → the matching impl unless noted. Domain consumers depend on **api only**; `fineract-provider` / `fineract-war` compose **api + impl**.
 
-Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` where `<stem>` is the module name with hyphens removed (`loan-origination` → `loanorigination`). Impl `Export-Package` is the registrar package only (`*.impl.osgi`). Copy jars into `osgi/bundles/` with `./gradlew osgiStageBundles`.
+Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` where `<stem>` is the module name with hyphens removed (`loan-origination` → `loanorigination`). Impl `Export-Package` is the registrar package only (`*.impl.osgi`). Shared kernel BSN is `org.apache.fineract.core` (no api/impl suffix). Copy jars into `osgi/bundles/` with `./gradlew osgiStageBundles`.
 
 ### Catalog (all splits)
 
@@ -81,7 +81,7 @@ Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` 
 
 | Module | Role |
 |--------|------|
-| `fineract-core` | Shared kernel ([core slices standing rule](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)) |
+| `fineract-core` | Shared kernel; BSN `org.apache.fineract.core`; unique-kernel `Export-Package` only ([core slices standing rule](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md#standing-rule-fineract-core-is-the-shared-kernel)) |
 | `fineract-validation` | Bean Validation library |
 | `fineract-report` | Reporting SPI |
 | `fineract-avro-schemas` | Generated published-language schemas |
@@ -301,7 +301,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, and impl-involved or new api-api split packages. There are no remaining allow-listed api-api type splits. `jobs.exception` is jobs-api only after `LoanIdsHardLockedException` moved to `portfolio.loanaccount.exception`. `charge.exception` is charge-api only after the three savings-account charge exceptions moved to `portfolio.savings.exception`. Progressive buy-down / capitalized-income / schedule-plan types live under `portfolio.loanaccount.progressiveloan.*`.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, new split packages, and a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ## Layout
 
@@ -329,7 +329,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + `osgi.bundles`). Start levels: core `@2`, api `@3`, impl `@4`. This does **not** yet prove a full Equinox resolve: `fineract-core` has no OSGi export list.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + `osgi.bundles`). Start levels: core `@2`, api `@3`, impl `@4`. This does **not** yet prove a full Equinox resolve: residual same-package leftovers in core stay unpublished, and third-party Import-Package wiring is still unproven.
 
 ## Start
 

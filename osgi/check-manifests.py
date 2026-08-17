@@ -19,14 +19,17 @@
 
 """Static Equinox-readiness check of Gradle OSGi manifests (ADR-022).
 
-Scans fineract-*/{api,impl,test}/build.gradle plus fineract-command-integrationtest.
+Scans fineract-*/{api,impl,test}/build.gradle, fineract-core/build.gradle,
+and fineract-command-integrationtest.
 Fails on:
   * missing / duplicate Bundle-SymbolicName
   * BSN that does not match the Gradle module stem
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not exactly one *.impl.osgi package
   * impl-involved cross-stem Export-Package (split packages)
-  * new api-api Export-Package collisions (none are allow-listed)
+  * new api-api / kernel-api Export-Package collisions (none are allow-listed)
+  * fineract-core Export-Package that is missing, overlaps an *-api export,
+    or does not match unique kernel source packages
 
 Historical same-package type splits used to live in KNOWN_API_SPLITS.
 That map is empty after the loan/jobs, charge/savings, and
@@ -49,6 +52,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # No remaining same-package type splits across two *-api bundles.
 # The check fails on any new api-api Export-Package collision.
 KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
+
+# Packages that exist in fineract-core source but must not be exported.
+# org.springframework.batch.core.scope.context hosts a Spring Batch patch;
+# exporting it would split the real Spring Batch bundle.
+KERNEL_EXPORT_EXCLUDES: frozenset[str] = frozenset(
+    {
+        "org.springframework.batch.core.scope.context",
+    }
+)
 
 ATTR_KEYS = (
     "Bundle-SymbolicName",
@@ -89,6 +101,17 @@ def parse_export_packages(raw: str | None) -> list[str]:
     return [part.strip() for part in raw.split(",") if part.strip()]
 
 
+def java_source_packages(src_root: Path) -> set[str]:
+    packages: set[str] = set()
+    if not src_root.is_dir():
+        return packages
+    for source in src_root.rglob("*.java"):
+        rel = source.parent.relative_to(src_root)
+        if rel.parts:
+            packages.add(".".join(rel.parts))
+    return packages
+
+
 def bsn_stem_and_role(bsn: str) -> tuple[str | None, str | None]:
     prefix = "org.apache.fineract."
     if not bsn.startswith(prefix):
@@ -112,13 +135,20 @@ def discover_manifests() -> list[dict]:
     extra = ROOT / "fineract-command-integrationtest" / "build.gradle"
     if extra.is_file():
         rows.append(load_row(extra, "support"))
+    core = ROOT / "fineract-core" / "build.gradle"
+    if core.is_file():
+        rows.append(load_row(core, "kernel"))
     return rows
 
 
 def load_row(build: Path, layout_role: str) -> dict:
     text = build.read_text(encoding="utf-8")
     attrs = extract_attrs(text)
-    module_dir = build.parent.name if layout_role == "support" else build.parent.parent.name
+    module_dir = (
+        build.parent.name
+        if layout_role in {"support", "kernel"}
+        else build.parent.parent.name
+    )
     return {
         "path": str(build.relative_to(ROOT)),
         "module": module_dir,
@@ -155,6 +185,18 @@ def main() -> int:
         row["bsn_stem"] = stem
         row["bsn_role"] = role
         if row["layout_role"] == "support":
+            continue
+        if row["layout_role"] == "kernel":
+            if bsn != "org.apache.fineract.core":
+                errors.append(f"{row['path']}: kernel BSN must be org.apache.fineract.core, got {bsn}")
+            if role is not None:
+                errors.append(f"{row['path']}: kernel BSN {bsn} must not use .{role}")
+            if stem != "core":
+                errors.append(
+                    f"{row['path']}: BSN stem {stem!r} does not match module {row['module']}"
+                )
+            if not row["exports"]:
+                errors.append(f"{row['path']}: kernel Export-Package is empty")
             continue
         expected_role = row["layout_role"]
         if role != expected_role:
@@ -222,7 +264,7 @@ def main() -> int:
             continue
         expected = KNOWN_API_SPLITS.get(package)
         if expected is None:
-            errors.append(f"new api-api split Export-Package {package}: {owner_desc}")
+            errors.append(f"new split Export-Package {package}: {owner_desc}")
             continue
         if stems != expected:
             errors.append(
@@ -238,6 +280,35 @@ def main() -> int:
             warnings.append(
                 f"allow-list stale: {package} (stems {sorted(expected)}) is no longer a split; "
                 "remove it from KNOWN_API_SPLITS"
+            )
+
+    kernel_rows = [row for row in rows if row["layout_role"] == "kernel"]
+    if len(kernel_rows) != 1:
+        errors.append(f"expected exactly one kernel manifest, found {len(kernel_rows)}")
+    else:
+        api_exports = {
+            package
+            for row in rows
+            if row["layout_role"] == "api"
+            for package in row["exports"]
+        }
+        source_packages = java_source_packages(ROOT / "fineract-core" / "src" / "main" / "java")
+        expected_exports = sorted(
+            package
+            for package in source_packages
+            if package not in api_exports and package not in KERNEL_EXPORT_EXCLUDES
+        )
+        declared = kernel_rows[0]["exports"]
+        missing = [package for package in expected_exports if package not in declared]
+        extra = [package for package in declared if package not in expected_exports]
+        if missing:
+            errors.append(
+                "fineract-core Export-Package missing unique kernel packages: "
+                + ", ".join(missing)
+            )
+        if extra:
+            errors.append(
+                "fineract-core Export-Package has unexpected packages: " + ", ".join(extra)
             )
 
     print(f"Scanned {len(rows)} OSGi Gradle manifests, {len(exporters)} exported packages.")
