@@ -42,7 +42,7 @@ Inventory and ranks 1–30 below are **historical**. They are not a mandate to p
 | Project | Role |
 |---------|------|
 | `:fineract-codes-api` | `CodeValueData`, `CodeData`, read ports, swagger models (no core dep) |
-| `:fineract-codes-impl` | REST/handlers/services (from provider) + `CodesOsgiServiceRegistrar` |
+| `:fineract-codes-impl` | REST/handlers/services (from provider) + `CodesOsgiServiceRegistrar` / `CodesOsgiBundleActivator` |
 | Residual in core | `Code`/`CodeValue` entities, repos, exceptions, `CodeValueMapper` |
 
 Core has `api project(':fineract-codes-api')` for transitive DTO access.

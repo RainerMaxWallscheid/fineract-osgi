@@ -60,7 +60,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService",
             "org.apache.fineract.cob.service.ConfigJobParameterService",
             "org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService",
-            "org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService"
+            "org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService",
+            "org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService"
     };
 
     private EquinoxResolveSmoke() {}

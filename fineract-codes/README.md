@@ -5,7 +5,7 @@
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-codes-api` | `api/` | `org.apache.fineract.codes.api` | Pure DTOs, read ports, swagger models |
-| `fineract-codes-impl` | `impl/` | `org.apache.fineract.codes.impl` | REST, handlers, read/write services |
+| `fineract-codes-impl` | `impl/` | `org.apache.fineract.codes.impl` | REST, handlers, read/write services; Equinox `CodesOsgiBundleActivator` |
 | `fineract-codes-test` | `test/` | `org.apache.fineract.codes.test` | Fragment-Host → impl |
 
 ### Residual in `fineract-core`

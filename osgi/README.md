@@ -268,7 +268,7 @@ Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bund
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-codes-api` | `org.apache.fineract.codes.api` | Pure DTOs + read ports + swagger models |
-| `fineract-codes-impl` | `org.apache.fineract.codes.impl` | REST/handlers + `CodesOsgiServiceRegistrar` |
+| `fineract-codes-impl` | `org.apache.fineract.codes.impl` | REST/handlers + `CodesOsgiServiceRegistrar` / `CodesOsgiBundleActivator` |
 | `fineract-codes-test` | `org.apache.fineract.codes.test` | Fragment-Host → codes.impl |
 
 Entities/exceptions residual in **fineract-core**.
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, and businessdate ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, businessdate, and codes ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
