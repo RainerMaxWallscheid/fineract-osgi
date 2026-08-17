@@ -6,7 +6,7 @@ Floating Rates catalog — Wave 1 OSGi modularization (after charge)
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-rates-api` | `api/` | `org.apache.fineract.rates.api` | Contracts: **moduleapi**, data DTOs, service interfaces, exceptions |
-| `fineract-rates-impl` | `impl/` | `org.apache.fineract.rates.impl` | JPA, handlers, REST, Spring; **Export-Package** registrar only (`…floatingrates.impl.osgi`) |
+| `fineract-rates-impl` | `impl/` | `org.apache.fineract.rates.impl` | JPA, handlers, REST, Spring; **Export-Package** registrar only (`…floatingrates.impl.osgi`); Equinox `RatesOsgiBundleActivator` |
 | `fineract-rates-test` | `test/` | `org.apache.fineract.rates.test` | White-box tests; **Fragment-Host** → `rates.impl` |
 
 No `:fineract-rates` façade. Depend on `-api`; composition roots also take `-impl`.

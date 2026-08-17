@@ -126,7 +126,7 @@ Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bund
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-rates-api` | `org.apache.fineract.rates.api` | `FloatingRatePort`, DTOs, service interfaces |
-| `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` |
+| `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` / `RatesOsgiBundleActivator` |
 | `fineract-rates-test` | `org.apache.fineract.rates.test` | Fragment-Host → rates.impl |
 
 Loan uses **rates-api only** (`floatingRateId` + port).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command and charge pilots register ports via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, charge, and rates pilots register ports via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

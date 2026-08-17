@@ -57,7 +57,9 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.rates.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Floating rates + loan Rate catalog residual (JPA, services, REST, Spring wiring)',
-                'Import-Package': 'org.apache.fineract.portfolio.floatingrates.moduleapi,'
+                'Bundle-Activator': 'org.apache.fineract.portfolio.floatingrates.impl.osgi.RatesOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.floatingrates.moduleapi,'
                         + 'org.apache.fineract.portfolio.floatingrates.data,'
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
                         + 'org.apache.fineract.portfolio.floatingrates.exception,'

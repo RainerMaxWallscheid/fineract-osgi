@@ -85,7 +85,8 @@ Manifest Export/Import/Fragment-Host on jars.
 `FloatingRatePortJpaAdapterTest` under rates-test.
 
 ### Step 6 — OSGi registrar ✅
-`RatesOsgiServiceRegistrar` → `FloatingRatePort` + `RateReadService` + `RateWriteService`.
+`RatesOsgiServiceRegistrar` (Spring path) → `FloatingRatePort` + `RateReadService` + `RateWriteService`.  
+`RatesOsgiBundleActivator` (Equinox start; Spring-free empty catalog) → `FloatingRatePort`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |
