@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Search Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.search.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.search.impl.osgi.SearchOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.search.service,'
+                        + 'org.apache.fineract.portfolio.search.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.search.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.search.impl'
                 )
     }

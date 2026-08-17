@@ -385,6 +385,16 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 
 `PaymentType` entity residual in **fineract-core**. Equinox registers `PaymentTypeReadService` only (`retrieveAll*` → empty, `retrieveOne` → null). Did not register `PaymentTypeWriteService` (one thin port).
 
+### Provider peel: fineract-search (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-search-api` | `org.apache.fineract.search.api` | `SearchReadService`, `SearchData`/`SearchConditions`, ad-hoc DTOs |
+| `fineract-search-impl` | `org.apache.fineract.search.impl` | REST + `SearchOsgiServiceRegistrar` / `SearchOsgiBundleActivator` |
+| `fineract-search-test` | `org.apache.fineract.search.test` | Fragment-Host → search.impl |
+
+`SearchUtil` / advanced-query DTOs residual in **fineract-core**. Equinox registers `SearchReadService` (`retriveMatchingData` / ad-hoc match → empty, template → null).
+
 ## Manifest check
 
 ```bash

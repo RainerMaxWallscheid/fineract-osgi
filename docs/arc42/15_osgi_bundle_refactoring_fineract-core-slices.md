@@ -120,7 +120,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | Rank | Candidate | ~types | Target | Why / risk |
 |------|-----------|--------|--------|------------|
 | **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); `PaymentType` entity/repo/not-found residual in core |
-| **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
+| **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
 | **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
 | **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
@@ -177,7 +177,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 ### Closed leftover order
 
 1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); entity residual in core).  
-2. **Search** ✅ (`fineract-search` api/impl/test; `SearchUtil` + advanced-query DTOs residual in core).  
+2. **Search** ✅ (`fineract-search` api/impl/test; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core).  
 3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; write impl residual in progressive-loan-impl).  
 4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
 5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
