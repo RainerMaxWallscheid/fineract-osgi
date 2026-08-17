@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. The command pilot registers `CommandDispatcher` / handler / hook managers via `CommandOsgiBundleActivator` (no Spring). Charge and other ports stay at 0 until they have an activator or a Spring context. `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command and charge pilots register ports via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

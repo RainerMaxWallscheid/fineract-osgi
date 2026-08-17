@@ -59,7 +59,9 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.charge.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Charge Catalog implementation (JPA, services, REST, Spring wiring)',
-                'Import-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
+                'Bundle-Activator': 'org.apache.fineract.portfolio.charge.impl.osgi.ChargeOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.charge.moduleapi,'
                         + 'org.apache.fineract.portfolio.charge.exception,'
                         + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.charge.impl.osgi',

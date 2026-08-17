@@ -17,7 +17,8 @@ OSGi **implementation** bundle for the Charge Catalog ([ADR-022](../../docs/arc4
 | Platform services / handlers / REST | Application + driven adapters |
 | `ChargeDefinitionPortJpaAdapter` | Module API adapter (`@Service`) |
 | `ChargeConfiguration` | Spring `@Bean` wiring for read/write services |
-| `ChargeOsgiServiceRegistrar` | Registers `ChargeDefinitionPort` when OSGi `BundleContext` is present; **no-ops** under plain Boot |
+| `ChargeOsgiBundleActivator` | Registers `ChargeDefinitionPort` on Equinox start (Spring-free empty catalog) |
+| `ChargeOsgiServiceRegistrar` | Registers `ChargeDefinitionPort` from Spring beans when OSGi `BundleContext` is present; **no-ops** under plain Boot |
 | Composition ports | `ChargeOfficeAccessPort`, `ChargeAccountingDropdownPort` (adapters in provider) |
 
 **White-box tests:** production **main only** — tests live in `:fineract-charge-test` (Fragment-Host).

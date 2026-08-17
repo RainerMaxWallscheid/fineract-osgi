@@ -37,8 +37,12 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
                         + 'org.apache.fineract.portfolio.charge.exception,'
                         + 'org.apache.fineract.portfolio.charge.util',
-                // Kernel exception bases only; wildcard leaves transitive resolution to the framework.
-                'Import-Package': '*',
+                // Gradle writes this header literally (not BND). `*` is not DynamicImport-Package.
+                // Catalog exceptions extend kernel bases, so those packages must be named.
+                'Import-Package': 'org.apache.fineract.infrastructure.core.exception,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.portfolio.common.domain,'
+                        + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.api'
                 )
     }

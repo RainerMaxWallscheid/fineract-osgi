@@ -8,6 +8,7 @@ OSGi **interface** bundle for the Charge Catalog
 | Gradle project | `:fineract-charge-api` |
 | Bundle-SymbolicName | `org.apache.fineract.charge.api` |
 | Export-Package | `…moduleapi`, catalog `…exception` |
+| Import-Package | kernel `…core.exception` / `…core.data` / `…portfolio.common.domain` (catalog exceptions extend those bases) |
 | Spring / JPA entity / REST | **none** (enum `AttributeConverter`s only) |
 
 ## Contents

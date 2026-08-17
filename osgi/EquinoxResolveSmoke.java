@@ -106,7 +106,7 @@ public final class EquinoxResolveSmoke {
                     bundle.start();
                 } catch (Exception ex) {
                     startFailures++;
-                    System.err.println("START_FAIL " + bundle.getSymbolicName() + " " + ex.getMessage());
+                    System.err.println("START_FAIL " + bundle.getSymbolicName() + " " + explain(ex));
                 }
             }
         }
@@ -177,5 +177,19 @@ public final class EquinoxResolveSmoke {
             case Bundle.ACTIVE -> "ACTIVE";
             default -> "STATE_" + state;
         };
+    }
+
+    private static String explain(Throwable error) {
+        StringBuilder out = new StringBuilder();
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (out.length() > 0) {
+                out.append(" caused by ");
+            }
+            out.append(current.getClass().getSimpleName());
+            if (current.getMessage() != null && !current.getMessage().isBlank()) {
+                out.append(": ").append(current.getMessage());
+            }
+        }
+        return out.toString();
     }
 }
