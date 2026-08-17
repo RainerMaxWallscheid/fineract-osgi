@@ -6,7 +6,7 @@ Tax catalog (components / groups) — Wave 1 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-tax-api` | `api/` | `org.apache.fineract.tax.api` | Contracts: **moduleapi**, service interfaces, DTO tax helpers, exceptions |
-| `fineract-tax-impl` | `impl/` | `org.apache.fineract.tax.impl` | JPA, handlers, REST, adapters; JPA domain + residual write/read/assembler/config |
+| `fineract-tax-impl` | `impl/` | `org.apache.fineract.tax.impl` | JPA, handlers, REST, adapters; Equinox `TaxOsgiBundleActivator` |
 | `fineract-tax-test` | `test/` | `org.apache.fineract.tax.test` | White-box tests; **Fragment-Host** → `tax.impl` |
 
 No `:fineract-tax` façade.
