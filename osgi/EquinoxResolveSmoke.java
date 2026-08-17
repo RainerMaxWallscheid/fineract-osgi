@@ -56,7 +56,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService",
             "org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService",
             "org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort",
-            "org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService"
+            "org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService",
+            "org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService"
     };
 
     private EquinoxResolveSmoke() {}

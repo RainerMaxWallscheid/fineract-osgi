@@ -57,7 +57,11 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.workingcapitalloan.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Working capital loan domain, COB, residual services',
-                'Import-Package': '*',
+                'Bundle-Activator': 'org.apache.fineract.portfolio.workingcapitalloan.impl.osgi.WorkingCapitalLoanOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.service,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.workingcapitalloan.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.workingcapitalloan.impl'
                 )

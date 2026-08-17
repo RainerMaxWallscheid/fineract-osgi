@@ -61,6 +61,7 @@ dependencies {
             // Batch command strategies use org.apache.http.HttpStatus
             'org.apache.httpcomponents:httpcore',
             )
+    compileOnly 'org.osgi:osgi.core:8.0.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
