@@ -176,7 +176,7 @@ Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_b
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-mix-api` | `org.apache.fineract.mix.api` | Taxonomy / mapping / XBRL service interfaces + DTOs |
-| `fineract-mix-impl` | `org.apache.fineract.mix.impl` | JPA + REST + XBRL builder + `MixOsgiServiceRegistrar` |
+| `fineract-mix-impl` | `org.apache.fineract.mix.impl` | JPA + REST + `MixOsgiServiceRegistrar` / `MixOsgiBundleActivator` |
 | `fineract-mix-test` | `org.apache.fineract.mix.test` | Fragment-Host → mix.impl |
 
 Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-mix.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-mix.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, document, branch, and loan-origination ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, and Wave-2 (document / branch / loan-origination / mix) ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

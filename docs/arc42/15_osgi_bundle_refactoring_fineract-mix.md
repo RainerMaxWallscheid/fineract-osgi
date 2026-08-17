@@ -52,14 +52,14 @@ fineract-mix/
 | `…mix.data` / `exception` / `command` | **api** |
 | `…mix.service.*Impl` / `MixReportXBRLBuilder` | **impl** |
 | domain / mapping / handler / REST | **impl** |
-| `…mix.impl.osgi` | **impl** — `MixOsgiServiceRegistrar` |
+| `…mix.impl.osgi` | **impl** — `MixOsgiServiceRegistrar` (Spring) + `MixOsgiBundleActivator` (Equinox start) |
 
 ---
 
 ## 4. Steps
 
 ### Step 0–7, 9 ✅
-Mechanical api/impl/test + registrar + consumer Gradle (provider / war).
+Mechanical api/impl/test + registrar + Equinox `MixOsgiBundleActivator` + consumer Gradle (provider / war).
 
 ### Step 8 — Semantic residual ✅
 - [x] No foreign domain modules depend on mix
