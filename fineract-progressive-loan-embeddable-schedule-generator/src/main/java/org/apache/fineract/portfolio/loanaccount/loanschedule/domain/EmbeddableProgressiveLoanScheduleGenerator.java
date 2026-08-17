@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.ProgressiveLoanModel;
-import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePlan;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.loanschedule.data.LoanSchedulePlan;
 import org.apache.fineract.portfolio.loanaccount.service.InterestScheduleModelRepositoryWrapper;
 import org.apache.fineract.portfolio.loanproduct.calc.EMICalculator;
 import org.apache.fineract.portfolio.loanproduct.calc.ProgressiveEMICalculator;

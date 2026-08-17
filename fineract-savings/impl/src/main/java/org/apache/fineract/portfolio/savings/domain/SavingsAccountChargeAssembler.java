@@ -49,7 +49,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
-import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFoundException;
+import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.springframework.beans.factory.annotation.Autowired;

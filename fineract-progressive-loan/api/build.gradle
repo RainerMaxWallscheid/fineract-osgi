@@ -31,9 +31,9 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.progressiveloan.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Progressive loan contracts (ports, pure DTOs)',
-                'Export-Package': 'org.apache.fineract.portfolio.loanaccount.data,'
-                        + 'org.apache.fineract.portfolio.loanaccount.loanschedule.data,'
-                        + 'org.apache.fineract.portfolio.loanaccount.service,'
+                'Export-Package': 'org.apache.fineract.portfolio.loanaccount.progressiveloan.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.progressiveloan.loanschedule.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.progressiveloan.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.calc.data',
                 'Automatic-Module-Name': 'org.apache.fineract.progressiveloan.api'
                 )

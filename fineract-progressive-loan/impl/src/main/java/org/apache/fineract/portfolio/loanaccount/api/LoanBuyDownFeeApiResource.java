@@ -42,9 +42,9 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanaccount.data.BuyDownFeeAmortizationDetails;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFeeAmortizationDetails;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAmortizationAllocationData;
-import org.apache.fineract.portfolio.loanaccount.service.BuyDownFeeReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAmortizationAllocationService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.springframework.stereotype.Component;

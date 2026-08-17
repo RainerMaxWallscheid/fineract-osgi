@@ -16,15 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.loanschedule.data;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
-import java.time.LocalDate;
+public class LoanIdsHardLockedException extends RuntimeException {
+    private final Long loanIdFromRequest;
 
-public interface LoanSchedulePlanPeriod {
+    @java.lang.SuppressWarnings("all")
+        public LoanIdsHardLockedException(final Long loanIdFromRequest) {
+        this.loanIdFromRequest = loanIdFromRequest;
+    }
 
-    Integer periodNumber();
-
-    LocalDate periodFromDate();
-
-    LocalDate periodDueDate();
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanIdFromRequest() {
+        return this.loanIdFromRequest;
+    }
 }

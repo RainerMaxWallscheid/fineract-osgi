@@ -301,7 +301,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, and impl-involved or new api-api split packages. Five historical api-api type splits are allow-listed residuals (loan/jobs `jobs.exception`, charge/savings `charge.exception`, loan/progressive `loanaccount.data|service|loanschedule.data`) — Equinox still cannot uniquely wire those packages until the types move.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, and impl-involved or new api-api split packages. There are no remaining allow-listed api-api type splits. `jobs.exception` is jobs-api only after `LoanIdsHardLockedException` moved to `portfolio.loanaccount.exception`. `charge.exception` is charge-api only after the three savings-account charge exceptions moved to `portfolio.savings.exception`. Progressive buy-down / capitalized-income / schedule-plan types live under `portfolio.loanaccount.progressiveloan.*`.
 
 ## Layout
 
@@ -329,7 +329,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + `osgi.bundles`). Start levels: core `@2`, api `@3`, impl `@4`. This does **not** yet prove a full Equinox resolve: `fineract-core` has no OSGi export list, and the allow-listed api-api splits remain.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + `osgi.bundles`). Start levels: core `@2`, api `@3`, impl `@4`. This does **not** yet prove a full Equinox resolve: `fineract-core` has no OSGi export list.
 
 ## Start
 

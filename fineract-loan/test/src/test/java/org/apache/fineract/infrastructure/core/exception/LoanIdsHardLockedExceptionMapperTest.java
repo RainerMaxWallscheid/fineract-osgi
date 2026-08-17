@@ -20,7 +20,7 @@ package org.apache.fineract.infrastructure.core.exception;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

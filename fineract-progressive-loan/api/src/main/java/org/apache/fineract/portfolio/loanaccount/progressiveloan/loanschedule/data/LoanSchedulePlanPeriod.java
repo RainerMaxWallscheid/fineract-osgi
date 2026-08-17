@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.portfolio.loanaccount.progressiveloan.loanschedule.data;
 
-import java.util.List;
-import org.apache.fineract.portfolio.loanaccount.data.BuyDownFeeAmortizationDetails;
+import java.time.LocalDate;
 
-public interface BuyDownFeeReadPlatformService {
+public interface LoanSchedulePlanPeriod {
 
-    List<BuyDownFeeAmortizationDetails> retrieveLoanBuyDownFeeAmortizationDetails(Long loanId);
+    Integer periodNumber();
 
+    LocalDate periodFromDate();
+
+    LocalDate periodDueDate();
 }

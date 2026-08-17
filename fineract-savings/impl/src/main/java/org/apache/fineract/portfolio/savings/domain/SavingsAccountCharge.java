@@ -49,7 +49,7 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
-import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeWithoutMandatoryFieldException;
+import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeWithoutMandatoryFieldException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

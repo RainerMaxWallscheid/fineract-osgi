@@ -19,7 +19,7 @@
 
 dependencies {
     api project(path: ':fineract-core')
-    // LoanIdsHardLockedException used by COBApiFilter
+    // LoanIdsHardLockedException (loanaccount.exception) used by COBApiFilter
     api project(path: ':fineract-loan-api')
     compileOnly 'org.springframework.batch:spring-batch-core'
     // COBApiFilter / LoanCOBApiFilter servlet filter surface for security-impl

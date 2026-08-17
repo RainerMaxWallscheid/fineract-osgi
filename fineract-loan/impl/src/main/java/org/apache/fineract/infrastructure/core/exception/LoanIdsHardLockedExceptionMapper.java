@@ -23,7 +23,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exceptionmapper.FineractExceptionMapper;
-import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedException;
 import org.apache.http.HttpStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

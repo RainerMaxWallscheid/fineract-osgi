@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
-import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedException;
 import org.apache.fineract.useradministration.exception.UnAuthenticatedUserException;
 import org.apache.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;

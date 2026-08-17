@@ -26,11 +26,11 @@ Fails on:
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not exactly one *.impl.osgi package
   * impl-involved cross-stem Export-Package (split packages)
-  * new api-api Export-Package collisions that are not allow-listed
+  * new api-api Export-Package collisions (none are allow-listed)
 
-Known same-package type splits that still live in two *-api bundles are
-printed as residuals (do not fail until the allow-list entry is removed
-or the exporter set changes).
+Historical same-package type splits used to live in KNOWN_API_SPLITS.
+That map is empty after the loan/jobs, charge/savings, and
+loan/progressive close-ins.
 
 Usage:
     python3 osgi/check-manifests.py
@@ -46,18 +46,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Same-package types still split across two *-api bundles. Equinox resolve of
-# the full catalog still needs these types moved to unique packages. The check
-# fails if the exporter set changes (new collision or unexpected extra stem).
-KNOWN_API_SPLITS: dict[str, frozenset[str]] = {
-    "org.apache.fineract.infrastructure.jobs.exception": frozenset({"loan", "jobs"}),
-    "org.apache.fineract.portfolio.charge.exception": frozenset({"charge", "savings"}),
-    "org.apache.fineract.portfolio.loanaccount.data": frozenset({"loan", "progressiveloan"}),
-    "org.apache.fineract.portfolio.loanaccount.service": frozenset({"loan", "progressiveloan"}),
-    "org.apache.fineract.portfolio.loanaccount.loanschedule.data": frozenset(
-        {"loan", "progressiveloan"}
-    ),
-}
+# No remaining same-package type splits across two *-api bundles.
+# The check fails on any new api-api Export-Package collision.
+KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 
 ATTR_KEYS = (
     "Bundle-SymbolicName",

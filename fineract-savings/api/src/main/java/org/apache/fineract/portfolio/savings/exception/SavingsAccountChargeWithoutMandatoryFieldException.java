@@ -16,15 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.portfolio.savings.exception;
 
-import java.util.List;
-import org.apache.fineract.portfolio.loanaccount.data.CapitalizedIncomeDetails;
-import org.apache.fineract.portfolio.loanaccount.data.LoanCapitalizedIncomeData;
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-public interface CapitalizedIncomeBalanceReadService {
+/**
+ * {@link AbstractPlatformDomainRuleException} thrown when currency mismatch occurs
+ */
+public class SavingsAccountChargeWithoutMandatoryFieldException extends AbstractPlatformDomainRuleException {
 
-    LoanCapitalizedIncomeData fetchLoanCapitalizedIncomeData(Long loanId);
+    public SavingsAccountChargeWithoutMandatoryFieldException(final String entity, final String postFix, final String defaultUserMessage,
+            final Object... defaultUserMessageArgs) {
+        super("error.msg." + entity + "." + postFix + ".cannot.be.blank", defaultUserMessage, defaultUserMessageArgs);
+    }
 
-    List<CapitalizedIncomeDetails> fetchLoanCapitalizedIncomeDetails(Long loanId);
 }

@@ -29,7 +29,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.repository.LoanBuyDownFeeBalanceRepository;
 import org.apache.fineract.portfolio.loanaccount.repository.LoanCapitalizedIncomeBalanceRepository;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanTransactionValidator;
-import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceReadService;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.CapitalizedIncomeBalanceReadService;
 import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceReadServiceImpl;
 import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceService;
 import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceServiceImpl;

@@ -31,7 +31,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.savings.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Savings/deposit contracts (ports, DTOs, exceptions)',
-                'Export-Package': 'org.apache.fineract.portfolio.accountdetails.data,org.apache.fineract.portfolio.charge.exception,org.apache.fineract.portfolio.interestratechart.data,org.apache.fineract.portfolio.interestratechart.exception,org.apache.fineract.portfolio.savings,org.apache.fineract.portfolio.savings.data,org.apache.fineract.portfolio.savings.exception,org.apache.fineract.portfolio.savings.moduleapi,org.apache.fineract.portfolio.savings.service,org.apache.fineract.portfolio.savings.service.search',
+                'Export-Package': 'org.apache.fineract.portfolio.accountdetails.data,org.apache.fineract.portfolio.interestratechart.data,org.apache.fineract.portfolio.interestratechart.exception,org.apache.fineract.portfolio.savings,org.apache.fineract.portfolio.savings.data,org.apache.fineract.portfolio.savings.exception,org.apache.fineract.portfolio.savings.moduleapi,org.apache.fineract.portfolio.savings.service,org.apache.fineract.portfolio.savings.service.search',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.savings.api'
                 )

@@ -16,18 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.jobs.exception;
+package org.apache.fineract.portfolio.loanaccount.progressiveloan.service;
 
-public class LoanIdsHardLockedException extends RuntimeException {
-    private final Long loanIdFromRequest;
+import java.util.List;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.CapitalizedIncomeDetails;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.LoanCapitalizedIncomeData;
 
-    @java.lang.SuppressWarnings("all")
-        public LoanIdsHardLockedException(final Long loanIdFromRequest) {
-        this.loanIdFromRequest = loanIdFromRequest;
-    }
+public interface CapitalizedIncomeBalanceReadService {
 
-    @java.lang.SuppressWarnings("all")
-        public Long getLoanIdFromRequest() {
-        return this.loanIdFromRequest;
-    }
+    LoanCapitalizedIncomeData fetchLoanCapitalizedIncomeData(Long loanId);
+
+    List<CapitalizedIncomeDetails> fetchLoanCapitalizedIncomeDetails(Long loanId);
 }

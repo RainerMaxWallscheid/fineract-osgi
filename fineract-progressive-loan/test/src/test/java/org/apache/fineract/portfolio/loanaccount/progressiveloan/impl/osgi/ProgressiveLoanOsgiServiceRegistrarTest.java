@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.fineract.portfolio.loanaccount.service.BuyDownFeeReadPlatformService;
-import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceReadService;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.CapitalizedIncomeBalanceReadService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 

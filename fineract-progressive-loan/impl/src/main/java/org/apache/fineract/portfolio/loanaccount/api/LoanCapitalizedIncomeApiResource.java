@@ -41,10 +41,10 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanaccount.data.CapitalizedIncomeDetails;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.CapitalizedIncomeDetails;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAmortizationAllocationData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanCapitalizedIncomeData;
-import org.apache.fineract.portfolio.loanaccount.service.CapitalizedIncomeBalanceReadService;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.LoanCapitalizedIncomeData;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.CapitalizedIncomeBalanceReadService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAmortizationAllocationService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.springframework.stereotype.Component;

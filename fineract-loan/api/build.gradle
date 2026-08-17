@@ -31,8 +31,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.loan.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Loan contracts (ports, pure DTOs, exceptions)',
-                'Export-Package': 'org.apache.fineract.infrastructure.jobs.exception,'
-                        + 'org.apache.fineract.portfolio.delinquency.api.data,'
+                'Export-Package': 'org.apache.fineract.portfolio.delinquency.api.data,'
                         + 'org.apache.fineract.portfolio.delinquency.data,'
                         + 'org.apache.fineract.portfolio.delinquency.exception,'
                         + 'org.apache.fineract.portfolio.interestpauses.data,'
