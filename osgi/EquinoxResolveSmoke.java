@@ -66,7 +66,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService",
             "org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService",
             "org.apache.fineract.adhocquery.service.AdHocReadPlatformService",
-            "org.apache.fineract.template.service.TemplateMergeService"
+            "org.apache.fineract.template.service.TemplateMergeService",
+            "org.apache.fineract.notification.service.UserNotificationService"
     };
 
     private EquinoxResolveSmoke() {}
