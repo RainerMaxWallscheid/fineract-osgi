@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Organisation Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.organisation.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.organisation.impl.osgi.OrganisationOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.organisation.provisioning.service,'
+                        + 'org.apache.fineract.organisation.provisioning.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.organisation.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.impl'
                 )
     }
