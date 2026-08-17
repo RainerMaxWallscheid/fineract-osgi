@@ -375,6 +375,16 @@ Datatable ports come from **fineract-core**. Equinox registers `ReadLikelihoodSe
 
 Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `TransferWritePlatformService` only (`CommandProcessingResult.empty()`).
 
+### Provider peel: fineract-paymenttype (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-paymenttype-api` | `org.apache.fineract.paymenttype.api` | `PaymentTypeData` + request/response DTOs, read/write ports |
+| `fineract-paymenttype-impl` | `org.apache.fineract.paymenttype.impl` | REST/handlers + `PaymentTypeOsgiServiceRegistrar` / `PaymentTypeOsgiBundleActivator` |
+| `fineract-paymenttype-test` | `org.apache.fineract.paymenttype.test` | Fragment-Host → paymenttype.impl |
+
+`PaymentType` entity residual in **fineract-core**. Equinox registers `PaymentTypeReadService` only (`retrieveAll*` → empty, `retrieveOne` → null). Did not register `PaymentTypeWriteService` (one thin port).
+
 ## Manifest check
 
 ```bash
