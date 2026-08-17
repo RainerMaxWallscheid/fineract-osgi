@@ -216,7 +216,7 @@ Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_finer
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-loan-api` | `org.apache.fineract.loan.api` | Pure ports, DTOs, exceptions, selected pure enums |
-| `fineract-loan-impl` | `org.apache.fineract.loan.impl` | Domain + entity residual + COB + `LoanOsgiServiceRegistrar` |
+| `fineract-loan-impl` | `org.apache.fineract.loan.impl` | Domain + COB + `LoanOsgiServiceRegistrar` / `LoanOsgiBundleActivator` |
 | `fineract-loan-test` | `org.apache.fineract.loan.test` | Fragment-Host → loan.impl |
 
 Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_refactoring_fineract-loan.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, and Wave-3 ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, and loan ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 

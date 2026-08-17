@@ -38,7 +38,7 @@ fineract-loan/
 | Slice | Contents |
 |-------|----------|
 | **api** | Pure service ports, pure DTOs, exceptions (no Spring DAO), `moduleapi` |
-| **impl** | `Loan` domain, entity-typed services, schedule generators, COB, handlers, impure DTOs |
+| **impl** | `Loan` domain, entity-typed services, schedule generators, COB, handlers, impure DTOs; Equinox `LoanOsgiBundleActivator` (`LoanProductLookupReadPort`) |
 
 ---
 
