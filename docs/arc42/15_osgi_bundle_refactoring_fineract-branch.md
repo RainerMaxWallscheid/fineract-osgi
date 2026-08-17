@@ -57,7 +57,7 @@ fineract-branch/
 | `…teller.validation` | **impl** — `CashierTransactionDataValidator` implements port |
 | REST / handlers / serialization / util | **impl** |
 | `…teller.starter` | **impl** — `OrganisationTellerConfiguration` |
-| `…teller.impl.osgi` | **impl** — `BranchOsgiServiceRegistrar` |
+| `…teller.impl.osgi` | **impl** — `BranchOsgiServiceRegistrar` (Spring) + `BranchOsgiBundleActivator` (Equinox start) |
 
 **Kernel support (residual enabler):** `StaffRepository` + `StaffReadService` interfaces live in **fineract-core** (impls remain in provider) so branch-impl compiles without depending on provider.
 
@@ -84,7 +84,8 @@ Manifest Export/Import/Fragment-Host.
 Deserializer test + `BranchOsgiServiceRegistrarTest`.
 
 ### Step 6 — OSGi registrar ✅
-`BranchOsgiServiceRegistrar` → read + write teller services + `CashierTxnValidationPort`.
+`BranchOsgiServiceRegistrar` (Spring path) → read + write teller services + `CashierTxnValidationPort`.  
+`BranchOsgiBundleActivator` (Equinox start; Spring-free empty teller catalog) → `CashierTxnValidationPort`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

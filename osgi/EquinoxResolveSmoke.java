@@ -48,7 +48,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort",
             "org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort",
             "org.apache.fineract.infrastructure.contentstore.service.ContentStoreService",
-            "org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort"
+            "org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort",
+            "org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort"
     };
 
     private EquinoxResolveSmoke() {}

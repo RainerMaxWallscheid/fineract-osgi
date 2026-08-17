@@ -156,7 +156,7 @@ Provider bulk-import uses **`ContentStreamPort`**; composition root still api+im
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-branch-api` | `org.apache.fineract.branch.api` | Teller service interfaces, DTOs, exceptions, pure enums, `CashierTxnValidationPort` |
-| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + service impls + starter; `BranchOsgiServiceRegistrar` |
+| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + `BranchOsgiServiceRegistrar` / `BranchOsgiBundleActivator` |
 | `fineract-branch-test` | `org.apache.fineract.branch.test` | Fragment-Host → branch.impl |
 
 Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, and document content-store ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, document, and branch ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
