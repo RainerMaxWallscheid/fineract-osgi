@@ -5,7 +5,7 @@
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-businessdate-api` | `api/` | `org.apache.fineract.businessdate.api` | Ports, DTOs, exceptions |
-| `fineract-businessdate-impl` | `impl/` | `org.apache.fineract.businessdate.impl` | JPA, REST, handlers, registrar |
+| `fineract-businessdate-impl` | `impl/` | `org.apache.fineract.businessdate.impl` | JPA, REST, handlers; Equinox `BusinessDateOsgiBundleActivator` |
 | `fineract-businessdate-test` | `test/` | `org.apache.fineract.businessdate.test` | Fragment-Host → impl |
 
 ### Kernel residual in core

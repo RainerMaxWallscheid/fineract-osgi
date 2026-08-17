@@ -30,7 +30,7 @@ Inventory and ranks 1–30 below are **historical**. They are not a mandate to p
 | Project | Role |
 |---------|------|
 | `:fineract-businessdate-api` | Application ports, DTOs, exceptions |
-| `:fineract-businessdate-impl` | Entity, repository, REST, handlers, `BusinessDateOsgiServiceRegistrar` |
+| `:fineract-businessdate-impl` | Entity, repository, REST, handlers, `BusinessDateOsgiServiceRegistrar` / `BusinessDateOsgiBundleActivator` |
 | `:fineract-businessdate-test` | Fragment-Host |
 
 **Kernel residual:** `BusinessDateType` stays in `fineract-core` (same package) for `ThreadLocalContextUtil` / action context without core→businessdate-api→core cycles.

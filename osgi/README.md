@@ -258,7 +258,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-businessdate-api` | `org.apache.fineract.businessdate.api` | Ports, DTOs, exceptions |
-| `fineract-businessdate-impl` | `org.apache.fineract.businessdate.impl` | JPA/REST + `BusinessDateOsgiServiceRegistrar` |
+| `fineract-businessdate-impl` | `org.apache.fineract.businessdate.impl` | JPA/REST + `BusinessDateOsgiServiceRegistrar` / `BusinessDateOsgiBundleActivator` |
 | `fineract-businessdate-test` | `org.apache.fineract.businessdate.test` | Fragment-Host → businessdate.impl |
 
 Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, and Wave-4 ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, and businessdate ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
