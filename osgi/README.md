@@ -303,6 +303,14 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 
 `AppUser` / `Role` / `Permission` and shared DTOs residual in **fineract-core**.
 
+### Provider peel: fineract-adhocquery (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-adhocquery-api` | `org.apache.fineract.adhocquery.api` | Ports, DTOs, `ReportRunFrequency`, exceptions |
+| `fineract-adhocquery-impl` | `org.apache.fineract.adhocquery.impl` | REST/entity/handlers + `AdhocQueryOsgiServiceRegistrar` / `AdhocQueryOsgiBundleActivator` |
+| `fineract-adhocquery-test` | `org.apache.fineract.adhocquery.test` | Fragment-Host → adhocquery.impl |
+
 ## Manifest check
 
 ```bash
@@ -359,7 +367,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, and useradministration ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, useradministration, and adhocquery ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
