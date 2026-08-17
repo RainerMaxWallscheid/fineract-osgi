@@ -355,6 +355,16 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 
 Entity / generator residual in **fineract-core**.
 
+### Provider peel: fineract-survey (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-survey-api` | `org.apache.fineract.survey.api` | PPI/likelihood/poverty-line DTOs and ports |
+| `fineract-survey-impl` | `org.apache.fineract.survey.impl` | REST/JPA + `SurveyOsgiServiceRegistrar` / `SurveyOsgiBundleActivator` |
+| `fineract-survey-test` | `org.apache.fineract.survey.test` | Fragment-Host → survey.impl |
+
+Datatable ports come from **fineract-core**. Equinox registers `ReadLikelihoodService` only (`retrieveAll` → empty, `retrieve` → null). Did not register `ReadSurveyService` (one thin port; `GenericResultsetData` is already imported from dataqueries-api).
+
 ## Manifest check
 
 ```bash

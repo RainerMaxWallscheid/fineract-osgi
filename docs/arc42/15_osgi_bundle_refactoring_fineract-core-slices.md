@@ -219,7 +219,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-spm` | **complete** (api/impl/test); Equinox `SpmOsgiBundleActivator` (`ScorecardReadPlatformService`); Client/AppUser from core |
 | `fineract-fund` | **complete** (api/impl/test); Equinox `FundOsgiBundleActivator` (`FundReadPlatformService`); Fund entity residual in core |
 | `fineract-accountnumberformat` | **complete** (api/impl/test); Equinox `AccountNumberFormatOsgiBundleActivator` (`AccountNumberFormatReadPlatformService`); entity/generator residual in core |
-| `fineract-survey` | **complete** (api/impl/test); PPI/infrastructure surveys; datatable ports from core |
+| `fineract-survey` | **complete** (api/impl/test); Equinox `SurveyOsgiBundleActivator` (`ReadLikelihoodService`); PPI/infrastructure surveys; datatable ports from core |
 | `fineract-transfer` | **complete** (api/impl/test); write impl residual progressive-loan |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
 | `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |

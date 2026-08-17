@@ -70,7 +70,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.notification.service.UserNotificationService",
             "org.apache.fineract.spm.service.ScorecardReadPlatformService",
             "org.apache.fineract.portfolio.fund.service.FundReadPlatformService",
-            "org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService"
+            "org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService",
+            "org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService"
     };
 
     private EquinoxResolveSmoke() {}
