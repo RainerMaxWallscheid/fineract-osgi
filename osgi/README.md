@@ -166,7 +166,7 @@ Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_o
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-loan-origination-api` | `org.apache.fineract.loanorigination.api` | Originator service ports, DTOs (`LoanOriginatorData`), exceptions |
-| `fineract-loan-origination-impl` | `org.apache.fineract.loanorigination.impl` | JPA + REST + Avro enrichers + `LoanOriginationOsgiServiceRegistrar` |
+| `fineract-loan-origination-impl` | `org.apache.fineract.loanorigination.impl` | JPA + REST + `LoanOriginationOsgiServiceRegistrar` / `LoanOriginationOsgiBundleActivator` |
 | `fineract-loan-origination-test` | `org.apache.fineract.loanorigination.test` | Fragment-Host → loanorigination.impl |
 
 Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_bundle_refactoring_fineract-loan-origination.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan-origination.md).
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, document, and branch ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, document, branch, and loan-origination ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
