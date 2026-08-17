@@ -6,7 +6,7 @@ Progressive loan schedule / EMI model — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-progressive-loan-api` | `api/` | `org.apache.fineract.progressiveloan.api` | Pure ports & calc DTOs |
-| `fineract-progressive-loan-impl` | `impl/` | `org.apache.fineract.progressiveloan.impl` | Schedule engine, residual domain |
+| `fineract-progressive-loan-impl` | `impl/` | `org.apache.fineract.progressiveloan.impl` | Schedule engine, residual domain; Equinox `ProgressiveLoanOsgiBundleActivator` |
 | `fineract-progressive-loan-test` | `test/` | `org.apache.fineract.progressiveloan.test` | Fragment-Host → impl |
 
 No façade. Consumers: **api + impl**.

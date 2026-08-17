@@ -226,7 +226,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-progressive-loan-api` | `org.apache.fineract.progressiveloan.api` | Pure ports & calc DTOs |
-| `fineract-progressive-loan-impl` | `org.apache.fineract.progressiveloan.impl` | Schedule engine residual + `ProgressiveLoanOsgiServiceRegistrar` |
+| `fineract-progressive-loan-impl` | `org.apache.fineract.progressiveloan.impl` | Schedule engine residual + `ProgressiveLoanOsgiServiceRegistrar` / `ProgressiveLoanOsgiBundleActivator` |
 | `fineract-progressive-loan-test` | `org.apache.fineract.progressiveloan.test` | Fragment-Host → progressiveloan.impl |
 
 ### Wave 4: fineract-working-capital-loan bundles (complete)
@@ -349,7 +349,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, and loan ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, loan, and progressive-loan ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
 
 ## Start
 
