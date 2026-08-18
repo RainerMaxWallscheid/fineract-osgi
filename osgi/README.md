@@ -695,6 +695,16 @@ Equinox `OpenApiOsgiBundleActivator` starts with no service. openapi-api has no 
 
 Equinox registers `PropertyService` only (partition/chunk sizes → null). Did not register Spring `AllNestedConditions` handlers or `ContextualMessage` (Spring Batch `StepExecutionRequest`).
 
+### Provider peel: fineract-interoperation (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-interoperation-api` | `org.apache.fineract.interoperation.api` | Ports, DTOs, enums, exceptions |
+| `fineract-interoperation-impl` | `org.apache.fineract.interoperation.impl` | REST/JPA + `InteroperationOsgiServiceRegistrar` / `InteroperationOsgiBundleActivator` |
+| `fineract-interoperation-test` | `org.apache.fineract.interoperation.test` | Fragment-Host → interoperation.impl |
+
+Equinox `InteroperationOsgiBundleActivator` starts with no service. Did not register `InteropService` (jakarta.validation; leftover unpublished `DepositAccountType` / `SavingsAccountTransactionType` in savings-api-exported packages). Skipped `fineract-event` (leftover `ExternalEventProducer` in core only).
+
 ## Manifest check
 
 ```bash
