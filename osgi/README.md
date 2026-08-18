@@ -575,6 +575,16 @@ Equinox registers `NoteReadPlatformService` only (`retrieveNote` → null, `retr
 
 Equinox registers `HookReadPlatformService` only (`retrieveAllHooks` → empty, `retrieveHook` / `retrieveNewHookDetails` → null). Did not register `HookWritePlatformService` (request DTOs pull jakarta.validation).
 
+### Provider peel: fineract-sms (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-sms-api` | `org.apache.fineract.sms.api` | Ports, DTOs, exceptions, constants |
+| `fineract-sms-impl` | `org.apache.fineract.sms.impl` | REST/JPA + `SmsOsgiServiceRegistrar` / `SmsOsgiBundleActivator` |
+| `fineract-sms-test` | `org.apache.fineract.sms.test` | Fragment-Host → sms.impl |
+
+Equinox registers `SmsWritePlatformService` only (`create`/`update`/`delete` → empty). Did not register `SmsReadPlatformService` (`Page` / `SearchParameters`).
+
 ## Manifest check
 
 ```bash

@@ -55,8 +55,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract SMS Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.sms.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.sms.impl.osgi.SmsOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.sms.service,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.sms.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.sms.impl'
                 )
     }

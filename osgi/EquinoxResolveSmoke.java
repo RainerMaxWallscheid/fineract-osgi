@@ -92,7 +92,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformService",
             "org.apache.fineract.portfolio.collateralmanagement.service.CollateralManagementReadService",
             "org.apache.fineract.portfolio.note.service.NoteReadPlatformService",
-            "org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService"
+            "org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService",
+            "org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService"
     };
 
     private EquinoxResolveSmoke() {}
