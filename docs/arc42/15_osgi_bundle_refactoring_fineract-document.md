@@ -83,7 +83,7 @@ Existing contentstore/document tests + registrar smoke test under document-test.
 
 ### Step 6 — OSGi registrar ✅
 `DocumentOsgiServiceRegistrar` (Spring path) → `ContentStoreService`, `ContentStreamPort`, document read/write.  
-`DocumentOsgiBundleActivator` (Equinox start; Spring-free empty store + JDK pipe) → `ContentStoreService`, `ContentStreamPort`.
+`DocumentOsgiBundleActivator` (Equinox start; empty store + JDK pipe, lowest ranking) → `ContentStoreService`, `ContentStreamPort`. Composition-root hosted store: `osgi/CompositionRootOsgiBridge` (`ContentStoreService` only).
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

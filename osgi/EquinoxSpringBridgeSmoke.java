@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Arrays;
+import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
@@ -38,7 +40,8 @@ import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * Start the staged catalog, then register composition-root hosted Wave-1
- * catalog ports. Proves ranking over empty activators without staging Spring.
+ * catalog ports and Wave-2 {@link ContentStoreService}. Proves ranking over
+ * empty activators without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -46,6 +49,7 @@ public final class EquinoxSpringBridgeSmoke {
     private static final String CHARGE_PORT = ChargeDefinitionPort.class.getName();
     private static final String RATES_PORT = FloatingRatePort.class.getName();
     private static final String TAX_PORT = TaxCatalogPort.class.getName();
+    private static final String CONTENT_PORT = ContentStoreService.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -102,12 +106,13 @@ public final class EquinoxSpringBridgeSmoke {
         }
 
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
-                new HostedFloatingRatePort(), new HostedTaxCatalogPort());
+                new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
         boolean ratesWins = probeRates(ctx);
         boolean taxWins = probeTax(ctx);
+        boolean contentWins = probeContent(ctx);
 
         bridge.stop();
         framework.stop();
@@ -115,9 +120,10 @@ public final class EquinoxSpringBridgeSmoke {
 
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
-        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins;
+        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
-                + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins);
+                + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins + " contentWins="
+                + contentWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -134,6 +140,19 @@ public final class EquinoxSpringBridgeSmoke {
     private static boolean probeTax(final BundleContext ctx) throws Exception {
         return probe(ctx, TAX_PORT, service -> service instanceof TaxCatalogPort port
                 && port.findTaxGroup(HostedTaxCatalogPort.HOSTED_ID).isPresent());
+    }
+
+    private static boolean probeContent(final BundleContext ctx) throws Exception {
+        return probe(ctx, CONTENT_PORT, service -> {
+            if (!(service instanceof ContentStoreService port)) {
+                return false;
+            }
+            try (var in = port.download(HostedContentStoreService.HOSTED_PATH)) {
+                return Arrays.equals(in.readAllBytes(), HostedContentStoreService.HOSTED_BYTES);
+            } catch (final Exception ex) {
+                return false;
+            }
+        });
     }
 
     private static boolean probe(final BundleContext ctx, final String typeName, final java.util.function.Predicate<Object> hosted)
