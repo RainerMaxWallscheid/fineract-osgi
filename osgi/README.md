@@ -625,6 +625,16 @@ Equinox registers `NotificationConfigurationReadService` only (`getNotificationC
 
 Equinox registers `ReportWritePlatformService` only (`create*`/`update*`/`delete*` → empty). Did not register `ReadReportingService` / template reads (leftover unpublished `ReportData` / `DatatableData`), leftover `DatatableReadService` / `GenericDataService`, or export/check ports (jakarta.ws.rs / Gson).
 
+### Provider peel: fineract-configuration (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-configuration-api` | `org.apache.fineract.configuration.api` | External-services ports/DTOs |
+| `fineract-configuration-impl` | `org.apache.fineract.configuration.impl` | REST/JPA + `ConfigurationOsgiServiceRegistrar` / `ConfigurationOsgiBundleActivator` |
+| `fineract-configuration-test` | `org.apache.fineract.configuration.test` | Fragment-Host → configuration.impl |
+
+Equinox registers `ExternalServicesReadPlatformService` only (`getExternalServiceDetailsByServiceName` → null). Did not register properties read (`MaskedValueSerializer` leftover; extends `NotificationConfigurationReadService`), leftover global-config ports, or write ports.
+
 ## Manifest check
 
 ```bash
