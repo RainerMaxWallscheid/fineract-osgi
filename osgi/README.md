@@ -535,6 +535,16 @@ Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendan
 
 Equinox registers `CreditBureauReadPlatformService` only (`retrieveCreditBureau` → empty). Did not register loan-product mapping reads (loan-impl coupling).
 
+### Provider peel: fineract-collateral (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-collateral-api` | `org.apache.fineract.collateral.api` | Ports, DTOs, exceptions |
+| `fineract-collateral-impl` | `org.apache.fineract.collateral.impl` | REST/JPA + `CollateralOsgiServiceRegistrar` / `CollateralOsgiBundleActivator` |
+| `fineract-collateral-test` | `org.apache.fineract.collateral.test` | Fragment-Host → collateral.impl |
+
+Equinox registers `CollateralWritePlatformService` only (`add*`/`update*`/`delete*` → empty). Did not register `CollateralReadPlatformService` (leftover `CurrencyData` in `organisation.monetary.data`, which monetary-api also exports).
+
 ## Manifest check
 
 ```bash

@@ -5,7 +5,7 @@ Provider peel — legacy loan collateral (`portfolio.collateral`) (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-collateral-api` | `api/` | `org.apache.fineract.collateral.api` | Ports, DTOs (`CollateralData`), exceptions |
-| `fineract-collateral-impl` | `impl/` | `org.apache.fineract.collateral.impl` | Entity, constants, REST, handlers, OSGi registrar |
+| `fineract-collateral-impl` | `impl/` | `org.apache.fineract.collateral.impl` | Entity, constants, REST, handlers; Equinox `CollateralOsgiBundleActivator` |
 | `fineract-collateral-test` | `test/` | `org.apache.fineract.collateral.test` | Fragment-Host → impl |
 
 ## Residual closed (loan)
