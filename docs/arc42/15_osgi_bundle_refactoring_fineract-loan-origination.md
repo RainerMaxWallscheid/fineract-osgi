@@ -80,7 +80,7 @@ Enricher / helper tests + registrar smoke test.
 
 ### Step 6 — OSGi registrar ✅
 `LoanOriginationOsgiServiceRegistrar` (Spring path) → read + write + WC write.  
-`LoanOriginationOsgiBundleActivator` (Equinox start; Spring-free empty catalog) → `LoanOriginatorReadPlatformService`.
+`LoanOriginationOsgiBundleActivator` (Equinox start; empty originator catalog, lowest ranking) → `LoanOriginatorReadPlatformService`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

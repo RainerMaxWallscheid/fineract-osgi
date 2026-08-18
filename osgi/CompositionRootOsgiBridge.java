@@ -24,6 +24,7 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -45,16 +46,19 @@ public final class CompositionRootOsgiBridge {
     private final TaxCatalogPort tax;
     private final ContentStoreService content;
     private final CashierTxnValidationPort cashier;
+    private final LoanOriginatorReadPlatformService originator;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
     public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates,
-            final TaxCatalogPort tax, final ContentStoreService content, final CashierTxnValidationPort cashier) {
+            final TaxCatalogPort tax, final ContentStoreService content, final CashierTxnValidationPort cashier,
+            final LoanOriginatorReadPlatformService originator) {
         this.context = context;
         this.charge = charge;
         this.rates = rates;
         this.tax = tax;
         this.content = content;
         this.cashier = cashier;
+        this.originator = originator;
     }
 
     public void start() {
@@ -63,6 +67,7 @@ public final class CompositionRootOsgiBridge {
         register(TaxCatalogPort.class, tax);
         register(ContentStoreService.class, content);
         register(CashierTxnValidationPort.class, cashier);
+        register(LoanOriginatorReadPlatformService.class, originator);
     }
 
     private <T> void register(final Class<T> type, final T service) {

@@ -23,11 +23,13 @@ import java.util.Hashtable;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Equinox start path for the originator catalog (ADR-022 B3). Registers
  * {@link LoanOriginatorReadPlatformService} without a Spring/JPA context.
+ * Lowest {@code service.ranking} so a composition-root hosted port wins.
  * {@link LoanOriginationOsgiServiceRegistrar} remains the Spring Boot path.
  */
 public class LoanOriginationOsgiBundleActivator implements BundleActivator {
@@ -38,6 +40,7 @@ public class LoanOriginationOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-loan-origination-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(LoanOriginatorReadPlatformService.class, new OsgiLoanOriginatorReadPlatformService(),
                 props);
     }

@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -42,9 +43,10 @@ import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * Start the staged catalog, then register composition-root hosted Wave-1
- * catalog ports, Wave-2 {@link ContentStoreService}, and
- * {@link CashierTxnValidationPort}. Proves ranking over empty activators
- * without staging Spring.
+ * catalog ports, Wave-2 {@link ContentStoreService},
+ * {@link CashierTxnValidationPort}, and
+ * {@link LoanOriginatorReadPlatformService}. Proves ranking over empty
+ * activators without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -54,6 +56,7 @@ public final class EquinoxSpringBridgeSmoke {
     private static final String TAX_PORT = TaxCatalogPort.class.getName();
     private static final String CONTENT_PORT = ContentStoreService.class.getName();
     private static final String CASHIER_PORT = CashierTxnValidationPort.class.getName();
+    private static final String ORIGINATOR_PORT = LoanOriginatorReadPlatformService.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -111,7 +114,7 @@ public final class EquinoxSpringBridgeSmoke {
 
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
                 new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService(),
-                new HostedCashierTxnValidationPort());
+                new HostedCashierTxnValidationPort(), new HostedLoanOriginatorReadPlatformService());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
@@ -119,6 +122,7 @@ public final class EquinoxSpringBridgeSmoke {
         boolean taxWins = probeTax(ctx);
         boolean contentWins = probeContent(ctx);
         boolean cashierWins = probeCashier(ctx);
+        boolean originatorWins = probeOriginator(ctx);
 
         bridge.stop();
         framework.stop();
@@ -126,10 +130,11 @@ public final class EquinoxSpringBridgeSmoke {
 
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
-        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins && cashierWins;
+        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins && cashierWins
+                && originatorWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
                 + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins + " contentWins="
-                + contentWins + " cashierWins=" + cashierWins);
+                + contentWins + " cashierWins=" + cashierWins + " originatorWins=" + originatorWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -155,6 +160,16 @@ public final class EquinoxSpringBridgeSmoke {
             }
             port.validateOnLoanDisbursal(HostedCashierTxnValidationPort.HOSTED_STAFF_ID, "USD", BigDecimal.TEN);
             return HostedCashierTxnValidationPort.HOSTED_STAFF_ID == port.lastStaffId();
+        });
+    }
+
+    private static boolean probeOriginator(final BundleContext ctx) throws Exception {
+        return probe(ctx, ORIGINATOR_PORT, service -> {
+            if (!(service instanceof LoanOriginatorReadPlatformService port)) {
+                return false;
+            }
+            return HostedLoanOriginatorReadPlatformService.HOSTED_ID == port.retrieveById(HostedLoanOriginatorReadPlatformService.HOSTED_ID)
+                    .getId();
         });
     }
 
