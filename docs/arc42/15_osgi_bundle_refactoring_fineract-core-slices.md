@@ -126,7 +126,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
 | **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); product JPA residual core; account write residual progressive; product write residual charge |
 | **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity+DTO residual core; Centers/Groups REST + write residual progressive |
-| **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
+| **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core; main write/REST residual progressive |
 | **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; entity residual loan-impl |
 | **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
 | **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; `ProductNotFoundException` residual core |
@@ -183,7 +183,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write residual progressive-loan).  
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); product JPA residual core).  
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity residual core).  
-8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
+8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core).  
 9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; entity residual loan-impl).  
 10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).  
 11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).  
@@ -222,7 +222,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-survey` | **complete** (api/impl/test); Equinox `SurveyOsgiBundleActivator` (`ReadLikelihoodService`); PPI/infrastructure surveys; datatable ports from core |
 | `fineract-transfer` | **complete** (api/impl/test); Equinox `TransferOsgiBundleActivator` (`TransferWritePlatformService`); write impl residual progressive-loan |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
-| `fineract-clients` | **complete** (api/impl/test); pure family/identifiers/transactions/search; Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
+| `fineract-clients` | **complete** (api/impl/test); Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
 | `fineract-group` | **complete** (api/impl/test); Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
 | `fineract-collectionsheet` | **complete** (api/impl/test); Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | **closed** into fineract-search; `LoanProductLookupReadPort` + lookup DTO on loan-api; adapter residual loan-impl |
@@ -258,7 +258,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-accounttransfer` | **complete** (api/impl/test); Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 | `fineract-shares` | **complete** (api/impl/test); Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
 | `fineract-group` | **complete** (api/impl/test); Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
-| `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
+| `fineract-clients` | **complete** (api/impl/test); Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); ports/DTOs/REST/handlers; entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
 | `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |

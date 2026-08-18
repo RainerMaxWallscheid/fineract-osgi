@@ -435,6 +435,16 @@ Product JPA residual in **fineract-core**. Equinox registers `ShareProductDropdo
 
 Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatformService` only (`retrieveAllLevels` → empty). Did not register `GroupReadPlatformService` / `CenterReadPlatformService` (leftover `GroupGeneralData` / `CenterData`; `Page`).
 
+### Provider peel: fineract-clients (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-clients-api` | `org.apache.fineract.clients.api` | Ports, pure DTOs/requests, search v2 API types |
+| `fineract-clients-impl` | `org.apache.fineract.clients.impl` | REST/handlers + `ClientsOsgiServiceRegistrar` / `ClientsOsgiBundleActivator` |
+| `fineract-clients-test` | `org.apache.fineract.clients.test` | Fragment-Host → clients.impl |
+
+`Client` / `ClientData` residual in **fineract-core**. Equinox registers `ClientIdentifierWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `ClientReadPlatformService` / `ClientWritePlatformService` / `ClientTemplateReadPlatformService` (leftover `Client` / `ClientData`) or search (`Page`).
+
 ## Manifest check
 
 ```bash
