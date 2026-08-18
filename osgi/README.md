@@ -525,6 +525,16 @@ Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendan
 
 `AddressData` residual in **fineract-core**. Equinox registers `FieldConfigurationReadPlatformService` only (`retrieve*` → empty). Did not register `AddressReadPlatformService` (leftover `AddressData`) or `AddressWritePlatformService` (leftover `Client`).
 
+### Provider peel: fineract-creditbureau (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-creditbureau-api` | `org.apache.fineract.creditbureau.api` | DTOs, ports, exception |
+| `fineract-creditbureau-impl` | `org.apache.fineract.creditbureau.impl` | REST/JPA + `CreditBureauOsgiServiceRegistrar` / `CreditBureauOsgiBundleActivator` |
+| `fineract-creditbureau-test` | `org.apache.fineract.creditbureau.test` | Fragment-Host → creditbureau.impl |
+
+Equinox registers `CreditBureauReadPlatformService` only (`retrieveCreditBureau` → empty). Did not register loan-product mapping reads (loan-impl coupling).
+
 ## Manifest check
 
 ```bash
