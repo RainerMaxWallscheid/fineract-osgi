@@ -16,11 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.openapi.impl.osgi;
 
-dependencies {
-    api project(path: ':fineract-openapi-api')
-    implementation(project(path: ':fineract-core'))
-    implementation('org.springframework.boot:spring-boot-starter')
-    compileOnly 'org.osgi:osgi.core:8.0.0'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+
+/**
+ * Equinox start path for openapi (ADR-022 B3). No api port is registered:
+ * openapi-api exports swagger-gradle-plugin reader/filter utilities only.
+ * {@link OpenApiOsgiServiceRegistrar} remains the Spring Boot path.
+ */
+public class OpenApiOsgiBundleActivator implements BundleActivator {
+
+    @Override
+    public void start(final BundleContext context) {
+        // no Equinox-safe api port
+    }
+
+    @Override
+    public void stop(final BundleContext context) {
+        // no registrations
+    }
 }

@@ -675,6 +675,16 @@ Equinox registers `StuckJobExecutorService` only (`resumeStuckJob` no-op). Did n
 
 Equinox `S3OsgiBundleActivator` starts with no service. Did not register `S3ClientCustomizer` (AWS SDK `S3ClientBuilder` has no staged Equinox BSN).
 
+### Provider peel: fineract-openapi (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-openapi-api` | `org.apache.fineract.openapi.api` | swagger-gradle-plugin reader/filter utilities |
+| `fineract-openapi-impl` | `org.apache.fineract.openapi.impl` | `OpenApiOsgiServiceRegistrar` / `OpenApiOsgiBundleActivator` |
+| `fineract-openapi-test` | `org.apache.fineract.openapi.test` | Fragment-Host → openapi.impl |
+
+Equinox `OpenApiOsgiBundleActivator` starts with no service. openapi-api has no application port (`FineractOperationIdReader` / `FineractOpenApiSpecFilter` only).
+
 ## Manifest check
 
 ```bash
