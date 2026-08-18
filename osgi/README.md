@@ -465,6 +465,16 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 
 `ProductNotFoundException` residual in **fineract-core**. Equinox registers `ProductCommandsService` only (`handleCommand` → null). Did not register `ShareProductReadPlatformService` (`Page`).
 
+### Provider peel: fineract-paymentdetail (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-paymentdetail-api` | `org.apache.fineract.paymentdetail.api` | Write port, constants |
+| `fineract-paymentdetail-impl` | `org.apache.fineract.paymentdetail.impl` | Write impl + `PaymentDetailOsgiServiceRegistrar` / `PaymentDetailOsgiBundleActivator` |
+| `fineract-paymentdetail-test` | `org.apache.fineract.paymentdetail.test` | Fragment-Host → paymentdetail.impl |
+
+`PaymentDetail` entity / `PaymentDetailData` residual in **fineract-core**. Equinox registers `PaymentDetailWritePlatformService` only (`create*` / `persist*` → null).
+
 ## Manifest check
 
 ```bash
