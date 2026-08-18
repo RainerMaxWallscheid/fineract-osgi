@@ -515,6 +515,16 @@ Entity / `CalendarData` residual in **fineract-core**. Equinox registers `Calend
 
 Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendanceTypeOptions` → empty). Did not register `MeetingReadService` (leftover `MeetingData` coupling).
 
+### Provider peel: fineract-address (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-address-api` | `org.apache.fineract.address.api` | Ports, DTOs, filter, exception |
+| `fineract-address-impl` | `org.apache.fineract.address.impl` | REST/JPA + `AddressOsgiServiceRegistrar` / `AddressOsgiBundleActivator` |
+| `fineract-address-test` | `org.apache.fineract.address.test` | Fragment-Host → address.impl |
+
+`AddressData` residual in **fineract-core**. Equinox registers `FieldConfigurationReadPlatformService` only (`retrieve*` → empty). Did not register `AddressReadPlatformService` (leftover `AddressData`) or `AddressWritePlatformService` (leftover `Client`).
+
 ## Manifest check
 
 ```bash

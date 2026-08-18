@@ -236,7 +236,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-entityaccess` | **complete** (api/impl/test); Equinox `EntityAccessOsgiBundleActivator` (`FineractEntityAccessReadService`); residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`); entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`); depends on calendar-api/impl |
-| `fineract-address` | **complete** (api/impl/test); AddressData residual in core; ClientAddress on impl |
+| `fineract-address` | **complete** (api/impl/test); Equinox `AddressOsgiBundleActivator` (`FieldConfigurationReadPlatformService`); AddressData residual in core; ClientAddress on impl |
 | `fineract-creditbureau` | **complete** (api/impl/test); loan product mapping via loan-impl |
 | `fineract-collateral` | **complete** (api/impl/test); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
 | `fineract-collateralmanagement` | **complete** (api/impl/test); entity residual **closed** (entities on impl; Loan inverse collection removed) |
