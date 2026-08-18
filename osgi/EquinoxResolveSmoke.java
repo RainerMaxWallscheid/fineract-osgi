@@ -95,7 +95,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService",
             "org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService",
             "org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService",
-            "org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService"
+            "org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService",
+            "org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService"
     };
 
     private EquinoxResolveSmoke() {}

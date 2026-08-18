@@ -605,6 +605,16 @@ Equinox registers `ReportMailingJobConfigurationReadPlatformService` only (`retr
 
 Equinox registers `SmsCampaignDropdownReadPlatformService` only (`retrieve*` → empty). Did not register SMS/email campaign or email reads (`Page` / leftover `ReportData`), `TwoFactorSmsDeliveryPort` (leftover `Staff`), or write/email-job ports.
 
+### Provider peel: fineract-gcm (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-gcm-api` | `org.apache.fineract.gcm.api` | Config DTO + `NotificationConfigurationReadService` |
+| `fineract-gcm-impl` | `org.apache.fineract.gcm.impl` | Sender + `GcmOsgiServiceRegistrar` / `GcmOsgiBundleActivator` |
+| `fineract-gcm-test` | `org.apache.fineract.gcm.test` | Fragment-Host → gcm.impl |
+
+Equinox registers `NotificationConfigurationReadService` only (`getNotificationConfiguration` → null). Did not register `NotificationSenderService` (impl-only; SMS/JPA coupling).
+
 ## Manifest check
 
 ```bash

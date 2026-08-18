@@ -16,23 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.gcm.impl.osgi;
 
-dependencies {
-    api project(path: ':fineract-gcm-api')
-    implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-sms-api'))
-    implementation(project(path: ':fineract-sms-impl'))
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
 
-    implementation(
-            'org.springframework.boot:spring-boot-starter',
-            'com.google.code.gson:gson',
-            )
-    implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
-        exclude group: 'org.hibernate'
+class OsgiNotificationConfigurationReadServiceTest {
+
+    private final OsgiNotificationConfigurationReadService port = new OsgiNotificationConfigurationReadService();
+
+    @Test
+    void emptyCatalogHasNoNotificationConfiguration() {
+        assertNull(port.getNotificationConfiguration());
     }
-    implementation('org.eclipse.persistence:org.eclipse.persistence.jpa') {
-        exclude group: 'org.eclipse.persistence', module: 'jakarta.persistence'
-    }
-    compileOnly 'org.osgi:osgi.core:8.0.0'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }
