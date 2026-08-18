@@ -85,7 +85,7 @@ Deserializer test + `BranchOsgiServiceRegistrarTest`.
 
 ### Step 6 — OSGi registrar ✅
 `BranchOsgiServiceRegistrar` (Spring path) → read + write teller services + `CashierTxnValidationPort`.  
-`BranchOsgiBundleActivator` (Equinox start; Spring-free empty teller catalog) → `CashierTxnValidationPort`.
+`BranchOsgiBundleActivator` (Equinox start; empty teller catalog, lowest ranking) → `CashierTxnValidationPort`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

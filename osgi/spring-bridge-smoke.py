@@ -20,8 +20,9 @@
 """Composition-root Equinox bridge smoke (ADR-022 B3).
 
 Starts the staged catalog (empty activators), then registers hosted Wave-1
-catalog ports and Wave-2 ``ContentStoreService`` from the composition-root
-classpath. Does not stage Spring. Writes ``osgi/logs/spring-bridge-smoke.txt``.
+catalog ports, Wave-2 ``ContentStoreService``, and
+``CashierTxnValidationPort`` from the composition-root classpath. Does not
+stage Spring. Writes ``osgi/logs/spring-bridge-smoke.txt``.
 
 Usage:
     python3 osgi/spring-bridge-smoke.py
@@ -49,6 +50,7 @@ SOURCES = (
     OSGI_DIR / "HostedFloatingRatePort.java",
     OSGI_DIR / "HostedTaxCatalogPort.java",
     OSGI_DIR / "HostedContentStoreService.java",
+    OSGI_DIR / "HostedCashierTxnValidationPort.java",
     OSGI_DIR / "EquinoxSpringBridgeSmoke.java",
 )
 
@@ -93,9 +95,18 @@ def main() -> int:
     rates_api = one_jar("fineract-rates-api-*.jar")
     tax_api = one_jar("fineract-tax-api-*.jar")
     document_api = one_jar("fineract-document-api-*.jar")
+    branch_api = one_jar("fineract-branch-api-*.jar")
     core = one_jar("fineract-core-*.jar")
     compile_cp = os.pathsep.join(
-        (str(equinox), str(charge_api), str(rates_api), str(tax_api), str(document_api), str(core))
+        (
+            str(equinox),
+            str(charge_api),
+            str(rates_api),
+            str(tax_api),
+            str(document_api),
+            str(branch_api),
+            str(core),
+        )
     )
     run_cp_prefix = compile_cp
 

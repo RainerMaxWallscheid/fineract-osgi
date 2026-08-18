@@ -23,11 +23,13 @@ import java.util.Hashtable;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Equinox start path for branch/teller (ADR-022 B3). Registers
- * {@link CashierTxnValidationPort} without a Spring/JPA context.
+ * {@link CashierTxnValidationPort} without a Spring/JPA context. Lowest
+ * {@code service.ranking} so a composition-root hosted port wins.
  * {@link BranchOsgiServiceRegistrar} remains the Spring Boot path.
  */
 public class BranchOsgiBundleActivator implements BundleActivator {
@@ -38,6 +40,7 @@ public class BranchOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-branch-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(CashierTxnValidationPort.class, new OsgiCashierTxnValidationPort(), props);
     }
 

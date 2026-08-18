@@ -21,6 +21,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
@@ -43,15 +44,17 @@ public final class CompositionRootOsgiBridge {
     private final FloatingRatePort rates;
     private final TaxCatalogPort tax;
     private final ContentStoreService content;
+    private final CashierTxnValidationPort cashier;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
     public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates,
-            final TaxCatalogPort tax, final ContentStoreService content) {
+            final TaxCatalogPort tax, final ContentStoreService content, final CashierTxnValidationPort cashier) {
         this.context = context;
         this.charge = charge;
         this.rates = rates;
         this.tax = tax;
         this.content = content;
+        this.cashier = cashier;
     }
 
     public void start() {
@@ -59,6 +62,7 @@ public final class CompositionRootOsgiBridge {
         register(FloatingRatePort.class, rates);
         register(TaxCatalogPort.class, tax);
         register(ContentStoreService.class, content);
+        register(CashierTxnValidationPort.class, cashier);
     }
 
     private <T> void register(final Class<T> type, final T service) {

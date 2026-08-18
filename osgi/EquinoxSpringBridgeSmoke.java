@@ -26,7 +26,9 @@ import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Arrays;
+import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
@@ -40,8 +42,9 @@ import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * Start the staged catalog, then register composition-root hosted Wave-1
- * catalog ports and Wave-2 {@link ContentStoreService}. Proves ranking over
- * empty activators without staging Spring.
+ * catalog ports, Wave-2 {@link ContentStoreService}, and
+ * {@link CashierTxnValidationPort}. Proves ranking over empty activators
+ * without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -50,6 +53,7 @@ public final class EquinoxSpringBridgeSmoke {
     private static final String RATES_PORT = FloatingRatePort.class.getName();
     private static final String TAX_PORT = TaxCatalogPort.class.getName();
     private static final String CONTENT_PORT = ContentStoreService.class.getName();
+    private static final String CASHIER_PORT = CashierTxnValidationPort.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -106,13 +110,15 @@ public final class EquinoxSpringBridgeSmoke {
         }
 
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
-                new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService());
+                new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService(),
+                new HostedCashierTxnValidationPort());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
         boolean ratesWins = probeRates(ctx);
         boolean taxWins = probeTax(ctx);
         boolean contentWins = probeContent(ctx);
+        boolean cashierWins = probeCashier(ctx);
 
         bridge.stop();
         framework.stop();
@@ -120,10 +126,10 @@ public final class EquinoxSpringBridgeSmoke {
 
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
-        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins;
+        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins && cashierWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
                 + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins + " contentWins="
-                + contentWins);
+                + contentWins + " cashierWins=" + cashierWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -140,6 +146,16 @@ public final class EquinoxSpringBridgeSmoke {
     private static boolean probeTax(final BundleContext ctx) throws Exception {
         return probe(ctx, TAX_PORT, service -> service instanceof TaxCatalogPort port
                 && port.findTaxGroup(HostedTaxCatalogPort.HOSTED_ID).isPresent());
+    }
+
+    private static boolean probeCashier(final BundleContext ctx) throws Exception {
+        return probe(ctx, CASHIER_PORT, service -> {
+            if (!(service instanceof HostedCashierTxnValidationPort port)) {
+                return false;
+            }
+            port.validateOnLoanDisbursal(HostedCashierTxnValidationPort.HOSTED_STAFF_ID, "USD", BigDecimal.TEN);
+            return HostedCashierTxnValidationPort.HOSTED_STAFF_ID == port.lastStaffId();
+        });
     }
 
     private static boolean probeContent(final BundleContext ctx) throws Exception {
