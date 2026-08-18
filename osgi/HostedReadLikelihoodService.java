@@ -1,0 +1,41 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import java.util.List;
+import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
+import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
+
+/** Composition-root hosted survey likelihoods for the Equinox bridge smoke. */
+final class HostedReadLikelihoodService implements ReadLikelihoodService {
+
+    static final long HOSTED_ID = 1L;
+
+    private final LikelihoodData hosted = new LikelihoodData().setResourceId(HOSTED_ID).setLikeliHoodName("hosted")
+            .setLikeliHoodCode("hosted").setEnabled(HOSTED_ID);
+
+    @Override
+    public List<LikelihoodData> retrieveAll(final String ppiName) {
+        return List.of(hosted);
+    }
+
+    @Override
+    public LikelihoodData retrieve(final Long likelihoodId) {
+        return Long.valueOf(HOSTED_ID).equals(likelihoodId) ? hosted : null;
+    }
+}

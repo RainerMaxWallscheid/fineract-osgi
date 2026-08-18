@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -38,6 +39,7 @@ public class AccountNumberFormatOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-accountnumberformat-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(AccountNumberFormatReadPlatformService.class, new OsgiAccountNumberFormatReadPlatformService(),
                 props);
     }

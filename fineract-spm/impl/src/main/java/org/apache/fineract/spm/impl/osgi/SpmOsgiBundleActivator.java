@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -38,6 +39,7 @@ public class SpmOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-spm-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(ScorecardReadPlatformService.class, new OsgiScorecardReadPlatformService(), props);
     }
 

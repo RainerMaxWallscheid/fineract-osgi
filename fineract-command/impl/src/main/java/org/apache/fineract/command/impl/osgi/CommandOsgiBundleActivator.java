@@ -27,6 +27,7 @@ import org.apache.fineract.command.core.CommandHandlerManager;
 import org.apache.fineract.command.core.CommandHookManager;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -63,6 +64,7 @@ public class CommandOsgiBundleActivator implements BundleActivator {
     private <T> void register(final BundleContext context, final Class<T> type, final T service, final String dispatcherKind) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-command-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         if (dispatcherKind != null) {
             props.put("dispatcher", dispatcherKind);
         }

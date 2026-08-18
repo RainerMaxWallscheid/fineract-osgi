@@ -19,11 +19,9 @@
 
 """Composition-root Equinox bridge smoke (ADR-022 B3).
 
-Starts the staged catalog (empty activators), then registers hosted Wave-1
-catalog ports, Wave-2 ``ContentStoreService``,
-``CashierTxnValidationPort``, ``LoanOriginatorReadPlatformService``,
-``MixTaxonomyReadService``, and Wave-3 ``DelayedSettlementAttributeService``
-from the composition-root classpath. Does not stage Spring. Writes
+Starts the staged catalog (empty activators), then registers every hosted
+PILOT_PORT from the composition-root classpath. Does not stage Spring.
+``ContentStreamPort`` stays empty-catalog only. Writes
 ``osgi/logs/spring-bridge-smoke.txt``.
 
 Usage:
@@ -46,18 +44,6 @@ EQUINOX_URL = (
     "org.eclipse.osgi/3.20.0/org.eclipse.osgi-3.20.0.jar"
 )
 EQUINOX_NAME = "org.eclipse.osgi-3.20.0.jar"
-SOURCES = (
-    OSGI_DIR / "CompositionRootOsgiBridge.java",
-    OSGI_DIR / "HostedChargeDefinitionPort.java",
-    OSGI_DIR / "HostedFloatingRatePort.java",
-    OSGI_DIR / "HostedTaxCatalogPort.java",
-    OSGI_DIR / "HostedContentStoreService.java",
-    OSGI_DIR / "HostedCashierTxnValidationPort.java",
-    OSGI_DIR / "HostedLoanOriginatorReadPlatformService.java",
-    OSGI_DIR / "HostedMixTaxonomyReadService.java",
-    OSGI_DIR / "HostedDelayedSettlementAttributeService.java",
-    OSGI_DIR / "EquinoxSpringBridgeSmoke.java",
-)
 
 
 def ensure_equinox_jar() -> Path:
@@ -92,35 +78,19 @@ def one_jar(pattern: str) -> Path:
 def main() -> int:
     require_staged()
     equinox = ensure_equinox_jar()
-    missing = [str(src) for src in SOURCES if not src.is_file()]
+    sources = sorted(OSGI_DIR.glob("Hosted*.java")) + [
+        OSGI_DIR / "CompositionRootOsgiBridge.java",
+        OSGI_DIR / "EquinoxSpringBridgeSmoke.java",
+    ]
+    missing = [str(src) for src in sources if not src.is_file()]
     if missing:
         raise SystemExit("Missing " + ", ".join(missing))
 
-    charge_api = one_jar("fineract-charge-api-*.jar")
-    rates_api = one_jar("fineract-rates-api-*.jar")
-    tax_api = one_jar("fineract-tax-api-*.jar")
-    document_api = one_jar("fineract-document-api-*.jar")
-    branch_api = one_jar("fineract-branch-api-*.jar")
-    loan_origination_api = one_jar("fineract-loan-origination-api-*.jar")
-    mix_api = one_jar("fineract-mix-api-*.jar")
-    investor_api = one_jar("fineract-investor-api-*.jar")
-    codes_api = one_jar("fineract-codes-api-*.jar")
+    api_jars = sorted((OSGI_DIR / "bundles").glob("fineract-*-api-*.jar"))
+    if not api_jars:
+        raise SystemExit("Missing staged fineract-*-api-*.jar. Run ./gradlew osgiStageBundles.")
     core = one_jar("fineract-core-*.jar")
-    compile_cp = os.pathsep.join(
-        (
-            str(equinox),
-            str(charge_api),
-            str(rates_api),
-            str(tax_api),
-            str(document_api),
-            str(branch_api),
-            str(loan_origination_api),
-            str(mix_api),
-            str(investor_api),
-            str(codes_api),
-            str(core),
-        )
-    )
+    compile_cp = os.pathsep.join([str(equinox), *(str(jar) for jar in api_jars), str(core)])
     run_cp_prefix = compile_cp
 
     (OSGI_DIR / "logs").mkdir(parents=True, exist_ok=True)
@@ -133,7 +103,7 @@ def main() -> int:
             compile_cp,
             "-d",
             tmp,
-            *(str(src) for src in SOURCES),
+            *(str(src) for src in sources),
         ]
         compiled = subprocess.run(compile_cmd, capture_output=True, text=True)
         if compiled.returncode != 0:

@@ -723,16 +723,9 @@ Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export
 | `check-manifests.py` | Static BSN / Fragment-Host / Export-Package / api Import-Package guard |
 | `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
 | `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
-| `CompositionRootOsgiBridge.java` | Composition-root Spring→OSGi registration (Wave-1 catalogs, content store, cashier, originator, mix, investor) |
-| `HostedChargeDefinitionPort.java` | In-memory hosted `ChargeDefinitionPort` for the bridge smoke |
-| `HostedFloatingRatePort.java` | In-memory hosted `FloatingRatePort` for the bridge smoke |
-| `HostedTaxCatalogPort.java` | In-memory hosted `TaxCatalogPort` for the bridge smoke |
-| `HostedContentStoreService.java` | In-memory hosted `ContentStoreService` for the bridge smoke |
-| `HostedCashierTxnValidationPort.java` | In-memory hosted `CashierTxnValidationPort` for the bridge smoke |
-| `HostedLoanOriginatorReadPlatformService.java` | In-memory hosted `LoanOriginatorReadPlatformService` for the bridge smoke |
-| `HostedMixTaxonomyReadService.java` | In-memory hosted `MixTaxonomyReadService` for the bridge smoke |
-| `HostedDelayedSettlementAttributeService.java` | In-memory hosted `DelayedSettlementAttributeService` for the bridge smoke |
-| `EquinoxSpringBridgeSmoke.java` | Start catalog, register hosted Wave-1/document/branch/originator/mix/investor ports, assert ranking |
+| `CompositionRootOsgiBridge.java` | Composition-root Spring→OSGi registration of every hosted PILOT_PORT |
+| `Hosted*.java` | In-memory hosted ports for the bridge smoke (one per catalog module) |
+| `EquinoxSpringBridgeSmoke.java` | Start catalog, register hosted PILOT_PORTs, assert ranking |
 | `spring-bridge-smoke.py` | Compiles and runs the composition-root bridge smoke |
 | `equinox/config.ini` | Framework + Fineract mode **template** |
 | `equinox/org.eclipse.osgi-*.jar` | Framework JAR (**not** in git; download locally) |
@@ -780,7 +773,7 @@ Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave
 python3 osgi/spring-bridge-smoke.py
 ```
 
-Starts the same catalog, then registers composition-root hosted Wave-1 ports, Wave-2 `ContentStoreService`, `CashierTxnValidationPort`, `LoanOriginatorReadPlatformService`, `MixTaxonomyReadService`, and Wave-3 `DelayedSettlementAttributeService` (in-memory, not JPA / Spring). Empty charge/rates/tax/document/branch/loan-origination/mix/investor activators stay lowest-ranked. Exit 0 means the selected services are the hosted ports. Empty stubs stay in the impl bundle class space; the system classpath does not treat those Classes as assignable. `ContentStreamPort` stays empty-catalog only (JDK pipe).
+Starts the same catalog, then registers every composition-root hosted PILOT_PORT (in-memory, not JPA / Spring). Empty catalog activators stay lowest-ranked. Exit 0 means the selected services are the hosted ports. Empty stubs stay in the impl bundle class space; the system classpath does not treat those Classes as assignable. `ContentStreamPort` stays empty-catalog only (JDK pipe). `PaymentDetailWritePlatformService` stays empty-catalog only (leftover JPA `PaymentDetail`). Modules with no Equinox-safe port (bulkimport, instancemode, s3, openapi, interoperation, event) stay empty-activator or skipped.
 
 ## Start
 

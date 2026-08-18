@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -39,6 +40,7 @@ public class PostDatedChecksOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-postdatedchecks-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(RepaymentWithPostDatedChecksWritePlatformService.class,
                 new OsgiRepaymentWithPostDatedChecksWritePlatformService(), props);
     }
