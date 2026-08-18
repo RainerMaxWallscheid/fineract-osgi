@@ -54,7 +54,7 @@ fineract-investor/
 | `…investor.exception` (not mappers) | **api** |
 | entity-typed ports (`AccountingService`, loan transfer services), *Impl, handlers | **impl** |
 | domain / REST / enrichers / cob / config | **impl** |
-| `…investor.impl.osgi` | **impl** — `InvestorOsgiServiceRegistrar` (Spring) + `InvestorOsgiBundleActivator` (Equinox start) |
+| `…investor.impl.osgi` | **impl** — `InvestorOsgiServiceRegistrar` (Spring) + `InvestorOsgiBundleActivator` (Equinox start; empty catalog, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge`. |
 
 ---
 

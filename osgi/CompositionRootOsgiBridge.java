@@ -21,6 +21,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -49,11 +50,13 @@ public final class CompositionRootOsgiBridge {
     private final CashierTxnValidationPort cashier;
     private final LoanOriginatorReadPlatformService originator;
     private final MixTaxonomyReadService mix;
+    private final DelayedSettlementAttributeService delayedSettlement;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
     public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates,
             final TaxCatalogPort tax, final ContentStoreService content, final CashierTxnValidationPort cashier,
-            final LoanOriginatorReadPlatformService originator, final MixTaxonomyReadService mix) {
+            final LoanOriginatorReadPlatformService originator, final MixTaxonomyReadService mix,
+            final DelayedSettlementAttributeService delayedSettlement) {
         this.context = context;
         this.charge = charge;
         this.rates = rates;
@@ -62,6 +65,7 @@ public final class CompositionRootOsgiBridge {
         this.cashier = cashier;
         this.originator = originator;
         this.mix = mix;
+        this.delayedSettlement = delayedSettlement;
     }
 
     public void start() {
@@ -72,6 +76,7 @@ public final class CompositionRootOsgiBridge {
         register(CashierTxnValidationPort.class, cashier);
         register(LoanOriginatorReadPlatformService.class, originator);
         register(MixTaxonomyReadService.class, mix);
+        register(DelayedSettlementAttributeService.class, delayedSettlement);
     }
 
     private <T> void register(final Class<T> type, final T service) {

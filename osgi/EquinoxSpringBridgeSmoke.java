@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -46,9 +47,9 @@ import org.osgi.framework.wiring.FrameworkWiring;
  * Start the staged catalog, then register composition-root hosted Wave-1
  * catalog ports, Wave-2 {@link ContentStoreService},
  * {@link CashierTxnValidationPort},
- * {@link LoanOriginatorReadPlatformService}, and
- * {@link MixTaxonomyReadService}. Proves ranking over empty activators
- * without staging Spring.
+ * {@link LoanOriginatorReadPlatformService}, {@link MixTaxonomyReadService},
+ * and Wave-3 {@link DelayedSettlementAttributeService}. Proves ranking over
+ * empty activators without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -60,6 +61,7 @@ public final class EquinoxSpringBridgeSmoke {
     private static final String CASHIER_PORT = CashierTxnValidationPort.class.getName();
     private static final String ORIGINATOR_PORT = LoanOriginatorReadPlatformService.class.getName();
     private static final String MIX_PORT = MixTaxonomyReadService.class.getName();
+    private static final String DELAYED_PORT = DelayedSettlementAttributeService.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -118,7 +120,7 @@ public final class EquinoxSpringBridgeSmoke {
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
                 new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService(),
                 new HostedCashierTxnValidationPort(), new HostedLoanOriginatorReadPlatformService(),
-                new HostedMixTaxonomyReadService());
+                new HostedMixTaxonomyReadService(), new HostedDelayedSettlementAttributeService());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
@@ -128,6 +130,7 @@ public final class EquinoxSpringBridgeSmoke {
         boolean cashierWins = probeCashier(ctx);
         boolean originatorWins = probeOriginator(ctx);
         boolean mixWins = probeMix(ctx);
+        boolean delayedWins = probeDelayed(ctx);
 
         bridge.stop();
         framework.stop();
@@ -136,10 +139,11 @@ public final class EquinoxSpringBridgeSmoke {
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
         boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins && cashierWins
-                && originatorWins && mixWins;
+                && originatorWins && mixWins && delayedWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
                 + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins + " contentWins="
-                + contentWins + " cashierWins=" + cashierWins + " originatorWins=" + originatorWins + " mixWins=" + mixWins);
+                + contentWins + " cashierWins=" + cashierWins + " originatorWins=" + originatorWins + " mixWins=" + mixWins
+                + " delayedWins=" + delayedWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -186,6 +190,11 @@ public final class EquinoxSpringBridgeSmoke {
             final var row = port.retrieveOne(HostedMixTaxonomyReadService.HOSTED_ID);
             return row != null && HostedMixTaxonomyReadService.HOSTED_ID == row.getId();
         });
+    }
+
+    private static boolean probeDelayed(final BundleContext ctx) throws Exception {
+        return probe(ctx, DELAYED_PORT, service -> service instanceof DelayedSettlementAttributeService port
+                && port.isEnabled(HostedDelayedSettlementAttributeService.HOSTED_PRODUCT_ID));
     }
 
     private static boolean probeContent(final BundleContext ctx) throws Exception {
