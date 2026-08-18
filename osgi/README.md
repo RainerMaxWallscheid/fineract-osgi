@@ -615,6 +615,16 @@ Equinox registers `SmsCampaignDropdownReadPlatformService` only (`retrieve*` →
 
 Equinox registers `NotificationConfigurationReadService` only (`getNotificationConfiguration` → null). Did not register `NotificationSenderService` (impl-only; SMS/JPA coupling).
 
+### Provider peel: fineract-dataqueries (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-dataqueries-api` | `org.apache.fineract.dataqueries.api` | Ports, extra DTOs, exceptions |
+| `fineract-dataqueries-impl` | `org.apache.fineract.dataqueries.impl` | REST/JPA + `DataqueriesOsgiServiceRegistrar` / `DataqueriesOsgiBundleActivator` |
+| `fineract-dataqueries-test` | `org.apache.fineract.dataqueries.test` | Fragment-Host → dataqueries.impl |
+
+Equinox registers `ReportWritePlatformService` only (`create*`/`update*`/`delete*` → empty). Did not register `ReadReportingService` / template reads (leftover unpublished `ReportData` / `DatatableData`), leftover `DatatableReadService` / `GenericDataService`, or export/check ports (jakarta.ws.rs / Gson).
+
 ## Manifest check
 
 ```bash
