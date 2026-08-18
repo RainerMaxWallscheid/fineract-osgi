@@ -55,5 +55,6 @@ dependencies {
     implementation 'org.mapstruct:mapstruct'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'org.osgi:osgi.core:8.0.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

@@ -565,6 +565,16 @@ Equinox registers `CollateralManagementReadService` only (`getCollateralProduct`
 
 Equinox registers `NoteReadPlatformService` only (`retrieveNote` → null, `retrieveNotesByResource` → empty). Did not register `NoteWritePlatformService` (request DTOs pull swagger / jakarta.validation) or `ShareAccountNoteSupport` (share residual on provider).
 
+### Provider peel: fineract-hooks (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-hooks-api` | `org.apache.fineract.hooks.api` | Ports, DTOs, exceptions, constants |
+| `fineract-hooks-impl` | `org.apache.fineract.hooks.impl` | REST/JPA + `HooksOsgiServiceRegistrar` / `HooksOsgiBundleActivator` |
+| `fineract-hooks-test` | `org.apache.fineract.hooks.test` | Fragment-Host → hooks.impl |
+
+Equinox registers `HookReadPlatformService` only (`retrieveAllHooks` → empty, `retrieveHook` / `retrieveNewHookDetails` → null). Did not register `HookWritePlatformService` (request DTOs pull jakarta.validation).
+
 ## Manifest check
 
 ```bash
