@@ -16,36 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.impl.osgi;
-
 import java.util.Dictionary;
 import java.util.Hashtable;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Equinox start path for the charge catalog (ADR-022 B3). Registers
- * {@link ChargeDefinitionPort} without a Spring/JPA context. Lowest
- * {@code service.ranking} so a composition-root hosted port wins.
- * {@link ChargeOsgiServiceRegistrar} remains the Spring Boot path.
+ * Composition-root Spring→OSGi registration (ADR-022 B3 / playbook §15.5).
+ * Boot owns the {@link BundleContext}; Spring 6 is not staged as Equinox
+ * bundles. Ranks above empty catalog activators.
  */
-public class ChargeOsgiBundleActivator implements BundleActivator {
+public final class CompositionRootOsgiBridge {
 
+    public static final String PROVIDER = "fineract-osgi-bridge";
+    public static final int RANKING = 1;
+
+    private final BundleContext context;
+    private final ChargeDefinitionPort port;
     private ServiceRegistration<ChargeDefinitionPort> registration;
 
-    @Override
-    public void start(final BundleContext context) {
-        final Dictionary<String, Object> props = new Hashtable<>();
-        props.put("provider", "fineract-charge-impl");
-        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
-        registration = context.registerService(ChargeDefinitionPort.class, new OsgiChargeDefinitionPort(), props);
+    public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort port) {
+        this.context = context;
+        this.port = port;
     }
 
-    @Override
-    public void stop(final BundleContext context) {
+    public void start() {
+        final Dictionary<String, Object> props = new Hashtable<>();
+        props.put("provider", PROVIDER);
+        props.put(Constants.SERVICE_RANKING, RANKING);
+        registration = context.registerService(ChargeDefinitionPort.class, port, props);
+    }
+
+    public void stop() {
         if (registration != null) {
             try {
                 registration.unregister();

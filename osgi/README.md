@@ -723,6 +723,10 @@ Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export
 | `check-manifests.py` | Static BSN / Fragment-Host / Export-Package / api Import-Package guard |
 | `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
 | `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
+| `CompositionRootOsgiBridge.java` | Composition-root Spring→OSGi registration (charge first) |
+| `HostedChargeDefinitionPort.java` | In-memory hosted `ChargeDefinitionPort` for the bridge smoke |
+| `EquinoxSpringBridgeSmoke.java` | Start catalog, register hosted charge port, assert ranking |
+| `spring-bridge-smoke.py` | Compiles and runs the composition-root bridge smoke |
 | `equinox/config.ini` | Framework + Fineract mode **template** |
 | `equinox/org.eclipse.osgi-*.jar` | Framework JAR (**not** in git; download locally) |
 | `bundles/` | Staged api / impl / core JARs (`:osgiStageBundles`) |
@@ -762,6 +766,14 @@ python3 osgi/resolve-smoke.py --start --strict
 ```
 
 Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, and later provider-peel ports register via Bundle-Activators (no Spring). `--strict` requires every fineract bundle to be ACTIVE.
+
+```bash
+./gradlew equinoxSpringBridgeSmoke
+# or, after staging:
+python3 osgi/spring-bridge-smoke.py
+```
+
+Starts the same catalog, then registers a composition-root hosted `ChargeDefinitionPort` (in-memory, not JPA / not Spring). The empty charge activator stays lowest-ranked. Exit 0 means the selected service is the hosted port (`existsActiveCharge(1)`). The empty stub stays registered in the charge-impl bundle class space; the system classpath does not treat that Class as assignable.
 
 ## Start
 

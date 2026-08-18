@@ -25,7 +25,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
 | 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
 | 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 16 tests green |
-| 6 Spring↔OSGi bridge | **done** | `ChargeOsgiServiceRegistrar` (Spring path) + `ChargeOsgiBundleActivator` (Equinox start; Spring-free empty catalog) |
+| 6 Spring↔OSGi bridge | **done** | `ChargeOsgiServiceRegistrar` (Spring path) + `ChargeOsgiBundleActivator` (Equinox start; empty catalog, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge` |
 | 7 Consumer retarget (Gradle) | **done** (2026-07-26) | Off façade: progressive → api only; loan/savings/… → api+impl temp; provider/IT keep façade |
 | 8 Consumer retarget (semantic) | **done** | Product/account charges use chargeId; loan/savings/accounting/WC/progressive → charge-api only; provider/war/ITs → api+impl |
 | 9 Docs / acceptance | **done** | READMEs, osgi table, 15.6 rollout (Wave 1 **complete**), optional Gherkin; ArchUnit charge freeze green |

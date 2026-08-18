@@ -105,3 +105,11 @@ tasks.register('equinoxStartSmoke', Exec) {
     workingDir = rootDir
     commandLine 'python3', 'osgi/resolve-smoke.py', '--start'
 }
+
+tasks.register('equinoxSpringBridgeSmoke', Exec) {
+    group = 'verification'
+    description = 'Stage catalog jars, start Equinox, and register a hosted ChargeDefinitionPort from the composition root'
+    dependsOn osgiStageBundles
+    workingDir = rootDir
+    commandLine 'python3', 'osgi/spring-bridge-smoke.py'
+}
