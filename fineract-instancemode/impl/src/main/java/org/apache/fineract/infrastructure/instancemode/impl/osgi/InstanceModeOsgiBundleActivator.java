@@ -16,18 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.instancemode.impl.osgi;
 
-dependencies {
-    api project(path: ':fineract-instancemode-api')
-    implementation(project(path: ':fineract-core'))
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
-    implementation(
-            'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-security',
-            'jakarta.ws.rs:jakarta.ws.rs-api',
-            'org.glassfish.jersey.media:jersey-media-multipart',
-            'io.swagger.core.v3:swagger-annotations-jakarta',
-            )
-    compileOnly 'org.osgi:osgi.core:8.0.0'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+/**
+ * Equinox start path for instancemode (ADR-022 B3). No api port is registered:
+ * instancemode-api exports only swagger DTO and the servlet filter.
+ * {@link InstanceModeOsgiServiceRegistrar} remains the Spring Boot path.
+ */
+public class InstanceModeOsgiBundleActivator implements BundleActivator {
+
+    @Override
+    public void start(final BundleContext context) {
+        // no Equinox-safe api port
+    }
+
+    @Override
+    public void stop(final BundleContext context) {
+        // no registrations
+    }
 }

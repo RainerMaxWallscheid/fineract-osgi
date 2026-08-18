@@ -645,6 +645,16 @@ Equinox registers `ExternalServicesReadPlatformService` only (`getExternalServic
 
 Equinox `BulkImportOsgiBundleActivator` starts with no service. Did not register `BulkImportWorkbookService` (jersey multipart), `BulkImportWorkbookPopulatorService` (jakarta.ws.rs), or POI `WorkbookPopulator` / `ImportHandler`.
 
+### Provider peel: fineract-instancemode (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-instancemode-api` | `org.apache.fineract.instancemode.api` | Swagger request DTO + servlet filter |
+| `fineract-instancemode-impl` | `org.apache.fineract.instancemode.impl` | Test-profile REST + `InstanceModeOsgiServiceRegistrar` / `InstanceModeOsgiBundleActivator` |
+| `fineract-instancemode-test` | `org.apache.fineract.instancemode.test` | Fragment-Host → instancemode.impl |
+
+Equinox `InstanceModeOsgiBundleActivator` starts with no service. instancemode-api has no application port (swagger DTO + `FineractInstanceModeApiFilter` only).
+
 ## Manifest check
 
 ```bash
