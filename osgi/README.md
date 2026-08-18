@@ -585,6 +585,16 @@ Equinox registers `HookReadPlatformService` only (`retrieveAllHooks` → empty, 
 
 Equinox registers `SmsWritePlatformService` only (`create`/`update`/`delete` → empty). Did not register `SmsReadPlatformService` (`Page` / `SearchParameters`).
 
+### Provider peel: fineract-reportmailingjob (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-reportmailingjob-api` | `org.apache.fineract.reportmailingjob.api` | Ports, DTOs, exceptions, constants |
+| `fineract-reportmailingjob-impl` | `org.apache.fineract.reportmailingjob.impl` | REST/JPA + `ReportMailingJobOsgiServiceRegistrar` / `ReportMailingJobOsgiBundleActivator` |
+| `fineract-reportmailingjob-test` | `org.apache.fineract.reportmailingjob.test` | Fragment-Host → reportmailingjob.impl |
+
+Equinox registers `ReportMailingJobConfigurationReadPlatformService` only (`retrieveAll*` → empty, `retrieveReportMailingJobConfiguration` → null). Did not register job/run-history reads (`Page` / leftover `ReportData`) or write/email ports.
+
 ## Manifest check
 
 ```bash

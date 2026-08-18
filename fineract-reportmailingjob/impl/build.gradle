@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Report Mailing Job Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.reportmailingjob.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.reportmailingjob.impl.osgi.ReportMailingJobOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.reportmailingjob.service,'
+                        + 'org.apache.fineract.infrastructure.reportmailingjob.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.reportmailingjob.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.reportmailingjob.impl'
                 )
     }

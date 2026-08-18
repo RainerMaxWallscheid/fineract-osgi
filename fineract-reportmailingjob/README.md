@@ -5,7 +5,7 @@ Provider peel — scheduled report email jobs (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-reportmailingjob-api` | `api/` | `org.apache.fineract.reportmailingjob.api` | Ports, DTOs, exceptions, constants |
-| `fineract-reportmailingjob-impl` | `impl/` | `org.apache.fineract.reportmailingjob.impl` | Entities, REST, email, OSGi |
+| `fineract-reportmailingjob-impl` | `impl/` | `org.apache.fineract.reportmailingjob.impl` | Entities, REST, email; Equinox `ReportMailingJobOsgiBundleActivator` |
 | `fineract-reportmailingjob-test` | `test/` | `org.apache.fineract.reportmailingjob.test` | Fragment-Host → impl |
 
 `stretchyReportId` is a Long FK (dataqueries `Report` residual on provider). AppUser stays `@ManyToOne` (core).
