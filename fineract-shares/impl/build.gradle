@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Shares Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.shares.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.shares.impl.osgi.SharesOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.shares.shareproducts.service,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.shares.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.shares.impl'
                 )
     }

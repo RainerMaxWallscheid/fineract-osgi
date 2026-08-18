@@ -7,7 +7,7 @@ Java packages live under `org.apache.fineract.shares` (`shareaccounts`,
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-shares-api` | `api/` | `org.apache.fineract.shares.api` | Ports, pure DTOs, constants, exceptions |
-| `fineract-shares-impl` | `impl/` | `org.apache.fineract.shares.impl` | REST, handlers, JDBC reads, dividend job, OSGi registrar |
+| `fineract-shares-impl` | `impl/` | `org.apache.fineract.shares.impl` | REST, handlers, JDBC reads, dividend job; Equinox `SharesOsgiBundleActivator` |
 | `fineract-shares-test` | `test/` | `org.apache.fineract.shares.test` | Fragment-Host → impl |
 
 ### Residual

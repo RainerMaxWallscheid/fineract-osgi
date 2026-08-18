@@ -415,6 +415,16 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Co
 
 Write impl residual in **fineract-progressive-loan-impl**. Kernel residual `PortfolioAccountType` / `PortfolioAccountData` / `AccountTransferData` / `AccountTransfersReadPlatformService`. Equinox registers `StandingInstructionWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `AccountTransfersReadPlatformService` (kernel leftover), `AccountTransfersCommandWritePort` (leftover `PortfolioAccountType` in split package `…portfolio.account`), or SI read (`Page`).
 
+### Provider peel: fineract-shares (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-shares-api` | `org.apache.fineract.shares.api` | Ports, pure DTOs, constants, exceptions |
+| `fineract-shares-impl` | `org.apache.fineract.shares.impl` | REST/handlers + `SharesOsgiServiceRegistrar` / `SharesOsgiBundleActivator` |
+| `fineract-shares-test` | `org.apache.fineract.shares.test` | Fragment-Host → shares.impl |
+
+Product JPA residual in **fineract-core**. Equinox registers `ShareProductDropdownReadPlatformService` only (`retrieve*` → empty). Did not register account/product reads (Spring Data `Page`; leftover `ShareProduct*` / `ShareAccount*` types) or dividend reads (`Page`).
+
 ## Manifest check
 
 ```bash
