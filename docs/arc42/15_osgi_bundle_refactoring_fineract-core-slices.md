@@ -137,7 +137,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
 | **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
-| **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; `CacheType`/`PlatformCache`/runtime manager residual core |
+| **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core |
 | **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
 | **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
@@ -194,7 +194,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api).  
 17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
 18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
-19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; `CacheType`/`PlatformCache`/runtime manager residual core).  
+19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core).  
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
 22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
@@ -268,7 +268,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | delinquency catalog close-in | **complete**; `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + type enums on loan-impl next to repos |
 | `fineract-meeting` attendance close-in | **complete**; `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
 | `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
-| `fineract-cache` | **complete** (api/impl/test); write port/DTOs + REST/handler/impl; CacheType/PlatformCache/runtime manager residual core |
+| `fineract-cache` | **complete** (api/impl/test); Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); CacheType/PlatformCache/runtime manager residual core |
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
 | `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |

@@ -475,6 +475,16 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 
 `PaymentDetail` entity / `PaymentDetailData` residual in **fineract-core**. Equinox registers `PaymentDetailWritePlatformService` only (`create*` / `persist*` → null).
 
+### Provider peel: fineract-cache (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-cache-api` | `org.apache.fineract.cache.api` | Write port, switch request/response DTOs |
+| `fineract-cache-impl` | `org.apache.fineract.cache.impl` | REST/handler + `CacheOsgiServiceRegistrar` / `CacheOsgiBundleActivator` |
+| `fineract-cache-test` | `org.apache.fineract.cache.test` | Fragment-Host → cache.impl |
+
+`CacheType` / `PlatformCache` residual in **fineract-core**. Equinox registers `CacheWritePlatformService` only (`switchToCache` → empty).
+
 ## Manifest check
 
 ```bash

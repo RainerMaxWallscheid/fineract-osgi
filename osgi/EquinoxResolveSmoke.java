@@ -82,7 +82,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService",
             "org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService",
             "org.apache.fineract.portfolio.products.service.ProductCommandsService",
-            "org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService"
+            "org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService",
+            "org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService"
     };
 
     private EquinoxResolveSmoke() {}

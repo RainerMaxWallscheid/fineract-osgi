@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Cache Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.cache.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.cache.impl.osgi.CacheOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.cache.service,'
+                        + 'org.apache.fineract.infrastructure.cache.domain,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.cache.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.cache.impl'
                 )
     }
