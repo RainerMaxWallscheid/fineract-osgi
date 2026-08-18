@@ -685,6 +685,16 @@ Equinox `S3OsgiBundleActivator` starts with no service. Did not register `S3Clie
 
 Equinox `OpenApiOsgiBundleActivator` starts with no service. openapi-api has no application port (`FineractOperationIdReader` / `FineractOpenApiSpecFilter` only).
 
+### Provider peel: fineract-springbatch (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-springbatch-api` | `org.apache.fineract.springbatch.api` | `PropertyService`, constants, handler conditions |
+| `fineract-springbatch-impl` | `org.apache.fineract.springbatch.impl` | JMS/Kafka/Spring events + `SpringBatchOsgiServiceRegistrar` / `SpringBatchOsgiBundleActivator` |
+| `fineract-springbatch-test` | `org.apache.fineract.springbatch.test` | Fragment-Host → springbatch.impl |
+
+Equinox registers `PropertyService` only (partition/chunk sizes → null). Did not register Spring `AllNestedConditions` handlers or `ContextualMessage` (Spring Batch `StepExecutionRequest`).
+
 ## Manifest check
 
 ```bash

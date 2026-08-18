@@ -99,7 +99,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService",
             "org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService",
             "org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService",
-            "org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService"
+            "org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService",
+            "org.apache.fineract.infrastructure.springbatch.PropertyService"
     };
 
     private EquinoxResolveSmoke() {}

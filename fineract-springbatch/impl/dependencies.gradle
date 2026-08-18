@@ -36,5 +36,6 @@ dependencies {
     implementation ('org.apache.activemq:activemq-client') {
         // version from BOM
     }
+    compileOnly 'org.osgi:osgi.core:8.0.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }
