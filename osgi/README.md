@@ -555,6 +555,16 @@ Equinox registers `CollateralWritePlatformService` only (`add*`/`update*`/`delet
 
 Equinox registers `CollateralManagementReadService` only (`getCollateralProduct` → null, `getAllCollateralProducts` → empty). Did not register client/loan reads (leftover `ClientCollateralManagementData`; `LoanCollateralResponseData` loads `loanaccount.data.LoanCollateralManagementData`) or writes (request DTOs pull swagger / jakarta.validation).
 
+### Provider peel: fineract-note (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-note-api` | `org.apache.fineract.note.api` | Ports, DTOs, NoteType, exceptions |
+| `fineract-note-impl` | `org.apache.fineract.note.impl` | REST/JPA + `NoteOsgiServiceRegistrar` / `NoteOsgiBundleActivator` |
+| `fineract-note-test` | `org.apache.fineract.note.test` | Fragment-Host → note.impl |
+
+Equinox registers `NoteReadPlatformService` only (`retrieveNote` → null, `retrieveNotesByResource` → empty). Did not register `NoteWritePlatformService` (request DTOs pull swagger / jakarta.validation) or `ShareAccountNoteSupport` (share residual on provider).
+
 ## Manifest check
 
 ```bash
