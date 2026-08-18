@@ -485,6 +485,16 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 
 `CacheType` / `PlatformCache` residual in **fineract-core**. Equinox registers `CacheWritePlatformService` only (`switchToCache` → empty).
 
+### Provider peel: fineract-entityaccess (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-entityaccess-api` | `org.apache.fineract.entityaccess.api` | Ports, DTOs, access types, exceptions |
+| `fineract-entityaccess-impl` | `org.apache.fineract.entityaccess.impl` | REST/JPA + `EntityAccessOsgiServiceRegistrar` / `EntityAccessOsgiBundleActivator` |
+| `fineract-entityaccess-test` | `org.apache.fineract.entityaccess.test` | Fragment-Host → entityaccess.impl |
+
+Equinox registers `FineractEntityAccessReadService` only (`retrieve*` → empty, SQL clauses → `""`). Did not register `FineractEntityAccessWriteService` (leftover `CodeValue` in `…codes.domain`).
+
 ## Manifest check
 
 ```bash

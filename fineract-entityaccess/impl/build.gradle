@@ -55,8 +55,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract Entity Access Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.entityaccess.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.entityaccess.impl.osgi.EntityAccessOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.entityaccess.service,'
+                        + 'org.apache.fineract.infrastructure.entityaccess.data,'
+                        + 'org.apache.fineract.infrastructure.entityaccess.domain,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.entityaccess.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.entityaccess.impl'
                 )
     }
