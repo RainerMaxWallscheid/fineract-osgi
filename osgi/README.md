@@ -495,6 +495,16 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 
 Equinox registers `FineractEntityAccessReadService` only (`retrieve*` → empty, SQL clauses → `""`). Did not register `FineractEntityAccessWriteService` (leftover `CodeValue` in `…codes.domain`).
 
+### Provider peel: fineract-calendar (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-calendar-api` | `org.apache.fineract.calendar.api` | Read/write/dropdown ports, exceptions, command, `CalendarRequest`, `CalendarInstanceLookupPort` |
+| `fineract-calendar-impl` | `org.apache.fineract.calendar.impl` | REST/handlers + `CalendarOsgiServiceRegistrar` / `CalendarOsgiBundleActivator` |
+| `fineract-calendar-test` | `org.apache.fineract.calendar.test` | Fragment-Host → calendar.impl |
+
+Entity / `CalendarData` residual in **fineract-core**. Equinox registers `CalendarDropdownReadPlatformService` only (`retrieve*` → empty). Did not register `CalendarReadPlatformService` (leftover `CalendarData`) or `CalendarInstanceLookupPort` (leftover `CalendarInstance`).
+
 ## Manifest check
 
 ```bash

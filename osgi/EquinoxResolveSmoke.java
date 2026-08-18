@@ -84,7 +84,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.products.service.ProductCommandsService",
             "org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService",
             "org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService",
-            "org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService"
+            "org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService",
+            "org.apache.fineract.portfolio.calendar.service.CalendarDropdownReadPlatformService"
     };
 
     private EquinoxResolveSmoke() {}

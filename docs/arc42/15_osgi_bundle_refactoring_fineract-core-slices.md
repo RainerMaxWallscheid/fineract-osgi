@@ -145,7 +145,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **24** | **Loan leftover ports** | ~2 | `fineract-loan` api | **Done** — `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 | **25** | **Instance-mode API filter** | 1 | `fineract-instancemode` api | **Done** — `FineractInstanceModeApiFilter` on instancemode-api (security-impl api-only); `FineractInstanceModeConstants` residual core (event conditions) |
 | **26** | **Leftover module tests** | 2 | `fineract-clients-test` / `fineract-bulkimport-test` | **Done** — `ClientDataValidatorTest` + `LookupModeTest` next to the already-moved production types |
-| **27** | **Calendar leftover** | ~2 | `fineract-calendar` api | **Done** — `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; loan-impl api-only; entity/`CalendarData` residual core |
+| **27** | **Calendar leftover** | ~2 | `fineract-calendar` api | **Done** — `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`); loan-impl api-only; entity/`CalendarData` residual core |
 | **28** | **Charge convert leftover** | 1 | `fineract-charge` api | **Done** — `ConvertChargeDataToSpecificChargeData` on charge-api (savings-impl + progressive-loan already api-only); fat charge/savings/share DTOs residual core |
 | **29** | **Unused image leftovers** | 4 | `fineract-document` api | **Done** — `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api; no remaining consumers |
 | **30** | **Unused JobParametersDTO** | 1 | `fineract-jobs` api | **Done** — unused wrapper on jobs-api; `JobParameterDTO` residual core (`CustomJobParameterRepository`) |
@@ -202,7 +202,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 24. **Loan leftover ports** ✅ (`LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` → loan-api).  
 25. **Instance-mode API filter** ✅ (`FineractInstanceModeApiFilter` → instancemode-api; constants residual core).  
 26. **Leftover module tests** ✅ (`ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test).  
-27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api).  
+27. **Calendar leftover** ✅ (`CalendarRequest` + `CalendarInstanceLookupPort` → calendar-api; Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`)).  
 28. **Charge convert leftover** ✅ (`ConvertChargeDataToSpecificChargeData` → charge-api).  
 29. **Unused image leftovers** ✅ (`Image*` exceptions + `Base64EncodedImage` → document-api).  
 30. **Unused JobParametersDTO** ✅ (`JobParametersDTO` → jobs-api; `JobParameterDTO` residual core).  
@@ -234,7 +234,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException, jdbc/jersey/cache/jpa/liquibase helpers, auditors, password encoder, AccountNumberFormatRepositoryWrapper, CalendarInstance repos in core; app bootstrap (Web/Liquibase-only) stay on provider |
 | share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
 | `fineract-entityaccess` | **complete** (api/impl/test); Equinox `EntityAccessOsgiBundleActivator` (`FineractEntityAccessReadService`); residual consumers in provider |
-| `fineract-calendar` | **complete** (api/impl/test); `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; entity residual in core; GroupRepository residual to core |
+| `fineract-calendar` | **complete** (api/impl/test); Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`); entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl; attendance type/enum + dropdown port closed into meeting-api |
 | `fineract-address` | **complete** (api/impl/test); AddressData residual in core; ClientAddress on impl |
 | `fineract-creditbureau` | **complete** (api/impl/test); loan product mapping via loan-impl |
@@ -276,7 +276,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | loan leftover ports close-in | **complete**; `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` on loan-api; `LoanStatus` residual core |
 | `fineract-instancemode` filter close-in | **complete**; `FineractInstanceModeApiFilter` on instancemode-api; `FineractInstanceModeConstants` residual core |
 | leftover module tests close-in | **complete**; `ClientDataValidatorTest` → clients-test; `LookupModeTest` → bulkimport-test |
-| `fineract-calendar` leftover close-in | **complete**; `CalendarRequest` + `CalendarInstanceLookupPort` on calendar-api; entity/`CalendarData` residual core |
+| `fineract-calendar` leftover close-in | **complete**; Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`); entity/`CalendarData` residual core |
 | `fineract-charge` convert leftover close-in | **complete**; `ConvertChargeDataToSpecificChargeData` on charge-api; `ChargeData` / savings+share charge DTOs residual core |
 | `fineract-document` unused image close-in | **complete**; `ImageNotFoundException`/`ImageUploadException`/`ImageDataURLNotValidException`/`Base64EncodedImage` on document-api |
 | `fineract-jobs` unused JobParametersDTO close-in | **complete**; `JobParametersDTO` on jobs-api; `JobParameterDTO` residual core |
