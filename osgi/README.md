@@ -545,6 +545,16 @@ Equinox registers `CreditBureauReadPlatformService` only (`retrieveCreditBureau`
 
 Equinox registers `CollateralWritePlatformService` only (`add*`/`update*`/`delete*` → empty). Did not register `CollateralReadPlatformService` (leftover `CurrencyData` in `organisation.monetary.data`, which monetary-api also exports).
 
+### Provider peel: fineract-collateralmanagement (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-collateralmanagement-api` | `org.apache.fineract.collateralmanagement.api` | Ports, DTOs, exceptions |
+| `fineract-collateralmanagement-impl` | `org.apache.fineract.collateralmanagement.impl` | REST/JPA + `CollateralManagementOsgiServiceRegistrar` / `CollateralManagementOsgiBundleActivator` |
+| `fineract-collateralmanagement-test` | `org.apache.fineract.collateralmanagement.test` | Fragment-Host → collateralmanagement.impl |
+
+Equinox registers `CollateralManagementReadService` only (`getCollateralProduct` → null, `getAllCollateralProducts` → empty). Did not register client/loan reads (leftover `ClientCollateralManagementData`; `LoanCollateralResponseData` loads `loanaccount.data.LoanCollateralManagementData`) or writes (request DTOs pull swagger / jakarta.validation).
+
 ## Manifest check
 
 ```bash

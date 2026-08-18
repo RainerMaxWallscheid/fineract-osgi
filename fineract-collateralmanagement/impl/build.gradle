@@ -55,8 +55,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Collateral Management Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.collateralmanagement.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.collateralmanagement.impl.osgi.CollateralManagementOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.collateralmanagement.service,'
+                        + 'org.apache.fineract.portfolio.collateralmanagement.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.collateralmanagement.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.collateralmanagement.impl'
                 )
     }
