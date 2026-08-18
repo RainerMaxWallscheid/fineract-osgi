@@ -86,7 +86,7 @@ Manifest Export/Import/Fragment-Host on jars.
 
 ### Step 6 — OSGi registrar ✅
 `RatesOsgiServiceRegistrar` (Spring path) → `FloatingRatePort` + `RateReadService` + `RateWriteService`.  
-`RatesOsgiBundleActivator` (Equinox start; Spring-free empty catalog) → `FloatingRatePort`.
+`RatesOsgiBundleActivator` (Equinox start; empty catalog, lowest ranking) → `FloatingRatePort`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

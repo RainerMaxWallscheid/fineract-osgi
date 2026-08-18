@@ -26,6 +26,7 @@ import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -35,14 +36,15 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
- * Start the staged catalog, then register a composition-root hosted
- * {@link ChargeDefinitionPort}. Proves ranking over the empty charge
- * activator without staging Spring.
+ * Start the staged catalog, then register composition-root hosted
+ * {@link ChargeDefinitionPort} and {@link FloatingRatePort}. Proves ranking
+ * over empty activators without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
     private static final Pattern BUNDLE_REF = Pattern.compile("reference:file:([^@,\\s]+)(?:@[^,]*)?");
     private static final String CHARGE_PORT = ChargeDefinitionPort.class.getName();
+    private static final String RATES_PORT = FloatingRatePort.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -98,41 +100,54 @@ public final class EquinoxSpringBridgeSmoke {
             }
         }
 
-        CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort());
+        CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
+                new HostedFloatingRatePort());
         bridge.start();
 
-        ServiceReference<?>[] all = ctx.getServiceReferences(CHARGE_PORT, null);
-        int count = all == null ? 0 : all.length;
-        System.out.println("SERVICE " + CHARGE_PORT + " " + count);
-
-        ServiceReference<?> selected = ctx.getServiceReference(CHARGE_PORT);
-        boolean hostedWins = false;
-        if (selected != null) {
-            Object provider = selected.getProperty("provider");
-            Object ranking = selected.getProperty(Constants.SERVICE_RANKING);
-            System.out.println("SELECTED provider=" + provider + " ranking=" + ranking);
-            Object service = ctx.getService(selected);
-            if (service instanceof ChargeDefinitionPort port) {
-                hostedWins = port.existsActiveCharge(HostedChargeDefinitionPort.HOSTED_ID);
-                System.out.println("HOSTED existsActiveCharge(" + HostedChargeDefinitionPort.HOSTED_ID + ") " + hostedWins);
-                ctx.ungetService(selected);
-            } else {
-                System.out.println("SELECTED_TYPE " + (service == null ? "null" : service.getClass().getName()));
-            }
-        } else {
-            System.out.println("SELECTED none");
-        }
+        boolean chargeWins = probeCharge(ctx);
+        boolean ratesWins = probeRates(ctx);
 
         bridge.stop();
         framework.stop();
         framework.waitForStop(10_000);
 
-        // System classpath ChargeDefinitionPort is not assignable to the bundle
-        // stub's Class, so this context sees only the hosted registration.
-        boolean ok = installFailures == 0 && startFailures == 0 && hostedWins;
+        // System classpath port types are not assignable to the bundle stubs'
+        // Class objects, so this context sees only the hosted registrations.
+        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
-                + startFailures + " chargeServices=" + count + " hostedWins=" + hostedWins);
+                + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins);
         System.exit(ok ? 0 : 1);
+    }
+
+    private static boolean probeCharge(final BundleContext ctx) throws Exception {
+        return probe(ctx, CHARGE_PORT, service -> service instanceof ChargeDefinitionPort port
+                && port.existsActiveCharge(HostedChargeDefinitionPort.HOSTED_ID));
+    }
+
+    private static boolean probeRates(final BundleContext ctx) throws Exception {
+        return probe(ctx, RATES_PORT, service -> service instanceof FloatingRatePort port
+                && port.findFloatingRate(HostedFloatingRatePort.HOSTED_ID).isPresent());
+    }
+
+    private static boolean probe(final BundleContext ctx, final String typeName, final java.util.function.Predicate<Object> hosted)
+            throws Exception {
+        ServiceReference<?>[] all = ctx.getServiceReferences(typeName, null);
+        int count = all == null ? 0 : all.length;
+        System.out.println("SERVICE " + typeName + " " + count);
+        ServiceReference<?> selected = ctx.getServiceReference(typeName);
+        boolean wins = false;
+        if (selected != null) {
+            Object provider = selected.getProperty("provider");
+            Object ranking = selected.getProperty(Constants.SERVICE_RANKING);
+            System.out.println("SELECTED " + typeName + " provider=" + provider + " ranking=" + ranking);
+            Object service = ctx.getService(selected);
+            wins = hosted.test(service);
+            System.out.println("HOSTED " + typeName + " " + wins);
+            ctx.ungetService(selected);
+        } else {
+            System.out.println("SELECTED " + typeName + " none");
+        }
+        return wins;
     }
 
     private static List<String> parseBundleLocations(String ini) {

@@ -23,11 +23,13 @@ import java.util.Hashtable;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Equinox start path for the floating-rates catalog (ADR-022 B3). Registers
- * {@link FloatingRatePort} without a Spring/JPA context.
+ * {@link FloatingRatePort} without a Spring/JPA context. Lowest
+ * {@code service.ranking} so a composition-root hosted port wins.
  * {@link RatesOsgiServiceRegistrar} remains the Spring Boot path.
  */
 public class RatesOsgiBundleActivator implements BundleActivator {
@@ -38,6 +40,7 @@ public class RatesOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-rates-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(FloatingRatePort.class, new OsgiFloatingRatePort(), props);
     }
 

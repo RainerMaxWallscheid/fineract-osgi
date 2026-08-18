@@ -16,9 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -34,29 +37,36 @@ public final class CompositionRootOsgiBridge {
     public static final int RANKING = 1;
 
     private final BundleContext context;
-    private final ChargeDefinitionPort port;
-    private ServiceRegistration<ChargeDefinitionPort> registration;
+    private final ChargeDefinitionPort charge;
+    private final FloatingRatePort rates;
+    private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
-    public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort port) {
+    public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates) {
         this.context = context;
-        this.port = port;
+        this.charge = charge;
+        this.rates = rates;
     }
 
     public void start() {
+        register(ChargeDefinitionPort.class, charge);
+        register(FloatingRatePort.class, rates);
+    }
+
+    private <T> void register(final Class<T> type, final T service) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", PROVIDER);
         props.put(Constants.SERVICE_RANKING, RANKING);
-        registration = context.registerService(ChargeDefinitionPort.class, port, props);
+        registrations.add(context.registerService(type, service, props));
     }
 
     public void stop() {
-        if (registration != null) {
+        for (int i = registrations.size() - 1; i >= 0; i--) {
             try {
-                registration.unregister();
+                registrations.get(i).unregister();
             } catch (final IllegalStateException ignored) {
                 // already unregistered
             }
-            registration = null;
         }
+        registrations.clear();
     }
 }

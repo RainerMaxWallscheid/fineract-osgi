@@ -87,7 +87,7 @@ Full playbook: [15 OSGi Bundle Refactoring](../15_osgi_bundle_refactoring.md).
 | **B0** | Guardrails: ArchUnit Module API, `moduleapi` ports (already started) |
 | **B1** | Bundle tooling (bnd / manifests, symbolic names, export whitelist) |
 | **B2** | Pilot split of one small module into api/impl/test — **done for `fineract-command`**; Waves **1–4** domain modules **complete** (see [15.6](../15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot)) |
-| **B3** | Spring↔OSGi bridge in composition root — **in progress** (empty-catalog activators catalog-wide; first hosted port `ChargeDefinitionPort` via `osgi/CompositionRootOsgiBridge`; per-module `*OsgiServiceRegistrar` remains the Boot classpath path) |
+| **B3** | Spring↔OSGi bridge in composition root — **in progress** (empty-catalog activators catalog-wide; hosted `ChargeDefinitionPort` + `FloatingRatePort` via `osgi/CompositionRootOsgiBridge`; per-module `*OsgiServiceRegistrar` remains the Boot classpath path) |
 | **B4** | Consumers obtain ports only via OSGi services (or bridge façade), not foreign impl — **Gradle/api-first**; full OSGi lookup still optional |
 | **B5** | Roll out further domain modules — **done for ranked waves**; optional provider peels remain; **shrink ArchUnit freeze store** on each residual fix |
 | **B6** | Optional: DS-only for pure logic extension bundles (not for loan/COB/security) |
