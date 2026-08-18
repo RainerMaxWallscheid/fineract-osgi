@@ -134,7 +134,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
 | **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
 | **15** | **Delinquency catalog entities** | ~6 | `fineract-loan-impl` | **Done** — `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + enums next to repos; WC already depends on loan-impl |
-| **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
+| **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`) |
 | **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
 | **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core |
@@ -191,7 +191,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
 14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
 15. **Delinquency catalog entities** ✅ (`DelinquencyBucket`/`Range` + enums → loan-impl; WC already on loan-impl).  
-16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api).  
+16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`)).  
 17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
 18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
 19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core).  
@@ -235,7 +235,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
 | `fineract-entityaccess` | **complete** (api/impl/test); Equinox `EntityAccessOsgiBundleActivator` (`FineractEntityAccessReadService`); residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); Equinox `CalendarOsgiBundleActivator` (`CalendarDropdownReadPlatformService`); entity residual in core; GroupRepository residual to core |
-| `fineract-meeting` | **complete** (api/impl/test); depends on calendar-api/impl; attendance type/enum + dropdown port closed into meeting-api |
+| `fineract-meeting` | **complete** (api/impl/test); Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`); depends on calendar-api/impl |
 | `fineract-address` | **complete** (api/impl/test); AddressData residual in core; ClientAddress on impl |
 | `fineract-creditbureau` | **complete** (api/impl/test); loan product mapping via loan-impl |
 | `fineract-collateral` | **complete** (api/impl/test); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
@@ -266,7 +266,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
 | `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |
 | delinquency catalog close-in | **complete**; `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + type enums on loan-impl next to repos |
-| `fineract-meeting` attendance close-in | **complete**; `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api |
+| `fineract-meeting` attendance close-in | **complete**; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`) |
 | `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
 | `fineract-cache` | **complete** (api/impl/test); Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); CacheType/PlatformCache/runtime manager residual core |
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |

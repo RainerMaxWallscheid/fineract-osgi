@@ -505,6 +505,16 @@ Equinox registers `FineractEntityAccessReadService` only (`retrieve*` → empty,
 
 Entity / `CalendarData` residual in **fineract-core**. Equinox registers `CalendarDropdownReadPlatformService` only (`retrieve*` → empty). Did not register `CalendarReadPlatformService` (leftover `CalendarData`) or `CalendarInstanceLookupPort` (leftover `CalendarInstance`).
 
+### Provider peel: fineract-meeting (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-meeting-api` | `org.apache.fineract.meeting.api` | DTOs, commands, ports, exceptions |
+| `fineract-meeting-impl` | `org.apache.fineract.meeting.impl` | REST/JPA + `MeetingOsgiServiceRegistrar` / `MeetingOsgiBundleActivator` |
+| `fineract-meeting-test` | `org.apache.fineract.meeting.test` | Fragment-Host → meeting.impl |
+
+Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendanceTypeOptions` → empty). Did not register `MeetingReadService` (leftover `MeetingData` coupling).
+
 ## Manifest check
 
 ```bash
