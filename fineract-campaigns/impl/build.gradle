@@ -55,8 +55,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract Campaigns Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.campaigns.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.campaigns.impl.osgi.CampaignsOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.campaigns.sms.service,'
+                        + 'org.apache.fineract.infrastructure.campaigns.sms.data,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.campaigns.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.campaigns.impl'
                 )
     }

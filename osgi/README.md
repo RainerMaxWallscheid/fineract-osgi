@@ -595,6 +595,16 @@ Equinox registers `SmsWritePlatformService` only (`create`/`update`/`delete` →
 
 Equinox registers `ReportMailingJobConfigurationReadPlatformService` only (`retrieveAll*` → empty, `retrieveReportMailingJobConfiguration` → null). Did not register job/run-history reads (`Page` / leftover `ReportData`) or write/email ports.
 
+### Provider peel: fineract-campaigns (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-campaigns-api` | `org.apache.fineract.campaigns.api` | Ports, DTOs, exceptions, constants |
+| `fineract-campaigns-impl` | `org.apache.fineract.campaigns.impl` | REST/JPA + `CampaignsOsgiServiceRegistrar` / `CampaignsOsgiBundleActivator` |
+| `fineract-campaigns-test` | `org.apache.fineract.campaigns.test` | Fragment-Host → campaigns.impl |
+
+Equinox registers `SmsCampaignDropdownReadPlatformService` only (`retrieve*` → empty). Did not register SMS/email campaign or email reads (`Page` / leftover `ReportData`), `TwoFactorSmsDeliveryPort` (leftover `Staff`), or write/email-job ports.
+
 ## Manifest check
 
 ```bash
