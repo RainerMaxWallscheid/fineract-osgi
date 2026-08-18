@@ -55,8 +55,10 @@ jar {
                 'Bundle-Name': 'Apache Fineract Bulk Import Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.bulkimport.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.bulkimport.impl.osgi.BulkImportOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.bulkimport.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.bulkimport.impl'
                 )
     }

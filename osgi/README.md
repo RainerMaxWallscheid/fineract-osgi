@@ -635,6 +635,16 @@ Equinox registers `ReportWritePlatformService` only (`create*`/`update*`/`delete
 
 Equinox registers `ExternalServicesReadPlatformService` only (`getExternalServiceDetailsByServiceName` → null). Did not register properties read (`MaskedValueSerializer` leftover; extends `NotificationConfigurationReadService`), leftover global-config ports, or write ports.
 
+### Provider peel: fineract-bulkimport (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-bulkimport-api` | `org.apache.fineract.bulkimport.api` | Constants, SPI, extra DTOs |
+| `fineract-bulkimport-impl` | `org.apache.fineract.bulkimport.impl` | REST/JPA + `BulkImportOsgiServiceRegistrar` / `BulkImportOsgiBundleActivator` |
+| `fineract-bulkimport-test` | `org.apache.fineract.bulkimport.test` | Fragment-Host → bulkimport.impl |
+
+Equinox `BulkImportOsgiBundleActivator` starts with no service. Did not register `BulkImportWorkbookService` (jersey multipart), `BulkImportWorkbookPopulatorService` (jakarta.ws.rs), or POI `WorkbookPopulator` / `ImportHandler`.
+
 ## Manifest check
 
 ```bash
