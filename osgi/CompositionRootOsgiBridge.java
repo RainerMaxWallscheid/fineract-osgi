@@ -21,6 +21,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
@@ -47,11 +48,12 @@ public final class CompositionRootOsgiBridge {
     private final ContentStoreService content;
     private final CashierTxnValidationPort cashier;
     private final LoanOriginatorReadPlatformService originator;
+    private final MixTaxonomyReadService mix;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
     public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates,
             final TaxCatalogPort tax, final ContentStoreService content, final CashierTxnValidationPort cashier,
-            final LoanOriginatorReadPlatformService originator) {
+            final LoanOriginatorReadPlatformService originator, final MixTaxonomyReadService mix) {
         this.context = context;
         this.charge = charge;
         this.rates = rates;
@@ -59,6 +61,7 @@ public final class CompositionRootOsgiBridge {
         this.content = content;
         this.cashier = cashier;
         this.originator = originator;
+        this.mix = mix;
     }
 
     public void start() {
@@ -68,6 +71,7 @@ public final class CompositionRootOsgiBridge {
         register(ContentStoreService.class, content);
         register(CashierTxnValidationPort.class, cashier);
         register(LoanOriginatorReadPlatformService.class, originator);
+        register(MixTaxonomyReadService.class, mix);
     }
 
     private <T> void register(final Class<T> type, final T service) {

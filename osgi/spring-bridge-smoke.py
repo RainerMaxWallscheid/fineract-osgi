@@ -21,9 +21,9 @@
 
 Starts the staged catalog (empty activators), then registers hosted Wave-1
 catalog ports, Wave-2 ``ContentStoreService``,
-``CashierTxnValidationPort``, and ``LoanOriginatorReadPlatformService`` from
-the composition-root classpath. Does not stage Spring. Writes
-``osgi/logs/spring-bridge-smoke.txt``.
+``CashierTxnValidationPort``, ``LoanOriginatorReadPlatformService``, and
+``MixTaxonomyReadService`` from the composition-root classpath. Does not
+stage Spring. Writes ``osgi/logs/spring-bridge-smoke.txt``.
 
 Usage:
     python3 osgi/spring-bridge-smoke.py
@@ -53,6 +53,7 @@ SOURCES = (
     OSGI_DIR / "HostedContentStoreService.java",
     OSGI_DIR / "HostedCashierTxnValidationPort.java",
     OSGI_DIR / "HostedLoanOriginatorReadPlatformService.java",
+    OSGI_DIR / "HostedMixTaxonomyReadService.java",
     OSGI_DIR / "EquinoxSpringBridgeSmoke.java",
 )
 
@@ -99,6 +100,7 @@ def main() -> int:
     document_api = one_jar("fineract-document-api-*.jar")
     branch_api = one_jar("fineract-branch-api-*.jar")
     loan_origination_api = one_jar("fineract-loan-origination-api-*.jar")
+    mix_api = one_jar("fineract-mix-api-*.jar")
     codes_api = one_jar("fineract-codes-api-*.jar")
     core = one_jar("fineract-core-*.jar")
     compile_cp = os.pathsep.join(
@@ -110,6 +112,7 @@ def main() -> int:
             str(document_api),
             str(branch_api),
             str(loan_origination_api),
+            str(mix_api),
             str(codes_api),
             str(core),
         )

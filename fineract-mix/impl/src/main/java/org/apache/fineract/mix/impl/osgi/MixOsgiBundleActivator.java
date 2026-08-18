@@ -23,11 +23,13 @@ import java.util.Hashtable;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Equinox start path for MIX taxonomy (ADR-022 B3). Registers
- * {@link MixTaxonomyReadService} without a Spring/JPA context.
+ * {@link MixTaxonomyReadService} without a Spring/JPA context. Lowest
+ * {@code service.ranking} so a composition-root hosted port wins.
  * {@link MixOsgiServiceRegistrar} remains the Spring Boot path.
  */
 public class MixOsgiBundleActivator implements BundleActivator {
@@ -38,6 +40,7 @@ public class MixOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-mix-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(MixTaxonomyReadService.class, new OsgiMixTaxonomyReadService(), props);
     }
 

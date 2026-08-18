@@ -52,7 +52,7 @@ fineract-mix/
 | `…mix.data` / `exception` / `command` | **api** |
 | `…mix.service.*Impl` / `MixReportXBRLBuilder` | **impl** |
 | domain / mapping / handler / REST | **impl** |
-| `…mix.impl.osgi` | **impl** — `MixOsgiServiceRegistrar` (Spring) + `MixOsgiBundleActivator` (Equinox start) |
+| `…mix.impl.osgi` | **impl** — `MixOsgiServiceRegistrar` (Spring) + `MixOsgiBundleActivator` (Equinox start; empty taxonomy, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge`. |
 
 ---
 

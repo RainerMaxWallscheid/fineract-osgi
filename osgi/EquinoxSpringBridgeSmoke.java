@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
@@ -44,9 +45,10 @@ import org.osgi.framework.wiring.FrameworkWiring;
 /**
  * Start the staged catalog, then register composition-root hosted Wave-1
  * catalog ports, Wave-2 {@link ContentStoreService},
- * {@link CashierTxnValidationPort}, and
- * {@link LoanOriginatorReadPlatformService}. Proves ranking over empty
- * activators without staging Spring.
+ * {@link CashierTxnValidationPort},
+ * {@link LoanOriginatorReadPlatformService}, and
+ * {@link MixTaxonomyReadService}. Proves ranking over empty activators
+ * without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -57,6 +59,7 @@ public final class EquinoxSpringBridgeSmoke {
     private static final String CONTENT_PORT = ContentStoreService.class.getName();
     private static final String CASHIER_PORT = CashierTxnValidationPort.class.getName();
     private static final String ORIGINATOR_PORT = LoanOriginatorReadPlatformService.class.getName();
+    private static final String MIX_PORT = MixTaxonomyReadService.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -114,7 +117,8 @@ public final class EquinoxSpringBridgeSmoke {
 
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
                 new HostedFloatingRatePort(), new HostedTaxCatalogPort(), new HostedContentStoreService(),
-                new HostedCashierTxnValidationPort(), new HostedLoanOriginatorReadPlatformService());
+                new HostedCashierTxnValidationPort(), new HostedLoanOriginatorReadPlatformService(),
+                new HostedMixTaxonomyReadService());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
@@ -123,6 +127,7 @@ public final class EquinoxSpringBridgeSmoke {
         boolean contentWins = probeContent(ctx);
         boolean cashierWins = probeCashier(ctx);
         boolean originatorWins = probeOriginator(ctx);
+        boolean mixWins = probeMix(ctx);
 
         bridge.stop();
         framework.stop();
@@ -131,10 +136,10 @@ public final class EquinoxSpringBridgeSmoke {
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
         boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins && contentWins && cashierWins
-                && originatorWins;
+                && originatorWins && mixWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
                 + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins + " contentWins="
-                + contentWins + " cashierWins=" + cashierWins + " originatorWins=" + originatorWins);
+                + contentWins + " cashierWins=" + cashierWins + " originatorWins=" + originatorWins + " mixWins=" + mixWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -170,6 +175,16 @@ public final class EquinoxSpringBridgeSmoke {
             }
             return HostedLoanOriginatorReadPlatformService.HOSTED_ID == port.retrieveById(HostedLoanOriginatorReadPlatformService.HOSTED_ID)
                     .getId();
+        });
+    }
+
+    private static boolean probeMix(final BundleContext ctx) throws Exception {
+        return probe(ctx, MIX_PORT, service -> {
+            if (!(service instanceof MixTaxonomyReadService port)) {
+                return false;
+            }
+            final var row = port.retrieveOne(HostedMixTaxonomyReadService.HOSTED_ID);
+            return row != null && HostedMixTaxonomyReadService.HOSTED_ID == row.getId();
         });
     }
 
