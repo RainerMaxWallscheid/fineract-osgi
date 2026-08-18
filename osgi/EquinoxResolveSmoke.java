@@ -77,7 +77,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.portfolio.search.service.SearchReadService",
             "org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService",
             "org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService",
-            "org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService"
+            "org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService",
+            "org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService"
     };
 
     private EquinoxResolveSmoke() {}

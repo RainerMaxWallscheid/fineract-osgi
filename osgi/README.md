@@ -425,6 +425,16 @@ Write impl residual in **fineract-progressive-loan-impl**. Kernel residual `Port
 
 Product JPA residual in **fineract-core**. Equinox registers `ShareProductDropdownReadPlatformService` only (`retrieve*` → empty). Did not register account/product reads (Spring Data `Page`; leftover `ShareProduct*` / `ShareAccount*` types) or dividend reads (`Page`).
 
+### Provider peel: fineract-group (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-group-api` | `org.apache.fineract.group.api` | Read/write ports, enumerations helper |
+| `fineract-group-impl` | `org.apache.fineract.group.impl` | REST/handlers + `GroupOsgiServiceRegistrar` / `GroupOsgiBundleActivator` |
+| `fineract-group-test` | `org.apache.fineract.group.test` | Fragment-Host → group.impl |
+
+Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatformService` only (`retrieveAllLevels` → empty). Did not register `GroupReadPlatformService` / `CenterReadPlatformService` (leftover `GroupGeneralData` / `CenterData`; `Page`).
+
 ## Manifest check
 
 ```bash
