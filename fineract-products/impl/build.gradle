@@ -55,8 +55,11 @@ jar {
                 'Bundle-Name': 'Apache Fineract Products Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.products.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.products.impl.osgi.ProductsOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.products.service,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.products.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.products.impl'
                 )
     }

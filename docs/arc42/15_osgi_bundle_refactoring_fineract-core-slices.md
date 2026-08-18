@@ -129,7 +129,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core; main write/REST residual progressive |
 | **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl |
 | **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
-| **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; `ProductNotFoundException` residual core |
+| **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); `ProductNotFoundException` residual core |
 | **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; entity + PaymentDetailData residual core |
 | **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
 | **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
@@ -186,7 +186,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core).  
 9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl).  
 10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).  
-11. **Generic products REST** ✅ (`fineract-products` api/impl/test; ProductNotFoundException residual core).  
+11. **Generic products REST** ✅ (`fineract-products` api/impl/test; Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); ProductNotFoundException residual core).  
 12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; entity residual core).  
 13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
 14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
@@ -261,7 +261,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-clients` | **complete** (api/impl/test); Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
 | `fineract-postdatedchecks` | **complete** (api/impl/test); Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
-| `fineract-products` | **complete** (api/impl/test); generic products REST + share-product read port; ProductNotFoundException residual core; read impl residual charge-impl |
+| `fineract-products` | **complete** (api/impl/test); Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); ProductNotFoundException residual core; read impl residual charge-impl |
 | `fineract-paymentdetail` | **complete** (api/impl/test); write port/impl/assembler; PaymentDetail entity/repo + PaymentDetailData residual core |
 | `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
 | `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |

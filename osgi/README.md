@@ -455,6 +455,16 @@ Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatf
 
 Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostDatedChecksWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `RepaymentWithPostDatedChecksReadPlatformService` (one thin port).
 
+### Provider peel: fineract-products (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-products-api` | `org.apache.fineract.products.api` | `ShareProductReadPlatformService`, `ProductCommandsService`, `ProductData` |
+| `fineract-products-impl` | `org.apache.fineract.products.impl` | REST + `ProductsOsgiServiceRegistrar` / `ProductsOsgiBundleActivator` |
+| `fineract-products-test` | `org.apache.fineract.products.test` | Fragment-Host → products.impl |
+
+`ProductNotFoundException` residual in **fineract-core**. Equinox registers `ProductCommandsService` only (`handleCommand` → null). Did not register `ShareProductReadPlatformService` (`Page`).
+
 ## Manifest check
 
 ```bash
