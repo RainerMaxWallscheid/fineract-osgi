@@ -19,9 +19,9 @@
 
 """Composition-root Equinox bridge smoke (ADR-022 B3).
 
-Starts the staged catalog (empty activators), then registers hosted
-``ChargeDefinitionPort`` and ``FloatingRatePort`` from the composition-root
-classpath. Does not stage Spring. Writes ``osgi/logs/spring-bridge-smoke.txt``.
+Starts the staged catalog (empty activators), then registers hosted Wave-1
+catalog ports from the composition-root classpath. Does not stage Spring.
+Writes ``osgi/logs/spring-bridge-smoke.txt``.
 
 Usage:
     python3 osgi/spring-bridge-smoke.py
@@ -47,6 +47,7 @@ SOURCES = (
     OSGI_DIR / "CompositionRootOsgiBridge.java",
     OSGI_DIR / "HostedChargeDefinitionPort.java",
     OSGI_DIR / "HostedFloatingRatePort.java",
+    OSGI_DIR / "HostedTaxCatalogPort.java",
     OSGI_DIR / "EquinoxSpringBridgeSmoke.java",
 )
 
@@ -89,8 +90,9 @@ def main() -> int:
 
     charge_api = one_jar("fineract-charge-api-*.jar")
     rates_api = one_jar("fineract-rates-api-*.jar")
+    tax_api = one_jar("fineract-tax-api-*.jar")
     core = one_jar("fineract-core-*.jar")
-    compile_cp = os.pathsep.join((str(equinox), str(charge_api), str(rates_api), str(core)))
+    compile_cp = os.pathsep.join((str(equinox), str(charge_api), str(rates_api), str(tax_api), str(core)))
     run_cp_prefix = compile_cp
 
     (OSGI_DIR / "logs").mkdir(parents=True, exist_ok=True)

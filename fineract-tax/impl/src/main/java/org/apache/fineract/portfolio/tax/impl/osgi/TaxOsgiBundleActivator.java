@@ -23,11 +23,13 @@ import java.util.Hashtable;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Equinox start path for the tax catalog (ADR-022 B3). Registers
- * {@link TaxCatalogPort} without a Spring/JPA context.
+ * {@link TaxCatalogPort} without a Spring/JPA context. Lowest
+ * {@code service.ranking} so a composition-root hosted port wins.
  * {@link TaxOsgiServiceRegistrar} remains the Spring Boot path.
  */
 public class TaxOsgiBundleActivator implements BundleActivator {
@@ -38,6 +40,7 @@ public class TaxOsgiBundleActivator implements BundleActivator {
     public void start(final BundleContext context) {
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", "fineract-tax-impl");
+        props.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
         registration = context.registerService(TaxCatalogPort.class, new OsgiTaxCatalogPort(), props);
     }
 

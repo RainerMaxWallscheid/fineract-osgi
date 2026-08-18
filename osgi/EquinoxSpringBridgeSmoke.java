@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -36,15 +37,15 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
- * Start the staged catalog, then register composition-root hosted
- * {@link ChargeDefinitionPort} and {@link FloatingRatePort}. Proves ranking
- * over empty activators without staging Spring.
+ * Start the staged catalog, then register composition-root hosted Wave-1
+ * catalog ports. Proves ranking over empty activators without staging Spring.
  */
 public final class EquinoxSpringBridgeSmoke {
 
     private static final Pattern BUNDLE_REF = Pattern.compile("reference:file:([^@,\\s]+)(?:@[^,]*)?");
     private static final String CHARGE_PORT = ChargeDefinitionPort.class.getName();
     private static final String RATES_PORT = FloatingRatePort.class.getName();
+    private static final String TAX_PORT = TaxCatalogPort.class.getName();
 
     private EquinoxSpringBridgeSmoke() {}
 
@@ -101,11 +102,12 @@ public final class EquinoxSpringBridgeSmoke {
         }
 
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx, new HostedChargeDefinitionPort(),
-                new HostedFloatingRatePort());
+                new HostedFloatingRatePort(), new HostedTaxCatalogPort());
         bridge.start();
 
         boolean chargeWins = probeCharge(ctx);
         boolean ratesWins = probeRates(ctx);
+        boolean taxWins = probeTax(ctx);
 
         bridge.stop();
         framework.stop();
@@ -113,9 +115,9 @@ public final class EquinoxSpringBridgeSmoke {
 
         // System classpath port types are not assignable to the bundle stubs'
         // Class objects, so this context sees only the hosted registrations.
-        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins;
+        boolean ok = installFailures == 0 && startFailures == 0 && chargeWins && ratesWins && taxWins;
         System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
-                + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins);
+                + startFailures + " chargeWins=" + chargeWins + " ratesWins=" + ratesWins + " taxWins=" + taxWins);
         System.exit(ok ? 0 : 1);
     }
 
@@ -127,6 +129,11 @@ public final class EquinoxSpringBridgeSmoke {
     private static boolean probeRates(final BundleContext ctx) throws Exception {
         return probe(ctx, RATES_PORT, service -> service instanceof FloatingRatePort port
                 && port.findFloatingRate(HostedFloatingRatePort.HOSTED_ID).isPresent());
+    }
+
+    private static boolean probeTax(final BundleContext ctx) throws Exception {
+        return probe(ctx, TAX_PORT, service -> service instanceof TaxCatalogPort port
+                && port.findTaxGroup(HostedTaxCatalogPort.HOSTED_ID).isPresent());
     }
 
     private static boolean probe(final BundleContext ctx, final String typeName, final java.util.function.Predicate<Object> hosted)

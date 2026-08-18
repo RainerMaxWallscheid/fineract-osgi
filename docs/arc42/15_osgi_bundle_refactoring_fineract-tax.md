@@ -45,7 +45,7 @@ fineract-tax/
 | `…tax.domain` | **impl** |
 | `…tax.service` (impls, `TaxEntityUtils`, port adapter) | **impl** |
 | REST / handlers / mappers / serialization | **impl** |
-| `…tax.impl.osgi` | **impl** — `TaxOsgiServiceRegistrar` (Spring) + `TaxOsgiBundleActivator` (Equinox start) |
+| `…tax.impl.osgi` | **impl** — `TaxOsgiServiceRegistrar` (Spring) + `TaxOsgiBundleActivator` (Equinox start; empty catalog, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge` |
 | provider `TaxAssembler` / `*PlatformServiceImpl` / `TaxConfiguration` | **provider** |
 
 ---

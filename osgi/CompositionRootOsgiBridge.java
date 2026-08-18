@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import java.util.List;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -39,17 +40,21 @@ public final class CompositionRootOsgiBridge {
     private final BundleContext context;
     private final ChargeDefinitionPort charge;
     private final FloatingRatePort rates;
+    private final TaxCatalogPort tax;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
-    public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates) {
+    public CompositionRootOsgiBridge(final BundleContext context, final ChargeDefinitionPort charge, final FloatingRatePort rates,
+            final TaxCatalogPort tax) {
         this.context = context;
         this.charge = charge;
         this.rates = rates;
+        this.tax = tax;
     }
 
     public void start() {
         register(ChargeDefinitionPort.class, charge);
         register(FloatingRatePort.class, rates);
+        register(TaxCatalogPort.class, tax);
     }
 
     private <T> void register(final Class<T> type, final T service) {
