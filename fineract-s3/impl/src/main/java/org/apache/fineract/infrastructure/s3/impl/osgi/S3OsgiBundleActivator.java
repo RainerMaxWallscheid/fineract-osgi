@@ -16,22 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.s3.impl.osgi;
 
-dependencies {
-    api project(path: ':fineract-s3-api')
-    implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-dataqueries-api'))
-    implementation(project(path: ':fineract-dataqueries-impl'))
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
-    implementation(
-            'org.springframework.boot:spring-boot-starter',
-            'org.apache.commons:commons-lang3',
-            )
-    implementation ('software.amazon.awssdk:s3') {
-        // keep version from BOM / platform
+/**
+ * Equinox start path for s3 (ADR-022 B3). No api port is registered:
+ * {@code S3ClientCustomizer} loads AWS SDK {@code S3ClientBuilder}, which has no
+ * staged Equinox BSN. {@link S3OsgiServiceRegistrar} remains the Spring Boot path.
+ */
+public class S3OsgiBundleActivator implements BundleActivator {
+
+    @Override
+    public void start(final BundleContext context) {
+        // no Equinox-safe api port
     }
-    implementation ('software.amazon.awssdk:auth') {
+
+    @Override
+    public void stop(final BundleContext context) {
+        // no registrations
     }
-    compileOnly 'org.osgi:osgi.core:8.0.0'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

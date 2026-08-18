@@ -251,7 +251,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-bulkimport` | **complete** (api/impl/test); Equinox `BulkImportOsgiBundleActivator` (no port: jersey / jakarta.ws.rs / POI); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; `LookupModeTest` on bulkimport-test; populator impl residual provider (share) |
 | `fineract-instancemode` | **complete** (api/impl/test); Equinox `InstanceModeOsgiBundleActivator` (no port: swagger DTO + servlet filter only); test-profile REST + swagger DTO + `FineractInstanceModeApiFilter` on api; constants residual in core |
 | `fineract-jobs` | **complete** (api/impl/test); Equinox `JobsOsgiBundleActivator` (`StuckJobExecutorService`); residual **closed** (filters + inline + retained-earning + NPA); unused `JobParametersDTO` on jobs-api; `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
-| `fineract-s3` | **complete** (api/impl/test); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
+| `fineract-s3` | **complete** (api/impl/test); Equinox `S3OsgiBundleActivator` (no port: AWS SDK `S3ClientBuilder`); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
 | `fineract-springbatch` | **complete** (api/impl/test); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |

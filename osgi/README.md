@@ -665,6 +665,16 @@ Equinox `InstanceModeOsgiBundleActivator` starts with no service. instancemode-a
 
 Equinox registers `StuckJobExecutorService` only (`resumeStuckJob` no-op). Did not register leftover `SchedulerJobRunnerReadService` (`Page`/`SearchParameters`, unpublished `JobDetailData`), `NamedJobLaunchPort` / `JobParameterProvider` (unpublished `JobParameterDTO`; Spring Batch), or servlet COB filters.
 
+### Provider peel: fineract-s3 (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-s3-api` | `org.apache.fineract.s3.api` | `S3ClientCustomizer` SPI |
+| `fineract-s3-impl` | `org.apache.fineract.s3.impl` | Amazon/Localstack config + `S3OsgiServiceRegistrar` / `S3OsgiBundleActivator` |
+| `fineract-s3-test` | `org.apache.fineract.s3.test` | Fragment-Host → s3.impl |
+
+Equinox `S3OsgiBundleActivator` starts with no service. Did not register `S3ClientCustomizer` (AWS SDK `S3ClientBuilder` has no staged Equinox BSN).
+
 ## Manifest check
 
 ```bash
