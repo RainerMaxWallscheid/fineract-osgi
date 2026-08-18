@@ -55,8 +55,11 @@ jar {
                 'Bundle-Name': 'Apache Fineract Jobs Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.jobs.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.infrastructure.jobs.impl.osgi.JobsOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.infrastructure.jobs.service,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.infrastructure.jobs.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.jobs.impl'
                 )
     }

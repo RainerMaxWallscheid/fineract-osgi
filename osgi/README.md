@@ -655,6 +655,16 @@ Equinox `BulkImportOsgiBundleActivator` starts with no service. Did not register
 
 Equinox `InstanceModeOsgiBundleActivator` starts with no service. instancemode-api has no application port (swagger DTO + `FineractInstanceModeApiFilter` only).
 
+### Provider peel: fineract-jobs (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-jobs-api` | `org.apache.fineract.jobs.api` | SPI, exceptions, constants |
+| `fineract-jobs-impl` | `org.apache.fineract.jobs.impl` | Quartz/Batch/REST + `JobsOsgiServiceRegistrar` / `JobsOsgiBundleActivator` |
+| `fineract-jobs-test` | `org.apache.fineract.jobs.test` | Fragment-Host → jobs.impl |
+
+Equinox registers `StuckJobExecutorService` only (`resumeStuckJob` no-op). Did not register leftover `SchedulerJobRunnerReadService` (`Page`/`SearchParameters`, unpublished `JobDetailData`), `NamedJobLaunchPort` / `JobParameterProvider` (unpublished `JobParameterDTO`; Spring Batch), or servlet COB filters.
+
 ## Manifest check
 
 ```bash
