@@ -55,8 +55,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract Account Transfer Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.accounttransfer.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.account.impl.osgi.AccountTransferOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.account.service,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.account.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.accounttransfer.impl'
                 )
     }

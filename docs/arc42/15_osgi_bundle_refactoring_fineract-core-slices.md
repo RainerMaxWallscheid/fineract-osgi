@@ -123,7 +123,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
 | **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
-| **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
+| **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
 | **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; product JPA residual core; account write residual progressive; product write residual charge |
 | **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; entity+DTO residual core; Centers/Groups REST + write residual progressive |
 | **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Client hub residual core; main write/REST residual progressive |
@@ -180,7 +180,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 2. **Search** ✅ (`fineract-search` api/impl/test; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core).  
 3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl).  
 4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
-5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; write residual progressive-loan).  
+5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write residual progressive-loan).  
 6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; product JPA residual core).  
 7. **Group pure residual** ✅ (`fineract-group` api/impl/test; entity residual core).  
 8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Client hub residual core).  
@@ -255,7 +255,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-openapi` | **complete** (api/impl/test); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
 | `fineract-springbatch` | **complete** (api/impl/test); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |
-| `fineract-accounttransfer` | **complete** (api/impl/test); ports/enums/DTOs + REST/handlers/reads/SI job; write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
+| `fineract-accounttransfer` | **complete** (api/impl/test); Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
 | `fineract-shares` | **complete** (api/impl/test); ports/DTOs/REST/handlers/reads/dividend job; ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
 | `fineract-group` | **complete** (api/impl/test); ports/handlers/JDBC reads/roles write/levels REST; Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
 | `fineract-clients` | **complete** (api/impl/test); family/identifiers/transactions/search pure; Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |

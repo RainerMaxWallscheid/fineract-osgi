@@ -405,6 +405,16 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 
 Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `CollectionSheetWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `CollectionSheetReadPlatformService` (leftover core `SavingsProductData` in split package `…savings.data`).
 
+### Provider peel: fineract-accounttransfer (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-accounttransfer-api` | `org.apache.fineract.accounttransfer.api` | Ports, enums, shared DTOs, exceptions, API constants |
+| `fineract-accounttransfer-impl` | `org.apache.fineract.accounttransfer.impl` | REST/handlers + `AccountTransferOsgiServiceRegistrar` / `AccountTransferOsgiBundleActivator` |
+| `fineract-accounttransfer-test` | `org.apache.fineract.accounttransfer.test` | Fragment-Host → accounttransfer.impl |
+
+Write impl residual in **fineract-progressive-loan-impl**. Kernel residual `PortfolioAccountType` / `PortfolioAccountData` / `AccountTransferData` / `AccountTransfersReadPlatformService`. Equinox registers `StandingInstructionWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `AccountTransfersReadPlatformService` (kernel leftover), `AccountTransfersCommandWritePort` (leftover `PortfolioAccountType` in split package `…portfolio.account`), or SI read (`Page`).
+
 ## Manifest check
 
 ```bash
