@@ -55,8 +55,13 @@ jar {
                 'Bundle-Name': 'Apache Fineract Post-Dated Checks Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.postdatedchecks.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Activator': 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.impl.osgi.PostDatedChecksOsgiBundleActivator',
+                'Import-Package': 'org.osgi.framework,'
+                        + 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service,'
+                        + 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.data,'
+                        + '*',
                 'Export-Package': 'org.apache.fineract.portfolio.repaymentwithpostdatedchecks.impl.osgi',
-                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.postdatedchecks.impl'
                 )
     }

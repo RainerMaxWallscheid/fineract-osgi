@@ -445,6 +445,16 @@ Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatf
 
 `Client` / `ClientData` residual in **fineract-core**. Equinox registers `ClientIdentifierWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `ClientReadPlatformService` / `ClientWritePlatformService` / `ClientTemplateReadPlatformService` (leftover `Client` / `ClientData`) or search (`Page`).
 
+### Provider peel: fineract-postdatedchecks (complete)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-postdatedchecks-api` | `org.apache.fineract.postdatedchecks.api` | Ports, DTOs, status, exceptions |
+| `fineract-postdatedchecks-impl` | `org.apache.fineract.postdatedchecks.impl` | REST/handlers + `PostDatedChecksOsgiServiceRegistrar` / `PostDatedChecksOsgiBundleActivator` |
+| `fineract-postdatedchecks-test` | `org.apache.fineract.postdatedchecks.test` | Fragment-Host → postdatedchecks.impl |
+
+Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostDatedChecksWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `RepaymentWithPostDatedChecksReadPlatformService` (one thin port).
+
 ## Manifest check
 
 ```bash
