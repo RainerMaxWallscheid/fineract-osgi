@@ -180,7 +180,7 @@ import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.rate.data.RateData;
 import org.apache.fineract.portfolio.rate.service.RateReadService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountStatuses;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.data.domain.Pageable;
@@ -350,7 +350,7 @@ public class LoansApiResource {
         if (currencyData != null) {
             currencyCode = currencyData.getCode();
         }
-        final long[] accountStatus = {SavingsAccountStatusType.ACTIVE.getValue()};
+        final long[] accountStatus = {SavingsAccountStatuses.ACTIVE};
         final PortfolioAccountDTO portfolioAccountDTO = new PortfolioAccountDTO(PortfolioAccountType.SAVINGS.getValue(), clientId, currencyCode, accountStatus, DepositAccountType.SAVINGS_DEPOSIT.getValue());
         if (groupId != null) {
             portfolioAccountDTO.setGroupId(groupId);
@@ -923,7 +923,7 @@ public class LoansApiResource {
             if (currencyData != null) {
                 currencyCode = currencyData.getCode();
             }
-            final long[] accountStatus = {SavingsAccountStatusType.ACTIVE.getValue()};
+            final long[] accountStatus = {SavingsAccountStatuses.ACTIVE};
             PortfolioAccountDTO portfolioAccountDTO = new PortfolioAccountDTO(PortfolioAccountType.SAVINGS.getValue(), loanBasicDetails.getClientId(), currencyCode, accountStatus, DepositAccountType.SAVINGS_DEPOSIT.getValue());
             accountLinkingOptions = this.portfolioAccountReadPlatformService.retrieveAllForLookup(portfolioAccountDTO);
             if (!associationParameters.contains(DataTableApiConstant.linkedAccountAssociateParamName)) {

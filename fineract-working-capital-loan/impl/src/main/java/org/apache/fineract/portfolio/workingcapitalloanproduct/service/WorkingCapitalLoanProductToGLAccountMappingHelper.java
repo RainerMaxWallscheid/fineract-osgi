@@ -27,7 +27,7 @@ import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsFor
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
+import org.apache.fineract.accounting.moduleapi.GLAccountTypes;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingInvalidException;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkingCapitalLoanProductToGLAccountMappingHelper {
     private static final PortfolioProductType PRODUCT_TYPE = PortfolioProductType.WORKING_CAPITAL_LOAN;
-    private static final List<GLAccountType> ASSET_LIABILITY_TYPES = List.of(GLAccountType.ASSET, GLAccountType.LIABILITY);
+    private static final List<GLAccountTypes> ASSET_LIABILITY_TYPES = List.of(GLAccountTypes.ASSET, GLAccountTypes.LIABILITY);
     private final ProductToGLAccountMappingRepository accountMappingRepository;
     private final GLAccountRepositoryWrapper accountRepositoryWrapper;
     private final FromJsonHelper fromApiJsonHelper;
@@ -50,58 +50,58 @@ public class WorkingCapitalLoanProductToGLAccountMappingHelper {
         // assets / liabilities (fund source can be either asset or liability)
         saveAccountMapping(element, LoanProductAccountingParams.FUND_SOURCE.getValue(), productId, CashAccountsForLoan.FUND_SOURCE.getValue(), ASSET_LIABILITY_TYPES);
         // assets
-        saveAccountMapping(element, LoanProductAccountingParams.LOAN_PORTFOLIO.getValue(), productId, CashAccountsForLoan.LOAN_PORTFOLIO.getValue(), GLAccountType.ASSET);
-        saveAccountMapping(element, LoanProductAccountingParams.TRANSFERS_SUSPENSE.getValue(), productId, CashAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), GLAccountType.ASSET);
+        saveAccountMapping(element, LoanProductAccountingParams.LOAN_PORTFOLIO.getValue(), productId, CashAccountsForLoan.LOAN_PORTFOLIO.getValue(), GLAccountTypes.ASSET);
+        saveAccountMapping(element, LoanProductAccountingParams.TRANSFERS_SUSPENSE.getValue(), productId, CashAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), GLAccountTypes.ASSET);
         // assets (receivables)
-        saveAccountMapping(element, LoanProductAccountingParams.FEES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.FEES_RECEIVABLE.getValue(), GLAccountType.ASSET);
-        saveAccountMapping(element, LoanProductAccountingParams.PENALTIES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue(), GLAccountType.ASSET);
+        saveAccountMapping(element, LoanProductAccountingParams.FEES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.FEES_RECEIVABLE.getValue(), GLAccountTypes.ASSET);
+        saveAccountMapping(element, LoanProductAccountingParams.PENALTIES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue(), GLAccountTypes.ASSET);
         // income (required)
-        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_DISCOUNT_FEE.getValue(), productId, CashAccountsForLoan.INCOME_FROM_DISCOUNT_FEE.getValue(), GLAccountType.INCOME);
-        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_FEES.getValue(), GLAccountType.INCOME);
-        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_PENALTIES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_PENALTIES.getValue(), GLAccountType.INCOME);
-        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_RECOVERY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue(), GLAccountType.INCOME);
+        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_DISCOUNT_FEE.getValue(), productId, CashAccountsForLoan.INCOME_FROM_DISCOUNT_FEE.getValue(), GLAccountTypes.INCOME);
+        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_FEES.getValue(), GLAccountTypes.INCOME);
+        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_PENALTIES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_PENALTIES.getValue(), GLAccountTypes.INCOME);
+        saveAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_RECOVERY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue(), GLAccountTypes.INCOME);
         // income (optional)
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_FEES.getValue(), GLAccountType.INCOME);
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), GLAccountType.INCOME);
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), GLAccountType.INCOME);
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), GLAccountType.INCOME);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_FEES.getValue(), GLAccountTypes.INCOME);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), GLAccountTypes.INCOME);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), GLAccountTypes.INCOME);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), GLAccountTypes.INCOME);
         // expenses (required)
-        saveAccountMapping(element, LoanProductAccountingParams.LOSSES_WRITTEN_OFF.getValue(), productId, CashAccountsForLoan.LOSSES_WRITTEN_OFF.getValue(), GLAccountType.EXPENSE);
+        saveAccountMapping(element, LoanProductAccountingParams.LOSSES_WRITTEN_OFF.getValue(), productId, CashAccountsForLoan.LOSSES_WRITTEN_OFF.getValue(), GLAccountTypes.EXPENSE);
         // expenses (optional)
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.GOODWILL_CREDIT.getValue(), productId, CashAccountsForLoan.GOODWILL_CREDIT.getValue(), GLAccountType.EXPENSE);
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.CHARGE_OFF_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_EXPENSE.getValue(), GLAccountType.EXPENSE);
-        saveOptionalAccountMapping(element, LoanProductAccountingParams.CHARGE_OFF_FRAUD_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE.getValue(), GLAccountType.EXPENSE);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.GOODWILL_CREDIT.getValue(), productId, CashAccountsForLoan.GOODWILL_CREDIT.getValue(), GLAccountTypes.EXPENSE);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.CHARGE_OFF_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_EXPENSE.getValue(), GLAccountTypes.EXPENSE);
+        saveOptionalAccountMapping(element, LoanProductAccountingParams.CHARGE_OFF_FRAUD_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE.getValue(), GLAccountTypes.EXPENSE);
         // liabilities
-        saveAccountMapping(element, LoanProductAccountingParams.OVERPAYMENT.getValue(), productId, CashAccountsForLoan.OVERPAYMENT.getValue(), GLAccountType.LIABILITY);
-        saveAccountMapping(element, LoanProductAccountingParams.DEFERRED_INCOME_LIABILITY.getValue(), productId, CashAccountsForLoan.DEFERRED_INCOME_LIABILITY.getValue(), GLAccountType.LIABILITY);
+        saveAccountMapping(element, LoanProductAccountingParams.OVERPAYMENT.getValue(), productId, CashAccountsForLoan.OVERPAYMENT.getValue(), GLAccountTypes.LIABILITY);
+        saveAccountMapping(element, LoanProductAccountingParams.DEFERRED_INCOME_LIABILITY.getValue(), productId, CashAccountsForLoan.DEFERRED_INCOME_LIABILITY.getValue(), GLAccountTypes.LIABILITY);
     }
 
     public void handleChangesToAccrualWithDeferredRevenueAmortizationAccountMapping(final Long productId, final Map<String, Object> changes, final JsonElement element) {
         // assets / liabilities (fund source can be either asset or liability)
         mergeAccountMappingChanges(element, LoanProductAccountingParams.FUND_SOURCE.getValue(), productId, CashAccountsForLoan.FUND_SOURCE.getValue(), changes, ASSET_LIABILITY_TYPES);
         // assets
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.LOAN_PORTFOLIO.getValue(), productId, CashAccountsForLoan.LOAN_PORTFOLIO.getValue(), changes, GLAccountType.ASSET);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.TRANSFERS_SUSPENSE.getValue(), productId, CashAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), changes, GLAccountType.ASSET);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.LOAN_PORTFOLIO.getValue(), productId, CashAccountsForLoan.LOAN_PORTFOLIO.getValue(), changes, GLAccountTypes.ASSET);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.TRANSFERS_SUSPENSE.getValue(), productId, CashAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), changes, GLAccountTypes.ASSET);
         // assets (receivables)
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.FEES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.FEES_RECEIVABLE.getValue(), changes, GLAccountType.ASSET);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.PENALTIES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue(), changes, GLAccountType.ASSET);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.FEES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.FEES_RECEIVABLE.getValue(), changes, GLAccountTypes.ASSET);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.PENALTIES_RECEIVABLE.getValue(), productId, CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue(), changes, GLAccountTypes.ASSET);
         // income
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_DISCOUNT_FEE.getValue(), productId, CashAccountsForLoan.INCOME_FROM_DISCOUNT_FEE.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_FEES.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_PENALTIES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_PENALTIES.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_RECOVERY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_FEES.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), changes, GLAccountType.INCOME);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), changes, GLAccountType.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_DISCOUNT_FEE.getValue(), productId, CashAccountsForLoan.INCOME_FROM_DISCOUNT_FEE.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_FEES.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_PENALTIES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_PENALTIES.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_RECOVERY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_FEES.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), changes, GLAccountTypes.INCOME);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), productId, CashAccountsForLoan.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), changes, GLAccountTypes.INCOME);
         // expenses
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.LOSSES_WRITTEN_OFF.getValue(), productId, CashAccountsForLoan.LOSSES_WRITTEN_OFF.getValue(), changes, GLAccountType.EXPENSE);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.GOODWILL_CREDIT.getValue(), productId, CashAccountsForLoan.GOODWILL_CREDIT.getValue(), changes, GLAccountType.EXPENSE);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.CHARGE_OFF_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_EXPENSE.getValue(), changes, GLAccountType.EXPENSE);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.CHARGE_OFF_FRAUD_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE.getValue(), changes, GLAccountType.EXPENSE);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.LOSSES_WRITTEN_OFF.getValue(), productId, CashAccountsForLoan.LOSSES_WRITTEN_OFF.getValue(), changes, GLAccountTypes.EXPENSE);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.GOODWILL_CREDIT.getValue(), productId, CashAccountsForLoan.GOODWILL_CREDIT.getValue(), changes, GLAccountTypes.EXPENSE);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.CHARGE_OFF_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_EXPENSE.getValue(), changes, GLAccountTypes.EXPENSE);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.CHARGE_OFF_FRAUD_EXPENSE.getValue(), productId, CashAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE.getValue(), changes, GLAccountTypes.EXPENSE);
         // liabilities
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.OVERPAYMENT.getValue(), productId, CashAccountsForLoan.OVERPAYMENT.getValue(), changes, GLAccountType.LIABILITY);
-        mergeAccountMappingChanges(element, LoanProductAccountingParams.DEFERRED_INCOME_LIABILITY.getValue(), productId, CashAccountsForLoan.DEFERRED_INCOME_LIABILITY.getValue(), changes, GLAccountType.LIABILITY);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.OVERPAYMENT.getValue(), productId, CashAccountsForLoan.OVERPAYMENT.getValue(), changes, GLAccountTypes.LIABILITY);
+        mergeAccountMappingChanges(element, LoanProductAccountingParams.DEFERRED_INCOME_LIABILITY.getValue(), productId, CashAccountsForLoan.DEFERRED_INCOME_LIABILITY.getValue(), changes, GLAccountTypes.LIABILITY);
     }
 
     public Map<String, Object> populateChangesForNewAccrualWithDeferredRevenueAmortizationMappingCreation(final JsonElement element) {
@@ -164,11 +164,11 @@ public class WorkingCapitalLoanProductToGLAccountMappingHelper {
         }
     }
 
-    private void saveAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final GLAccountType expectedAccountType) {
+    private void saveAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final GLAccountTypes expectedAccountType) {
         saveAccountMapping(element, paramName, productId, financialAccountType, List.of(expectedAccountType));
     }
 
-    private void saveAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final List<GLAccountType> expectedAccountTypes) {
+    private void saveAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final List<GLAccountTypes> expectedAccountTypes) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
         if (accountId != null) {
             final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountTypes, accountId);
@@ -177,18 +177,18 @@ public class WorkingCapitalLoanProductToGLAccountMappingHelper {
         }
     }
 
-    private void saveOptionalAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final GLAccountType expectedAccountType) {
+    private void saveOptionalAccountMapping(final JsonElement element, final String paramName, final Long productId, final int financialAccountType, final GLAccountTypes expectedAccountType) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
         if (accountId != null) {
             saveAccountMapping(element, paramName, productId, financialAccountType, expectedAccountType);
         }
     }
 
-    private void mergeAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final Map<String, Object> changes, final GLAccountType expectedAccountType) {
+    private void mergeAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final Map<String, Object> changes, final GLAccountTypes expectedAccountType) {
         mergeAccountMappingChanges(element, paramName, productId, accountTypeId, changes, List.of(expectedAccountType));
     }
 
-    private void mergeAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final Map<String, Object> changes, final List<GLAccountType> expectedAccountTypes) {
+    private void mergeAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final Map<String, Object> changes, final List<GLAccountTypes> expectedAccountTypes) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
         if (accountId != null) {
             final ProductToGLAccountMapping existingMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId, PRODUCT_TYPE.getValue(), accountTypeId);
@@ -204,11 +204,11 @@ public class WorkingCapitalLoanProductToGLAccountMappingHelper {
         }
     }
 
-    private GLAccount getAccountByIdAndType(final String paramName, final List<GLAccountType> expectedAccountTypes, final Long accountId) {
+    private GLAccount getAccountByIdAndType(final String paramName, final List<GLAccountTypes> expectedAccountTypes, final Long accountId) {
         final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
-        final List<Integer> expectedValues = expectedAccountTypes.stream().map(GLAccountType::getValue).toList();
+        final List<Integer> expectedValues = expectedAccountTypes.stream().map(GLAccountTypes::getValue).toList();
         if (!expectedValues.contains(glAccount.getType())) {
-            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountType.fromInt(glAccount.getType()).toString(), expectedValues.toString());
+            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountTypes.fromInt(glAccount.getType()).toString(), expectedValues.toString());
         }
         return glAccount;
     }

@@ -27,6 +27,9 @@ import org.apache.fineract.portfolio.client.domain.LegalForm;
 
 public final class ClientEnumerations {
 
+    /** Leftover {@code ClientStatus.ACTIVE} value. */
+    public static final int ACTIVE = 300;
+
     private ClientEnumerations() {
 
     }

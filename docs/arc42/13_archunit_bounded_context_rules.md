@@ -93,7 +93,7 @@ On the first run, violations were written to `archunit_store`. Empty freeze file
 | Loan → Savings internals (guarantor / on-hold) | **frozen** residual |
 | Loan/Investor → Accounting internals | **frozen** residual |
 
-Exact counts: **987** frozen violation lines in **13** non-empty files (19 empty = rule green). Remaining lines are leftover JPA / entity graphs (Loan.client, investor journals, accounting processors) plus leftover service types that share constructors with those graphs (`GSIMReadPlatformService`, impl-only writes). Enum / JSON-param leftovers and already-on-*-api ports that lived in INTERNAL packages (`ClientReadPlatformService`, ProductToGL mapping R/W/validator, `LoanPeriodicAccrualPort`, `LoanReadPlatformServiceCommon`) are on `moduleapi`. Accounting journals use loan-api `LoanTransactionEnumerations`.
+Exact counts: **925** frozen violation lines in **13** non-empty files (19 empty = rule green). Remaining lines are leftover JPA / entity graphs (Loan.client, investor journals, accounting processors) plus leftover service types that share constructors with those graphs (`GSIMReadPlatformService`, impl-only writes). Enum / JSON-param leftovers and already-on-*-api ports that lived in INTERNAL packages are on `moduleapi`. Foreign BCs use published `GLAccountTypes` / `JournalEntryTypes` / `SavingsAccountStatuses` / `ClientEnumerations.ACTIVE` instead of leftover kernel catalog enums.
 
 `ACCOUNTING_OWNED` / `ACCOUNTING_INTERNAL` use `org.apache.fineract.accounting..` so loan-owned `…workingcapitalloan.accounting…` is not treated as the Accounting BC.
 

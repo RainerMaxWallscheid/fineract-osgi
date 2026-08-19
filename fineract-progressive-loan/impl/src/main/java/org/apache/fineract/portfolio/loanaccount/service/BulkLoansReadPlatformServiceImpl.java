@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accountdetails.data.LoanAccountSummaryData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
-import org.apache.fineract.portfolio.client.domain.ClientStatus;
+import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.group.domain.GroupingTypeStatus;
 import org.apache.fineract.portfolio.loanaccount.data.StaffAccountSummaryCollectionData;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +45,7 @@ public class BulkLoansReadPlatformServiceImpl implements BulkLoansReadPlatformSe
         final StaffGroupMapper staffGroupMapper = new StaffGroupMapper();
         final String groupSql = "select distinct " + staffGroupMapper.schema() + " and g.status_enum=?";
         final List<StaffAccountSummaryCollectionData.LoanAccountSummary> clientSummaryList = this.jdbcTemplate.query(clientSql,  // NOSONAR
-        staffClientMapper, loanOfficerId, ClientStatus.ACTIVE.getValue());
+        staffClientMapper, loanOfficerId, ClientEnumerations.ACTIVE);
         for (final StaffAccountSummaryCollectionData.LoanAccountSummary clientSummary : clientSummaryList) {
             final Collection<LoanAccountSummaryData> clientLoanAccounts = this.accountDetailsReadPlatformService.retrieveClientLoanAccountsByLoanOfficerId(clientSummary.getId(), loanOfficerId);
             clientSummary.setLoans(clientLoanAccounts);
