@@ -26,10 +26,18 @@ tasks.register('checkForeignImplDeps', Exec) {
     commandLine 'python3', 'osgi/check-foreign-impl-deps.py'
 }
 
+tasks.register('checkArchUnitFreeze', Exec) {
+    group = 'verification'
+    description = 'Fail when the ArchUnit freeze store grows or the B5 budget is stale'
+    workingDir = rootDir
+    commandLine 'python3', 'osgi/check-archunit-freeze.py'
+}
+
 tasks.register('checkOsgiManifests', Exec) {
     group = 'verification'
     description = 'Fail on duplicate BSN, missing Fragment-Host, split packages, a stale core export list, or incomplete api Import-Package'
     dependsOn checkForeignImplDeps
+    dependsOn checkArchUnitFreeze
     workingDir = rootDir
     commandLine 'python3', 'osgi/check-manifests.py'
 }

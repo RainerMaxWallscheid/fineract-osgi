@@ -723,6 +723,14 @@ python3 osgi/check-foreign-impl-deps.py
 
 Fails on a new domain `*-impl` dependency on a foreign `*-impl`, any `*-api` dependency on a `*-impl`, or a stale `osgi/foreign-impl-allowlist.txt` row. Composition roots are not scanned. Remaining allow-listed edges are leftover JPA residuals; full OSGi lookup stays optional (ADR-022 B4).
 
+```bash
+python3 osgi/check-archunit-freeze.py
+# or
+./gradlew checkArchUnitFreeze
+```
+
+Fails when leftover ArchUnit freeze-store lines exceed `osgi/archunit-freeze-budget.txt`, or when the budget is stale after a shrink. Remaining lines are leftover JPA / entity residuals (ADR-022 B5). Do not peel `fineract-core` or the composition root to force a shrink.
+
 ## Layout
 
 | Path | Purpose |
@@ -731,6 +739,8 @@ Fails on a new domain `*-impl` dependency on a foreign `*-impl`, any `*-api` dep
 | `check-manifests.py` | Static BSN / Fragment-Host / Export-Package / api Import-Package guard |
 | `check-foreign-impl-deps.py` | B4 Gradle/api-first guard: no new domain foreign `-impl` |
 | `foreign-impl-allowlist.txt` | Leftover JPA `*-impl` → foreign `*-impl` edges |
+| `check-archunit-freeze.py` | B5 freeze-store budget: leftover violation lines must not grow |
+| `archunit-freeze-budget.txt` | Current leftover ArchUnit freeze-store line count |
 | `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
 | `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
 | `CompositionRootOsgiBridge.java` | Composition-root Spring→OSGi registration of every hosted PILOT_PORT |
