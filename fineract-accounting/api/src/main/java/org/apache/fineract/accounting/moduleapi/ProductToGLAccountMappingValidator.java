@@ -16,18 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.accounting.moduleapi;
 
-import java.time.LocalDate;
-import org.apache.fineract.infrastructure.core.exception.MultiException;
-import org.springframework.lang.NonNull;
+import com.google.gson.JsonObject;
+import java.util.List;
+import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 
 /**
- * Narrow loan-api port for periodic accrual used by accounting residual.
- * <p>
- * Avoids accounting-impl depending on loan-impl (loan-impl already depends on accounting-impl).
+ * Database-side validation helpers for product→GL mappings without requiring accounting-impl.
  */
-public interface LoanPeriodicAccrualPort {
+public interface ProductToGLAccountMappingValidator {
 
-    void addPeriodicAccruals(@NonNull LocalDate tillDate) throws MultiException;
+    void validateGLAccountInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
+
+    void validateClassificationMappingsInDatabase(List<JsonObject> mappings, String dataCodeName);
+
+    void validateChargeOffMappingsInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
+
+    void validateWriteOffMappingsInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
 }

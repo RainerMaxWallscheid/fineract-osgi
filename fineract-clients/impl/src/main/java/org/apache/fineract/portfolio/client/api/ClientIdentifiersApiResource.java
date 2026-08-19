@@ -57,7 +57,7 @@ import org.apache.fineract.portfolio.client.data.ClientIdentifierData;
 import org.apache.fineract.portfolio.client.data.ClientIdentifierRequest;
 import org.apache.fineract.portfolio.client.exception.DuplicateClientIdentifierException;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierReadPlatformService;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/clients/{clientId}/identifiers")

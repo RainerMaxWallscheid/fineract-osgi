@@ -38,7 +38,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.accountdetails.data.WorkingCapitalLoanAccountSummaryData;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.delinquency.data.DelinquencyBucketData;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentType;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;

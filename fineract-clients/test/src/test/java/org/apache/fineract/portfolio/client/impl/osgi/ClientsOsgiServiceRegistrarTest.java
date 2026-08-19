@@ -27,7 +27,7 @@ import org.apache.fineract.portfolio.client.service.ClientFamilyMembersReadPlatf
 import org.apache.fineract.portfolio.client.service.ClientFamilyMembersWritePlatformService;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientTemplateReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientTransactionReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientTransactionWritePlatformService;

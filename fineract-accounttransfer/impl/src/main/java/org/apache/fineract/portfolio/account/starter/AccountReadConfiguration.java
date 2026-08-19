@@ -34,7 +34,7 @@ import org.apache.fineract.portfolio.account.service.StandingInstructionHistoryR
 import org.apache.fineract.portfolio.account.service.StandingInstructionHistoryReadServiceImpl;
 import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformService;
 import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

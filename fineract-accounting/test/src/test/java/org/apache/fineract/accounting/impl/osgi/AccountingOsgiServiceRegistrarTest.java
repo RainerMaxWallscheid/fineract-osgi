@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryReadPlatformService;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingReadPlatformService;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingReadPlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 

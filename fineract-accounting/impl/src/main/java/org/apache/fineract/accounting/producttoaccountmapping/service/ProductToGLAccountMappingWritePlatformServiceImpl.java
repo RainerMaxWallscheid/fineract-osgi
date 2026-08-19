@@ -34,7 +34,7 @@ import org.apache.fineract.accounting.common.AccountingConstants.SavingProductAc
 import org.apache.fineract.accounting.common.AccountingConstants.SharesProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.producttoaccountmapping.serialization.ProductToGLAccountMappingFromApiJsonDeserializer;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.accounting.producttoaccountmapping.service.SavingsProductToGLAccountMappingHelper;
 import org.apache.fineract.accounting.producttoaccountmapping.service.ShareProductToGLAccountMappingHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;

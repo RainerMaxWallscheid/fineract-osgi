@@ -16,9 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
-public interface LoanReadPlatformServiceCommon {
+import java.time.LocalDate;
+import org.apache.fineract.infrastructure.core.exception.MultiException;
+import org.springframework.lang.NonNull;
 
-    Long getLoanIdByLoanExternalId(String externalId);
+/**
+ * Narrow loan-api port for periodic accrual used by accounting residual.
+ * <p>
+ * Avoids accounting-impl depending on loan-impl (loan-impl already depends on accounting-impl).
+ */
+public interface LoanPeriodicAccrualPort {
+
+    void addPeriodicAccruals(@NonNull LocalDate tillDate) throws MultiException;
 }

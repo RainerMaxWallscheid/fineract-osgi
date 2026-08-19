@@ -19,8 +19,8 @@
 package org.apache.fineract.shares.shareproducts.starter;
 
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingReadPlatformService;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingReadPlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;

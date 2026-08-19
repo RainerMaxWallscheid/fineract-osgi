@@ -29,7 +29,7 @@ import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
 import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;

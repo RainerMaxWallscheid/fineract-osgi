@@ -60,7 +60,7 @@ import org.apache.fineract.investor.data.ExternalTransferOwnerData;
 import org.apache.fineract.investor.data.request.ExternalAssetOwnerRequest;
 import org.apache.fineract.investor.service.ExternalAssetOwnersReadService;
 import org.apache.fineract.investor.service.search.domain.ExternalAssetOwnerSearchRequest;
-import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformServiceCommon;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanReadPlatformServiceCommon;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

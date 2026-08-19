@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanproduct.starter;
 
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;

@@ -98,7 +98,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelation;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -655,7 +655,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         final AccountingBridgeLoanTransactionDTO transactionDTO = new AccountingBridgeLoanTransactionDTO();
         transactionDTO.setId(loanTransaction.getId());
         transactionDTO.setOfficeId(loanTransaction.getOffice().getId());
-        transactionDTO.setType(LoanEnumerations.transactionType(loanTransaction.getTypeOf()));
+        transactionDTO.setType(LoanTransactionEnumerations.transactionType(loanTransaction.getTypeOf()));
         transactionDTO.setReversed(loanTransaction.isReversed());
         transactionDTO.setDate(loanTransaction.getTransactionDate());
         transactionDTO.setCurrencyCode(currency.getCode());

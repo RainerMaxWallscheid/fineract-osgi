@@ -37,7 +37,7 @@ import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingValidations;
-import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingValidator;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingValidator;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;

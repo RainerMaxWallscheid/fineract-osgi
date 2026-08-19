@@ -16,22 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.accounting.producttoaccountmapping.service;
+package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
-import com.google.gson.JsonObject;
-import java.util.List;
-import org.apache.fineract.infrastructure.core.data.ApiParameterError;
+public interface LoanReadPlatformServiceCommon {
 
-/**
- * Database-side validation helpers for product→GL mappings without requiring accounting-impl.
- */
-public interface ProductToGLAccountMappingValidator {
-
-    void validateGLAccountInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
-
-    void validateClassificationMappingsInDatabase(List<JsonObject> mappings, String dataCodeName);
-
-    void validateChargeOffMappingsInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
-
-    void validateWriteOffMappingsInDatabase(List<ApiParameterError> validationErrors, List<JsonObject> mappings);
+    Long getLoanIdByLoanExternalId(String externalId);
 }

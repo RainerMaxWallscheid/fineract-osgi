@@ -39,7 +39,7 @@ import org.apache.fineract.portfolio.calendar.data.CalendarData;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarEntityTypeNotSupportedException;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.meeting.command.MeetingAttendanceUpdateCommand;
 import org.apache.fineract.portfolio.meeting.command.MeetingCreateCommand;
 import org.apache.fineract.portfolio.meeting.command.MeetingDeleteCommand;

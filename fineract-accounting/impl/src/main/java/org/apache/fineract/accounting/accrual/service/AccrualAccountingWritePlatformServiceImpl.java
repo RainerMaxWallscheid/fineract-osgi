@@ -31,7 +31,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.portfolio.loanaccount.service.LoanPeriodicAccrualPort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanPeriodicAccrualPort;
 
 public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccountingWritePlatformService {
     private final LoanPeriodicAccrualPort loanPeriodicAccrualPort;

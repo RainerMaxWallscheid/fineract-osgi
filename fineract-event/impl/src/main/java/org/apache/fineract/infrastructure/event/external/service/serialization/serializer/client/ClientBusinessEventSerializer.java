@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.event.business.domain.client.ClientBus
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.client.ClientDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Component

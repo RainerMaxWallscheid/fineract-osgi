@@ -42,7 +42,7 @@ import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatfor
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementReadService;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;

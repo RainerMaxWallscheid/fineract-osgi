@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanPeriodicAccrualPort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
