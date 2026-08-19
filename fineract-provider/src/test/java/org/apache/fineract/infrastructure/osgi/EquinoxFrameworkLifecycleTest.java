@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
@@ -104,7 +105,8 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
-        return new SpringOsgiPortBridge(charge, null, null, null, null, null, null, delayed);
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
+                SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
     }
 
     private static Path stagedCatalog() {

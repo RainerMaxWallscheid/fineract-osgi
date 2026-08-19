@@ -18,15 +18,27 @@
  */
 package org.apache.fineract.infrastructure.osgi;
 
+import static org.apache.fineract.infrastructure.osgi.SpringOsgiPortBridge.bind;
 import java.nio.file.Path;
+import java.util.List;
+import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
+import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
+import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
+import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
+import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
+import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,9 +58,29 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<FloatingRatePort> rates, final ObjectProvider<TaxCatalogPort> tax,
             final ObjectProvider<ContentStoreService> content, final ObjectProvider<CashierTxnValidationPort> cashier,
             final ObjectProvider<LoanOriginatorReadPlatformService> originator, final ObjectProvider<MixTaxonomyReadService> mix,
-            final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement) {
-        return new SpringOsgiPortBridge(charge.getIfAvailable(), rates.getIfAvailable(), tax.getIfAvailable(), content.getIfAvailable(),
-                cashier.getIfAvailable(), originator.getIfAvailable(), mix.getIfAvailable(), delayedSettlement.getIfAvailable());
+            final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement,
+            final ObjectProvider<GLClosureReadPlatformService> closures, final ObjectProvider<SavingsDropdownReadPlatformService> savings,
+            final ObjectProvider<LoanProductLookupReadPort> loanProducts, final ObjectProvider<BuyDownFeeReadPlatformService> buyDown,
+            final ObjectProvider<WorkingCapitalLoanPeriodPaymentRateChangeReadService> wcRateChange,
+            final ObjectProvider<ConfigJobParameterService> cobJobs, final ObjectProvider<AccessTokenGenerationService> accessTokens,
+            final ObjectProvider<BusinessDateReadPlatformService> businessDates, final ObjectProvider<CodeReadPlatformService> codes,
+            final ObjectProvider<ProvisioningCategoryReadPlatformService> provisioning) {
+        return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
+                bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
+                bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
+                bind(LoanOriginatorReadPlatformService.class, originator.getIfAvailable()),
+                bind(MixTaxonomyReadService.class, mix.getIfAvailable()),
+                bind(DelayedSettlementAttributeService.class, delayedSettlement.getIfAvailable()),
+                bind(GLClosureReadPlatformService.class, closures.getIfAvailable()),
+                bind(SavingsDropdownReadPlatformService.class, savings.getIfAvailable()),
+                bind(LoanProductLookupReadPort.class, loanProducts.getIfAvailable()),
+                bind(BuyDownFeeReadPlatformService.class, buyDown.getIfAvailable()),
+                bind(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class, wcRateChange.getIfAvailable()),
+                bind(ConfigJobParameterService.class, cobJobs.getIfAvailable()),
+                bind(AccessTokenGenerationService.class, accessTokens.getIfAvailable()),
+                bind(BusinessDateReadPlatformService.class, businessDates.getIfAvailable()),
+                bind(CodeReadPlatformService.class, codes.getIfAvailable()),
+                bind(ProvisioningCategoryReadPlatformService.class, provisioning.getIfAvailable())));
     }
 
     @Bean

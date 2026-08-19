@@ -22,20 +22,12 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
-import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
-import org.apache.fineract.mix.service.MixTaxonomyReadService;
-import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
-import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
-import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
-import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Spring→OSGi registration of Boot-owned Wave-1 and Wave-2 catalog ports
+ * Spring→OSGi registration of Boot-owned Wave-1 through Wave-4 catalog ports
  * (ADR-022 B3 / playbook §15.5). Ranks above empty catalog activators.
  * Spring 6 is not staged as Equinox bundles.
  */
@@ -44,48 +36,42 @@ public final class SpringOsgiPortBridge {
     public static final String PROVIDER = "fineract-osgi-bridge";
     public static final int RANKING = 1;
 
-    private final ChargeDefinitionPort charge;
-    private final FloatingRatePort rates;
-    private final TaxCatalogPort tax;
-    private final ContentStoreService content;
-    private final CashierTxnValidationPort cashier;
-    private final LoanOriginatorReadPlatformService originator;
-    private final MixTaxonomyReadService mix;
-    private final DelayedSettlementAttributeService delayedSettlement;
+    public static final class Binding<T> {
+
+        private final Class<T> type;
+        private final T service;
+
+        Binding(final Class<T> type, final T service) {
+            this.type = type;
+            this.service = service;
+        }
+    }
+
+    public static <T> Binding<T> bind(final Class<T> type, final T service) {
+        return new Binding<>(type, service);
+    }
+
+    private final List<Binding<?>> bindings;
     private final List<ServiceRegistration<?>> registrations = new ArrayList<>();
 
-    public SpringOsgiPortBridge(final ChargeDefinitionPort charge, final FloatingRatePort rates, final TaxCatalogPort tax,
-            final ContentStoreService content, final CashierTxnValidationPort cashier, final LoanOriginatorReadPlatformService originator,
-            final MixTaxonomyReadService mix, final DelayedSettlementAttributeService delayedSettlement) {
-        this.charge = charge;
-        this.rates = rates;
-        this.tax = tax;
-        this.content = content;
-        this.cashier = cashier;
-        this.originator = originator;
-        this.mix = mix;
-        this.delayedSettlement = delayedSettlement;
+    public SpringOsgiPortBridge(final List<Binding<?>> bindings) {
+        this.bindings = List.copyOf(bindings);
     }
 
     public void start(final BundleContext context) {
-        register(context, ChargeDefinitionPort.class, charge);
-        register(context, FloatingRatePort.class, rates);
-        register(context, TaxCatalogPort.class, tax);
-        register(context, ContentStoreService.class, content);
-        register(context, CashierTxnValidationPort.class, cashier);
-        register(context, LoanOriginatorReadPlatformService.class, originator);
-        register(context, MixTaxonomyReadService.class, mix);
-        register(context, DelayedSettlementAttributeService.class, delayedSettlement);
+        for (final Binding<?> binding : bindings) {
+            register(context, binding);
+        }
     }
 
-    private <T> void register(final BundleContext context, final Class<T> type, final T service) {
-        if (service == null) {
+    private <T> void register(final BundleContext context, final Binding<T> binding) {
+        if (binding.service == null) {
             return;
         }
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", PROVIDER);
         props.put(Constants.SERVICE_RANKING, RANKING);
-        registrations.add(context.registerService(type, service, props));
+        registrations.add(context.registerService(binding.type, binding.service, props));
     }
 
     public void stop() {
