@@ -19,8 +19,13 @@
 package org.apache.fineract.infrastructure.osgi;
 
 import java.nio.file.Path;
+import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
+import org.apache.fineract.mix.service.MixTaxonomyReadService;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +43,12 @@ public class EquinoxOsgiConfiguration {
 
     @Bean
     public SpringOsgiPortBridge springOsgiPortBridge(final ObjectProvider<ChargeDefinitionPort> charge,
-            final ObjectProvider<FloatingRatePort> rates, final ObjectProvider<TaxCatalogPort> tax) {
-        return new SpringOsgiPortBridge(charge.getIfAvailable(), rates.getIfAvailable(), tax.getIfAvailable());
+            final ObjectProvider<FloatingRatePort> rates, final ObjectProvider<TaxCatalogPort> tax,
+            final ObjectProvider<ContentStoreService> content, final ObjectProvider<CashierTxnValidationPort> cashier,
+            final ObjectProvider<LoanOriginatorReadPlatformService> originator, final ObjectProvider<MixTaxonomyReadService> mix,
+            final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement) {
+        return new SpringOsgiPortBridge(charge.getIfAvailable(), rates.getIfAvailable(), tax.getIfAvailable(), content.getIfAvailable(),
+                cashier.getIfAvailable(), originator.getIfAvailable(), mix.getIfAvailable(), delayedSettlement.getIfAvailable());
     }
 
     @Bean

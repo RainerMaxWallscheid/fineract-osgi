@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,8 @@ class EquinoxFrameworkLifecycleTest {
     @Test
     void registersWave1ChargePortAndUnbindsOnStop() {
         final ChargeDefinitionPort charge = new StubChargeDefinitionPort();
-        final SpringOsgiPortBridge bridge = new SpringOsgiPortBridge(charge, null, null);
+        final DelayedSettlementAttributeService delayed = id -> true;
+        final SpringOsgiPortBridge bridge = wave2Bridge(charge, delayed);
         final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
 
         lifecycle.start();
@@ -60,6 +62,11 @@ class EquinoxFrameworkLifecycleTest {
             assertEquals(SpringOsgiPortBridge.RANKING, selected.getProperty(Constants.SERVICE_RANKING));
             assertSame(charge, ctx.getService(selected));
             ctx.ungetService(selected);
+            final ServiceReference<DelayedSettlementAttributeService> delayedRef = ctx
+                    .getServiceReference(DelayedSettlementAttributeService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, delayedRef.getProperty("provider"));
+            assertSame(delayed, ctx.getService(delayedRef));
+            ctx.ungetService(delayedRef);
         } finally {
             lifecycle.stop();
         }
@@ -71,7 +78,7 @@ class EquinoxFrameworkLifecycleTest {
         final Path catalog = stagedCatalog();
         assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
         final ChargeDefinitionPort charge = new StubChargeDefinitionPort();
-        final SpringOsgiPortBridge bridge = new SpringOsgiPortBridge(charge, null, null);
+        final SpringOsgiPortBridge bridge = wave2Bridge(charge, null);
         final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
 
         lifecycle.start();
@@ -94,6 +101,10 @@ class EquinoxFrameworkLifecycleTest {
             lifecycle.stop();
         }
         assertFalse(lifecycle.isRunning());
+    }
+
+    private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
+        return new SpringOsgiPortBridge(charge, null, null, null, null, null, null, delayed);
     }
 
     private static Path stagedCatalog() {
