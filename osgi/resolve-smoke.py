@@ -22,7 +22,8 @@
 Compiles and runs ``EquinoxResolveSmoke`` against the staged api/impl/core
 catalog. Installs and resolves bundles. ``--start`` also starts them (no
 Spring, so ``*OsgiServiceRegistrar`` does not fire) and probes pilot ports
-in the Service Registry. Writes ``osgi/logs/resolve-smoke.txt``.
+in the Service Registry. ``--start`` fails when any pilot port is unpublished.
+Writes ``osgi/logs/resolve-smoke.txt``.
 
 Usage:
     python3 osgi/resolve-smoke.py
@@ -83,7 +84,7 @@ def main() -> int:
     parser.add_argument(
         "--start",
         action="store_true",
-        help="start staged bundles after resolve and probe pilot OSGi services",
+        help="start staged bundles after resolve; fail if a pilot OSGi service is missing",
     )
     args = parser.parse_args()
     require_staged()

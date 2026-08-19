@@ -786,7 +786,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve (no Spring). Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve (no Spring). Exit 0 requires every PILOT_PORT in the Service Registry (`SERVICE_MISS` otherwise). Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE. `:equinoxStartSmoke` passes `--start --strict`.
 
 ```bash
 ./gradlew equinoxSpringBridgeSmoke

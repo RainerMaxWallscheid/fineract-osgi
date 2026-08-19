@@ -128,10 +128,10 @@ tasks.register('equinoxResolveSmoke', Exec) {
 
 tasks.register('equinoxStartSmoke', Exec) {
     group = 'verification'
-    description = 'Stage catalog jars, start them in Equinox, and probe pilot OSGi services'
+    description = 'Stage catalog jars, start them in Equinox, and fail if a pilot OSGi service is missing'
     dependsOn osgiStageBundles
     workingDir = rootDir
-    commandLine 'python3', 'osgi/resolve-smoke.py', '--start'
+    commandLine 'python3', 'osgi/resolve-smoke.py', '--start', '--strict'
 }
 
 tasks.register('equinoxSpringBridgeSmoke', Exec) {

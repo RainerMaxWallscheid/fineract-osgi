@@ -35,8 +35,9 @@ import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * Install the staged catalog and resolve it. With {@code --start}, also start
- * every non-system bundle and probe a few Module API ports in the Service
- * Registry. Starting does not run Spring, so registrars do not fire.
+ * every non-system bundle and probe Module API ports in the Service Registry.
+ * Starting does not run Spring, so registrars do not fire. {@code --start}
+ * exits non-zero when any probed port is unpublished.
  */
 public final class EquinoxResolveSmoke {
     private static final Pattern BUNDLE_REF = Pattern
@@ -188,20 +189,25 @@ public final class EquinoxResolveSmoke {
                 }
             }
         }
+        int missingServices = 0;
         if (start) {
             for (String typeName : PILOT_PORTS) {
                 var refs = ctx.getServiceReferences(typeName, null);
                 int count = refs == null ? 0 : refs.length;
                 System.out.println("SERVICE " + typeName + " " + count);
+                if (count < 1) {
+                    missingServices++;
+                    System.err.println("SERVICE_MISS " + typeName);
+                }
             }
         }
         System.out.println("SUMMARY staged=" + locations.size() + " fineract=" + fineract
                 + " INSTALLED=" + installed + " RESOLVED=" + resolved + " ACTIVE=" + active
                 + " installFailures=" + installFailures + " startFailures=" + startFailures
-                + " started=" + start);
+                + " missingServices=" + missingServices + " started=" + start);
         framework.stop();
         framework.waitForStop(10_000);
-        System.exit(installFailures == 0 && startFailures == 0 ? 0 : 1);
+        System.exit(installFailures == 0 && startFailures == 0 && missingServices == 0 ? 0 : 1);
     }
 
     private static List<String> parseBundleLocations(String ini) {
