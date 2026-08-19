@@ -729,7 +729,7 @@ python3 osgi/check-archunit-freeze.py
 ./gradlew checkArchUnitFreeze
 ```
 
-Fails when leftover ArchUnit freeze-store lines exceed `osgi/archunit-freeze-budget.txt`, or when the budget is stale after a shrink. Remaining lines are leftover JPA / entity residuals (ADR-022 B5). Freeze shrink started at 918 leftover JPA/entity lines. Leftover catalog enums are closed onto `moduleapi`. Do not peel `fineract-core` or the composition root to force a shrink.
+Fails when leftover ArchUnit freeze-store lines exceed `osgi/archunit-freeze-budget.txt`, or when the budget is stale after a shrink. Remaining lines are leftover JPA / entity residuals (ADR-022 B5). Freeze shrink started at 871 leftover JPA/entity lines. Leftover catalog enums are closed onto `moduleapi`. Do not peel `fineract-core` or the composition root to force a shrink.
 
 ## Layout
 

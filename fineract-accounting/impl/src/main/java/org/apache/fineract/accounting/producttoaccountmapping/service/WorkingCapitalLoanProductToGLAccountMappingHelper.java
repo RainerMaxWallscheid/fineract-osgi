@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.workingcapitalloanproduct.service;
+package org.apache.fineract.accounting.producttoaccountmapping.service;
 
 import com.google.gson.JsonElement;
 import java.util.HashMap;

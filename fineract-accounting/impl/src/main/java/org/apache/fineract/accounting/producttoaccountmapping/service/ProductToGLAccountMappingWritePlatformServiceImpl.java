@@ -51,6 +51,7 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
     private final LoanProductToGLAccountMappingHelper loanProductToGLAccountMappingHelper;
     private final SavingsProductToGLAccountMappingHelper savingsProductToGLAccountMappingHelper;
     private final ShareProductToGLAccountMappingHelper shareProductToGLAccountMappingHelper;
+    private final WorkingCapitalLoanProductToGLAccountMappingHelper workingCapitalLoanProductToGLAccountMappingHelper;
 
     @Override
     @Transactional
@@ -319,12 +320,48 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
         return changes;
     }
 
+    @Override
+    @Transactional
+    public void createWorkingCapitalLoanProductToGLAccountMapping(final Long wcLoanProductId, final JsonCommand command) {
+        final JsonElement element = this.fromApiJsonHelper.parse(command.json());
+        this.workingCapitalLoanProductToGLAccountMappingHelper.saveAccrualWithDeferredRevenueAmortizationAccountMapping(element,
+                wcLoanProductId);
+        this.workingCapitalLoanProductToGLAccountMappingHelper.saveAdvancedMappings(command, element, wcLoanProductId);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> updateWorkingCapitalLoanProductToGLAccountMapping(final Long wcLoanProductId, final JsonCommand command,
+            final boolean accountingRuleChanged) {
+        Map<String, Object> changes = new HashMap<>();
+        final JsonElement element = this.fromApiJsonHelper.parse(command.json());
+        if (accountingRuleChanged) {
+            this.workingCapitalLoanProductToGLAccountMappingHelper.deleteProductToGLAccountMapping(wcLoanProductId);
+            this.workingCapitalLoanProductToGLAccountMappingHelper.saveAccrualWithDeferredRevenueAmortizationAccountMapping(element,
+                    wcLoanProductId);
+            changes = this.workingCapitalLoanProductToGLAccountMappingHelper
+                    .populateChangesForNewAccrualWithDeferredRevenueAmortizationMappingCreation(element);
+        } else {
+            this.workingCapitalLoanProductToGLAccountMappingHelper
+                    .handleChangesToAccrualWithDeferredRevenueAmortizationAccountMapping(wcLoanProductId, changes, element);
+            this.workingCapitalLoanProductToGLAccountMappingHelper.updateAdvancedMappings(command, element, wcLoanProductId, changes);
+        }
+        return changes;
+    }
+
+    @Override
+    @Transactional
+    public void deleteWorkingCapitalLoanProductToGLAccountMapping(final Long wcLoanProductId) {
+        this.workingCapitalLoanProductToGLAccountMappingHelper.deleteProductToGLAccountMapping(wcLoanProductId);
+    }
+
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingWritePlatformServiceImpl(final FromJsonHelper fromApiJsonHelper, final ProductToGLAccountMappingFromApiJsonDeserializer deserializer, final LoanProductToGLAccountMappingHelper loanProductToGLAccountMappingHelper, final SavingsProductToGLAccountMappingHelper savingsProductToGLAccountMappingHelper, final ShareProductToGLAccountMappingHelper shareProductToGLAccountMappingHelper) {
+        public ProductToGLAccountMappingWritePlatformServiceImpl(final FromJsonHelper fromApiJsonHelper, final ProductToGLAccountMappingFromApiJsonDeserializer deserializer, final LoanProductToGLAccountMappingHelper loanProductToGLAccountMappingHelper, final SavingsProductToGLAccountMappingHelper savingsProductToGLAccountMappingHelper, final ShareProductToGLAccountMappingHelper shareProductToGLAccountMappingHelper, final WorkingCapitalLoanProductToGLAccountMappingHelper workingCapitalLoanProductToGLAccountMappingHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.deserializer = deserializer;
         this.loanProductToGLAccountMappingHelper = loanProductToGLAccountMappingHelper;
         this.savingsProductToGLAccountMappingHelper = savingsProductToGLAccountMappingHelper;
         this.shareProductToGLAccountMappingHelper = shareProductToGLAccountMappingHelper;
+        this.workingCapitalLoanProductToGLAccountMappingHelper = workingCapitalLoanProductToGLAccountMappingHelper;
     }
 }

@@ -21,6 +21,7 @@ package org.apache.fineract.accounting.moduleapi;
 import java.util.List;
 import java.util.Map;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
+import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.AdvancedMappingToExpenseAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ChargeToGLAccountMapper;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ClassificationToGLAccountData;
@@ -66,4 +67,6 @@ public interface ProductToGLAccountMappingReadPlatformService {
     List<AdvancedMappingToExpenseAccountData> fetchChargeOffReasonMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
 
     List<AdvancedMappingToExpenseAccountData> fetchWriteOffReasonMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
+
+    Map<String, GLAccountData> fetchAccountMappingDetailsForWorkingCapitalLoanProduct(Long wcLoanProductId);
 }

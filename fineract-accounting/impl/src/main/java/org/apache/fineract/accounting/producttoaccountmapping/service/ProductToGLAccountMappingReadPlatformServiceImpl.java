@@ -350,6 +350,62 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         return fetchWriteOffReasonMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId);
     }
 
+    @Override
+    public Map<String, GLAccountData> fetchAccountMappingDetailsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        final Map<String, GLAccountData> accountMappingDetails = new LinkedHashMap<>(8);
+        final List<ProductToGLAccountMapping> mappings = productToGLAccountMappingRepository.findAllRegularMappings(wcLoanProductId,
+                PortfolioProductType.WORKING_CAPITAL_LOAN.getValue());
+        for (final ProductToGLAccountMapping mapping : mappings) {
+            final CashAccountsForLoan glAccountForLoan = CashAccountsForLoan.fromInt(mapping.getFinancialAccountType());
+            if (glAccountForLoan == null) {
+                continue;
+            }
+            final GLAccountData glAccountData = new GLAccountData().setId(mapping.getGlAccount().getId())
+                    .setName(mapping.getGlAccount().getName()).setGlCode(mapping.getGlAccount().getGlCode());
+            switch (glAccountForLoan) {
+                case FUND_SOURCE -> accountMappingDetails.put(LoanProductAccountingDataParams.FUND_SOURCE.getValue(), glAccountData);
+                case LOAN_PORTFOLIO -> accountMappingDetails.put(LoanProductAccountingDataParams.LOAN_PORTFOLIO.getValue(), glAccountData);
+                case TRANSFERS_SUSPENSE ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.TRANSFERS_SUSPENSE.getValue(), glAccountData);
+                case INCOME_FROM_DISCOUNT_FEE ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_DISCOUNT_FEE.getValue(), glAccountData);
+                case DEFERRED_INCOME_LIABILITY ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.DEFERRED_INCOME_LIABILITY.getValue(), glAccountData);
+                case FEES_RECEIVABLE -> accountMappingDetails.put(LoanProductAccountingDataParams.FEES_RECEIVABLE.getValue(), glAccountData);
+                case PENALTIES_RECEIVABLE ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.PENALTIES_RECEIVABLE.getValue(), glAccountData);
+                case INCOME_FROM_FEES -> accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_FEES.getValue(), glAccountData);
+                case INCOME_FROM_PENALTIES ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_PENALTIES.getValue(), glAccountData);
+                case INCOME_FROM_RECOVERY ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_RECOVERY.getValue(), glAccountData);
+                case LOSSES_WRITTEN_OFF ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.LOSSES_WRITTEN_OFF.getValue(), glAccountData);
+                case GOODWILL_CREDIT -> accountMappingDetails.put(LoanProductAccountingDataParams.GOODWILL_CREDIT.getValue(), glAccountData);
+                case OVERPAYMENT -> accountMappingDetails.put(LoanProductAccountingDataParams.OVERPAYMENT.getValue(), glAccountData);
+                case INCOME_FROM_CHARGE_OFF_INTEREST ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_CHARGE_OFF_INTEREST.getValue(), glAccountData);
+                case INCOME_FROM_CHARGE_OFF_FEES ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_CHARGE_OFF_FEES.getValue(), glAccountData);
+                case INCOME_FROM_CHARGE_OFF_PENALTY ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_CHARGE_OFF_PENALTY.getValue(), glAccountData);
+                case CHARGE_OFF_EXPENSE ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.CHARGE_OFF_EXPENSE.getValue(), glAccountData);
+                case CHARGE_OFF_FRAUD_EXPENSE ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.CHARGE_OFF_FRAUD_EXPENSE.getValue(), glAccountData);
+                case INCOME_FROM_GOODWILL_CREDIT_INTEREST ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_GOODWILL_CREDIT_INTEREST.getValue(), glAccountData);
+                case INCOME_FROM_GOODWILL_CREDIT_FEES ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_GOODWILL_CREDIT_FEES.getValue(), glAccountData);
+                case INCOME_FROM_GOODWILL_CREDIT_PENALTY ->
+                    accountMappingDetails.put(LoanProductAccountingDataParams.INCOME_FROM_GOODWILL_CREDIT_PENALTY.getValue(), glAccountData);
+                default -> {
+                }
+            }
+        }
+        return accountMappingDetails;
+    }
+
     private Map<String, Object> setAccrualPeriodicSavingsProductToGLAccountMaps(final List<ProductToGLAccountMapping> mappings) {
         final Map<String, Object> accountMappingDetails = new LinkedHashMap<>(8);
         for (final ProductToGLAccountMapping mapping : mappings) {
