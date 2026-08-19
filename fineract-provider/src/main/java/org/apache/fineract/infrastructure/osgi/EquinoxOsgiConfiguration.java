@@ -22,6 +22,7 @@ import static org.apache.fineract.infrastructure.osgi.SpringOsgiPortBridge.bind;
 import java.nio.file.Path;
 import java.util.List;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
+import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
@@ -29,6 +30,8 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
+import org.apache.fineract.notification.service.UserNotificationService;
+import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -39,6 +42,8 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPo
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.template.service.TemplateMergeService;
+import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -64,7 +69,11 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<WorkingCapitalLoanPeriodPaymentRateChangeReadService> wcRateChange,
             final ObjectProvider<ConfigJobParameterService> cobJobs, final ObjectProvider<AccessTokenGenerationService> accessTokens,
             final ObjectProvider<BusinessDateReadPlatformService> businessDates, final ObjectProvider<CodeReadPlatformService> codes,
-            final ObjectProvider<ProvisioningCategoryReadPlatformService> provisioning) {
+            final ObjectProvider<ProvisioningCategoryReadPlatformService> provisioning,
+            final ObjectProvider<CurrencyWritePlatformService> currencies,
+            final ObjectProvider<PasswordValidationPolicyReadPlatformService> passwordPolicies,
+            final ObjectProvider<AdHocReadPlatformService> adhoc, final ObjectProvider<TemplateMergeService> templates,
+            final ObjectProvider<UserNotificationService> notifications) {
         return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
                 bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
                 bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
@@ -80,7 +89,12 @@ public class EquinoxOsgiConfiguration {
                 bind(AccessTokenGenerationService.class, accessTokens.getIfAvailable()),
                 bind(BusinessDateReadPlatformService.class, businessDates.getIfAvailable()),
                 bind(CodeReadPlatformService.class, codes.getIfAvailable()),
-                bind(ProvisioningCategoryReadPlatformService.class, provisioning.getIfAvailable())));
+                bind(ProvisioningCategoryReadPlatformService.class, provisioning.getIfAvailable()),
+                bind(CurrencyWritePlatformService.class, currencies.getIfAvailable()),
+                bind(PasswordValidationPolicyReadPlatformService.class, passwordPolicies.getIfAvailable()),
+                bind(AdHocReadPlatformService.class, adhoc.getIfAvailable()),
+                bind(TemplateMergeService.class, templates.getIfAvailable()),
+                bind(UserNotificationService.class, notifications.getIfAvailable())));
     }
 
     @Bean
