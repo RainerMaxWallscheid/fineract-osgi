@@ -26,6 +26,7 @@ Fails on:
   * BSN that does not match the Gradle module stem
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not empty (impl packages stay private)
+  * impl Bundle-Activator outside the loan / COB / security / command allow-list
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
@@ -56,6 +57,18 @@ ROOT = Path(__file__).resolve().parents[1]
 # The check fails on any new api-api Export-Package collision.
 KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 
+# Bundle-Activator remains only for loan/COB/security and the command dispatcher graph.
+ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset(
+    {
+        "command",
+        "cob",
+        "loan",
+        "progressiveloan",
+        "security",
+        "workingcapitalloan",
+    }
+)
+
 # Packages that exist in fineract-core source but must not be exported.
 # org.springframework.batch.core.scope.context hosts a Spring Batch patch;
 # exporting it would split the real Spring Batch bundle.
@@ -72,6 +85,7 @@ ATTR_KEYS = (
     "Import-Package",
     "Bundle-Version",
     "Automatic-Module-Name",
+    "Bundle-Activator",
 )
 
 IMPORT_TYPE_RE = re.compile(
@@ -190,6 +204,7 @@ def load_row(build: Path, layout_role: str) -> dict:
         "fragment_host": attrs.get("Fragment-Host"),
         "exports": parse_export_packages(attrs.get("Export-Package")),
         "imports": parse_export_packages(attrs.get("Import-Package")),
+        "activator": attrs.get("Bundle-Activator"),
     }
 
 
@@ -275,6 +290,12 @@ def main() -> int:
             errors.append(
                 f"{row['path']}: impl Export-Package must be empty "
                 f"(packages stay private), got {exports}"
+            )
+        activator = row.get("activator")
+        if activator and row["expected_stem"] not in ALLOWED_ACTIVATOR_STEMS:
+            errors.append(
+                f"{row['path']}: Bundle-Activator {activator} is not allow-listed "
+                f"(loan / COB / security / command only)"
             )
 
     seen_known: set[str] = set()

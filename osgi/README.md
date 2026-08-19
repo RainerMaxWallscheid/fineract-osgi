@@ -640,20 +640,20 @@ Equinox registers `ExternalServicesReadPlatformService` only (`getExternalServic
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-bulkimport-api` | `org.apache.fineract.bulkimport.api` | Constants, SPI, extra DTOs |
-| `fineract-bulkimport-impl` | `org.apache.fineract.bulkimport.impl` | REST/JPA + `BulkImportOsgiServiceRegistrar` / `BulkImportOsgiBundleActivator` |
+| `fineract-bulkimport-impl` | `org.apache.fineract.bulkimport.impl` | REST/JPA + `BulkImportOsgiServiceRegistrar` (no Equinox port) |
 | `fineract-bulkimport-test` | `org.apache.fineract.bulkimport.test` | Fragment-Host → bulkimport.impl |
 
-Equinox `BulkImportOsgiBundleActivator` starts with no service. Did not register `BulkImportWorkbookService` (jersey multipart), `BulkImportWorkbookPopulatorService` (jakarta.ws.rs), or POI `WorkbookPopulator` / `ImportHandler`.
+No Equinox port. Did not register `BulkImportWorkbookService` (jersey multipart), `BulkImportWorkbookPopulatorService` (jakarta.ws.rs), or POI `WorkbookPopulator` / `ImportHandler`.
 
 ### Provider peel: fineract-instancemode (complete)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-instancemode-api` | `org.apache.fineract.instancemode.api` | Swagger request DTO + servlet filter |
-| `fineract-instancemode-impl` | `org.apache.fineract.instancemode.impl` | Test-profile REST + `InstanceModeOsgiServiceRegistrar` / `InstanceModeOsgiBundleActivator` |
+| `fineract-instancemode-impl` | `org.apache.fineract.instancemode.impl` | Test-profile REST + `InstanceModeOsgiServiceRegistrar` (no Equinox port) |
 | `fineract-instancemode-test` | `org.apache.fineract.instancemode.test` | Fragment-Host → instancemode.impl |
 
-Equinox `InstanceModeOsgiBundleActivator` starts with no service. instancemode-api has no application port (swagger DTO + `FineractInstanceModeApiFilter` only).
+No Equinox port. instancemode-api has no application port (swagger DTO + `FineractInstanceModeApiFilter` only).
 
 ### Provider peel: fineract-jobs (complete)
 
@@ -670,20 +670,20 @@ Equinox registers `StuckJobExecutorService` only (`resumeStuckJob` no-op). Did n
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-s3-api` | `org.apache.fineract.s3.api` | `S3ClientCustomizer` SPI |
-| `fineract-s3-impl` | `org.apache.fineract.s3.impl` | Amazon/Localstack config + `S3OsgiServiceRegistrar` / `S3OsgiBundleActivator` |
+| `fineract-s3-impl` | `org.apache.fineract.s3.impl` | Amazon/Localstack config + `S3OsgiServiceRegistrar` (no Equinox port) |
 | `fineract-s3-test` | `org.apache.fineract.s3.test` | Fragment-Host → s3.impl |
 
-Equinox `S3OsgiBundleActivator` starts with no service. Did not register `S3ClientCustomizer` (AWS SDK `S3ClientBuilder` has no staged Equinox BSN).
+No Equinox port. Did not register `S3ClientCustomizer` (AWS SDK `S3ClientBuilder` has no staged Equinox BSN).
 
 ### Provider peel: fineract-openapi (complete)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-openapi-api` | `org.apache.fineract.openapi.api` | swagger-gradle-plugin reader/filter utilities |
-| `fineract-openapi-impl` | `org.apache.fineract.openapi.impl` | `OpenApiOsgiServiceRegistrar` / `OpenApiOsgiBundleActivator` |
+| `fineract-openapi-impl` | `org.apache.fineract.openapi.impl` | `OpenApiOsgiServiceRegistrar` (no Equinox port) |
 | `fineract-openapi-test` | `org.apache.fineract.openapi.test` | Fragment-Host → openapi.impl |
 
-Equinox `OpenApiOsgiBundleActivator` starts with no service. openapi-api has no application port (`FineractOperationIdReader` / `FineractOpenApiSpecFilter` only).
+No Equinox port. openapi-api has no application port (`FineractOperationIdReader` / `FineractOpenApiSpecFilter` only).
 
 ### Provider peel: fineract-springbatch (complete)
 
@@ -700,10 +700,10 @@ Equinox registers `PropertyService` only (partition/chunk sizes → null). Did n
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-interoperation-api` | `org.apache.fineract.interoperation.api` | Ports, DTOs, enums, exceptions |
-| `fineract-interoperation-impl` | `org.apache.fineract.interoperation.impl` | REST/JPA + `InteroperationOsgiServiceRegistrar` / `InteroperationOsgiBundleActivator` |
+| `fineract-interoperation-impl` | `org.apache.fineract.interoperation.impl` | REST/JPA + `InteroperationOsgiServiceRegistrar` (no Equinox port) |
 | `fineract-interoperation-test` | `org.apache.fineract.interoperation.test` | Fragment-Host → interoperation.impl |
 
-Equinox `InteroperationOsgiBundleActivator` starts with no service. Did not register `InteropService` (jakarta.validation; leftover unpublished `DepositAccountType` / `SavingsAccountTransactionType` in savings-api-exported packages). Skipped `fineract-event` (leftover `ExternalEventProducer` in core only).
+No Equinox port. Did not register `InteropService` (jakarta.validation; leftover unpublished `DepositAccountType` / `SavingsAccountTransactionType` in savings-api-exported packages). Skipped `fineract-event` (leftover `ExternalEventProducer` in core only).
 
 ## Manifest check
 
@@ -713,7 +713,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security / command allow-list, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ```bash
 python3 osgi/check-foreign-impl-deps.py
@@ -768,7 +768,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators. No-port modules stay empty-activator.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators. No-port modules have no Equinox activator.
 
 ## Resolve smoke
 
@@ -794,7 +794,7 @@ Starts every staged bundle after resolve (no Spring). Equinox-safe empty catalog
 python3 osgi/spring-bridge-smoke.py
 ```
 
-Starts the same catalog, then registers every composition-root hosted PILOT_PORT (in-memory, not JPA / Spring). Empty catalog activators stay lowest-ranked. Exit 0 means the selected services are the hosted ports. Empty stubs stay in the impl bundle class space; the system classpath does not treat those Classes as assignable. `ContentStreamPort` stays empty-catalog only (JDK pipe). `PaymentDetailWritePlatformService` stays empty-catalog only (leftover JPA `PaymentDetail`). Modules with no Equinox-safe port (bulkimport, instancemode, s3, openapi, interoperation, event) stay empty-activator or skipped.
+Starts the same catalog, then registers every composition-root hosted PILOT_PORT (in-memory, not JPA / Spring). Empty catalog activators stay lowest-ranked. Exit 0 means the selected services are the hosted ports. Empty stubs stay in the impl bundle class space; the system classpath does not treat those Classes as assignable. `ContentStreamPort` stays empty-catalog only (JDK pipe). `PaymentDetailWritePlatformService` stays empty-catalog only (leftover JPA `PaymentDetail`). Modules with no Equinox-safe port (bulkimport, instancemode, s3, openapi, interoperation, event) have no Equinox activator.
 
 Optional Boot embed (`fineract.osgi.enabled=true`, default off): `ServerApplication` starts in-process Equinox and registers every Equinox-safe hosted Spring bean via `org.apache.fineract.infrastructure.osgi.SpringOsgiPortBridge` (Waves 1–8 plus remaining `FineractEntityAccessReadService`, `CalendarDropdownReadPlatformService`, `MeetingAttendanceDropdownReadService`, `FieldConfigurationReadPlatformService`, `CreditBureauReadPlatformService`, `CollateralWritePlatformService`, `CollateralManagementReadService`, `NoteReadPlatformService`, `HookReadPlatformService`, `SmsWritePlatformService`, `ReportMailingJobConfigurationReadPlatformService`, `SmsCampaignDropdownReadPlatformService`, `NotificationConfigurationReadService`, `ReportWritePlatformService`, `ExternalServicesReadPlatformService`, `StuckJobExecutorService`, `PropertyService`). Boot callers look services up with `OsgiServiceLookup` (empty when Equinox is off or the type is unpublished). When Boot has no bean for an Equinox-safe hosted port, `OsgiBackedPortFactory` supplies a lazy no-op proxy that is not published back into Equinox. `CommandDispatcher` stays hosted-only. Set `fineract.osgi.catalog-dir` to a staged `osgi/` directory (`./gradlew osgiStageBundles`) to install empty catalog activators first; Spring ports still win on ranking. Spring is not staged. Missing catalog is a no-op.
 

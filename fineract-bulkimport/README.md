@@ -5,7 +5,7 @@ Provider peel — Excel workbook import (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-bulkimport-api` | `api/` | `org.apache.fineract.bulkimport.api` | Constants, SPI interfaces, extra DTOs |
-| `fineract-bulkimport-impl` | `impl/` | `org.apache.fineract.bulkimport.impl` | Handlers, populators, domain, REST; Equinox `BulkImportOsgiBundleActivator` |
+| `fineract-bulkimport-impl` | `impl/` | `org.apache.fineract.bulkimport.impl` | Handlers, populators, domain, REST; no Equinox port |
 | `fineract-bulkimport-test` | `test/` | `org.apache.fineract.bulkimport.test` | Fragment-Host → impl; `LookupModeTest` |
 
 Public ports `BulkImportWorkbookService` / `BulkImportWorkbookPopulatorService` and

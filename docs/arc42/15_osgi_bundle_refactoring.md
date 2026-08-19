@@ -175,7 +175,7 @@ sequenceDiagram
 | **B3** | Bridge | Spring↔OSGi registration for pilot ports | Service visible in Equinox; optional unbind degrades cleanly |
 | **B4** | OSGi-only consumers | Domain consumers use service (or bridge façade), not impl project | **Done** — `./gradlew checkForeignImplDeps` blocks new foreign `-impl`; leftover JPA edges stay allow-listed |
 | **B5** | Rollout | Further modules by coupling (small → large) | **Done** — ranked waves + leftover peels 1–30 closed; `./gradlew checkArchUnitFreeze` holds the leftover freeze-store budget |
-| **B6** | Optional polish | DS-only for pure extensions; tighten exports | **Done** — Equinox-safe empty catalog ports register via `Service-Component` + staged Felix SCR. Impl `Export-Package` is empty. Loan / progressive-loan / WC-loan / COB / security keep Bundle-Activators. Command keeps its activator (dispatcher graph). No-port modules stay empty-activator. Boot registrars stay Spring |
+| **B6** | Optional polish | DS-only for pure extensions; tighten exports | **Done** — Equinox-safe empty catalog ports register via `Service-Component` + staged Felix SCR. Impl `Export-Package` is empty. Loan / progressive-loan / WC-loan / COB / security keep Bundle-Activators. Command keeps its activator (dispatcher graph). No-port modules have no Equinox activator. Boot registrars stay Spring |
 
 ### Suggested rollout order (post–command pilot)
 

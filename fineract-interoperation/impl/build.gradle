@@ -55,7 +55,6 @@ jar {
                 'Bundle-Name': 'Apache Fineract Interoperation Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.interoperation.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.interoperation.impl.osgi.InteroperationOsgiBundleActivator',
                 'Import-Package': 'org.osgi.framework,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.interoperation.impl'
