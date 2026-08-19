@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.template.service,'
                         + 'org.apache.fineract.template.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.template.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.template.impl'
                 )
     }

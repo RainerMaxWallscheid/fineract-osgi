@@ -62,7 +62,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.businessdate.data.service,'
                         + 'org.apache.fineract.infrastructure.businessdate.domain,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.businessdate.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.businessdate.impl'
                 )
     }

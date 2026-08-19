@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.adhocquery.service,'
                         + 'org.apache.fineract.adhocquery.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.adhocquery.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.adhocquery.impl'
                 )
     }

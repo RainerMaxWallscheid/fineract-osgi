@@ -61,7 +61,6 @@ jar {
                         + 'org.apache.fineract.portfolio.paymentdetail.domain,'
                         + 'org.apache.fineract.infrastructure.core.api,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.paymentdetail.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.paymentdetail.impl'
                 )
     }

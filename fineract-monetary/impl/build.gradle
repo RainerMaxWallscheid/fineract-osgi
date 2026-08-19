@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.organisation.monetary.service,'
                         + 'org.apache.fineract.organisation.monetary.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.monetary.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.monetary.impl'
                 )
     }

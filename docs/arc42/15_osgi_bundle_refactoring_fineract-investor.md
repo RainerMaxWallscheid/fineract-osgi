@@ -67,7 +67,7 @@ Mechanical split + registrar + Equinox DS `OSGI-INF/investor.xml` (`DelayedSettl
 - [x] Pure ports + DTOs on api
 - [x] provider / war / ITs = api + **impl**
 - [ ] Optional: redesign `AccountingService` without `Loan` / entity params so journal can use ports only
-- [x] Impl Export-Package is registrar-only (`…investor.impl.osgi`)
+- [x] Impl Export-Package is empty (registrar / DS types stay private)
 
 ### Notes
 - EclipseLink static weave: `:fineract-investor-impl:compileJava` depends on `:fineract-investor-api:jar` so `@Enumerated` enums resolve across jars.

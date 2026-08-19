@@ -64,7 +64,6 @@ jar {
                         + 'org.apache.fineract.portfolio.tax.api,'
                         + '*',
                 // Domain residual still consumed by charge/loan/savings until Step 8 taxGroupId.
-                'Export-Package': 'org.apache.fineract.portfolio.tax.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.tax.impl'
                 )
     }

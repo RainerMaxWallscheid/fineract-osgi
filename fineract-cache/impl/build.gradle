@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.cache.service,'
                         + 'org.apache.fineract.infrastructure.cache.domain,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.cache.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.cache.impl'
                 )
     }

@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.useradministration.service,'
                         + 'org.apache.fineract.useradministration.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.useradministration.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.useradministration.impl'
                 )
     }

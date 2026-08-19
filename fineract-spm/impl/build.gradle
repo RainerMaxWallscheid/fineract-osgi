@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.spm.service,'
                         + 'org.apache.fineract.spm.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.spm.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.spm.impl'
                 )
     }

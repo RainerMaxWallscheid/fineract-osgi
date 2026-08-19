@@ -7,7 +7,7 @@ See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 
 **Catalog status:** complete for every Gradle `api` / `impl` / `test` split (waves 1–4, core slices, leftover peels 1–30). Each impl registers ports via `*OsgiServiceRegistrar`. Each `*-test` is `Fragment-Host` → the matching impl unless noted. Domain consumers depend on **api only**; `fineract-provider` / `fineract-war` compose **api + impl**.
 
-Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` where `<stem>` is the module name with hyphens removed (`loan-origination` → `loanorigination`). Impl `Export-Package` is the registrar package only (`*.impl.osgi`). Shared kernel BSN is `org.apache.fineract.core` (no api/impl suffix). Copy jars into `osgi/bundles/` with `./gradlew osgiStageBundles`.
+Convention: Bundle-SymbolicName is `org.apache.fineract.<stem>.{api,impl,test}` where `<stem>` is the module name with hyphens removed (`loan-origination` → `loanorigination`). Impl bundles have no `Export-Package` (registrar / DS types stay private). Shared kernel BSN is `org.apache.fineract.core` (no api/impl suffix). Copy jars into `osgi/bundles/` with `./gradlew osgiStageBundles`.
 
 ### Catalog (all splits)
 
@@ -713,7 +713,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ```bash
 python3 osgi/check-foreign-impl-deps.py

@@ -35,7 +35,7 @@ tasks.register('checkArchUnitFreeze', Exec) {
 
 tasks.register('checkOsgiManifests', Exec) {
     group = 'verification'
-    description = 'Fail on duplicate BSN, missing Fragment-Host, split packages, a stale core export list, or incomplete api Import-Package'
+    description = 'Fail on duplicate BSN, missing Fragment-Host, impl Export-Package, split packages, a stale core export list, or incomplete api Import-Package'
     dependsOn checkForeignImplDeps
     dependsOn checkArchUnitFreeze
     workingDir = rootDir

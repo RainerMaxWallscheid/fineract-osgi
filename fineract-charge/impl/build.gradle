@@ -64,7 +64,6 @@ jar {
                         + 'org.apache.fineract.portfolio.charge.moduleapi,'
                         + 'org.apache.fineract.portfolio.charge.exception,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.charge.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )
     }

@@ -25,7 +25,7 @@ Fails on:
   * missing / duplicate Bundle-SymbolicName
   * BSN that does not match the Gradle module stem
   * test fragment whose Fragment-Host is missing or does not resolve
-  * impl Export-Package that is not exactly one *.impl.osgi package
+  * impl Export-Package that is not empty (impl packages stay private)
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
@@ -271,16 +271,10 @@ def main() -> int:
         if row["layout_role"] != "impl":
             continue
         exports = row["exports"]
-        if len(exports) != 1:
+        if exports:
             errors.append(
-                f"{row['path']}: impl Export-Package must be exactly one registrar "
-                f"package, got {exports or ['<empty>']}"
-            )
-            continue
-        package = exports[0]
-        if not package.endswith(".impl.osgi"):
-            errors.append(
-                f"{row['path']}: impl Export-Package {package} must end with .impl.osgi"
+                f"{row['path']}: impl Export-Package must be empty "
+                f"(packages stay private), got {exports}"
             )
 
     seen_known: set[str] = set()

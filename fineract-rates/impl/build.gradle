@@ -64,7 +64,6 @@ jar {
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
                         + 'org.apache.fineract.portfolio.floatingrates.exception,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.floatingrates.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.impl'
                 )
     }

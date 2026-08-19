@@ -61,7 +61,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.accountnumberformat.data,'
                         + 'org.apache.fineract.infrastructure.accountnumberformat.domain,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.accountnumberformat.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.accountnumberformat.impl'
                 )
     }

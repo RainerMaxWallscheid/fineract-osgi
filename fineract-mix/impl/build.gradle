@@ -62,7 +62,6 @@ jar {
                         + 'org.apache.fineract.mix.command,'
                         + '*',
                 // provider JdbcConfig scans mix.domain; white-box tests use Builder/impls.
-                'Export-Package': 'org.apache.fineract.mix.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.mix.impl'
                 )
     }

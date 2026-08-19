@@ -61,7 +61,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.campaigns.sms.data,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.campaigns.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.campaigns.impl'
                 )
     }

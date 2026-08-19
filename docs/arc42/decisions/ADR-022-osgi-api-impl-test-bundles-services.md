@@ -25,7 +25,7 @@ Without an explicit decision, teams risk either a big-bang Spring removal or int
 
 - Bundles publish and consume **OSGi services** registered under interfaces from the **api** bundle.
 - Consumers never depend on another module’s **impl** types at compile time (Gradle `implementation` of a foreign `-impl` is forbidden for domain modules).
-- Package **Export-Package** is limited to api / shared-kernel contracts; impl packages stay private except the `*OsgiServiceRegistrar` package (`*.impl.osgi`).
+- Package **Export-Package** is limited to api / shared-kernel contracts; impl packages stay private (registrar / DS implementation types are not exported).
 - Optional services: bind via Service Tracker / Declarative Services; missing service → **degradation**, not total failure ([ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
 
 #### 2. Explicit non-goal: Apache Karaf Features (and similar feature install models)
@@ -48,7 +48,7 @@ fineract-<name>/
 | Bundle | Role | OSGi rules |
 |--------|------|------------|
 | **`-api`** | Ports (`moduleapi`), stable DTOs/IDs, service interfaces | **Export-Package** contract packages only; no Spring, JPA, REST, EclipseLink |
-| **`-impl`** | Domain, handlers, adapters, Spring configuration | Implements and **registers** OSGi services; imports api; exports only the registrar package (`*.impl.osgi`) |
+| **`-impl`** | Domain, handlers, adapters, Spring configuration | Implements and **registers** OSGi services; imports api; no `Export-Package` |
 | **`-test`** | Unit / white-box tests | **`Fragment-Host`** points at the **impl** host (primary); pure contract tests may stay non-fragment on `-api` |
 
 #### 4. Test bundles use Fragment-Host
@@ -90,7 +90,7 @@ Full playbook: [15 OSGi Bundle Refactoring](../15_osgi_bundle_refactoring.md).
 | **B3** | Spring↔OSGi bridge in composition root — **done** (empty-catalog activators catalog-wide; every Equinox-safe PILOT_PORT hosted via `osgi/CompositionRootOsgiBridge`; optional Boot embed `fineract.osgi.enabled` registers every Equinox-safe hosted Spring port, exposes `OsgiServiceLookup` and OSGi-backed Spring beans when Boot has none, and may install `fineract.osgi.catalog-dir`; `ContentStreamPort` / `PaymentDetailWritePlatformService` empty-catalog only; `CommandDispatcher` hosted-only; per-module `*OsgiServiceRegistrar` remains the Boot classpath path) |
 | **B4** | Consumers obtain ports only via OSGi services (or bridge façade), not foreign impl — **done** (`./gradlew checkForeignImplDeps`; leftover JPA `*-impl` edges allow-listed); full OSGi lookup still optional |
 | **B5** | Roll out further domain modules — **done** (ranked waves + leftover peels 1–30 closed; `./gradlew checkArchUnitFreeze` holds the leftover freeze-store budget). Do not peel `fineract-provider` or remaining `fineract-core` kernel types |
-| **B6** | Optional: DS-only for pure logic extension bundles (not for loan/COB/security) — **done** (Equinox-safe empty catalog ports via `Service-Component` + staged Felix SCR; loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators; no-port modules stay empty-activator; Boot registrar stays Spring) |
+| **B6** | Optional: DS-only for pure logic extension bundles (not for loan/COB/security) — **done** (Equinox-safe empty catalog ports via `Service-Component` + staged Felix SCR; impl `Export-Package` empty; loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators; no-port modules stay empty-activator; Boot registrar stays Spring) |
 
 ### Alternatives
 

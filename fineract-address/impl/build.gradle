@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.portfolio.address.service,'
                         + 'org.apache.fineract.portfolio.address.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.address.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.address.impl'
                 )
     }

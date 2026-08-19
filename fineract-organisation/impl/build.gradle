@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.organisation.provisioning.service,'
                         + 'org.apache.fineract.organisation.provisioning.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.organisation.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.impl'
                 )
     }

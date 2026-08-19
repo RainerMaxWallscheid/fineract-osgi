@@ -334,7 +334,7 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 |--------|-----|------|------|
 | `Bundle-SymbolicName` | `org.apache.fineract.charge.api` | `org.apache.fineract.charge.impl` | `org.apache.fineract.charge.test` |
 | `Bundle-Version` | project version (`x.y.z.SNAPSHOT`) | same | same |
-| `Export-Package` | `moduleapi`, catalog `exception`, `util` | `…charge.impl.osgi` (registrar) only | — |
+| `Export-Package` | `moduleapi`, catalog `exception`, `util` | none | — |
 | `Import-Package` | `*` (kernel bases) | api packages + `*` | inherits host |
 | `Fragment-Host` | — | — | `org.apache.fineract.charge.impl` |
 

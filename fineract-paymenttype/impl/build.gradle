@@ -61,7 +61,6 @@ jar {
                         + 'org.apache.fineract.portfolio.paymenttype.service,'
                         + 'org.apache.fineract.portfolio.paymenttype.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.paymenttype.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.paymenttype.impl'
                 )
     }

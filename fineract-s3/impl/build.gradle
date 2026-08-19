@@ -58,7 +58,6 @@ jar {
                 'Bundle-Activator': 'org.apache.fineract.infrastructure.s3.impl.osgi.S3OsgiBundleActivator',
                 'Import-Package': 'org.osgi.framework,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.s3.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.s3.impl'
                 )
     }

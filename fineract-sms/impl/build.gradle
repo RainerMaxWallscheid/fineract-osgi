@@ -61,7 +61,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.sms.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.sms.impl'
                 )
     }

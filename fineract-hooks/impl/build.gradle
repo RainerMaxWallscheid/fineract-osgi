@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.hooks.service,'
                         + 'org.apache.fineract.infrastructure.hooks.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.hooks.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.hooks.impl'
                 )
     }

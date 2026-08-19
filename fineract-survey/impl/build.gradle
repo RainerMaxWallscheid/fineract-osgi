@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.survey.service,'
                         + 'org.apache.fineract.infrastructure.survey.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.survey.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.survey.impl'
                 )
     }

@@ -62,7 +62,6 @@ jar {
                         + 'org.apache.fineract.portfolio.workingcapitalloan.service,'
                         + 'org.apache.fineract.portfolio.workingcapitalloan.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.workingcapitalloan.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.workingcapitalloan.impl'
                 )
     }

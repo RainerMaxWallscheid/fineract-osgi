@@ -56,7 +56,6 @@ jar {
                 'Bundle-Name': 'Apache Fineract Event Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.event.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.event.impl.osgi',
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.event.impl'
                 )

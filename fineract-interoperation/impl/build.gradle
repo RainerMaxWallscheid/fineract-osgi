@@ -58,7 +58,6 @@ jar {
                 'Bundle-Activator': 'org.apache.fineract.interoperation.impl.osgi.InteroperationOsgiBundleActivator',
                 'Import-Package': 'org.osgi.framework,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.interoperation.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.interoperation.impl'
                 )
     }

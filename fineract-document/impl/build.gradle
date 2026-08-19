@@ -68,7 +68,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.documentmanagement.exception,'
                         + '*',
                 // Spring config package only for Boot wiring; no ContentPipe/processor export (use ContentStreamPort).
-                'Export-Package': 'org.apache.fineract.infrastructure.document.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.document.impl'
                 )
     }

@@ -261,7 +261,7 @@ Execute as **separate PRs** so each step stays reviewable and green. Checkboxes 
 |--------|-----|------|
 | `Bundle-SymbolicName` | `org.apache.fineract.command.api` | `org.apache.fineract.command.impl` |
 | `Bundle-Version` | project version | project version |
-| `Export-Package` | `core` + `core.exception` | registrar only (`…command.impl.osgi`) |
+| `Export-Package` | `core` + `core.exception` | none |
 | `Import-Package` | minimal | api packages + Spring + … |
 
 Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional later).

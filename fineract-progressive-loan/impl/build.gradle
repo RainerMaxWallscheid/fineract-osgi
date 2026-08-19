@@ -62,7 +62,6 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.progressiveloan.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.progressiveloan.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.loanaccount.progressiveloan.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.progressiveloan.impl'
                 )
     }

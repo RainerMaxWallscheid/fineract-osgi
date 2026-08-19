@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.portfolio.meeting.service,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.meeting.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.meeting.impl'
                 )
     }

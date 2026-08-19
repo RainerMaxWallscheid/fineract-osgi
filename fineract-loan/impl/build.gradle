@@ -63,7 +63,6 @@ jar {
                         + 'org.apache.fineract.portfolio.loanproduct.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.loanaccount.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.loan.impl'
                 )
     }

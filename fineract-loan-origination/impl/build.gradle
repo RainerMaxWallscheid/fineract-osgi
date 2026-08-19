@@ -65,7 +65,6 @@ jar {
                         + 'org.apache.fineract.portfolio.loanorigination.exception,'
                         + 'org.apache.fineract.portfolio.loanorigination.api,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.portfolio.loanorigination.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.loanorigination.impl'
                 )
     }

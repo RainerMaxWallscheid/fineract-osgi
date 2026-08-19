@@ -59,7 +59,6 @@ jar {
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.springbatch,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.springbatch.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.springbatch.impl'
                 )
     }

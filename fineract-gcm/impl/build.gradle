@@ -60,7 +60,6 @@ jar {
                         + 'org.apache.fineract.infrastructure.gcm.service,'
                         + 'org.apache.fineract.infrastructure.gcm.domain,'
                         + '*',
-                'Export-Package': 'org.apache.fineract.infrastructure.gcm.impl.osgi',
                 'Automatic-Module-Name': 'org.apache.fineract.gcm.impl'
                 )
     }
