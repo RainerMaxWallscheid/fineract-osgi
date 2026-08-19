@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.savings.starter;
 
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.SavingsJournalPort;
 import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.commands.service.CommandProcessingService;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
@@ -234,7 +234,7 @@ public class SavingsConfiguration {
             SavingsAccountChargeDataValidator savingsAccountChargeDataValidator,
             PaymentDetailWritePlatformService paymentDetailWritePlatformService,
             ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper,
-            JournalEntryWritePlatformService journalEntryWritePlatformService, DepositAccountDomainService depositAccountDomainService,
+            SavingsJournalPort savingsJournalPort, DepositAccountDomainService depositAccountDomainService,
             NoteRepository noteRepository, AccountTransfersReadPlatformService accountTransfersReadPlatformService,
             ChargeDefinitionPort chargeDefinitionPort, SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository,
             AccountAssociationsReadPlatformService accountAssociationsReadPlatformService,
@@ -248,7 +248,7 @@ public class SavingsConfiguration {
         return new DepositAccountWritePlatformServiceJpaRepositoryImpl(context, savingAccountRepositoryWrapper,
                 savingsAccountTransactionRepository, depositAccountAssembler, savingsAccountPostInterestService,
                 depositAccountTransactionDataValidator, savingsAccountChargeDataValidator, paymentDetailWritePlatformService,
-                applicationCurrencyRepositoryWrapper, journalEntryWritePlatformService, depositAccountDomainService, noteRepository,
+                applicationCurrencyRepositoryWrapper, savingsJournalPort, depositAccountDomainService, noteRepository,
                 accountTransfersReadPlatformService, chargeDefinitionPort, savingsAccountChargeRepository,
                 accountAssociationsReadPlatformService, accountTransfersWritePlatformService, depositAccountReadPlatformService,
                 calendarInstanceRepository, configurationDomainService, holidayRepository, workingDaysRepository,
@@ -393,7 +393,7 @@ public class SavingsConfiguration {
             SavingsAccountAssembler savingAccountAssembler, SavingsAccountTransactionDataValidator savingsAccountTransactionDataValidator,
             SavingsAccountChargeDataValidator savingsAccountChargeDataValidator,
             PaymentDetailWritePlatformService paymentDetailWritePlatformService,
-            JournalEntryWritePlatformService journalEntryWritePlatformService, SavingsAccountDomainService savingsAccountDomainService,
+            SavingsJournalPort savingsJournalPort, SavingsAccountDomainService savingsAccountDomainService,
             NoteRepository noteRepository, AccountTransfersReadPlatformService accountTransfersReadPlatformService,
             AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, HolidayRepositoryWrapper holidayRepository,
@@ -407,7 +407,7 @@ public class SavingsConfiguration {
             ErrorHandler errorHandler) {
         return new SavingsAccountWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, savingAccountRepositoryWrapper,
                 staffRepository, savingsAccountTransactionRepository, savingAccountAssembler, savingsAccountTransactionDataValidator,
-                savingsAccountChargeDataValidator, paymentDetailWritePlatformService, journalEntryWritePlatformService,
+                savingsAccountChargeDataValidator, paymentDetailWritePlatformService, savingsJournalPort,
                 savingsAccountDomainService, noteRepository, accountTransfersReadPlatformService, accountAssociationsReadPlatformService,
                 chargeDefinitionPort, savingsAccountChargeRepository, holidayRepository, workingDaysRepository, configurationDomainService,
                 depositAccountOnHoldTransactionRepository, entityDatatableChecksWritePlatformService, appuserRepository,

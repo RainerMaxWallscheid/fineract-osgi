@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.SavingsJournalPort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -120,7 +120,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     private final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final SavingsJournalPort savingsJournalPort;
     private final DepositAccountDomainService depositAccountDomainService;
     private final NoteRepository noteRepository;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
@@ -1167,7 +1167,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     private void postJournalEntries(final SavingsAccount savingsAccount, final Set<Long> existingTransactionIds, final Set<Long> existingReversedTransactionIds) {
         boolean isAccountTransfer = false;
         final Map<String, Object> accountingBridgeData = savingsAccount.deriveAccountingBridgeData(savingsAccount.getCurrency().getCode(), existingTransactionIds, existingReversedTransactionIds, isAccountTransfer, false);
-        this.journalEntryWritePlatformService.createJournalEntriesForSavings(accountingBridgeData);
+        this.savingsJournalPort.postSavings(accountingBridgeData);
     }
 
     @Transactional
@@ -1192,7 +1192,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final JournalEntryWritePlatformService journalEntryWritePlatformService, final DepositAccountDomainService depositAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
+        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final SavingsJournalPort savingsJournalPort, final DepositAccountDomainService depositAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -1202,7 +1202,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.savingsAccountChargeDataValidator = savingsAccountChargeDataValidator;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
-        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.savingsJournalPort = savingsJournalPort;
         this.depositAccountDomainService = depositAccountDomainService;
         this.noteRepository = noteRepository;
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;

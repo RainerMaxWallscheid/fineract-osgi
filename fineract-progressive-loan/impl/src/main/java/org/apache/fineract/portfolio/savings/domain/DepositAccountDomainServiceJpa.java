@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.SavingsJournalPort;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormat;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
@@ -69,7 +69,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DepositAccountDomainServiceJpa implements DepositAccountDomainService {
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private final SavingsAccountActivationService savingsAccountActivationService;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final SavingsJournalPort savingsJournalPort;
     private final AccountNumberGenerator accountNumberGenerator;
     private final DepositAccountAssembler depositAccountAssembler;
     private final SavingsAccountDomainService savingsAccountDomainService;
@@ -444,7 +444,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     private void postJournalEntries(final SavingsAccount savingsAccount, final Set<Long> existingTransactionIds, final Set<Long> existingReversedTransactionIds, boolean isAccountTransfer) {
         final boolean backdatedTxnsAllowedTill = false;
         final Map<String, Object> accountingBridgeData = savingsAccount.deriveAccountingBridgeData(savingsAccount.getCurrency().getCode(), existingTransactionIds, existingReversedTransactionIds, isAccountTransfer, backdatedTxnsAllowedTill);
-        this.journalEntryWritePlatformService.createJournalEntriesForSavings(accountingBridgeData);
+        this.savingsJournalPort.postSavings(accountingBridgeData);
     }
 
     private void updateAlreadyPostedTransactions(final Set<Long> existingTransactionIds, final SavingsAccount savingsAccount) {
@@ -461,10 +461,10 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final AccountNumberGenerator accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceRepository calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
+        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final SavingsJournalPort savingsJournalPort, final AccountNumberGenerator accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceRepository calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountActivationService = savingsAccountActivationService;
-        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.savingsJournalPort = savingsJournalPort;
         this.accountNumberGenerator = accountNumberGenerator;
         this.depositAccountAssembler = depositAccountAssembler;
         this.savingsAccountDomainService = savingsAccountDomainService;

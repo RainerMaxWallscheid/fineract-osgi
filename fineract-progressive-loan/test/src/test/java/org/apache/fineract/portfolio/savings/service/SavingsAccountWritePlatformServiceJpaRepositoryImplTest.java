@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.SavingsJournalPort;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -112,7 +112,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
     @Mock
     private PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     @Mock
-    private JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private SavingsJournalPort savingsJournalPort;
     @Mock
     private SavingsAccountDomainService savingsAccountDomainService;
     @Mock
