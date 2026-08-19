@@ -82,7 +82,7 @@ public class EquinoxFrameworkLifecycle implements SmartLifecycle {
             }
             bridge.start(context);
             running = true;
-            LOG.info("Embedded Equinox started; Wave-1 through Wave-5 Spring ports registered in the Service Registry");
+            LOG.info("Embedded Equinox started; Wave-1 through Wave-6 Spring ports registered in the Service Registry");
         } catch (final Exception ex) {
             LOG.warn("Failed to start embedded Equinox; Boot continues without OSGi: {}", ex.toString());
             stopQuietly();

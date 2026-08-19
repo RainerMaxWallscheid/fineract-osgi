@@ -27,7 +27,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Spring→OSGi registration of Boot-owned Wave-1 through Wave-5 catalog ports
+ * Spring→OSGi registration of Boot-owned Wave-1 through Wave-6 catalog ports
  * (ADR-022 B3 / playbook §15.5). Ranks above empty catalog activators.
  * Spring 6 is not staged as Equinox bundles.
  */

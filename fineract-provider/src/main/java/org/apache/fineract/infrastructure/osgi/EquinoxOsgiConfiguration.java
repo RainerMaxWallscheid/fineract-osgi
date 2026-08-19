@@ -24,10 +24,12 @@ import java.util.List;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
+import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.notification.service.UserNotificationService;
@@ -36,12 +38,15 @@ import org.apache.fineract.organisation.provisioning.service.ProvisioningCategor
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
+import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.springframework.beans.factory.ObjectProvider;
@@ -73,7 +78,10 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<CurrencyWritePlatformService> currencies,
             final ObjectProvider<PasswordValidationPolicyReadPlatformService> passwordPolicies,
             final ObjectProvider<AdHocReadPlatformService> adhoc, final ObjectProvider<TemplateMergeService> templates,
-            final ObjectProvider<UserNotificationService> notifications) {
+            final ObjectProvider<UserNotificationService> notifications, final ObjectProvider<ScorecardReadPlatformService> scorecards,
+            final ObjectProvider<FundReadPlatformService> funds,
+            final ObjectProvider<AccountNumberFormatReadPlatformService> accountNumbers,
+            final ObjectProvider<ReadLikelihoodService> likelihood, final ObjectProvider<TransferWritePlatformService> transfers) {
         return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
                 bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
                 bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
@@ -94,7 +102,12 @@ public class EquinoxOsgiConfiguration {
                 bind(PasswordValidationPolicyReadPlatformService.class, passwordPolicies.getIfAvailable()),
                 bind(AdHocReadPlatformService.class, adhoc.getIfAvailable()),
                 bind(TemplateMergeService.class, templates.getIfAvailable()),
-                bind(UserNotificationService.class, notifications.getIfAvailable())));
+                bind(UserNotificationService.class, notifications.getIfAvailable()),
+                bind(ScorecardReadPlatformService.class, scorecards.getIfAvailable()),
+                bind(FundReadPlatformService.class, funds.getIfAvailable()),
+                bind(AccountNumberFormatReadPlatformService.class, accountNumbers.getIfAvailable()),
+                bind(ReadLikelihoodService.class, likelihood.getIfAvailable()),
+                bind(TransferWritePlatformService.class, transfers.getIfAvailable())));
     }
 
     @Bean
