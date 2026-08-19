@@ -102,7 +102,8 @@ import org.osgi.framework.wiring.FrameworkWiring;
 /**
  * Start the staged catalog, then register every composition-root hosted
  * PILOT_PORT (in-memory, not JPA / Spring). {@link org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort}
- * stays empty-catalog only. Proves ranking over empty activators.
+ * stays empty-catalog only. Proves ranking over empty catalog ports. Fails
+ * when Felix SCR or any fineract bundle is not ACTIVE.
  */
 public final class EquinoxSpringBridgeSmoke {
 
@@ -164,6 +165,26 @@ public final class EquinoxSpringBridgeSmoke {
             }
         }
 
+        int fineract = 0;
+        int notActive = 0;
+        boolean scrActive = false;
+        for (Bundle bundle : ctx.getBundles()) {
+            String bsn = bundle.getSymbolicName();
+            if ("org.apache.felix.scr".equals(bsn) && bundle.getState() == Bundle.ACTIVE) {
+                scrActive = true;
+            }
+            if (bsn != null && bsn.startsWith("org.apache.fineract.")) {
+                fineract++;
+                if (bundle.getState() != Bundle.ACTIVE) {
+                    notActive++;
+                    System.err.println("NOT_ACTIVE " + bsn + " " + bundle.getState());
+                }
+            }
+        }
+        if (!scrActive) {
+            System.err.println("SERVICE_MISS org.apache.felix.scr");
+        }
+
         CompositionRootOsgiBridge bridge = new CompositionRootOsgiBridge(ctx);
         bridge.start();
 
@@ -181,9 +202,10 @@ public final class EquinoxSpringBridgeSmoke {
         framework.stop();
         framework.waitForStop(10_000);
 
-        boolean ok = installFailures == 0 && startFailures == 0 && hostedFails == 0;
-        System.out.println("SUMMARY staged=" + locations.size() + " installFailures=" + installFailures + " startFailures="
-                + startFailures + " hostedWins=" + hostedWins + " hostedFails=" + hostedFails);
+        boolean ok = installFailures == 0 && startFailures == 0 && hostedFails == 0 && scrActive && notActive == 0;
+        System.out.println("SUMMARY staged=" + locations.size() + " fineract=" + fineract + " notActive=" + notActive
+                + " scrActive=" + scrActive + " installFailures=" + installFailures + " startFailures=" + startFailures
+                + " hostedWins=" + hostedWins + " hostedFails=" + hostedFails);
         System.exit(ok ? 0 : 1);
     }
 

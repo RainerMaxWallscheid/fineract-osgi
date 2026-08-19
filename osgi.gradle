@@ -136,7 +136,7 @@ tasks.register('equinoxStartSmoke', Exec) {
 
 tasks.register('equinoxSpringBridgeSmoke', Exec) {
     group = 'verification'
-    description = 'Stage catalog jars, start Equinox, and register a hosted ChargeDefinitionPort from the composition root'
+    description = 'Stage catalog jars, start Equinox, require ACTIVE fineract + Felix SCR, and assert hosted PILOT_PORTs win'
     dependsOn osgiStageBundles
     workingDir = rootDir
     commandLine 'python3', 'osgi/spring-bridge-smoke.py'

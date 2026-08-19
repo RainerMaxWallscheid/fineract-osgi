@@ -19,8 +19,9 @@
 
 """Composition-root Equinox bridge smoke (ADR-022 B3).
 
-Starts the staged catalog (empty activators), then registers every hosted
-PILOT_PORT from the composition-root classpath. Does not stage Spring.
+Starts the staged catalog, then registers every hosted PILOT_PORT from the
+composition-root classpath. Fails when Felix SCR or a fineract bundle is
+not ACTIVE. Does not stage Spring.
 ``ContentStreamPort`` stays empty-catalog only. Writes
 ``osgi/logs/spring-bridge-smoke.txt``.
 
