@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.function.Supplier;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -39,16 +40,36 @@ public final class SpringOsgiPortBridge {
     public static final class Binding<T> {
 
         private final Class<T> type;
-        private final T service;
+        private final Supplier<T> service;
 
-        Binding(final Class<T> type, final T service) {
+        Binding(final Class<T> type, final Supplier<T> service) {
             this.type = type;
             this.service = service;
         }
     }
 
     public static <T> Binding<T> bind(final Class<T> type, final T service) {
+        return new Binding<>(type, () -> service);
+    }
+
+    public static <T> Binding<T> bindLater(final Class<T> type, final Supplier<T> service) {
         return new Binding<>(type, service);
+    }
+
+    /**
+     * Spring-owned port: skip OSGi→Spring lookup proxies so they are not
+     * published back into the Service Registry.
+     */
+    public static <T> T owned(final Iterable<T> candidates) {
+        if (candidates == null) {
+            return null;
+        }
+        for (final T service : candidates) {
+            if (service != null && !(service instanceof OsgiBackedPort)) {
+                return service;
+            }
+        }
+        return null;
     }
 
     private final List<Binding<?>> bindings;
@@ -65,13 +86,14 @@ public final class SpringOsgiPortBridge {
     }
 
     private <T> void register(final BundleContext context, final Binding<T> binding) {
-        if (binding.service == null || binding.service instanceof OsgiBackedPort) {
+        final T service = binding.service == null ? null : binding.service.get();
+        if (service == null || service instanceof OsgiBackedPort) {
             return;
         }
         final Dictionary<String, Object> props = new Hashtable<>();
         props.put("provider", PROVIDER);
         props.put(Constants.SERVICE_RANKING, RANKING);
-        registrations.add(context.registerService(binding.type, binding.service, props));
+        registrations.add(context.registerService(binding.type, service, props));
     }
 
     public void stop() {

@@ -77,12 +77,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
- * OSGi→Spring optional port beans (ADR-022 B3 / playbook §15.5). Created only
- * when Boot has no bean of that type. {@code CommandDispatcher} stays
- * hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * OSGi→Spring port beans (ADR-022 B4 / playbook §15.5). {@code ChargeDefinitionPort}
+ * is a {@code @Primary} lookup façade when Equinox is on — Boot consumers resolve
+ * it from the Service Registry. Other ports are created only when Boot has no
+ * bean of that type. {@code CommandDispatcher} stays hosted-only.
+ * {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService} stay
+ * empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -93,7 +96,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(ChargeDefinitionPort.class)
+    @Primary
     public ChargeDefinitionPort osgiChargeDefinitionPort(final OsgiServiceLookup lookup) {
         return backed(lookup, ChargeDefinitionPort.class);
     }

@@ -20,6 +20,7 @@ package org.apache.fineract.infrastructure.osgi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -139,6 +140,75 @@ class EquinoxFrameworkLifecycleTest {
             lifecycle.stop();
         }
         assertFalse(backed.existsActiveCharge(1L));
+    }
+
+    @Test
+    void ownedSkipsOsgiBackedPort() {
+        final ChargeDefinitionPort spring = new StubChargeDefinitionPort();
+        final ChargeDefinitionPort proxy = OsgiBackedPortFactory.of(new OsgiServiceLookup(() -> null), ChargeDefinitionPort.class);
+        assertSame(spring, SpringOsgiPortBridge.owned(List.of(proxy, spring)));
+        assertNull(SpringOsgiPortBridge.owned(List.of(proxy)));
+        assertNull(SpringOsgiPortBridge.owned(List.of()));
+    }
+
+    @Test
+    void lazyOwnedBindingPublishesSpringPortNotLookupProxy() {
+        final ChargeDefinitionPort spring = new StubChargeDefinitionPort();
+        final ChargeDefinitionPort proxy = OsgiBackedPortFactory.of(new OsgiServiceLookup(() -> null), ChargeDefinitionPort.class);
+        final SpringOsgiPortBridge bridge = new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bindLater(ChargeDefinitionPort.class,
+                () -> SpringOsgiPortBridge.owned(List.of(proxy, spring)))));
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final ServiceReference<ChargeDefinitionPort> selected = lifecycle.getBundleContext()
+                    .getServiceReference(ChargeDefinitionPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(spring, lifecycle.getBundleContext().getService(selected));
+            lifecycle.getBundleContext().ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+    }
+
+    @Test
+    void chargeLookupFacadeDelegatesToPublishedSpringPort() {
+        final ChargeDefinitionPort spring = new ChargeDefinitionPort() {
+
+            @Override
+            public boolean existsActiveCharge(final Long chargeId) {
+                return chargeId != null && chargeId == 7L;
+            }
+
+            @Override
+            public Optional<ChargeDefinitionData> findActiveCharge(final Long chargeId) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<ChargeDefinitionData> findCharge(final Long chargeId) {
+                return Optional.empty();
+            }
+
+            @Override
+            public ChargeDefinitionData getActiveCharge(final Long chargeId) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = wave2Bridge(spring, null);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ChargeDefinitionPort facade = OsgiBackedPortFactory.of(lookup, ChargeDefinitionPort.class);
+
+        assertFalse(facade.existsActiveCharge(7L));
+        lifecycle.start();
+        try {
+            assertTrue(facade.existsActiveCharge(7L));
+            assertFalse(facade.existsActiveCharge(1L));
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(facade.existsActiveCharge(7L));
     }
 
     @Test
