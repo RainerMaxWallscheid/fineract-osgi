@@ -5,7 +5,7 @@ Savings / deposit products & accounts — Wave 3 OSGi modularization
 
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
-| `fineract-savings-api` | `api/` | `org.apache.fineract.savings.api` | Pure ports, DTOs, exceptions (many enums/DTOs already in core) |
+| `fineract-savings-api` | `api/` | `org.apache.fineract.savings.api` | Pure ports, DTOs, exceptions, `SavingsTransactionEnumerations` (many enums/DTOs already in core) |
 | `fineract-savings-impl` | `impl/` | `org.apache.fineract.savings.impl` | JPA domain, entity-typed services, COB; Equinox DS `OSGI-INF/savings.xml` |
 | `fineract-savings-test` | `test/` | `org.apache.fineract.savings.test` | Fragment-Host → `savings.impl` |
 

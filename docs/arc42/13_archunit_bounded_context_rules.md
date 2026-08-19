@@ -83,6 +83,7 @@ On the first run, violations were written to `archunit_store`. Empty freeze file
 | Loan/Savings ↔ Journal | **green** (0 frozen) |
 | Loan/Savings → Charge entity / write services | **green** (moduleapi only) |
 | Loan → Tax catalog ports | **green** (tax-api service/moduleapi allowed) |
+| Accounting → Savings internals | **green** (`SavingsTransactionEnumerations` on savings-api) |
 | Accounting BC (`org.apache.fineract.accounting..` only — not WC `…accounting…` processors) | **green** / residual frozen |
 | Loan → Client / Group | **frozen** (`Loan.client` / `Loan.group`) |
 | Savings → Client / Group | **frozen** |
@@ -91,7 +92,7 @@ On the first run, violations were written to `archunit_store`. Empty freeze file
 | Loan → Savings internals (guarantor / on-hold) | **frozen** residual |
 | Loan/Investor → Accounting internals | **frozen** residual |
 
-Exact counts: **1167** frozen violation lines in **15** non-empty files (17 empty = rule green). Previous store (658 lines) was stale after peels and could not be imported without a 2g test heap.
+Exact counts: **1166** frozen violation lines in **14** non-empty files (18 empty = rule green). Previous store (658 lines) was stale after peels and could not be imported without a 2g test heap.
 
 `ACCOUNTING_OWNED` / `ACCOUNTING_INTERNAL` use `org.apache.fineract.accounting..` so loan-owned `…workingcapitalloan.accounting…` is not treated as the Accounting BC.
 

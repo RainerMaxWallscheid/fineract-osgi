@@ -59,7 +59,7 @@ import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
-import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsTransactionEnumerations;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -173,7 +173,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                     final LoanTransactionEnumData loanTransactionType = LoanTransactionEnumerations.transactionType(JdbcSupport.getInteger(rs, "loanTransactionType"));
                     transactionTypeEnumData = new TransactionTypeEnumData(loanTransactionType.getId(), loanTransactionType.getCode(), loanTransactionType.getValue());
                 } else if (PortfolioAccountType.SAVINGS.equals(PortfolioAccountType.fromInt(entityTypeId))) {
-                    final SavingsAccountTransactionEnumData savingsTransactionType = SavingsEnumerations.transactionType(JdbcSupport.getInteger(rs, "savingsTransactionType"));
+                    final SavingsAccountTransactionEnumData savingsTransactionType = SavingsTransactionEnumerations.transactionType(JdbcSupport.getInteger(rs, "savingsTransactionType"));
                     transactionTypeEnumData = new TransactionTypeEnumData(savingsTransactionType.getId(), savingsTransactionType.getCode(), savingsTransactionType.getValue());
                 }
                 transactionDetailData = new TransactionDetailData(transaction, paymentDetailData, noteData, transactionTypeEnumData);
