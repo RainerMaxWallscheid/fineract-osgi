@@ -24,8 +24,9 @@ import org.apache.fineract.command.core.CommandHookManager;
 /**
  * Empty hook list for Equinox without Spring. Same behavior as
  * {@code DefaultCommandHookManager} constructed with empty lists.
+ * Published by {@code OSGI-INF/command-hooks.xml} (ADR-022 B6).
  */
-final class OsgiCommandHookManager implements CommandHookManager {
+public final class OsgiCommandHookManager implements CommandHookManager {
 
     @Override
     public void before(Command command) {}

@@ -28,13 +28,18 @@ import org.apache.fineract.command.core.CommandHookManager;
 /**
  * Synchronous dispatcher with no Spring types, so Equinox can load it
  * without staging Spring jars.
+ * Published by {@code OSGI-INF/command-dispatcher.xml} (ADR-022 B6).
  */
-final class OsgiCommandDispatcher implements CommandDispatcher {
+public final class OsgiCommandDispatcher implements CommandDispatcher {
 
     private final CommandHandlerManager handlerManager;
     private final CommandHookManager hookManager;
 
-    OsgiCommandDispatcher(final CommandHandlerManager handlerManager, final CommandHookManager hookManager) {
+    public OsgiCommandDispatcher() {
+        this(new OsgiCommandHandlerManager(), new OsgiCommandHookManager());
+    }
+
+    public OsgiCommandDispatcher(final CommandHandlerManager handlerManager, final CommandHookManager hookManager) {
         this.handlerManager = requireNonNull(handlerManager, "handlerManager");
         this.hookManager = requireNonNull(hookManager, "hookManager");
     }

@@ -7,7 +7,7 @@ OSGi **implementation** bundle: default synchronous dispatcher, hooks, Spring Bo
 - **Bundle-SymbolicName:** `org.apache.fineract.command.impl`
 - **Depends on:** `fineract-command-api`
 - **Spring:** allowed and expected inside this bundle
-- **OSGi Equinox start:** `CommandOsgiBundleActivator` registers `CommandDispatcher`, `CommandHandlerManager`, `CommandHookManager` (Spring-free empty registry)
+- **OSGi Equinox start:** DS `OSGI-INF/command-*.xml` registers `CommandDispatcher`, `CommandHandlerManager`, `CommandHookManager` (Spring-free empty registry)
 - **OSGi Spring bridge:** `CommandOsgiServiceRegistrar` registers the same ports from Spring beans when an OSGi `BundleContext` is present
 - **Sources:** production **main** only — unit / white-box tests live in `:fineract-command-test` (`fineract-command/test`, Fragment-Host); shared IT fixtures in `:fineract-command-integrationtest`
 

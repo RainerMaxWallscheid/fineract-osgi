@@ -26,7 +26,7 @@ Fails on:
   * BSN that does not match the Gradle module stem
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not empty (impl packages stay private)
-  * impl Bundle-Activator outside the loan / COB / security / command allow-list
+  * impl Bundle-Activator outside the loan / COB / security allow-list
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
@@ -57,10 +57,9 @@ ROOT = Path(__file__).resolve().parents[1]
 # The check fails on any new api-api Export-Package collision.
 KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 
-# Bundle-Activator remains only for loan/COB/security and the command dispatcher graph.
+# Bundle-Activator remains only for loan/COB/security.
 ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset(
     {
-        "command",
         "cob",
         "loan",
         "progressiveloan",
@@ -295,7 +294,7 @@ def main() -> int:
         if activator and row["expected_stem"] not in ALLOWED_ACTIVATOR_STEMS:
             errors.append(
                 f"{row['path']}: Bundle-Activator {activator} is not allow-listed "
-                f"(loan / COB / security / command only)"
+                f"(loan / COB / security only)"
             )
 
     seen_known: set[str] = set()

@@ -25,8 +25,9 @@ import org.apache.fineract.command.core.exception.CommandHandlerNotFoundExceptio
 /**
  * Empty handler registry for Equinox without Spring. Same outcome as
  * {@code DefaultCommandHandlerManager} with no handlers.
+ * Published by {@code OSGI-INF/command-handlers.xml} (ADR-022 B6).
  */
-final class OsgiCommandHandlerManager implements CommandHandlerManager {
+public final class OsgiCommandHandlerManager implements CommandHandlerManager {
 
     @Override
     public <REQ, RES> RES handle(Command<REQ> command) {

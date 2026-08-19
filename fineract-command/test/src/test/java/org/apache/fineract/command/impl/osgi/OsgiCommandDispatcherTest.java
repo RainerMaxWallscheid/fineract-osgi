@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.command.impl.osgi;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.exception.CommandHandlerNotFoundException;
@@ -37,5 +38,12 @@ class OsgiCommandDispatcherTest {
     void dispatchRejectsNullCommand() {
         final var dispatcher = new OsgiCommandDispatcher(new OsgiCommandHandlerManager(), new OsgiCommandHookManager());
         assertThrows(NullPointerException.class, () -> dispatcher.dispatch(null));
+    }
+
+    @Test
+    void dsComponentDescriptorsAreOnClasspath() {
+        assertNotNull(OsgiCommandDispatcher.class.getResource("/OSGI-INF/command-dispatcher.xml"));
+        assertNotNull(OsgiCommandHandlerManager.class.getResource("/OSGI-INF/command-handlers.xml"));
+        assertNotNull(OsgiCommandHookManager.class.getResource("/OSGI-INF/command-hooks.xml"));
     }
 }

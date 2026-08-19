@@ -16,7 +16,7 @@ Step-by-step plan:
 | `fineract-command-integrationtest` | `fineract-command-integrationtest/` | `org.apache.fineract.command.integrationtest` | Shared IT fixtures/samples for **all** command modules |
 
 No `:fineract-command` façade (Step 8 closed). Depend on **`fineract-command-api`** (plus **`fineract-command-impl`** at composition roots that need Spring auto-config).
-Inter-bundle access: **OSGi Service Registry** (`CommandOsgiBundleActivator` on Equinox start; `CommandOsgiServiceRegistrar` from Spring). Not Karaf Features.  
+Inter-bundle access: **OSGi Service Registry** (DS `OSGI-INF/command-*.xml` on Equinox start; `CommandOsgiServiceRegistrar` from Spring). Not Karaf Features.  
 Spring remains inside **impl**.  
 
 

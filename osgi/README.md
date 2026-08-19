@@ -713,7 +713,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security / command allow-list, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security allow-list, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ```bash
 python3 osgi/check-foreign-impl-deps.py
@@ -768,7 +768,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators. No-port modules have no Equinox activator.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security keep Bundle-Activators. No-port modules have no Equinox activator.
 
 ## Resolve smoke
 
@@ -786,7 +786,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve (no Spring). Equinox-safe empty catalog ports register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security / command still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve (no Spring). Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE.
 
 ```bash
 ./gradlew equinoxSpringBridgeSmoke
