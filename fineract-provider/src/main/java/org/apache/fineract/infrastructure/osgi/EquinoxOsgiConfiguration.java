@@ -27,9 +27,20 @@ import org.apache.fineract.cob.service.ConfigJobParameterService;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
+import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
+import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
+import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
+import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
+import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
+import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
+import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
+import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
+import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
@@ -38,8 +49,12 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
+import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatformService;
+import org.apache.fineract.portfolio.calendar.service.CalendarDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
+import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformService;
+import org.apache.fineract.portfolio.collateralmanagement.service.CollateralManagementReadService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
@@ -47,6 +62,8 @@ import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
+import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
+import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
@@ -99,7 +116,21 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<GroupLevelReadPlatformService> groupLevels,
             final ObjectProvider<ClientIdentifierWritePlatformService> clientIdentifiers,
             final ObjectProvider<RepaymentWithPostDatedChecksWritePlatformService> postDatedChecks,
-            final ObjectProvider<ProductCommandsService> productCommands, final ObjectProvider<CacheWritePlatformService> cache) {
+            final ObjectProvider<ProductCommandsService> productCommands, final ObjectProvider<CacheWritePlatformService> cache,
+            final ObjectProvider<FineractEntityAccessReadService> entityAccess,
+            final ObjectProvider<CalendarDropdownReadPlatformService> calendars,
+            final ObjectProvider<MeetingAttendanceDropdownReadService> meetings,
+            final ObjectProvider<FieldConfigurationReadPlatformService> addressFields,
+            final ObjectProvider<CreditBureauReadPlatformService> creditBureaus,
+            final ObjectProvider<CollateralWritePlatformService> collateral,
+            final ObjectProvider<CollateralManagementReadService> collateralMgmt, final ObjectProvider<NoteReadPlatformService> notes,
+            final ObjectProvider<HookReadPlatformService> hooks, final ObjectProvider<SmsWritePlatformService> sms,
+            final ObjectProvider<ReportMailingJobConfigurationReadPlatformService> reportMailing,
+            final ObjectProvider<SmsCampaignDropdownReadPlatformService> smsCampaigns,
+            final ObjectProvider<NotificationConfigurationReadService> gcmConfig,
+            final ObjectProvider<ReportWritePlatformService> reports,
+            final ObjectProvider<ExternalServicesReadPlatformService> externalServices,
+            final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties) {
         return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
                 bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
                 bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
@@ -135,7 +166,23 @@ public class EquinoxOsgiConfiguration {
                 bind(ClientIdentifierWritePlatformService.class, clientIdentifiers.getIfAvailable()),
                 bind(RepaymentWithPostDatedChecksWritePlatformService.class, postDatedChecks.getIfAvailable()),
                 bind(ProductCommandsService.class, productCommands.getIfAvailable()),
-                bind(CacheWritePlatformService.class, cache.getIfAvailable())));
+                bind(CacheWritePlatformService.class, cache.getIfAvailable()),
+                bind(FineractEntityAccessReadService.class, entityAccess.getIfAvailable()),
+                bind(CalendarDropdownReadPlatformService.class, calendars.getIfAvailable()),
+                bind(MeetingAttendanceDropdownReadService.class, meetings.getIfAvailable()),
+                bind(FieldConfigurationReadPlatformService.class, addressFields.getIfAvailable()),
+                bind(CreditBureauReadPlatformService.class, creditBureaus.getIfAvailable()),
+                bind(CollateralWritePlatformService.class, collateral.getIfAvailable()),
+                bind(CollateralManagementReadService.class, collateralMgmt.getIfAvailable()),
+                bind(NoteReadPlatformService.class, notes.getIfAvailable()), bind(HookReadPlatformService.class, hooks.getIfAvailable()),
+                bind(SmsWritePlatformService.class, sms.getIfAvailable()),
+                bind(ReportMailingJobConfigurationReadPlatformService.class, reportMailing.getIfAvailable()),
+                bind(SmsCampaignDropdownReadPlatformService.class, smsCampaigns.getIfAvailable()),
+                bind(NotificationConfigurationReadService.class, gcmConfig.getIfAvailable()),
+                bind(ReportWritePlatformService.class, reports.getIfAvailable()),
+                bind(ExternalServicesReadPlatformService.class, externalServices.getIfAvailable()),
+                bind(StuckJobExecutorService.class, stuckJobs.getIfAvailable()),
+                bind(PropertyService.class, batchProperties.getIfAvailable())));
     }
 
     @Bean
