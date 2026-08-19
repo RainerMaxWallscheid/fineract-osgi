@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanproduct.service;
+package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
 /**
- * Loan-api enum helpers for transaction types (used by accounting residual without loan-impl).
+ * Loan-api transaction-type helper for foreign BCs (ADR-021). Lives in
+ * {@code moduleapi} so accounting journal reads are not loan internals.
  */
 public final class LoanTransactionEnumerations {
 

@@ -20,7 +20,7 @@ package org.apache.fineract.accounting.glaccount.command;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
+import org.apache.fineract.accounting.glaccount.data.GLAccountJsonInputParams;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountUsage;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;

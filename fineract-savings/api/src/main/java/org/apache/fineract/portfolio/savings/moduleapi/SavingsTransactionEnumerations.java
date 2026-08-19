@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.savings.moduleapi;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.savings.DepositAccountOnHoldTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 
@@ -61,5 +63,18 @@ public final class SavingsTransactionEnumerations {
 
     private static SavingsAccountTransactionEnumData data(final SavingsAccountTransactionType type, final String value) {
         return new SavingsAccountTransactionEnumData(type.getValue().longValue(), type.getCode(), value);
+    }
+
+    public static EnumOptionData onHoldTransactionType(final Integer id) {
+        return onHoldTransactionType(DepositAccountOnHoldTransactionType.fromInt(id));
+    }
+
+    public static EnumOptionData onHoldTransactionType(final DepositAccountOnHoldTransactionType type) {
+        final DepositAccountOnHoldTransactionType resolved = type == null ? DepositAccountOnHoldTransactionType.INVALID : type;
+        return switch (resolved) {
+            case INVALID -> new EnumOptionData(resolved.getValue().longValue(), resolved.getCode(), "Invalid");
+            case HOLD -> new EnumOptionData(resolved.getValue().longValue(), resolved.getCode(), "hold");
+            case RELEASE -> new EnumOptionData(resolved.getValue().longValue(), resolved.getCode(), "release");
+        };
     }
 }

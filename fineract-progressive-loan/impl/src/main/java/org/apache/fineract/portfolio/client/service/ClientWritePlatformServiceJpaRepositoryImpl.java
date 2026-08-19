@@ -72,7 +72,7 @@ import org.apache.fineract.portfolio.address.service.AddressWritePlatformService
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.data.ClientDataValidator;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientEnumerations;
+import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.client.domain.ClientNonPerson;
 import org.apache.fineract.portfolio.client.domain.ClientNonPersonRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;

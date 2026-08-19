@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.core',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Shared kernel (not an api/impl split)',
-                'Export-Package': 'org.apache.fineract.accounting.glaccount.api,'
-                        + 'org.apache.fineract.accounting.glaccount.domain,'
+                'Export-Package': 'org.apache.fineract.accounting.glaccount.domain,'
                         + 'org.apache.fineract.accounting.glaccount.mapper,'
                         + 'org.apache.fineract.accounting.journalentry.domain,'
                         + 'org.apache.fineract.accounting.producttoaccountmapping.data,'

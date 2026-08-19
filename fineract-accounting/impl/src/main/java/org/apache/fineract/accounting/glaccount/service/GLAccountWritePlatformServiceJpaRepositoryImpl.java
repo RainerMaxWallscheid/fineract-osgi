@@ -20,7 +20,7 @@ package org.apache.fineract.accounting.glaccount.service;
 
 import java.util.Map;
 import org.apache.fineract.accounting.common.AccountingConstants;
-import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
+import org.apache.fineract.accounting.glaccount.data.GLAccountJsonInputParams;
 import org.apache.fineract.accounting.glaccount.command.GLAccountCommand;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;

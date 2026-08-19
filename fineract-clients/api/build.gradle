@@ -32,6 +32,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.client.api.v2.search,'
                         + 'org.apache.fineract.portfolio.client.command,'
                         + 'org.apache.fineract.portfolio.client.data,'
+                        + 'org.apache.fineract.portfolio.client.moduleapi,'
                         + 'org.apache.fineract.portfolio.client.service,'
                         + 'org.apache.fineract.portfolio.client.service.search,'
                         + 'org.apache.fineract.portfolio.client.service.search.domain,'
@@ -45,6 +46,7 @@ jar {
                         + 'org.apache.fineract.organisation.monetary.data,'
                         + 'org.apache.fineract.portfolio.charge.data,'
                         + 'org.apache.fineract.portfolio.client.api,'
+                        + 'org.apache.fineract.portfolio.client.domain,'
                         + 'org.apache.fineract.portfolio.paymentdetail.data,'
                         + 'org.apache.fineract.portfolio.paymenttype.data,'
                         + '*',

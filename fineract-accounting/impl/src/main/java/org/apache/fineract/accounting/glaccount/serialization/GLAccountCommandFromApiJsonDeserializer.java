@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
+import org.apache.fineract.accounting.glaccount.data.GLAccountJsonInputParams;
 import org.apache.fineract.accounting.glaccount.command.GLAccountCommand;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.serialization.AbstractFromApiJsonDeserializer;

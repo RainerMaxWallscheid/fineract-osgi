@@ -16,38 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.accounting.rule.api;
+package org.apache.fineract.accounting.glaccount.data;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /***
- * Enum of all parameters passed in while creating/updating a loan product
+ * Enum of all parameters passed in while creating/updating a GL Account
  ***/
-public enum AccountingRuleJsonInputParams {
+public enum GLAccountJsonInputParams {
 
     ID("id"), //
-    OFFICE_ID("officeId"), //
-    ACCOUNT_TO_DEBIT("accountToDebit"), //
-    ACCOUNT_TO_CREDIT("accountToCredit"), //
     NAME("name"), //
+    PARENT_ID("parentId"), //
+    GL_CODE("glCode"), //
+    DISABLED("disabled"), //
+    MANUAL_ENTRIES_ALLOWED("manualEntriesAllowed"), //
+    TYPE("type"), //
+    USAGE("usage"), //
     DESCRIPTION("description"), //
-    SYSTEM_DEFINED("systemDefined"), //
-    DEBIT_ACCOUNT_TAGS("debitTags"), //
-    CREDIT_ACCOUNT_TAGS("creditTags"), //
-    ALLOW_MULTIPLE_CREDIT_ENTRIES("allowMultipleCreditEntries"), //
-    ALLOW_MULTIPLE_DEBIT_ENTRIES("allowMultipleDebitEntries"); //
+    TAGID("tagId"); //
 
     private final String value;
 
-    AccountingRuleJsonInputParams(final String value) {
+    GLAccountJsonInputParams(final String value) {
         this.value = value;
     }
 
     private static final Set<String> values = new HashSet<>();
 
     static {
-        for (final AccountingRuleJsonInputParams type : AccountingRuleJsonInputParams.values()) {
+        for (final GLAccountJsonInputParams type : GLAccountJsonInputParams.values()) {
             values.add(type.value);
         }
     }

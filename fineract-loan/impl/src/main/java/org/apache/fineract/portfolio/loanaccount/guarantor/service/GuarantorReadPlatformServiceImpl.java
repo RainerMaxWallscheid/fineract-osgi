@@ -41,7 +41,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorFunding
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorTransactionData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.ObligeeData;
 import org.apache.fineract.portfolio.savings.data.DepositAccountOnHoldTransactionData;
-import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsTransactionEnumerations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -273,7 +273,7 @@ public class GuarantorReadPlatformServiceImpl implements GuarantorReadPlatformSe
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "transactionAmount");
             final LocalDate date = JdbcSupport.getLocalDate(rs, "transactionDate");
             final int transactionTypeEnum = rs.getInt("transactionType");
-            EnumOptionData transactionType = SavingsEnumerations.onHoldTransactionType(transactionTypeEnum);
+            EnumOptionData transactionType = SavingsTransactionEnumerations.onHoldTransactionType(transactionTypeEnum);
             final boolean reversed = rs.getBoolean("reversed");
             final boolean transactionReversed = rs.getBoolean("transactionReversed");
             DepositAccountOnHoldTransactionData onHoldTransactionData = DepositAccountOnHoldTransactionData.instance(transactionId, amount,

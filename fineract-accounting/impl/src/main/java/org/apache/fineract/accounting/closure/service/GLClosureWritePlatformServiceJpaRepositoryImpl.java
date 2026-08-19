@@ -20,7 +20,7 @@ package org.apache.fineract.accounting.closure.service;
 
 import java.time.LocalDate;
 import java.util.Map;
-import org.apache.fineract.accounting.closure.api.GLClosureJsonInputParams;
+import org.apache.fineract.accounting.closure.data.GLClosureJsonInputParams;
 import org.apache.fineract.accounting.closure.command.GLClosureCommand;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;

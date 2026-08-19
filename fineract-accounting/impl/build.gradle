@@ -63,6 +63,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.accounting.closure.service,'
                         + 'org.apache.fineract.accounting.closure.data,'
                         + 'org.apache.fineract.accounting.closure.exception,'
+                        + 'org.apache.fineract.portfolio.loanaccount.moduleapi,'
                         + 'org.apache.fineract.portfolio.savings.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.accounting.impl'

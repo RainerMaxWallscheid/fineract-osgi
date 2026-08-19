@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.accounting.closure.api;
+package org.apache.fineract.accounting.closure.data;
 
 import java.util.HashSet;
 import java.util.Set;
