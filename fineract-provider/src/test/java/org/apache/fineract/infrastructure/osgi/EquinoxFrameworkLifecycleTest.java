@@ -75,6 +75,25 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void lookupFindsWave1ChargePortAndIsEmptyAfterStop() {
+        final ChargeDefinitionPort charge = new StubChargeDefinitionPort();
+        final SpringOsgiPortBridge bridge = wave2Bridge(charge, null);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+
+        assertTrue(lookup.find(ChargeDefinitionPort.class).isEmpty());
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            assertSame(charge, lookup.find(ChargeDefinitionPort.class).orElseThrow());
+            assertTrue(lookup.find(DelayedSettlementAttributeService.class).isEmpty());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(lookup.find(ChargeDefinitionPort.class).isEmpty());
+    }
+
+    @Test
     void stagedCatalogStartsAndSpringChargePortStillWins() {
         final Path catalog = stagedCatalog();
         assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");

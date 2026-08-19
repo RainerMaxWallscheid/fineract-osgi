@@ -190,4 +190,9 @@ public class EquinoxOsgiConfiguration {
             @Value("${fineract.osgi.catalog-dir:}") final String catalogDir) {
         return new EquinoxFrameworkLifecycle(bridge, catalogDir.isBlank() ? null : Path.of(catalogDir).toAbsolutePath());
     }
+
+    @Bean
+    public OsgiServiceLookup osgiServiceLookup(final EquinoxFrameworkLifecycle lifecycle) {
+        return new OsgiServiceLookup(lifecycle::getBundleContext);
+    }
 }
