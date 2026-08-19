@@ -65,7 +65,7 @@ public final class SpringOsgiPortBridge {
     }
 
     private <T> void register(final BundleContext context, final Binding<T> binding) {
-        if (binding.service == null) {
+        if (binding.service == null || binding.service instanceof OsgiBackedPort) {
             return;
         }
         final Dictionary<String, Object> props = new Hashtable<>();

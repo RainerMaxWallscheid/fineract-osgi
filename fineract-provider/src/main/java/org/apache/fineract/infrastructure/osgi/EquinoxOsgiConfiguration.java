@@ -78,6 +78,7 @@ import org.apache.fineract.template.service.TemplateMergeService;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -194,5 +195,11 @@ public class EquinoxOsgiConfiguration {
     @Bean
     public OsgiServiceLookup osgiServiceLookup(final EquinoxFrameworkLifecycle lifecycle) {
         return new OsgiServiceLookup(lifecycle::getBundleContext);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ChargeDefinitionPort.class)
+    public ChargeDefinitionPort osgiChargeDefinitionPort(final OsgiServiceLookup lookup) {
+        return OsgiBackedPortFactory.of(lookup, ChargeDefinitionPort.class, new EmptyChargeDefinitionPort());
     }
 }

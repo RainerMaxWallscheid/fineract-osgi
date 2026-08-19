@@ -94,6 +94,67 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void osgiBackedChargePortDelegatesAfterStartAndNoopsAfterStop() {
+        final ChargeDefinitionPort charge = new ChargeDefinitionPort() {
+
+            @Override
+            public boolean existsActiveCharge(final Long chargeId) {
+                return true;
+            }
+
+            @Override
+            public Optional<ChargeDefinitionData> findActiveCharge(final Long chargeId) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<ChargeDefinitionData> findCharge(final Long chargeId) {
+                return Optional.empty();
+            }
+
+            @Override
+            public ChargeDefinitionData getActiveCharge(final Long chargeId) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = wave2Bridge(charge, null);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(lookup, ChargeDefinitionPort.class,
+                new EmptyChargeDefinitionPort());
+
+        assertFalse(backed.existsActiveCharge(1L));
+        assertTrue(backed instanceof OsgiBackedPort);
+        lifecycle.start();
+        try {
+            assertTrue(backed.existsActiveCharge(1L));
+            final ServiceReference<ChargeDefinitionPort> selected = lifecycle.getBundleContext()
+                    .getServiceReference(ChargeDefinitionPort.class);
+            assertSame(charge, lifecycle.getBundleContext().getService(selected));
+            lifecycle.getBundleContext().ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(backed.existsActiveCharge(1L));
+    }
+
+    @Test
+    void bridgeDoesNotPublishOsgiBackedChargePort() {
+        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(new OsgiServiceLookup(() -> null), ChargeDefinitionPort.class,
+                new EmptyChargeDefinitionPort());
+        final SpringOsgiPortBridge bridge = new SpringOsgiPortBridge(
+                List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, backed)));
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            assertEquals(null, lifecycle.getBundleContext().getServiceReference(ChargeDefinitionPort.class));
+        } finally {
+            lifecycle.stop();
+        }
+    }
+
+    @Test
     void stagedCatalogStartsAndSpringChargePortStillWins() {
         final Path catalog = stagedCatalog();
         assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
