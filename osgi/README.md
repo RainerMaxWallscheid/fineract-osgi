@@ -775,6 +775,8 @@ python3 osgi/spring-bridge-smoke.py
 
 Starts the same catalog, then registers every composition-root hosted PILOT_PORT (in-memory, not JPA / Spring). Empty catalog activators stay lowest-ranked. Exit 0 means the selected services are the hosted ports. Empty stubs stay in the impl bundle class space; the system classpath does not treat those Classes as assignable. `ContentStreamPort` stays empty-catalog only (JDK pipe). `PaymentDetailWritePlatformService` stays empty-catalog only (leftover JPA `PaymentDetail`). Modules with no Equinox-safe port (bulkimport, instancemode, s3, openapi, interoperation, event) stay empty-activator or skipped.
 
+Optional Boot embed (`fineract.osgi.enabled=true`, default off): `ServerApplication` starts in-process Equinox and registers Wave-1 Spring beans (`ChargeDefinitionPort`, `FloatingRatePort`, `TaxCatalogPort`) via `org.apache.fineract.infrastructure.osgi.SpringOsgiPortBridge`. Spring is not staged. Catalog install from Boot is a later slice.
+
 ## Start
 
 ```bash

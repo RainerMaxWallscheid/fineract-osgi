@@ -320,6 +320,9 @@ dependencies {
     implementation 'io.github.classgraph:classgraph'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    implementation 'org.osgi:osgi.core:8.0.0'
+    implementation 'org.eclipse.platform:org.eclipse.osgi:3.20.0'
+
     // testCompile dependencies are ONLY used in src/test, not src/main.
     // Do NOT repeat dependencies which are ALREADY in implementation or runtimeOnly!
     // Provider tests are composition-root inventory only (ClassGraph ApiVerificationTest).
