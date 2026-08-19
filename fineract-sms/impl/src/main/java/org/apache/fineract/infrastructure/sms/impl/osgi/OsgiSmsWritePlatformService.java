@@ -24,8 +24,9 @@ import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 
 /**
  * Empty SMS write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/sms.xml} (ADR-022 B6).
  */
-final class OsgiSmsWritePlatformService implements SmsWritePlatformService {
+public final class OsgiSmsWritePlatformService implements SmsWritePlatformService {
 
     @Override
     public CommandProcessingResult create(final JsonCommand command) {

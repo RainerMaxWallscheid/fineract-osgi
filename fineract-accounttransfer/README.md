@@ -5,7 +5,7 @@ Core residual peel — account transfers and standing instructions (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-accounttransfer-api` | `api/` | `org.apache.fineract.accounttransfer.api` | Ports, enums, shared DTOs, exceptions, API constants |
-| `fineract-accounttransfer-impl` | `impl/` | `org.apache.fineract.accounttransfer.impl` | REST, handlers, validators, JDBC reads, SI job; Equinox `AccountTransferOsgiBundleActivator` |
+| `fineract-accounttransfer-impl` | `impl/` | `org.apache.fineract.accounttransfer.impl` | REST, handlers, validators, JDBC reads, SI job; Equinox DS `OSGI-INF/accounttransfer.xml` |
 | `fineract-accounttransfer-test` | `test/` | `org.apache.fineract.accounttransfer.test` | Fragment-Host → impl |
 
 ### Residual / composition-root

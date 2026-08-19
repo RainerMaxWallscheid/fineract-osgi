@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 
 /**
  * Empty payment-type catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/paymenttype.xml} (ADR-022 B6).
  */
-final class OsgiPaymentTypeReadService implements PaymentTypeReadService {
+public final class OsgiPaymentTypeReadService implements PaymentTypeReadService {
 
     @Override
     public List<PaymentTypeData> retrieveAllPaymentTypes() {

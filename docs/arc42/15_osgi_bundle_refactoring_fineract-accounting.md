@@ -45,7 +45,7 @@ fineract-accounting/
 ## 3. Steps
 
 ### Step 0–7, 9 ✅
-Mechanical split + registrar + Equinox `AccountingOsgiBundleActivator` (`GLClosureReadPlatformService`) + consumer Gradle.
+Mechanical split + registrar + Equinox DS `OSGI-INF/accounting.xml` (`GLClosureReadPlatformService`) + consumer Gradle.
 
 ### Step 8 residual ⚠️
 - [x] Pure ports / DTOs on api

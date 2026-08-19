@@ -30,8 +30,9 @@ import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 /**
  * Empty catalog for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no floating rates.
+ * Published by {@code OSGI-INF/rates.xml} (ADR-022 B6).
  */
-final class OsgiFloatingRatePort implements FloatingRatePort {
+public final class OsgiFloatingRatePort implements FloatingRatePort {
 
     @Override
     public Optional<FloatingRateDefinitionData> findFloatingRate(final Long floatingRateId) {

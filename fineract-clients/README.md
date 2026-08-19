@@ -5,7 +5,7 @@ Core residual peel — client pure REST/handlers/services (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-clients-api` | `api/` | `org.apache.fineract.clients.api` | Ports, pure DTOs/requests, search v2 API types |
-| `fineract-clients-impl` | `impl/` | `org.apache.fineract.clients.impl` | Family/identifiers/transactions REST, handlers, pure write/read impls, search; Equinox `ClientsOsgiBundleActivator` |
+| `fineract-clients-impl` | `impl/` | `org.apache.fineract.clients.impl` | Family/identifiers/transactions REST, handlers, pure write/read impls, search; Equinox DS `OSGI-INF/clients.xml` |
 | `fineract-clients-test` | `test/` | `org.apache.fineract.clients.test` | Fragment-Host → impl; `ClientDataValidatorTest` |
 
 ### Residual

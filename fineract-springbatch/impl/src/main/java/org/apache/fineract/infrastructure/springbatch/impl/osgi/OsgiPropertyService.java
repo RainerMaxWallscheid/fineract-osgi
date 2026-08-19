@@ -22,8 +22,9 @@ import org.apache.fineract.infrastructure.springbatch.PropertyService;
 
 /**
  * Empty partition-property port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/springbatch.xml} (ADR-022 B6).
  */
-final class OsgiPropertyService implements PropertyService {
+public final class OsgiPropertyService implements PropertyService {
 
     @Override
     public Integer getPartitionSize(final String jobName) {

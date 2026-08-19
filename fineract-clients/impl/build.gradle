@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Clients Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.clients.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.portfolio.client.impl.osgi.ClientsOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/clients.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.client.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'

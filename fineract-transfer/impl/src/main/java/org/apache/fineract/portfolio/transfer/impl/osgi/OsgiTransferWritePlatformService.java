@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformServi
 
 /**
  * Empty client-transfer write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/transfer.xml} (ADR-022 B6).
  */
-final class OsgiTransferWritePlatformService implements TransferWritePlatformService {
+public final class OsgiTransferWritePlatformService implements TransferWritePlatformService {
 
     @Override
     public CommandProcessingResult transferClientsBetweenGroups(final Long sourceGroupId, final JsonCommand jsonCommand) {

@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Spring Batch Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.springbatch.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.springbatch.impl.osgi.SpringBatchOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/springbatch.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.springbatch,'
                         + '*',

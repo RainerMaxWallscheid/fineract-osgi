@@ -5,7 +5,7 @@
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-organisation-api` | `api/` | `org.apache.fineract.organisation.api` | Read/write ports + pure DTOs / exceptions |
-| `fineract-organisation-impl` | `impl/` | `org.apache.fineract.organisation.impl` | REST, handlers, services, JPA wrappers; Equinox `OrganisationOsgiBundleActivator` |
+| `fineract-organisation-impl` | `impl/` | `org.apache.fineract.organisation.impl` | REST, handlers, services, JPA wrappers; Equinox DS `OSGI-INF/organisation.xml` |
 | `fineract-organisation-test` | `test/` | `org.apache.fineract.organisation.test` | Fragment-Host → impl |
 
 ### Residual in `fineract-core`

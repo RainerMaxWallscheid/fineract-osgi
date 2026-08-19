@@ -23,8 +23,9 @@ import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 /**
  * Empty investor attribute catalog for Equinox without Spring/JPA. Same
  * outcome as a product with no delayed-settlement attribute.
+ * Published by {@code OSGI-INF/investor.xml} (ADR-022 B6).
  */
-final class OsgiDelayedSettlementAttributeService implements DelayedSettlementAttributeService {
+public final class OsgiDelayedSettlementAttributeService implements DelayedSettlementAttributeService {
 
     @Override
     public boolean isEnabled(final Long loanProductId) {

@@ -28,8 +28,9 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 /**
  * Empty catalog for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no tax groups or components.
+ * Published by {@code OSGI-INF/tax.xml} (ADR-022 B6).
  */
-final class OsgiTaxCatalogPort implements TaxCatalogPort {
+public final class OsgiTaxCatalogPort implements TaxCatalogPort {
 
     @Override
     public Optional<TaxGroupDefinitionData> findTaxGroup(final Long taxGroupId) {

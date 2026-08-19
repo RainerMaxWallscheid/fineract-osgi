@@ -22,8 +22,9 @@ import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 
 /**
  * Empty product-commands port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/products.xml} (ADR-022 B6).
  */
-final class OsgiProductCommandsService implements ProductCommandsService {
+public final class OsgiProductCommandsService implements ProductCommandsService {
 
     @Override
     public Object handleCommand(final Long productId, final String command, final String jsonBody) {

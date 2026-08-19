@@ -57,7 +57,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.loanorigination.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Loan originator implementation (JPA, REST, handlers, Avro enrichers, Spring)',
-                'Bundle-Activator': 'org.apache.fineract.portfolio.loanorigination.impl.osgi.LoanOriginationOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/loan-origination.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.loanorigination.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanorigination.service,'

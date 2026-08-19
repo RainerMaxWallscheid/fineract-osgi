@@ -45,7 +45,7 @@ fineract-tax/
 | `…tax.domain` | **impl** |
 | `…tax.service` (impls, `TaxEntityUtils`, port adapter) | **impl** |
 | REST / handlers / mappers / serialization | **impl** |
-| `…tax.impl.osgi` | **impl** — `TaxOsgiServiceRegistrar` (Spring) + `TaxOsgiBundleActivator` (Equinox start; empty catalog, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge` |
+| `…tax.impl.osgi` | **impl** — `TaxOsgiServiceRegistrar` (Spring) + DS `OSGI-INF/tax.xml` (Equinox start; empty catalog, lowest ranking). Composition-root hosted port: `osgi/CompositionRootOsgiBridge` |
 | provider `TaxAssembler` / `*PlatformServiceImpl` / `TaxConfiguration` | **provider** |
 
 ---
@@ -53,7 +53,7 @@ fineract-tax/
 ## 3. Steps
 
 ### Step 0–7, 9 ✅
-Mechanical api/impl/test + `TaxCatalogPort` + OSGi registrar + Equinox `TaxOsgiBundleActivator` + consumer Gradle.
+Mechanical api/impl/test + `TaxCatalogPort` + OSGi registrar + Equinox DS `OSGI-INF/tax.xml` + consumer Gradle.
 
 ### Step 8 — Semantic retarget ✅
 - [x] Charge: `taxGroupId` column (no `@ManyToOne TaxGroup`); write validates via `TaxCatalogPort`

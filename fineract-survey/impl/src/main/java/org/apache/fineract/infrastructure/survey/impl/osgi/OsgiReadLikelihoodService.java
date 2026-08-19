@@ -24,8 +24,9 @@ import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
 
 /**
  * Empty PPI likelihood catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/survey.xml} (ADR-022 B6).
  */
-final class OsgiReadLikelihoodService implements ReadLikelihoodService {
+public final class OsgiReadLikelihoodService implements ReadLikelihoodService {
 
     @Override
     public List<LikelihoodData> retrieveAll(final String ppiName) {

@@ -25,8 +25,9 @@ import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 
 /**
  * Empty scorecard catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/spm.xml} (ADR-022 B6).
  */
-final class OsgiScorecardReadPlatformService implements ScorecardReadPlatformService {
+public final class OsgiScorecardReadPlatformService implements ScorecardReadPlatformService {
 
     @Override
     public Collection<ScorecardData> retrieveScorecardByClient(final Long clientId) {

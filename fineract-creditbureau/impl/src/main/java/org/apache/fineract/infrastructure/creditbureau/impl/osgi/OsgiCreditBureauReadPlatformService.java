@@ -25,8 +25,9 @@ import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadP
 
 /**
  * Empty credit-bureau catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/creditbureau.xml} (ADR-022 B6).
  */
-final class OsgiCreditBureauReadPlatformService implements CreditBureauReadPlatformService {
+public final class OsgiCreditBureauReadPlatformService implements CreditBureauReadPlatformService {
 
     @Override
     public Collection<CreditBureauData> retrieveCreditBureau() {

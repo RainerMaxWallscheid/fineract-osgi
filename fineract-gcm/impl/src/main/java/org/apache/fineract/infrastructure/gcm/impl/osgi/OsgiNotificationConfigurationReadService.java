@@ -23,8 +23,9 @@ import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationR
 
 /**
  * Empty FCM/GCM configuration catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/gcm.xml} (ADR-022 B6).
  */
-final class OsgiNotificationConfigurationReadService implements NotificationConfigurationReadService {
+public final class OsgiNotificationConfigurationReadService implements NotificationConfigurationReadService {
 
     @Override
     public NotificationConfigurationData getNotificationConfiguration() {

@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatf
 
 /**
  * Empty address field-configuration catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/address.xml} (ADR-022 B6).
  */
-final class OsgiFieldConfigurationReadPlatformService implements FieldConfigurationReadPlatformService {
+public final class OsgiFieldConfigurationReadPlatformService implements FieldConfigurationReadPlatformService {
 
     @Override
     public List<FieldConfigurationData> retrieveFieldConfiguration(final String entity) {

@@ -25,8 +25,9 @@ import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 
 /**
  * Empty code catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/codes.xml} (ADR-022 B6).
  */
-final class OsgiCodeReadPlatformService implements CodeReadPlatformService {
+public final class OsgiCodeReadPlatformService implements CodeReadPlatformService {
 
     @Override
     public Collection<CodeData> retrieveAllCodes() {

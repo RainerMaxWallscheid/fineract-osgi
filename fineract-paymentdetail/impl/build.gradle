@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Payment Detail Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.paymentdetail.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.portfolio.paymentdetail.impl.osgi.PaymentDetailOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/paymentdetail.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.paymentdetail.service,'
                         + 'org.apache.fineract.portfolio.paymentdetail.domain,'

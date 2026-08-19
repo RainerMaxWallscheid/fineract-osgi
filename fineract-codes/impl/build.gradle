@@ -56,7 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.codes.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Codes REST, handlers, read/write services',
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.codes.impl.osgi.CodesOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/codes.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.codes.service,'
                         + 'org.apache.fineract.infrastructure.codes.data,'

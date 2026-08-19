@@ -25,8 +25,9 @@ import org.apache.fineract.mix.service.MixTaxonomyReadService;
 /**
  * Empty MIX taxonomy for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no taxonomy rows ({@code retrieveOne} returns null).
+ * Published by {@code OSGI-INF/mix.xml} (ADR-022 B6).
  */
-final class OsgiMixTaxonomyReadService implements MixTaxonomyReadService {
+public final class OsgiMixTaxonomyReadService implements MixTaxonomyReadService {
 
     @Override
     public List<MixTaxonomyData> retrieveAll() {

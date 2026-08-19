@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Credit Bureau Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.creditbureau.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.creditbureau.impl.osgi.CreditBureauOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/creditbureau.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.creditbureau.service,'
                         + 'org.apache.fineract.infrastructure.creditbureau.data,'

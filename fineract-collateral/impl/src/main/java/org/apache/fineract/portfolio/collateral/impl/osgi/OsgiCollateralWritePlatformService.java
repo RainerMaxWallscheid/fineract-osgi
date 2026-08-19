@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformS
 
 /**
  * Empty collateral write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/collateral.xml} (ADR-022 B6).
  */
-final class OsgiCollateralWritePlatformService implements CollateralWritePlatformService {
+public final class OsgiCollateralWritePlatformService implements CollateralWritePlatformService {
 
     @Override
     public CommandProcessingResult addCollateral(final Long loanId, final JsonCommand command) {

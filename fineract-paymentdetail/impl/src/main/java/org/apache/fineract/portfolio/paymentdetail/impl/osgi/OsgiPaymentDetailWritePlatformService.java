@@ -25,8 +25,9 @@ import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePla
 
 /**
  * Empty payment-detail write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/paymentdetail.xml} (ADR-022 B6).
  */
-final class OsgiPaymentDetailWritePlatformService implements PaymentDetailWritePlatformService {
+public final class OsgiPaymentDetailWritePlatformService implements PaymentDetailWritePlatformService {
 
     @Override
     public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {

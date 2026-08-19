@@ -24,8 +24,9 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatfor
 
 /**
  * Empty report write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/dataqueries.xml} (ADR-022 B6).
  */
-final class OsgiReportWritePlatformService implements ReportWritePlatformService {
+public final class OsgiReportWritePlatformService implements ReportWritePlatformService {
 
     @Override
     public CommandProcessingResult createReport(final JsonCommand command) {

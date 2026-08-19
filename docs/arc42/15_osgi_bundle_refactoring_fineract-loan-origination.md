@@ -54,7 +54,7 @@ fineract-loan-origination/
 | `…loanorigination.exception` | **api** |
 | `…loanorigination.api` (constants) | **api** |
 | domain / service impls / handlers / REST / enrichers | **impl** |
-| `…loanorigination.impl.osgi` | **impl** — `LoanOriginationOsgiServiceRegistrar` (Spring) + `LoanOriginationOsgiBundleActivator` (Equinox start) |
+| `…loanorigination.impl.osgi` | **impl** — `LoanOriginationOsgiServiceRegistrar` (Spring) + DS `OSGI-INF/loan-origination.xml` (Equinox start) |
 
 ---
 
@@ -80,7 +80,7 @@ Enricher / helper tests + registrar smoke test.
 
 ### Step 6 — OSGi registrar ✅
 `LoanOriginationOsgiServiceRegistrar` (Spring path) → read + write + WC write.  
-`LoanOriginationOsgiBundleActivator` (Equinox start; empty originator catalog, lowest ranking) → `LoanOriginatorReadPlatformService`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
+DS `OSGI-INF/loan-origination.xml` (Equinox start; empty originator catalog, lowest ranking) → `LoanOriginatorReadPlatformService`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

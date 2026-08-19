@@ -25,8 +25,9 @@ import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailing
 
 /**
  * Empty report-mailing-job configuration catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/reportmailingjob.xml} (ADR-022 B6).
  */
-final class OsgiReportMailingJobConfigurationReadPlatformService implements ReportMailingJobConfigurationReadPlatformService {
+public final class OsgiReportMailingJobConfigurationReadPlatformService implements ReportMailingJobConfigurationReadPlatformService {
 
     @Override
     public Collection<ReportMailingJobConfigurationData> retrieveAllReportMailingJobConfigurations() {

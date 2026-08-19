@@ -23,8 +23,9 @@ import org.apache.fineract.infrastructure.configuration.service.ExternalServices
 
 /**
  * Empty external-services catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/configuration.xml} (ADR-022 B6).
  */
-final class OsgiExternalServicesReadPlatformService implements ExternalServicesReadPlatformService {
+public final class OsgiExternalServicesReadPlatformService implements ExternalServicesReadPlatformService {
 
     @Override
     public ExternalServicesData getExternalServiceDetailsByServiceName(final String serviceName) {

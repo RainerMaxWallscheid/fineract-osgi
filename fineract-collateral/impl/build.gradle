@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Collateral Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.collateral.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.portfolio.collateral.impl.osgi.CollateralOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/collateral.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.collateral.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'

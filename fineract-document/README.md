@@ -6,7 +6,7 @@ Document management + content store (filesystem / S3) — Wave 2 OSGi modulariza
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-document-api` | `api/` | `org.apache.fineract.document.api` | Contracts: `ContentStoreService`, document/image ports, DTOs, exceptions |
-| `fineract-document-impl` | `impl/` | `org.apache.fineract.document.impl` | FS/S3 adapters, policies, REST, handlers; Equinox `DocumentOsgiBundleActivator` (empty store, lowest ranking) |
+| `fineract-document-impl` | `impl/` | `org.apache.fineract.document.impl` | FS/S3 adapters, policies, REST, handlers; Equinox DS `OSGI-INF/document-store.xml, document-stream.xml` |
 | `fineract-document-test` | `test/` | `org.apache.fineract.document.test` | White-box tests; **Fragment-Host** → `document.impl` |
 
 No `:fineract-document` façade.

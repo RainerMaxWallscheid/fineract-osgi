@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.Repaym
 
 /**
  * Empty post-dated-check write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/postdatedchecks.xml} (ADR-022 B6).
  */
-final class OsgiRepaymentWithPostDatedChecksWritePlatformService implements RepaymentWithPostDatedChecksWritePlatformService {
+public final class OsgiRepaymentWithPostDatedChecksWritePlatformService implements RepaymentWithPostDatedChecksWritePlatformService {
 
     @Override
     public CommandProcessingResult deletePostDatedChecks(final JsonCommand command) {

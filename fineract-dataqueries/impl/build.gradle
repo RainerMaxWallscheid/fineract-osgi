@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Dataqueries Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.dataqueries.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.dataqueries.impl.osgi.DataqueriesOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/dataqueries.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.dataqueries.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'

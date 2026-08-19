@@ -24,8 +24,9 @@ import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformServic
 
 /**
  * Empty cache write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/cache.xml} (ADR-022 B6).
  */
-final class OsgiCacheWritePlatformService implements CacheWritePlatformService {
+public final class OsgiCacheWritePlatformService implements CacheWritePlatformService {
 
     @Override
     public Map<String, Object> switchToCache(final CacheType cacheType) {

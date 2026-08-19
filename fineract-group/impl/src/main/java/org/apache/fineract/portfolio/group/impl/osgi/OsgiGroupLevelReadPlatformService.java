@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService
 
 /**
  * Empty group-level catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/group.xml} (ADR-022 B6).
  */
-final class OsgiGroupLevelReadPlatformService implements GroupLevelReadPlatformService {
+public final class OsgiGroupLevelReadPlatformService implements GroupLevelReadPlatformService {
 
     @Override
     public List<GroupLevelData> retrieveAllLevels() {

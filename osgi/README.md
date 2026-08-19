@@ -126,7 +126,7 @@ Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bund
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-rates-api` | `org.apache.fineract.rates.api` | `FloatingRatePort`, DTOs, service interfaces |
-| `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` / `RatesOsgiBundleActivator` |
+| `fineract-rates-impl` | `org.apache.fineract.rates.impl` | JPA + REST + `RatesOsgiServiceRegistrar` / DS `OSGI-INF/rates.xml` |
 | `fineract-rates-test` | `org.apache.fineract.rates.test` | Fragment-Host → rates.impl |
 
 Loan uses **rates-api only** (`floatingRateId` + port).
@@ -136,7 +136,7 @@ Loan uses **rates-api only** (`floatingRateId` + port).
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-tax-api` | `org.apache.fineract.tax.api` | `TaxCatalogPort`, `ChargeTaxApplicationService`, exceptions |
-| `fineract-tax-impl` | `org.apache.fineract.tax.impl` | JPA + REST + `TaxOsgiServiceRegistrar` / `TaxOsgiBundleActivator` |
+| `fineract-tax-impl` | `org.apache.fineract.tax.impl` | JPA + REST + `TaxOsgiServiceRegistrar` / DS `OSGI-INF/tax.xml` |
 | `fineract-tax-test` | `org.apache.fineract.tax.test` | Fragment-Host → tax.impl |
 
 Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + ports). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-tax.md).
@@ -146,7 +146,7 @@ Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + port
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-document-api` | `org.apache.fineract.document.api` | `ContentStoreService`, `ContentStreamPort`, document/image ports |
-| `fineract-document-impl` | `org.apache.fineract.document.impl` | FS/S3 + REST + `DocumentOsgiServiceRegistrar` / `DocumentOsgiBundleActivator` |
+| `fineract-document-impl` | `org.apache.fineract.document.impl` | FS/S3 + REST + `DocumentOsgiServiceRegistrar` / DS `OSGI-INF/document-store.xml, document-stream.xml` |
 | `fineract-document-test` | `org.apache.fineract.document.test` | Fragment-Host → document.impl |
 
 Provider bulk-import uses **`ContentStreamPort`**; composition root still api+impl. Plan: [15_osgi_bundle_refactoring_fineract-document.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-document.md).
@@ -156,7 +156,7 @@ Provider bulk-import uses **`ContentStreamPort`**; composition root still api+im
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-branch-api` | `org.apache.fineract.branch.api` | Teller service interfaces, DTOs, exceptions, pure enums, `CashierTxnValidationPort` |
-| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + `BranchOsgiServiceRegistrar` / `BranchOsgiBundleActivator` |
+| `fineract-branch-impl` | `org.apache.fineract.branch.impl` | JPA + REST + `BranchOsgiServiceRegistrar` / DS `OSGI-INF/branch.xml` |
 | `fineract-branch-test` | `org.apache.fineract.branch.test` | Fragment-Host → branch.impl |
 
 Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_osgi_bundle_refactoring_fineract-branch.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-branch.md).
@@ -166,7 +166,7 @@ Loan cash path uses **`CashierTxnValidationPort`**; residual closed. Plan: [15_o
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-loan-origination-api` | `org.apache.fineract.loanorigination.api` | Originator service ports, DTOs (`LoanOriginatorData`), exceptions |
-| `fineract-loan-origination-impl` | `org.apache.fineract.loanorigination.impl` | JPA + REST + `LoanOriginationOsgiServiceRegistrar` / `LoanOriginationOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-loan-origination-impl` | `org.apache.fineract.loanorigination.impl` | JPA + REST + `LoanOriginationOsgiServiceRegistrar` / DS `OSGI-INF/loan-origination.xml` (empty catalog, lowest ranking) |
 | `fineract-loan-origination-test` | `org.apache.fineract.loanorigination.test` | Fragment-Host → loanorigination.impl |
 
 Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_bundle_refactoring_fineract-loan-origination.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan-origination.md).
@@ -176,7 +176,7 @@ Loan / WC use **api only**; provider composition root api+impl. Plan: [15_osgi_b
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-mix-api` | `org.apache.fineract.mix.api` | Taxonomy / mapping / XBRL service interfaces + DTOs |
-| `fineract-mix-impl` | `org.apache.fineract.mix.impl` | JPA + REST + `MixOsgiServiceRegistrar` / `MixOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-mix-impl` | `org.apache.fineract.mix.impl` | JPA + REST + `MixOsgiServiceRegistrar` / DS `OSGI-INF/mix.xml` (empty catalog, lowest ranking) |
 | `fineract-mix-test` | `org.apache.fineract.mix.test` | Fragment-Host → mix.impl |
 
 Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-mix.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-mix.md).
@@ -186,7 +186,7 @@ Provider/war composition root only. Plan: [15_osgi_bundle_refactoring_fineract-m
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-investor-api` | `org.apache.fineract.investor.api` | Pure ports, DTOs/status enums, exceptions |
-| `fineract-investor-impl` | `org.apache.fineract.investor.impl` | JPA + REST + `InvestorOsgiServiceRegistrar` / `InvestorOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-investor-impl` | `org.apache.fineract.investor.impl` | JPA + REST + `InvestorOsgiServiceRegistrar` / DS `OSGI-INF/investor.xml` (empty catalog, lowest ranking) |
 | `fineract-investor-test` | `org.apache.fineract.investor.test` | Fragment-Host → investor.impl |
 
 Provider journal residual uses entities/`AccountingService` from impl. Plan: [15_osgi_bundle_refactoring_fineract-investor.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-investor.md).
@@ -196,7 +196,7 @@ Provider journal residual uses entities/`AccountingService` from impl. Plan: [15
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-accounting-api` | `org.apache.fineract.accounting.api` | Ports, DTOs, exceptions, pure constants |
-| `fineract-accounting-impl` | `org.apache.fineract.accounting.impl` | JPA + REST + `AccountingOsgiServiceRegistrar` / `AccountingOsgiBundleActivator` |
+| `fineract-accounting-impl` | `org.apache.fineract.accounting.impl` | JPA + REST + `AccountingOsgiServiceRegistrar` / DS `OSGI-INF/accounting.xml` |
 | `fineract-accounting-test` | `org.apache.fineract.accounting.test` | Fragment-Host → accounting.impl |
 
 investor-api uses **api only**; loan/savings/provider use api+impl residual. Plan: [15_osgi_bundle_refactoring_fineract-accounting.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-accounting.md).
@@ -206,7 +206,7 @@ investor-api uses **api only**; loan/savings/provider use api+impl residual. Pla
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-savings-api` | `org.apache.fineract.savings.api` | Pure product/application ports, DTOs, exceptions |
-| `fineract-savings-impl` | `org.apache.fineract.savings.impl` | Domain + COB + `SavingsOsgiServiceRegistrar` / `SavingsOsgiBundleActivator` |
+| `fineract-savings-impl` | `org.apache.fineract.savings.impl` | Domain + COB + `SavingsOsgiServiceRegistrar` / DS `OSGI-INF/savings.xml` |
 | `fineract-savings-test` | `org.apache.fineract.savings.test` | Fragment-Host → savings.impl |
 
 Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_fineract-savings.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-savings.md).
@@ -258,7 +258,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-businessdate-api` | `org.apache.fineract.businessdate.api` | Ports, DTOs, exceptions |
-| `fineract-businessdate-impl` | `org.apache.fineract.businessdate.impl` | JPA/REST + `BusinessDateOsgiServiceRegistrar` / `BusinessDateOsgiBundleActivator` |
+| `fineract-businessdate-impl` | `org.apache.fineract.businessdate.impl` | JPA/REST + `BusinessDateOsgiServiceRegistrar` / DS `OSGI-INF/businessdate.xml` |
 | `fineract-businessdate-test` | `org.apache.fineract.businessdate.test` | Fragment-Host → businessdate.impl |
 
 Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
@@ -268,7 +268,7 @@ Kernel enum `BusinessDateType` remains in **fineract-core**. Plan: [15_osgi_bund
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-codes-api` | `org.apache.fineract.codes.api` | Pure DTOs + read ports + swagger models |
-| `fineract-codes-impl` | `org.apache.fineract.codes.impl` | REST/handlers + `CodesOsgiServiceRegistrar` / `CodesOsgiBundleActivator` |
+| `fineract-codes-impl` | `org.apache.fineract.codes.impl` | REST/handlers + `CodesOsgiServiceRegistrar` / DS `OSGI-INF/codes.xml` |
 | `fineract-codes-test` | `org.apache.fineract.codes.test` | Fragment-Host → codes.impl |
 
 Entities/exceptions residual in **fineract-core**.
@@ -278,7 +278,7 @@ Entities/exceptions residual in **fineract-core**.
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-organisation-api` | `org.apache.fineract.organisation.api` | Office / staff / holiday / working-days / provisioning ports |
-| `fineract-organisation-impl` | `org.apache.fineract.organisation.impl` | REST/handlers + `OrganisationOsgiServiceRegistrar` / `OrganisationOsgiBundleActivator` |
+| `fineract-organisation-impl` | `org.apache.fineract.organisation.impl` | REST/handlers + `OrganisationOsgiServiceRegistrar` / DS `OSGI-INF/organisation.xml` |
 | `fineract-organisation-test` | `org.apache.fineract.organisation.test` | Fragment-Host → organisation.impl |
 
 Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. Plan: [core slices](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).
@@ -288,7 +288,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-monetary-api` | `org.apache.fineract.monetary.api` | Currency read/write ports, admin DTOs |
-| `fineract-monetary-impl` | `org.apache.fineract.monetary.impl` | REST/handlers + `MonetaryOsgiServiceRegistrar` / `MonetaryOsgiBundleActivator` |
+| `fineract-monetary-impl` | `org.apache.fineract.monetary.impl` | REST/handlers + `MonetaryOsgiServiceRegistrar` / DS `OSGI-INF/monetary.xml` |
 | `fineract-monetary-test` | `org.apache.fineract.monetary.test` | Fragment-Host → monetary.impl |
 
 `Money` / `CurrencyData` residual in **fineract-core**.
@@ -298,7 +298,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-useradministration-api` | `org.apache.fineract.useradministration.api` | Read/write ports + password policy DTO |
-| `fineract-useradministration-impl` | `org.apache.fineract.useradministration.impl` | REST/handlers + `UserAdministrationOsgiServiceRegistrar` / `UserAdministrationOsgiBundleActivator` |
+| `fineract-useradministration-impl` | `org.apache.fineract.useradministration.impl` | REST/handlers + `UserAdministrationOsgiServiceRegistrar` / DS `OSGI-INF/useradministration.xml` |
 | `fineract-useradministration-test` | `org.apache.fineract.useradministration.test` | Fragment-Host → useradministration.impl |
 
 `AppUser` / `Role` / `Permission` and shared DTOs residual in **fineract-core**.
@@ -308,7 +308,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-adhocquery-api` | `org.apache.fineract.adhocquery.api` | Ports, DTOs, `ReportRunFrequency`, exceptions |
-| `fineract-adhocquery-impl` | `org.apache.fineract.adhocquery.impl` | REST/entity/handlers + `AdhocQueryOsgiServiceRegistrar` / `AdhocQueryOsgiBundleActivator` |
+| `fineract-adhocquery-impl` | `org.apache.fineract.adhocquery.impl` | REST/entity/handlers + `AdhocQueryOsgiServiceRegistrar` / DS `OSGI-INF/adhocquery.xml` |
 | `fineract-adhocquery-test` | `org.apache.fineract.adhocquery.test` | Fragment-Host → adhocquery.impl |
 
 ### Provider peel: fineract-template (complete)
@@ -316,7 +316,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-template-api` | `org.apache.fineract.template.api` | Ports, DTOs, enums, commands, exceptions |
-| `fineract-template-impl` | `org.apache.fineract.template.impl` | REST/entity/merge + `TemplateOsgiServiceRegistrar` / `TemplateOsgiBundleActivator` |
+| `fineract-template-impl` | `org.apache.fineract.template.impl` | REST/entity/merge + `TemplateOsgiServiceRegistrar` / DS `OSGI-INF/template.xml` |
 | `fineract-template-test` | `org.apache.fineract.template.test` | Fragment-Host → template.impl |
 
 ### Provider peel: fineract-notification (complete)
@@ -324,7 +324,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-notification-api` | `org.apache.fineract.notification.api` | Read/write ports, event publisher port, DTOs |
-| `fineract-notification-impl` | `org.apache.fineract.notification.impl` | REST/JPA/JMS + `NotificationOsgiServiceRegistrar` / `NotificationOsgiBundleActivator` |
+| `fineract-notification-impl` | `org.apache.fineract.notification.impl` | REST/JPA/JMS + `NotificationOsgiServiceRegistrar` / DS `OSGI-INF/notification.xml` |
 | `fineract-notification-test` | `org.apache.fineract.notification.test` | Fragment-Host → notification.impl |
 
 ### Provider peel: fineract-spm (complete)
@@ -332,7 +332,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-spm-api` | `org.apache.fineract.spm.api` | DTOs, exceptions, `ScorecardReadPlatformService`, constants |
-| `fineract-spm-impl` | `org.apache.fineract.spm.impl` | REST/JPA + `SpmOsgiServiceRegistrar` / `SpmOsgiBundleActivator` |
+| `fineract-spm-impl` | `org.apache.fineract.spm.impl` | REST/JPA + `SpmOsgiServiceRegistrar` / DS `OSGI-INF/spm.xml` |
 | `fineract-spm-test` | `org.apache.fineract.spm.test` | Fragment-Host → spm.impl |
 
 ### Provider peel: fineract-fund (complete)
@@ -340,7 +340,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-fund-api` | `org.apache.fineract.fund.api` | `FundData`/`FundRequest`, read/write ports |
-| `fineract-fund-impl` | `org.apache.fineract.fund.impl` | REST/handlers + `FundOsgiServiceRegistrar` / `FundOsgiBundleActivator` |
+| `fineract-fund-impl` | `org.apache.fineract.fund.impl` | REST/handlers + `FundOsgiServiceRegistrar` / DS `OSGI-INF/fund.xml` |
 | `fineract-fund-test` | `org.apache.fineract.fund.test` | Fragment-Host → fund.impl |
 
 `Fund` entity residual in **fineract-core**.
@@ -350,7 +350,7 @@ Office / Staff / Holiday / WorkingDays entities residual in **fineract-core**. P
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-accountnumberformat-api` | `org.apache.fineract.accountnumberformat.api` | `AccountNumberFormatData`, read/write ports |
-| `fineract-accountnumberformat-impl` | `org.apache.fineract.accountnumberformat.impl` | REST/handlers + `AccountNumberFormatOsgiServiceRegistrar` / `AccountNumberFormatOsgiBundleActivator` |
+| `fineract-accountnumberformat-impl` | `org.apache.fineract.accountnumberformat.impl` | REST/handlers + `AccountNumberFormatOsgiServiceRegistrar` / DS `OSGI-INF/accountnumberformat.xml` |
 | `fineract-accountnumberformat-test` | `org.apache.fineract.accountnumberformat.test` | Fragment-Host → accountnumberformat.impl |
 
 Entity / generator residual in **fineract-core**.
@@ -360,7 +360,7 @@ Entity / generator residual in **fineract-core**.
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-survey-api` | `org.apache.fineract.survey.api` | PPI/likelihood/poverty-line DTOs and ports |
-| `fineract-survey-impl` | `org.apache.fineract.survey.impl` | REST/JPA + `SurveyOsgiServiceRegistrar` / `SurveyOsgiBundleActivator` |
+| `fineract-survey-impl` | `org.apache.fineract.survey.impl` | REST/JPA + `SurveyOsgiServiceRegistrar` / DS `OSGI-INF/survey.xml` |
 | `fineract-survey-test` | `org.apache.fineract.survey.test` | Fragment-Host → survey.impl |
 
 Datatable ports come from **fineract-core**. Equinox registers `ReadLikelihoodService` only (`retrieveAll` → empty, `retrieve` → null). Did not register `ReadSurveyService` (one thin port; `GenericResultsetData` is already imported from dataqueries-api).
@@ -370,7 +370,7 @@ Datatable ports come from **fineract-core**. Equinox registers `ReadLikelihoodSe
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-transfer-api` | `org.apache.fineract.transfer.api` | Write port, event type, constants, exceptions |
-| `fineract-transfer-impl` | `org.apache.fineract.transfer.impl` | Handlers/validator + `TransferOsgiServiceRegistrar` / `TransferOsgiBundleActivator` |
+| `fineract-transfer-impl` | `org.apache.fineract.transfer.impl` | Handlers/validator + `TransferOsgiServiceRegistrar` / DS `OSGI-INF/transfer.xml` |
 | `fineract-transfer-test` | `org.apache.fineract.transfer.test` | Fragment-Host → transfer.impl |
 
 Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `TransferWritePlatformService` only (`CommandProcessingResult.empty()`).
@@ -380,7 +380,7 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-paymenttype-api` | `org.apache.fineract.paymenttype.api` | `PaymentTypeData` + request/response DTOs, read/write ports |
-| `fineract-paymenttype-impl` | `org.apache.fineract.paymenttype.impl` | REST/handlers + `PaymentTypeOsgiServiceRegistrar` / `PaymentTypeOsgiBundleActivator` |
+| `fineract-paymenttype-impl` | `org.apache.fineract.paymenttype.impl` | REST/handlers + `PaymentTypeOsgiServiceRegistrar` / DS `OSGI-INF/paymenttype.xml` |
 | `fineract-paymenttype-test` | `org.apache.fineract.paymenttype.test` | Fragment-Host → paymenttype.impl |
 
 `PaymentType` entity residual in **fineract-core**. Equinox registers `PaymentTypeReadService` only (`retrieveAll*` → empty, `retrieveOne` → null). Did not register `PaymentTypeWriteService` (one thin port).
@@ -390,7 +390,7 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-search-api` | `org.apache.fineract.search.api` | `SearchReadService`, `SearchData`/`SearchConditions`, ad-hoc DTOs |
-| `fineract-search-impl` | `org.apache.fineract.search.impl` | REST + `SearchOsgiServiceRegistrar` / `SearchOsgiBundleActivator` |
+| `fineract-search-impl` | `org.apache.fineract.search.impl` | REST + `SearchOsgiServiceRegistrar` / DS `OSGI-INF/search.xml` |
 | `fineract-search-test` | `org.apache.fineract.search.test` | Fragment-Host → search.impl |
 
 `SearchUtil` / advanced-query DTOs residual in **fineract-core**. Equinox registers `SearchReadService` (`retriveMatchingData` / ad-hoc match → empty, template → null).
@@ -400,7 +400,7 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Tr
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-collectionsheet-api` | `org.apache.fineract.collectionsheet.api` | Ports, constants, commands, pure DTOs |
-| `fineract-collectionsheet-impl` | `org.apache.fineract.collectionsheet.impl` | REST/handlers + `CollectionSheetOsgiServiceRegistrar` / `CollectionSheetOsgiBundleActivator` |
+| `fineract-collectionsheet-impl` | `org.apache.fineract.collectionsheet.impl` | REST/handlers + `CollectionSheetOsgiServiceRegistrar` / DS `OSGI-INF/collectionsheet.xml` |
 | `fineract-collectionsheet-test` | `org.apache.fineract.collectionsheet.test` | Fragment-Host → collectionsheet.impl |
 
 Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `CollectionSheetWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `CollectionSheetReadPlatformService` (leftover core `SavingsProductData` in split package `…savings.data`).
@@ -410,7 +410,7 @@ Write impl residual in **fineract-progressive-loan-impl**. Equinox registers `Co
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-accounttransfer-api` | `org.apache.fineract.accounttransfer.api` | Ports, enums, shared DTOs, exceptions, API constants |
-| `fineract-accounttransfer-impl` | `org.apache.fineract.accounttransfer.impl` | REST/handlers + `AccountTransferOsgiServiceRegistrar` / `AccountTransferOsgiBundleActivator` |
+| `fineract-accounttransfer-impl` | `org.apache.fineract.accounttransfer.impl` | REST/handlers + `AccountTransferOsgiServiceRegistrar` / DS `OSGI-INF/accounttransfer.xml` |
 | `fineract-accounttransfer-test` | `org.apache.fineract.accounttransfer.test` | Fragment-Host → accounttransfer.impl |
 
 Write impl residual in **fineract-progressive-loan-impl**. Kernel residual `PortfolioAccountType` / `PortfolioAccountData` / `AccountTransferData` / `AccountTransfersReadPlatformService`. Equinox registers `StandingInstructionWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `AccountTransfersReadPlatformService` (kernel leftover), `AccountTransfersCommandWritePort` (leftover `PortfolioAccountType` in split package `…portfolio.account`), or SI read (`Page`).
@@ -420,7 +420,7 @@ Write impl residual in **fineract-progressive-loan-impl**. Kernel residual `Port
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-shares-api` | `org.apache.fineract.shares.api` | Ports, pure DTOs, constants, exceptions |
-| `fineract-shares-impl` | `org.apache.fineract.shares.impl` | REST/handlers + `SharesOsgiServiceRegistrar` / `SharesOsgiBundleActivator` |
+| `fineract-shares-impl` | `org.apache.fineract.shares.impl` | REST/handlers + `SharesOsgiServiceRegistrar` / DS `OSGI-INF/shares.xml` |
 | `fineract-shares-test` | `org.apache.fineract.shares.test` | Fragment-Host → shares.impl |
 
 Product JPA residual in **fineract-core**. Equinox registers `ShareProductDropdownReadPlatformService` only (`retrieve*` → empty). Did not register account/product reads (Spring Data `Page`; leftover `ShareProduct*` / `ShareAccount*` types) or dividend reads (`Page`).
@@ -430,7 +430,7 @@ Product JPA residual in **fineract-core**. Equinox registers `ShareProductDropdo
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-group-api` | `org.apache.fineract.group.api` | Read/write ports, enumerations helper |
-| `fineract-group-impl` | `org.apache.fineract.group.impl` | REST/handlers + `GroupOsgiServiceRegistrar` / `GroupOsgiBundleActivator` |
+| `fineract-group-impl` | `org.apache.fineract.group.impl` | REST/handlers + `GroupOsgiServiceRegistrar` / DS `OSGI-INF/group.xml` |
 | `fineract-group-test` | `org.apache.fineract.group.test` | Fragment-Host → group.impl |
 
 Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatformService` only (`retrieveAllLevels` → empty). Did not register `GroupReadPlatformService` / `CenterReadPlatformService` (leftover `GroupGeneralData` / `CenterData`; `Page`).
@@ -440,7 +440,7 @@ Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatf
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-clients-api` | `org.apache.fineract.clients.api` | Ports, pure DTOs/requests, search v2 API types |
-| `fineract-clients-impl` | `org.apache.fineract.clients.impl` | REST/handlers + `ClientsOsgiServiceRegistrar` / `ClientsOsgiBundleActivator` |
+| `fineract-clients-impl` | `org.apache.fineract.clients.impl` | REST/handlers + `ClientsOsgiServiceRegistrar` / DS `OSGI-INF/clients.xml` |
 | `fineract-clients-test` | `org.apache.fineract.clients.test` | Fragment-Host → clients.impl |
 
 `Client` / `ClientData` residual in **fineract-core**. Equinox registers `ClientIdentifierWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `ClientReadPlatformService` / `ClientWritePlatformService` / `ClientTemplateReadPlatformService` (leftover `Client` / `ClientData`) or search (`Page`).
@@ -450,7 +450,7 @@ Entity/DTO residual in **fineract-core**. Equinox registers `GroupLevelReadPlatf
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-postdatedchecks-api` | `org.apache.fineract.postdatedchecks.api` | Ports, DTOs, status, exceptions |
-| `fineract-postdatedchecks-impl` | `org.apache.fineract.postdatedchecks.impl` | REST/handlers + `PostDatedChecksOsgiServiceRegistrar` / `PostDatedChecksOsgiBundleActivator` |
+| `fineract-postdatedchecks-impl` | `org.apache.fineract.postdatedchecks.impl` | REST/handlers + `PostDatedChecksOsgiServiceRegistrar` / DS `OSGI-INF/postdatedchecks.xml` |
 | `fineract-postdatedchecks-test` | `org.apache.fineract.postdatedchecks.test` | Fragment-Host → postdatedchecks.impl |
 
 Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostDatedChecksWritePlatformService` only (`CommandProcessingResult.empty()`). Did not register `RepaymentWithPostDatedChecksReadPlatformService` (one thin port).
@@ -460,7 +460,7 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-products-api` | `org.apache.fineract.products.api` | `ShareProductReadPlatformService`, `ProductCommandsService`, `ProductData` |
-| `fineract-products-impl` | `org.apache.fineract.products.impl` | REST + `ProductsOsgiServiceRegistrar` / `ProductsOsgiBundleActivator` |
+| `fineract-products-impl` | `org.apache.fineract.products.impl` | REST + `ProductsOsgiServiceRegistrar` / DS `OSGI-INF/products.xml` |
 | `fineract-products-test` | `org.apache.fineract.products.test` | Fragment-Host → products.impl |
 
 `ProductNotFoundException` residual in **fineract-core**. Equinox registers `ProductCommandsService` only (`handleCommand` → null). Did not register `ShareProductReadPlatformService` (`Page`).
@@ -470,7 +470,7 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-paymentdetail-api` | `org.apache.fineract.paymentdetail.api` | Write port, constants |
-| `fineract-paymentdetail-impl` | `org.apache.fineract.paymentdetail.impl` | Write impl + `PaymentDetailOsgiServiceRegistrar` / `PaymentDetailOsgiBundleActivator` |
+| `fineract-paymentdetail-impl` | `org.apache.fineract.paymentdetail.impl` | Write impl + `PaymentDetailOsgiServiceRegistrar` / DS `OSGI-INF/paymentdetail.xml` |
 | `fineract-paymentdetail-test` | `org.apache.fineract.paymentdetail.test` | Fragment-Host → paymentdetail.impl |
 
 `PaymentDetail` entity / `PaymentDetailData` residual in **fineract-core**. Equinox registers `PaymentDetailWritePlatformService` only (`create*` / `persist*` → null).
@@ -480,7 +480,7 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-cache-api` | `org.apache.fineract.cache.api` | Write port, switch request/response DTOs |
-| `fineract-cache-impl` | `org.apache.fineract.cache.impl` | REST/handler + `CacheOsgiServiceRegistrar` / `CacheOsgiBundleActivator` |
+| `fineract-cache-impl` | `org.apache.fineract.cache.impl` | REST/handler + `CacheOsgiServiceRegistrar` / DS `OSGI-INF/cache.xml` |
 | `fineract-cache-test` | `org.apache.fineract.cache.test` | Fragment-Host → cache.impl |
 
 `CacheType` / `PlatformCache` residual in **fineract-core**. Equinox registers `CacheWritePlatformService` only (`switchToCache` → empty).
@@ -490,7 +490,7 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-entityaccess-api` | `org.apache.fineract.entityaccess.api` | Ports, DTOs, access types, exceptions |
-| `fineract-entityaccess-impl` | `org.apache.fineract.entityaccess.impl` | REST/JPA + `EntityAccessOsgiServiceRegistrar` / `EntityAccessOsgiBundleActivator` |
+| `fineract-entityaccess-impl` | `org.apache.fineract.entityaccess.impl` | REST/JPA + `EntityAccessOsgiServiceRegistrar` / DS `OSGI-INF/entityaccess.xml` |
 | `fineract-entityaccess-test` | `org.apache.fineract.entityaccess.test` | Fragment-Host → entityaccess.impl |
 
 Equinox registers `FineractEntityAccessReadService` only (`retrieve*` → empty, SQL clauses → `""`). Did not register `FineractEntityAccessWriteService` (leftover `CodeValue` in `…codes.domain`).
@@ -510,7 +510,7 @@ Entity / `CalendarData` residual in **fineract-core**. Equinox registers `Calend
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-meeting-api` | `org.apache.fineract.meeting.api` | DTOs, commands, ports, exceptions |
-| `fineract-meeting-impl` | `org.apache.fineract.meeting.impl` | REST/JPA + `MeetingOsgiServiceRegistrar` / `MeetingOsgiBundleActivator` |
+| `fineract-meeting-impl` | `org.apache.fineract.meeting.impl` | REST/JPA + `MeetingOsgiServiceRegistrar` / DS `OSGI-INF/meeting.xml` |
 | `fineract-meeting-test` | `org.apache.fineract.meeting.test` | Fragment-Host → meeting.impl |
 
 Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendanceTypeOptions` → empty). Did not register `MeetingReadService` (leftover `MeetingData` coupling).
@@ -520,7 +520,7 @@ Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendan
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-address-api` | `org.apache.fineract.address.api` | Ports, DTOs, filter, exception |
-| `fineract-address-impl` | `org.apache.fineract.address.impl` | REST/JPA + `AddressOsgiServiceRegistrar` / `AddressOsgiBundleActivator` |
+| `fineract-address-impl` | `org.apache.fineract.address.impl` | REST/JPA + `AddressOsgiServiceRegistrar` / DS `OSGI-INF/address.xml` |
 | `fineract-address-test` | `org.apache.fineract.address.test` | Fragment-Host → address.impl |
 
 `AddressData` residual in **fineract-core**. Equinox registers `FieldConfigurationReadPlatformService` only (`retrieve*` → empty). Did not register `AddressReadPlatformService` (leftover `AddressData`) or `AddressWritePlatformService` (leftover `Client`).
@@ -530,7 +530,7 @@ Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendan
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-creditbureau-api` | `org.apache.fineract.creditbureau.api` | DTOs, ports, exception |
-| `fineract-creditbureau-impl` | `org.apache.fineract.creditbureau.impl` | REST/JPA + `CreditBureauOsgiServiceRegistrar` / `CreditBureauOsgiBundleActivator` |
+| `fineract-creditbureau-impl` | `org.apache.fineract.creditbureau.impl` | REST/JPA + `CreditBureauOsgiServiceRegistrar` / DS `OSGI-INF/creditbureau.xml` |
 | `fineract-creditbureau-test` | `org.apache.fineract.creditbureau.test` | Fragment-Host → creditbureau.impl |
 
 Equinox registers `CreditBureauReadPlatformService` only (`retrieveCreditBureau` → empty). Did not register loan-product mapping reads (loan-impl coupling).
@@ -540,7 +540,7 @@ Equinox registers `CreditBureauReadPlatformService` only (`retrieveCreditBureau`
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-collateral-api` | `org.apache.fineract.collateral.api` | Ports, DTOs, exceptions |
-| `fineract-collateral-impl` | `org.apache.fineract.collateral.impl` | REST/JPA + `CollateralOsgiServiceRegistrar` / `CollateralOsgiBundleActivator` |
+| `fineract-collateral-impl` | `org.apache.fineract.collateral.impl` | REST/JPA + `CollateralOsgiServiceRegistrar` / DS `OSGI-INF/collateral.xml` |
 | `fineract-collateral-test` | `org.apache.fineract.collateral.test` | Fragment-Host → collateral.impl |
 
 Equinox registers `CollateralWritePlatformService` only (`add*`/`update*`/`delete*` → empty). Did not register `CollateralReadPlatformService` (leftover `CurrencyData` in `organisation.monetary.data`, which monetary-api also exports).
@@ -550,7 +550,7 @@ Equinox registers `CollateralWritePlatformService` only (`add*`/`update*`/`delet
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-collateralmanagement-api` | `org.apache.fineract.collateralmanagement.api` | Ports, DTOs, exceptions |
-| `fineract-collateralmanagement-impl` | `org.apache.fineract.collateralmanagement.impl` | REST/JPA + `CollateralManagementOsgiServiceRegistrar` / `CollateralManagementOsgiBundleActivator` |
+| `fineract-collateralmanagement-impl` | `org.apache.fineract.collateralmanagement.impl` | REST/JPA + `CollateralManagementOsgiServiceRegistrar` / DS `OSGI-INF/collateralmanagement.xml` |
 | `fineract-collateralmanagement-test` | `org.apache.fineract.collateralmanagement.test` | Fragment-Host → collateralmanagement.impl |
 
 Equinox registers `CollateralManagementReadService` only (`getCollateralProduct` → null, `getAllCollateralProducts` → empty). Did not register client/loan reads (leftover `ClientCollateralManagementData`; `LoanCollateralResponseData` loads `loanaccount.data.LoanCollateralManagementData`) or writes (request DTOs pull swagger / jakarta.validation).
@@ -560,7 +560,7 @@ Equinox registers `CollateralManagementReadService` only (`getCollateralProduct`
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-note-api` | `org.apache.fineract.note.api` | Ports, DTOs, NoteType, exceptions |
-| `fineract-note-impl` | `org.apache.fineract.note.impl` | REST/JPA + `NoteOsgiServiceRegistrar` / `NoteOsgiBundleActivator` |
+| `fineract-note-impl` | `org.apache.fineract.note.impl` | REST/JPA + `NoteOsgiServiceRegistrar` / DS `OSGI-INF/note.xml` |
 | `fineract-note-test` | `org.apache.fineract.note.test` | Fragment-Host → note.impl |
 
 Equinox registers `NoteReadPlatformService` only (`retrieveNote` → null, `retrieveNotesByResource` → empty). Did not register `NoteWritePlatformService` (request DTOs pull swagger / jakarta.validation) or `ShareAccountNoteSupport` (share residual on provider).
@@ -570,7 +570,7 @@ Equinox registers `NoteReadPlatformService` only (`retrieveNote` → null, `retr
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-hooks-api` | `org.apache.fineract.hooks.api` | Ports, DTOs, exceptions, constants |
-| `fineract-hooks-impl` | `org.apache.fineract.hooks.impl` | REST/JPA + `HooksOsgiServiceRegistrar` / `HooksOsgiBundleActivator` |
+| `fineract-hooks-impl` | `org.apache.fineract.hooks.impl` | REST/JPA + `HooksOsgiServiceRegistrar` / DS `OSGI-INF/hooks.xml` |
 | `fineract-hooks-test` | `org.apache.fineract.hooks.test` | Fragment-Host → hooks.impl |
 
 Equinox registers `HookReadPlatformService` only (`retrieveAllHooks` → empty, `retrieveHook` / `retrieveNewHookDetails` → null). Did not register `HookWritePlatformService` (request DTOs pull jakarta.validation).
@@ -580,7 +580,7 @@ Equinox registers `HookReadPlatformService` only (`retrieveAllHooks` → empty, 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-sms-api` | `org.apache.fineract.sms.api` | Ports, DTOs, exceptions, constants |
-| `fineract-sms-impl` | `org.apache.fineract.sms.impl` | REST/JPA + `SmsOsgiServiceRegistrar` / `SmsOsgiBundleActivator` |
+| `fineract-sms-impl` | `org.apache.fineract.sms.impl` | REST/JPA + `SmsOsgiServiceRegistrar` / DS `OSGI-INF/sms.xml` |
 | `fineract-sms-test` | `org.apache.fineract.sms.test` | Fragment-Host → sms.impl |
 
 Equinox registers `SmsWritePlatformService` only (`create`/`update`/`delete` → empty). Did not register `SmsReadPlatformService` (`Page` / `SearchParameters`).
@@ -590,7 +590,7 @@ Equinox registers `SmsWritePlatformService` only (`create`/`update`/`delete` →
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-reportmailingjob-api` | `org.apache.fineract.reportmailingjob.api` | Ports, DTOs, exceptions, constants |
-| `fineract-reportmailingjob-impl` | `org.apache.fineract.reportmailingjob.impl` | REST/JPA + `ReportMailingJobOsgiServiceRegistrar` / `ReportMailingJobOsgiBundleActivator` |
+| `fineract-reportmailingjob-impl` | `org.apache.fineract.reportmailingjob.impl` | REST/JPA + `ReportMailingJobOsgiServiceRegistrar` / DS `OSGI-INF/reportmailingjob.xml` |
 | `fineract-reportmailingjob-test` | `org.apache.fineract.reportmailingjob.test` | Fragment-Host → reportmailingjob.impl |
 
 Equinox registers `ReportMailingJobConfigurationReadPlatformService` only (`retrieveAll*` → empty, `retrieveReportMailingJobConfiguration` → null). Did not register job/run-history reads (`Page` / leftover `ReportData`) or write/email ports.
@@ -600,7 +600,7 @@ Equinox registers `ReportMailingJobConfigurationReadPlatformService` only (`retr
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-campaigns-api` | `org.apache.fineract.campaigns.api` | Ports, DTOs, exceptions, constants |
-| `fineract-campaigns-impl` | `org.apache.fineract.campaigns.impl` | REST/JPA + `CampaignsOsgiServiceRegistrar` / `CampaignsOsgiBundleActivator` |
+| `fineract-campaigns-impl` | `org.apache.fineract.campaigns.impl` | REST/JPA + `CampaignsOsgiServiceRegistrar` / DS `OSGI-INF/campaigns.xml` |
 | `fineract-campaigns-test` | `org.apache.fineract.campaigns.test` | Fragment-Host → campaigns.impl |
 
 Equinox registers `SmsCampaignDropdownReadPlatformService` only (`retrieve*` → empty). Did not register SMS/email campaign or email reads (`Page` / leftover `ReportData`), `TwoFactorSmsDeliveryPort` (leftover `Staff`), or write/email-job ports.
@@ -610,7 +610,7 @@ Equinox registers `SmsCampaignDropdownReadPlatformService` only (`retrieve*` →
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-gcm-api` | `org.apache.fineract.gcm.api` | Config DTO + `NotificationConfigurationReadService` |
-| `fineract-gcm-impl` | `org.apache.fineract.gcm.impl` | Sender + `GcmOsgiServiceRegistrar` / `GcmOsgiBundleActivator` |
+| `fineract-gcm-impl` | `org.apache.fineract.gcm.impl` | Sender + `GcmOsgiServiceRegistrar` / DS `OSGI-INF/gcm.xml` |
 | `fineract-gcm-test` | `org.apache.fineract.gcm.test` | Fragment-Host → gcm.impl |
 
 Equinox registers `NotificationConfigurationReadService` only (`getNotificationConfiguration` → null). Did not register `NotificationSenderService` (impl-only; SMS/JPA coupling).
@@ -620,7 +620,7 @@ Equinox registers `NotificationConfigurationReadService` only (`getNotificationC
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-dataqueries-api` | `org.apache.fineract.dataqueries.api` | Ports, extra DTOs, exceptions |
-| `fineract-dataqueries-impl` | `org.apache.fineract.dataqueries.impl` | REST/JPA + `DataqueriesOsgiServiceRegistrar` / `DataqueriesOsgiBundleActivator` |
+| `fineract-dataqueries-impl` | `org.apache.fineract.dataqueries.impl` | REST/JPA + `DataqueriesOsgiServiceRegistrar` / DS `OSGI-INF/dataqueries.xml` |
 | `fineract-dataqueries-test` | `org.apache.fineract.dataqueries.test` | Fragment-Host → dataqueries.impl |
 
 Equinox registers `ReportWritePlatformService` only (`create*`/`update*`/`delete*` → empty). Did not register `ReadReportingService` / template reads (leftover unpublished `ReportData` / `DatatableData`), leftover `DatatableReadService` / `GenericDataService`, or export/check ports (jakarta.ws.rs / Gson).
@@ -630,7 +630,7 @@ Equinox registers `ReportWritePlatformService` only (`create*`/`update*`/`delete
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-configuration-api` | `org.apache.fineract.configuration.api` | External-services ports/DTOs |
-| `fineract-configuration-impl` | `org.apache.fineract.configuration.impl` | REST/JPA + `ConfigurationOsgiServiceRegistrar` / `ConfigurationOsgiBundleActivator` |
+| `fineract-configuration-impl` | `org.apache.fineract.configuration.impl` | REST/JPA + `ConfigurationOsgiServiceRegistrar` / DS `OSGI-INF/configuration.xml` |
 | `fineract-configuration-test` | `org.apache.fineract.configuration.test` | Fragment-Host → configuration.impl |
 
 Equinox registers `ExternalServicesReadPlatformService` only (`getExternalServiceDetailsByServiceName` → null). Did not register properties read (`MaskedValueSerializer` leftover; extends `NotificationConfigurationReadService`), leftover global-config ports, or write ports.
@@ -660,7 +660,7 @@ Equinox `InstanceModeOsgiBundleActivator` starts with no service. instancemode-a
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-jobs-api` | `org.apache.fineract.jobs.api` | SPI, exceptions, constants |
-| `fineract-jobs-impl` | `org.apache.fineract.jobs.impl` | Quartz/Batch/REST + `JobsOsgiServiceRegistrar` / `JobsOsgiBundleActivator` |
+| `fineract-jobs-impl` | `org.apache.fineract.jobs.impl` | Quartz/Batch/REST + `JobsOsgiServiceRegistrar` / DS `OSGI-INF/jobs.xml` |
 | `fineract-jobs-test` | `org.apache.fineract.jobs.test` | Fragment-Host → jobs.impl |
 
 Equinox registers `StuckJobExecutorService` only (`resumeStuckJob` no-op). Did not register leftover `SchedulerJobRunnerReadService` (`Page`/`SearchParameters`, unpublished `JobDetailData`), `NamedJobLaunchPort` / `JobParameterProvider` (unpublished `JobParameterDTO`; Spring Batch), or servlet COB filters.
@@ -690,7 +690,7 @@ Equinox `OpenApiOsgiBundleActivator` starts with no service. openapi-api has no 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-springbatch-api` | `org.apache.fineract.springbatch.api` | `PropertyService`, constants, handler conditions |
-| `fineract-springbatch-impl` | `org.apache.fineract.springbatch.impl` | JMS/Kafka/Spring events + `SpringBatchOsgiServiceRegistrar` / `SpringBatchOsgiBundleActivator` |
+| `fineract-springbatch-impl` | `org.apache.fineract.springbatch.impl` | JMS/Kafka/Spring events + `SpringBatchOsgiServiceRegistrar` / DS `OSGI-INF/springbatch.xml` |
 | `fineract-springbatch-test` | `org.apache.fineract.springbatch.test` | Fragment-Host → springbatch.impl |
 
 Equinox registers `PropertyService` only (partition/chunk sizes → null). Did not register Spring `AllNestedConditions` handlers or `ContextualMessage` (Spring Batch `StepExecutionRequest`).
@@ -768,7 +768,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. `fineract-calendar-impl` registers `CalendarDropdownReadPlatformService` via Declarative Services (`Service-Component`), not a Bundle-Activator.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security / command keep Bundle-Activators. No-port modules stay empty-activator.
 
 ## Resolve smoke
 
@@ -786,7 +786,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve. Command, Wave-1 catalogs, Wave-2, Wave-3, Wave-4, core-slice, and later provider-peel ports register via Bundle-Activators (no Spring). `fineract-calendar-impl` registers `CalendarDropdownReadPlatformService` via Declarative Services. `--strict` requires every fineract bundle to be ACTIVE.
+Starts every staged bundle after resolve (no Spring). Equinox-safe empty catalog ports register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security / command still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE.
 
 ```bash
 ./gradlew equinoxSpringBridgeSmoke

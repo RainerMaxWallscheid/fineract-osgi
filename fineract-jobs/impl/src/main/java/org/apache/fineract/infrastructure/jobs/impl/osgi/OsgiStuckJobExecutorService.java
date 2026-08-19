@@ -22,8 +22,9 @@ import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
 
 /**
  * Empty stuck-job port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/jobs.xml} (ADR-022 B6).
  */
-final class OsgiStuckJobExecutorService implements StuckJobExecutorService {
+public final class OsgiStuckJobExecutorService implements StuckJobExecutorService {
 
     @Override
     public void resumeStuckJob(final String jobName) {

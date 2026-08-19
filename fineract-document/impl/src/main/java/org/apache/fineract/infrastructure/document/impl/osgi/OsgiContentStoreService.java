@@ -27,8 +27,9 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 /**
  * Empty content store for Equinox without Spring/FS/S3. Same outcome as a
  * filesystem store that has no objects.
+ * Published by {@code OSGI-INF/document-store.xml} (ADR-022 B6).
  */
-final class OsgiContentStoreService implements ContentStoreService {
+public final class OsgiContentStoreService implements ContentStoreService {
 
     @Override
     public InputStream download(final String path) {

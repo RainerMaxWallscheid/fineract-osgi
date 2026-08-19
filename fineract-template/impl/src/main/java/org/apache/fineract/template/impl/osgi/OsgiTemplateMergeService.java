@@ -24,8 +24,9 @@ import org.apache.fineract.template.service.TemplateMergeService;
 
 /**
  * Empty template merge for Equinox without Spring/Mustache.
+ * Published by {@code OSGI-INF/template.xml} (ADR-022 B6).
  */
-final class OsgiTemplateMergeService implements TemplateMergeService {
+public final class OsgiTemplateMergeService implements TemplateMergeService {
 
     @Override
     public String compile(final TemplateData template, final Map<String, Object> scopes) {

@@ -26,8 +26,9 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
 /**
  * Empty SMS-campaign dropdown catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/campaigns.xml} (ADR-022 B6).
  */
-final class OsgiSmsCampaignDropdownReadPlatformService implements SmsCampaignDropdownReadPlatformService {
+public final class OsgiSmsCampaignDropdownReadPlatformService implements SmsCampaignDropdownReadPlatformService {
 
     @Override
     public Collection<EnumOptionData> retrieveCampaignTriggerTypes() {

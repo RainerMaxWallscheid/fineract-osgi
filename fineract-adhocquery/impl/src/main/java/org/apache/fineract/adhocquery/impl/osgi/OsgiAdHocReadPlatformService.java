@@ -24,8 +24,9 @@ import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 
 /**
  * Empty ad-hoc query catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/adhocquery.xml} (ADR-022 B6).
  */
-final class OsgiAdHocReadPlatformService implements AdHocReadPlatformService {
+public final class OsgiAdHocReadPlatformService implements AdHocReadPlatformService {
 
     @Override
     public List<AdHocData> retrieveAllAdHocQuery() {

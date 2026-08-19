@@ -56,7 +56,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Payment Type Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.paymenttype.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.portfolio.paymenttype.impl.osgi.PaymentTypeOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/paymenttype.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.paymenttype.service,'
                         + 'org.apache.fineract.portfolio.paymenttype.data,'

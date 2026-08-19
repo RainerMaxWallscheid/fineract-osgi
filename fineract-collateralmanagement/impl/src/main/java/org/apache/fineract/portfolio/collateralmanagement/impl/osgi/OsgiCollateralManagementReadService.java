@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.collateralmanagement.service.CollateralMana
 
 /**
  * Empty collateral-product catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/collateralmanagement.xml} (ADR-022 B6).
  */
-final class OsgiCollateralManagementReadService implements CollateralManagementReadService {
+public final class OsgiCollateralManagementReadService implements CollateralManagementReadService {
 
     @Override
     public CollateralManagementData getCollateralProduct(final Long collateralId) {

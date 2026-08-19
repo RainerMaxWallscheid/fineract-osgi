@@ -23,8 +23,9 @@ import org.apache.fineract.notification.service.UserNotificationService;
 
 /**
  * Empty user-notification catalog for Equinox without Spring/JPA/JMS.
+ * Published by {@code OSGI-INF/notification.xml} (ADR-022 B6).
  */
-final class OsgiUserNotificationService implements UserNotificationService {
+public final class OsgiUserNotificationService implements UserNotificationService {
 
     @Override
     public void notifyUsers(final String permission, final String objectType, final Long objectIdentifier, final String notificationContent,

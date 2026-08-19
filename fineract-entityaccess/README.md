@@ -5,7 +5,7 @@ Provider peel — office-specific product/charge access mappings (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-entityaccess-api` | `api/` | `org.apache.fineract.entityaccess.api` | Ports, DTOs, access types, exceptions |
-| `fineract-entityaccess-impl` | `impl/` | `org.apache.fineract.entityaccess.impl` | REST, JPA, util, validators; Equinox `EntityAccessOsgiBundleActivator` |
+| `fineract-entityaccess-impl` | `impl/` | `org.apache.fineract.entityaccess.impl` | REST, JPA, util, validators; Equinox DS `OSGI-INF/entityaccess.xml` |
 | `fineract-entityaccess-test` | `test/` | `org.apache.fineract.entityaccess.test` | Fragment-Host → impl |
 
 ### Consumers

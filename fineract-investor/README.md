@@ -6,7 +6,7 @@ External asset owner (investor) transfers — Wave 3 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-investor-api` | `api/` | `org.apache.fineract.investor.api` | Pure ports, DTOs/status enums, exceptions |
-| `fineract-investor-impl` | `impl/` | `org.apache.fineract.investor.impl` | JPA, REST, COB step, enrichers; Equinox `InvestorOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-investor-impl` | `impl/` | `org.apache.fineract.investor.impl` | JPA, REST, COB step, enrichers; Equinox DS `OSGI-INF/investor.xml` |
 | `fineract-investor-test` | `test/` | `org.apache.fineract.investor.test` | White-box tests; **Fragment-Host** → `investor.impl` |
 
 No `:fineract-investor` façade.

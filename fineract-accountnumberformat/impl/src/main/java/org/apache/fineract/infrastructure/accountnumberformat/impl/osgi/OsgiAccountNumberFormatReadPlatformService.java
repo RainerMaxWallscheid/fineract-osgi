@@ -25,8 +25,9 @@ import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNum
 
 /**
  * Empty account-number-format catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/accountnumberformat.xml} (ADR-022 B6).
  */
-final class OsgiAccountNumberFormatReadPlatformService implements AccountNumberFormatReadPlatformService {
+public final class OsgiAccountNumberFormatReadPlatformService implements AccountNumberFormatReadPlatformService {
 
     @Override
     public List<AccountNumberFormatData> getAllAccountNumberFormats() {

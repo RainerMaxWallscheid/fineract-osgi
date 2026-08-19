@@ -6,7 +6,7 @@ MIX taxonomy mapping and XBRL report generation — Wave 2 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-mix-api` | `api/` | `org.apache.fineract.mix.api` | Service interfaces, DTOs, command, exceptions |
-| `fineract-mix-impl` | `impl/` | `org.apache.fineract.mix.impl` | JPA domain, REST, MapStruct, XBRL builder; Equinox `MixOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-mix-impl` | `impl/` | `org.apache.fineract.mix.impl` | JPA domain, REST, MapStruct, XBRL builder; Equinox DS `OSGI-INF/mix.xml` |
 | `fineract-mix-test` | `test/` | `org.apache.fineract.mix.test` | White-box tests; **Fragment-Host** → `mix.impl` |
 
 No `:fineract-mix` façade.

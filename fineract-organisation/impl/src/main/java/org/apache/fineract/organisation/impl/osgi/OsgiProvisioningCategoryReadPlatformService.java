@@ -24,8 +24,9 @@ import org.apache.fineract.organisation.provisioning.service.ProvisioningCategor
 
 /**
  * Empty provisioning-category catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/organisation.xml} (ADR-022 B6).
  */
-final class OsgiProvisioningCategoryReadPlatformService implements ProvisioningCategoryReadPlatformService {
+public final class OsgiProvisioningCategoryReadPlatformService implements ProvisioningCategoryReadPlatformService {
 
     @Override
     public List<ProvisioningCategoryData> retrieveAllProvisionCategories() {

@@ -5,7 +5,7 @@ Core residual peel — cache admin REST / switch write path (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-cache-api` | `api/` | `org.apache.fineract.cache.api` | Write port, switch request/response DTOs |
-| `fineract-cache-impl` | `impl/` | `org.apache.fineract.cache.impl` | REST, command handler, write impl; Equinox `CacheOsgiBundleActivator` |
+| `fineract-cache-impl` | `impl/` | `org.apache.fineract.cache.impl` | REST, command handler, write impl; Equinox DS `OSGI-INF/cache.xml` |
 | `fineract-cache-test` | `test/` | `org.apache.fineract.cache.test` | Fragment-Host → impl |
 
 Residual in `fineract-core`: `CacheType`, `PlatformCache` / repo, `CacheData`,

@@ -29,8 +29,9 @@ import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPo
 /**
  * JDK pipe for Equinox without Spring. Same contract as {@code ContentPipe},
  * using a daemon thread instead of the Boot executor.
+ * Published by {@code OSGI-INF/document-stream.xml} (ADR-022 B6).
  */
-final class OsgiContentStreamPort implements ContentStreamPort {
+public final class OsgiContentStreamPort implements ContentStreamPort {
 
     private static final int BUFFER_SIZE = 8192;
 

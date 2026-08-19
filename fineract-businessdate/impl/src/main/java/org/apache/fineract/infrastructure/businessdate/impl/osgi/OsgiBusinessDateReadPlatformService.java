@@ -27,8 +27,9 @@ import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadP
 
 /**
  * Empty business-date catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/businessdate.xml} (ADR-022 B6).
  */
-final class OsgiBusinessDateReadPlatformService implements BusinessDateReadPlatformService {
+public final class OsgiBusinessDateReadPlatformService implements BusinessDateReadPlatformService {
 
     @Override
     public List<BusinessDateDTO> findAll() {

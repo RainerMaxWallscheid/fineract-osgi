@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 
 /**
  * Empty fund catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/fund.xml} (ADR-022 B6).
  */
-final class OsgiFundReadPlatformService implements FundReadPlatformService {
+public final class OsgiFundReadPlatformService implements FundReadPlatformService {
 
     @Override
     public List<FundData> retrieveAllFunds() {

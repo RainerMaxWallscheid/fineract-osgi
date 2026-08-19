@@ -59,7 +59,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.investor.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'External asset owner implementation (JPA, REST, COB step, enrichers)',
-                'Bundle-Activator': 'org.apache.fineract.investor.impl.osgi.InvestorOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/investor.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.investor.moduleapi,'
                         + 'org.apache.fineract.investor.service,'

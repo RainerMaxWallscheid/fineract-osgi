@@ -53,7 +53,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.mix.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'MIX/XBRL taxonomy mapping & report implementation (JPA, REST, Spring)',
-                'Bundle-Activator': 'org.apache.fineract.mix.impl.osgi.MixOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/mix.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.mix.moduleapi,'
                         + 'org.apache.fineract.mix.service,'

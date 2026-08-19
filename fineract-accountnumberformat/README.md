@@ -5,7 +5,7 @@ Provider peel — account number format admin (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-accountnumberformat-api` | `api/` | `org.apache.fineract.accountnumberformat.api` | `AccountNumberFormatData`, read/write ports, not-found exception |
-| `fineract-accountnumberformat-impl` | `impl/` | `org.apache.fineract.accountnumberformat.impl` | REST, handlers, services; Equinox `AccountNumberFormatOsgiBundleActivator` |
+| `fineract-accountnumberformat-impl` | `impl/` | `org.apache.fineract.accountnumberformat.impl` | REST, handlers, services; Equinox DS `OSGI-INF/accountnumberformat.xml` |
 | `fineract-accountnumberformat-test` | `test/` | `org.apache.fineract.accountnumberformat.test` | Fragment-Host → impl |
 
 ### Residual in `fineract-core`

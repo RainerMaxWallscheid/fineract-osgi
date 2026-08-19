@@ -30,7 +30,7 @@ Inventory and ranks 1–30 below are **historical**. They are not a mandate to p
 | Project | Role |
 |---------|------|
 | `:fineract-businessdate-api` | Application ports, DTOs, exceptions |
-| `:fineract-businessdate-impl` | Entity, repository, REST, handlers, `BusinessDateOsgiServiceRegistrar` / `BusinessDateOsgiBundleActivator` |
+| `:fineract-businessdate-impl` | Entity, repository, REST, handlers, `BusinessDateOsgiServiceRegistrar` / DS `OSGI-INF/businessdate.xml` |
 | `:fineract-businessdate-test` | Fragment-Host |
 
 **Kernel residual:** `BusinessDateType` stays in `fineract-core` (same package) for `ThreadLocalContextUtil` / action context without core→businessdate-api→core cycles.
@@ -42,7 +42,7 @@ Inventory and ranks 1–30 below are **historical**. They are not a mandate to p
 | Project | Role |
 |---------|------|
 | `:fineract-codes-api` | `CodeValueData`, `CodeData`, read ports, swagger models (no core dep) |
-| `:fineract-codes-impl` | REST/handlers/services (from provider) + `CodesOsgiServiceRegistrar` / `CodesOsgiBundleActivator` |
+| `:fineract-codes-impl` | REST/handlers/services (from provider) + `CodesOsgiServiceRegistrar` / DS `OSGI-INF/codes.xml` |
 | Residual in core | `Code`/`CodeValue` entities, repos, exceptions, `CodeValueMapper` |
 
 Core has `api project(':fineract-codes-api')` for transitive DTO access.
@@ -52,7 +52,7 @@ Core has `api project(':fineract-codes-api')` for transitive DTO access.
 | Project | Role |
 |---------|------|
 | `:fineract-organisation-api` | Ports + pure DTOs/exceptions: office, staff, holiday, working days, category/criteria write, category data |
-| `:fineract-organisation-impl` | REST/handlers/services/repos; provisioning entities + criteria read DTO residual; `OrganisationOsgiServiceRegistrar` / `OrganisationOsgiBundleActivator` |
+| `:fineract-organisation-impl` | REST/handlers/services/repos; provisioning entities + criteria read DTO residual; `OrganisationOsgiServiceRegistrar` / DS `OSGI-INF/organisation.xml` |
 | Residual in core | `Office`/`Staff` entities + DTOs; `Holiday`/`WorkingDays` entities, utils, schedule DTOs/enums |
 | Residual in impl | `ProvisioningCriteriaData` / criteria read (needs `LoanProductData`); `LoanProductProvisionCriteria`; loan-impl + accounting-api deps |
 
@@ -63,7 +63,7 @@ Core has `api project(':fineract-codes-api')` for transitive DTO access.
 | Project | Role |
 |---------|------|
 | `:fineract-monetary-api` | Currency read/write ports, admin DTOs, `CurrencyUpdateCommand` |
-| `:fineract-monetary-impl` | `CurrenciesApiResource`, handlers, read impls, `MonetaryOsgiServiceRegistrar` / `MonetaryOsgiBundleActivator` |
+| `:fineract-monetary-impl` | `CurrenciesApiResource`, handlers, read impls, `MonetaryOsgiServiceRegistrar` / DS `OSGI-INF/monetary.xml` |
 | Residual in core | `Money` / `CurrencyData` / currency entities, `CurrencyMapper` |
 | Impl coupling | Currency write checks loan/savings/charge product catalogs (loan-impl + savings-api + charge-api) |
 
@@ -119,25 +119,25 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 | Rank | Candidate | ~types | Target | Why / risk |
 |------|-----------|--------|--------|------------|
-| **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); `PaymentType` entity/repo/not-found residual in core |
-| **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
-| **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl |
+| **1** | **Payment type** | ~24 | `fineract-paymenttype` api/impl/test | **Done** — ports/DTOs + REST/handlers in paymenttype-*; Equinox DS `OSGI-INF/paymenttype.xml` (`PaymentTypeReadService`); `PaymentType` entity/repo/not-found residual in core |
+| **2** | **Search** | ~18 | `fineract-search` api/impl/test | **Done** — `SearchReadService` + REST in search-*; Equinox DS `OSGI-INF/search.xml` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core (dataqueries/savings) |
+| **3** | **Collection sheet** | ~29 | `fineract-collectionsheet` api/impl/test | **Done** — ports/commands/DTOs + REST/handlers/read impl in collectionsheet-*; Equinox DS `OSGI-INF/collectionsheet.xml` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl |
 | **4** | **External event subsystem** | subset of ~87 | extend `fineract-event` | **Done (phase 1)** — jobs/config REST/validation moved to event-impl; outbox entity/`ExternalEventService`/serializer SPI remain core (notifier-bound) |
-| **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
-| **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); product JPA residual core; account write residual progressive; product write residual charge |
-| **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity+DTO residual core; Centers/Groups REST + write residual progressive |
-| **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core; main write/REST residual progressive |
-| **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl |
+| **5** | **Account transfer / SI pure+REST** | ~60 | `fineract-accounttransfer` api/impl/test | **Done** — pure+REST+reads/jobs in accounttransfer-*; Equinox DS `OSGI-INF/accounttransfer.xml` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual for savings txn DTO coupling |
+| **6** | **Shares pure residual** | ~81 | `fineract-shares` api/impl/test | **Done** — pure+REST+handlers/reads/job in shares-*; Equinox DS `OSGI-INF/shares.xml` (`ShareProductDropdownReadPlatformService`); product JPA residual core; account write residual progressive; product write residual charge |
+| **7** | **Group pure residual** | ~74 | `fineract-group` api/impl/test | **Done** — ports/handlers/reads/levels API in group-*; Equinox DS `OSGI-INF/group.xml` (`GroupLevelReadPlatformService`); entity+DTO residual core; Centers/Groups REST + write residual progressive |
+| **8** | **Client pure residual** | ~112 | `fineract-clients` api/impl/test | **Done** — pure REST/handlers/services in clients-*; Equinox DS `OSGI-INF/clients.xml` (`ClientIdentifierWritePlatformService`); Client hub residual core; main write/REST residual progressive |
+| **9** | **Post-dated checks** | ~11 | `fineract-postdatedchecks` api/impl/test | **Done** — ports/DTOs/REST/handlers; Equinox DS `OSGI-INF/postdatedchecks.xml` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl |
 | **10** | **Client office/group transfer** | ~13 | `fineract-transfer` api/impl/test | **Done** — ports/handlers/validator; write residual progressive-loan |
-| **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); `ProductNotFoundException` residual core |
-| **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; Equinox `PaymentDetailOsgiBundleActivator` (`PaymentDetailWritePlatformService`); entity + PaymentDetailData residual core |
+| **11** | **Generic products REST** | ~7 | `fineract-products` api/impl/test | **Done** — `/v1/products/{type}` + `ShareProductReadPlatformService`; Equinox DS `OSGI-INF/products.xml` (`ProductCommandsService`); `ProductNotFoundException` residual core |
+| **12** | **Payment detail write** | ~8 | `fineract-paymentdetail` api/impl/test | **Done** — write port/impl/assembler; Equinox DS `OSGI-INF/paymentdetail.xml` (`PaymentDetailWritePlatformService`); entity + PaymentDetailData residual core |
 | **13** | **Loan Rate catalog close-in** | ~3 | `fineract-rates` api | **Done** — `RateData` + `RateReadService`/`RateWriteService` on rates-api; entity/repo residual core |
 | **14** | **Tax request DTOs** | ~3 | `fineract-tax` api | **Done** — `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat `TaxGroupData` residual core (SavingsAccountData cycle) |
 | **15** | **Delinquency catalog entities** | ~6 | `fineract-loan-impl` | **Done** — `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + enums next to repos; WC already depends on loan-impl |
-| **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`) |
+| **16** | **Meeting attendance leftover** | ~3 | `fineract-meeting` api | **Done** — `MeetingAttendanceType`/`Enumerations` + dropdown port on meeting-api; Equinox DS `OSGI-INF/meeting.xml` (`MeetingAttendanceDropdownReadService`) |
 | **17** | **Notification leftover** | ~2 | `fineract-notification` api | **Done** — `UserNotificationService` + `NotificationData` on notification-api; security-impl is api-only |
 | **18** | **Interop identifier type** | 1 | `fineract-interoperation` api | **Done** — `InteropIdentifierType` on interop-api next to the other interop enums; entity residual savings-impl |
-| **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core |
+| **19** | **Cache admin REST** | ~7 | `fineract-cache` api/impl/test | **Done** — write port/DTOs + REST/handler/impl; Equinox DS `OSGI-INF/cache.xml` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core |
 | **20** | **Loan product lookup port** | ~2 | `fineract-loan` api | **Done** — `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api (already exported) |
 | **21** | **Entity image adapter** | 1 | `fineract-document` api | **Done** — `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | **22** | **Spring Batch PropertyService** | ~2 | `fineract-springbatch` api | **Done** — `PropertyService` + `SpringBatchJobConstants` on springbatch-api; cob/loan/WC/jobs are api-only |
@@ -176,25 +176,25 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 ### Closed leftover order
 
-1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; Equinox `PaymentTypeOsgiBundleActivator` (`PaymentTypeReadService`); entity residual in core).  
-2. **Search** ✅ (`fineract-search` api/impl/test; Equinox `SearchOsgiBundleActivator` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core).  
-3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl).  
+1. **Payment-type pilot** ✅ (`fineract-paymenttype` api/impl/test; Equinox DS `OSGI-INF/paymenttype.xml` (`PaymentTypeReadService`); entity residual in core).  
+2. **Search** ✅ (`fineract-search` api/impl/test; Equinox DS `OSGI-INF/search.xml` (`SearchReadService`); `SearchUtil` + advanced-query DTOs residual in core).  
+3. **Collection sheet** ✅ (`fineract-collectionsheet` api/impl/test; Equinox DS `OSGI-INF/collectionsheet.xml` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl).  
 4. **External event subsystem** ✅ (phase 1: jobs/config/API → event-impl; outbox residual in core).  
-5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write residual progressive-loan).  
-6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); product JPA residual core).  
-7. **Group pure residual** ✅ (`fineract-group` api/impl/test; Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity residual core).  
-8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core).  
-9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl).  
+5. **Account transfer / SI** ✅ (`fineract-accounttransfer` api/impl/test; Equinox DS `OSGI-INF/accounttransfer.xml` (`StandingInstructionWritePlatformService`); write residual progressive-loan).  
+6. **Shares pure residual** ✅ (`fineract-shares` api/impl/test; Equinox DS `OSGI-INF/shares.xml` (`ShareProductDropdownReadPlatformService`); product JPA residual core).  
+7. **Group pure residual** ✅ (`fineract-group` api/impl/test; Equinox DS `OSGI-INF/group.xml` (`GroupLevelReadPlatformService`); entity residual core).  
+8. **Client pure residual** ✅ (`fineract-clients` api/impl/test; Equinox DS `OSGI-INF/clients.xml` (`ClientIdentifierWritePlatformService`); Client hub residual core).  
+9. **Post-dated checks** ✅ (`fineract-postdatedchecks` api/impl/test; Equinox DS `OSGI-INF/postdatedchecks.xml` (`RepaymentWithPostDatedChecksWritePlatformService`); entity residual loan-impl).  
 10. **Client office/group transfer** ✅ (`fineract-transfer` api/impl/test; write residual progressive-loan).  
-11. **Generic products REST** ✅ (`fineract-products` api/impl/test; Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); ProductNotFoundException residual core).  
-12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; Equinox `PaymentDetailOsgiBundleActivator` (`PaymentDetailWritePlatformService`); entity residual core).  
+11. **Generic products REST** ✅ (`fineract-products` api/impl/test; Equinox DS `OSGI-INF/products.xml` (`ProductCommandsService`); ProductNotFoundException residual core).  
+12. **Payment detail write** ✅ (`fineract-paymentdetail` api/impl/test; Equinox DS `OSGI-INF/paymentdetail.xml` (`PaymentDetailWritePlatformService`); entity residual core).  
 13. **Loan Rate catalog close-in** ✅ (`RateData` + read/write ports → rates-api; `Rate` entity residual core).  
 14. **Tax request DTOs** ✅ (`Tax*Request` → tax-api; fat `TaxGroupData` residual core for SavingsAccountData).  
 15. **Delinquency catalog entities** ✅ (`DelinquencyBucket`/`Range` + enums → loan-impl; WC already on loan-impl).  
-16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`)).  
+16. **Meeting attendance leftover** ✅ (`MeetingAttendance*` + dropdown port → meeting-api; Equinox DS `OSGI-INF/meeting.xml` (`MeetingAttendanceDropdownReadService`)).  
 17. **Notification leftover** ✅ (`UserNotificationService` + `NotificationData` → notification-api; security-impl api-only).  
 18. **Interop identifier type** ✅ (`InteropIdentifierType` → interop-api; entity residual savings-impl).  
-19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core).  
+19. **Cache admin REST** ✅ (`fineract-cache` api/impl/test; Equinox DS `OSGI-INF/cache.xml` (`CacheWritePlatformService`); `CacheType`/`PlatformCache`/runtime manager residual core).  
 20. **Loan product lookup port** ✅ (`LoanProductLookupData` + read port → loan-api).  
 21. **Entity image adapter** ✅ (`EntityImageIdAdapter` → document-api).  
 22. **Spring Batch PropertyService** ✅ (`PropertyService` + job constants → springbatch-api).  
@@ -212,64 +212,64 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 
 | Peel | Status |
 |------|--------|
-| `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core; Equinox `UserAdministrationOsgiBundleActivator` (`PasswordValidationPolicyReadPlatformService`) |
-| `fineract-adhocquery` | **complete** (api/impl/test); leftover generate-adhoc-client-schedule job closed into impl; Equinox `AdhocQueryOsgiBundleActivator` (`AdHocReadPlatformService`) |
-| `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl; Equinox `TemplateOsgiBundleActivator` (`TemplateMergeService`) |
-| `fineract-notification` | **complete** (api/impl/test); Equinox `NotificationOsgiBundleActivator` (`UserNotificationService`); security-impl api-only |
-| `fineract-spm` | **complete** (api/impl/test); Equinox `SpmOsgiBundleActivator` (`ScorecardReadPlatformService`); Client/AppUser from core |
-| `fineract-fund` | **complete** (api/impl/test); Equinox `FundOsgiBundleActivator` (`FundReadPlatformService`); Fund entity residual in core |
-| `fineract-accountnumberformat` | **complete** (api/impl/test); Equinox `AccountNumberFormatOsgiBundleActivator` (`AccountNumberFormatReadPlatformService`); entity/generator residual in core |
-| `fineract-survey` | **complete** (api/impl/test); Equinox `SurveyOsgiBundleActivator` (`ReadLikelihoodService`); PPI/infrastructure surveys; datatable ports from core |
-| `fineract-transfer` | **complete** (api/impl/test); Equinox `TransferOsgiBundleActivator` (`TransferWritePlatformService`); write impl residual progressive-loan |
+| `fineract-useradministration` | **complete** (api/impl/test); kernel AppUser/Role residual in core; Equinox DS `OSGI-INF/useradministration.xml` (`PasswordValidationPolicyReadPlatformService`) |
+| `fineract-adhocquery` | **complete** (api/impl/test); leftover generate-adhoc-client-schedule job closed into impl; Equinox DS `OSGI-INF/adhocquery.xml` (`AdHocReadPlatformService`) |
+| `fineract-template` | **complete** (api/impl/test); Template entity residual used by hooks via impl; Equinox DS `OSGI-INF/template.xml` (`TemplateMergeService`) |
+| `fineract-notification` | **complete** (api/impl/test); Equinox DS `OSGI-INF/notification.xml` (`UserNotificationService`); security-impl api-only |
+| `fineract-spm` | **complete** (api/impl/test); Equinox DS `OSGI-INF/spm.xml` (`ScorecardReadPlatformService`); Client/AppUser from core |
+| `fineract-fund` | **complete** (api/impl/test); Equinox DS `OSGI-INF/fund.xml` (`FundReadPlatformService`); Fund entity residual in core |
+| `fineract-accountnumberformat` | **complete** (api/impl/test); Equinox DS `OSGI-INF/accountnumberformat.xml` (`AccountNumberFormatReadPlatformService`); entity/generator residual in core |
+| `fineract-survey` | **complete** (api/impl/test); Equinox DS `OSGI-INF/survey.xml` (`ReadLikelihoodService`); PPI/infrastructure surveys; datatable ports from core |
+| `fineract-transfer` | **complete** (api/impl/test); Equinox DS `OSGI-INF/transfer.xml` (`TransferWritePlatformService`); write impl residual progressive-loan |
 | share account residual (pure) | status enums, `SharesEnumerations`, frequency/dividend status types, `ShareAccountWritePlatformService` + command handlers in core; entity write/read/job stay on provider |
-| `fineract-clients` | **complete** (api/impl/test); Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
-| `fineract-group` | **complete** (api/impl/test); Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
-| `fineract-collectionsheet` | **complete** (api/impl/test); Equinox `CollectionSheetOsgiBundleActivator` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
+| `fineract-clients` | **complete** (api/impl/test); Equinox DS `OSGI-INF/clients.xml` (`ClientIdentifierWritePlatformService`); Client hub residual core; main Clients REST/write residual progressive; charges residual charge-impl; address residual address-impl |
+| `fineract-group` | **complete** (api/impl/test); Equinox DS `OSGI-INF/group.xml` (`GroupLevelReadPlatformService`); entity/DTO/exception residual in core; Centers/Groups REST + grouping write residual progressive |
+| `fineract-collectionsheet` | **complete** (api/impl/test); Equinox DS `OSGI-INF/collectionsheet.xml` (`CollectionSheetWritePlatformService`); write impl residual in progressive-loan-impl; group SAVECOLLECTIONSHEET handlers moved into collectionsheet-impl |
 | search residual | **closed** into fineract-search; `LoanProductLookupReadPort` + lookup DTO on loan-api; adapter residual loan-impl |
-| `fineract-postdatedchecks` | **complete** (api/impl/test); Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity/repo/assembler/impl/config residual loan-impl |
+| `fineract-postdatedchecks` | **complete** (api/impl/test); Equinox DS `OSGI-INF/postdatedchecks.xml` (`RepaymentWithPostDatedChecksWritePlatformService`); entity/repo/assembler/impl/config residual loan-impl |
 | product-mix residual | full productmix package (REST/commands/handlers/domain/services) in loan-impl |
 | loan product residual | LoanProductsApiResource, data validator, read/write impls, Spring config, assembler/update util in loan-impl (office restriction + mapping validator ports); Rate entity/repo residual in core; `RateData` + Rate read/write ports on rates-api |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException in core; app bootstrap configs stay on provider |
 | share product residual (pure) | write port, dropdown, exceptions, handlers, dividend JDBC/REST, product command ports/impl stub, products REST/constants/not-found, ShareProduct domain (+ market price/repos) in core; entity write/read/serializer stay on provider |
 | infrastructure residual (pure) | jersey JSON converters/serializers + Jackson converter config/argument handler, command JSON deserializers, performance sampling, ExternalIdConverter, CustomDateTimeProvider, SchemaUpgradeNeededException, jdbc/jersey/cache/jpa/liquibase helpers, auditors, password encoder, AccountNumberFormatRepositoryWrapper, CalendarInstance repos in core; app bootstrap (Web/Liquibase-only) stay on provider |
 | share account residual (JDBC reads/job) | purchased-shares + account-dividend reads, schedular port, post-dividends job, commands stub, ShareAccountApiConstants, full accounts REST/DTOs/exception in core; charge read stays (charge-api enums); entity write/read/schedular impl stay on provider |
-| `fineract-entityaccess` | **complete** (api/impl/test); Equinox `EntityAccessOsgiBundleActivator` (`FineractEntityAccessReadService`); residual consumers in provider |
+| `fineract-entityaccess` | **complete** (api/impl/test); Equinox DS `OSGI-INF/entityaccess.xml` (`FineractEntityAccessReadService`); residual consumers in provider |
 | `fineract-calendar` | **complete** (api/impl/test); Equinox DS `CalendarDropdownReadPlatformService`; entity residual in core; GroupRepository residual to core |
-| `fineract-meeting` | **complete** (api/impl/test); Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`); depends on calendar-api/impl |
-| `fineract-address` | **complete** (api/impl/test); Equinox `AddressOsgiBundleActivator` (`FieldConfigurationReadPlatformService`); AddressData residual in core; ClientAddress on impl |
-| `fineract-creditbureau` | **complete** (api/impl/test); Equinox `CreditBureauOsgiBundleActivator` (`CreditBureauReadPlatformService`); loan product mapping via loan-impl |
-| `fineract-collateral` | **complete** (api/impl/test); Equinox `CollateralOsgiBundleActivator` (`CollateralWritePlatformService`); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
-| `fineract-collateralmanagement` | **complete** (api/impl/test); Equinox `CollateralManagementOsgiBundleActivator` (`CollateralManagementReadService`); entity residual **closed** (entities on impl; Loan inverse collection removed) |
-| `fineract-note` | **complete** (api/impl/test); Equinox `NoteOsgiBundleActivator` (`NoteReadPlatformService`); FK-based Note entity; share residual via ShareAccountNoteSupport |
-| `fineract-hooks` | **complete** (api/impl/test); Equinox `HooksOsgiBundleActivator` (`HookReadPlatformService`); ports DTO-only + HookEventQueryService on impl; MessageGatewayHookProcessor **closed** (hooks-impl via sms + campaigns); HookEvent residual in core; Template via template-impl |
-| `fineract-sms` | **complete** (api/impl/test); Equinox `SmsOsgiBundleActivator` (`SmsWritePlatformService`); campaignId Long FK; scheduled job residual **closed** into campaigns-impl (`SmsMessageScheduledJobService`) |
-| `fineract-reportmailingjob` | **complete** (api/impl/test); Equinox `ReportMailingJobOsgiBundleActivator` (`ReportMailingJobConfigurationReadPlatformService`); stretchyReportId Long FK (dataqueries Report residual); AppUser @ManyToOne (core); ExecuteReportMailingJobs in campaigns-impl |
-| `fineract-campaigns` | **complete** (api/impl/test); Equinox `CampaignsOsgiBundleActivator` (`SmsCampaignDropdownReadPlatformService`); Report FKs Long; residual write/domain/jobs **closed** (campaigns-impl; dataqueries/gcm/configuration/loan/savings/event) |
-| `fineract-gcm` | **complete** (api/impl/test); Equinox `GcmOsgiBundleActivator` (`NotificationConfigurationReadService`); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
-| `fineract-dataqueries` | **complete** (api/impl/test); Equinox `DataqueriesOsgiBundleActivator` (`ReportWritePlatformService`); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
-| `fineract-configuration` | **complete** (api/impl/test); Equinox `ConfigurationOsgiBundleActivator` (`ExternalServicesReadPlatformService`); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
+| `fineract-meeting` | **complete** (api/impl/test); Equinox DS `OSGI-INF/meeting.xml` (`MeetingAttendanceDropdownReadService`); depends on calendar-api/impl |
+| `fineract-address` | **complete** (api/impl/test); Equinox DS `OSGI-INF/address.xml` (`FieldConfigurationReadPlatformService`); AddressData residual in core; ClientAddress on impl |
+| `fineract-creditbureau` | **complete** (api/impl/test); Equinox DS `OSGI-INF/creditbureau.xml` (`CreditBureauReadPlatformService`); loan product mapping via loan-impl |
+| `fineract-collateral` | **complete** (api/impl/test); Equinox DS `OSGI-INF/collateral.xml` (`CollateralWritePlatformService`); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
+| `fineract-collateralmanagement` | **complete** (api/impl/test); Equinox DS `OSGI-INF/collateralmanagement.xml` (`CollateralManagementReadService`); entity residual **closed** (entities on impl; Loan inverse collection removed) |
+| `fineract-note` | **complete** (api/impl/test); Equinox DS `OSGI-INF/note.xml` (`NoteReadPlatformService`); FK-based Note entity; share residual via ShareAccountNoteSupport |
+| `fineract-hooks` | **complete** (api/impl/test); Equinox DS `OSGI-INF/hooks.xml` (`HookReadPlatformService`); ports DTO-only + HookEventQueryService on impl; MessageGatewayHookProcessor **closed** (hooks-impl via sms + campaigns); HookEvent residual in core; Template via template-impl |
+| `fineract-sms` | **complete** (api/impl/test); Equinox DS `OSGI-INF/sms.xml` (`SmsWritePlatformService`); campaignId Long FK; scheduled job residual **closed** into campaigns-impl (`SmsMessageScheduledJobService`) |
+| `fineract-reportmailingjob` | **complete** (api/impl/test); Equinox DS `OSGI-INF/reportmailingjob.xml` (`ReportMailingJobConfigurationReadPlatformService`); stretchyReportId Long FK (dataqueries Report residual); AppUser @ManyToOne (core); ExecuteReportMailingJobs in campaigns-impl |
+| `fineract-campaigns` | **complete** (api/impl/test); Equinox DS `OSGI-INF/campaigns.xml` (`SmsCampaignDropdownReadPlatformService`); Report FKs Long; residual write/domain/jobs **closed** (campaigns-impl; dataqueries/gcm/configuration/loan/savings/event) |
+| `fineract-gcm` | **complete** (api/impl/test); Equinox DS `OSGI-INF/gcm.xml` (`NotificationConfigurationReadService`); NotificationConfigurationReadService port implemented by configuration residual; NotificationSenderService on impl |
+| `fineract-dataqueries` | **complete** (api/impl/test); Equinox DS `OSGI-INF/dataqueries.xml` (`ReportWritePlatformService`); Report/datatable entities + platform impls; shared DTOs/ports remain in core |
+| `fineract-configuration` | **complete** (api/impl/test); Equinox DS `OSGI-INF/configuration.xml` (`ExternalServicesReadPlatformService`); external services + write/read impls; global config entity/ports remain in core; async residual **closed** (SpringAsyncConfig on impl; TaskExecutor* in core) |
 | `fineract-bulkimport` | **complete** (api/impl/test); Equinox `BulkImportOsgiBundleActivator` (no port: jersey / jakarta.ws.rs / POI); workbook ports + `GlobalEntityType`/`ImportData`/`LookupMode` on bulkimport-api; `LookupModeTest` on bulkimport-test; populator impl residual provider (share) |
 | `fineract-instancemode` | **complete** (api/impl/test); Equinox `InstanceModeOsgiBundleActivator` (no port: swagger DTO + servlet filter only); test-profile REST + swagger DTO + `FineractInstanceModeApiFilter` on api; constants residual in core |
-| `fineract-jobs` | **complete** (api/impl/test); Equinox `JobsOsgiBundleActivator` (`StuckJobExecutorService`); residual **closed** (filters + inline + retained-earning + NPA); unused `JobParametersDTO` on jobs-api; `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
+| `fineract-jobs` | **complete** (api/impl/test); Equinox DS `OSGI-INF/jobs.xml` (`StuckJobExecutorService`); residual **closed** (filters + inline + retained-earning + NPA); unused `JobParametersDTO` on jobs-api; `LoanCOBEnabledCondition` on cob-impl; `BodyCachingHttpServletRequestWrapper` in core |
 | `fineract-s3` | **complete** (api/impl/test); Equinox `S3OsgiBundleActivator` (no port: AWS SDK `S3ClientBuilder`); S3 client SPI + Amazon/Localstack config; report export bean via dataqueries-impl |
 | `fineract-openapi` | **complete** (api/impl/test); Equinox `OpenApiOsgiBundleActivator` (no port: swagger reader/filter utilities only); OperationId reader + spec filter for swagger-gradle-plugin; tests on fragment |
-| `fineract-springbatch` | **complete** (api/impl/test); Equinox `SpringBatchOsgiBundleActivator` (`PropertyService`); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
+| `fineract-springbatch` | **complete** (api/impl/test); Equinox DS `OSGI-INF/springbatch.xml` (`PropertyService`); remote job messaging; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |
 | `fineract-event` | **complete** (api/impl/test) + external jobs/config API peel; no Equinox port (leftover `ExternalEventProducer` in core only); domain events + producers/serializers + config REST/jobs; core residual: notifier + outbox entity/service + serializer SPI |
 | `fineract-interoperation` | **complete** (api/impl/test); Equinox `InteroperationOsgiBundleActivator` (no port: `InteropService` jakarta.validation + leftover unpublished savings types); `InteropIdentifier` entity residual savings-impl |
-| `fineract-accounttransfer` | **complete** (api/impl/test); Equinox `AccountTransferOsgiBundleActivator` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
-| `fineract-shares` | **complete** (api/impl/test); Equinox `SharesOsgiBundleActivator` (`ShareProductDropdownReadPlatformService`); ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
-| `fineract-group` | **complete** (api/impl/test); Equinox `GroupOsgiBundleActivator` (`GroupLevelReadPlatformService`); Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
-| `fineract-clients` | **complete** (api/impl/test); Equinox `ClientsOsgiBundleActivator` (`ClientIdentifierWritePlatformService`); Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
-| `fineract-postdatedchecks` | **complete** (api/impl/test); Equinox `PostDatedChecksOsgiBundleActivator` (`RepaymentWithPostDatedChecksWritePlatformService`); entity/assembler/write residual loan-impl |
+| `fineract-accounttransfer` | **complete** (api/impl/test); Equinox DS `OSGI-INF/accounttransfer.xml` (`StandingInstructionWritePlatformService`); write entities residual progressive-loan; kernel residual AccountTransferData/read port + PortfolioAccount* for savings |
+| `fineract-shares` | **complete** (api/impl/test); Equinox DS `OSGI-INF/shares.xml` (`ShareProductDropdownReadPlatformService`); ShareProduct JPA residual core; product write residual charge-impl; account entity residual savings-impl; account write residual progressive |
+| `fineract-group` | **complete** (api/impl/test); Equinox DS `OSGI-INF/group.xml` (`GroupLevelReadPlatformService`); Group entity+DTO residual core; Centers/Groups REST + grouping-types write residual progressive |
+| `fineract-clients` | **complete** (api/impl/test); Equinox DS `OSGI-INF/clients.xml` (`ClientIdentifierWritePlatformService`); Client entity+ClientData residual core; `ClientDataValidatorTest` on clients-test; main Clients REST/write residual progressive |
+| `fineract-postdatedchecks` | **complete** (api/impl/test); Equinox DS `OSGI-INF/postdatedchecks.xml` (`RepaymentWithPostDatedChecksWritePlatformService`); entity/assembler/write residual loan-impl |
 | `fineract-transfer` | **complete** (api/impl/test); ports/handlers/validator; write residual progressive-loan |
-| `fineract-products` | **complete** (api/impl/test); Equinox `ProductsOsgiBundleActivator` (`ProductCommandsService`); ProductNotFoundException residual core; read impl residual charge-impl |
-| `fineract-paymentdetail` | **complete** (api/impl/test); Equinox `PaymentDetailOsgiBundleActivator` (`PaymentDetailWritePlatformService`); PaymentDetail entity/repo + PaymentDetailData residual core |
+| `fineract-products` | **complete** (api/impl/test); Equinox DS `OSGI-INF/products.xml` (`ProductCommandsService`); ProductNotFoundException residual core; read impl residual charge-impl |
+| `fineract-paymentdetail` | **complete** (api/impl/test); Equinox DS `OSGI-INF/paymentdetail.xml` (`PaymentDetailWritePlatformService`); PaymentDetail entity/repo + PaymentDetailData residual core |
 | `fineract-rates` Rate catalog close-in | **complete**; `RateData` + `RateReadService`/`RateWriteService` on rates-api; Rate entity/`RateAppliesTo`/repo/wrapper/`RateNotFoundException` residual core |
 | `fineract-tax` request close-in | **complete**; `TaxComponentRequest`/`TaxGroupRequest`/`TaxGroupComponent` on tax-api; fat tax DTOs residual core (`TaxGroupData` on SavingsAccountData / ChargeData) |
 | delinquency catalog close-in | **complete**; `DelinquencyBucket`/`Range`/`MinimumPaymentPeriodAndRule` + type enums on loan-impl next to repos |
-| `fineract-meeting` attendance close-in | **complete**; Equinox `MeetingOsgiBundleActivator` (`MeetingAttendanceDropdownReadService`) |
+| `fineract-meeting` attendance close-in | **complete**; Equinox DS `OSGI-INF/meeting.xml` (`MeetingAttendanceDropdownReadService`) |
 | `fineract-interoperation` identifier-type close-in | **complete**; `InteropIdentifierType` on interop-api; `InteropIdentifier` entity residual savings-impl |
-| `fineract-cache` | **complete** (api/impl/test); Equinox `CacheOsgiBundleActivator` (`CacheWritePlatformService`); CacheType/PlatformCache/runtime manager residual core |
+| `fineract-cache` | **complete** (api/impl/test); Equinox DS `OSGI-INF/cache.xml` (`CacheWritePlatformService`); CacheType/PlatformCache/runtime manager residual core |
 | loan product lookup close-in | **complete**; `LoanProductLookupData` + `LoanProductLookupReadPort` on loan-api; adapter residual loan-impl |
 | `fineract-document` image-adapter close-in | **complete**; `EntityImageIdAdapter` on document-api; clients-impl + organisation-impl implement it |
 | `fineract-springbatch` PropertyService close-in | **complete**; `PropertyService` + `SpringBatchJobConstants` on springbatch-api |

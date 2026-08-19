@@ -26,7 +26,7 @@ fineract-savings/
 | Slice | Contents |
 |-------|----------|
 | **api** | Pure product/application ports, module DTOs/exceptions, `moduleapi` |
-| **impl** | `SavingsAccount*` domain, entity-typed account services, COB, interest-chart domain, interop; Equinox `SavingsOsgiBundleActivator` (`SavingsDropdownReadPlatformService`) |
+| **impl** | `SavingsAccount*` domain, entity-typed account services, COB, interest-chart domain, interop; Equinox DS `OSGI-INF/savings.xml` (`SavingsDropdownReadPlatformService`) |
 
 **Kernel note:** Many savings enums/DTOs already live in **fineract-core**.
 

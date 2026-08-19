@@ -6,7 +6,7 @@ Loan originator catalog + attach/detach mappings (standard loan + working-capita
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-loan-origination-api` | `api/` | `org.apache.fineract.loanorigination.api` | Contracts: service interfaces, DTOs (incl. `LoanOriginatorData`), exceptions, `LoanOriginatorStatus` |
-| `fineract-loan-origination-impl` | `impl/` | `org.apache.fineract.loanorigination.impl` | JPA, REST, handlers, Avro enrichers; Equinox `LoanOriginationOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-loan-origination-impl` | `impl/` | `org.apache.fineract.loanorigination.impl` | JPA, REST, handlers, Avro enrichers; Equinox DS `OSGI-INF/loan-origination.xml` |
 | `fineract-loan-origination-test` | `test/` | `org.apache.fineract.loanorigination.test` | White-box tests; **Fragment-Host** → `loanorigination.impl` |
 
 No `:fineract-loan-origination` façade.

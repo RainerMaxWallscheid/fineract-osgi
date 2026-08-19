@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Configuration Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.configuration.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.configuration.impl.osgi.ConfigurationOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/configuration.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.configuration.service,'
                         + 'org.apache.fineract.infrastructure.configuration.data,'

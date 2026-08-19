@@ -25,8 +25,9 @@ import org.apache.fineract.useradministration.service.PasswordValidationPolicyRe
 
 /**
  * Empty password-policy catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/useradministration.xml} (ADR-022 B6).
  */
-final class OsgiPasswordValidationPolicyReadPlatformService implements PasswordValidationPolicyReadPlatformService {
+public final class OsgiPasswordValidationPolicyReadPlatformService implements PasswordValidationPolicyReadPlatformService {
 
     @Override
     public Collection<PasswordValidationPolicyData> retrieveAll() {

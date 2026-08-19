@@ -57,7 +57,7 @@ fineract-branch/
 | `…teller.validation` | **impl** — `CashierTransactionDataValidator` implements port |
 | REST / handlers / serialization / util | **impl** |
 | `…teller.starter` | **impl** — `OrganisationTellerConfiguration` |
-| `…teller.impl.osgi` | **impl** — `BranchOsgiServiceRegistrar` (Spring) + `BranchOsgiBundleActivator` (Equinox start) |
+| `…teller.impl.osgi` | **impl** — `BranchOsgiServiceRegistrar` (Spring) + DS `OSGI-INF/branch.xml` (Equinox start) |
 
 **Kernel support (residual enabler):** `StaffRepository` + `StaffReadService` interfaces live in **fineract-core** (impls remain in provider) so branch-impl compiles without depending on provider.
 
@@ -85,7 +85,7 @@ Deserializer test + `BranchOsgiServiceRegistrarTest`.
 
 ### Step 6 — OSGi registrar ✅
 `BranchOsgiServiceRegistrar` (Spring path) → read + write teller services + `CashierTxnValidationPort`.  
-`BranchOsgiBundleActivator` (Equinox start; empty teller catalog, lowest ranking) → `CashierTxnValidationPort`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
+DS `OSGI-INF/branch.xml` (Equinox start; empty teller catalog, lowest ranking) → `CashierTxnValidationPort`. Composition-root hosted port: `osgi/CompositionRootOsgiBridge`.
 
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |

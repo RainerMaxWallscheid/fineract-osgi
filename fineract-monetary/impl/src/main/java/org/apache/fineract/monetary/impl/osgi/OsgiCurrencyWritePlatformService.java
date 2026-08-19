@@ -25,8 +25,9 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 
 /**
  * Empty allowed-currency write for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/monetary.xml} (ADR-022 B6).
  */
-final class OsgiCurrencyWritePlatformService implements CurrencyWritePlatformService {
+public final class OsgiCurrencyWritePlatformService implements CurrencyWritePlatformService {
 
     @Override
     public CurrencyUpdateResponse updateAllowedCurrencies(final CurrencyUpdateRequest request) {

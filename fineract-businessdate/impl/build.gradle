@@ -56,7 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.businessdate.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Business date JPA, REST, handlers',
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.businessdate.impl.osgi.BusinessDateOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/businessdate.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.businessdate.service,'
                         + 'org.apache.fineract.infrastructure.businessdate.data.service,'

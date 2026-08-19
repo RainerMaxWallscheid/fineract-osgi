@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 
 /**
  * Empty note catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/note.xml} (ADR-022 B6).
  */
-final class OsgiNoteReadPlatformService implements NoteReadPlatformService {
+public final class OsgiNoteReadPlatformService implements NoteReadPlatformService {
 
     @Override
     public NoteData retrieveNote(final Long noteId, final Long resourceId, final Integer noteTypeId) {

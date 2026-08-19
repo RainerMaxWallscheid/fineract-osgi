@@ -57,7 +57,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.branch.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Branch/teller implementation (JPA, REST, handlers, Spring)',
-                'Bundle-Activator': 'org.apache.fineract.organisation.teller.impl.osgi.BranchOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/branch.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.organisation.teller.moduleapi,'
                         + 'org.apache.fineract.organisation.teller.service,'

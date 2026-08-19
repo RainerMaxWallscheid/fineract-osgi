@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.account.service.StandingInstructionWritePla
 
 /**
  * Empty standing-instruction write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/accounttransfer.xml} (ADR-022 B6).
  */
-final class OsgiStandingInstructionWritePlatformService implements StandingInstructionWritePlatformService {
+public final class OsgiStandingInstructionWritePlatformService implements StandingInstructionWritePlatformService {
 
     @Override
     public CommandProcessingResult create(final JsonCommand command) {

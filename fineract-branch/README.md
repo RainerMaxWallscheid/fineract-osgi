@@ -6,7 +6,7 @@ Branch cash / teller (cashier allocation and cash settle) — Wave 2 OSGi modula
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-branch-api` | `api/` | `org.apache.fineract.branch.api` | Contracts: service interfaces, DTOs, exceptions, pure enums, **`CashierTxnValidationPort`** |
-| `fineract-branch-impl` | `impl/` | `org.apache.fineract.branch.impl` | JPA, REST, handlers, service impls, starter; Equinox `BranchOsgiBundleActivator` (empty catalog, lowest ranking) |
+| `fineract-branch-impl` | `impl/` | `org.apache.fineract.branch.impl` | JPA, REST, handlers, service impls, starter; Equinox DS `OSGI-INF/branch.xml` |
 | `fineract-branch-test` | `test/` | `org.apache.fineract.branch.test` | White-box tests; **Fragment-Host** → `branch.impl` |
 
 No `:fineract-branch` façade. Depend on `-api`; composition roots also take `-impl`.

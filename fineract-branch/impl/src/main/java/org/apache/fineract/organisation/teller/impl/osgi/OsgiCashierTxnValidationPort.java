@@ -24,8 +24,9 @@ import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPor
 /**
  * Empty teller catalog for Equinox without Spring/JPA. Same outcome as a
  * staff member with no open cashier session.
+ * Published by {@code OSGI-INF/branch.xml} (ADR-022 B6).
  */
-final class OsgiCashierTxnValidationPort implements CashierTxnValidationPort {
+public final class OsgiCashierTxnValidationPort implements CashierTxnValidationPort {
 
     @Override
     public void validateOnLoanDisbursal(final Long staffId, final String currencyCode, final BigDecimal transactionAmount) {

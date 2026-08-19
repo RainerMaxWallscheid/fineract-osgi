@@ -5,7 +5,7 @@ Provider peel — client/product/loan collateral management (`portfolio.collater
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-collateralmanagement-api` | `api/` | `org.apache.fineract.collateralmanagement.api` | Ports, DTOs, exceptions |
-| `fineract-collateralmanagement-impl` | `impl/` | `org.apache.fineract.collateralmanagement.impl` | REST, repos, handlers; Equinox `CollateralManagementOsgiBundleActivator` |
+| `fineract-collateralmanagement-impl` | `impl/` | `org.apache.fineract.collateralmanagement.impl` | REST, repos, handlers; Equinox DS `OSGI-INF/collateralmanagement.xml` |
 | `fineract-collateralmanagement-test` | `test/` | `org.apache.fineract.collateralmanagement.test` | Fragment-Host → impl |
 
 ## Residual closed (loan)

@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatfor
 
 /**
  * Empty client-identifier write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/clients.xml} (ADR-022 B6).
  */
-final class OsgiClientIdentifierWritePlatformService implements ClientIdentifierWritePlatformService {
+public final class OsgiClientIdentifierWritePlatformService implements ClientIdentifierWritePlatformService {
 
     @Override
     public CommandProcessingResult addClientIdentifier(final Long clientId, final JsonCommand command) {

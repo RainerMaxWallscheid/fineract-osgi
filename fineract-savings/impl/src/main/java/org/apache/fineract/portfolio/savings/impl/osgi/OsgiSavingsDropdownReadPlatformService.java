@@ -25,8 +25,9 @@ import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatform
 
 /**
  * Empty savings dropdown catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/savings.xml} (ADR-022 B6).
  */
-final class OsgiSavingsDropdownReadPlatformService implements SavingsDropdownReadPlatformService {
+public final class OsgiSavingsDropdownReadPlatformService implements SavingsDropdownReadPlatformService {
 
     @Override
     public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {

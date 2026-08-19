@@ -27,8 +27,9 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 
 /**
  * Empty entity-access read port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/entityaccess.xml} (ADR-022 B6).
  */
-final class OsgiFineractEntityAccessReadService implements FineractEntityAccessReadService {
+public final class OsgiFineractEntityAccessReadService implements FineractEntityAccessReadService {
 
     @Override
     public Collection<FineractEntityToEntityMappingData> retrieveEntityAccessFor(final FineractEntityType firstEntityType, final Long relId,

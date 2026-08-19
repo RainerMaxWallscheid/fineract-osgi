@@ -5,7 +5,7 @@
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-monetary-api` | `api/` | `org.apache.fineract.monetary.api` | Currency ports, admin DTOs, update command |
-| `fineract-monetary-impl` | `impl/` | `org.apache.fineract.monetary.impl` | Currencies API, handlers, read/write impls; Equinox `MonetaryOsgiBundleActivator` |
+| `fineract-monetary-impl` | `impl/` | `org.apache.fineract.monetary.impl` | Currencies API, handlers, read/write impls; Equinox DS `OSGI-INF/monetary.xml` |
 | `fineract-monetary-test` | `test/` | `org.apache.fineract.monetary.test` | Fragment-Host → impl |
 
 ### Residual in `fineract-core`

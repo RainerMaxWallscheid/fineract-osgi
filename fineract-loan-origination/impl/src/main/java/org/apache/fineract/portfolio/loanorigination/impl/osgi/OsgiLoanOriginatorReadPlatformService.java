@@ -28,8 +28,9 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 /**
  * Empty originator catalog for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no originators.
+ * Published by {@code OSGI-INF/loan-origination.xml} (ADR-022 B6).
  */
-final class OsgiLoanOriginatorReadPlatformService implements LoanOriginatorReadPlatformService {
+public final class OsgiLoanOriginatorReadPlatformService implements LoanOriginatorReadPlatformService {
 
     @Override
     public List<LoanOriginatorData> retrieveAll() {

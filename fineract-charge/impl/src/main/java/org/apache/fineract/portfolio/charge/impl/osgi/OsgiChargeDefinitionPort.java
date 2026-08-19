@@ -26,8 +26,9 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 /**
  * Empty catalog for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no non-deleted charges.
+ * Published by {@code OSGI-INF/charge.xml} (ADR-022 B6).
  */
-final class OsgiChargeDefinitionPort implements ChargeDefinitionPort {
+public final class OsgiChargeDefinitionPort implements ChargeDefinitionPort {
 
     @Override
     public boolean existsActiveCharge(final Long chargeId) {

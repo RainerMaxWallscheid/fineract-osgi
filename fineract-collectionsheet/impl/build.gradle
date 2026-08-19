@@ -55,7 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Collection Sheet Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.collectionsheet.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Bundle-Activator': 'org.apache.fineract.portfolio.collectionsheet.impl.osgi.CollectionSheetOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/collectionsheet.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.portfolio.collectionsheet.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'

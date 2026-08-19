@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownRe
 
 /**
  * Empty meeting-attendance dropdown catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/meeting.xml} (ADR-022 B6).
  */
-final class OsgiMeetingAttendanceDropdownReadService implements MeetingAttendanceDropdownReadService {
+public final class OsgiMeetingAttendanceDropdownReadService implements MeetingAttendanceDropdownReadService {
 
     @Override
     public List<EnumOptionData> retrieveAttendanceTypeOptions() {

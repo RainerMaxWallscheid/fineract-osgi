@@ -26,8 +26,9 @@ import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 
 /**
  * Empty hook catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/hooks.xml} (ADR-022 B6).
  */
-final class OsgiHookReadPlatformService implements HookReadPlatformService {
+public final class OsgiHookReadPlatformService implements HookReadPlatformService {
 
     @Override
     public Collection<HookData> retrieveAllHooks() {

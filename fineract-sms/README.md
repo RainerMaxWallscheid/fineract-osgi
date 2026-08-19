@@ -5,7 +5,7 @@ Provider peel — outbound SMS messages (ADR-022).
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
 | `fineract-sms-api` | `api/` | `org.apache.fineract.sms.api` | Ports, DTOs, exceptions, constants |
-| `fineract-sms-impl` | `impl/` | `org.apache.fineract.sms.impl` | Entity, REST, handlers; Equinox `SmsOsgiBundleActivator` |
+| `fineract-sms-impl` | `impl/` | `org.apache.fineract.sms.impl` | Entity, REST, handlers; Equinox DS `OSGI-INF/sms.xml` |
 | `fineract-sms-test` | `test/` | `org.apache.fineract.sms.test` | Fragment-Host → impl |
 
 Residual on provider:

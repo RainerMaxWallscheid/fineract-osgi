@@ -26,8 +26,9 @@ import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformServi
 /**
  * Empty GL-closure catalog for Equinox without Spring/JPA. Same outcome as a
  * repository that finds no closures.
+ * Published by {@code OSGI-INF/accounting.xml} (ADR-022 B6).
  */
-final class OsgiGLClosureReadPlatformService implements GLClosureReadPlatformService {
+public final class OsgiGLClosureReadPlatformService implements GLClosureReadPlatformService {
 
     @Override
     public List<GLClosureData> retrieveAllGLClosures(final Long officeId) {

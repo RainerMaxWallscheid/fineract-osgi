@@ -57,7 +57,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.document.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Document management & content-store implementation (FS/S3, REST, Spring)',
-                'Bundle-Activator': 'org.apache.fineract.infrastructure.document.impl.osgi.DocumentOsgiBundleActivator',
+                'Service-Component': 'OSGI-INF/document-store.xml, OSGI-INF/document-stream.xml',
                 'Import-Package': 'org.osgi.framework,'
                         + 'org.apache.fineract.infrastructure.contentstore.moduleapi,'
                         + 'org.apache.fineract.infrastructure.contentstore.service,'

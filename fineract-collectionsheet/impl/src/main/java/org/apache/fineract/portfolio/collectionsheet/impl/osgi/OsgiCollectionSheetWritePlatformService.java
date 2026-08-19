@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWrit
 
 /**
  * Empty collection-sheet write port for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/collectionsheet.xml} (ADR-022 B6).
  */
-final class OsgiCollectionSheetWritePlatformService implements CollectionSheetWritePlatformService {
+public final class OsgiCollectionSheetWritePlatformService implements CollectionSheetWritePlatformService {
 
     @Override
     public CommandProcessingResult updateCollectionSheet(final JsonCommand command) {

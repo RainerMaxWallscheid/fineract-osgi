@@ -25,8 +25,9 @@ import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownRead
 
 /**
  * Empty share-product dropdown catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/shares.xml} (ADR-022 B6).
  */
-final class OsgiShareProductDropdownReadPlatformService implements ShareProductDropdownReadPlatformService {
+public final class OsgiShareProductDropdownReadPlatformService implements ShareProductDropdownReadPlatformService {
 
     @Override
     public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {

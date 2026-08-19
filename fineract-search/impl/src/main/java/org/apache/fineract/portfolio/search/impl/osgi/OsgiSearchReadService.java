@@ -27,8 +27,9 @@ import org.apache.fineract.portfolio.search.service.SearchReadService;
 
 /**
  * Empty search catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/search.xml} (ADR-022 B6).
  */
-final class OsgiSearchReadService implements SearchReadService {
+public final class OsgiSearchReadService implements SearchReadService {
 
     @Override
     public List<SearchData> retriveMatchingData(final SearchConditions searchConditions) {
