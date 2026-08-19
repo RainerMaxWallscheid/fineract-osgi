@@ -30,6 +30,7 @@ Fails on:
   * impl Service-Component file, implementation class, or provide interface missing
   * DS provide interface that is not a PILOT_PORT in EquinoxResolveSmoke
   * unused org.osgi.framework Import-Package on a DS or no-port impl
+  * DS impl missing Require-Capability osgi.extender=osgi.component
   * impl with neither Service-Component, an allow-listed activator, nor a no-port stem
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
@@ -105,6 +106,7 @@ ATTR_KEYS = (
     "Automatic-Module-Name",
     "Bundle-Activator",
     "Service-Component",
+    "Require-Capability",
 )
 
 IMPORT_TYPE_RE = re.compile(
@@ -247,6 +249,7 @@ def load_row(build: Path, layout_role: str) -> dict:
         "imports": parse_export_packages(attrs.get("Import-Package")),
         "activator": attrs.get("Bundle-Activator"),
         "components": parse_export_packages(attrs.get("Service-Component")),
+        "require_capability": attrs.get("Require-Capability"),
         "impl_dir": build.parent,
     }
 
@@ -386,6 +389,16 @@ def main() -> int:
             errors.append(
                 f"{row['path']}: unused org.osgi.framework Import-Package "
                 "(DS / no-port impls do not compile against OSGi Framework)"
+            )
+        require_cap = row.get("require_capability") or ""
+        if components and "osgi.extender=osgi.component" not in require_cap:
+            errors.append(
+                f"{row['path']}: Service-Component impl must Require-Capability "
+                "osgi.extender=osgi.component"
+            )
+        if not components and "osgi.extender=osgi.component" in require_cap:
+            errors.append(
+                f"{row['path']}: Require-Capability osgi.extender is only for DS impls"
             )
         if not activator and not components and row["expected_stem"] not in NO_PORT_STEMS:
             errors.append(
