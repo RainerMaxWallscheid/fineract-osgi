@@ -36,16 +36,21 @@ import org.apache.fineract.notification.service.UserNotificationService;
 import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
+import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
+import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
+import org.apache.fineract.portfolio.search.service.SearchReadService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
@@ -81,7 +86,11 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<UserNotificationService> notifications, final ObjectProvider<ScorecardReadPlatformService> scorecards,
             final ObjectProvider<FundReadPlatformService> funds,
             final ObjectProvider<AccountNumberFormatReadPlatformService> accountNumbers,
-            final ObjectProvider<ReadLikelihoodService> likelihood, final ObjectProvider<TransferWritePlatformService> transfers) {
+            final ObjectProvider<ReadLikelihoodService> likelihood, final ObjectProvider<TransferWritePlatformService> transfers,
+            final ObjectProvider<PaymentTypeReadService> paymentTypes, final ObjectProvider<SearchReadService> search,
+            final ObjectProvider<CollectionSheetWritePlatformService> collectionSheets,
+            final ObjectProvider<StandingInstructionWritePlatformService> standingInstructions,
+            final ObjectProvider<ShareProductDropdownReadPlatformService> shareProducts) {
         return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
                 bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
                 bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
@@ -107,7 +116,12 @@ public class EquinoxOsgiConfiguration {
                 bind(FundReadPlatformService.class, funds.getIfAvailable()),
                 bind(AccountNumberFormatReadPlatformService.class, accountNumbers.getIfAvailable()),
                 bind(ReadLikelihoodService.class, likelihood.getIfAvailable()),
-                bind(TransferWritePlatformService.class, transfers.getIfAvailable())));
+                bind(TransferWritePlatformService.class, transfers.getIfAvailable()),
+                bind(PaymentTypeReadService.class, paymentTypes.getIfAvailable()),
+                bind(SearchReadService.class, search.getIfAvailable()),
+                bind(CollectionSheetWritePlatformService.class, collectionSheets.getIfAvailable()),
+                bind(StandingInstructionWritePlatformService.class, standingInstructions.getIfAvailable()),
+                bind(ShareProductDropdownReadPlatformService.class, shareProducts.getIfAvailable())));
     }
 
     @Bean
