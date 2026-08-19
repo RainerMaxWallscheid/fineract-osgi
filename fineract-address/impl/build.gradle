@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.address.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/address.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.portfolio.address.service,'
+                'Import-Package': 'org.apache.fineract.portfolio.address.service,'
                         + 'org.apache.fineract.portfolio.address.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.address.impl'

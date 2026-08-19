@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.transfer.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/transfer.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.portfolio.transfer.service,'
+                'Import-Package': 'org.apache.fineract.portfolio.transfer.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',

@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.spm.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/spm.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.spm.service,'
+                'Import-Package': 'org.apache.fineract.spm.service,'
                         + 'org.apache.fineract.spm.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.spm.impl'

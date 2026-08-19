@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.campaigns.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/campaigns.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.infrastructure.campaigns.sms.service,'
+                'Import-Package': 'org.apache.fineract.infrastructure.campaigns.sms.service,'
                         + 'org.apache.fineract.infrastructure.campaigns.sms.data,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',

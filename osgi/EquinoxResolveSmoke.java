@@ -45,6 +45,8 @@ public final class EquinoxResolveSmoke {
 
     private static final String[] PILOT_PORTS = {
             "org.apache.fineract.command.core.CommandDispatcher",
+            "org.apache.fineract.command.core.CommandHandlerManager",
+            "org.apache.fineract.command.core.CommandHookManager",
             "org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort",
             "org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort",
             "org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort",

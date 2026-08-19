@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.meeting.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/meeting.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.portfolio.meeting.service,'
+                'Import-Package': 'org.apache.fineract.portfolio.meeting.service,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.meeting.impl'

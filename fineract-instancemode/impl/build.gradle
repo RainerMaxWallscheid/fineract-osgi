@@ -55,8 +55,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Instance Mode Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.instancemode.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Import-Package': 'org.osgi.framework,'
-                        + '*',
+                'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.instancemode.impl'
                 )
     }

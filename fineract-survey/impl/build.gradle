@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.survey.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/survey.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.infrastructure.survey.service,'
+                'Import-Package': 'org.apache.fineract.infrastructure.survey.service,'
                         + 'org.apache.fineract.infrastructure.survey.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.survey.impl'

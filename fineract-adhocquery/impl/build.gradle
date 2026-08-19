@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.adhocquery.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/adhocquery.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.adhocquery.service,'
+                'Import-Package': 'org.apache.fineract.adhocquery.service,'
                         + 'org.apache.fineract.adhocquery.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.adhocquery.impl'

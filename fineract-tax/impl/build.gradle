@@ -58,8 +58,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Tax catalog implementation (JPA, services, REST, Spring wiring)',
                 'Service-Component': 'OSGI-INF/tax.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.portfolio.tax.moduleapi,'
+                'Import-Package': 'org.apache.fineract.portfolio.tax.moduleapi,'
                         + 'org.apache.fineract.portfolio.tax.exception,'
                         + 'org.apache.fineract.portfolio.tax.api,'
                         + '*',

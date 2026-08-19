@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.template.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/template.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.template.service,'
+                'Import-Package': 'org.apache.fineract.template.service,'
                         + 'org.apache.fineract.template.data,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.template.impl'

@@ -28,6 +28,8 @@ Fails on:
   * impl Export-Package that is not empty (impl packages stay private)
   * impl Bundle-Activator outside the loan / COB / security allow-list
   * impl Service-Component file, implementation class, or provide interface missing
+  * DS provide interface that is not a PILOT_PORT in EquinoxResolveSmoke
+  * unused org.osgi.framework Import-Package on a DS or no-port impl
   * impl with neither Service-Component, an allow-listed activator, nor a no-port stem
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
@@ -139,6 +141,13 @@ def parse_export_packages(raw: str | None) -> list[str]:
     if not raw:
         return []
     return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def pilot_ports() -> set[str]:
+    source = ROOT / "osgi" / "EquinoxResolveSmoke.java"
+    text = source.read_text(encoding="utf-8")
+    block = text.split("PILOT_PORTS", 1)[1].split("};", 1)[0]
+    return set(re.findall(r'"(org\.apache\.fineract[^"]+)"', block))
 
 
 def contract_type_names() -> set[str]:
@@ -312,6 +321,7 @@ def main() -> int:
             )
 
     contract_types = contract_type_names()
+    smoked_ports = pilot_ports()
 
     exporters: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
@@ -364,6 +374,19 @@ def main() -> int:
                     errors.append(
                         f"{xml_path}: provide interface {iface} is not an *-api or fineract-core type"
                     )
+                if iface not in smoked_ports:
+                    errors.append(
+                        f"{xml_path}: provide interface {iface} is not a PILOT_PORT in "
+                        "osgi/EquinoxResolveSmoke.java"
+                    )
+        if (
+            not activator
+            and "org.osgi.framework" in (row.get("imports") or [])
+        ):
+            errors.append(
+                f"{row['path']}: unused org.osgi.framework Import-Package "
+                "(DS / no-port impls do not compile against OSGi Framework)"
+            )
         if not activator and not components and row["expected_stem"] not in NO_PORT_STEMS:
             errors.append(
                 f"{row['path']}: impl has no Service-Component and no allow-listed Bundle-Activator"

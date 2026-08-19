@@ -56,8 +56,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.accountnumberformat.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/accountnumberformat.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.infrastructure.accountnumberformat.service,'
+                'Import-Package': 'org.apache.fineract.infrastructure.accountnumberformat.service,'
                         + 'org.apache.fineract.infrastructure.accountnumberformat.data,'
                         + 'org.apache.fineract.infrastructure.accountnumberformat.domain,'
                         + '*',

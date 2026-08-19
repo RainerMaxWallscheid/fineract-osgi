@@ -54,7 +54,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.command.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Service-Component': 'OSGI-INF/command-hooks.xml, OSGI-INF/command-handlers.xml, OSGI-INF/command-dispatcher.xml',
-                'Import-Package': 'org.osgi.framework,org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
+                'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
                 'Automatic-Module-Name': 'org.apache.fineract.command.impl'
                 )
     }

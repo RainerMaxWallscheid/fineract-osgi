@@ -59,8 +59,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Accounting implementation (JPA, REST, product mapping helpers, jobs)',
                 'Service-Component': 'OSGI-INF/accounting.xml',
-                'Import-Package': 'org.osgi.framework,'
-                        + 'org.apache.fineract.accounting.closure.service,'
+                'Import-Package': 'org.apache.fineract.accounting.closure.service,'
                         + 'org.apache.fineract.accounting.closure.data,'
                         + 'org.apache.fineract.accounting.closure.exception,'
                         + '*',
