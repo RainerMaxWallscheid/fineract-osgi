@@ -325,6 +325,31 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         return fetchClassificationMappings(PortfolioProductType.LOAN, loanProductId, classificationParameter);
     }
 
+    @Override
+    public List<PaymentTypeToGLAccountMapper> fetchPaymentTypeToFundSourceMappingsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        return fetchPaymentTypeToFundSourceMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId);
+    }
+
+    @Override
+    public List<ChargeToGLAccountMapper> fetchFeeToGLAccountMappingsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        return fetchChargeToIncomeAccountMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId, false);
+    }
+
+    @Override
+    public List<ChargeToGLAccountMapper> fetchPenaltyToIncomeAccountMappingsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        return fetchChargeToIncomeAccountMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId, true);
+    }
+
+    @Override
+    public List<AdvancedMappingToExpenseAccountData> fetchChargeOffReasonMappingsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        return fetchChargeOffReasonMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId);
+    }
+
+    @Override
+    public List<AdvancedMappingToExpenseAccountData> fetchWriteOffReasonMappingsForWorkingCapitalLoanProduct(final Long wcLoanProductId) {
+        return fetchWriteOffReasonMappings(PortfolioProductType.WORKING_CAPITAL_LOAN, wcLoanProductId);
+    }
+
     private Map<String, Object> setAccrualPeriodicSavingsProductToGLAccountMaps(final List<ProductToGLAccountMapping> mappings) {
         final Map<String, Object> accountMappingDetails = new LinkedHashMap<>(8);
         for (final ProductToGLAccountMapping mapping : mappings) {

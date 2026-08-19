@@ -56,4 +56,14 @@ public interface ProductToGLAccountMappingReadPlatformService {
 
     List<ClassificationToGLAccountData> fetchClassificationMappingsForLoanProduct(Long loanProductId,
             LoanProductAccountingParams classificationParameter);
+
+    List<PaymentTypeToGLAccountMapper> fetchPaymentTypeToFundSourceMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
+
+    List<ChargeToGLAccountMapper> fetchFeeToGLAccountMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
+
+    List<ChargeToGLAccountMapper> fetchPenaltyToIncomeAccountMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
+
+    List<AdvancedMappingToExpenseAccountData> fetchChargeOffReasonMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
+
+    List<AdvancedMappingToExpenseAccountData> fetchWriteOffReasonMappingsForWorkingCapitalLoanProduct(Long wcLoanProductId);
 }

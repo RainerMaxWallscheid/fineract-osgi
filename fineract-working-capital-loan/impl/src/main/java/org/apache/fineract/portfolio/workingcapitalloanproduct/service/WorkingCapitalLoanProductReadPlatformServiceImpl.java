@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.accounting.producttoaccountmapping.service.WorkingCapitalLoanProductAdvancedAccountingReadHelper;
+import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingReadPlatformService;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
@@ -69,7 +69,7 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
     private final WorkingCapitalBreachReadPlatformService breachReadPlatformService;
     private final PaymentTypeReadService paymentTypeReadService;
     private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
-    private final WorkingCapitalLoanProductAdvancedAccountingReadHelper advancedAccountingReadHelper;
+    private final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
     private final WorkingCapitalProductAccountingMappingService wcAccountingMappingService;
     private final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService;
@@ -87,11 +87,16 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
         if (product.getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
             final Map<String, GLAccountData> accountingMappings = this.wcAccountingMappingService.fetchAccountMappingDetails(productId, product.getAccountingRule());
             productData.setAccountingMappings(accountingMappings);
-            productData.setPaymentChannelToFundSourceMappings(advancedAccountingReadHelper.fetchPaymentTypeToFundSourceMappings(productId));
-            productData.setFeeToIncomeAccountMappings(advancedAccountingReadHelper.fetchFeeToIncomeMappings(productId));
-            productData.setPenaltyToIncomeAccountMappings(advancedAccountingReadHelper.fetchPenaltyToIncomeMappings(productId));
-            productData.setChargeOffReasonToExpenseAccountMappings(advancedAccountingReadHelper.fetchChargeOffReasonMappings(productId));
-            productData.setWriteOffReasonsToExpenseMappings(advancedAccountingReadHelper.fetchWriteOffReasonMappings(productId));
+            productData.setPaymentChannelToFundSourceMappings(
+                    accountMappingReadPlatformService.fetchPaymentTypeToFundSourceMappingsForWorkingCapitalLoanProduct(productId));
+            productData.setFeeToIncomeAccountMappings(
+                    accountMappingReadPlatformService.fetchFeeToGLAccountMappingsForWorkingCapitalLoanProduct(productId));
+            productData.setPenaltyToIncomeAccountMappings(
+                    accountMappingReadPlatformService.fetchPenaltyToIncomeAccountMappingsForWorkingCapitalLoanProduct(productId));
+            productData.setChargeOffReasonToExpenseAccountMappings(
+                    accountMappingReadPlatformService.fetchChargeOffReasonMappingsForWorkingCapitalLoanProduct(productId));
+            productData.setWriteOffReasonsToExpenseMappings(
+                    accountMappingReadPlatformService.fetchWriteOffReasonMappingsForWorkingCapitalLoanProduct(productId));
         }
         return productData;
     }
@@ -143,7 +148,7 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanProductReadPlatformServiceImpl(final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanProductMapper mapper, final FundReadPlatformService fundReadPlatformService, final CurrencyReadPlatformService currencyReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final PaymentTypeReadService paymentTypeReadService, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final WorkingCapitalLoanProductAdvancedAccountingReadHelper advancedAccountingReadHelper, final CodeValueReadPlatformService codeValueReadPlatformService, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService) {
+        public WorkingCapitalLoanProductReadPlatformServiceImpl(final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanProductMapper mapper, final FundReadPlatformService fundReadPlatformService, final CurrencyReadPlatformService currencyReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final PaymentTypeReadService paymentTypeReadService, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService, final CodeValueReadPlatformService codeValueReadPlatformService, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService) {
         this.repository = repository;
         this.mapper = mapper;
         this.fundReadPlatformService = fundReadPlatformService;
@@ -152,7 +157,7 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
         this.breachReadPlatformService = breachReadPlatformService;
         this.paymentTypeReadService = paymentTypeReadService;
         this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
-        this.advancedAccountingReadHelper = advancedAccountingReadHelper;
+        this.accountMappingReadPlatformService = accountMappingReadPlatformService;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
         this.wcAccountingMappingService = wcAccountingMappingService;
         this.nearBreachReadPlatformService = nearBreachReadPlatformService;
