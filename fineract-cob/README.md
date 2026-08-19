@@ -6,7 +6,7 @@ Close-of-business orchestration — Wave 4 OSGi modularization
 | Gradle project | Path | Bundle-SymbolicName | Role |
 |----------------|------|---------------------|------|
 | `fineract-cob-api` | `api/` | `org.apache.fineract.cob.api` | Pure ports, DTOs, exceptions |
-| `fineract-cob-impl` | `impl/` | `org.apache.fineract.cob.impl` | Batch steps, loan lock residual, lock/business-step REST; Equinox `CobOsgiBundleActivator` |
+| `fineract-cob-impl` | `impl/` | `org.apache.fineract.cob.impl` | Batch steps, loan lock residual, lock/business-step REST; Equinox DS `OSGI-INF/cob.xml` |
 | `fineract-cob-test` | `test/` | `org.apache.fineract.cob.test` | Fragment-Host → impl |
 
 No façade. Domain modules depend on **api + impl**.

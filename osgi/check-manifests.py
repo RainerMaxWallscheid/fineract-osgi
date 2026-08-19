@@ -26,12 +26,12 @@ Fails on:
   * BSN that does not match the Gradle module stem
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not empty (impl packages stay private)
-  * impl Bundle-Activator outside the loan / COB / security allow-list
+  * impl Bundle-Activator (none remain; DS or no-port stem only)
   * impl Service-Component file, implementation class, or provide interface missing
   * DS provide interface that is not a PILOT_PORT in EquinoxResolveSmoke
   * unused org.osgi.framework Import-Package on a DS or no-port impl
   * DS impl missing Require-Capability osgi.extender=osgi.component
-  * impl with neither Service-Component, an allow-listed activator, nor a no-port stem
+  * impl with neither Service-Component nor a no-port stem
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
@@ -62,16 +62,8 @@ ROOT = Path(__file__).resolve().parents[1]
 # The check fails on any new api-api Export-Package collision.
 KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 
-# Bundle-Activator remains only for loan/COB/security.
-ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset(
-    {
-        "cob",
-        "loan",
-        "progressiveloan",
-        "security",
-        "workingcapitalloan",
-    }
-)
+# No Equinox Bundle-Activator remains. Empty-catalog ports use DS.
+ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset()
 
 # No Equinox-safe catalog port (jersey / AWS / swagger / leftover types).
 NO_PORT_STEMS: frozenset[str] = frozenset(
@@ -343,8 +335,8 @@ def main() -> int:
         activator = row.get("activator")
         if activator and row["expected_stem"] not in ALLOWED_ACTIVATOR_STEMS:
             errors.append(
-                f"{row['path']}: Bundle-Activator {activator} is not allow-listed "
-                f"(loan / COB / security only)"
+                f"{row['path']}: Bundle-Activator {activator} is not allowed "
+                f"(DS or no-port stem only)"
             )
         components = row.get("components") or []
         if activator and components:
@@ -402,7 +394,7 @@ def main() -> int:
             )
         if not activator and not components and row["expected_stem"] not in NO_PORT_STEMS:
             errors.append(
-                f"{row['path']}: impl has no Service-Component and no allow-listed Bundle-Activator"
+                f"{row['path']}: impl has no Service-Component (and is not a no-port stem)"
             )
 
     seen_known: set[str] = set()

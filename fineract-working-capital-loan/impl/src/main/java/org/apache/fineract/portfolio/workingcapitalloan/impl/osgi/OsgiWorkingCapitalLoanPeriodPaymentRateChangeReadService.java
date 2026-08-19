@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLo
 
 /**
  * Empty period-payment rate-change catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/working-capital-loan.xml} (ADR-022 B6).
  */
-final class OsgiWorkingCapitalLoanPeriodPaymentRateChangeReadService implements WorkingCapitalLoanPeriodPaymentRateChangeReadService {
+public final class OsgiWorkingCapitalLoanPeriodPaymentRateChangeReadService implements WorkingCapitalLoanPeriodPaymentRateChangeReadService {
 
     @Override
     public List<WorkingCapitalLoanPeriodPaymentRateChangeData> retrieveRateChangeHistory(final Long loanId) {

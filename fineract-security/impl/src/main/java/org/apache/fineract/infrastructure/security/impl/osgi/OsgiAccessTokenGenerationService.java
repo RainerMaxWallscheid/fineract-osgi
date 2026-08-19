@@ -23,8 +23,9 @@ import org.apache.fineract.infrastructure.security.service.AccessTokenGeneration
 
 /**
  * JDK UUID token generator for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/security.xml} (ADR-022 B6).
  */
-final class OsgiAccessTokenGenerationService implements AccessTokenGenerationService {
+public final class OsgiAccessTokenGenerationService implements AccessTokenGenerationService {
 
     @Override
     public String generateRandomToken() {

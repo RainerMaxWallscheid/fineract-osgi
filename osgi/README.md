@@ -216,7 +216,7 @@ Provider composition root uses api+impl. Plan: [15_osgi_bundle_refactoring_finer
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-loan-api` | `org.apache.fineract.loan.api` | Pure ports, DTOs, exceptions, selected pure enums |
-| `fineract-loan-impl` | `org.apache.fineract.loan.impl` | Domain + COB + `LoanOsgiServiceRegistrar` / `LoanOsgiBundleActivator` |
+| `fineract-loan-impl` | `org.apache.fineract.loan.impl` | Domain + COB + `LoanOsgiServiceRegistrar` / DS `OSGI-INF/loan.xml` |
 | `fineract-loan-test` | `org.apache.fineract.loan.test` | Fragment-Host → loan.impl |
 
 Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_refactoring_fineract-loan.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-loan.md).
@@ -226,7 +226,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-progressive-loan-api` | `org.apache.fineract.progressiveloan.api` | Pure ports & calc DTOs |
-| `fineract-progressive-loan-impl` | `org.apache.fineract.progressiveloan.impl` | Schedule engine residual + `ProgressiveLoanOsgiServiceRegistrar` / `ProgressiveLoanOsgiBundleActivator` |
+| `fineract-progressive-loan-impl` | `org.apache.fineract.progressiveloan.impl` | Schedule engine residual + `ProgressiveLoanOsgiServiceRegistrar` / DS `OSGI-INF/progressive-loan.xml` |
 | `fineract-progressive-loan-test` | `org.apache.fineract.progressiveloan.test` | Fragment-Host → progressiveloan.impl |
 
 ### Wave 4: fineract-working-capital-loan bundles (complete)
@@ -234,7 +234,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-working-capital-loan-api` | `org.apache.fineract.workingcapitalloan.api` | Pure ports, DTOs, exceptions, pure enums |
-| `fineract-working-capital-loan-impl` | `org.apache.fineract.workingcapitalloan.impl` | Domain + COB residual + `WorkingCapitalLoanOsgiServiceRegistrar` / `WorkingCapitalLoanOsgiBundleActivator` |
+| `fineract-working-capital-loan-impl` | `org.apache.fineract.workingcapitalloan.impl` | Domain + COB residual + `WorkingCapitalLoanOsgiServiceRegistrar` / DS `OSGI-INF/working-capital-loan.xml` |
 | `fineract-working-capital-loan-test` | `org.apache.fineract.workingcapitalloan.test` | Fragment-Host → workingcapitalloan.impl |
 
 ### Wave 4: fineract-cob bundles (complete)
@@ -242,7 +242,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-cob-api` | `org.apache.fineract.cob.api` | Pure ports, DTOs, exceptions |
-| `fineract-cob-impl` | `org.apache.fineract.cob.impl` | Batch residual + `CobOsgiServiceRegistrar` / `CobOsgiBundleActivator` |
+| `fineract-cob-impl` | `org.apache.fineract.cob.impl` | Batch residual + `CobOsgiServiceRegistrar` / DS `OSGI-INF/cob.xml` |
 | `fineract-cob-test` | `org.apache.fineract.cob.test` | Fragment-Host → cob.impl |
 
 ### Wave 4: fineract-security bundles (complete)
@@ -250,7 +250,7 @@ Progressive / WC / provider / custom use **api + impl**. Plan: [15_osgi_bundle_r
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-security-api` | `org.apache.fineract.security.api` | Pure ports, DTOs, exceptions, constants |
-| `fineract-security-impl` | `org.apache.fineract.security.impl` | Filters/OIDC residual + `SecurityOsgiServiceRegistrar` / `SecurityOsgiBundleActivator` |
+| `fineract-security-impl` | `org.apache.fineract.security.impl` | Filters/OIDC residual + `SecurityOsgiServiceRegistrar` / DS `OSGI-INF/security.xml` |
 | `fineract-security-test` | `org.apache.fineract.security.test` | Fragment-Host → security.impl |
 
 ### Core slice: fineract-businessdate (complete)
@@ -713,7 +713,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security allow-list, a missing `Service-Component` descriptor, implementation class, or provide interface on `*-api` / `fineract-core`, a DS provide interface that is not a PILOT_PORT, unused `org.osgi.framework` Import-Package on a DS or no-port impl, a DS impl missing `Require-Capability` `osgi.extender=osgi.component`, an impl with no Equinox start path (unless it is a no-port stem), new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, any impl `Bundle-Activator`, a missing `Service-Component` descriptor, implementation class, or provide interface on `*-api` / `fineract-core`, a DS provide interface that is not a PILOT_PORT, unused `org.osgi.framework` Import-Package on a DS or no-port impl, a DS impl missing `Require-Capability` `osgi.extender=osgi.component`, an impl with no Equinox start path (unless it is a no-port stem), new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ```bash
 python3 osgi/check-foreign-impl-deps.py
@@ -768,7 +768,7 @@ curl -L -o osgi/equinox/org.eclipse.osgi-3.20.0.jar \
 ./gradlew osgiStageBundles
 ```
 
-Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services (`Service-Component`). Loan / progressive-loan / WC-loan / COB / security keep Bundle-Activators. No-port modules have no Equinox activator.
+Copies every `fineract-*-api`, `fineract-*-impl`, and `fineract-core` jar into `osgi/bundles/` and writes `osgi/config/config.ini` (template + absolute `osgi.bundles` `reference:file:` URLs). Start levels: Felix SCR + OSGi DS API `@1`, core `@2`, api `@3`, impl `@4`. Relative bundle paths resolve against `osgi.install.area` (`osgi/equinox`), not the working directory. Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services (`Service-Component`). No-port modules have no Equinox activator.
 
 ## Resolve smoke
 
@@ -786,7 +786,7 @@ Downloads Equinox if needed, compiles `EquinoxResolveSmoke.java`, installs the s
 python3 osgi/resolve-smoke.py --start --strict
 ```
 
-Starts every staged bundle after resolve (no Spring). Exit 0 requires every PILOT_PORT in the Service Registry (`SERVICE_MISS` otherwise). Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services. Loan / progressive-loan / WC-loan / COB / security still register via Bundle-Activators. `--strict` requires every fineract bundle to be ACTIVE. `:equinoxStartSmoke` passes `--start --strict`.
+Starts every staged bundle after resolve (no Spring). Exit 0 requires every PILOT_PORT in the Service Registry (`SERVICE_MISS` otherwise). Equinox-safe empty catalog ports and the command dispatcher graph register via Declarative Services. `--strict` requires every fineract bundle to be ACTIVE. `:equinoxStartSmoke` passes `--start --strict`.
 
 ```bash
 ./gradlew equinoxSpringBridgeSmoke

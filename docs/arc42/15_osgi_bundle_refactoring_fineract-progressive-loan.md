@@ -5,7 +5,7 @@ Wave‑4 product variant after [loan](15_osgi_bundle_refactoring_fineract-loan.m
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test; residual domain for provider/embeddable); Equinox `ProgressiveLoanOsgiBundleActivator` (`BuyDownFeeReadPlatformService`) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test; residual domain for provider/embeddable); Equinox DS `OSGI-INF/progressive-loan.xml` (`BuyDownFeeReadPlatformService`) |
 | **Module** | Progressive EMI schedule, capitalized income, buy-down fee reads |
 | **No façade** | Compose with `:fineract-progressive-loan-api` + `:fineract-progressive-loan-impl` |
 

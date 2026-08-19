@@ -25,8 +25,9 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPo
 
 /**
  * Empty loan-product lookup catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/loan.xml} (ADR-022 B6).
  */
-final class OsgiLoanProductLookupReadPort implements LoanProductLookupReadPort {
+public final class OsgiLoanProductLookupReadPort implements LoanProductLookupReadPort {
 
     @Override
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {

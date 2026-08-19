@@ -5,7 +5,7 @@ Wave‑4 product variant after [loan](15_osgi_bundle_refactoring_fineract-loan.m
 
 | Field | Value |
 |-------|--------|
-| **Status** | **complete** — Steps **0–9** (api/impl/test; entity residual for provider); Equinox `WorkingCapitalLoanOsgiBundleActivator` (`WorkingCapitalLoanPeriodPaymentRateChangeReadService`) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test; entity residual for provider); Equinox DS `OSGI-INF/working-capital-loan.xml` (`WorkingCapitalLoanPeriodPaymentRateChangeReadService`) |
 | **Module** | Working capital products/accounts, breach/near-breach, COB |
 | **No façade** | Compose with `:fineract-working-capital-loan-api` + `:fineract-working-capital-loan-impl` |
 

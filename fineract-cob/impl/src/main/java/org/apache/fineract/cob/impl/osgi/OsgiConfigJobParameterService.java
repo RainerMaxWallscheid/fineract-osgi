@@ -27,8 +27,9 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
 /**
  * Empty COB job-parameter catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/cob.xml} (ADR-022 B6).
  */
-final class OsgiConfigJobParameterService implements ConfigJobParameterService {
+public final class OsgiConfigJobParameterService implements ConfigJobParameterService {
 
     @Override
     public JobBusinessStepConfigData getBusinessStepConfigByJobName(final String jobName) {
