@@ -21,17 +21,33 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
+import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanJournalPort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LoanJournalEntryPosterImpl implements LoanJournalEntryPoster {
     private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    @Autowired
+    private LoanJournalPort loanJournalPort;
+    @Autowired
+    private LoanAccountingBridgeMapper loanAccountingBridgeMapper;
 
     @Override
     public void postJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer, final boolean isLoanToLoanTransfer) {
-        this.journalEntryWritePlatformService.createJournalEntriesForLoanTransaction(loanTransaction, isAccountTransfer, isLoanToLoanTransfer);
+        final Loan loan = loanTransaction.getLoan();
+        if (!loan.isCashBasedAccountingEnabledOnLoanProduct() && !loan.isUpfrontAccrualAccountingEnabledOnLoanProduct()
+                && !loan.isPeriodicAccrualAccountingEnabledOnLoanProduct()) {
+            return;
+        }
+        final AccountingBridgeDataDTO accountingBridgeData = this.loanAccountingBridgeMapper.toBridge(loanTransaction, isAccountTransfer);
+        if (isLoanToLoanTransfer) {
+            accountingBridgeData.getNewLoanTransactions().forEach(tx -> tx.setLoanToLoanTransfer(true));
+        }
+        this.loanJournalPort.postLoan(accountingBridgeData);
     }
 
     @Override

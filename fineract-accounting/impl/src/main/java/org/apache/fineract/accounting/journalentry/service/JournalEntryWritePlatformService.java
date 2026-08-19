@@ -27,7 +27,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
 public interface JournalEntryWritePlatformService extends JournalEntryCommandWritePort, LoanReversalJournalEntryPort {
 
@@ -48,18 +47,6 @@ public interface JournalEntryWritePlatformService extends JournalEntryCommandWri
     void createJournalEntriesForShares(Map<String, Object> accountingBridgeData);
 
     void revertShareAccountJournalEntries(ArrayList<Long> transactionId, LocalDate transactionDate);
-
-    /**
-     * Create journal entries immediately for a single loan transaction
-     *
-     * @param loanTransaction
-     *            the loan transaction to create journal entries for
-     * @param isAccountTransfer
-     *            whether this is an account transfer transaction
-     * @param isLoanToLoanTransfer
-     *            whether this is a loan-to-loan transfer transaction
-     */
-    void createJournalEntriesForLoanTransaction(LoanTransaction loanTransaction, boolean isAccountTransfer, boolean isLoanToLoanTransfer);
 
     /**
      * Create journal entries immediately for an external owner transfer

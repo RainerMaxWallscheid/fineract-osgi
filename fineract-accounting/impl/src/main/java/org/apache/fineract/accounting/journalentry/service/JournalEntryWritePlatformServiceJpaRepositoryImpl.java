@@ -19,7 +19,6 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
@@ -43,7 +41,6 @@ import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformSer
 import org.apache.fineract.accounting.journalentry.api.JournalEntryJsonInputParams;
 import org.apache.fineract.accounting.journalentry.command.JournalEntryCommand;
 import org.apache.fineract.accounting.journalentry.command.SingleDebitOrCreditEntryCommand;
-import org.apache.fineract.accounting.journalentry.data.AdvancedMappingtDTO;
 import org.apache.fineract.accounting.journalentry.data.ClientTransactionDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanDTO;
 import org.apache.fineract.accounting.journalentry.data.SavingsDTO;
@@ -59,7 +56,6 @@ import org.apache.fineract.accounting.journalentry.serialization.JournalEntryCom
 import org.apache.fineract.accounting.rule.domain.AccountingRule;
 import org.apache.fineract.accounting.rule.domain.AccountingRuleRepository;
 import org.apache.fineract.accounting.rule.exception.AccountingRuleNotFoundException;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.service.ConfigurationReadPlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -77,28 +73,12 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
-import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
-import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeLoanTransactionDTO;
-import org.apache.fineract.portfolio.loanaccount.data.ChargeTaxDetailDTO;
-import org.apache.fineract.portfolio.loanaccount.data.LoanChargePaidByDTO;
-import org.apache.fineract.portfolio.loanaccount.domain.AmortizationType;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanAmortizationAllocationMapping;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanAmortizationAllocationMappingRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanChargePaidBy;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeTaxDetails;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelation;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
-import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -129,9 +109,6 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     private final CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions;
     private final ConfigurationReadPlatformService configurationReadPlatformService;
     private final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort;
-    private final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository;
-    private final LoanTransactionRepository loanTransactionRepository;
-    private final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort;
 
     @Transactional
     @Override
@@ -580,163 +557,24 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
     @Transactional
     @Override
-    public void createJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer, final boolean isLoanToLoanTransfer) {
-        final Loan loan = loanTransaction.getLoan();
-        // Check if accounting is enabled for this loan
-        if (!loan.isCashBasedAccountingEnabledOnLoanProduct() && !loan.isUpfrontAccrualAccountingEnabledOnLoanProduct() && !loan.isPeriodicAccrualAccountingEnabledOnLoanProduct()) {
-            return; // No accounting enabled, skip journal entry creation
-        }
-        final AccountingBridgeDataDTO accountingBridgeData = createAccountingBridgeDataForSingleTransaction(loanTransaction, isAccountTransfer);
-        if (isLoanToLoanTransfer) {
-            accountingBridgeData.getNewLoanTransactions().forEach(tx -> tx.setLoanToLoanTransfer(true));
-        }
-        this.createJournalEntriesForLoan(accountingBridgeData);
-    }
-
-    @Transactional
-    @Override
     public void createJournalEntriesForExternalOwnerTransfer(final Loan loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer, final ExternalAssetOwner previousOwner) {
         this.externalAssetOwnerJournalPort.createJournalEntriesForExternalOwnerTransfer(loan, externalAssetOwnerTransfer, previousOwner);
     }
 
-    /**
-     * Create AccountingBridgeDataDTO for a single loan transaction This converts a single LoanTransaction to the format
-     * expected by existing journal entry logic
-     */
-    private AccountingBridgeDataDTO createAccountingBridgeDataForSingleTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer) {
-        final Loan loan = loanTransaction.getLoan();
-        final String currencyCode = loan.getCurrencyCode();
-        final AccountingBridgeLoanTransactionDTO transactionDTO = convertToAccountingBridgeTransaction(loanTransaction);
-        final List<AccountingBridgeLoanTransactionDTO> transactions = new ArrayList<>();
-        transactions.add(transactionDTO);
-        boolean wasChargedOffAtTransactionTime = loan.isChargedOff();
-        if (loan.isChargedOff() && loan.getChargedOffOnDate() != null) {
-            // If transaction date is before charge-off date, treat as non-charged-off
-            if (loanTransaction.getTransactionDate().isBefore(loan.getChargedOffOnDate())) {
-                wasChargedOffAtTransactionTime = false;
-            }
-        }
-        List<AdvancedMappingtDTO> buydownFeeAdvancedMappingData = null;
-        List<AdvancedMappingtDTO> capitalizedIncomeAdvancedMappingData = null;
-        if (loanTransaction.isBuyDownFeeAmortization()) {
-            buydownFeeAdvancedMappingData = getLoanTransactionClassificationId(loanTransaction);
-        } else if (loanTransaction.isCapitalizedIncomeAmortization()) {
-            capitalizedIncomeAdvancedMappingData = getLoanTransactionClassificationId(loanTransaction);
-        }
-        AdvancedMappingtDTO writeOffReasonAdvancedMappingData = null;
-        if (loan.isClosedWrittenOff() && loan.getWriteOffReason() != null) {
-            writeOffReasonAdvancedMappingData = new AdvancedMappingtDTO(loan.getWriteOffReason().getId(), BigDecimal.ZERO);
-        }
-        return new AccountingBridgeDataDTO(loan.getId(), loan.productId(), loan.getOfficeId(), currencyCode, loan.getSummary().getTotalInterestCharged(), loan.isCashBasedAccountingEnabledOnLoanProduct(), loan.isUpfrontAccrualAccountingEnabledOnLoanProduct(), loan.isPeriodicAccrualAccountingEnabledOnLoanProduct(), isAccountTransfer, wasChargedOffAtTransactionTime, loan.isFraud(), loan.fetchChargeOffReasonId(), loan.isClosedWrittenOff(), transactions, loan.getLoanProductRelatedDetail().isMerchantBuyDownFee(), buydownFeeAdvancedMappingData, capitalizedIncomeAdvancedMappingData, writeOffReasonAdvancedMappingData);
-    }
-
-    private List<AdvancedMappingtDTO> getLoanTransactionClassificationId(final LoanTransaction loanTransaction) {
-        final List<AdvancedMappingtDTO> advancedMappingData = new ArrayList<AdvancedMappingtDTO>();
-        if (loanTransaction.isCapitalizedIncomeAmortization() || loanTransaction.isBuyDownFeeAmortization()) {
-            final List<LoanAmortizationAllocationMapping> loanTransactionAllocations = loanAmortizationAllocationMappingRepository.fetchLoanTransactionAllocationByAmortizationLoanTransactionId(loanTransaction.getId(), loanTransaction.getLoan().getId());
-            loanTransactionAllocations.forEach(loanTransactionAllocation -> {
-                final CodeValue classification = loanTransactionRepository.fetchClassificationCodeValueByTransactionId(loanTransactionAllocation.getBaseLoanTransactionId());
-                final BigDecimal allocationAmount = loanTransactionAllocation.getAmortizationType().equals(AmortizationType.AM) ? loanTransactionAllocation.getAmount() : loanTransactionAllocation.getAmount().negate();
-                if (classification != null) {
-                    advancedMappingData.add(new AdvancedMappingtDTO(classification.getId(), allocationAmount));
-                } else {
-                    advancedMappingData.add(new AdvancedMappingtDTO(null, allocationAmount));
-                }
-            });
-        }
-        return advancedMappingData;
-    }
-
-    /**
-     * Convert LoanTransaction to AccountingBridgeLoanTransactionDTO
-     */
-    private AccountingBridgeLoanTransactionDTO convertToAccountingBridgeTransaction(LoanTransaction loanTransaction) {
-        final MonetaryCurrency currency = loanTransaction.getLoan().getCurrency();
-        final AccountingBridgeLoanTransactionDTO transactionDTO = new AccountingBridgeLoanTransactionDTO();
-        transactionDTO.setId(loanTransaction.getId());
-        transactionDTO.setOfficeId(loanTransaction.getOffice().getId());
-        transactionDTO.setType(LoanTransactionEnumerations.transactionType(loanTransaction.getTypeOf()));
-        transactionDTO.setReversed(loanTransaction.isReversed());
-        transactionDTO.setDate(loanTransaction.getTransactionDate());
-        transactionDTO.setCurrencyCode(currency.getCode());
-        transactionDTO.setAmount(loanTransaction.getAmount());
-        transactionDTO.setNetDisbursalAmount(loanTransaction.getLoan().getNetDisbursalAmount());
-        // Handle principalPortion for chargeback
-        if (transactionDTO.getType().isChargeback() && (loanTransaction.getLoan().getCreditAllocationRules() == null || loanTransaction.getLoan().getCreditAllocationRules().isEmpty())) {
-            transactionDTO.setPrincipalPortion(loanTransaction.getAmount());
-        } else {
-            transactionDTO.setPrincipalPortion(loanTransaction.getPrincipalPortion());
-        }
-        transactionDTO.setInterestPortion(loanTransaction.getInterestPortion());
-        transactionDTO.setFeeChargesPortion(loanTransaction.getFeeChargesPortion());
-        transactionDTO.setPenaltyChargesPortion(loanTransaction.getPenaltyChargesPortion());
-        transactionDTO.setOverPaymentPortion(loanTransaction.getOverPaymentPortion());
-        // Handle ChargeRefund transactions
-        if (transactionDTO.getType().isChargeRefund()) {
-            transactionDTO.setChargeRefundChargeType(loanTransaction.getChargeRefundChargeType());
-        }
-        if (loanTransaction.getPaymentDetail() != null) {
-            transactionDTO.setPaymentTypeId(loanTransaction.getPaymentDetail().getPaymentType().getId());
-        }
-        // Populate loanChargesPaid from the transaction
-        if (!loanTransaction.getLoanChargesPaid().isEmpty()) {
-            List<LoanChargePaidByDTO> loanChargesPaidData = new ArrayList<>();
-            final MathContext mc = MoneyHelper.getMathContext();
-            for (final LoanChargePaidBy chargePaidBy : loanTransaction.getLoanChargesPaid()) {
-                final LoanCharge lc = chargePaidBy.getLoanCharge();
-                final LoanChargePaidByDTO loanChargePaidData = new LoanChargePaidByDTO();
-                loanChargePaidData.setChargeId(lc.getChargeId());
-                loanChargePaidData.setIsPenalty(lc.isPenaltyCharge());
-                loanChargePaidData.setLoanChargeId(lc.getId());
-                loanChargePaidData.setAmount(chargePaidBy.getAmount());
-                loanChargePaidData.setInstallmentNumber(chargePaidBy.getInstallmentNumber());
-                // Pro-rate each TaxComponent's tax proportionally to the paid amount
-                final BigDecimal chargeAmount = lc.getAmount();
-                final BigDecimal paidAmount = chargePaidBy.getAmount();
-                if (chargeAmount != null && chargeAmount.compareTo(BigDecimal.ZERO) > 0 && !lc.getTaxDetails().isEmpty()) {
-                    final List<ChargeTaxDetailDTO> taxDetails = new ArrayList<>();
-                    for (LoanChargeTaxDetails taxDetail : lc.getTaxDetails()) {
-                        final Long creditAccountId = resolveTaxCreditAccountId(taxDetail.getTaxComponentId());
-                        if (creditAccountId != null) {
-                            final BigDecimal proRatedTax = taxDetail.getAmount().multiply(paidAmount, mc).divide(chargeAmount, mc);
-                            taxDetails.add(new ChargeTaxDetailDTO(creditAccountId, proRatedTax));
-                        }
-                    }
-                    loanChargePaidData.setTaxDetails(taxDetails);
-                }
-                loanChargesPaidData.add(loanChargePaidData);
-            }
-            transactionDTO.setLoanChargesPaid(loanChargesPaidData);
-        }
-        // Handle chargeback principalPaid/feePaid/penaltyPaid
-        if (transactionDTO.getType().isChargeback() && loanTransaction.getOverPaymentPortion() != null && loanTransaction.getOverPaymentPortion().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal principalPaid = loanTransaction.getOverPaymentPortion();
-            BigDecimal feePaid = BigDecimal.ZERO;
-            BigDecimal penaltyPaid = BigDecimal.ZERO;
-            if (!loanTransaction.getLoanTransactionToRepaymentScheduleMappings().isEmpty()) {
-                principalPaid = loanTransaction.getLoanTransactionToRepaymentScheduleMappings().stream().map(mapping -> Optional.ofNullable(mapping.getPrincipalPortion()).orElse(BigDecimal.ZERO)).reduce(BigDecimal.ZERO, BigDecimal::add);
-                feePaid = loanTransaction.getLoanTransactionToRepaymentScheduleMappings().stream().map(mapping -> Optional.ofNullable(mapping.getFeeChargesPortion()).orElse(BigDecimal.ZERO)).reduce(BigDecimal.ZERO, BigDecimal::add);
-                penaltyPaid = loanTransaction.getLoanTransactionToRepaymentScheduleMappings().stream().map(mapping -> Optional.ofNullable(mapping.getPenaltyChargesPortion()).orElse(BigDecimal.ZERO)).reduce(BigDecimal.ZERO, BigDecimal::add);
-            }
-            transactionDTO.setPrincipalPaid(principalPaid);
-            transactionDTO.setFeePaid(feePaid);
-            transactionDTO.setPenaltyPaid(penaltyPaid);
-        }
-        // Populate loanChargeData for CHARGE_ADJUSTMENT transactions
-        LoanTransactionRelation loanTransactionRelation = loanTransaction.getLoanTransactionRelations().stream().filter(e -> LoanTransactionRelationTypeEnum.CHARGE_ADJUSTMENT.equals(e.getRelationType())).findAny().orElse(null);
-        if (loanTransactionRelation != null) {
-            LoanCharge loanCharge = loanTransactionRelation.getToCharge();
-            transactionDTO.setLoanChargeData(loanCharge.toData());
-        }
-        // Set loanToLoanTransfer
-        transactionDTO.setLoanToLoanTransfer(false);
-        return transactionDTO;
-    }
-
-
-
     @java.lang.SuppressWarnings("all")
-        public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory, final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory, final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper, final JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, final AccountingRuleRepository accountingRuleRepository, final GLAccountReadPlatformService glAccountReadPlatformService, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final PlatformSecurityContext context, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper, final CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions, final ConfigurationReadPlatformService configurationReadPlatformService, final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort, final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository, final LoanTransactionRepository loanTransactionRepository, final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
+    public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository,
+            final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository,
+            final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
+            final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory,
+            final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper,
+            final JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, final AccountingRuleRepository accountingRuleRepository,
+            final GLAccountReadPlatformService glAccountReadPlatformService,
+            final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final PlatformSecurityContext context,
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService,
+            final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper,
+            final CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions,
+            final ConfigurationReadPlatformService configurationReadPlatformService,
+            final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort) {
         this.glClosureRepository = glClosureRepository;
         this.glAccountRepository = glAccountRepository;
         this.glJournalEntryRepository = glJournalEntryRepository;
@@ -755,16 +593,6 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         this.accountingProcessorForClientTransactions = accountingProcessorForClientTransactions;
         this.configurationReadPlatformService = configurationReadPlatformService;
         this.externalAssetOwnerJournalPort = externalAssetOwnerJournalPort;
-        this.loanAmortizationAllocationMappingRepository = loanAmortizationAllocationMappingRepository;
-        this.loanTransactionRepository = loanTransactionRepository;
-        this.taxCatalogPort = taxCatalogPort;
-    }
-
-    private Long resolveTaxCreditAccountId(final Long taxComponentId) {
-        if (taxComponentId == null || this.taxCatalogPort == null) {
-            return null;
-        }
-        return this.taxCatalogPort.findTaxComponent(taxComponentId)
-                .map(org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData::getCreditAccountId).orElse(null);
     }
 }
+
