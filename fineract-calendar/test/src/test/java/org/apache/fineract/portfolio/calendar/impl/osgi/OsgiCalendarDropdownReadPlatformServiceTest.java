@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.calendar.impl.osgi;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
@@ -33,5 +34,10 @@ class OsgiCalendarDropdownReadPlatformServiceTest {
         assertTrue(port.retrieveCalendarFrequencyTypeOptions().isEmpty());
         assertTrue(port.retrieveCalendarWeekDaysTypeOptions().isEmpty());
         assertTrue(port.retrieveCalendarFrequencyNthDayTypeOptions().isEmpty());
+    }
+
+    @Test
+    void dsComponentDescriptorIsOnClasspath() {
+        assertNotNull(OsgiCalendarDropdownReadPlatformService.class.getResource("/OSGI-INF/calendar.xml"));
     }
 }

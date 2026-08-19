@@ -64,6 +64,18 @@ tasks.register('osgiStageBundles') {
             }
         }
         def entries = []
+        // ADR-022 B6: Felix SCR + OSGi DS API at start level 1 (not copied to bundles/).
+        def dsProc = new ByteArrayOutputStream()
+        exec {
+            commandLine 'python3', 'osgi/ensure-ds-runtime.py'
+            standardOutput = dsProc
+        }
+        dsProc.toString().trim().split('\n').each { line ->
+            def jar = file(line.trim())
+            if (jar.name.endsWith('.jar') && jar.exists()) {
+                entries << "reference:file:${jar.absolutePath}@1:start"
+            }
+        }
         osgiStageProjects().each { p ->
             def jarTask = p.tasks.named('jar').get()
             def jar = jarTask.archiveFile.get().asFile

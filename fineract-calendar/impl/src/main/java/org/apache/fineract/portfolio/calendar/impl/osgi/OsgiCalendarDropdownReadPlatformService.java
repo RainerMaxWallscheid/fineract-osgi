@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.calendar.service.CalendarDropdownReadPlatfo
 
 /**
  * Empty calendar dropdown catalog for Equinox without Spring/JPA.
+ * Published by {@code OSGI-INF/calendar.xml} (ADR-022 B6).
  */
-final class OsgiCalendarDropdownReadPlatformService implements CalendarDropdownReadPlatformService {
+public final class OsgiCalendarDropdownReadPlatformService implements CalendarDropdownReadPlatformService {
 
     @Override
     public List<EnumOptionData> retrieveCalendarEntityTypeOptions() {
