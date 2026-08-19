@@ -18,34 +18,27 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.accounting;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForLoan;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
-import org.apache.fineract.accounting.journalentry.service.AccountingProcessorHelper;
+import org.apache.fineract.accounting.moduleapi.WorkingCapitalLoanJournalPort;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
@@ -62,7 +55,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -70,16 +62,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapitalLoanTest {
 
-    private static final Long PRODUCT_ID = 10L;
-    private static final Long LOAN_ID = 100L;
-    private static final Long TXN_ID = 200L;
+    private static final long OFFICE_ID = 1L;
+    private static final long PRODUCT_ID = 10L;
+    private static final long LOAN_ID = 100L;
+    private static final long TXN_ID = 200L;
     private static final String CURRENCY_CODE = "USD";
-    private static final int WORKING_CAPITAL_LOAN_ENTITY_TYPE = PortfolioProductType.WORKING_CAPITAL_LOAN.getValue();
+    private static final LocalDate TXN_DATE = LocalDate.of(2026, 5, 1);
 
     @Mock
-    private AccountingProcessorHelper helper;
-    @Mock
-    private JournalEntryRepository journalEntryRepository;
+    private WorkingCapitalLoanJournalPort journalPort;
 
     @InjectMocks
     private AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapitalLoan processor;
@@ -101,31 +92,14 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
     @Mock
     private Office office;
 
-    @Mock
-    private GLAccount fundSourceGLAccount;
-    @Mock
-    private GLAccount loanPortfolioGLAccount;
-    @Mock
-    private GLAccount overpaymentGLAccount;
-    @Mock
-    private GLAccount feesReceivableGLAccount;
-    @Mock
-    private GLAccount penaltiesReceivableGLAccount;
-    @Mock
-    private GLAccount incomeFromRecoveryGLAccount;
-    @Mock
-    private GLAccount incomeFromFeesGLAccount;
-    @Mock
-    private GLAccount incomeFromPenaltiesGLAccount;
-
     @BeforeEach
     void setUp() {
         ThreadLocalContextUtil.setBusinessDates(new HashMap<>(
-                Map.of(BusinessDateType.BUSINESS_DATE, LocalDate.of(2026, 5, 1), BusinessDateType.COB_DATE, LocalDate.of(2026, 4, 30))));
+                Map.of(BusinessDateType.BUSINESS_DATE, TXN_DATE, BusinessDateType.COB_DATE, LocalDate.of(2026, 4, 30))));
 
         lenient().when(loan.getClient()).thenReturn(client);
         lenient().when(client.getOffice()).thenReturn(office);
-        lenient().when(office.getId()).thenReturn(1L);
+        lenient().when(office.getId()).thenReturn(OFFICE_ID);
         lenient().when(loan.getLoanProduct()).thenReturn(loanProduct);
         lenient().when(loanProduct.getId()).thenReturn(PRODUCT_ID);
         lenient().when(loan.getLoanProductRelatedDetails()).thenReturn(loanProductRelatedDetails);
@@ -135,26 +109,8 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
         lenient().when(txn.getTypeOf()).thenReturn(LoanTransactionType.REPAYMENT);
         lenient().when(loan.getId()).thenReturn(LOAN_ID);
         lenient().when(txn.getId()).thenReturn(TXN_ID);
-        lenient().when(txn.getTransactionDate()).thenReturn(LocalDate.of(2026, 5, 1));
+        lenient().when(txn.getTransactionDate()).thenReturn(TXN_DATE);
         lenient().when(txn.getPaymentDetail()).thenReturn(null);
-        lenient().when(helper.getLatestClosureByBranch(anyLong())).thenReturn(null);
-
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID), eq(CashAccountsForLoan.FUND_SOURCE.getValue()),
-                any())).thenReturn(fundSourceGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.LOAN_PORTFOLIO.getValue()), any())).thenReturn(loanPortfolioGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID), eq(CashAccountsForLoan.OVERPAYMENT.getValue()),
-                any())).thenReturn(overpaymentGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.FEES_RECEIVABLE.getValue()), any())).thenReturn(feesReceivableGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue()), any())).thenReturn(penaltiesReceivableGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue()), any())).thenReturn(incomeFromRecoveryGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.INCOME_FROM_FEES.getValue()), any())).thenReturn(incomeFromFeesGLAccount);
-        lenient().when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID),
-                eq(CashAccountsForLoan.INCOME_FROM_PENALTIES.getValue()), any())).thenReturn(incomeFromPenaltiesGLAccount);
     }
 
     private void mockChargeAdjustmentRelation(final boolean penaltyCharge) {
@@ -164,6 +120,16 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
         lenient().when(relation.getToCharge()).thenReturn(charge);
         lenient().when(relation.getRelationType()).thenReturn(LoanTransactionRelationTypeEnum.CHARGE_ADJUSTMENT);
         lenient().when(txn.getLoanTransactionRelations()).thenReturn(Set.of(relation));
+    }
+
+    private void verifyCredit(final CashAccountsForLoan accountType, final String amount) {
+        verify(journalPort).postCredit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(accountType.getValue()), isNull(), eq(LOAN_ID),
+                eq(TXN_ID), any(), eq(new BigDecimal(amount)));
+    }
+
+    private void verifyDebit(final CashAccountsForLoan accountType, final Long paymentTypeId, final String amount) {
+        verify(journalPort).postDebit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(accountType.getValue()), eq(paymentTypeId),
+                eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal(amount)));
     }
 
     @AfterEach
@@ -180,14 +146,11 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(loanPortfolioGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("1000")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(feesReceivableGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("300")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(penaltiesReceivableGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("200")), isNull());
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("1500")), isNull());
+        verify(journalPort).ensureBranchNotClosed(OFFICE_ID, TXN_DATE);
+        verifyCredit(CashAccountsForLoan.LOAN_PORTFOLIO, "1000");
+        verifyCredit(CashAccountsForLoan.FEES_RECEIVABLE, "300");
+        verifyCredit(CashAccountsForLoan.PENALTIES_RECEIVABLE, "200");
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, null, "1500");
     }
 
     @Test
@@ -199,12 +162,9 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(loanPortfolioGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("5000")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(overpaymentGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("200")), isNull());
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("5200")), isNull());
+        verifyCredit(CashAccountsForLoan.LOAN_PORTFOLIO, "5000");
+        verifyCredit(CashAccountsForLoan.OVERPAYMENT, "200");
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, null, "5200");
     }
 
     @Test
@@ -216,16 +176,14 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("750")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(overpaymentGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("750")), isNull());
-        verify(helper, org.mockito.Mockito.never()).createCreditJournalEntryForWorkingCapitalLoan(any(), any(), eq(loanPortfolioGLAccount), any(),
-                any(), any(), any(), any());
-        verify(helper, org.mockito.Mockito.never()).createCreditJournalEntryForWorkingCapitalLoan(any(), any(), eq(feesReceivableGLAccount), any(),
-                any(), any(), any(), any());
-        verify(helper, org.mockito.Mockito.never()).createCreditJournalEntryForWorkingCapitalLoan(any(), any(), eq(penaltiesReceivableGLAccount),
-                any(), any(), any(), any(), any());
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, null, "750");
+        verifyCredit(CashAccountsForLoan.OVERPAYMENT, "750");
+        verify(journalPort, never()).postCredit(anyLong(), anyLong(), any(), eq(CashAccountsForLoan.LOAN_PORTFOLIO.getValue()), any(),
+                anyLong(), anyLong(), any(), any());
+        verify(journalPort, never()).postCredit(anyLong(), anyLong(), any(), eq(CashAccountsForLoan.FEES_RECEIVABLE.getValue()), any(),
+                anyLong(), anyLong(), any(), any());
+        verify(journalPort, never()).postCredit(anyLong(), anyLong(), any(), eq(CashAccountsForLoan.PENALTIES_RECEIVABLE.getValue()), any(),
+                anyLong(), anyLong(), any(), any());
     }
 
     @Test
@@ -237,15 +195,13 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, true);
 
-        // 3 separate credit entries to recovery income
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromRecoveryGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("1000")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromRecoveryGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("300")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromRecoveryGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("200")), isNull());
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("1500")), isNull());
+        verify(journalPort).postCredit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue()),
+                isNull(), eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("1000")));
+        verify(journalPort).postCredit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue()),
+                isNull(), eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("300")));
+        verify(journalPort).postCredit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue()),
+                isNull(), eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("200")));
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, null, "1500");
     }
 
     @Test
@@ -257,35 +213,19 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, true);
 
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromRecoveryGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("5000")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(overpaymentGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("1000")), isNull());
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID), eq(TXN_ID),
-                any(), eq(new BigDecimal("6000")), isNull());
+        verify(journalPort).postCredit(eq(OFFICE_ID), eq(PRODUCT_ID), eq(CURRENCY_CODE), eq(CashAccountsForLoan.INCOME_FROM_RECOVERY.getValue()),
+                isNull(), eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("5000")));
+        verifyCredit(CashAccountsForLoan.OVERPAYMENT, "1000");
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, null, "6000");
     }
 
     @Test
-    void testReversalCreatesInverseEntriesAndMarksOriginalReversed() {
+    void testReversalDelegatesToJournalPort() {
         when(txn.getReversedOnDate()).thenReturn(LocalDate.of(2026, 5, 2));
-
-        JournalEntry originalDebit = JournalEntry.createNew(office, null, fundSourceGLAccount, CURRENCY_CODE, "WC" + TXN_ID, false,
-                LocalDate.of(2026, 5, 1), JournalEntryType.DEBIT, new BigDecimal("5000"), null, WORKING_CAPITAL_LOAN_ENTITY_TYPE, LOAN_ID, null, TXN_ID, null,
-                null, null);
-        JournalEntry originalCredit = JournalEntry.createNew(office, null, loanPortfolioGLAccount, CURRENCY_CODE, "WC" + TXN_ID, false,
-                LocalDate.of(2026, 5, 1), JournalEntryType.CREDIT, new BigDecimal("5000"), null, WORKING_CAPITAL_LOAN_ENTITY_TYPE, LOAN_ID, null, TXN_ID,
-                null, null, null);
-
-        when(journalEntryRepository.findJournalEntries("WC" + TXN_ID, WORKING_CAPITAL_LOAN_ENTITY_TYPE))
-                .thenReturn(List.of(originalDebit, originalCredit));
-        when(helper.persistJournalEntry(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         processor.postReversalJournalEntries(loan, txn);
 
-        // 4 persists: 2 reversals + 2 originals marked reversed
-        verify(helper, org.mockito.Mockito.times(4)).persistJournalEntry(any());
-        assertTrue(originalDebit.isReversed());
-        assertTrue(originalCredit.isReversed());
+        verify(journalPort).reverse(OFFICE_ID, TXN_ID, LocalDate.of(2026, 5, 2));
     }
 
     @Test
@@ -295,52 +235,23 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        // debit Overpayment Liability, credit Fund source
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(overpaymentGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("50")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(fundSourceGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("50")), isNull());
+        verifyDebit(CashAccountsForLoan.OVERPAYMENT, null, "50");
+        verifyCredit(CashAccountsForLoan.FUND_SOURCE, "50");
     }
 
     @Test
-    void testCreditBalanceRefundReversalSwapsToFundSourceDebitAndOverpaymentCredit() {
+    void testCreditBalanceRefundReversalDelegatesToJournalPort() {
         when(txn.getReversedOnDate()).thenReturn(LocalDate.of(2026, 5, 3));
-
-        final JournalEntry overpaymentDebit = JournalEntry.createNew(office, null, overpaymentGLAccount, CURRENCY_CODE, "WC" + TXN_ID, false,
-                LocalDate.of(2026, 5, 1), JournalEntryType.DEBIT, new BigDecimal("50"), null, WORKING_CAPITAL_LOAN_ENTITY_TYPE, LOAN_ID,
-                null, TXN_ID, null, null, null);
-        final JournalEntry fundSourceCredit = JournalEntry.createNew(office, null, fundSourceGLAccount, CURRENCY_CODE, "WC" + TXN_ID, false,
-                LocalDate.of(2026, 5, 1), JournalEntryType.CREDIT, new BigDecimal("50"), null, WORKING_CAPITAL_LOAN_ENTITY_TYPE, LOAN_ID,
-                null, TXN_ID, null, null, null);
-
-        when(journalEntryRepository.findJournalEntries("WC" + TXN_ID, WORKING_CAPITAL_LOAN_ENTITY_TYPE))
-                .thenReturn(List.of(overpaymentDebit, fundSourceCredit));
 
         processor.postReversalJournalEntries(loan, txn);
 
-        final ArgumentCaptor<JournalEntry> captor = ArgumentCaptor.forClass(JournalEntry.class);
-        verify(helper, org.mockito.Mockito.times(4)).persistJournalEntry(captor.capture());
-
-        final List<JournalEntry> reversalEntries = captor.getAllValues().stream()
-                .filter(entry -> entry != overpaymentDebit && entry != fundSourceCredit).toList();
-
-        final JournalEntry overpaymentReversal = reversalEntries.stream().filter(entry -> entry.getGlAccount() == overpaymentGLAccount)
-                .findFirst().orElseThrow();
-        final JournalEntry fundSourceReversal = reversalEntries.stream().filter(entry -> entry.getGlAccount() == fundSourceGLAccount)
-                .findFirst().orElseThrow();
-
-        // reversal flips the original CBR direction: debit Fund source, credit Overpayment Liability
-        assertTrue(fundSourceReversal.isDebitEntry());
-        assertTrue(overpaymentReversal.isCreditEntry());
-        assertEquals(new BigDecimal("50"), fundSourceReversal.getAmount());
-        assertEquals(new BigDecimal("50"), overpaymentReversal.getAmount());
+        verify(journalPort).reverse(OFFICE_ID, TXN_ID, LocalDate.of(2026, 5, 3));
     }
 
     @Test
     void testAdvanceAccountingUsesPaymentChannelFundSource() {
-        GLAccount paymentChannelFundSource = org.mockito.Mockito.mock(GLAccount.class);
-        PaymentDetail paymentDetail = org.mockito.Mockito.mock(PaymentDetail.class);
-        PaymentType paymentType = org.mockito.Mockito.mock(PaymentType.class);
+        final PaymentDetail paymentDetail = org.mockito.Mockito.mock(PaymentDetail.class);
+        final PaymentType paymentType = org.mockito.Mockito.mock(PaymentType.class);
 
         when(txn.getTransactionAmount()).thenReturn(new BigDecimal("1000"));
         when(txn.getPaymentDetail()).thenReturn(paymentDetail);
@@ -350,13 +261,9 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
         when(allocation.getFeeChargesPortion()).thenReturn(BigDecimal.ZERO);
         when(allocation.getPenaltyChargesPortion()).thenReturn(BigDecimal.ZERO);
 
-        when(helper.getLinkedGLAccountForWorkingCapitalLoanProduct(eq(PRODUCT_ID), eq(CashAccountsForLoan.FUND_SOURCE.getValue()), eq(5L)))
-                .thenReturn(paymentChannelFundSource);
-
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(paymentChannelFundSource),
-                eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("1000")), eq(paymentDetail));
+        verifyDebit(CashAccountsForLoan.FUND_SOURCE, 5L, "1000");
     }
 
     @Test
@@ -370,10 +277,8 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromFeesGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("40")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(feesReceivableGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("40")), isNull());
+        verifyDebit(CashAccountsForLoan.INCOME_FROM_FEES, null, "40");
+        verifyCredit(CashAccountsForLoan.FEES_RECEIVABLE, "40");
     }
 
     @Test
@@ -387,10 +292,8 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromPenaltiesGLAccount),
-                eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("25")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(penaltiesReceivableGLAccount),
-                eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("25")), isNull());
+        verifyDebit(CashAccountsForLoan.INCOME_FROM_PENALTIES, null, "25");
+        verifyCredit(CashAccountsForLoan.PENALTIES_RECEIVABLE, "25");
     }
 
     @Test
@@ -404,15 +307,9 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, false);
 
-        // Debit is the FULL transaction amount against the adjusted charge's own income account, regardless of
-        // where the credit side ends up.
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromFeesGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("60")), isNull());
-        // Credit is split by where the allocation actually landed.
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(feesReceivableGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("20")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(loanPortfolioGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("40")), isNull());
+        verifyDebit(CashAccountsForLoan.INCOME_FROM_FEES, null, "60");
+        verifyCredit(CashAccountsForLoan.FEES_RECEIVABLE, "20");
+        verifyCredit(CashAccountsForLoan.LOAN_PORTFOLIO, "40");
     }
 
     @Test
@@ -426,10 +323,8 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
         processor.postJournalEntries(loan, txn, allocation, true);
 
-        verify(helper).createDebitJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(incomeFromRecoveryGLAccount),
-                eq(LOAN_ID), eq(TXN_ID), any(), eq(new BigDecimal("40")), isNull());
-        verify(helper).createCreditJournalEntryForWorkingCapitalLoan(eq(office), eq(CURRENCY_CODE), eq(feesReceivableGLAccount), eq(LOAN_ID),
-                eq(TXN_ID), any(), eq(new BigDecimal("40")), isNull());
+        verifyDebit(CashAccountsForLoan.INCOME_FROM_RECOVERY, null, "40");
+        verifyCredit(CashAccountsForLoan.FEES_RECEIVABLE, "40");
     }
 
     @Test
