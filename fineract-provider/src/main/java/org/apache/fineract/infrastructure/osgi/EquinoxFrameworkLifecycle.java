@@ -35,18 +35,26 @@ import org.springframework.context.SmartLifecycle;
 
 /**
  * Optional in-process Equinox for the Boot composition root. Does not stage
- * Spring. Catalog install is a later B3 slice.
+ * Spring. When {@code catalogDir} points at a staged {@code osgi/} tree,
+ * empty catalog activators start first; Wave-1 Spring ports then rank above
+ * them.
  */
 public class EquinoxFrameworkLifecycle implements SmartLifecycle {
 
     private static final Logger LOG = LoggerFactory.getLogger(EquinoxFrameworkLifecycle.class);
 
     private final SpringOsgiPortBridge bridge;
+    private final Path catalogDir;
     private Framework framework;
     private boolean running;
 
     public EquinoxFrameworkLifecycle(final SpringOsgiPortBridge bridge) {
+        this(bridge, null);
+    }
+
+    public EquinoxFrameworkLifecycle(final SpringOsgiPortBridge bridge, final Path catalogDir) {
         this.bridge = bridge;
+        this.catalogDir = catalogDir;
     }
 
     @Override
@@ -68,7 +76,11 @@ public class EquinoxFrameworkLifecycle implements SmartLifecycle {
             framework = factories.next().newFramework(cfg);
             framework.init();
             framework.start();
-            bridge.start(framework.getBundleContext());
+            final BundleContext context = framework.getBundleContext();
+            if (catalogDir != null) {
+                EquinoxCatalogInstaller.installAndStart(context, catalogDir);
+            }
+            bridge.start(context);
             running = true;
             LOG.info("Embedded Equinox started; Wave-1 Spring ports registered in the Service Registry");
         } catch (final Exception ex) {
