@@ -26,6 +26,7 @@ import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
+import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
@@ -38,13 +39,17 @@ import org.apache.fineract.organisation.provisioning.service.ProvisioningCategor
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
+import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
+import org.apache.fineract.portfolio.products.service.ProductCommandsService;
+import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.search.service.SearchReadService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
@@ -90,7 +95,11 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<PaymentTypeReadService> paymentTypes, final ObjectProvider<SearchReadService> search,
             final ObjectProvider<CollectionSheetWritePlatformService> collectionSheets,
             final ObjectProvider<StandingInstructionWritePlatformService> standingInstructions,
-            final ObjectProvider<ShareProductDropdownReadPlatformService> shareProducts) {
+            final ObjectProvider<ShareProductDropdownReadPlatformService> shareProducts,
+            final ObjectProvider<GroupLevelReadPlatformService> groupLevels,
+            final ObjectProvider<ClientIdentifierWritePlatformService> clientIdentifiers,
+            final ObjectProvider<RepaymentWithPostDatedChecksWritePlatformService> postDatedChecks,
+            final ObjectProvider<ProductCommandsService> productCommands, final ObjectProvider<CacheWritePlatformService> cache) {
         return new SpringOsgiPortBridge(List.of(bind(ChargeDefinitionPort.class, charge.getIfAvailable()),
                 bind(FloatingRatePort.class, rates.getIfAvailable()), bind(TaxCatalogPort.class, tax.getIfAvailable()),
                 bind(ContentStoreService.class, content.getIfAvailable()), bind(CashierTxnValidationPort.class, cashier.getIfAvailable()),
@@ -121,7 +130,12 @@ public class EquinoxOsgiConfiguration {
                 bind(SearchReadService.class, search.getIfAvailable()),
                 bind(CollectionSheetWritePlatformService.class, collectionSheets.getIfAvailable()),
                 bind(StandingInstructionWritePlatformService.class, standingInstructions.getIfAvailable()),
-                bind(ShareProductDropdownReadPlatformService.class, shareProducts.getIfAvailable())));
+                bind(ShareProductDropdownReadPlatformService.class, shareProducts.getIfAvailable()),
+                bind(GroupLevelReadPlatformService.class, groupLevels.getIfAvailable()),
+                bind(ClientIdentifierWritePlatformService.class, clientIdentifiers.getIfAvailable()),
+                bind(RepaymentWithPostDatedChecksWritePlatformService.class, postDatedChecks.getIfAvailable()),
+                bind(ProductCommandsService.class, productCommands.getIfAvailable()),
+                bind(CacheWritePlatformService.class, cache.getIfAvailable())));
     }
 
     @Bean
