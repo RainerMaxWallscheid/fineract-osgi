@@ -22,9 +22,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.client.domain.ClientTransactionType;
 
 public class ClientTransactionDTO {
+
+    /** Published {@code ClientTransactionType.PAY_CHARGE} value (kernel leftover enum). */
+    private static final int PAY_CHARGE = 1;
     private final Long clientId;
     private final Long officeId;
     private final Long paymentTypeId;
@@ -44,7 +46,7 @@ public class ClientTransactionDTO {
     private final List<ClientChargePaymentDTO> chargePayments;
 
     public boolean isChargePayment() {
-        return ClientTransactionType.PAY_CHARGE.getValue().equals(this.transactionType.getId().intValue());
+        return this.transactionType.getId().intValue() == PAY_CHARGE;
     }
 
     /**

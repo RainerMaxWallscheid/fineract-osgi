@@ -1,2 +1,0 @@
-Method <org.apache.fineract.portfolio.savings.service.GSIMReadPlatformServiceImpl$GSIMMapper.mapRow(java.sql.ResultSet, int)> calls method <org.apache.fineract.portfolio.loanaccount.domain.LoanStatus.fromInt(java.lang.Integer)> in (GSIMReadPlatformServiceImpl.java:86)
-Method <org.apache.fineract.portfolio.savings.service.GSIMReadPlatformServiceImpl$GSIMMapper.mapRow(java.sql.ResultSet, int)> calls method <org.apache.fineract.portfolio.loanaccount.domain.LoanStatus.toString()> in (GSIMReadPlatformServiceImpl.java:86)

@@ -32,7 +32,6 @@ import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.accountdetails.data.SavingsSummaryCustom;
 import org.apache.fineract.portfolio.accountdetails.service.AccountEnumerations;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.savings.data.GSIMContainer;
 import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountApplicationTimelineData;
@@ -83,8 +82,8 @@ public class GSIMReadPlatformServiceImpl implements GSIMReadPlatformService {
             final BigDecimal groupId = rs.getBigDecimal("groupId");
             final String accountNumber = rs.getString("accountNumber");
             final BigDecimal parentDeposit = rs.getBigDecimal("parentDeposit");
-            final String loanStatus = LoanStatus.fromInt((int) rs.getLong("savingsStatus")).toString();
-            return GroupSavingsIndividualMonitoringAccountData.builder().gsimId(glimId).groupId(groupId).accountNumber(accountNumber).parentDeposit(parentDeposit).savingsStatus(loanStatus).build();
+            final String savingsStatus = SavingsAccountStatusType.fromInt((int) rs.getLong("savingsStatus")).toString();
+            return GroupSavingsIndividualMonitoringAccountData.builder().gsimId(glimId).groupId(groupId).accountNumber(accountNumber).parentDeposit(parentDeposit).savingsStatus(savingsStatus).build();
         }
     }
 

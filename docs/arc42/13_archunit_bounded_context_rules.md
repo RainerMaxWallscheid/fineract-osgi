@@ -87,10 +87,11 @@ On the first run, violations were written to `archunit_store`. Empty freeze file
 | Loan → Client / Group | **frozen** (`Loan.client` / `Loan.group`) |
 | Savings → Client / Group | **frozen** |
 | WC → Client | **frozen** |
-| Loan ↔ Savings internals (guarantor / on-hold) | **frozen** residual |
+| Savings → Loan internals | **green** (GSIM uses `SavingsAccountStatusType`) |
+| Loan → Savings internals (guarantor / on-hold) | **frozen** residual |
 | Loan/Investor → Accounting internals | **frozen** residual |
 
-Exact counts: **1171** frozen violation lines in **17** non-empty files (15 empty = rule green). Previous store (658 lines) was stale after peels and could not be imported without a 2g test heap.
+Exact counts: **1167** frozen violation lines in **15** non-empty files (17 empty = rule green). Previous store (658 lines) was stale after peels and could not be imported without a 2g test heap.
 
 `ACCOUNTING_OWNED` / `ACCOUNTING_INTERNAL` use `org.apache.fineract.accounting..` so loan-owned `…workingcapitalloan.accounting…` is not treated as the Accounting BC.
 
