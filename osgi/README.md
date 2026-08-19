@@ -713,7 +713,7 @@ python3 osgi/check-manifests.py
 ./gradlew checkOsgiManifests
 ```
 
-Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security allow-list, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
+Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not empty, impl `Bundle-Activator` outside the loan / COB / security allow-list, a missing `Service-Component` descriptor or implementation class, an impl with no Equinox start path (unless it is a no-port stem), new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
 ```bash
 python3 osgi/check-foreign-impl-deps.py

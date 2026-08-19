@@ -27,6 +27,8 @@ Fails on:
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not empty (impl packages stay private)
   * impl Bundle-Activator outside the loan / COB / security allow-list
+  * impl Service-Component file or implementation class missing
+  * impl with neither Service-Component, an allow-listed activator, nor a no-port stem
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
   * fineract-core Export-Package that is missing, overlaps an *-api export,
@@ -68,6 +70,20 @@ ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset(
     }
 )
 
+# No Equinox-safe catalog port (jersey / AWS / swagger / leftover types).
+NO_PORT_STEMS: frozenset[str] = frozenset(
+    {
+        "bulkimport",
+        "event",
+        "instancemode",
+        "interoperation",
+        "openapi",
+        "s3",
+    }
+)
+
+IMPLEMENTATION_CLASS_RE = re.compile(r'<implementation\s+class="([^"]+)"')
+
 # Packages that exist in fineract-core source but must not be exported.
 # org.springframework.batch.core.scope.context hosts a Spring Batch patch;
 # exporting it would split the real Spring Batch bundle.
@@ -85,6 +101,7 @@ ATTR_KEYS = (
     "Bundle-Version",
     "Automatic-Module-Name",
     "Bundle-Activator",
+    "Service-Component",
 )
 
 IMPORT_TYPE_RE = re.compile(
@@ -204,6 +221,8 @@ def load_row(build: Path, layout_role: str) -> dict:
         "exports": parse_export_packages(attrs.get("Export-Package")),
         "imports": parse_export_packages(attrs.get("Import-Package")),
         "activator": attrs.get("Bundle-Activator"),
+        "components": parse_export_packages(attrs.get("Service-Component")),
+        "impl_dir": build.parent,
     }
 
 
@@ -295,6 +314,32 @@ def main() -> int:
             errors.append(
                 f"{row['path']}: Bundle-Activator {activator} is not allow-listed "
                 f"(loan / COB / security only)"
+            )
+        components = row.get("components") or []
+        if activator and components:
+            errors.append(
+                f"{row['path']}: impl must not declare both Bundle-Activator and Service-Component"
+            )
+        impl_dir = Path(row["impl_dir"])
+        for header in components:
+            xml_path = impl_dir / "src" / "main" / "resources" / header
+            if not xml_path.is_file():
+                errors.append(f"{row['path']}: Service-Component {header} is missing ({xml_path})")
+                continue
+            xml = xml_path.read_text(encoding="utf-8")
+            classes = IMPLEMENTATION_CLASS_RE.findall(xml)
+            if not classes:
+                errors.append(f"{xml_path}: Service-Component has no implementation class")
+                continue
+            for fqcn in classes:
+                java_path = impl_dir / "src" / "main" / "java" / Path(*fqcn.split(".")).with_suffix(".java")
+                if not java_path.is_file():
+                    errors.append(
+                        f"{xml_path}: implementation class {fqcn} is missing ({java_path})"
+                    )
+        if not activator and not components and row["expected_stem"] not in NO_PORT_STEMS:
+            errors.append(
+                f"{row['path']}: impl has no Service-Component and no allow-listed Bundle-Activator"
             )
 
     seen_known: set[str] = set()
