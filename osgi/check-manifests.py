@@ -27,7 +27,7 @@ Fails on:
   * test fragment whose Fragment-Host is missing or does not resolve
   * impl Export-Package that is not empty (impl packages stay private)
   * impl Bundle-Activator outside the loan / COB / security allow-list
-  * impl Service-Component file or implementation class missing
+  * impl Service-Component file, implementation class, or provide interface missing
   * impl with neither Service-Component, an allow-listed activator, nor a no-port stem
   * impl-involved cross-stem Export-Package (split packages)
   * new api-api / kernel-api Export-Package collisions (none are allow-listed)
@@ -83,6 +83,7 @@ NO_PORT_STEMS: frozenset[str] = frozenset(
 )
 
 IMPLEMENTATION_CLASS_RE = re.compile(r'<implementation\s+class="([^"]+)"')
+PROVIDE_INTERFACE_RE = re.compile(r'<provide\s+interface="([^"]+)"')
 
 # Packages that exist in fineract-core source but must not be exported.
 # org.springframework.batch.core.scope.context hosts a Spring Batch patch;
@@ -138,6 +139,21 @@ def parse_export_packages(raw: str | None) -> list[str]:
     if not raw:
         return []
     return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def contract_type_names() -> set[str]:
+    """Fully qualified main-source types on *-api and fineract-core."""
+    types: set[str] = set()
+    roots = list(ROOT.glob("fineract-*/api/src/main/java"))
+    core = ROOT / "fineract-core" / "src" / "main" / "java"
+    if core.is_dir():
+        roots.append(core)
+    for src_root in roots:
+        for source in src_root.rglob("*.java"):
+            rel = source.relative_to(src_root).with_suffix("")
+            if rel.parts:
+                types.add(".".join(rel.parts))
+    return types
 
 
 def java_source_packages(src_root: Path) -> set[str]:
@@ -295,6 +311,8 @@ def main() -> int:
                 f"{row['path']}: Fragment-Host {host} expected {expected_host}"
             )
 
+    contract_types = contract_type_names()
+
     exporters: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
         for package in row["exports"]:
@@ -336,6 +354,15 @@ def main() -> int:
                 if not java_path.is_file():
                     errors.append(
                         f"{xml_path}: implementation class {fqcn} is missing ({java_path})"
+                    )
+            interfaces = PROVIDE_INTERFACE_RE.findall(xml)
+            if not interfaces:
+                errors.append(f"{xml_path}: Service-Component has no provide interface")
+                continue
+            for iface in interfaces:
+                if iface not in contract_types:
+                    errors.append(
+                        f"{xml_path}: provide interface {iface} is not an *-api or fineract-core type"
                     )
         if not activator and not components and row["expected_stem"] not in NO_PORT_STEMS:
             errors.append(
