@@ -27,9 +27,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -120,8 +124,7 @@ class EquinoxFrameworkLifecycleTest {
         final SpringOsgiPortBridge bridge = wave2Bridge(charge, null);
         final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
         final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
-        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(lookup, ChargeDefinitionPort.class,
-                new EmptyChargeDefinitionPort());
+        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(lookup, ChargeDefinitionPort.class);
 
         assertFalse(backed.existsActiveCharge(1L));
         assertTrue(backed instanceof OsgiBackedPort);
@@ -140,8 +143,7 @@ class EquinoxFrameworkLifecycleTest {
 
     @Test
     void bridgeDoesNotPublishOsgiBackedChargePort() {
-        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(new OsgiServiceLookup(() -> null), ChargeDefinitionPort.class,
-                new EmptyChargeDefinitionPort());
+        final ChargeDefinitionPort backed = OsgiBackedPortFactory.of(new OsgiServiceLookup(() -> null), ChargeDefinitionPort.class);
         final SpringOsgiPortBridge bridge = new SpringOsgiPortBridge(
                 List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, backed)));
         final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
@@ -152,6 +154,16 @@ class EquinoxFrameworkLifecycleTest {
         } finally {
             lifecycle.stop();
         }
+    }
+
+    @Test
+    void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
+        final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
+        assertTrue(rates.findFloatingRate(1L).isEmpty());
+        assertTrue(rates.fetchInterestRates(1L, null).isEmpty());
+        final TransferWritePlatformService transfers = OsgiBackedPortFactory.empty(TransferWritePlatformService.class);
+        assertEquals(CommandProcessingResult.empty().getClass(), transfers.proposeClientTransfer(1L, null).getClass());
+        assertEquals(0, OsgiBackedPortFactory.empty(PropertyService.class).getPartitionSize("hosted"));
     }
 
     @Test
