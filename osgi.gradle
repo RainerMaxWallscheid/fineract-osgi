@@ -19,9 +19,17 @@
 
 // Equinox scaffold tasks. Applied from the root build. See osgi/README.md.
 
+tasks.register('checkForeignImplDeps', Exec) {
+    group = 'verification'
+    description = 'Fail on new domain *-impl dependencies on a foreign *-impl (ADR-022 B4)'
+    workingDir = rootDir
+    commandLine 'python3', 'osgi/check-foreign-impl-deps.py'
+}
+
 tasks.register('checkOsgiManifests', Exec) {
     group = 'verification'
     description = 'Fail on duplicate BSN, missing Fragment-Host, split packages, a stale core export list, or incomplete api Import-Package'
+    dependsOn checkForeignImplDeps
     workingDir = rootDir
     commandLine 'python3', 'osgi/check-manifests.py'
 }

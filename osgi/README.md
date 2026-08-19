@@ -715,12 +715,22 @@ python3 osgi/check-manifests.py
 
 Fails on duplicate BSN, BSN/stem mismatch, missing `Fragment-Host`, impl `Export-Package` that is not exactly one `*.impl.osgi` package, new split packages, a `fineract-core` export list that is empty, overlaps an `*-api` export, or does not match unique kernel source packages, and an `*-api` `Import-Package` that omits an `org.apache.fineract.*` package the sources import when another scanned bundle exports it. Gradle writes `Import-Package` literally — `*` is not BND / `DynamicImport-Package`. There are no remaining allow-listed api-api type splits. Residual same-package leftovers in core stay unpublished from the kernel bundle.
 
+```bash
+python3 osgi/check-foreign-impl-deps.py
+# or
+./gradlew checkForeignImplDeps
+```
+
+Fails on a new domain `*-impl` dependency on a foreign `*-impl`, any `*-api` dependency on a `*-impl`, or a stale `osgi/foreign-impl-allowlist.txt` row. Composition roots are not scanned. Remaining allow-listed edges are leftover JPA residuals; full OSGi lookup stays optional (ADR-022 B4).
+
 ## Layout
 
 | Path | Purpose |
 |------|---------|
 | `start-equinox.sh` | Start Equinox console on port **2501** (`-configuration` = `config/` directory) |
 | `check-manifests.py` | Static BSN / Fragment-Host / Export-Package / api Import-Package guard |
+| `check-foreign-impl-deps.py` | B4 Gradle/api-first guard: no new domain foreign `-impl` |
+| `foreign-impl-allowlist.txt` | Leftover JPA `*-impl` → foreign `*-impl` edges |
 | `resolve-smoke.py` | Bounded Equinox install + resolve of the staged catalog |
 | `EquinoxResolveSmoke.java` | Embedded Equinox resolver used by the smoke |
 | `CompositionRootOsgiBridge.java` | Composition-root Spring→OSGi registration of every hosted PILOT_PORT |
