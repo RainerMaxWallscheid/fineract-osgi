@@ -23,13 +23,10 @@ import java.sql.Date;
 import java.time.LocalDate;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
-import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -96,8 +93,8 @@ public class InvestorAccountingHelper {
         }
     }
 
-    public JournalEntry createDebitJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final int accountMappingTypeId, final Long loanProductId, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder) {
-        final GLAccount account = getLinkedGLAccountForLoanProduct(loanProductId, accountMappingTypeId);
+    public Object createDebitJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final int accountMappingTypeId, final Long loanProductId, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder) {
+        final Object account = getLinkedGLAccountForLoanProduct(loanProductId, accountMappingTypeId);
         if (isReversalOrder) {
             return createCreditJournalEntryForInvestor(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
         } else {
@@ -105,7 +102,7 @@ public class InvestorAccountingHelper {
         }
     }
 
-    public JournalEntry createCreditJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder, final GLAccount account) {
+    public Object createCreditJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder, final Object account) {
         if (isReversalOrder) {
             return createDebitJournalEntryForInvestor(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
         } else {
@@ -113,9 +110,8 @@ public class InvestorAccountingHelper {
         }
     }
 
-    public ProductToGLAccountMapping getChargeOffMappingByCodeValue(final Long loanProductId, final PortfolioProductType productType, final Long chargeOffReasonId) {
-        return (ProductToGLAccountMapping) this.transferJournalPort.chargeOffMapping(loanProductId, productType.getValue(),
-                chargeOffReasonId);
+    public Object getChargeOffMappingByCodeValue(final Long loanProductId, final PortfolioProductType productType, final Long chargeOffReasonId) {
+        return this.transferJournalPort.chargeOffMapping(loanProductId, productType.getValue(), chargeOffReasonId);
     }
 
     /**
@@ -126,20 +122,20 @@ public class InvestorAccountingHelper {
         return this.transferJournalPort.chargeOffGlAccount(loanProductId, PortfolioProductType.LOAN.getValue(), chargeOffReasonId);
     }
 
-    private JournalEntry createCreditJournalEntryForInvestor(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private Object createCreditJournalEntryForInvestor(final Office office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
-        return (JournalEntry) this.transferJournalPort.postInvestorCredit(office, currencyCode, account, modifiedTransactionId,
-                transactionDate, amount, loanId);
+        return this.transferJournalPort.postInvestorCredit(office, currencyCode, account, modifiedTransactionId, transactionDate, amount,
+                loanId);
     }
 
-    private JournalEntry createDebitJournalEntryForInvestor(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private Object createDebitJournalEntryForInvestor(final Office office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
-        return (JournalEntry) this.transferJournalPort.postInvestorDebit(office, currencyCode, account, modifiedTransactionId,
-                transactionDate, amount, loanId);
+        return this.transferJournalPort.postInvestorDebit(office, currencyCode, account, modifiedTransactionId, transactionDate, amount,
+                loanId);
     }
 
-    public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {
-        return (GLAccount) this.transferJournalPort.linkedGlAccountForLoanProduct(loanProductId, accountMappingTypeId);
+    public Object getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {
+        return this.transferJournalPort.linkedGlAccountForLoanProduct(loanProductId, accountMappingTypeId);
     }
 
     @java.lang.SuppressWarnings("all")
