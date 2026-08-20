@@ -186,7 +186,7 @@ public class SavingsAccountAssembler {
         }
 
         if (group != null && client != null) {
-            if (!group.hasClientAsMember(client)) {
+            if (!this.groupActivePort.hasClientAsMember(groupId, clientId)) {
                 throw new ClientNotInGroupException(clientId, groupId);
             }
             accountType = AccountType.JLG;
