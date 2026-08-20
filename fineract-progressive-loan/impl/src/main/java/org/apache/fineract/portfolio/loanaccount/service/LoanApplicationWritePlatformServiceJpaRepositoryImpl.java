@@ -312,7 +312,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     createLinkedAccountAssociation(loan, savingsAccount, changes);
                 } else 
                 // When the previous one was linking to a different account
-                if (!accountAssociations.linkedSavingsAccount().getId().equals(savingsAccountId)) {
+                if (!savingsAccountId.equals(accountAssociations.linkedSavingsAccountId())) {
                     updateLinkedAccountAssociation(accountAssociations, savingsAccount, changes);
                 }
             }
@@ -322,7 +322,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private void updateLinkedAccountAssociation(AccountAssociations accountAssociations, SavingsAccount savingsAccount, Map<String, Object> changes) {
         accountAssociations.updateLinkedSavingsAccount(savingsAccount);
         this.accountAssociationsRepository.save(accountAssociations);
-        changes.put(LoanApiConstants.linkAccountIdParameterName, savingsAccount.getId());
+        changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }
 
     private void removeLinkedAccountAssociation(final AccountAssociations accountAssociations, final Map<String, Object> changes) {
@@ -334,8 +334,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void createLinkedAccountAssociation(final Loan loan, final SavingsAccount savingsAccount, final Map<String, Object> changes) {
         boolean isActive = true;
-        this.accountAssociationsRepository.save(AccountAssociations.associateSavingsAccount(loan, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive));
-        changes.put(LoanApiConstants.linkAccountIdParameterName, savingsAccount.getId());
+        final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+        this.accountAssociationsRepository.save(accountAssociations);
+        changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }
 
     private void modifyCalendar(Long loanId, Long calendarId, Loan loan, Map<String, Object> changes) {

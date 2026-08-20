@@ -592,7 +592,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             if (accountAssociations != null) {
                 SavingsAccount linkedSavingsAccount = accountAssociations.linkedSavingsAccount();
                 // name is auto-generated
-                final String name = "To loan " + loan.getAccountNumber() + " from savings " + linkedSavingsAccount.getAccountNumber();
+                final String name = "To loan " + loan.getAccountNumber() + " from savings " + accountAssociations.linkedSavingsAccountNumber();
                 final Office fromOffice = loan.getOffice();
                 final Client fromClient = loan.getClient();
                 final Office toOffice = loan.getOffice();

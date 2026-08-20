@@ -79,6 +79,14 @@ public class AccountAssociations extends AbstractPersistableCustom<Long> {
         return this.linkedSavingsAccount;
     }
 
+    public Long linkedSavingsAccountId() {
+        return this.linkedSavingsAccount == null ? null : this.linkedSavingsAccount.getId();
+    }
+
+    public String linkedSavingsAccountNumber() {
+        return this.linkedSavingsAccount == null ? null : this.linkedSavingsAccount.getAccountNumber();
+    }
+
     public void updateLinkedSavingsAccount(final SavingsAccount savingsAccount) {
         this.linkedSavingsAccount = savingsAccount;
     }
