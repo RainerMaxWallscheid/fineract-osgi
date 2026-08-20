@@ -379,7 +379,8 @@ public class DepositAccountAssembler {
         }
 
         if (account != null) {
-            account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+            account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                    this.clientActivePort, this.groupActivePort);
             account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
             account.validateNewApplicationState(depositAccountType.resourceName());
         }
@@ -389,13 +390,15 @@ public class DepositAccountAssembler {
 
     public SavingsAccount assembleFrom(final Long savingsId, DepositAccountType depositAccountType) {
         final SavingsAccount account = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsId, depositAccountType);
-        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                    this.clientActivePort, this.groupActivePort);
         account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         return account;
     }
 
     public void assignSavingAccountHelpers(final SavingsAccount savingsAccount) {
-        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 

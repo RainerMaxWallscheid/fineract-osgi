@@ -97,6 +97,8 @@ import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
@@ -107,6 +109,7 @@ import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanc
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -136,6 +139,18 @@ public class InteropServiceImpl implements InteropService {
     private final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService;
+    private ClientActivePort clientActivePort;
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
+    }
 
 
     private static final class KycMapper implements RowMapper<InteropKycData> {
@@ -481,7 +496,8 @@ public class InteropServiceImpl implements InteropService {
             @NonNull Consumer<MonetaryCurrency> amountNormalizer) {
         // TODO: error handling
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getAccountId());
-        savingsAccount.setHelpers(savingsAccountTransactionSummaryWrapper, savingsHelper, configurationDomainService);
+        savingsAccount.setHelpers(savingsAccountTransactionSummaryWrapper, savingsHelper, configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         ApplicationCurrency requestCurrency = currencyRepository.findOneByCode(request.getAmount().getCurrency());
         if (!savingsAccount.getCurrency().getCode().equals(requestCurrency.getCode())) {

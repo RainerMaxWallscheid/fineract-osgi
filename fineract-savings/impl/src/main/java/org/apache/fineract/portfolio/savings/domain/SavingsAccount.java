@@ -96,8 +96,10 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFoundException;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
@@ -325,6 +327,10 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     protected ChargeTaxApplicationService chargeTaxApplicationService;
     @Transient
     protected List<SavingsAccountTransaction> savingsAccountTransactions = new ArrayList<>();
+    @Transient
+    private ClientActivePort clientActivePort;
+    @Transient
+    private GroupActivePort groupActivePort;
 
     @Column(name = "deposit_type_enum", insertable = false, updatable = false)
     private Integer depositType;
@@ -460,10 +466,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
      * update summary details after events/transactions on a {@link SavingsAccount}.
      */
     public void setHelpers(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
-            final SavingsHelper savingsHelper, final ConfigurationDomainService configurationDomainService) {
+            final SavingsHelper savingsHelper, final ConfigurationDomainService configurationDomainService,
+            final ClientActivePort clientActivePort, final GroupActivePort groupActivePort) {
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsHelper = savingsHelper;
         this.configurationDomainService = configurationDomainService;
+        this.clientActivePort = clientActivePort;
+        this.groupActivePort = groupActivePort;
     }
 
     public void setChargeTaxApplicationService(final ChargeTaxApplicationService chargeTaxApplicationService) {
@@ -1910,9 +1919,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     public Long officeId() {
         Long officeId = null;
         if (this.client != null) {
-            officeId = this.client.officeId();
+            officeId = this.clientActivePort.officeId(clientId());
         } else if (this.group != null) {
-            officeId = this.group.officeId();
+            officeId = this.groupActivePort.officeId(groupId());
         }
         return officeId;
     }
@@ -1948,19 +1957,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public Long clientId() {
-        Long id = null;
-        if (this.client != null) {
-            id = this.client.getId();
-        }
-        return id;
+        return this.clientActivePort.id(this.client);
     }
 
     public Long groupId() {
-        Long id = null;
-        if (this.group != null) {
-            id = this.group.getId();
-        }
-        return id;
+        return this.groupActivePort.id(this.group);
     }
 
     public GroupSavingsIndividualMonitoring getGsim() {
@@ -3222,12 +3223,10 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             return false;
         }
 
-        Client client = getClient();
-        if (client != null && !client.isActive()) {
+        if (this.client != null && !this.clientActivePort.isActive(clientId())) {
             return false;
         }
-        Group group = group();
-        if (group != null && !group.isActive()) {
+        if (this.group != null && !this.groupActivePort.isActive(groupId())) {
             return false;
         }
 

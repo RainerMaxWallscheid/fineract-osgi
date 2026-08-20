@@ -348,7 +348,8 @@ public class SavingsAccountAssembler {
                 minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, iswithdrawalFeeApplicableForTransfer, charges,
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, maxAllowedLienLimit, lienAllowed,
                 nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax);
-        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
 
         account.validateNewApplicationState(SAVINGS_ACCOUNT_RESOURCE_NAME);
@@ -400,7 +401,8 @@ public class SavingsAccountAssembler {
             }
         }
 
-        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
         return account;
     }
@@ -441,7 +443,8 @@ public class SavingsAccountAssembler {
     }
 
     public void setHelpers(final SavingsAccount account) {
-        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 
@@ -488,7 +491,8 @@ public class SavingsAccountAssembler {
                 product.isMinRequiredBalanceEnforced(), product.minRequiredBalance(), product.maxAllowedLienLimit(),
                 product.isLienAllowed(), product.nominalAnnualInterestRateOverdraft(), product.minOverdraftForInterestCalculation(),
                 product.withHoldTax());
-        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         account.setChargeTaxApplicationService(this.chargeTaxApplicationService);
 
         account.validateNewApplicationState(SAVINGS_ACCOUNT_RESOURCE_NAME);
@@ -499,7 +503,8 @@ public class SavingsAccountAssembler {
     }
 
     public void assignSavingAccountHelpers(final SavingsAccount savingsAccount) {
-        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         savingsAccount.setChargeTaxApplicationService(this.chargeTaxApplicationService);
     }
 

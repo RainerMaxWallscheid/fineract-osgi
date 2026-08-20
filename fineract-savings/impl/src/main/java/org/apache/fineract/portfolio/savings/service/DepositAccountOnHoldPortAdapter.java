@@ -32,6 +32,8 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrap
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionSummaryWrapper;
 import org.apache.fineract.portfolio.savings.domain.SavingsHelper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
 import org.springframework.stereotype.Service;
@@ -44,16 +46,21 @@ public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
     private final SavingsHelper savingsHelper;
     private final ConfigurationDomainService configurationDomainService;
+    private final ClientActivePort clientActivePort;
+    private final GroupActivePort groupActivePort;
 
     public DepositAccountOnHoldPortAdapter(final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsHelper savingsHelper,
-            final ConfigurationDomainService configurationDomainService) {
+            final ConfigurationDomainService configurationDomainService, final ClientActivePort clientActivePort,
+            final GroupActivePort groupActivePort) {
         this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsHelper = savingsHelper;
         this.configurationDomainService = configurationDomainService;
+        this.clientActivePort = clientActivePort;
+        this.groupActivePort = groupActivePort;
     }
 
     @Override
@@ -107,7 +114,8 @@ public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort
 
     private SavingsAccount attachHelpers(final Long savingsAccountId) {
         final SavingsAccount savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
-        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService,
+                this.clientActivePort, this.groupActivePort);
         return savingsAccount;
     }
 
