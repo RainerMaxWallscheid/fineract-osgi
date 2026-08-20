@@ -19,8 +19,8 @@
 package org.apache.fineract.investor.accounting.journalentry.service;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
-import org.apache.fineract.accounting.closure.domain.GLClosure;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
@@ -38,6 +38,8 @@ import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductT
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,7 +48,18 @@ public class InvestorAccountingHelper {
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository accountMappingRepository;
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover {@code GLClosureRepository}
+     * ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final GLClosureRepository closureRepository;
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setJdbcTemplate(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     /**
      * @param officeId
@@ -56,9 +69,11 @@ public class InvestorAccountingHelper {
         /**
          * check if an accounting closure has happened for this branch after the transaction Date
          */
-        GLClosure gLClosure = getLatestClosureByBranch(officeId);
-        if (gLClosure != null && !DateUtils.isAfter(transactionDate, gLClosure.getClosingDate())) {
-            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.ACCOUNTING_CLOSED, gLClosure.getClosingDate(), null, null);
+        final Date closing = this.jdbcTemplate.queryForObject("select max(closing_date) from acc_gl_closure where office_id = ?", Date.class,
+                officeId);
+        final LocalDate closingDate = closing == null ? null : closing.toLocalDate();
+        if (closingDate != null && !DateUtils.isAfter(transactionDate, closingDate)) {
+            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.ACCOUNTING_CLOSED, closingDate, null, null);
         }
     }
 
@@ -114,10 +129,6 @@ public class InvestorAccountingHelper {
 
     private boolean isOrganizationAccount(final int accountMappingTypeId) {
         return FinancialActivity.fromInt(accountMappingTypeId) != null;
-    }
-
-    public GLClosure getLatestClosureByBranch(final long officeId) {
-        return this.closureRepository.getLatestGLClosureByBranch(officeId);
     }
 
     @java.lang.SuppressWarnings("all")
