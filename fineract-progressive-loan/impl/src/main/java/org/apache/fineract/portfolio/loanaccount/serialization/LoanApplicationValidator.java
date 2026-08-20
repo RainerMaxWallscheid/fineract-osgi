@@ -125,8 +125,10 @@ import org.apache.fineract.portfolio.loanproduct.exception.EqualAmortizationUnsu
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountView;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -166,12 +168,23 @@ public final class LoanApplicationValidator {
     private final LoanCollateralAssembler collateralAssembler;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final HolidayRepository holidayRepository;
+    /**
+     * Retained for ArchUnit freeze-identity: ctor still shares leftover
+     * {@code ClientRepositoryWrapper} / group siblings (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
     private final CalendarInstanceRepository calendarInstanceRepository;
     private final LoanUtilService loanUtilService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final LoanMapper loanMapper;
+
+    @Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
 
     public void validateForCreate(final Loan loan) {
         final LocalDate expectedFirstRepaymentOnDate = loan.getExpectedFirstRepaymentOnDate();
@@ -1139,12 +1152,12 @@ public final class LoanApplicationValidator {
         final Long linkedAccountId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.linkAccountIdParameterName, element);
         if (linkedAccountId != null) {
             baseDataValidator.reset().parameter(LoanApiConstants.linkAccountIdParameterName).value(linkedAccountId).ignoreIfNull().longGreaterThanZero();
-            final SavingsAccount savingsAccount = savingsAccountRepository.findOneWithNotFoundDetection(linkedAccountId);
+            final LinkedSavingsAccountView savingsAccount = linkedSavingsAccountPort.requireById(linkedAccountId);
             final Long clientId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.clientIdParameterName, element);
-            if (savingsAccount.isNotActive()) {
+            if (!savingsAccount.isActive()) {
                 final ApiParameterError error = ApiParameterError.parameterError("validation.msg.loan.linked.savings.account.is.not.active", "Linked Savings account with id:" + savingsAccount.getId() + " is not in active state", "linkAccountId", savingsAccount.getId());
                 baseDataValidator.getDataValidationErrors().add(error);
-            } else if (!clientId.equals(savingsAccount.clientId())) {
+            } else if (!clientId.equals(savingsAccount.getClientId())) {
                 final ApiParameterError error = ApiParameterError.parameterError("validation.msg.loan.linked.savings.account.not.belongs.to.same.client", "Linked Savings account with id:" + savingsAccount.getId() + " is not belongs to the same client", "linkAccountId", savingsAccount.getId());
                 baseDataValidator.getDataValidationErrors().add(error);
             }
