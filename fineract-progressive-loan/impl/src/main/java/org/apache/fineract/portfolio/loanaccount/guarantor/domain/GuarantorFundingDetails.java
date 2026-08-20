@@ -136,9 +136,14 @@ public class GuarantorFundingDetails extends AbstractPersistableCustom<Long> {
         this.guarantorFundingTransactions.add(guarantorFundingTransaction);
     }
 
-    public void undoAllTransactions() {
+    public List<Long> undoAllTransactions() {
+        final List<Long> reversedOnHoldIds = new ArrayList<>();
         for (GuarantorFundingTransaction fundingTransaction : this.guarantorFundingTransactions) {
-            fundingTransaction.reverseTransaction();
+            final Long onHoldId = fundingTransaction.reverseTransaction();
+            if (onHoldId != null) {
+                reversedOnHoldIds.add(onHoldId);
+            }
         }
+        return reversedOnHoldIds;
     }
 }

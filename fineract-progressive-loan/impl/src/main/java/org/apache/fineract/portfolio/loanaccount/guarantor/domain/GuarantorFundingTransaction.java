@@ -22,12 +22,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
-import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransaction;
 
 @Entity
 @Table(name = "m_guarantor_transaction")
@@ -41,9 +38,12 @@ public class GuarantorFundingTransaction extends AbstractPersistableCustom<Long>
     @JoinColumn(name = "loan_transaction_id", nullable = true)
     private LoanTransaction loanTransaction;
 
-    @OneToOne
-    @JoinColumn(name = "deposit_on_hold_transaction_id", nullable = false)
-    private DepositAccountOnHoldTransaction depositAccountOnHoldTransaction;
+    /**
+     * On-hold transaction id (no JPA association to leftover
+     * {@code DepositAccountOnHoldTransaction} — ADR-021 / charge Step 8).
+     */
+    @Column(name = "deposit_on_hold_transaction_id", nullable = false)
+    private Long depositAccountOnHoldTransactionId;
 
     @Column(name = "is_reversed", nullable = false)
     private boolean reversed;
@@ -52,21 +52,28 @@ public class GuarantorFundingTransaction extends AbstractPersistableCustom<Long>
 
     public GuarantorFundingTransaction(final GuarantorFundingDetails guarantorFundingDetails, final LoanTransaction loanTransaction,
             final Object depositAccountOnHoldTransaction) {
-        this.depositAccountOnHoldTransaction = (DepositAccountOnHoldTransaction) depositAccountOnHoldTransaction;
+        this.depositAccountOnHoldTransactionId = depositAccountOnHoldTransaction == null ? null
+                : (Long) ((AbstractPersistableCustom<?>) depositAccountOnHoldTransaction).getId();
         this.guarantorFundingDetails = guarantorFundingDetails;
         this.loanTransaction = loanTransaction;
         this.reversed = false;
     }
 
-    public void reverseTransaction() {
+    public GuarantorFundingDetails guarantorFundingDetails() {
+        return this.guarantorFundingDetails;
+    }
+
+    /**
+     * Marks this funding transaction reversed. Returns the on-hold id when the
+     * reverse is newly applied so callers can reverse the savings on-hold via
+     * {@code DepositAccountOnHoldPort}.
+     */
+    public Long reverseTransaction() {
         if (!this.reversed) {
             this.reversed = true;
-            BigDecimal amountForReverse = this.depositAccountOnHoldTransaction.getAmount();
-            this.depositAccountOnHoldTransaction.reverseTransaction();
-            if (this.depositAccountOnHoldTransaction.getTransactionType().isRelease()) {
-                this.guarantorFundingDetails.undoReleaseFunds(amountForReverse);
-            }
+            return this.depositAccountOnHoldTransactionId;
         }
+        return null;
     }
 
 }
