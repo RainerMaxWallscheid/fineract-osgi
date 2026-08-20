@@ -92,6 +92,14 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public Long id(final Object client) {
+        if (client == null) {
+            return null;
+        }
+        return ((Client) client).getId();
+    }
+
+    @Override
     public List<Long> groupIds(final Long clientId) {
         final Set<Group> groups = client(clientId).getGroups();
         if (groups == null || groups.isEmpty()) {

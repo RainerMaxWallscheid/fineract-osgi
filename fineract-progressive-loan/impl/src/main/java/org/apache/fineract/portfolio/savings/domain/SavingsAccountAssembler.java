@@ -449,36 +449,38 @@ public class SavingsAccountAssembler {
      * Assembles a new {@link SavingsAccount} from JSON details passed in request inheriting details where relevant from
      * chosen {@link SavingsProduct}.
      */
-    public SavingsAccount assembleFrom(final Client client, final Group group, final Long productId, final LocalDate appliedonDate,
+    public SavingsAccount assembleFrom(final Object client, final Object group, final Long productId, final LocalDate appliedonDate,
             final AppUser appliedBy) {
 
         AccountType accountType = AccountType.INVALID;
+        final Long clientId = this.clientActivePort.id(client);
+        final Long groupId = this.groupActivePort.id(group);
         if (client != null) {
             accountType = AccountType.INDIVIDUAL;
-            if (client.isNotActive()) {
-                throw new ClientNotActiveException(client.getId());
+            if (!this.clientActivePort.isActive(clientId)) {
+                throw new ClientNotActiveException(clientId);
             }
         }
 
         if (group != null) {
             accountType = AccountType.GROUP;
-            if (group.isNotActive()) {
-                if (group.isCenter()) {
-                    throw new CenterNotActiveException(group.getId());
+            if (!this.groupActivePort.isActive(groupId)) {
+                if (this.groupActivePort.isCenter(groupId)) {
+                    throw new CenterNotActiveException(groupId);
                 }
-                throw new GroupNotActiveException(group.getId());
+                throw new GroupNotActiveException(groupId);
             }
         }
 
         if (group != null && client != null) {
-            if (!group.hasClientAsMember(client)) {
-                throw new ClientNotInGroupException(client.getId(), group.getId());
+            if (!this.groupActivePort.hasClientAsMember(groupId, clientId)) {
+                throw new ClientNotInGroupException(clientId, groupId);
             }
             accountType = AccountType.JLG;
         }
         final SavingsProduct product = this.savingProductRepository.findById(productId).orElseThrow();
         final Set<SavingsAccountCharge> charges = this.savingsAccountChargeAssembler.fromSavingsProduct(product);
-        final SavingsAccount account = SavingsAccount.createNewApplicationForSubmittal(client, group, product, null, null, null,
+        final SavingsAccount account = SavingsAccount.createNewApplicationForSubmittal((Client) client, (Group) group, product, null, null, null,
                 accountType, appliedonDate, appliedBy, product.nominalAnnualInterestRate(), product.interestCompoundingPeriodType(),
                 product.interestPostingPeriodType(), product.interestCalculationType(), product.interestCalculationDaysInYearType(),
                 product.minRequiredOpeningBalance(), product.lockinPeriodFrequency(), product.lockinPeriodFrequencyType(),

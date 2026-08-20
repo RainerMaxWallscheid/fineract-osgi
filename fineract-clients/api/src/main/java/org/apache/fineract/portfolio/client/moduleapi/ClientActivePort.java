@@ -47,4 +47,9 @@ public interface ClientActivePort {
     ExternalId externalId(Long clientId);
 
     List<Long> groupIds(Long clientId);
+
+    /**
+     * Client id from a persistable client instance (Object-typed, ADR-021).
+     */
+    Long id(Object client);
 }

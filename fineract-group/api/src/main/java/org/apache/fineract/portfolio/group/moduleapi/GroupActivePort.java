@@ -31,4 +31,9 @@ public interface GroupActivePort {
     Long officeId(Long groupId);
 
     boolean hasClientAsMember(Long groupId, Long clientId);
+
+    /**
+     * Group id from a persistable group instance (Object-typed, ADR-021).
+     */
+    Long id(Object group);
 }
