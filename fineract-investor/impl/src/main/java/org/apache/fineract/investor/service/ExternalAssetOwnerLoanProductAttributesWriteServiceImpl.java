@@ -44,7 +44,7 @@ import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttri
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributeNotFoundException;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributesException;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.reflections.Reflections;
 import org.springframework.cache.annotation.CacheEvict;
@@ -57,7 +57,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
     private static final String INVESTOR_PATH = "org.apache.fineract.investor";
     private final FromJsonHelper fromApiJsonHelper;
     private final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final Set<Class<?>> implementingClasses = new Reflections(INVESTOR_PATH).get(SubTypes.of(ExternalAssetOwnerLoanProductAttribute.class).asClass());
 
     @Override
@@ -111,7 +111,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
     }
 
     private void validateLoanProductExists(Long loanProductId) {
-        if (!loanProductRepository.existsById(loanProductId)) {
+        if (!loanProductExistencePort.existsById(loanProductId)) {
             throw new LoanProductNotFoundException(loanProductId);
         }
     }
@@ -165,9 +165,9 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExternalAssetOwnerLoanProductAttributesWriteServiceImpl(final FromJsonHelper fromApiJsonHelper, final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductRepository loanProductRepository) {
+        public ExternalAssetOwnerLoanProductAttributesWriteServiceImpl(final FromJsonHelper fromApiJsonHelper, final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductExistencePort loanProductExistencePort) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.externalAssetOwnerLoanProductAttributesRepository = externalAssetOwnerLoanProductAttributesRepository;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
     }
 }

@@ -39,7 +39,7 @@ import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttri
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributeNotFoundException;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerLoanProductAttributesException;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -65,13 +65,13 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, null);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.existsByLoanProductIdAndKey(testContext.loanProductId, testContext.attributeKey)).thenReturn(false);
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         // when
         testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command);
         // then
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).existsByLoanProductIdAndKey(any(), any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         assertLoanProductAttributeValues(testContext, loanProductAttributeArgumentCaptor.getValue());
     }
 
@@ -86,11 +86,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         attributeInDB.setId(1L);
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, attributeInDB.getId());
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.findById(command.entityId())).thenReturn(Optional.of(attributeInDB));
         testContext.externalAssetOwnerLoanProductAttributesWriteService.updateExternalAssetOwnerLoanProductAttribute(command, testContext.attributeKey, testContext.attributeValue);
         // then
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).findById(command.entityId());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
     }
@@ -106,11 +106,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         attributeInDB.setId(1L);
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, attributeInDB.getId());
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.findById(command.entityId())).thenReturn(Optional.of(attributeInDB));
         testContext.externalAssetOwnerLoanProductAttributesWriteService.updateExternalAssetOwnerLoanProductAttribute(command, testContext.attributeKey, testContext.attributeValue);
         // then
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).findById(command.entityId());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
     }
@@ -121,11 +121,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         ArgumentCaptor<ExternalAssetOwnerLoanProductAttributes> loanProductAttributeArgumentCaptor = ArgumentCaptor.forClass(ExternalAssetOwnerLoanProductAttributes.class);
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, 1L);
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.findById(1L)).thenReturn(Optional.empty());
         ExternalAssetOwnerLoanProductAttributeNotFoundException thrownException = assertThrows(ExternalAssetOwnerLoanProductAttributeNotFoundException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.updateExternalAssetOwnerLoanProductAttribute(command, testContext.attributeKey, testContext.attributeValue));
         // then
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).findById(1L);
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
         Assertions.assertEquals(thrownException.getMessage(), "Loan product attribute with id " + 1L + " was not found");
@@ -142,11 +142,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         attributeInDB.setId(1L);
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, attributeInDB.getId());
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.findById(command.entityId())).thenReturn(Optional.of(attributeInDB));
         ExternalAssetOwnerLoanProductAttributesException thrownException = assertThrows(ExternalAssetOwnerLoanProductAttributesException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.updateExternalAssetOwnerLoanProductAttribute(command, testContext.attributeKey, testContext.attributeValue));
         // then
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).findById(command.entityId());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
         Assertions.assertEquals(thrownException.getMessage(), "The attribute key of requested update attribute does not match the attribute key from database.");
@@ -160,7 +160,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         final JsonElement jsonCommandElement = testContext.fromJsonHelper.parse(testContext.jsonCommandString);
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, null);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.existsByLoanProductIdAndKey(testContext.loanProductId, testContext.attributeKey)).thenReturn(false);
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         when(testContext.fromApiJsonHelper.extractStringNamed(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE, jsonCommandElement)).thenReturn("DEFAULT_SETTLEMENT");
         testContext.setAttributeValue("DEFAULT_SETTLEMENT");
         // when
@@ -168,7 +168,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         // then
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).existsByLoanProductIdAndKey(any(), any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository).saveAndFlush(loanProductAttributeArgumentCaptor.capture());
-        verify(testContext.loanProductRepository).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort).existsById(testContext.loanProductId);
         assertLoanProductAttributeValues(testContext, loanProductAttributeArgumentCaptor.getValue());
     }
 
@@ -183,7 +183,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         PlatformApiDataValidationException thrownException = assertThrows(PlatformApiDataValidationException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command));
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).existsByLoanProductIdAndKey(any(), any());
-        verify(testContext.loanProductRepository, times(0)).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort, times(0)).existsById(testContext.loanProductId);
         Assertions.assertEquals(thrownException.getMessage(), expectedErrorString);
     }
 
@@ -191,11 +191,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
     public void testCreateLoanProductAttributeExternalAssetOwnerExternalAssetOwnerLoanProductNotFound() {
         TestContext testContext = new TestContext();
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, null);
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(false);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(false);
         LoanProductNotFoundException thrownException = assertThrows(LoanProductNotFoundException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command));
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).existsByLoanProductIdAndKey(any(), any());
-        verify(testContext.loanProductRepository, times(1)).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort, times(1)).existsById(testContext.loanProductId);
         Assertions.assertEquals(thrownException.getMessage(), "Loan product with identifier " + testContext.loanProductId + " does not exist");
     }
 
@@ -204,11 +204,11 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         TestContext testContext = new TestContext();
         final JsonCommand command = createJsonCommand(testContext.jsonCommandString, testContext.loanProductId, null);
         when(testContext.externalAssetOwnerLoanProductAttributesRepository.existsByLoanProductIdAndKey(testContext.loanProductId, testContext.attributeKey)).thenReturn(true);
-        when(testContext.loanProductRepository.existsById(testContext.loanProductId)).thenReturn(true);
+        when(testContext.loanProductExistencePort.existsById(testContext.loanProductId)).thenReturn(true);
         ExternalAssetOwnerLoanProductAttributeAlreadyExistsException thrownException = assertThrows(ExternalAssetOwnerLoanProductAttributeAlreadyExistsException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command));
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(1)).existsByLoanProductIdAndKey(any(), any());
-        verify(testContext.loanProductRepository, times(1)).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort, times(1)).existsById(testContext.loanProductId);
         Assertions.assertEquals(thrownException.getMessage(), "attributeKey already exists for the loanProductId: " + testContext.loanProductId + ". Use PUT call to UPDATE the attribute.");
     }
 
@@ -221,7 +221,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException thrownException = assertThrows(ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command));
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).existsByLoanProductIdAndKey(any(), any());
-        verify(testContext.loanProductRepository, times(0)).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort, times(0)).existsById(testContext.loanProductId);
         Assertions.assertEquals(thrownException.getMessage(), "The given attribute key or attribute value is not valid.");
     }
 
@@ -234,7 +234,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException thrownException = assertThrows(ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException.class, () -> testContext.externalAssetOwnerLoanProductAttributesWriteService.createExternalAssetOwnerLoanProductAttribute(command));
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).saveAndFlush(any());
         verify(testContext.externalAssetOwnerLoanProductAttributesRepository, times(0)).existsByLoanProductIdAndKey(any(), any());
-        verify(testContext.loanProductRepository, times(0)).existsById(testContext.loanProductId);
+        verify(testContext.loanProductExistencePort, times(0)).existsById(testContext.loanProductId);
         Assertions.assertEquals(thrownException.getMessage(), "The given attribute key or attribute value is not valid.");
     }
 
@@ -269,7 +269,7 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImplTest {
         @Mock
         private ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
         @Mock
-        private LoanProductRepository loanProductRepository;
+        private LoanProductExistencePort loanProductExistencePort;
         @InjectMocks
         private ExternalAssetOwnerLoanProductAttributesWriteServiceImpl externalAssetOwnerLoanProductAttributesWriteService;
         private final FromJsonHelper fromJsonHelper = new FromJsonHelper();

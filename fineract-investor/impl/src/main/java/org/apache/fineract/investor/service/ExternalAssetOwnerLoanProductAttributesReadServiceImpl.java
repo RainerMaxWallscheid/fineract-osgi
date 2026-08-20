@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.investor.data.ExternalTransferLoanProductAttributesData;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerLoanProductAttributes;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerLoanProductAttributesRepository;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ExternalAssetOwnerLoanProductAttributesReadServiceImpl implements ExternalAssetOwnerLoanProductAttributesReadService {
     private final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final ExternalAssetOwnerLoanProductAttributesMapper mapper;
 
     @Override
@@ -55,7 +55,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceImpl implements E
         if (loanProductId == null) {
             throw new IllegalArgumentException("At least one of the following parameters must be provided: loanProductId");
         }
-        if (!loanProductRepository.existsById(loanProductId)) {
+        if (!loanProductExistencePort.existsById(loanProductId)) {
             throw new LoanProductNotFoundException(loanProductId);
         }
     }
@@ -72,9 +72,9 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceImpl implements E
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExternalAssetOwnerLoanProductAttributesReadServiceImpl(final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductRepository loanProductRepository, final ExternalAssetOwnerLoanProductAttributesMapper mapper) {
+        public ExternalAssetOwnerLoanProductAttributesReadServiceImpl(final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductExistencePort loanProductExistencePort, final ExternalAssetOwnerLoanProductAttributesMapper mapper) {
         this.externalAssetOwnerLoanProductAttributesRepository = externalAssetOwnerLoanProductAttributesRepository;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.mapper = mapper;
     }
 }

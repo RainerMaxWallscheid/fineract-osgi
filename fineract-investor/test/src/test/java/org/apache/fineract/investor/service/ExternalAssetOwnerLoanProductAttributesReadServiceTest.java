@@ -33,7 +33,7 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.investor.data.ExternalTransferLoanProductAttributesData;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerLoanProductAttributes;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerLoanProductAttributesRepository;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
     private ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
 
     @Mock
-    private LoanProductRepository loanProductRepository;
+    private LoanProductExistencePort loanProductExistencePort;
 
     @Mock
     private ExternalAssetOwnerLoanProductAttributesMapper mapper;
@@ -71,7 +71,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
     @BeforeEach
     public void setUp() {
         underTest = new ExternalAssetOwnerLoanProductAttributesReadServiceImpl(externalAssetOwnerLoanProductAttributesRepository,
-                loanProductRepository, mapper);
+                loanProductExistencePort, mapper);
     }
 
     @ParameterizedTest
@@ -87,7 +87,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
         when(externalAssetOwnerLoanProductAttributesRepository
                 .findAll(ArgumentMatchers.<Specification<ExternalAssetOwnerLoanProductAttributes>>any(), eq(pageRequest)))
                 .thenReturn(attributesPage);
-        when(loanProductRepository.existsById(loanProductId)).thenReturn(true);
+        when(loanProductExistencePort.existsById(loanProductId)).thenReturn(true);
         when(mapper.mapLoanProductAttributes(attributes)).thenReturn(data);
 
         // when
@@ -97,7 +97,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
         // then
         assertEquals(1, result.getTotalFilteredRecords());
         assertEquals(data, result.getPageItems().getFirst());
-        verify(loanProductRepository, times(1)).existsById(loanProductId);
+        verify(loanProductExistencePort, times(1)).existsById(loanProductId);
         verify(mapper, times(1)).mapLoanProductAttributes(attributes);
     }
 
@@ -113,7 +113,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
         when(externalAssetOwnerLoanProductAttributesRepository
                 .findAll(ArgumentMatchers.<Specification<ExternalAssetOwnerLoanProductAttributes>>any(), eq(pageRequest)))
                 .thenReturn(attributesPage);
-        when(loanProductRepository.existsById(loanProductId)).thenReturn(true);
+        when(loanProductExistencePort.existsById(loanProductId)).thenReturn(true);
         when(mapper.mapLoanProductAttributes(attributes)).thenReturn(null);
 
         // when
@@ -125,7 +125,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
         assertNull(result.getPageItems().getFirst());
         verify(externalAssetOwnerLoanProductAttributesRepository, times(1))
                 .findAll(ArgumentMatchers.<Specification<ExternalAssetOwnerLoanProductAttributes>>any(), eq(pageRequest));
-        verify(loanProductRepository, times(1)).existsById(loanProductId);
+        verify(loanProductExistencePort, times(1)).existsById(loanProductId);
         verify(mapper, times(1)).mapLoanProductAttributes(attributes);
     }
 
@@ -140,7 +140,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
         // then
         assertEquals("At least one of the following parameters must be provided: loanProductId", exception.getMessage());
         verifyNoInteractions(externalAssetOwnerLoanProductAttributesRepository);
-        verifyNoInteractions(loanProductRepository);
+        verifyNoInteractions(loanProductExistencePort);
         verifyNoInteractions(mapper);
     }
 
@@ -148,7 +148,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
     public void testRetrieveLoanProductAttributesDataByLoanProductIdNotFound() {
         // given
         Long loanProductId = 1L;
-        when(loanProductRepository.existsById(loanProductId)).thenReturn(false);
+        when(loanProductExistencePort.existsById(loanProductId)).thenReturn(false);
 
         // when
         LoanProductNotFoundException exception = assertThrows(LoanProductNotFoundException.class,
@@ -156,7 +156,7 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceTest {
 
         // then
         assertEquals("Loan product with identifier 1 does not exist", exception.getMessage());
-        verify(loanProductRepository, times(1)).existsById(loanProductId);
+        verify(loanProductExistencePort, times(1)).existsById(loanProductId);
         verifyNoInteractions(externalAssetOwnerLoanProductAttributesRepository);
         verifyNoInteractions(mapper);
     }
