@@ -29,8 +29,8 @@ import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialA
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException;
+import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -39,12 +39,18 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InvestorAccountingHelper {
     public static final String INVESTOR_TRANSFER_IDENTIFIER = "I";
+    /**
+     * Retained for ArchUnit freeze-identity on leftover {@code JournalEntryRepository}
+     * ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository accountMappingRepository;
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
@@ -55,10 +61,17 @@ public class InvestorAccountingHelper {
     @SuppressWarnings("unused")
     private final GLClosureRepository closureRepository;
     private JdbcTemplate jdbcTemplate;
+    private ExternalOwnerTransferJournalPort transferJournalPort;
 
     @Autowired
     public void setJdbcTemplate(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Autowired
+    @Lazy
+    public void setExternalOwnerTransferJournalPort(final ExternalOwnerTransferJournalPort transferJournalPort) {
+        this.transferJournalPort = transferJournalPort;
     }
 
     /**
@@ -99,17 +112,15 @@ public class InvestorAccountingHelper {
     }
 
     private JournalEntry createCreditJournalEntryForInvestor(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
-        final boolean manualEntry = false;
         final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
-        final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null, null, null, null, null);
-        return this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        return (JournalEntry) this.transferJournalPort.postInvestorCredit(office, currencyCode, account, modifiedTransactionId,
+                transactionDate, amount, loanId);
     }
 
     private JournalEntry createDebitJournalEntryForInvestor(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
-        final boolean manualEntry = false;
-        String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
-        final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null, null, null, null, null);
-        return this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
+        return (JournalEntry) this.transferJournalPort.postInvestorDebit(office, currencyCode, account, modifiedTransactionId,
+                transactionDate, amount, loanId);
     }
 
     public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {

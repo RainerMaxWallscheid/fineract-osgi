@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.accounting.moduleapi;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 /**
  * Object-typed external-owner transfer journal posting (ADR-021). Lives on
  * accounting-api so loan posters need not depend on leftover
@@ -27,4 +30,22 @@ package org.apache.fineract.accounting.moduleapi;
 public interface ExternalOwnerTransferJournalPort {
 
     void postTransfer(Object loan, Object externalAssetOwnerTransfer, Object previousOwner);
+
+    /**
+     * Persists an investor credit journal. Object params avoid leftover
+     * {@code JournalEntry} / {@code GLAccount} types on foreign BCs.
+     *
+     * @return persisted journal entry as {@code Object}
+     */
+    Object postInvestorCredit(Object office, String currencyCode, Object glAccount, String transactionId, LocalDate transactionDate,
+            BigDecimal amount, Long loanId);
+
+    /**
+     * Persists an investor debit journal. Object params avoid leftover
+     * {@code JournalEntry} / {@code GLAccount} types on foreign BCs.
+     *
+     * @return persisted journal entry as {@code Object}
+     */
+    Object postInvestorDebit(Object office, String currencyCode, Object glAccount, String transactionId, LocalDate transactionDate,
+            BigDecimal amount, Long loanId);
 }
