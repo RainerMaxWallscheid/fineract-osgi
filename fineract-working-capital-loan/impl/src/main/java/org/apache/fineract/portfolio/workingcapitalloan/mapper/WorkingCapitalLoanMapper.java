@@ -42,15 +42,15 @@ import org.mapstruct.Named;
 @Mapper(config = MapstructMapperConfig.class, uses = { DelinquencyBucketMapper.class, WorkingCapitalLoanProductMapper.class,
         WorkingCapitalLoanBalanceMapper.class, WorkingCapitalLoanDisbursementDetailMapper.class, WorkingCapitalLoanTransactionMapper.class,
         WorkingCapitalBreachMapper.class, WorkingCapitalNearBreachMapper.class, WorkingCapitalLoanSummaryDataMapper.class,
-        WorkingCapitalLoanPaymentAllocationMapper.class })
+        WorkingCapitalLoanPaymentAllocationMapper.class, ClientIdLookup.class })
 public interface WorkingCapitalLoanMapper {
 
     @Mapping(target = "accountNo", source = "accountNumber")
     @Mapping(target = "client", ignore = true)
     @Mapping(target = "clientId", source = "clientId")
-    @Mapping(target = "clientAccountNo", source = "client.accountNumber")
-    @Mapping(target = "clientName", source = "client.displayName")
-    @Mapping(target = "clientExternalId", source = "client.externalId")
+    @Mapping(target = "clientAccountNo", source = "clientId", qualifiedByName = "clientAccountNumber")
+    @Mapping(target = "clientName", source = "clientId", qualifiedByName = "clientDisplayName")
+    @Mapping(target = "clientExternalId", source = "clientId", qualifiedByName = "clientExternalId")
     @Mapping(target = "clientOfficeId", source = "officeId")
     @Mapping(target = "fundId", source = "fund.id")
     @Mapping(target = "fundName", source = "fund.name")

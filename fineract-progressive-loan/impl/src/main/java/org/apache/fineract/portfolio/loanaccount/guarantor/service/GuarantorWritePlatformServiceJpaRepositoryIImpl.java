@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.guarantor.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -68,10 +70,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements GuarantorWritePlatformService {
     private ClientActivePort clientActivePort;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Autowired
     public void setClientActivePort(final ClientActivePort clientActivePort) {
         this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(GuarantorWritePlatformServiceJpaRepositoryIImpl.class);
@@ -129,9 +137,10 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             final boolean backdatedTxnsAllowedTill = false;
             AccountAssociations accountAssociations = null;
             if (guarantorCommand.getSavingsId() != null) {
+                validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan,
+                        this.linkedSavingsAccountPort.requireById(guarantorCommand.getSavingsId()).getActivationDate());
                 final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(guarantorCommand.getSavingsId(),
                         backdatedTxnsAllowedTill);
-                validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
                 accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
                         AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
 
@@ -208,13 +217,13 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     }
 
     private void validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(final Loan loan,
-            final SavingsAccount savingsAccount) {
-        if (DateUtils.isBefore(loan.getSubmittedOnDate(), savingsAccount.getActivationDate())) {
+            final LocalDate savingsActivationDate) {
+        if (DateUtils.isBefore(loan.getSubmittedOnDate(), savingsActivationDate)) {
             throw new GeneralPlatformDomainRuleException(
                     "error.msg.guarantor.saving.account.activation.date.is.on.or.before.loan.submitted.on.date",
-                    "Guarantor saving account activation date [" + savingsAccount.getActivationDate()
+                    "Guarantor saving account activation date [" + savingsActivationDate
                             + "] is on or before the loan submitted on date [" + loan.getSubmittedOnDate() + "]",
-                    savingsAccount.getActivationDate(), loan.getSubmittedOnDate());
+                    savingsActivationDate, loan.getSubmittedOnDate());
         }
     }
 

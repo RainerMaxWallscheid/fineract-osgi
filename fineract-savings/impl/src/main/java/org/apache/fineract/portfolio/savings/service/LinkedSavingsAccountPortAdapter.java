@@ -36,6 +36,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     @Override
     public LinkedSavingsAccountView requireById(final Long savingsAccountId) {
         final SavingsAccount savingsAccount = savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
-        return new LinkedSavingsAccountView(savingsAccount.getId(), savingsAccount.clientId(), !savingsAccount.isNotActive());
+        return new LinkedSavingsAccountView(savingsAccount.getId(), savingsAccount.clientId(), !savingsAccount.isNotActive(),
+                savingsAccount.getActivationDate());
     }
 }

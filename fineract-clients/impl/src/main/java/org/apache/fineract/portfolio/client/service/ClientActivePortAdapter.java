@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.client.service;
 
 import java.time.LocalDate;
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -74,6 +75,16 @@ public class ClientActivePortAdapter implements ClientActivePort {
     @Override
     public String displayName(final Long clientId) {
         return client(clientId).getDisplayName();
+    }
+
+    @Override
+    public String accountNumber(final Long clientId) {
+        return client(clientId).getAccountNumber();
+    }
+
+    @Override
+    public ExternalId externalId(final Long clientId) {
+        return client(clientId).getExternalId();
     }
 
     private Client client(final Long clientId) {

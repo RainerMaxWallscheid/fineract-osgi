@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.client.moduleapi;
 
 import java.time.LocalDate;
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
  * ID-only client activity / transfer-date probes (ADR-021). Foreign BCs must
@@ -39,4 +40,8 @@ public interface ClientActivePort {
     Long officeId(Long clientId);
 
     String displayName(Long clientId);
+
+    String accountNumber(Long clientId);
+
+    ExternalId externalId(Long clientId);
 }

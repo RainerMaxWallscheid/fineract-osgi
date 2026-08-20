@@ -50,14 +50,14 @@ public class LoanPointInTimeData {
     private LoanArrearsData arrears;
 
 
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class, uses = {LoanStatusEnumData.Mapper.class, CurrencyMapper.class, LoanPrincipalData.Mapper.class, LoanInterestData.Mapper.class, LoanFeeData.Mapper.class, LoanPenaltyData.Mapper.class, LoanTotalAmountData.Mapper.class})
+    @org.mapstruct.Mapper(config = MapstructMapperConfig.class, uses = {LoanStatusEnumData.Mapper.class, CurrencyMapper.class, LoanPrincipalData.Mapper.class, LoanInterestData.Mapper.class, LoanFeeData.Mapper.class, LoanPenaltyData.Mapper.class, LoanTotalAmountData.Mapper.class, org.apache.fineract.portfolio.loanaccount.mapper.ClientIdLookup.class})
     public interface Mapper {
         @Mapping(source = "accountNumber", target = "accountNo")
         @Mapping(source = "source", target = "status")
         @Mapping(source = "clientId", target = "clientId")
-        @Mapping(source = "client.accountNumber", target = "clientAccountNo")
-        @Mapping(source = "client.externalId", target = "clientExternalId")
-        @Mapping(source = "client.displayName", target = "clientDisplayName")
+        @Mapping(source = "clientId", target = "clientAccountNo", qualifiedByName = "clientAccountNumber")
+        @Mapping(source = "clientId", target = "clientExternalId", qualifiedByName = "clientExternalIdValue")
+        @Mapping(source = "clientId", target = "clientDisplayName", qualifiedByName = "clientDisplayName")
         @Mapping(source = "officeId", target = "clientOfficeId")
         @Mapping(source = "summary", target = "principal")
         @Mapping(source = "summary", target = "interest")

@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.savings.moduleapi;
 
+import java.time.LocalDate;
+
 /**
  * ID-only projection for loan-linked savings validation (ADR-021).
  */
@@ -26,11 +28,13 @@ public final class LinkedSavingsAccountView {
     private final Long id;
     private final Long clientId;
     private final boolean active;
+    private final LocalDate activationDate;
 
-    public LinkedSavingsAccountView(final Long id, final Long clientId, final boolean active) {
+    public LinkedSavingsAccountView(final Long id, final Long clientId, final boolean active, final LocalDate activationDate) {
         this.id = id;
         this.clientId = clientId;
         this.active = active;
+        this.activationDate = activationDate;
     }
 
     public Long getId() {
@@ -43,5 +47,9 @@ public final class LinkedSavingsAccountView {
 
     public boolean isActive() {
         return this.active;
+    }
+
+    public LocalDate getActivationDate() {
+        return this.activationDate;
     }
 }
