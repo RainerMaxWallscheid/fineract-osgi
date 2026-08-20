@@ -27,4 +27,6 @@ public interface GroupActivePort {
     boolean isActive(Long groupId);
 
     boolean isCenter(Long groupId);
+
+    Long officeId(Long groupId);
 }

@@ -72,8 +72,8 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.MeetingFrequencyMismatchException;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.DayOfWeekType;
 import org.apache.fineract.portfolio.common.domain.DaysInMonthType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
@@ -86,6 +86,7 @@ import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
@@ -138,6 +139,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.RepaymentStartDateType;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -167,6 +169,18 @@ public class LoanScheduleAssembler {
     private final LoanChargeService loanChargeService;
     private final LoanScheduleService loanScheduleService;
     private final LoanProductRelatedDetailUpdateUtil relatedDetailUpdateUtil;
+    private ClientActivePort clientActivePort;
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
+    }
 
     public LoanApplicationTerms assembleLoanTerms(final JsonElement element) {
         final Long loanProductId = this.fromApiJsonHelper.extractLongNamed("productId", element);
@@ -400,14 +414,11 @@ public class LoanScheduleAssembler {
             }
         }
         final Long clientId = this.fromApiJsonHelper.extractLongNamed("clientId", element);
-        Client client = null;
         Long officeId = null;
         if (clientId != null) {
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-            officeId = client.getOffice().getId();
+            officeId = this.clientActivePort.officeId(clientId);
         } else if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
-            officeId = group.getOffice().getId();
+            officeId = this.groupActivePort.officeId(groupId);
         }
         final boolean isHolidayEnabled = this.configurationDomainService.isRescheduleRepaymentsOnHolidaysEnabled();
         final List<Holiday> holidays = officeId != null ? this.holidayRepository.findByOfficeIdAndGreaterThanDate(officeId, expectedDisbursementDate, HolidayStatusType.ACTIVE.getValue()) : List.of();
@@ -563,15 +574,11 @@ public class LoanScheduleAssembler {
         final boolean isHolidayEnabled = this.configurationDomainService.isRescheduleRepaymentsOnHolidaysEnabled();
         final Long clientId = this.fromApiJsonHelper.extractLongNamed("clientId", element);
         final Long groupId = this.fromApiJsonHelper.extractLongNamed("groupId", element);
-        Client client = null;
-        Group group = null;
         Long officeId = null;
         if (clientId != null) {
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-            officeId = client.getOffice().getId();
+            officeId = this.clientActivePort.officeId(clientId);
         } else if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
-            officeId = group.getOffice().getId();
+            officeId = this.groupActivePort.officeId(groupId);
         }
         final LocalDate expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed("expectedDisbursementDate", element);
         final List<Holiday> holidays = officeId != null ? this.holidayRepository.findByOfficeIdAndGreaterThanDate(officeId, expectedDisbursementDate, HolidayStatusType.ACTIVE.getValue()) : List.of();

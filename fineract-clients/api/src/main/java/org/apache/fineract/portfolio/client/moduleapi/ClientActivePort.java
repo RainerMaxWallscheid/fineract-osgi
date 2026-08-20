@@ -28,9 +28,13 @@ public interface ClientActivePort {
 
     boolean isActive(Long clientId);
 
+    boolean exists(Long clientId);
+
     boolean isActivatedAfter(Long clientId, LocalDate date);
 
     LocalDate activationDate(Long clientId);
 
     LocalDate officeJoiningDate(Long clientId);
+
+    Long officeId(Long clientId);
 }

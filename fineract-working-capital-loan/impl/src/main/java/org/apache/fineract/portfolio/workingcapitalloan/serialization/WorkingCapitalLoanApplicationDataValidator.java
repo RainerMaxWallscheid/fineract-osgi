@@ -43,10 +43,9 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.ExpectedDisbursementDateValidator;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanStateTransitionException;
@@ -67,6 +66,7 @@ import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCap
 import org.apache.fineract.portfolio.workingcapitalloanproduct.exception.WorkingCapitalLoanProductNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.repository.WorkingCapitalLoanProductRepository;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.serialization.WorkingCapitalPaymentAllocationDataValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -82,10 +82,21 @@ public class WorkingCapitalLoanApplicationDataValidator {
     private final FromJsonHelper fromApiJsonHelper;
     private final WorkingCapitalPaymentAllocationDataValidator paymentAllocationDataValidator;
     private final WorkingCapitalLoanProductRepository productRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover {@code ClientRepository}
+     * ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final ClientRepository clientRepository;
+    private ClientActivePort clientActivePort;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final ExpectedDisbursementDateValidator expectedDisbursementDateValidator;
     private final WorkingCapitalNearBreachParseAndValidator workingCapitalNearBreachValidator;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
 
     /**
      * Validates the create loan application request. Mandatory: clientId, productId, principal (disbursement amount),
@@ -105,16 +116,13 @@ public class WorkingCapitalLoanApplicationDataValidator {
         final JsonElement element = this.fromApiJsonHelper.parse(json);
         final Long clientId = this.fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.clientIdParameterName).value(clientId).notNull().longGreaterThanZero();
-        final Client client = clientId != null ? this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId)) : null;
         // Mandatory: productId
         final Long productId = this.fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.productIdParameterName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.productIdParameterName).value(productId).notNull().longGreaterThanZero();
-        if (client == null) {
+        if (clientId == null) {
             baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.clientIdParameterName).value(null).notNull();
-        } else {
-            if (client.isNotActive()) {
-                throw new ClientNotActiveException(client.getId());
-            }
+        } else if (!this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         WorkingCapitalLoanProduct product = null;
         if (productId != null) {
@@ -169,10 +177,13 @@ public class WorkingCapitalLoanApplicationDataValidator {
             }
         }
         // Submitted-on date rules (product range, client activation, not future, not after expected disbursement)
-        validateSubmittedOnDate(element, product, client, expectedDisbursementDate, null);
+        validateSubmittedOnDate(element, product, clientId, expectedDisbursementDate, null);
         // Disbursement date business rules (non-working day, holiday)
-        if (expectedDisbursementDate != null && client != null && client.getOffice() != null) {
-            this.expectedDisbursementDateValidator.validate(expectedDisbursementDate, client.getOffice().getId());
+        if (expectedDisbursementDate != null && clientId != null) {
+            final Long officeId = this.clientActivePort.officeId(clientId);
+            if (officeId != null) {
+                this.expectedDisbursementDateValidator.validate(expectedDisbursementDate, officeId);
+            }
         }
         // Optional: accountNo, externalId, fundId (same rules as LoanApplicationValidator)
         if (this.fromApiJsonHelper.parameterExists(WorkingCapitalLoanConstants.accountNoParameterName, element)) {
@@ -207,7 +218,7 @@ public class WorkingCapitalLoanApplicationDataValidator {
             throw new WorkingCapitalLoanApplicationNotInSubmittedStateCannotBeModifiedException(loan.getId());
         }
         final LocalDate expectedDisbursementDate = loan.getDisbursementDetails().isEmpty() ? null : loan.getDisbursementDetails().getFirst().getExpectedDisbursementDate();
-        validateForUpdate(command, loan.getLoanProduct() != null ? loan.getLoanProduct().getId() : null, loan.getClient() != null ? loan.getClient().getId() : null, loan.getExternalId() != null ? loan.getExternalId().getValue() : null, loan.getAccountNumber(), loan.getSubmittedOnDate(), expectedDisbursementDate);
+        validateForUpdate(command, loan.getLoanProduct() != null ? loan.getLoanProduct().getId() : null, loan.getClientId(), loan.getExternalId() != null ? loan.getExternalId().getValue() : null, loan.getAccountNumber(), loan.getSubmittedOnDate(), expectedDisbursementDate);
     }
 
     /**
@@ -258,14 +269,8 @@ public class WorkingCapitalLoanApplicationDataValidator {
             atLeastOneParameterPassedForUpdate = true;
             baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.clientIdParameterName).value(clientIdFromRequest).notNull().longGreaterThanZero();
         }
-        Client client = null;
-        if (resolvedClientId != null) {
-            client = this.clientRepository.findById(resolvedClientId).orElse(null);
-            if (client != null) {
-                if (client.isNotActive()) {
-                    throw new ClientNotActiveException(client.getId());
-                }
-            }
+        if (resolvedClientId != null && this.clientActivePort.exists(resolvedClientId) && !this.clientActivePort.isActive(resolvedClientId)) {
+            throw new ClientNotActiveException(resolvedClientId);
         }
         if (this.fromApiJsonHelper.parameterExists(WorkingCapitalLoanConstants.principalAmountParamName, element)) {
             atLeastOneParameterPassedForUpdate = true;
@@ -355,12 +360,15 @@ public class WorkingCapitalLoanApplicationDataValidator {
         if (!atLeastOneParameterPassedForUpdate) {
             baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.idParameterName).value(null).anyOfNotNull();
         }
-        if (resolvedExpectedDisbursementDate != null && client != null && client.getOffice() != null) {
-            this.expectedDisbursementDateValidator.validate(resolvedExpectedDisbursementDate, client.getOffice().getId());
+        if (resolvedExpectedDisbursementDate != null && resolvedClientId != null && this.clientActivePort.exists(resolvedClientId)) {
+            final Long officeId = this.clientActivePort.officeId(resolvedClientId);
+            if (officeId != null) {
+                this.expectedDisbursementDateValidator.validate(resolvedExpectedDisbursementDate, officeId);
+            }
         }
         if (this.fromApiJsonHelper.parameterExists(WorkingCapitalLoanConstants.submittedOnDateParameterName, element) || this.fromApiJsonHelper.parameterExists(WorkingCapitalLoanConstants.expectedDisbursementDateParameterName, element)) {
             if (resolvedExpectedDisbursementDate != null || existingSubmittedOnDate != null) {
-                validateSubmittedOnDate(element, product, client, resolvedExpectedDisbursementDate, existingSubmittedOnDate);
+                validateSubmittedOnDate(element, product, resolvedClientId, resolvedExpectedDisbursementDate, existingSubmittedOnDate);
             }
         }
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
@@ -371,7 +379,7 @@ public class WorkingCapitalLoanApplicationDataValidator {
      * after expected disbursement date. For update, pass existingSubmittedOnDate so resolved value is request or
      * existing (same as basic Loan).
      */
-    private void validateSubmittedOnDate(final JsonElement element, final WorkingCapitalLoanProduct product, final Client client, final LocalDate expectedDisbursementDate, final LocalDate existingSubmittedOnDate) {
+    private void validateSubmittedOnDate(final JsonElement element, final WorkingCapitalLoanProduct product, final Long clientId, final LocalDate expectedDisbursementDate, final LocalDate existingSubmittedOnDate) {
         final LocalDate submittedOnDate = this.fromApiJsonHelper.parameterExists(WorkingCapitalLoanConstants.submittedOnDateParameterName, element) ? this.fromApiJsonHelper.extractLocalDateNamed(WorkingCapitalLoanConstants.submittedOnDateParameterName, element) : (existingSubmittedOnDate != null ? existingSubmittedOnDate : DateUtils.getBusinessLocalDate());
         if (submittedOnDate == null) {
             return;
@@ -389,12 +397,13 @@ public class WorkingCapitalLoanApplicationDataValidator {
         if (DateUtils.isDateInTheFuture(submittedOnDate)) {
             throw new InvalidLoanStateTransitionException("submittal", "cannot.be.a.future.date", "The date on which a loan is submitted cannot be in the future.", submittedOnDate, DateUtils.getBusinessLocalDate());
         }
-        if (client != null) {
-            if (client.isActivatedAfter(submittedOnDate)) {
-                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", "The date on which a loan is submitted cannot be earlier than client\'s activation date.", submittedOnDate, client.getActivationDate());
+        if (clientId != null && this.clientActivePort.exists(clientId)) {
+            if (this.clientActivePort.isActivatedAfter(clientId, submittedOnDate)) {
+                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", "The date on which a loan is submitted cannot be earlier than client\'s activation date.", submittedOnDate, this.clientActivePort.activationDate(clientId));
             }
-            if (client.getOfficeJoiningDate() != null && DateUtils.isBefore(submittedOnDate, client.getOfficeJoiningDate())) {
-                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.transfer.date", "The date on which a loan is submitted cannot be earlier than client\'s transfer date to this office", client.getOfficeJoiningDate());
+            final LocalDate officeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (officeJoiningDate != null && DateUtils.isBefore(submittedOnDate, officeJoiningDate)) {
+                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.transfer.date", "The date on which a loan is submitted cannot be earlier than client\'s transfer date to this office", officeJoiningDate);
             }
         }
         if (expectedDisbursementDate != null && DateUtils.isAfter(submittedOnDate, expectedDisbursementDate)) {
