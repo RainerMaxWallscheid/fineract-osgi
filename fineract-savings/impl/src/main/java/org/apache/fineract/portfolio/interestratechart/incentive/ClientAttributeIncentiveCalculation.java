@@ -22,14 +22,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientIncentiveView;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestIncentivesFields;
 
 public class ClientAttributeIncentiveCalculation extends AttributeIncentiveCalculation {
 
+    private ClientActivePort clientActivePort;
+
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     @Override
     public BigDecimal calculateIncentive(IncentiveDTO incentiveDTO) {
-        final Client client = (Client) incentiveDTO.client();
+        final ClientIncentiveView client = this.clientActivePort.incentiveAttributes(incentiveDTO.client());
         BigDecimal interest = incentiveDTO.interest();
         final InterestIncentivesFields incentivesFields = incentiveDTO.incentives();
         boolean applyIncentive = false;

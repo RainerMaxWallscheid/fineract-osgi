@@ -60,4 +60,10 @@ public interface ClientActivePort {
      *             when the id does not exist
      */
     Object persistableById(Long clientId);
+
+    /**
+     * Incentive attributes from a persistable client instance (Object-typed,
+     * ADR-021).
+     */
+    ClientIncentiveView incentiveAttributes(Object client);
 }

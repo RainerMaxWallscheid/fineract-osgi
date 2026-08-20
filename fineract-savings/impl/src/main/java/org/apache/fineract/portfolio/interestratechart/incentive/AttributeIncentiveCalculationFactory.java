@@ -18,17 +18,27 @@
  */
 package org.apache.fineract.portfolio.interestratechart.incentive;
 
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+
 public final class AttributeIncentiveCalculationFactory {
+
+    private static ClientActivePort clientActivePort;
 
     private AttributeIncentiveCalculationFactory() {
 
+    }
+
+    public static void setClientActivePort(final ClientActivePort clientActivePort) {
+        AttributeIncentiveCalculationFactory.clientActivePort = clientActivePort;
     }
 
     public static AttributeIncentiveCalculation findAttributeIncentiveCalculation(InterestIncentiveEntityType entityType) {
         AttributeIncentiveCalculation attributeIncentiveCalculation = null;
         switch (entityType) {
             case CUSTOMER:
-                attributeIncentiveCalculation = new ClientAttributeIncentiveCalculation();
+                final ClientAttributeIncentiveCalculation clientCalculation = new ClientAttributeIncentiveCalculation();
+                clientCalculation.setClientActivePort(clientActivePort);
+                attributeIncentiveCalculation = clientCalculation;
             break;
             default:
             break;

@@ -29,6 +29,7 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientIncentiveView;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -102,6 +103,16 @@ public class ClientActivePortAdapter implements ClientActivePort {
     @Override
     public Object persistableById(final Long clientId) {
         return this.clientRepository.findOneWithNotFoundDetection(clientId);
+    }
+
+    @Override
+    public ClientIncentiveView incentiveAttributes(final Object client) {
+        if (client == null) {
+            return null;
+        }
+        final Client persistable = (Client) client;
+        return new ClientIncentiveView(persistable.genderId(), persistable.dateOfBirth(), persistable.clientTypeId(),
+                persistable.clientClassificationId());
     }
 
     @Override
