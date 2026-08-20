@@ -31,12 +31,13 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
+import org.apache.fineract.portfolio.loanaccount.service.LoanOutstandingInterestPortAdapter;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanSummaryDataProvider;
 import org.apache.fineract.portfolio.loanaccount.service.LoanSummaryProviderDelegate;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,21 +72,22 @@ class ExternalAssetOwnerTransferOutstandingInterestCalculationTest {
     @Mock
     private LoanSummaryDataProvider summaryDataProvider;
 
-    @InjectMocks
     private ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
+
+    @BeforeEach
+    void setUp() {
+        final LoanOutstandingInterestPortAdapter port = new LoanOutstandingInterestPortAdapter(loanSummaryDataProvider,
+                configurationDomainService, loanReadPlatformService, currencyMapper);
+        externalAssetOwnerTransferOutstandingInterestCalculation = new ExternalAssetOwnerTransferOutstandingInterestCalculation(port);
+    }
 
     @Test
     void testCalculateOutstandingInterest_WhenLoanNotDisbursed_ShouldReturnZero() {
-        // Given
         when(loan.isOpen()).thenReturn(false);
 
-        // When
         BigDecimal result = externalAssetOwnerTransferOutstandingInterestCalculation.calculateOutstandingInterest(loan);
 
-        // Then
         assertEquals(BigDecimal.ZERO, result);
-
-        // Verify that no other calculations were performed
         verify(configurationDomainService, never()).getAssetOwnerTransferOustandingInterestStrategy();
         verify(loanReadPlatformService, never()).retrieveOne(Mockito.anyLong());
         verify(loan, times(1)).isOpen();
@@ -93,17 +95,14 @@ class ExternalAssetOwnerTransferOutstandingInterestCalculationTest {
 
     @Test
     void testCalculateOutstandingInterest_WhenLoanDisbursedWithTotalStrategy_ShouldCalculate() {
-        // Given - ACTIVE loan with TOTAL_OUTSTANDING_INTEREST strategy
         when(loan.isOpen()).thenReturn(true);
         when(configurationDomainService.getAssetOwnerTransferOustandingInterestStrategy()).thenReturn("TOTAL_OUTSTANDING_INTEREST");
         when(loan.getSummary()).thenReturn(loanSummary);
         BigDecimal expectedInterest = new BigDecimal("150.50");
         when(loanSummary.getTotalInterestOutstanding()).thenReturn(expectedInterest);
 
-        // When
         BigDecimal result = externalAssetOwnerTransferOutstandingInterestCalculation.calculateOutstandingInterest(loan);
 
-        // Then
         assertEquals(expectedInterest, result);
         verify(loan, times(1)).isOpen();
         verify(loan, times(1)).getSummary();
@@ -111,16 +110,11 @@ class ExternalAssetOwnerTransferOutstandingInterestCalculationTest {
 
     @Test
     void testCalculateOutstandingInterest_BackdatedUndisbursedLoan_ShouldReturnZero() {
-        // Given - backdated loan (created 3 months ago) but not disbursed
         when(loan.isOpen()).thenReturn(false);
 
-        // When
         BigDecimal result = externalAssetOwnerTransferOutstandingInterestCalculation.calculateOutstandingInterest(loan);
 
-        // Then
         assertEquals(BigDecimal.ZERO, result);
-
-        // Verify that the method returned early due to disbursement check
         verify(loan, times(1)).isOpen();
         verify(configurationDomainService, never()).getAssetOwnerTransferOustandingInterestStrategy();
     }
