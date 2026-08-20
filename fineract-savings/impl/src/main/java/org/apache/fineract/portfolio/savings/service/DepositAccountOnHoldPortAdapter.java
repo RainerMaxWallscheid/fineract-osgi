@@ -20,12 +20,18 @@ package org.apache.fineract.portfolio.savings.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransaction;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransactionRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionSummaryWrapper;
+import org.apache.fineract.portfolio.savings.domain.SavingsHelper;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
 import org.springframework.stereotype.Service;
@@ -35,11 +41,19 @@ public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort
 
     private final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository;
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
+    private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
+    private final SavingsHelper savingsHelper;
+    private final ConfigurationDomainService configurationDomainService;
 
     public DepositAccountOnHoldPortAdapter(final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
-            final SavingsAccountRepositoryWrapper savingsAccountRepository) {
+            final SavingsAccountRepositoryWrapper savingsAccountRepository,
+            final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsHelper savingsHelper,
+            final ConfigurationDomainService configurationDomainService) {
         this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
         this.savingsAccountRepository = savingsAccountRepository;
+        this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
+        this.savingsHelper = savingsHelper;
+        this.configurationDomainService = configurationDomainService;
     }
 
     @Override
@@ -71,6 +85,30 @@ public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort
     public void persistAll(final List<Object> onHoldTransactions) {
         this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) onHoldTransactions);
         this.depositAccountOnHoldTransactionRepository.flush();
+    }
+
+    @Override
+    public void rebuildSummaryUntil(final Long savingsAccountId, final LocalDate until) {
+        final SavingsAccount savingsAccount = attachHelpers(savingsAccountId);
+        final List<SavingsAccountTransaction> transactions = new ArrayList<>();
+        for (final SavingsAccountTransaction transaction : savingsAccount.getTransactions()) {
+            if (!DateUtils.isAfter(transaction.getTransactionDate(), until)) {
+                transactions.add(transaction);
+            }
+        }
+        savingsAccount.updateSavingsAccountSummary(transactions);
+    }
+
+    @Override
+    public void refreshSummary(final Long savingsAccountId) {
+        final SavingsAccount savingsAccount = attachHelpers(savingsAccountId);
+        savingsAccount.updateSavingsAccountSummary(savingsAccount.getTransactions());
+    }
+
+    private SavingsAccount attachHelpers(final Long savingsAccountId) {
+        final SavingsAccount savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+        savingsAccount.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper, this.configurationDomainService);
+        return savingsAccount;
     }
 
     @Override

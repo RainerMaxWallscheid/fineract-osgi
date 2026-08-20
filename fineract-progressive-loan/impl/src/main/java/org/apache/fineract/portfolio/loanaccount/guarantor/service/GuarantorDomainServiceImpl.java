@@ -64,10 +64,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorRepos
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductGuaranteeDetails;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransactionRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
@@ -81,9 +78,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final GuarantorFundingTransactionRepository guarantorFundingTransactionRepository;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
     private final BusinessEventNotifierService businessEventNotifierService;
-    private final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository;
     private final Map<Long, Long> releaseLoanIds = new HashMap<>(2);
-    private final SavingsAccountAssembler savingsAccountAssembler;
     private final ConfigurationDomainService configurationDomainService;
     private final ExternalIdFactory externalIdFactory;
     private final LoanRepository loanRepository;
@@ -295,18 +290,10 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 final List<GuarantorFundingDetails> fundingDetails = guarantor.getGuarantorFundDetails();
                 for (GuarantorFundingDetails guarantorFundingDetails : fundingDetails) {
                     if (guarantorFundingDetails.getStatus().isActive()) {
-                        final SavingsAccount savingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
-                        if (loan.isApproved() && !loan.isDisbursed()) {
-                            final List<SavingsAccountTransaction> transactions = new ArrayList<>();
-                            for (final SavingsAccountTransaction transaction : savingsAccount.getTransactions()) {
-                                if (!DateUtils.isAfter(transaction.getTransactionDate(), loan.getApprovedOnDate())) {
-                                    transactions.add(transaction);
-                                }
-                            }
-                            this.savingsAccountAssembler.setHelpers(savingsAccount);
-                            savingsAccount.updateSavingsAccountSummary(transactions);
-                        }
                         final Long savingsAccountId = guarantorFundingDetails.linkedSavingsAccountId();
+                        if (loan.isApproved() && !loan.isDisbursed()) {
+                            this.depositAccountOnHoldPort.rebuildSummaryUntil(savingsAccountId, loan.getApprovedOnDate());
+                        }
                         totalGuarantee = totalGuarantee.add(guarantorFundingDetails.getAmount());
                         onHoldTransactions.add(this.depositAccountOnHoldPort.hold(savingsAccountId, guarantorFundingDetails.getAmount(),
                                 loan.getApprovedOnDate()));
@@ -314,7 +301,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                         if (this.depositAccountOnHoldPort.withdrawableBalance(savingsAccountId).compareTo(BigDecimal.ZERO) < 0) {
                             insufficientBalanceIds.add(savingsAccountId);
                         }
-                        savingsAccount.updateSavingsAccountSummary(savingsAccount.getTransactions());
+                        this.depositAccountOnHoldPort.refreshSummary(savingsAccountId);
                     }
                 }
             }
@@ -562,14 +549,12 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GuarantorDomainServiceImpl(final GuarantorRepository guarantorRepository, final GuarantorFundingRepository guarantorFundingRepository, final GuarantorFundingTransactionRepository guarantorFundingTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, final SavingsAccountAssembler savingsAccountAssembler, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository) {
+        public GuarantorDomainServiceImpl(final GuarantorRepository guarantorRepository, final GuarantorFundingRepository guarantorFundingRepository, final GuarantorFundingTransactionRepository guarantorFundingTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository) {
         this.guarantorRepository = guarantorRepository;
         this.guarantorFundingRepository = guarantorFundingRepository;
         this.guarantorFundingTransactionRepository = guarantorFundingTransactionRepository;
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
         this.businessEventNotifierService = businessEventNotifierService;
-        this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
-        this.savingsAccountAssembler = savingsAccountAssembler;
         this.configurationDomainService = configurationDomainService;
         this.externalIdFactory = externalIdFactory;
         this.loanRepository = loanRepository;

@@ -39,5 +39,9 @@ public interface DepositAccountOnHoldPort {
 
     void persistAll(List<Object> onHoldTransactions);
 
+    void rebuildSummaryUntil(Long savingsAccountId, LocalDate until);
+
+    void refreshSummary(Long savingsAccountId);
+
     OnHoldReverseResult reverse(Long onHoldTransactionId);
 }
