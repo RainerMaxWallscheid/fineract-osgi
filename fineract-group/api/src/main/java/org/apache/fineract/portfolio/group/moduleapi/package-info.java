@@ -16,21 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.client.moduleapi;
-
-import java.time.LocalDate;
 
 /**
- * ID-only client activity / transfer-date probes (ADR-021). Foreign BCs must
- * not depend on leftover {@code Client} graphs.
+ * Module API (ADR-021) — the only package other Gradle modules should depend on
+ * from this bounded context.
  */
-public interface ClientActivePort {
-
-    boolean isActive(Long clientId);
-
-    boolean isActivatedAfter(Long clientId, LocalDate date);
-
-    LocalDate activationDate(Long clientId);
-
-    LocalDate officeJoiningDate(Long clientId);
-}
+package org.apache.fineract.portfolio.group.moduleapi;

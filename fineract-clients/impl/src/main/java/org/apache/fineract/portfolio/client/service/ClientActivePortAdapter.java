@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.client.service;
 
+import java.time.LocalDate;
+import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,25 @@ public class ClientActivePortAdapter implements ClientActivePort {
 
     @Override
     public boolean isActive(final Long clientId) {
-        return !this.clientRepository.findOneWithNotFoundDetection(clientId).isNotActive();
+        return !client(clientId).isNotActive();
+    }
+
+    @Override
+    public boolean isActivatedAfter(final Long clientId, final LocalDate date) {
+        return client(clientId).isActivatedAfter(date);
+    }
+
+    @Override
+    public LocalDate activationDate(final Long clientId) {
+        return client(clientId).getActivationDate();
+    }
+
+    @Override
+    public LocalDate officeJoiningDate(final Long clientId) {
+        return client(clientId).getOfficeJoiningDate();
+    }
+
+    private Client client(final Long clientId) {
+        return this.clientRepository.findOneWithNotFoundDetection(clientId);
     }
 }

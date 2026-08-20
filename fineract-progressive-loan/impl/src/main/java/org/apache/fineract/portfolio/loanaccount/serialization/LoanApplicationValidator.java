@@ -76,6 +76,7 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
@@ -86,6 +87,7 @@ import org.apache.fineract.portfolio.common.domain.DaysInYearType;
 import org.apache.fineract.portfolio.common.service.Validator;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -181,9 +183,22 @@ public final class LoanApplicationValidator {
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final LoanMapper loanMapper;
 
+    private ClientActivePort clientActivePort;
+    private GroupActivePort groupActivePort;
+
     @Autowired
     public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
         this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
     }
 
     public void validateForCreate(final Loan loan) {
@@ -642,7 +657,7 @@ public final class LoanApplicationValidator {
         Validator.validateOrThrow("loan", baseDataValidator -> {
             final JsonElement element = this.fromApiJsonHelper.parse(json);
             boolean atLeastOneParameterPassedForUpdate = false;
-            Long clientId = loan.getClient() != null ? loan.getClient().getId() : null;
+            Long clientId = loan.getClientId();
             if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.clientIdParameterName, element)) {
                 atLeastOneParameterPassedForUpdate = true;
                 clientId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.clientIdParameterName, element);
@@ -1370,13 +1385,13 @@ public final class LoanApplicationValidator {
             throw new InvalidLoanStateTransitionException("submittal", "cannot.be.a.future.date", errorMessage, submittedOnDate, DateUtils.getBusinessLocalDate());
         }
         if (clientId != null) {
-            Client client = clientRepository.findOneWithNotFoundDetection(clientId);
-            if (client != null && client.isActivatedAfter(submittedOnDate)) {
+            if (this.clientActivePort.isActivatedAfter(clientId, submittedOnDate)) {
                 final String errorMessage = "The date on which a loan is submitted cannot be earlier than client\'s activation date.";
-                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", errorMessage, submittedOnDate, client.getActivationDate());
+                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", errorMessage, submittedOnDate, this.clientActivePort.activationDate(clientId));
             }
-            if (client != null && client.getOfficeJoiningDate() != null && DateUtils.isBefore(submittedOnDate, client.getOfficeJoiningDate())) {
-                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.transfer.date", "The date on which a loan is submitted cannot be earlier than client\'s transfer date to this office", client.getOfficeJoiningDate());
+            final LocalDate officeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (officeJoiningDate != null && DateUtils.isBefore(submittedOnDate, officeJoiningDate)) {
+                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.transfer.date", "The date on which a loan is submitted cannot be earlier than client\'s transfer date to this office", officeJoiningDate);
             }
         }
         if (groupId != null) {
@@ -1444,13 +1459,13 @@ public final class LoanApplicationValidator {
             final String note = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.noteParameterName, element);
             baseDataValidator.reset().parameter(LoanApiConstants.noteParameterName).value(note).notExceedingLengthOf(1000);
             final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-            final Client client = loan.client();
-            if (client != null && client.isNotActive()) {
-                throw new ClientNotActiveException(client.getId());
+            final Long clientId = loan.getClientId();
+            if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+                throw new ClientNotActiveException(clientId);
             }
-            final Group group = loan.group();
-            if (group != null && group.isNotActive()) {
-                throw new GroupNotActiveException(group.getId());
+            final Long groupId = loan.getGroupId();
+            if (groupId != null && !this.groupActivePort.isActive(groupId)) {
+                throw new GroupNotActiveException(groupId);
             }
             if (expectedDisbursementDate == null) {
                 expectedDisbursementDate = loan.getExpectedDisbursedOnLocalDate();
@@ -1500,9 +1515,9 @@ public final class LoanApplicationValidator {
                     throw new InvalidLoanStateTransitionException("expecteddisbursal", "should.be.on.or.after.approval.date", errorMessage, approvedOnDate, expectedDisbursementDate);
                 }
             }
-            if (client != null && client.getOfficeJoiningDate() != null && approvedOnDate != null) {
-                final LocalDate clientOfficeJoiningDate = client.getOfficeJoiningDate();
-                if (DateUtils.isBefore(approvedOnDate, clientOfficeJoiningDate)) {
+            if (clientId != null && approvedOnDate != null) {
+                final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+                if (clientOfficeJoiningDate != null && DateUtils.isBefore(approvedOnDate, clientOfficeJoiningDate)) {
                     throw new InvalidLoanStateTransitionException("approval", "cannot.be.before.client.transfer.date", "The date on which a loan is approved cannot be earlier than client\'s transfer date to this office", clientOfficeJoiningDate);
                 }
             }

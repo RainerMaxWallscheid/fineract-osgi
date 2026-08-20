@@ -68,6 +68,7 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
@@ -103,6 +104,13 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Autowired
     public void setClientActivePort(final ClientActivePort clientActivePort) {
         this.clientActivePort = clientActivePort;
+    }
+
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -628,12 +636,12 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         if (clientId != null && !this.clientActivePort.isActive(clientId)) {
             throw new ClientNotActiveException(clientId);
         }
-        final Group group = account.group();
-        if (group != null && group.isNotActive()) {
-            if (group.isCenter()) {
-                throw new CenterNotActiveException(group.getId());
+        final Long groupId = account.groupId();
+        if (groupId != null && !this.groupActivePort.isActive(groupId)) {
+            if (this.groupActivePort.isCenter(groupId)) {
+                throw new CenterNotActiveException(groupId);
             }
-            throw new GroupNotActiveException(group.getId());
+            throw new GroupNotActiveException(groupId);
         }
     }
 

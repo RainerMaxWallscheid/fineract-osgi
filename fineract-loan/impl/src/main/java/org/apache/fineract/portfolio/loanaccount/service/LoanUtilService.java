@@ -43,6 +43,7 @@ import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
@@ -63,6 +64,13 @@ public class LoanUtilService implements ILoanUtilService {
     @Autowired
     public void setClientActivePort(final ClientActivePort clientActivePort) {
         this.clientActivePort = clientActivePort;
+    }
+
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
     }
 
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
@@ -269,9 +277,9 @@ public class LoanUtilService implements ILoanUtilService {
         if (clientId != null && !this.clientActivePort.isActive(clientId)) {
             throw new ClientNotActiveException(clientId);
         }
-        final Group group = loan.group();
-        if (group != null && group.isNotActive()) {
-            throw new GroupNotActiveException(group.getId());
+        final Long groupId = loan.getGroupId();
+        if (groupId != null && !this.groupActivePort.isActive(groupId)) {
+            throw new GroupNotActiveException(groupId);
         }
     }
 

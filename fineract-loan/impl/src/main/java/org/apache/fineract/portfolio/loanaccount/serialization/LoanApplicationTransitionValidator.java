@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -58,6 +59,13 @@ public final class LoanApplicationTransitionValidator {
     @Autowired
     public void setClientActivePort(final ClientActivePort clientActivePort) {
         this.clientActivePort = clientActivePort;
+    }
+
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
     }
 
     private final FromJsonHelper fromApiJsonHelper;
@@ -243,9 +251,9 @@ public final class LoanApplicationTransitionValidator {
         if (clientId != null && !this.clientActivePort.isActive(clientId)) {
             throw new ClientNotActiveException(clientId);
         }
-        final Group group = loan.group();
-        if (group != null && group.isNotActive()) {
-            throw new GroupNotActiveException(group.getId());
+        final Long groupId = loan.getGroupId();
+        if (groupId != null && !this.groupActivePort.isActive(groupId)) {
+            throw new GroupNotActiveException(groupId);
         }
     }
 

@@ -16,21 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.client.moduleapi;
-
-import java.time.LocalDate;
+package org.apache.fineract.portfolio.group.moduleapi;
 
 /**
- * ID-only client activity / transfer-date probes (ADR-021). Foreign BCs must
- * not depend on leftover {@code Client} graphs.
+ * ID-only group activity check (ADR-021). Foreign BCs must not depend on
+ * leftover {@code Group} graphs for {@code checkClientOrGroupActive}.
  */
-public interface ClientActivePort {
+public interface GroupActivePort {
 
-    boolean isActive(Long clientId);
+    boolean isActive(Long groupId);
 
-    boolean isActivatedAfter(Long clientId, LocalDate date);
-
-    LocalDate activationDate(Long clientId);
-
-    LocalDate officeJoiningDate(Long clientId);
+    boolean isCenter(Long groupId);
 }
