@@ -21,13 +21,9 @@ package org.apache.fineract.investor.accounting.journalentry.service;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
-import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
-import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
@@ -39,30 +35,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class InvestorAccountingHelper {
     public static final String INVESTOR_TRANSFER_IDENTIFIER = "I";
-    /**
-     * Retained for ArchUnit freeze-identity on leftover {@code JournalEntryRepository}
-     * ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final JournalEntryRepository glJournalEntryRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover mapping repo ctor/field
-     * (lookups go through {@link ExternalOwnerTransferJournalPort}).
-     */
-    @SuppressWarnings("unused")
-    private final ProductToGLAccountMappingRepository accountMappingRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover financial-activity repo
-     * ctor/field (lookups go through {@link ExternalOwnerTransferJournalPort}).
-     */
-    @SuppressWarnings("unused")
-    private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover {@code GLClosureRepository}
-     * ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final GLClosureRepository closureRepository;
     private JdbcTemplate jdbcTemplate;
     private ExternalOwnerTransferJournalPort transferJournalPort;
 
@@ -136,13 +108,5 @@ public class InvestorAccountingHelper {
 
     public Object getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {
         return this.transferJournalPort.linkedGlAccountForLoanProduct(loanProductId, accountMappingTypeId);
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public InvestorAccountingHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository) {
-        this.glJournalEntryRepository = glJournalEntryRepository;
-        this.accountMappingRepository = accountMappingRepository;
-        this.financialActivityAccountRepository = financialActivityAccountRepository;
-        this.closureRepository = closureRepository;
     }
 }
