@@ -89,6 +89,10 @@ public class GuarantorFundingDetails extends AbstractPersistableCustom<Long> {
         return accountAssociations.linkedSavingsAccount();
     }
 
+    public Long linkedSavingsAccountId() {
+        return this.accountAssociations == null ? null : this.accountAssociations.linkedSavingsAccountId();
+    }
+
     public Loan getLoanAccount() {
         return this.guarantor.getLoan();
     }

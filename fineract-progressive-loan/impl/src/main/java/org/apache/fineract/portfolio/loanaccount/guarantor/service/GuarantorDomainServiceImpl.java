@@ -153,7 +153,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             if (savingsAccount.getWithdrawableBalance().compareTo(BigDecimal.ZERO) < 0) {
                 final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                 final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.guarantor");
-                baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_INSUFFICIENT_BALANCE_ERROR, savingsAccount.getId());
+                baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_INSUFFICIENT_BALANCE_ERROR, guarantorFundingDetails.linkedSavingsAccountId());
                 throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
             }
             DepositAccountOnHoldTransaction onHoldTransaction = DepositAccountOnHoldTransaction.hold(savingsAccount, guarantorFundingDetails.getAmount(), transactionDate);
@@ -217,7 +217,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 Loan freshLoan = loanRepository.findById(loanId).orElseThrow();
                 if (guarantorFundingDetails.getStatus().isActive()) {
                     final SavingsAccount fromSavingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
-                    final Long fromAccountId = fromSavingsAccount.getId();
+                    final Long fromAccountId = guarantorFundingDetails.linkedSavingsAccountId();
                     releaseLoanIds.put(loanId, guarantorFundingDetails.getId());
                     try {
                         BigDecimal remainingAmount = guarantorFundingDetails.getAmountRemaining();
@@ -305,7 +305,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                         guarantorFundingDetails.addGuarantorFundingTransactions(guarantorFundingTransaction);
                         guarantorFundingDetailList.add(guarantorFundingDetails);
                         if (savingsAccount.getWithdrawableBalance().compareTo(BigDecimal.ZERO) < 0) {
-                            insufficientBalanceIds.add(savingsAccount.getId());
+                            insufficientBalanceIds.add(guarantorFundingDetails.linkedSavingsAccountId());
                         }
                         savingsAccount.updateSavingsAccountSummary(savingsAccount.getTransactions());
                     }
