@@ -27,7 +27,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -75,14 +74,13 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
 
     @Override
     public void createJournalEntriesForExternalOwnerTransfer(final Object loanObj, final Object transferObj, final Object previousOwnerObj) {
-        final Loan loan = (Loan) loanObj;
         final ExternalAssetOwnerTransfer transfer = (ExternalAssetOwnerTransfer) transferObj;
         final ExternalAssetOwner previousOwner = (ExternalAssetOwner) previousOwnerObj;
         final boolean isBuyback = transfer.getStatus().name().contains("BUYBACK");
         if (isBuyback) {
-            accountingService.createJournalEntriesForBuybackAssetTransfer(loan, transfer);
+            accountingService.createJournalEntriesForBuybackAssetTransfer(loanObj, transfer);
         } else {
-            accountingService.createJournalEntriesForSaleAssetTransfer(loan, transfer, previousOwner);
+            accountingService.createJournalEntriesForSaleAssetTransfer(loanObj, transfer, previousOwner);
         }
     }
 }

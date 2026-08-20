@@ -39,7 +39,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMapping;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMappingRepository;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferJournalContextPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.lang.NonNull;
@@ -77,12 +76,12 @@ public class AccountingServiceImpl implements AccountingService {
     private final ThreadLocal<Map<Object, Boolean>> currentJournalEntryCredit = new ThreadLocal<>();
 
     @Override
-    public void createJournalEntriesForSaleAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer, final ExternalAssetOwner previousOwner) {
+    public void createJournalEntriesForSaleAssetTransfer(final Object loan, final ExternalAssetOwnerTransfer transfer, final ExternalAssetOwner previousOwner) {
         final ExternalAssetOwner newOwner = transfer.getOwner();
         try {
             currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
             currentJournalEntryCredit.set(new IdentityHashMap<>());
-            List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, true);
+            List<Object> journalEntryList = createJournalEntries(loan, transfer, true);
             createMappingToTransfer(transfer, journalEntryList);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
             journalEntryList.forEach(journalEntry -> {
@@ -101,12 +100,12 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     @Override
-    public void createJournalEntriesForBuybackAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer) {
+    public void createJournalEntriesForBuybackAssetTransfer(final Object loan, final ExternalAssetOwnerTransfer transfer) {
         final ExternalAssetOwner previousOwner = transfer.getOwner();
         try {
             currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
             currentJournalEntryCredit.set(new IdentityHashMap<>());
-            List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, false);
+            List<Object> journalEntryList = createJournalEntries(loan, transfer, false);
             createMappingToTransfer(transfer, journalEntryList);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
             journalEntryList.forEach(journalEntry -> {
@@ -125,7 +124,7 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     @NonNull
-    private List<JournalEntry> createJournalEntries(final Loan loan, final ExternalAssetOwnerTransfer transfer, final boolean isReversalOrder) {
+    private List<Object> createJournalEntries(final Object loan, final ExternalAssetOwnerTransfer transfer, final boolean isReversalOrder) {
         this.helper.checkForBranchClosures(loanTransferJournalContextPort.officeId(loan), transfer.getSettlementDate());
         // transaction properties
         final Long transactionId = transfer.getId();
@@ -139,7 +138,7 @@ public class AccountingServiceImpl implements AccountingService {
         // Reuse already-loaded overpayment amount so owner mapping need not touch leftover LoanStatus.
         currentTransferOverpaid.set(MathUtil.isGreaterThanZero(overPaymentAmount));
         // Moving money to asset transfer account
-        final List<JournalEntry> journalEntryList = createJournalEntries(loan, transactionId, transactionDate, principalAmount, interestAmount, feesAmount, penaltiesAmount, overPaymentAmount, !isReversalOrder);
+        final List<Object> journalEntryList = createJournalEntries(loan, transactionId, transactionDate, principalAmount, interestAmount, feesAmount, penaltiesAmount, overPaymentAmount, !isReversalOrder);
         // Moving money from asset transfer account
         journalEntryList.addAll(createJournalEntries(loan, transactionId, transactionDate, principalAmount, interestAmount, feesAmount, penaltiesAmount, overPaymentAmount, isReversalOrder));
         return journalEntryList;
@@ -156,8 +155,7 @@ public class AccountingServiceImpl implements AccountingService {
         externalAssetOwnerJournalEntryMappingRepository.saveAndFlush(mapping);
     }
 
-    private ExternalAssetOwner determineOwnerForSale(final JournalEntry journalEntry, final Loan loan, final ExternalAssetOwner previousOwner, final ExternalAssetOwner newOwner) {
-        // loan retained for ArchUnit freeze-identity on this method; overpaid comes from createJournalEntries.
+    private ExternalAssetOwner determineOwnerForSale(final Object journalEntry, final Object loan, final ExternalAssetOwner previousOwner, final ExternalAssetOwner newOwner) {
         Objects.requireNonNull(loan, "loan");
         final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
         final Boolean credit = currentJournalEntryCredit.get() == null ? null : currentJournalEntryCredit.get().get(journalEntry);
@@ -170,7 +168,7 @@ public class AccountingServiceImpl implements AccountingService {
         return credit ? previousOwner : newOwner;
     }
 
-    private ExternalAssetOwner determineOwnerForBuyback(final JournalEntry journalEntry, final Loan loan, final ExternalAssetOwner previousOwner) {
+    private ExternalAssetOwner determineOwnerForBuyback(final Object journalEntry, final Object loan, final ExternalAssetOwner previousOwner) {
         Objects.requireNonNull(loan, "loan");
         final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
         final Boolean credit = currentJournalEntryCredit.get() == null ? null : currentJournalEntryCredit.get().get(journalEntry);
@@ -192,13 +190,13 @@ public class AccountingServiceImpl implements AccountingService {
         });
     }
 
-    private List<JournalEntry> createJournalEntries(final Loan loan, final Long transactionId, final LocalDate transactionDate, final BigDecimal principalAmount, final BigDecimal interestAmount, final BigDecimal feesAmount, final BigDecimal penaltiesAmount, final BigDecimal overPaymentAmount, final boolean isReversalOrder) {
+    private List<Object> createJournalEntries(final Object loan, final Long transactionId, final LocalDate transactionDate, final BigDecimal principalAmount, final BigDecimal interestAmount, final BigDecimal feesAmount, final BigDecimal penaltiesAmount, final BigDecimal overPaymentAmount, final boolean isReversalOrder) {
         final Long loanProductId = loanTransferJournalContextPort.productId(loan);
         final Long loanId = loanTransferJournalContextPort.loanId(loan);
         final Office office = (Office) loanTransferJournalContextPort.office(loan);
         final String currencyCode = loanTransferJournalContextPort.currencyCode(loan);
         final boolean chargedOff = loanTransferJournalContextPort.chargedOff(loan);
-        final List<JournalEntry> journalEntryList = new ArrayList<>();
+        final List<Object> journalEntryList = new ArrayList<>();
         BigDecimal totalDebitAmount = BigDecimal.ZERO;
         final Map<Object, BigDecimal> accountMap = new LinkedHashMap<>();
         // principal entry
@@ -278,12 +276,12 @@ public class AccountingServiceImpl implements AccountingService {
         }
         // asset transfer entry
         for (Map.Entry<Object, BigDecimal> entry : accountMap.entrySet()) {
-            final JournalEntry journalEntry = (JournalEntry) this.helper.createCreditJournalEntryOrReversalForInvestor(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), isReversalOrder, entry.getKey());
+            final Object journalEntry = this.helper.createCreditJournalEntryOrReversalForInvestor(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), isReversalOrder, entry.getKey());
             journalEntryList.add(journalEntry);
             rememberCredit(journalEntry, !isReversalOrder);
         }
         if (MathUtil.isGreaterThanZero(totalDebitAmount)) {
-            final JournalEntry assetTransferEntry = (JournalEntry) this.helper.createDebitJournalEntryOrReversalForInvestor(office, currencyCode, AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue(), loanProductId, loanId, transactionId, transactionDate, totalDebitAmount, isReversalOrder);
+            final Object assetTransferEntry = this.helper.createDebitJournalEntryOrReversalForInvestor(office, currencyCode, AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue(), loanProductId, loanId, transactionId, transactionDate, totalDebitAmount, isReversalOrder);
             journalEntryList.add(assetTransferEntry);
             rememberCredit(assetTransferEntry, isReversalOrder);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
