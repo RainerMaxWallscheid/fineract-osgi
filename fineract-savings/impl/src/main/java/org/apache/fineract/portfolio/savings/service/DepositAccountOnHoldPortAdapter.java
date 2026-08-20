@@ -18,9 +18,13 @@
  */
 package org.apache.fineract.portfolio.savings.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransaction;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransactionRepository;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
 import org.springframework.stereotype.Service;
@@ -29,9 +33,31 @@ import org.springframework.stereotype.Service;
 public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort {
 
     private final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository;
+    private final SavingsAccountRepositoryWrapper savingsAccountRepository;
 
-    public DepositAccountOnHoldPortAdapter(final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
+    public DepositAccountOnHoldPortAdapter(final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
+            final SavingsAccountRepositoryWrapper savingsAccountRepository) {
         this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
+        this.savingsAccountRepository = savingsAccountRepository;
+    }
+
+    @Override
+    public Object hold(final Long savingsAccountId, final BigDecimal amount, final LocalDate date) {
+        final SavingsAccount savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+        savingsAccount.holdFunds(amount);
+        return DepositAccountOnHoldTransaction.hold(savingsAccount, amount, date);
+    }
+
+    @Override
+    public Object release(final Long savingsAccountId, final BigDecimal amount, final LocalDate date) {
+        final SavingsAccount savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+        savingsAccount.releaseFunds(amount);
+        return DepositAccountOnHoldTransaction.release(savingsAccount, amount, date);
+    }
+
+    @Override
+    public BigDecimal withdrawableBalance(final Long savingsAccountId) {
+        return this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId).getWithdrawableBalance();
     }
 
     @Override
