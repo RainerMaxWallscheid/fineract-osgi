@@ -20,11 +20,18 @@ package org.apache.fineract.accounting.journalentry.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.apache.fineract.accounting.common.AccountingConstants;
+import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
+import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
+import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
+import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
+import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingNotFoundException;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.springframework.stereotype.Service;
@@ -34,11 +41,16 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
 
     private final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort;
     private final JournalEntryRepository journalEntryRepository;
+    private final ProductToGLAccountMappingRepository accountMappingRepository;
+    private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
 
     public ExternalOwnerTransferJournalPortAdapter(final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort,
-            final JournalEntryRepository journalEntryRepository) {
+            final JournalEntryRepository journalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository,
+            final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository) {
         this.externalAssetOwnerJournalPort = externalAssetOwnerJournalPort;
         this.journalEntryRepository = journalEntryRepository;
+        this.accountMappingRepository = accountMappingRepository;
+        this.financialActivityAccountRepository = financialActivityAccountRepository;
     }
 
     @Override
@@ -64,5 +76,33 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
         final JournalEntry journalEntry = JournalEntry.createNew((Office) office, null, (GLAccount) glAccount, currencyCode, transactionId,
                 manualEntry, transactionDate, type, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null, null, null, null, null);
         return this.journalEntryRepository.saveAndFlush(journalEntry);
+    }
+
+    @Override
+    public Object linkedGlAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {
+        if (FinancialActivity.fromInt(accountMappingTypeId) != null) {
+            final FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository
+                    .findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
+            return financialActivityAccount.getGlAccount();
+        }
+        final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId,
+                PortfolioProductType.LOAN.getValue(), accountMappingTypeId);
+        if (accountMapping == null) {
+            throw new ProductToGLAccountMappingNotFoundException(PortfolioProductType.LOAN, loanProductId,
+                    AccountingConstants.AccrualAccountsForLoan.fromInt(accountMappingTypeId).toString());
+        }
+        return accountMapping.getGlAccount();
+    }
+
+    @Override
+    public Object chargeOffMapping(final Long loanProductId, final int productTypeValue, final Long chargeOffReasonId) {
+        return this.accountMappingRepository.findChargeOffReasonMapping(loanProductId, productTypeValue, chargeOffReasonId);
+    }
+
+    @Override
+    public Object chargeOffGlAccount(final Long loanProductId, final int productTypeValue, final Long chargeOffReasonId) {
+        final ProductToGLAccountMapping mapping = (ProductToGLAccountMapping) chargeOffMapping(loanProductId, productTypeValue,
+                chargeOffReasonId);
+        return mapping == null ? null : mapping.getGlAccount();
     }
 }

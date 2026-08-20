@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
-import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.investor.accounting.journalentry.service.InvestorAccountingHelper;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
@@ -41,7 +40,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMapping;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMappingRepository;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferJournalContextPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
@@ -210,9 +208,10 @@ public class AccountingServiceImpl implements AccountingService {
             GLAccount account;
             if (chargedOff) {
                 final Long chargeOffReasonId = loanTransferJournalContextPort.chargeOffReasonId(loan);
-                final ProductToGLAccountMapping mapping = chargeOffReasonId != null ? helper.getChargeOffMappingByCodeValue(loanProductId, PortfolioProductType.LOAN, chargeOffReasonId) : null;
-                if (mapping != null) {
-                    account = mapping.getGlAccount();
+                final Object chargeOffAccount = chargeOffReasonId != null ? helper.chargeOffGlAccount(loanProductId, chargeOffReasonId)
+                        : null;
+                if (chargeOffAccount != null) {
+                    account = (GLAccount) chargeOffAccount;
                 } else {
                     final AccountingConstants.AccrualAccountsForLoan accrualAccount = loanTransferJournalContextPort.fraud(loan) ? AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE : AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_EXPENSE;
                     account = helper.getLinkedGLAccountForLoanProduct(loanProductId, accrualAccount.getValue());

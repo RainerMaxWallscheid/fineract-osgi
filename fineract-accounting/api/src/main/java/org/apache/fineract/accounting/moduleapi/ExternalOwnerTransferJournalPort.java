@@ -48,4 +48,20 @@ public interface ExternalOwnerTransferJournalPort {
      */
     Object postInvestorDebit(Object office, String currencyCode, Object glAccount, String transactionId, LocalDate transactionDate,
             BigDecimal amount, Long loanId);
+
+    /**
+     * Linked product GL account as {@code Object} so investor helpers need not
+     * call leftover mapping / financial-activity graphs.
+     */
+    Object linkedGlAccountForLoanProduct(Long loanProductId, int accountMappingTypeId);
+
+    /**
+     * Charge-off product mapping as {@code Object} ({@code null} when absent).
+     */
+    Object chargeOffMapping(Long loanProductId, int productTypeValue, Long chargeOffReasonId);
+
+    /**
+     * Charge-off GL account as {@code Object} ({@code null} when no mapping).
+     */
+    Object chargeOffGlAccount(Long loanProductId, int productTypeValue, Long chargeOffReasonId);
 }

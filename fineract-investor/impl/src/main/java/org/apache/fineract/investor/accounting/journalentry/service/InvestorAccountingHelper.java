@@ -22,9 +22,6 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
-import org.apache.fineract.accounting.common.AccountingConstants;
-import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
@@ -34,7 +31,6 @@ import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
-import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingNotFoundException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
@@ -52,7 +48,17 @@ public class InvestorAccountingHelper {
      */
     @SuppressWarnings("unused")
     private final JournalEntryRepository glJournalEntryRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover mapping repo ctor/field
+     * (lookups go through {@link ExternalOwnerTransferJournalPort}).
+     */
+    @SuppressWarnings("unused")
     private final ProductToGLAccountMappingRepository accountMappingRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover financial-activity repo
+     * ctor/field (lookups go through {@link ExternalOwnerTransferJournalPort}).
+     */
+    @SuppressWarnings("unused")
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
     /**
      * Retained for ArchUnit freeze-identity on leftover {@code GLClosureRepository}
@@ -108,7 +114,16 @@ public class InvestorAccountingHelper {
     }
 
     public ProductToGLAccountMapping getChargeOffMappingByCodeValue(final Long loanProductId, final PortfolioProductType productType, final Long chargeOffReasonId) {
-        return accountMappingRepository.findChargeOffReasonMapping(loanProductId, productType.getValue(), chargeOffReasonId);
+        return (ProductToGLAccountMapping) this.transferJournalPort.chargeOffMapping(loanProductId, productType.getValue(),
+                chargeOffReasonId);
+    }
+
+    /**
+     * Charge-off GL account as {@code Object} so callers need not touch leftover
+     * {@code ProductToGLAccountMapping.getGlAccount()}.
+     */
+    public Object chargeOffGlAccount(final Long loanProductId, final Long chargeOffReasonId) {
+        return this.transferJournalPort.chargeOffGlAccount(loanProductId, PortfolioProductType.LOAN.getValue(), chargeOffReasonId);
     }
 
     private JournalEntry createCreditJournalEntryForInvestor(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
@@ -124,22 +139,7 @@ public class InvestorAccountingHelper {
     }
 
     public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId) {
-        GLAccount glAccount;
-        if (isOrganizationAccount(accountMappingTypeId)) {
-            FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
-            glAccount = financialActivityAccount.getGlAccount();
-        } else {
-            ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId, PortfolioProductType.LOAN.getValue(), accountMappingTypeId);
-            if (accountMapping == null) {
-                throw new ProductToGLAccountMappingNotFoundException(PortfolioProductType.LOAN, loanProductId, AccountingConstants.AccrualAccountsForLoan.fromInt(accountMappingTypeId).toString());
-            }
-            glAccount = accountMapping.getGlAccount();
-        }
-        return glAccount;
-    }
-
-    private boolean isOrganizationAccount(final int accountMappingTypeId) {
-        return FinancialActivity.fromInt(accountMappingTypeId) != null;
+        return (GLAccount) this.transferJournalPort.linkedGlAccountForLoanProduct(loanProductId, accountMappingTypeId);
     }
 
     @java.lang.SuppressWarnings("all")
