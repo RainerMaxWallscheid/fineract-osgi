@@ -21,23 +21,22 @@ package org.apache.fineract.portfolio.savings.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.group.domain.Group;
 
 @Entity
 @Table(name = "gsim_accounts", uniqueConstraints = { @UniqueConstraint(columnNames = { "account_number" }, name = "gsim_id") })
 public final class GroupSavingsIndividualMonitoring extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
+    /**
+     * Group id (no JPA association to leftover Group — ADR-021 / charge Step 8).
+     */
+    @Column(name = "group_id", nullable = false)
+    private Long groupId;
 
     @Column(name = "account_number", nullable = false)
     private String accountNumber;
@@ -62,10 +61,10 @@ public final class GroupSavingsIndividualMonitoring extends AbstractPersistableC
 
     private GroupSavingsIndividualMonitoring() {}
 
-    private GroupSavingsIndividualMonitoring(String accountNumber, Group group, BigDecimal parentDeposit, Long childAccountsCount,
+    private GroupSavingsIndividualMonitoring(String accountNumber, Long groupId, BigDecimal parentDeposit, Long childAccountsCount,
             Boolean isAcceptingChild, Integer savingsStatus, BigDecimal applicationId) {
         this.accountNumber = accountNumber;
-        this.group = group;
+        this.groupId = groupId;
         this.parentDeposit = parentDeposit;
         this.childAccountsCount = childAccountsCount;
         this.isAcceptingChild = isAcceptingChild;
@@ -74,18 +73,15 @@ public final class GroupSavingsIndividualMonitoring extends AbstractPersistableC
 
     }
 
-    public static GroupSavingsIndividualMonitoring getInstance(String accountNumber, Group group, BigDecimal parentDeposit,
+    public static GroupSavingsIndividualMonitoring getInstance(String accountNumber, Object group, BigDecimal parentDeposit,
             Long childAccountsCount, Boolean isAcceptingChild, Integer savingsStatus, BigDecimal applicationId) {
-        return new GroupSavingsIndividualMonitoring(accountNumber, group, parentDeposit, childAccountsCount, isAcceptingChild,
+        final Long groupId = group == null ? null : (Long) ((AbstractPersistableCustom<?>) group).getId();
+        return new GroupSavingsIndividualMonitoring(accountNumber, groupId, parentDeposit, childAccountsCount, isAcceptingChild,
                 savingsStatus, applicationId);
     }
 
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
+    public Long getGroupId() {
+        return this.groupId;
     }
 
     public String getAccountNumber() {
