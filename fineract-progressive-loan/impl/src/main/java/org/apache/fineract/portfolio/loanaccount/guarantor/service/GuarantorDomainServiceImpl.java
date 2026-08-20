@@ -19,6 +19,8 @@
 package org.apache.fineract.portfolio.loanaccount.guarantor.service;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -90,10 +92,16 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final LoanRepository loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
     private DepositAccountOnHoldPort depositAccountOnHoldPort;
+    private EntityManager entityManager;
 
     @Autowired
     public void setDepositAccountOnHoldPort(final DepositAccountOnHoldPort depositAccountOnHoldPort) {
         this.depositAccountOnHoldPort = depositAccountOnHoldPort;
+    }
+
+    @PersistenceContext
+    public void setEntityManager(final EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @PostConstruct
@@ -329,6 +337,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             loan.setGuaranteeAmount(totalGuarantee);
             if (!guarantorFundingDetailList.isEmpty()) {
                 this.depositAccountOnHoldTransactionRepository.saveAll(onHoldTransactions);
+                flushOnHoldIds();
                 bindGuarantorFundingTransactions(guarantorFundingDetailList, onHoldTransactions, null);
                 this.guarantorFundingRepository.saveAll(guarantorFundingDetailList);
             }
@@ -375,6 +384,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 }
                 if (!externalGuarantorList.isEmpty()) {
                     this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) accountOnHoldTransactions);
+                    flushOnHoldIds();
                     bindGuarantorFundingTransactions(externalGuarantorList, accountOnHoldTransactions, loanTransaction);
                     this.guarantorFundingRepository.saveAll(externalGuarantorList);
                 }
@@ -407,6 +417,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             }
             if (!saveGuarantorFundingDetails.isEmpty()) {
                 this.depositAccountOnHoldTransactionRepository.saveAll(onHoldTransactions);
+                flushOnHoldIds();
                 bindGuarantorFundingTransactions(saveGuarantorFundingDetails, onHoldTransactions, loanTransaction);
                 this.guarantorFundingRepository.saveAll(saveGuarantorFundingDetails);
             }
@@ -427,6 +438,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             final List<Object> accountOnHoldTransactions = new ArrayList<>();
             calculateAndRelaseGuarantorFunds(guarantorList, guarantorGuarantee, amountForRelease, loanTransaction, accountOnHoldTransactions);
             this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) accountOnHoldTransactions);
+            flushOnHoldIds();
             bindGuarantorFundingTransactions(guarantorList, accountOnHoldTransactions, loanTransaction);
             this.guarantorFundingRepository.saveAndFlush(guarantorFundingDetails);
         }
@@ -459,6 +471,12 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
         }
         if (!fundingTransactions.isEmpty()) {
             this.guarantorFundingTransactionRepository.saveAll(fundingTransactions);
+        }
+    }
+
+    private void flushOnHoldIds() {
+        if (this.entityManager != null) {
+            this.entityManager.flush();
         }
     }
 
