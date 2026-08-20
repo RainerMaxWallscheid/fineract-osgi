@@ -37,4 +37,6 @@ public interface ClientActivePort {
     LocalDate officeJoiningDate(Long clientId);
 
     Long officeId(Long clientId);
+
+    String displayName(Long clientId);
 }

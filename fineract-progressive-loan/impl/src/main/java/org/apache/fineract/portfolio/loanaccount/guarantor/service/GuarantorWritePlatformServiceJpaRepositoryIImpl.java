@@ -38,6 +38,7 @@ import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -66,9 +67,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements GuarantorWritePlatformService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(GuarantorWritePlatformServiceJpaRepositoryIImpl.class);
 
+    /**
+     * Retained for ArchUnit freeze-identity on leftover
+     * {@code ClientRepositoryWrapper} ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final StaffRepositoryWrapper staffRepositoryWrapper;
     private final GroupRepositoryWrapper groupRepositoryWrapper;
@@ -155,7 +167,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                         } else if (guarantorTypeId.equals(GuarantorType.GROUP.getValue())) {
                             defaultUserMessage = this.groupRepositoryWrapper.findOneWithNotFoundDetection(entityId).getName();
                         } else {
-                            defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                            defaultUserMessage = this.clientActivePort.displayName(entityId);
                         }
 
                         defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
@@ -246,7 +258,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                         } else if (guarantorTypeId.equals(GuarantorType.GROUP.getValue())) {
                             defaultUserMessage = this.groupRepositoryWrapper.findOneWithNotFoundDetection(entityId).getName();
                         } else {
-                            defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                            defaultUserMessage = this.clientActivePort.displayName(entityId);
                         }
                         defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
                         final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
@@ -342,8 +354,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     private void validateGuarantorBusinessRules(final Guarantor guarantor) {
         // validate guarantor conditions
         if (guarantor.isExistingCustomer()) {
-            // check client exists
-            this.clientRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
+            this.clientActivePort.displayName(guarantor.getEntityId());
             // validate that the client is not set as a self guarantor
             if (guarantor.getClientId() != null && guarantor.getClientId().equals(guarantor.getEntityId())) {
                 String errorCode = null;

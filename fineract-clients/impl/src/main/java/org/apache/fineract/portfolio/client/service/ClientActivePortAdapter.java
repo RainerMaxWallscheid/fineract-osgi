@@ -71,6 +71,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
         return office == null ? null : office.getId();
     }
 
+    @Override
+    public String displayName(final Long clientId) {
+        return client(clientId).getDisplayName();
+    }
+
     private Client client(final Long clientId) {
         return this.clientRepository.findOneWithNotFoundDetection(clientId);
     }
