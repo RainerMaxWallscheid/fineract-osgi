@@ -78,6 +78,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public Object office(final Long clientId) {
+        return client(clientId).getOffice();
+    }
+
+    @Override
     public String displayName(final Long clientId) {
         return client(clientId).getDisplayName();
     }

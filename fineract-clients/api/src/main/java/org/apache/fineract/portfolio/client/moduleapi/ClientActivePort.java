@@ -40,6 +40,11 @@ public interface ClientActivePort {
 
     Long officeId(Long clientId);
 
+    /**
+     * Persistable office for the client (Object-typed, ADR-021).
+     */
+    Object office(Long clientId);
+
     String displayName(Long clientId);
 
     String accountNumber(Long clientId);

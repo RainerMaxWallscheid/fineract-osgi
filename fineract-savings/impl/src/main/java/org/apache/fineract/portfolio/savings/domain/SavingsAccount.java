@@ -1929,9 +1929,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     public Office office() {
         Office office = null;
         if (this.client != null) {
-            office = this.client.getOffice();
+            office = (Office) this.clientActivePort.office(clientId());
         } else if (this.group != null) {
-            office = this.group.getOffice();
+            office = (Office) this.groupActivePort.office(groupId());
         }
         return office;
     }
@@ -3388,7 +3388,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         charges.size();
         savingsOfficerHistory.size();
         if (group != null) {
-            Office dummyOffice = group.getOffice();
+            this.groupActivePort.office(groupId());
         } // Ensure lazy loading of group if set
     }
 
