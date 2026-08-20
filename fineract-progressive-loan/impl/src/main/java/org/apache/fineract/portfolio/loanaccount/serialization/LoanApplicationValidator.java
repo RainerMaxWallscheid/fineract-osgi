@@ -158,6 +158,11 @@ public final class LoanApplicationValidator {
     private final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
     private final ConfigurationDomainService configurationDomainService;
     private final LoanProductRepository loanProductRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover
+     * {@code ClientRepositoryWrapper} ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final ClientRepositoryWrapper clientRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final LoanReadPlatformService loanReadPlatformService;
@@ -244,9 +249,7 @@ public final class LoanApplicationValidator {
         final LoanProduct loanProduct = this.loanProductRepository.findById(productId).orElseThrow(() -> new LoanProductNotFoundException(productId));
         final Long clientId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.clientIdParameterName, element);
         final Long groupId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.groupIdParameterName, element);
-        final Client client = clientId != null ? this.clientRepository.findOneWithNotFoundDetection(clientId) : null;
-        final Group group = groupId != null ? this.groupRepository.findOneWithNotFoundDetection(groupId) : null;
-        validateClientOrGroup(client, group, productId);
+        validateClientOrGroup(clientId, groupId, productId);
         Validator.validateOrThrow("loan", baseDataValidator -> {
             final String loanTypeStr = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.loanTypeParameterName, element);
             baseDataValidator.reset().parameter(LoanApiConstants.loanTypeParameterName).value(loanTypeStr).notNull();
@@ -663,19 +666,11 @@ public final class LoanApplicationValidator {
                 clientId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.clientIdParameterName, element);
                 baseDataValidator.reset().parameter(LoanApiConstants.clientIdParameterName).value(clientId).notNull().integerGreaterThanZero();
             }
-            Client client = null;
-            if (clientId != null) {
-                client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-            }
-            Long groupId = loan.getGroup() != null ? loan.getGroup().getId() : null;
+            Long groupId = loan.getGroupId();
             if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.groupIdParameterName, element)) {
                 atLeastOneParameterPassedForUpdate = true;
                 groupId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.groupIdParameterName, element);
                 baseDataValidator.reset().parameter(LoanApiConstants.groupIdParameterName).value(groupId).notNull().integerGreaterThanZero();
-            }
-            Group group = null;
-            if (groupId != null) {
-                group = this.groupRepository.findOneWithNotFoundDetection(groupId);
             }
             if (productId != null) {
                 atLeastOneParameterPassedForUpdate = true;
@@ -1031,7 +1026,7 @@ public final class LoanApplicationValidator {
             loanScheduleValidator.validateDownPaymentAttribute(loanProduct.getLoanProductRelatedDetail().isEnableDownPayment(), element);
             validateDisbursementDetails(loanProduct, element);
             validateSubmittedOnDate(element, loan.getSubmittedOnDate(), loan.getExpectedDisbursementDate(), loanProduct);
-            validateClientOrGroup(client, group, productId);
+            validateClientOrGroup(clientId, groupId, productId);
             // validate if disbursement date is a holiday or a non-working day
             validateDisbursementDateIsOnNonWorkingDay(expectedDisbursementDate);
             final Long officeId = resolveOfficeId(clientId, groupId);
@@ -1057,26 +1052,26 @@ public final class LoanApplicationValidator {
         });
     }
 
-    private void validateClientOrGroup(Client client, Group group, Long productId) {
+    private void validateClientOrGroup(Long clientId, Long groupId, Long productId) {
         Validator.validateOrThrow("loan", baseDataValidator -> {
-            if (client == null && group == null) {
-                baseDataValidator.reset().parameter(LoanApiConstants.clientIdParameterName).value(client).notNull();
+            if (clientId == null && groupId == null) {
+                baseDataValidator.reset().parameter(LoanApiConstants.clientIdParameterName).value(clientId).notNull();
             } else {
-                if (client != null) {
-                    officeSpecificLoanProductValidation(productId, client.getOffice().getId());
-                    if (client.isNotActive()) {
-                        throw new ClientNotActiveException(client.getId());
+                if (clientId != null) {
+                    officeSpecificLoanProductValidation(productId, this.clientActivePort.officeId(clientId));
+                    if (!this.clientActivePort.isActive(clientId)) {
+                        throw new ClientNotActiveException(clientId);
                     }
                 }
-                if (group != null) {
-                    officeSpecificLoanProductValidation(productId, group.getOffice().getId());
-                    if (group.isNotActive()) {
-                        throw new GroupNotActiveException(group.getId());
+                if (groupId != null) {
+                    officeSpecificLoanProductValidation(productId, this.groupActivePort.officeId(groupId));
+                    if (!this.groupActivePort.isActive(groupId)) {
+                        throw new GroupNotActiveException(groupId);
                     }
                 }
-                if (client != null && group != null) {
-                    if (!group.hasClientAsMember(client)) {
-                        throw new ClientNotInGroupException(client.getId(), group.getId());
+                if (clientId != null && groupId != null) {
+                    if (!this.groupActivePort.hasClientAsMember(groupId, clientId)) {
+                        throw new ClientNotInGroupException(clientId, groupId);
                     }
                 }
             }

@@ -47,6 +47,11 @@ public class GroupActivePortAdapter implements GroupActivePort {
         return group(groupId).getOffice().getId();
     }
 
+    @Override
+    public boolean hasClientAsMember(final Long groupId, final Long clientId) {
+        return group(groupId).isChildClient(clientId);
+    }
+
     private Group group(final Long groupId) {
         return this.groupRepository.findOneWithNotFoundDetection(groupId);
     }
