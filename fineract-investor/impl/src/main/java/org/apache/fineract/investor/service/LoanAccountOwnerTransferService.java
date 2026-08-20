@@ -18,9 +18,7 @@
  */
 package org.apache.fineract.investor.service;
 
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-
 public interface LoanAccountOwnerTransferService {
 
-    void handleLoanClosedOrOverpaid(Loan loan);
+    void handleLoanClosedOrOverpaid(Object loan);
 }

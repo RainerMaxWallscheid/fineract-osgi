@@ -66,7 +66,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     private final LoanTransferBalancePort loanTransferBalancePort;
 
     @Override
-    public void handleLoanClosedOrOverpaid(Loan loan) {
+    public void handleLoanClosedOrOverpaid(Object loan) {
         Long loanId = loanTransferBalancePort.loanId(loan);
         List<ExternalAssetOwnerTransfer> transferDataList = findAllPendingOrBuybackOrIntermediateTransfers(loanId);
         if (transferDataList.size() > 1) {
@@ -87,26 +87,26 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         }
     }
 
-    private void cancelTransfer(Loan loan, ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
+    private void cancelTransfer(Object loan, ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
         updatePendingTransfer(pendingTransfer);
         ExternalAssetOwnerTransfer cancelledTransfer = createCancelledTransfer(pendingTransfer, subStatus);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledTransfer, loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledTransfer, (Loan) loan));
     }
 
-    private void declineTransfer(Loan loan, ExternalAssetOwnerTransfer pendingTransfer) {
+    private void declineTransfer(Object loan, ExternalAssetOwnerTransfer pendingTransfer) {
         ExternalAssetOwnerTransfer declinedSaleTransfer = createDeclinedTransfer(pendingTransfer, loan);
         updatePendingTransfer(pendingTransfer);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(declinedSaleTransfer, loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(declinedSaleTransfer, (Loan) loan));
     }
 
-    private void executePendingBuybackTransfer(final Loan loan, ExternalAssetOwnerTransfer buybackTransfer) {
+    private void executePendingBuybackTransfer(final Object loan, ExternalAssetOwnerTransfer buybackTransfer) {
         ExternalAssetOwnerTransfer activeTransfer = findActiveOrActiveIntermediateTransfer(loan, buybackTransfer);
         updateActiveTransfer(activeTransfer);
         buybackTransfer = updatePendingBuybackTransfer(loan, buybackTransfer);
         externalAssetOwnerTransferLoanMappingRepository.deleteByLoanIdAndOwnerTransfer(loanTransferBalancePort.loanId(loan), activeTransfer);
         externalOwnerTransferJournalPort.postTransfer(loan, buybackTransfer, null);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, loan));
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent(loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
     }
 
     private ExternalAssetOwnerTransfer createCancelledTransfer(ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
@@ -125,7 +125,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         return externalAssetOwnerTransferRepository.save(cancelledTransfer);
     }
 
-    private ExternalAssetOwnerTransfer createDeclinedTransfer(ExternalAssetOwnerTransfer pendingSaleTransfer, Loan loan) {
+    private ExternalAssetOwnerTransfer createDeclinedTransfer(ExternalAssetOwnerTransfer pendingSaleTransfer, Object loan) {
         ExternalAssetOwnerTransfer declinedTransfer = new ExternalAssetOwnerTransfer();
         declinedTransfer.setOwner(pendingSaleTransfer.getOwner());
         declinedTransfer.setExternalId(pendingSaleTransfer.getExternalId());
@@ -146,7 +146,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         externalAssetOwnerTransferRepository.save(pendingTransfer);
     }
 
-    private ExternalAssetOwnerTransfer updatePendingBuybackTransfer(Loan loan, ExternalAssetOwnerTransfer buybackTransfer) {
+    private ExternalAssetOwnerTransfer updatePendingBuybackTransfer(Object loan, ExternalAssetOwnerTransfer buybackTransfer) {
         buybackTransfer.setEffectiveDateTo(getBusinessLocalDate());
         buybackTransfer.setExternalAssetOwnerTransferDetails(createAssetOwnerTransferDetails(loan, buybackTransfer));
         return externalAssetOwnerTransferRepository.save(buybackTransfer);
@@ -170,7 +170,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         return details;
     }
 
-    private ExternalAssetOwnerTransfer findActiveOrActiveIntermediateTransfer(Loan loan, ExternalAssetOwnerTransfer buybackTransfer) {
+    private ExternalAssetOwnerTransfer findActiveOrActiveIntermediateTransfer(Object loan, ExternalAssetOwnerTransfer buybackTransfer) {
         return externalAssetOwnerTransferRepository.findOne((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.equal(root.get("loanId"), loanTransferBalancePort.loanId(loan)), criteriaBuilder.equal(root.get("owner"), buybackTransfer.getOwner()), root.get("status").in(List.of(ACTIVE, ACTIVE_INTERMEDIATE)), criteriaBuilder.equal(root.get("effectiveDateTo"), FUTURE_DATE_9999_12_31))).orElseThrow();
     }
 
