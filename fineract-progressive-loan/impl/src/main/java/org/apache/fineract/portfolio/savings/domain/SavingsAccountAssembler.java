@@ -64,6 +64,8 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
@@ -87,6 +89,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SavingsAccountAssembler {
+    private ClientActivePort clientActivePort;
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(SavingsAccountAssembler.class);
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
@@ -154,7 +168,7 @@ public class SavingsAccountAssembler {
         if (clientId != null) {
             client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             accountType = AccountType.INDIVIDUAL;
-            if (client.isNotActive()) {
+            if (!this.clientActivePort.isActive(clientId)) {
                 throw new ClientNotActiveException(clientId);
             }
         }
@@ -163,8 +177,8 @@ public class SavingsAccountAssembler {
         if (groupId != null) {
             group = this.groupRepository.findOneWithNotFoundDetection(groupId);
             accountType = AccountType.GROUP;
-            if (group.isNotActive()) {
-                if (group.isCenter()) {
+            if (!this.groupActivePort.isActive(groupId)) {
+                if (this.groupActivePort.isCenter(groupId)) {
                     throw new CenterNotActiveException(groupId);
                 }
                 throw new GroupNotActiveException(groupId);

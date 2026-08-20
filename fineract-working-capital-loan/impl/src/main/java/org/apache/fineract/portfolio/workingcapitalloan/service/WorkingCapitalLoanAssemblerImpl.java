@@ -112,7 +112,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         loan.setFund(fund);
         loan.setLoanProduct(product);
         loan.setLoanStatus(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL);
-        final Integer currentMaxLoanProductCounter = workingCapitalLoanRepository.findMaxLoanProductCounterByClientAndProduct(client.getId(), product.getId());
+        final Integer currentMaxLoanProductCounter = workingCapitalLoanRepository.findMaxLoanProductCounterByClientAndProduct(clientId, product.getId());
         final int newLoanProductCounter = currentMaxLoanProductCounter == null ? 1 : currentMaxLoanProductCounter + 1;
         loan.setLoanProductCounter(newLoanProductCounter);
         loan.setLoanCounter(newLoanProductCounter);
@@ -210,7 +210,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     public Map<String, Object> updateFrom(final JsonCommand command, final WorkingCapitalLoan loan) {
         final Map<String, Object> changes = new HashMap<>();
         final JsonElement element = command.parsedJson();
-        if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.clientIdParameterName, loan.getClient() != null ? loan.getClient().getId() : null)) {
+        if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.clientIdParameterName, loan.getClientId())) {
             final Long clientId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
             final Client client = clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
             loan.setClient(client);

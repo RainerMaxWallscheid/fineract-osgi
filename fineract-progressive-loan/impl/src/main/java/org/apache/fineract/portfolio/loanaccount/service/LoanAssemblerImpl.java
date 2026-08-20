@@ -58,6 +58,8 @@ import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralAssembler;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
@@ -100,8 +102,22 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.rate.service.RateAssembler;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoanAssemblerImpl implements LoanAssembler {
+    private ClientActivePort clientActivePort;
+    private GroupActivePort groupActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
+    @Autowired
+    public void setGroupActivePort(final GroupActivePort groupActivePort) {
+        this.groupActivePort = groupActivePort;
+    }
+
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanRepositoryWrapper loanRepository;
     private final LoanProductRepository loanProductRepository;
@@ -222,7 +238,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             allowFullTermForTranche = loanProduct.isAllowFullTermForTranche();
         }
         final boolean isHolidayEnabled = this.configurationDomainService.isRescheduleRepaymentsOnHolidaysEnabled();
-        Long officeId = client != null ? client.getOffice().getId() : group.getOffice().getId();
+        Long officeId = clientId != null ? this.clientActivePort.officeId(clientId) : this.groupActivePort.officeId(groupId);
         final List<Holiday> holidays = this.holidayRepository.findByOfficeIdAndGreaterThanDate(officeId, loanApplicationTerms.getExpectedDisbursementDate(), HolidayStatusType.ACTIVE.getValue());
         final WorkingDays workingDays = this.workingDaysRepository.findOne();
         final LoanScheduleModel loanScheduleModel = this.loanScheduleAssembler.assembleLoanScheduleFrom(loanApplicationTerms, isHolidayEnabled, holidays, workingDays, element, disbursementDetails);
@@ -467,7 +483,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             loan.setExternalId(externalId);
         }
         // add clientId, groupId and loanType changes to actual changes
-        final Long clientId = loan.getClient() == null ? null : loan.getClient().getId();
+        final Long clientId = loan.getClientId();
         if (command.isChangeInLongParameterNamed(LoanApiConstants.clientIdParameterName, clientId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.clientIdParameterName);
             changes.put(LoanApiConstants.clientIdParameterName, newValue);

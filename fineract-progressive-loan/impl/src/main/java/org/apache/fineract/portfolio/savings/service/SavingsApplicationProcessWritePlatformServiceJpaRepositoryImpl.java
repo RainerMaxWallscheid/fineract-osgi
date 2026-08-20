@@ -282,7 +282,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     final Long clientId = command.longValueOfParameterNamed(SavingsApiConstants.clientIdParamName);
                     if (clientId != null) {
                         final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-                        if (client.isNotActive()) {
+                        if (!this.clientActivePort.isActive(clientId)) {
                             throw new ClientNotActiveException(clientId);
                         }
                         account.update(client);
@@ -295,8 +295,8 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     final Long groupId = command.longValueOfParameterNamed(SavingsApiConstants.groupIdParamName);
                     if (groupId != null) {
                         final Group group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
-                        if (group.isNotActive()) {
-                            if (group.isCenter()) {
+                        if (!this.groupActivePort.isActive(groupId)) {
+                            if (this.groupActivePort.isCenter(groupId)) {
                                 throw new CenterNotActiveException(groupId);
                             }
                             throw new GroupNotActiveException(groupId);
