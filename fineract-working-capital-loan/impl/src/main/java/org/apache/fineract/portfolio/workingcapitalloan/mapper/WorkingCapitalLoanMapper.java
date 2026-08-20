@@ -42,7 +42,7 @@ import org.mapstruct.Named;
 @Mapper(config = MapstructMapperConfig.class, uses = { DelinquencyBucketMapper.class, WorkingCapitalLoanProductMapper.class,
         WorkingCapitalLoanBalanceMapper.class, WorkingCapitalLoanDisbursementDetailMapper.class, WorkingCapitalLoanTransactionMapper.class,
         WorkingCapitalBreachMapper.class, WorkingCapitalNearBreachMapper.class, WorkingCapitalLoanSummaryDataMapper.class,
-        WorkingCapitalLoanPaymentAllocationMapper.class, ClientIdLookup.class })
+        WorkingCapitalLoanPaymentAllocationMapper.class, WorkingCapitalLoanClientIdLookup.class })
 public interface WorkingCapitalLoanMapper {
 
     @Mapping(target = "accountNo", source = "accountNumber")

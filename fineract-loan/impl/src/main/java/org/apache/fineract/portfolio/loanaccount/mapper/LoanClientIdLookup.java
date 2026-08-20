@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.workingcapitalloan.mapper;
+package org.apache.fineract.portfolio.loanaccount.mapper;
 
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
@@ -24,11 +24,11 @@ import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ClientIdLookup {
+public class LoanClientIdLookup {
 
     private final ClientActivePort clientActivePort;
 
-    public ClientIdLookup(final ClientActivePort clientActivePort) {
+    public LoanClientIdLookup(final ClientActivePort clientActivePort) {
         this.clientActivePort = clientActivePort;
     }
 
@@ -42,8 +42,12 @@ public class ClientIdLookup {
         return clientId == null ? null : this.clientActivePort.accountNumber(clientId);
     }
 
-    @Named("clientExternalId")
-    public ExternalId clientExternalId(final Long clientId) {
-        return clientId == null ? null : this.clientActivePort.externalId(clientId);
+    @Named("clientExternalIdValue")
+    public String clientExternalIdValue(final Long clientId) {
+        if (clientId == null) {
+            return null;
+        }
+        final ExternalId externalId = this.clientActivePort.externalId(clientId);
+        return externalId == null || externalId.isEmpty() ? null : externalId.getValue();
     }
 }
