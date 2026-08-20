@@ -362,7 +362,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         //
     }
 
-    public static SavingsAccount createNewApplicationForSubmittal(final Client client, final Group group, final SavingsProduct product,
+    public static SavingsAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -384,7 +384,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 minOverdraftForInterestCalculation, withHoldTax);
     }
 
-    protected SavingsAccount(final Client client, final Group group, final SavingsProduct product, final Staff fieldOfficer,
+    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Staff fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -400,7 +400,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 null, withHoldTax);
     }
 
-    protected SavingsAccount(final Client client, final Group group, final SavingsProduct product, final Staff savingsOfficer,
+    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Staff savingsOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -411,8 +411,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final BigDecimal maxAllowedLienLimit, final boolean lienAllowed,
             final BigDecimal nominalAnnualInterestRateOverdraft, final BigDecimal minOverdraftForInterestCalculation, boolean withHoldTax) {
-        this.client = client;
-        this.group = group;
+        this.client = (Client) client;
+        this.group = (Group) group;
         this.product = product;
         this.savingsOfficer = savingsOfficer;
         if (StringUtils.isBlank(accountNo)) {

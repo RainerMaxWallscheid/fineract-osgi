@@ -96,7 +96,7 @@ public class RecurringDepositAccount extends SavingsAccount {
         //
     }
 
-    public static RecurringDepositAccount createNewApplicationForSubmittal(final Client client, final Group group,
+    public static RecurringDepositAccount createNewApplicationForSubmittal(final Object client, final Object group,
             final SavingsProduct product, final Staff fieldOfficer, final String accountNo, final ExternalId externalId,
             final AccountType accountType, final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -118,7 +118,7 @@ public class RecurringDepositAccount extends SavingsAccount {
                 recurringDetail, chart, allowOverdraft, overdraftLimit, withHoldTax);
     }
 
-    public static RecurringDepositAccount createNewActivatedAccount(final Client client, final Group group, final SavingsProduct product,
+    public static RecurringDepositAccount createNewActivatedAccount(final Object client, final Object group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -140,7 +140,7 @@ public class RecurringDepositAccount extends SavingsAccount {
                 recurringDetail, chart, allowOverdraft, overdraftLimit, withHoldTax);
     }
 
-    private RecurringDepositAccount(final Client client, final Group group, final SavingsProduct product, final Staff fieldOfficer,
+    private RecurringDepositAccount(final Object client, final Object group, final SavingsProduct product, final Staff fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,

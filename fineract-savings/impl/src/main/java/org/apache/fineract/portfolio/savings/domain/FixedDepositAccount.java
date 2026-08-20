@@ -88,7 +88,7 @@ public class FixedDepositAccount extends SavingsAccount {
         //
     }
 
-    public static FixedDepositAccount createNewApplicationForSubmittal(final Client client, final Group group, final SavingsProduct product,
+    public static FixedDepositAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -111,7 +111,7 @@ public class FixedDepositAccount extends SavingsAccount {
         return account;
     }
 
-    private FixedDepositAccount(final Client client, final Group group, final SavingsProduct product, final Staff fieldOfficer,
+    private FixedDepositAccount(final Object client, final Object group, final SavingsProduct product, final Staff fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
