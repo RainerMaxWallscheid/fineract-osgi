@@ -40,10 +40,9 @@ import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.investor.service.ExternalAssetOwnerTransferOutstandingInterestCalculation;
 import org.apache.fineract.investor.service.LoanTransferabilityService;
+import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.service.LoanBuyDownFeeAmortizationProcessingService;
-import org.apache.fineract.portfolio.loanaccount.service.LoanCapitalizedIncomeAmortizationProcessingService;
-import org.apache.fineract.portfolio.loanaccount.service.LoanJournalEntryPoster;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Sort;
@@ -60,13 +59,12 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     public static final List<ExternalTransferStatus> BUYBACK_STATUSES = List.of(ExternalTransferStatus.BUYBACK_INTERMEDIATE, ExternalTransferStatus.BUYBACK);
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository;
-    private final LoanJournalEntryPoster loanJournalEntryPoster;
+    private final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanTransferabilityService loanTransferabilityService;
     private final DelayedSettlementAttributeService delayedSettlementAttributeService;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
-    private final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService;
-    private final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService;
+    private final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort;
 
     @Override
     public Loan execute(Loan loan) {
@@ -125,7 +123,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         externalAssetOwnerTransferRepository.save(activeExternalAssetOwnerTransfer);
         buybackExternalAssetOwnerTransfer = externalAssetOwnerTransferRepository.save(buybackExternalAssetOwnerTransfer);
         externalAssetOwnerTransferLoanMappingRepository.deleteByLoanIdAndOwnerTransfer(loan.getId(), activeExternalAssetOwnerTransfer);
-        loanJournalEntryPoster.postJournalEntriesForExternalOwnerTransfer(loan, buybackExternalAssetOwnerTransfer, null);
+        externalOwnerTransferJournalPort.postTransfer(loan, buybackExternalAssetOwnerTransfer, null);
         return buybackExternalAssetOwnerTransfer;
     }
 
@@ -146,7 +144,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         ExternalTransferStatus activeStatus = determineActiveStatus(externalAssetOwnerTransfer);
         ExternalAssetOwnerTransfer newTransfer = activatePendingEntry(settlementDate, externalAssetOwnerTransfer, activeStatus, previousOwner);
         recognizeRemainingDeferredIncomeOnLoanSale(loan, settlementDate);
-        loanJournalEntryPoster.postJournalEntriesForExternalOwnerTransfer(loan, newTransfer, previousOwner);
+        externalOwnerTransferJournalPort.postTransfer(loan, newTransfer, previousOwner);
         return newTransfer;
     }
 
@@ -156,10 +154,10 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
             return;
         }
         if (loanProductRelatedDetail.isEnableIncomeCapitalization()) {
-            loanCapitalizedIncomeAmortizationProcessingService.processCapitalizedIncomeAmortizationOnLoanSale(loan, settlementDate, true);
+            loanSaleDeferredIncomePort.recognizeCapitalizedIncomeOnLoanSale(loan, settlementDate, true);
         }
         if (loanProductRelatedDetail.isEnableBuyDownFee()) {
-            loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanSale(loan, settlementDate, true);
+            loanSaleDeferredIncomePort.recognizeBuyDownFeeOnLoanSale(loan, settlementDate, true);
         }
     }
 
@@ -291,15 +289,14 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final LoanJournalEntryPoster loanJournalEntryPoster, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService, final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService) {
+        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
-        this.loanJournalEntryPoster = loanJournalEntryPoster;
+        this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanTransferabilityService = loanTransferabilityService;
         this.delayedSettlementAttributeService = delayedSettlementAttributeService;
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
-        this.loanCapitalizedIncomeAmortizationProcessingService = loanCapitalizedIncomeAmortizationProcessingService;
-        this.loanBuyDownFeeAmortizationProcessingService = loanBuyDownFeeAmortizationProcessingService;
+        this.loanSaleDeferredIncomePort = loanSaleDeferredIncomePort;
     }
 }

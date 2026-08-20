@@ -43,8 +43,8 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferDetails;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferLoanMappingRepository;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
+import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.service.LoanJournalEntryPoster;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +57,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     public static final LocalDate FUTURE_DATE_9999_12_31 = LocalDate.of(9999, 12, 31);
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository;
-    private final LoanJournalEntryPoster loanJournalEntryPoster;
+    private final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
 
@@ -100,7 +100,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         updateActiveTransfer(activeTransfer);
         buybackTransfer = updatePendingBuybackTransfer(loan, buybackTransfer);
         externalAssetOwnerTransferLoanMappingRepository.deleteByLoanIdAndOwnerTransfer(loan.getId(), activeTransfer);
-        loanJournalEntryPoster.postJournalEntriesForExternalOwnerTransfer(loan, buybackTransfer, null);
+        externalOwnerTransferJournalPort.postTransfer(loan, buybackTransfer, null);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent(loan));
     }
@@ -183,10 +183,10 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final LoanJournalEntryPoster loanJournalEntryPoster, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation) {
+        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
-        this.loanJournalEntryPoster = loanJournalEntryPoster;
+        this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
         this.businessEventNotifierService = businessEventNotifierService;
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
     }

@@ -50,7 +50,7 @@ import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
-import org.apache.fineract.portfolio.loanaccount.service.LoanJournalEntryPoster;
+import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,7 +84,7 @@ public class LoanAccountOwnerTransferServiceTest {
     @Mock
     private ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
     @Mock
-    private LoanJournalEntryPoster loanJournalEntryPoster;
+    private ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
 
     @InjectMocks
     private LoanAccountOwnerTransferServiceImpl underTest;
