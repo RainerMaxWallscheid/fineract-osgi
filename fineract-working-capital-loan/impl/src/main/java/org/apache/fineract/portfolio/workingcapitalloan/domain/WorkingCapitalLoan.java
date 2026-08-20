@@ -38,6 +38,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatusConverter;
@@ -48,6 +49,12 @@ import org.apache.fineract.useradministration.domain.AppUser;
 @Entity
 @Table(name = "m_wc_loan", uniqueConstraints = {@UniqueConstraint(columnNames = {"account_no"}, name = "wc_loan_account_no_UNIQUE"), @UniqueConstraint(columnNames = {"external_id"}, name = "wc_loan_externalid_UNIQUE")})
 public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+    private static ClientActivePort clientActivePort;
+
+    public static void setActivePorts(final ClientActivePort clientActivePort) {
+        WorkingCapitalLoan.clientActivePort = clientActivePort;
+    }
+
     @Version
     int version;
     @Column(name = "last_closed_business_date")
@@ -118,11 +125,11 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     private BigDecimal totalPaymentVolume;
 
     public Long getOfficeId() {
-        return client != null && client.getOffice() != null ? client.getOffice().getId() : null;
+        return this.client != null ? clientActivePort.officeId(getClientId()) : null;
     }
 
     public Long getClientId() {
-        return client != null ? client.getId() : null;
+        return clientActivePort.id(this.client);
     }
 
     @java.lang.SuppressWarnings("all")
