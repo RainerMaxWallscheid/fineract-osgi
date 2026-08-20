@@ -29,13 +29,13 @@ import org.apache.fineract.investor.data.ExternalTransferSubStatus;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
+import org.apache.fineract.portfolio.loanaccount.service.LoanTransferBalancePortAdapter;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -54,7 +54,6 @@ public class LoanTransferabilityServiceImplTest {
     @ParameterizedTest
     @MethodSource("amountDataProvider")
     void isTransferableWhenDelayedSettlementDisabled(final BigDecimal loanOutstandingAmount, final boolean expectedResult) {
-        // given
         TestContext testContext = new TestContext();
 
         LoanProduct loanProduct = Mockito.mock(LoanProduct.class);
@@ -70,10 +69,8 @@ public class LoanTransferabilityServiceImplTest {
         ExternalAssetOwnerTransfer externalAssetOwnerTransfer = new ExternalAssetOwnerTransfer();
         externalAssetOwnerTransfer.setStatus(ExternalTransferStatus.PENDING);
 
-        // when
         boolean result = testContext.testSubject.isTransferable(loan, externalAssetOwnerTransfer);
 
-        // then
         assertEquals(expectedResult, result);
     }
 
@@ -81,7 +78,6 @@ public class LoanTransferabilityServiceImplTest {
     @MethodSource("amountDataProvider")
     void isTransferableWhenDelayedSettlementEnabledAndSellingToIntermediate(final BigDecimal loanOutstandingAmount,
             final boolean expectedResult) {
-        // given
         TestContext testContext = new TestContext();
 
         LoanProduct loanProduct = Mockito.mock(LoanProduct.class);
@@ -97,16 +93,13 @@ public class LoanTransferabilityServiceImplTest {
         ExternalAssetOwnerTransfer externalAssetOwnerTransfer = new ExternalAssetOwnerTransfer();
         externalAssetOwnerTransfer.setStatus(ExternalTransferStatus.PENDING_INTERMEDIATE);
 
-        // when
         boolean result = testContext.testSubject.isTransferable(loan, externalAssetOwnerTransfer);
 
-        // then
         assertEquals(expectedResult, result);
     }
 
     @Test
     void isTransferableWhenDelayedSettlementEnabledAndSellingToInvestor() {
-        // given
         TestContext testContext = new TestContext();
 
         LoanProduct loanProduct = Mockito.mock(LoanProduct.class);
@@ -119,10 +112,8 @@ public class LoanTransferabilityServiceImplTest {
         ExternalAssetOwnerTransfer externalAssetOwnerTransfer = new ExternalAssetOwnerTransfer();
         externalAssetOwnerTransfer.setStatus(ExternalTransferStatus.PENDING);
 
-        // when
         boolean result = testContext.testSubject.isTransferable(loan, externalAssetOwnerTransfer);
 
-        // then
         assertTrue(result);
     }
 
@@ -135,16 +126,13 @@ public class LoanTransferabilityServiceImplTest {
     @ParameterizedTest
     @MethodSource("declinedSubStatusDataProvider")
     void getDeclinedSubStatus(final BigDecimal totalOverpaidAmount, final ExternalTransferSubStatus expectedSubStatus) {
-        // given
         TestContext testContext = new TestContext();
 
         Loan loan = Mockito.mock(Loan.class);
         when(loan.getTotalOverpaid()).thenReturn(totalOverpaidAmount);
 
-        // when
         ExternalTransferSubStatus result = testContext.testSubject.getDeclinedSubStatus(loan);
 
-        // then
         assertEquals(expectedSubStatus, result);
     }
 
@@ -153,11 +141,11 @@ public class LoanTransferabilityServiceImplTest {
         @Mock
         private DelayedSettlementAttributeService delayedSettlementAttributeService;
 
-        @InjectMocks
-        private LoanTransferabilityServiceImpl testSubject;
+        private final LoanTransferabilityServiceImpl testSubject;
 
         TestContext() {
             MockitoAnnotations.openMocks(this);
+            this.testSubject = new LoanTransferabilityServiceImpl(delayedSettlementAttributeService, new LoanTransferBalancePortAdapter());
         }
     }
 }

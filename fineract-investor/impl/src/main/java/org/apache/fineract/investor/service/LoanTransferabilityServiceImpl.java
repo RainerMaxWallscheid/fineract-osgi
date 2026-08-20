@@ -18,34 +18,33 @@
  */
 package org.apache.fineract.investor.service;
 
-import java.math.BigDecimal;
-import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.investor.data.ExternalTransferStatus;
 import org.apache.fineract.investor.data.ExternalTransferSubStatus;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 
 public class LoanTransferabilityServiceImpl implements LoanTransferabilityService {
     private final DelayedSettlementAttributeService delayedSettlementAttributeService;
+    private final LoanTransferBalancePort loanTransferBalancePort;
 
     @Override
-    public boolean isTransferable(final Loan loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
+    public boolean isTransferable(final Object loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
         if (shouldValidateTransferable(loan, externalAssetOwnerTransfer)) {
-            return MathUtil.nullToDefault(loan.getSummary().getTotalOutstanding(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0;
+            return loanTransferBalancePort.hasPositiveOutstanding(loan);
         }
         return true;
     }
 
     @Override
-    public ExternalTransferSubStatus getDeclinedSubStatus(final Loan loan) {
-        if (MathUtil.nullToDefault(loan.getTotalOverpaid(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0) {
+    public ExternalTransferSubStatus getDeclinedSubStatus(final Object loan) {
+        if (loanTransferBalancePort.hasOverpaidBalance(loan)) {
             return ExternalTransferSubStatus.BALANCE_NEGATIVE;
         }
         return ExternalTransferSubStatus.BALANCE_ZERO;
     }
 
-    private boolean shouldValidateTransferable(final Loan loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
-        if (!delayedSettlementAttributeService.isEnabled(loan.getLoanProduct().getId())) {
+    private boolean shouldValidateTransferable(final Object loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
+        if (!delayedSettlementAttributeService.isEnabled(loanTransferBalancePort.loanProductId(loan))) {
             // When delayed settlement is disabled, asset is directly sold to investor. Need to validate.
             return true;
         }
@@ -55,7 +54,9 @@ public class LoanTransferabilityServiceImpl implements LoanTransferabilityServic
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransferabilityServiceImpl(final DelayedSettlementAttributeService delayedSettlementAttributeService) {
+        public LoanTransferabilityServiceImpl(final DelayedSettlementAttributeService delayedSettlementAttributeService,
+            final LoanTransferBalancePort loanTransferBalancePort) {
         this.delayedSettlementAttributeService = delayedSettlementAttributeService;
+        this.loanTransferBalancePort = loanTransferBalancePort;
     }
 }

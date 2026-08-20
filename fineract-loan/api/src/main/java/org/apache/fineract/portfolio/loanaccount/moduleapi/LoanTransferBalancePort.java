@@ -16,14 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.investor.service;
+package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
-import org.apache.fineract.investor.data.ExternalTransferSubStatus;
-import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
+/**
+ * Object-typed loan balance / product probes for external-asset transferability
+ * (ADR-021). Foreign BCs must not depend on leftover {@code Loan} /
+ * {@code LoanSummary} graphs.
+ */
+public interface LoanTransferBalancePort {
 
-public interface LoanTransferabilityService {
+    boolean hasPositiveOutstanding(Object loan);
 
-    boolean isTransferable(Object loan, ExternalAssetOwnerTransfer externalAssetOwnerTransfer);
+    boolean hasOverpaidBalance(Object loan);
 
-    ExternalTransferSubStatus getDeclinedSubStatus(Object loan);
+    Long loanProductId(Object loan);
 }

@@ -21,6 +21,7 @@ package org.apache.fineract.investor.config;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.investor.service.LoanTransferabilityServiceImpl;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,8 @@ public class LoanAccountOwnerTransferConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(LoanTransferabilityService.class)
-    public LoanTransferabilityService loanTransferabilityService(DelayedSettlementAttributeService delayedSettlementAttributeService) {
-        return new LoanTransferabilityServiceImpl(delayedSettlementAttributeService);
+    public LoanTransferabilityService loanTransferabilityService(DelayedSettlementAttributeService delayedSettlementAttributeService,
+            LoanTransferBalancePort loanTransferBalancePort) {
+        return new LoanTransferabilityServiceImpl(delayedSettlementAttributeService, loanTransferBalancePort);
     }
 }
