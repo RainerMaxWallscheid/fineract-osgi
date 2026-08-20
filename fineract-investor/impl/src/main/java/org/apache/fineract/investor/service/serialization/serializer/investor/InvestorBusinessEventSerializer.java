@@ -26,10 +26,7 @@ import static org.apache.fineract.investor.data.ExternalTransferStatus.BUYBACK_I
 import static org.apache.fineract.investor.data.ExternalTransferStatus.CANCELLED;
 import static org.apache.fineract.investor.data.ExternalTransferStatus.DECLINED;
 import static org.apache.fineract.investor.data.ExternalTransferStatus.PENDING_INTERMEDIATE;
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -44,8 +41,9 @@ import org.apache.fineract.investor.data.ExternalTransferStatus;
 import org.apache.fineract.investor.data.ExternalTransferSubStatus;
 import org.apache.fineract.investor.domain.InvestorBusinessEvent;
 import org.apache.fineract.investor.service.ExternalAssetOwnersReadService;
-import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.loanaccount.data.UnpaidChargeData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanOwnershipEventDataPort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -54,10 +52,11 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
     private static final Set<ExternalTransferStatus> EXECUTED_TRANSFER_STATUSES = Set.of(ACTIVE, ACTIVE_INTERMEDIATE, BUYBACK, BUYBACK_INTERMEDIATE);
     private final ExternalAssetOwnersReadService externalAssetOwnersReadService;
     private final List<ExternalEventCustomDataSerializer<InvestorBusinessEvent>> externalEventCustomDataSerializers;
+    private final LoanOwnershipEventDataPort loanOwnershipEventDataPort;
 
-    private static CurrencyDataV1 getCurrencyFromEvent(InvestorBusinessEvent event) {
-        MonetaryCurrency loanCurrency = event.getLoan().getCurrency();
-        return CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode()).setDecimalPlaces(loanCurrency.getDigitsAfterDecimal()).setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
+    private CurrencyDataV1 getCurrencyFromEvent(InvestorBusinessEvent event) {
+        final CurrencyData loanCurrency = loanOwnershipEventDataPort.currency(event.getLoan());
+        return CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode()).setDecimalPlaces(loanCurrency.getDecimalPlaces()).setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
     }
 
     @Override
@@ -103,21 +102,11 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
     }
 
     private List<UnpaidChargeDataV1> getUnpaidChargeData(InvestorBusinessEvent event) {
-        java.util.Map<Long, UnpaidChargeDataV1> map = new HashMap<>();
-        event.getLoan().getLoanCharges().forEach(loanCharge -> addToMap(map, loanCharge));
-        return map.values().stream().toList();
+        return loanOwnershipEventDataPort.unpaidCharges(event.getLoan()).stream().map(this::toAvroUnpaidCharge).toList();
     }
 
-    private void addToMap(Map<Long, UnpaidChargeDataV1> map, LoanCharge loanCharge) {
-        if (loanCharge.amountOutstanding().compareTo(BigDecimal.ZERO) > 0) {
-            UnpaidChargeDataV1 toAdd = new UnpaidChargeDataV1(loanCharge.getChargeId(), loanCharge.name(), loanCharge.amountOutstanding());
-            UnpaidChargeDataV1 unpaidChargeDataV1 = map.get(loanCharge.getChargeId());
-            if (unpaidChargeDataV1 == null) {
-                map.put(toAdd.getChargeId(), toAdd);
-            } else {
-                unpaidChargeDataV1.setOutstandingAmount(unpaidChargeDataV1.getOutstandingAmount().add(toAdd.getOutstandingAmount()));
-            }
-        }
+    private UnpaidChargeDataV1 toAvroUnpaidCharge(final UnpaidChargeData unpaidChargeData) {
+        return new UnpaidChargeDataV1(unpaidChargeData.getChargeId(), unpaidChargeData.getChargeName(), unpaidChargeData.getOutstandingAmount());
     }
 
     private String getStatus(ExternalTransferStatus status) {
@@ -139,8 +128,9 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
     }
 
     @java.lang.SuppressWarnings("all")
-        public InvestorBusinessEventSerializer(final ExternalAssetOwnersReadService externalAssetOwnersReadService, final List<ExternalEventCustomDataSerializer<InvestorBusinessEvent>> externalEventCustomDataSerializers) {
+        public InvestorBusinessEventSerializer(final ExternalAssetOwnersReadService externalAssetOwnersReadService, final List<ExternalEventCustomDataSerializer<InvestorBusinessEvent>> externalEventCustomDataSerializers, final LoanOwnershipEventDataPort loanOwnershipEventDataPort) {
         this.externalAssetOwnersReadService = externalAssetOwnersReadService;
         this.externalEventCustomDataSerializers = externalEventCustomDataSerializers;
+        this.loanOwnershipEventDataPort = loanOwnershipEventDataPort;
     }
 }

@@ -34,16 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -61,9 +58,10 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.domain.InvestorBusinessEvent;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.investor.service.ExternalAssetOwnersReadService;
-import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.loanaccount.data.UnpaidChargeData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanOwnershipEventDataPort;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -134,14 +132,15 @@ public class InvestorBusinessEventSerializerTest {
         when(mockReadService.retrieveFirstTransferByExternalId(any(ExternalId.class)))
                 .thenReturn(createTransferData(firstTransferStatus, null));
         Loan loan = Mockito.mock(Loan.class);
-        when(loan.getCurrency()).thenReturn(new MonetaryCurrency("EUR", 2, 1));
-        final Set<LoanCharge> loanCharges = createMockCharges();
-        when(loan.getLoanCharges()).thenReturn(loanCharges);
+        LoanOwnershipEventDataPort loanOwnershipEventDataPort = Mockito.mock(LoanOwnershipEventDataPort.class);
+        when(loanOwnershipEventDataPort.currency(loan)).thenReturn(new CurrencyData("EUR", 2, 1));
+        when(loanOwnershipEventDataPort.unpaidCharges(loan)).thenReturn(createUnpaidCharges());
         LoanOwnershipTransferBusinessEvent loanOwnershipTransferBusinessEvent = new LoanOwnershipTransferBusinessEvent(
                 createExternalAssetOwnerTransfer(status, subStatus), loan);
 
         // when
-        InvestorBusinessEventSerializer serializer = new InvestorBusinessEventSerializer(mockReadService, createCustomDataForEvents());
+        InvestorBusinessEventSerializer serializer = new InvestorBusinessEventSerializer(mockReadService, createCustomDataForEvents(),
+                loanOwnershipEventDataPort);
         final ByteBufferSerializable byteBufferSerializable = serializer.toAvroDTO(loanOwnershipTransferBusinessEvent);
         final LoanOwnershipTransferDataV1 result = (LoanOwnershipTransferDataV1) byteBufferSerializable;
 
@@ -153,21 +152,9 @@ public class InvestorBusinessEventSerializerTest {
         assertEquals(CUSTOM_DATA_PREFIX + "_2", new String(customData.get("test_key_2").array(), UTF_8));
     }
 
-    private Set<LoanCharge> createMockCharges() {
-        final Set<LoanCharge> loanCharges = new HashSet<>();
-        loanCharges.add(loanCharge(1L, "charge a", new BigDecimal("10.00000")));
-        loanCharges.add(loanCharge(1L, "charge a", new BigDecimal("15.00000")));
-        loanCharges.add(loanCharge(2L, "charge b", BigDecimal.ZERO));
-        loanCharges.add(loanCharge(3L, "charge c", new BigDecimal("12.00000")));
-        return loanCharges;
-    }
-
-    private LoanCharge loanCharge(Long chargeId, String name, BigDecimal amountOutstanding) {
-        LoanCharge loanCharge = mock(LoanCharge.class);
-        when(loanCharge.name()).thenReturn(name);
-        when(loanCharge.getChargeId()).thenReturn(chargeId);
-        when(loanCharge.amountOutstanding()).thenReturn(amountOutstanding);
-        return loanCharge;
+    private List<UnpaidChargeData> createUnpaidCharges() {
+        return List.of(new UnpaidChargeData(1L, "charge a", new BigDecimal("25.00000")),
+                new UnpaidChargeData(3L, "charge c", new BigDecimal("12.00000")));
     }
 
     private static void verifyFields(ByteBufferSerializable byteBufferSerializable, String type, String status, String statusReason) {

@@ -21,13 +21,14 @@ package org.apache.fineract.investor.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.fineract.accounting.common.AccountingConstants;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
@@ -42,6 +43,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -50,8 +52,8 @@ public class AccountingServiceImpl implements AccountingService {
     private final InvestorAccountingHelper helper;
     private final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository;
     private final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository;
-    private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
+    private final LoanTransferSnapshotPort loanTransferSnapshotPort;
 
     /**
      * Overpaid flag for the in-flight transfer journal mapping. Kept off
@@ -60,15 +62,24 @@ public class AccountingServiceImpl implements AccountingService {
      */
     private final ThreadLocal<Boolean> currentTransferOverpaid = new ThreadLocal<>();
 
+    /**
+     * Asset-transfer journal entries created for the in-flight transfer.
+     * Identity set avoids a second {@code FinancialActivityAccount} lookup
+     * (helper already owns that repository) without new freeze-method
+     * descriptors on the helper.
+     */
+    private final ThreadLocal<Set<Object>> currentAssetTransferJournalEntries = new ThreadLocal<>();
+
     @Override
     public void createJournalEntriesForSaleAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer, final ExternalAssetOwner previousOwner) {
         final ExternalAssetOwner newOwner = transfer.getOwner();
         try {
+            currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
             List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, true);
             createMappingToTransfer(transfer, journalEntryList);
-            FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
+            final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
             journalEntryList.forEach(journalEntry -> {
-                if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
+                if (assetTransferEntries.contains(journalEntry)) {
                     createMappingToOwner(null, journalEntry);
                     return;
                 }
@@ -77,6 +88,7 @@ public class AccountingServiceImpl implements AccountingService {
             });
         } finally {
             currentTransferOverpaid.remove();
+            currentAssetTransferJournalEntries.remove();
         }
     }
 
@@ -84,11 +96,12 @@ public class AccountingServiceImpl implements AccountingService {
     public void createJournalEntriesForBuybackAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer) {
         final ExternalAssetOwner previousOwner = transfer.getOwner();
         try {
+            currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
             List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, false);
             createMappingToTransfer(transfer, journalEntryList);
-            FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
+            final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
             journalEntryList.forEach(journalEntry -> {
-                if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
+                if (assetTransferEntries.contains(journalEntry)) {
                     createMappingToOwner(null, journalEntry);
                     return;
                 }
@@ -97,6 +110,7 @@ public class AccountingServiceImpl implements AccountingService {
             });
         } finally {
             currentTransferOverpaid.remove();
+            currentAssetTransferJournalEntries.remove();
         }
     }
 
@@ -106,12 +120,12 @@ public class AccountingServiceImpl implements AccountingService {
         // transaction properties
         final Long transactionId = transfer.getId();
         final LocalDate transactionDate = transfer.getSettlementDate();
-        final BigDecimal principalAmount = loan.getSummary().getTotalPrincipalOutstanding();
+        final BigDecimal principalAmount = loanTransferSnapshotPort.totalPrincipalOutstanding(loan);
         // We have different strategies to calculate oustanding interest
         final BigDecimal interestAmount = externalAssetOwnerTransferOutstandingInterestCalculation.calculateOutstandingInterest(loan);
-        final BigDecimal feesAmount = loan.getSummary().getTotalFeeChargesOutstanding();
-        final BigDecimal penaltiesAmount = loan.getSummary().getTotalPenaltyChargesOutstanding();
-        final BigDecimal overPaymentAmount = loan.getTotalOverpaid();
+        final BigDecimal feesAmount = loanTransferSnapshotPort.totalFeeChargesOutstanding(loan);
+        final BigDecimal penaltiesAmount = loanTransferSnapshotPort.totalPenaltyChargesOutstanding(loan);
+        final BigDecimal overPaymentAmount = loanTransferSnapshotPort.totalOverpaid(loan);
         // Reuse already-loaded overpayment amount so owner mapping need not touch leftover LoanStatus.
         currentTransferOverpaid.set(MathUtil.isGreaterThanZero(overPaymentAmount));
         // Moving money to asset transfer account
@@ -263,20 +277,20 @@ public class AccountingServiceImpl implements AccountingService {
         }
         if (MathUtil.isGreaterThanZero(totalDebitAmount)) {
             journalEntryList.add(this.helper.createDebitJournalEntryOrReversalForInvestor(office, currencyCode, AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue(), loanProductId, loanId, transactionId, transactionDate, totalDebitAmount, isReversalOrder));
+            final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
+            if (assetTransferEntries != null) {
+                assetTransferEntries.add(journalEntryList.get(journalEntryList.size() - 1));
+            }
         }
         return journalEntryList;
     }
 
-    private boolean isOwnedByFinancialActivityAccount(JournalEntry journalEntry, FinancialActivityAccount financialActivityAccount) {
-        return Objects.equals(financialActivityAccount.getGlAccount().getId(), journalEntry.getGlAccount().getId());
-    }
-
     @java.lang.SuppressWarnings("all")
-        public AccountingServiceImpl(final InvestorAccountingHelper helper, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation) {
+        public AccountingServiceImpl(final InvestorAccountingHelper helper, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort) {
         this.helper = helper;
         this.externalAssetOwnerTransferJournalEntryMappingRepository = externalAssetOwnerTransferJournalEntryMappingRepository;
         this.externalAssetOwnerJournalEntryMappingRepository = externalAssetOwnerJournalEntryMappingRepository;
-        this.financialActivityAccountRepository = financialActivityAccountRepository;
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
+        this.loanTransferSnapshotPort = loanTransferSnapshotPort;
     }
 }

@@ -40,8 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.fineract.accounting.common.AccountingConstants;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
@@ -57,7 +55,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -534,10 +532,10 @@ class AccountingServiceImplTest {
         private ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository;
 
         @Mock
-        private FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
+        private ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
 
         @Mock
-        private ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
+        private LoanTransferSnapshotPort loanTransferSnapshotPort;
 
         @InjectMocks
         private AccountingServiceImpl testSubject;
@@ -560,11 +558,10 @@ class AccountingServiceImplTest {
             Office office = Office.headOffice("office", LocalDate.of(2024, 9, 27), new ExternalId("officeId"));
             when(loan.getOffice()).thenReturn(office);
 
-            LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-            when(loanSummary.getTotalPrincipalOutstanding()).thenReturn(BigDecimal.ONE);
-            when(loanSummary.getTotalFeeChargesOutstanding()).thenReturn(BigDecimal.ONE);
-            when(loanSummary.getTotalPenaltyChargesOutstanding()).thenReturn(BigDecimal.ONE);
-            when(loan.getSummary()).thenReturn(loanSummary);
+            when(loanTransferSnapshotPort.totalPrincipalOutstanding(loan)).thenReturn(BigDecimal.ONE);
+            when(loanTransferSnapshotPort.totalFeeChargesOutstanding(loan)).thenReturn(BigDecimal.ONE);
+            when(loanTransferSnapshotPort.totalPenaltyChargesOutstanding(loan)).thenReturn(BigDecimal.ONE);
+            when(loanTransferSnapshotPort.totalOverpaid(loan)).thenReturn(null);
 
             return loan;
         }
@@ -576,10 +573,10 @@ class AccountingServiceImplTest {
             Office office = Office.headOffice("office", LocalDate.of(2024, 9, 27), new ExternalId("officeId"));
             when(loan.getOffice()).thenReturn(office);
 
-            LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-            when(loan.getSummary()).thenReturn(loanSummary);
-
-            when(loan.getTotalOverpaid()).thenReturn(BigDecimal.ONE);
+            when(loanTransferSnapshotPort.totalPrincipalOutstanding(loan)).thenReturn(null);
+            when(loanTransferSnapshotPort.totalFeeChargesOutstanding(loan)).thenReturn(null);
+            when(loanTransferSnapshotPort.totalPenaltyChargesOutstanding(loan)).thenReturn(null);
+            when(loanTransferSnapshotPort.totalOverpaid(loan)).thenReturn(BigDecimal.ONE);
 
             return loan;
         }
@@ -589,12 +586,6 @@ class AccountingServiceImplTest {
             feeAndPenaltyAccount.setId(2L);
             transferAccount.setId(3L);
             overpaymentAccount.setId(4L);
-
-            FinancialActivityAccount financialActivityAccount = new FinancialActivityAccount(transferAccount,
-                    AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
-            when(financialActivityAccountRepository
-                    .findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue()))
-                    .thenReturn(financialActivityAccount);
 
             lenient().when(investorAccountingHelper.getLinkedGLAccountForLoanProduct(LOAN_PRODUCT_ID,
                     AccountingConstants.AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue())).thenReturn(principleAndInterestAccount);
