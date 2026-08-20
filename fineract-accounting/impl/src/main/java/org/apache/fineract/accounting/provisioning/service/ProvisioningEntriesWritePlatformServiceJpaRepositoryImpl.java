@@ -47,6 +47,8 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuild
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
+import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
@@ -62,6 +64,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
@@ -79,6 +82,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     private final ProvisioningJournalEntryService provisioningJournalEntryService;
     private final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer;
     private final FromJsonHelper fromApiJsonHelper;
+    private ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper;
+
+    @Autowired
+    public void setApplicationCurrencyRepositoryWrapper(final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
+        this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
+    }
 
     @Override
     public CommandProcessingResult createProvisioningJournalEntries(Long provisioningEntryId, JsonCommand command) {
@@ -211,7 +220,8 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
                 throw new GLAccountNotFoundException(data.getExpenseAccount());
             }
             ProvisioningCategory provisioningCategory = categoryMap.get(data.getCategoryId());
-            MonetaryCurrency currency = loanProduct.getPrincipalAmount().getCurrency();
+            final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(data.getCurrencyCode());
+            MonetaryCurrency currency = MonetaryCurrency.fromApplicationCurrency(applicationCurrency);
             Money money = Money.of(currency, data.getBalance());
             Money amountToReserve = money.percentageOf(data.getPercentage(), MoneyHelper.getMathContext());
             Long criteraId = data.getCriteriaId();
