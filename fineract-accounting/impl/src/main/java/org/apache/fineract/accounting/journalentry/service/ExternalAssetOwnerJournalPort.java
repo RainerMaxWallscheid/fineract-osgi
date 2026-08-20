@@ -19,13 +19,11 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.investor.domain.ExternalAssetOwner;
-import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 /**
  * Investor bridge used by journal write. Implemented in investor-impl so
- * accounting-impl does not depend on investor-impl (cycle break).
+ * accounting-impl does not depend on investor-impl (cycle break). Object params
+ * avoid accounting → leftover {@code Loan} / investor entity edges (ADR-021).
  */
 public interface ExternalAssetOwnerJournalPort {
 
@@ -33,6 +31,5 @@ public interface ExternalAssetOwnerJournalPort {
 
     void createMappingToOwner(ExternalId ownerExternalId, Long journalEntryId);
 
-    void createJournalEntriesForExternalOwnerTransfer(Loan loan, ExternalAssetOwnerTransfer transfer,
-            ExternalAssetOwner previousOwner);
+    void createJournalEntriesForExternalOwnerTransfer(Object loan, Object transfer, Object previousOwner);
 }

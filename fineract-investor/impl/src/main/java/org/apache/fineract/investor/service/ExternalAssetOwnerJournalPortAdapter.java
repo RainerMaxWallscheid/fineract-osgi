@@ -61,8 +61,10 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
     }
 
     @Override
-    public void createJournalEntriesForExternalOwnerTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer,
-            final ExternalAssetOwner previousOwner) {
+    public void createJournalEntriesForExternalOwnerTransfer(final Object loanObj, final Object transferObj, final Object previousOwnerObj) {
+        final Loan loan = (Loan) loanObj;
+        final ExternalAssetOwnerTransfer transfer = (ExternalAssetOwnerTransfer) transferObj;
+        final ExternalAssetOwner previousOwner = (ExternalAssetOwner) previousOwnerObj;
         final boolean isBuyback = transfer.getStatus().name().contains("BUYBACK");
         if (isBuyback) {
             accountingService.createJournalEntriesForBuybackAssetTransfer(loan, transfer);

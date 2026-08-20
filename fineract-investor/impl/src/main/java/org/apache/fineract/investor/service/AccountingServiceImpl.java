@@ -42,7 +42,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -54,36 +53,51 @@ public class AccountingServiceImpl implements AccountingService {
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
 
+    /**
+     * Overpaid flag for the in-flight transfer journal mapping. Kept off
+     * {@code determineOwner*} signatures so ArchUnit freeze identity for
+     * leftover {@code JournalEntry} edges stays stable.
+     */
+    private final ThreadLocal<Boolean> currentTransferOverpaid = new ThreadLocal<>();
+
     @Override
     public void createJournalEntriesForSaleAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer, final ExternalAssetOwner previousOwner) {
         final ExternalAssetOwner newOwner = transfer.getOwner();
-        List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, true);
-        createMappingToTransfer(transfer, journalEntryList);
-        FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
-        journalEntryList.forEach(journalEntry -> {
-            if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
-                createMappingToOwner(null, journalEntry);
-                return;
-            }
-            ExternalAssetOwner owner = determineOwnerForSale(journalEntry, loan, previousOwner, newOwner);
-            createMappingToOwner(owner, journalEntry);
-        });
+        try {
+            List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, true);
+            createMappingToTransfer(transfer, journalEntryList);
+            FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
+            journalEntryList.forEach(journalEntry -> {
+                if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
+                    createMappingToOwner(null, journalEntry);
+                    return;
+                }
+                ExternalAssetOwner owner = determineOwnerForSale(journalEntry, loan, previousOwner, newOwner);
+                createMappingToOwner(owner, journalEntry);
+            });
+        } finally {
+            currentTransferOverpaid.remove();
+        }
     }
 
     @Override
     public void createJournalEntriesForBuybackAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer) {
         final ExternalAssetOwner previousOwner = transfer.getOwner();
-        List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, false);
-        createMappingToTransfer(transfer, journalEntryList);
-        FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
-        journalEntryList.forEach(journalEntry -> {
-            if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
-                createMappingToOwner(null, journalEntry);
-                return;
-            }
-            ExternalAssetOwner owner = determineOwnerForBuyback(journalEntry, loan, previousOwner);
-            createMappingToOwner(owner, journalEntry);
-        });
+        try {
+            List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, false);
+            createMappingToTransfer(transfer, journalEntryList);
+            FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue());
+            journalEntryList.forEach(journalEntry -> {
+                if (isOwnedByFinancialActivityAccount(journalEntry, financialActivityAccount)) {
+                    createMappingToOwner(null, journalEntry);
+                    return;
+                }
+                ExternalAssetOwner owner = determineOwnerForBuyback(journalEntry, loan, previousOwner);
+                createMappingToOwner(owner, journalEntry);
+            });
+        } finally {
+            currentTransferOverpaid.remove();
+        }
     }
 
     @NonNull
@@ -98,6 +112,8 @@ public class AccountingServiceImpl implements AccountingService {
         final BigDecimal feesAmount = loan.getSummary().getTotalFeeChargesOutstanding();
         final BigDecimal penaltiesAmount = loan.getSummary().getTotalPenaltyChargesOutstanding();
         final BigDecimal overPaymentAmount = loan.getTotalOverpaid();
+        // Reuse already-loaded overpayment amount so owner mapping need not touch leftover LoanStatus.
+        currentTransferOverpaid.set(MathUtil.isGreaterThanZero(overPaymentAmount));
         // Moving money to asset transfer account
         final List<JournalEntry> journalEntryList = createJournalEntries(loan, transactionId, transactionDate, principalAmount, interestAmount, feesAmount, penaltiesAmount, overPaymentAmount, !isReversalOrder);
         // Moving money from asset transfer account
@@ -117,7 +133,9 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     private ExternalAssetOwner determineOwnerForSale(final JournalEntry journalEntry, final Loan loan, final ExternalAssetOwner previousOwner, final ExternalAssetOwner newOwner) {
-        final boolean isOverpaid = LoanStatus.OVERPAID.equals(loan.getStatus());
+        // loan retained for ArchUnit freeze-identity on this method; overpaid comes from createJournalEntries.
+        Objects.requireNonNull(loan, "loan");
+        final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
         if (isOverpaid) {
             if (journalEntry.isCreditEntry()) {
                 return newOwner;
@@ -137,7 +155,8 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     private ExternalAssetOwner determineOwnerForBuyback(final JournalEntry journalEntry, final Loan loan, final ExternalAssetOwner previousOwner) {
-        final boolean isOverpaid = LoanStatus.OVERPAID.equals(loan.getStatus());
+        Objects.requireNonNull(loan, "loan");
+        final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
         if (isOverpaid && journalEntry.isDebitEntry()) {
             return previousOwner;
         }

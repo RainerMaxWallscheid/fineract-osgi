@@ -19,9 +19,6 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
-import org.apache.fineract.investor.domain.ExternalAssetOwner;
-import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +32,6 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
 
     @Override
     public void postTransfer(final Object loan, final Object externalAssetOwnerTransfer, final Object previousOwner) {
-        this.externalAssetOwnerJournalPort.createJournalEntriesForExternalOwnerTransfer((Loan) loan,
-                (ExternalAssetOwnerTransfer) externalAssetOwnerTransfer, (ExternalAssetOwner) previousOwner);
+        this.externalAssetOwnerJournalPort.createJournalEntriesForExternalOwnerTransfer(loan, externalAssetOwnerTransfer, previousOwner);
     }
 }

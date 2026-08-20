@@ -57,7 +57,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -574,8 +573,6 @@ class AccountingServiceImplTest {
             Loan loan = mock(Loan.class);
             when(loan.getId()).thenReturn(LOAN_ID);
             when(loan.productId()).thenReturn(LOAN_PRODUCT_ID);
-            when(loan.getStatus()).thenReturn(LoanStatus.OVERPAID);
-
             Office office = Office.headOffice("office", LocalDate.of(2024, 9, 27), new ExternalId("officeId"));
             when(loan.getOffice()).thenReturn(office);
 

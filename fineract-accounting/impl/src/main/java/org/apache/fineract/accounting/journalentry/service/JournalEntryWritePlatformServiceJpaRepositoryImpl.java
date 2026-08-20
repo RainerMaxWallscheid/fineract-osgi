@@ -557,7 +557,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
     @Transactional
     @Override
-    public void createJournalEntriesForExternalOwnerTransfer(final Loan loan, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer, final ExternalAssetOwner previousOwner) {
+    public void createJournalEntriesForExternalOwnerTransfer(final Object loan, final Object externalAssetOwnerTransfer, final Object previousOwner) {
         this.externalAssetOwnerJournalPort.createJournalEntriesForExternalOwnerTransfer(loan, externalAssetOwnerTransfer, previousOwner);
     }
 

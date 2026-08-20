@@ -23,10 +23,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.investor.domain.ExternalAssetOwner;
-import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 public interface JournalEntryWritePlatformService extends JournalEntryCommandWritePort, LoanReversalJournalEntryPort {
 
@@ -49,16 +46,9 @@ public interface JournalEntryWritePlatformService extends JournalEntryCommandWri
     void revertShareAccountJournalEntries(ArrayList<Long> transactionId, LocalDate transactionDate);
 
     /**
-     * Create journal entries immediately for an external owner transfer
-     *
-     * @param loan
-     *            the loan being transferred
-     * @param externalAssetOwnerTransfer
-     *            the external owner transfer details
-     * @param previousOwner
-     *            the previous owner (can be null for initial transfers)
+     * Create journal entries immediately for an external owner transfer.
+     * Object params avoid accounting → leftover {@code Loan} / investor entity edges.
      */
-    void createJournalEntriesForExternalOwnerTransfer(Loan loan, ExternalAssetOwnerTransfer externalAssetOwnerTransfer,
-            ExternalAssetOwner previousOwner);
+    void createJournalEntriesForExternalOwnerTransfer(Object loan, Object externalAssetOwnerTransfer, Object previousOwner);
 
 }
