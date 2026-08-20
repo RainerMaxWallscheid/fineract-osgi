@@ -56,7 +56,6 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -283,9 +282,9 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                         if (!this.clientActivePort.isActive(clientId)) {
                             throw new ClientNotActiveException(clientId);
                         }
-                        account.update((Client) client);
+                        account.updateClient(client);
                     } else {
-                        account.update((Client) null);
+                        account.updateClient(null);
                     }
                 }
                 if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
@@ -298,10 +297,9 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                             }
                             throw new GroupNotActiveException(groupId);
                         }
-                        account.update(group);
+                        account.updateGroup(group);
                     } else {
-                        final Group group = null;
-                        account.update(group);
+                        account.updateGroup(null);
                     }
                 }
                 if (changes.containsKey(SavingsApiConstants.productIdParamName)) {

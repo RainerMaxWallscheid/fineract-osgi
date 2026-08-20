@@ -1874,12 +1874,12 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return ids;
     }
 
-    public void update(final Client client) {
-        this.client = client;
+    public void updateClient(final Object client) {
+        this.client = (Client) client;
     }
 
-    public void update(final Group group) {
-        this.group = group;
+    public void updateGroup(final Object group) {
+        this.group = (Group) group;
     }
 
     public void update(final SavingsProduct product) {

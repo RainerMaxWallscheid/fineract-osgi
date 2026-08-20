@@ -64,7 +64,6 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -446,9 +445,9 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 if (!this.clientActivePort.isActive(clientId)) {
                     throw new ClientNotActiveException(clientId);
                 }
-                account.update((Client) client);
+                account.updateClient(client);
             } else {
-                account.update((Client) null);
+                account.updateClient(null);
             }
         }
         if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
@@ -461,10 +460,9 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     }
                     throw new GroupNotActiveException(groupId);
                 }
-                account.update(group);
+                account.updateGroup(group);
             } else {
-                final Group group = null;
-                account.update(group);
+                account.updateGroup(null);
             }
         }
         if (changes.containsKey(SavingsApiConstants.productIdParamName)) {
