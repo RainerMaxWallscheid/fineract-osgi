@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.savings.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransaction;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountOnHoldTransactionRepository;
@@ -58,6 +59,18 @@ public class DepositAccountOnHoldPortAdapter implements DepositAccountOnHoldPort
     @Override
     public BigDecimal withdrawableBalance(final Long savingsAccountId) {
         return this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId).getWithdrawableBalance();
+    }
+
+    @Override
+    public Object persist(final Object onHoldTransaction) {
+        return this.depositAccountOnHoldTransactionRepository.saveAndFlush((DepositAccountOnHoldTransaction) onHoldTransaction);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void persistAll(final List<Object> onHoldTransactions) {
+        this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) onHoldTransactions);
+        this.depositAccountOnHoldTransactionRepository.flush();
     }
 
     @Override

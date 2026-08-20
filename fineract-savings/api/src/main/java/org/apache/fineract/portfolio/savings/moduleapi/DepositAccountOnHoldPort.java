@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.savings.moduleapi;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * ID-only deposit-account on-hold hold/release/reverse (ADR-021). Foreign BCs
@@ -33,6 +34,10 @@ public interface DepositAccountOnHoldPort {
     Object release(Long savingsAccountId, BigDecimal amount, LocalDate date);
 
     BigDecimal withdrawableBalance(Long savingsAccountId);
+
+    Object persist(Object onHoldTransaction);
+
+    void persistAll(List<Object> onHoldTransactions);
 
     OnHoldReverseResult reverse(Long onHoldTransactionId);
 }
