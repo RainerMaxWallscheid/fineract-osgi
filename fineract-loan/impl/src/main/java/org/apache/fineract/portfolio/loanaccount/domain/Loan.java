@@ -312,15 +312,15 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @Column(name = "repayment_start_date_type_enum")
     private RepaymentStartDateType repaymentStartDateType;
 
-    public static Loan newIndividualLoanApplication(final String accountNo, final Client client, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
+    public static Loan newIndividualLoanApplication(final String accountNo, final Object client, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, client, null, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct, loanRepaymentScheduleDetail, null, loanCharges, null, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, enableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
     }
 
-    public static Loan newGroupLoanApplication(final String accountNo, final Group group, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
+    public static Loan newGroupLoanApplication(final String accountNo, final Object group, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, null, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct, loanRepaymentScheduleDetail, null, loanCharges, syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, enableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
     }
 
-    public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Client client, final Group group, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
+    public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Object client, final Object group, final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct, loanRepaymentScheduleDetail, null, loanCharges, syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential, rates, fixedPrincipalPercentagePerInstallment, externalId, loanApplicationTerms, enableInstallmentLevelDelinquency, submittedOnDate, allowFullTermForTranche);
     }
 
@@ -328,7 +328,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         // empty
     }
 
-    private Loan(final String accountNo, final Client client, final Group group, final AccountType loanType, final Fund fund, final Staff loanOfficer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProduct loanProduct, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
+    private Loan(final String accountNo, final Object client, final Object group, final AccountType loanType, final Fund fund, final Staff loanOfficer, final CodeValue loanPurpose, final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProduct loanProduct, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus, final Set<LoanCharge> loanCharges, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount, final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance, final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate, final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency, final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         this.loanRepaymentScheduleDetail = loanRepaymentScheduleDetail;
         this.isFloatingInterestRate = isFloatingInterestRate;
         this.interestRateDifferential = interestRateDifferential;
@@ -337,8 +337,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         } else {
             this.accountNumber = accountNo;
         }
-        this.client = client;
-        this.group = group;
+        this.client = (Client) client;
+        this.group = (Group) group;
         this.loanType = loanType;
         this.fund = fund;
         this.loanOfficer = loanOfficer;
@@ -481,8 +481,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.loanProduct;
     }
 
-    public void updateClient(final Client client) {
-        this.client = client;
+    public void updateClient(final Object client) {
+        this.client = (Client) client;
     }
 
     public void updateLoanProduct(final LoanProduct loanProduct) {
@@ -956,8 +956,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.group;
     }
 
-    public void updateGroup(final Group newGroup) {
-        this.group = newGroup;
+    public void updateGroup(final Object newGroup) {
+        this.group = (Group) newGroup;
     }
 
     public Integer getCurrentLoanCounter() {
