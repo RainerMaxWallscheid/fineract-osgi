@@ -61,9 +61,9 @@ import org.apache.fineract.investor.service.ExternalAssetOwnerTransferOutstandin
 import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -115,6 +115,9 @@ public class LoanAccountOwnerTransferBusinessStepTest {
     @Mock
     private LoanSaleDeferredIncomePort loanSaleDeferredIncomePort;
 
+    @Mock
+    private LoanTransferSnapshotPort loanTransferSnapshotPort;
+
     private LoanAccountOwnerTransferBusinessStep underTest;
 
     @BeforeAll
@@ -136,7 +139,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         underTest = new LoanAccountOwnerTransferBusinessStep(externalAssetOwnerTransferRepository,
                 externalAssetOwnerTransferLoanMappingRepository, externalOwnerTransferJournalPort, businessEventNotifierService,
                 loanTransferabilityService, delayedSettlementAttributeService, externalAssetOwnerTransferOutstandingInterestCalculation,
-                loanSaleDeferredIncomePort);
+                loanSaleDeferredIncomePort, loanTransferSnapshotPort);
     }
 
     @AfterEach
@@ -295,8 +298,6 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
         when(loanForProcessing.getId()).thenReturn(1L);
-        LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-        when(loanForProcessing.getSummary()).thenReturn(loanSummary);
         ExternalAssetOwnerTransfer firstResponseItem = Mockito.mock(ExternalAssetOwnerTransfer.class);
         ExternalAssetOwnerTransfer secondResponseItem = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(firstResponseItem.getStatus()).thenReturn(buybackStatus);
@@ -346,9 +347,6 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(loanForProcessing.getId()).thenReturn(1L);
         when(loanForProcessing.getLoanProduct()).thenReturn(loanProduct);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(isDelayedSettlementEnabled);
-
-        LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-        when(loanForProcessing.getSummary()).thenReturn(loanSummary);
 
         ExternalAssetOwnerTransfer pendingTransfer = new ExternalAssetOwnerTransfer();
         pendingTransfer.setStatus(pendingStatus);
@@ -466,9 +464,6 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(loanForProcessing.getId()).thenReturn(1L);
         when(loanForProcessing.getLoanProduct()).thenReturn(loanProduct);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(true);
-
-        LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-        when(loanForProcessing.getSummary()).thenReturn(loanSummary);
 
         ExternalAssetOwner previousOwner = new ExternalAssetOwner();
         ExternalAssetOwnerTransfer activeIntermediateTransfer = new ExternalAssetOwnerTransfer();

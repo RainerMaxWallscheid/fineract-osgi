@@ -49,8 +49,8 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +85,8 @@ public class LoanAccountOwnerTransferServiceTest {
     private ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
     @Mock
     private ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
+    @Mock
+    private LoanTransferSnapshotPort loanTransferSnapshotPort;
 
     @InjectMocks
     private LoanAccountOwnerTransferServiceImpl underTest;
@@ -210,8 +212,6 @@ public class LoanAccountOwnerTransferServiceTest {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
         when(loanForProcessing.getId()).thenReturn(1L);
-        LoanSummary loanSummary = Mockito.mock(LoanSummary.class);
-        when(loanForProcessing.getSummary()).thenReturn(loanSummary);
 
         ExternalAssetOwnerTransfer pendingBuybackTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(pendingBuybackTransfer.getStatus()).thenReturn(buybackStatus);

@@ -45,6 +45,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +61,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     private final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
+    private final LoanTransferSnapshotPort loanTransferSnapshotPort;
 
     @Override
     public void handleLoanClosedOrOverpaid(Loan loan) {
@@ -153,16 +155,16 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         externalAssetOwnerTransferRepository.save(activeTransfer);
     }
 
-    private ExternalAssetOwnerTransferDetails createAssetOwnerTransferDetails(Loan loan, ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
+    private ExternalAssetOwnerTransferDetails createAssetOwnerTransferDetails(final Object loan,
+            final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
         ExternalAssetOwnerTransferDetails details = new ExternalAssetOwnerTransferDetails();
         details.setExternalAssetOwnerTransfer(externalAssetOwnerTransfer);
-        details.setTotalPrincipalOutstanding(loan.getSummary().getTotalPrincipalOutstanding());
-        // We have different strategies to calculate oustanding interest
+        details.setTotalPrincipalOutstanding(loanTransferSnapshotPort.totalPrincipalOutstanding(loan));
         final BigDecimal interestAmount = externalAssetOwnerTransferOutstandingInterestCalculation.calculateOutstandingInterest(loan);
         details.setTotalInterestOutstanding(interestAmount);
-        details.setTotalFeeChargesOutstanding(loan.getSummary().getTotalFeeChargesOutstanding());
-        details.setTotalPenaltyChargesOutstanding(loan.getSummary().getTotalPenaltyChargesOutstanding());
-        details.setTotalOverpaid(loan.getTotalOverpaid());
+        details.setTotalFeeChargesOutstanding(loanTransferSnapshotPort.totalFeeChargesOutstanding(loan));
+        details.setTotalPenaltyChargesOutstanding(loanTransferSnapshotPort.totalPenaltyChargesOutstanding(loan));
+        details.setTotalOverpaid(loanTransferSnapshotPort.totalOverpaid(loan));
         return details;
     }
 
@@ -183,11 +185,12 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation) {
+        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
         this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
         this.businessEventNotifierService = businessEventNotifierService;
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
+        this.loanTransferSnapshotPort = loanTransferSnapshotPort;
     }
 }

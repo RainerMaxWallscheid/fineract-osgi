@@ -21,6 +21,7 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.time.LocalDate;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
+import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,5 +46,20 @@ public class LoanSaleDeferredIncomePortAdapter implements LoanSaleDeferredIncome
     @Override
     public void recognizeBuyDownFeeOnLoanSale(final Object loan, final LocalDate transactionDate, final boolean addJournal) {
         buyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanSale((Loan) loan, transactionDate, addJournal);
+    }
+
+    @Override
+    public void recognizeRemainingOnLoanSale(final Object loanObj, final LocalDate transactionDate) {
+        final Loan loan = (Loan) loanObj;
+        final LoanProductRelatedDetail loanProductRelatedDetail = loan.getLoanProductRelatedDetail();
+        if (loanProductRelatedDetail == null) {
+            return;
+        }
+        if (loanProductRelatedDetail.isEnableIncomeCapitalization()) {
+            recognizeCapitalizedIncomeOnLoanSale(loan, transactionDate, true);
+        }
+        if (loanProductRelatedDetail.isEnableBuyDownFee()) {
+            recognizeBuyDownFeeOnLoanSale(loan, transactionDate, true);
+        }
     }
 }

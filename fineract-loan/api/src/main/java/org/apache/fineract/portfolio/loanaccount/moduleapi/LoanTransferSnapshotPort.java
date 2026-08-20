@@ -18,18 +18,20 @@
  */
 package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 /**
- * Object-typed deferred-income recognition on loan sale (ADR-021). Foreign BCs
- * must not depend on leftover capitalized-income / buy-down amortization services.
+ * Object-typed outstanding amounts for external-asset ownership transfer
+ * details (ADR-021). Foreign BCs must not depend on leftover {@code Loan} /
+ * {@code LoanSummary} graphs.
  */
-public interface LoanSaleDeferredIncomePort {
+public interface LoanTransferSnapshotPort {
 
-    void recognizeCapitalizedIncomeOnLoanSale(Object loan, LocalDate transactionDate, boolean addJournal);
+    BigDecimal totalPrincipalOutstanding(Object loan);
 
-    void recognizeBuyDownFeeOnLoanSale(Object loan, LocalDate transactionDate, boolean addJournal);
+    BigDecimal totalFeeChargesOutstanding(Object loan);
 
-    /** Applies enabled capitalized-income / buy-down recognition for a loan sale. */
-    void recognizeRemainingOnLoanSale(Object loan, LocalDate transactionDate);
+    BigDecimal totalPenaltyChargesOutstanding(Object loan);
+
+    BigDecimal totalOverpaid(Object loan);
 }
