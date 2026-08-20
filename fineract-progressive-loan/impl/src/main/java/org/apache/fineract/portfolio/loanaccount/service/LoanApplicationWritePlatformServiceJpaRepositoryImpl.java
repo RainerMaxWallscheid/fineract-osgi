@@ -95,8 +95,10 @@ import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.savings.service.GSIMReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +130,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoanScheduleService loanScheduleService;
     private final LoanOriginatorLinkingService loanOriginatorLinkingService;
     private final LoanCollateralLifecycleService loanCollateralLifecycleService;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
+
+    @Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
 
     @Transactional
     @Override
@@ -306,7 +314,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (savingsAccountId == null) {
                 removeLinkedAccountAssociation(accountAssociations, changes);
             } else {
-                final SavingsAccount savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+                final Object savingsAccount = this.linkedSavingsAccountPort.persistableById(savingsAccountId);
                 // If there was no previous
                 if (accountAssociations == null) {
                     createLinkedAccountAssociation(loan, savingsAccount, changes);
@@ -688,7 +696,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void createSavingsAccountAssociation(Long savingsAccountId, Loan loan) {
         if (savingsAccountId != null) {
-            SavingsAccount savingsAccount;
+            Object savingsAccount;
             AccountAssociations accountAssociations;
             if (loan.getLoanType().isGLIMAccount()) {
                 List<GroupSavingsIndividualMonitoringAccountData> childSavings = (List<GroupSavingsIndividualMonitoringAccountData>) gsimReadPlatformService.findGSIMAccountsByGSIMId(savingsAccountId);
@@ -699,12 +707,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     clientAccountMappings.put(childSaving.getClientId(), childSaving.getChildAccountId());
                 }
                 if (gsimClientMembers.contains(BigDecimal.valueOf(loan.getClientId()))) {
-                    savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(clientAccountMappings.get(BigDecimal.valueOf(loan.getClientId())).longValue());
+                    savingsAccount = this.linkedSavingsAccountPort.persistableById(clientAccountMappings.get(BigDecimal.valueOf(loan.getClientId())).longValue());
                 } else {
                     throw new GroupMemberNotFoundInGSIMException(loan.getClientId());
                 }
             } else {
-                savingsAccount = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+                savingsAccount = this.linkedSavingsAccountPort.persistableById(savingsAccountId);
             }
             boolean isActive = true;
             accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);

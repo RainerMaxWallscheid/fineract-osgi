@@ -65,14 +65,14 @@ public class AccountAssociations extends AbstractPersistableCustom<Long> {
         this.active = active;
     }
 
-    public static AccountAssociations associateSavingsAccount(final Loan loan, final SavingsAccount savingsAccount,
+    public static AccountAssociations associateSavingsAccount(final Loan loan, final Object savingsAccount,
             final Integer associationType, boolean isActive) {
-        return new AccountAssociations(loan, null, null, savingsAccount, associationType, isActive);
+        return new AccountAssociations(loan, null, null, (SavingsAccount) savingsAccount, associationType, isActive);
     }
 
     public static AccountAssociations associateSavingsAccount(final SavingsAccount savingsAccount,
-            final SavingsAccount linkedSavingsAccount, final Integer associationType, boolean isActive) {
-        return new AccountAssociations(null, savingsAccount, null, linkedSavingsAccount, associationType, isActive);
+            final Object linkedSavingsAccount, final Integer associationType, boolean isActive) {
+        return new AccountAssociations(null, savingsAccount, null, (SavingsAccount) linkedSavingsAccount, associationType, isActive);
     }
 
     public SavingsAccount linkedSavingsAccount() {

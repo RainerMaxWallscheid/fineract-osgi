@@ -56,7 +56,6 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.exception.DuplicateGu
 import org.apache.fineract.portfolio.loanaccount.guarantor.exception.GuarantorNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.guarantor.exception.InvalidGuarantorException;
 import org.apache.fineract.portfolio.loanaccount.guarantor.serialization.GuarantorCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,9 +138,8 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             if (guarantorCommand.getSavingsId() != null) {
                 validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan,
                         this.linkedSavingsAccountPort.requireById(guarantorCommand.getSavingsId()).getActivationDate());
-                final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(guarantorCommand.getSavingsId(),
-                        backdatedTxnsAllowedTill);
-                accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
+                accountAssociations = AccountAssociations.associateSavingsAccount(loan,
+                        this.linkedSavingsAccountPort.persistableById(guarantorCommand.getSavingsId()),
                         AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
 
                 GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,

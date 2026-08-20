@@ -32,4 +32,12 @@ public interface LinkedSavingsAccountPort {
      *             when the id does not exist
      */
     LinkedSavingsAccountView requireById(Long savingsAccountId);
+
+    /**
+     * Persistable savings account for association writes (Object-typed, ADR-021).
+     *
+     * @throws org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException
+     *             when the id does not exist
+     */
+    Object persistableById(Long savingsAccountId);
 }
