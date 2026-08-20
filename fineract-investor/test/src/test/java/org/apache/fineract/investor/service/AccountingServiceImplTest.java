@@ -55,6 +55,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferJournalContextPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -537,6 +538,9 @@ class AccountingServiceImplTest {
         @Mock
         private LoanTransferSnapshotPort loanTransferSnapshotPort;
 
+        @Mock
+        private LoanTransferJournalContextPort loanTransferJournalContextPort;
+
         @InjectMocks
         private AccountingServiceImpl testSubject;
 
@@ -552,11 +556,8 @@ class AccountingServiceImplTest {
 
         public Loan createMockedLoan() {
             Loan loan = mock(Loan.class);
-            when(loan.getId()).thenReturn(LOAN_ID);
-            when(loan.productId()).thenReturn(LOAN_PRODUCT_ID);
-
             Office office = Office.headOffice("office", LocalDate.of(2024, 9, 27), new ExternalId("officeId"));
-            when(loan.getOffice()).thenReturn(office);
+            stubJournalContext(loan, office);
 
             when(loanTransferSnapshotPort.totalPrincipalOutstanding(loan)).thenReturn(BigDecimal.ONE);
             when(loanTransferSnapshotPort.totalFeeChargesOutstanding(loan)).thenReturn(BigDecimal.ONE);
@@ -568,10 +569,8 @@ class AccountingServiceImplTest {
 
         public Loan createMockedOverpaidLoan() {
             Loan loan = mock(Loan.class);
-            when(loan.getId()).thenReturn(LOAN_ID);
-            when(loan.productId()).thenReturn(LOAN_PRODUCT_ID);
             Office office = Office.headOffice("office", LocalDate.of(2024, 9, 27), new ExternalId("officeId"));
-            when(loan.getOffice()).thenReturn(office);
+            stubJournalContext(loan, office);
 
             when(loanTransferSnapshotPort.totalPrincipalOutstanding(loan)).thenReturn(null);
             when(loanTransferSnapshotPort.totalFeeChargesOutstanding(loan)).thenReturn(null);
@@ -579,6 +578,17 @@ class AccountingServiceImplTest {
             when(loanTransferSnapshotPort.totalOverpaid(loan)).thenReturn(BigDecimal.ONE);
 
             return loan;
+        }
+
+        private void stubJournalContext(final Loan loan, final Office office) {
+            when(loanTransferJournalContextPort.loanId(loan)).thenReturn(LOAN_ID);
+            when(loanTransferJournalContextPort.productId(loan)).thenReturn(LOAN_PRODUCT_ID);
+            when(loanTransferJournalContextPort.officeId(loan)).thenReturn(office.getId());
+            when(loanTransferJournalContextPort.office(loan)).thenReturn(office);
+            when(loanTransferJournalContextPort.currencyCode(loan)).thenReturn("USD");
+            when(loanTransferJournalContextPort.chargedOff(loan)).thenReturn(false);
+            lenient().when(loanTransferJournalContextPort.fraud(loan)).thenReturn(false);
+            lenient().when(loanTransferJournalContextPort.chargeOffReasonId(loan)).thenReturn(null);
         }
 
         private void setupAccounts() {

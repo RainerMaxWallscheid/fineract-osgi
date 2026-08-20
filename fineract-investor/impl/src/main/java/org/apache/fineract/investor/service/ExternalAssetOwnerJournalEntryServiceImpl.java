@@ -44,7 +44,7 @@ public class ExternalAssetOwnerJournalEntryServiceImpl implements ExternalAssetO
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanJournalEntryCreatedBusinessEvent.class, event -> {
             JournalEntry journalEntry = event.get();
-            Long loanId = loanReadPlatformService.findLoanIdByTransactionId(journalEntry.getLoanTransactionId()).orElseThrow();
+            Long loanId = loanReadPlatformService.findLoanIdByTransactionId(event.getAggregateRootId()).orElseThrow();
             externalAssetOwnerTransferLoanMappingRepository.findByLoanId(loanId).ifPresent(transferLoanMapping -> {
                 ExternalAssetOwnerJournalEntryMapping mapping = new ExternalAssetOwnerJournalEntryMapping();
                 mapping.setJournalEntry(journalEntry);

@@ -43,6 +43,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntr
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferJournalContextPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class AccountingServiceImpl implements AccountingService {
     private final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository;
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
     private final LoanTransferSnapshotPort loanTransferSnapshotPort;
+    private final LoanTransferJournalContextPort loanTransferJournalContextPort;
 
     /**
      * Overpaid flag for the in-flight transfer journal mapping. Kept off
@@ -116,7 +118,7 @@ public class AccountingServiceImpl implements AccountingService {
 
     @NonNull
     private List<JournalEntry> createJournalEntries(final Loan loan, final ExternalAssetOwnerTransfer transfer, final boolean isReversalOrder) {
-        this.helper.checkForBranchClosures(loan.getOffice().getId(), transfer.getSettlementDate());
+        this.helper.checkForBranchClosures(loanTransferJournalContextPort.officeId(loan), transfer.getSettlementDate());
         // transaction properties
         final Long transactionId = transfer.getId();
         final LocalDate transactionDate = transfer.getSettlementDate();
@@ -190,10 +192,11 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     private List<JournalEntry> createJournalEntries(final Loan loan, final Long transactionId, final LocalDate transactionDate, final BigDecimal principalAmount, final BigDecimal interestAmount, final BigDecimal feesAmount, final BigDecimal penaltiesAmount, final BigDecimal overPaymentAmount, final boolean isReversalOrder) {
-        final Long loanProductId = loan.productId();
-        final Long loanId = loan.getId();
-        final Office office = loan.getOffice();
-        final String currencyCode = loan.getCurrencyCode();
+        final Long loanProductId = loanTransferJournalContextPort.productId(loan);
+        final Long loanId = loanTransferJournalContextPort.loanId(loan);
+        final Office office = (Office) loanTransferJournalContextPort.office(loan);
+        final String currencyCode = loanTransferJournalContextPort.currencyCode(loan);
+        final boolean chargedOff = loanTransferJournalContextPort.chargedOff(loan);
         final List<JournalEntry> journalEntryList = new ArrayList<>();
         BigDecimal totalDebitAmount = BigDecimal.ZERO;
         final Map<GLAccount, BigDecimal> accountMap = new LinkedHashMap<>();
@@ -201,13 +204,13 @@ public class AccountingServiceImpl implements AccountingService {
         if (MathUtil.isGreaterThanZero(principalAmount)) {
             totalDebitAmount = totalDebitAmount.add(principalAmount);
             GLAccount account;
-            if (loan.isChargedOff()) {
-                final Long chargeOffReasonId = loan.fetchChargeOffReasonId();
+            if (chargedOff) {
+                final Long chargeOffReasonId = loanTransferJournalContextPort.chargeOffReasonId(loan);
                 final ProductToGLAccountMapping mapping = chargeOffReasonId != null ? helper.getChargeOffMappingByCodeValue(loanProductId, PortfolioProductType.LOAN, chargeOffReasonId) : null;
                 if (mapping != null) {
                     account = mapping.getGlAccount();
                 } else {
-                    final AccountingConstants.AccrualAccountsForLoan accrualAccount = loan.isFraud() ? AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE : AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_EXPENSE;
+                    final AccountingConstants.AccrualAccountsForLoan accrualAccount = loanTransferJournalContextPort.fraud(loan) ? AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_FRAUD_EXPENSE : AccountingConstants.AccrualAccountsForLoan.CHARGE_OFF_EXPENSE;
                     account = helper.getLinkedGLAccountForLoanProduct(loanProductId, accrualAccount.getValue());
                 }
             } else {
@@ -218,7 +221,7 @@ public class AccountingServiceImpl implements AccountingService {
         // interest entry
         if (MathUtil.isGreaterThanZero(interestAmount)) {
             AccountingConstants.AccrualAccountsForLoan accrualAccount = AccountingConstants.AccrualAccountsForLoan.INTEREST_RECEIVABLE;
-            if (loan.isChargedOff()) {
+            if (chargedOff) {
                 accrualAccount = AccountingConstants.AccrualAccountsForLoan.INCOME_FROM_CHARGE_OFF_INTEREST;
             }
             totalDebitAmount = totalDebitAmount.add(interestAmount);
@@ -233,7 +236,7 @@ public class AccountingServiceImpl implements AccountingService {
         // fee entry
         if (MathUtil.isGreaterThanZero(feesAmount)) {
             AccountingConstants.AccrualAccountsForLoan accrualAccount = AccountingConstants.AccrualAccountsForLoan.FEES_RECEIVABLE;
-            if (loan.isChargedOff()) {
+            if (chargedOff) {
                 accrualAccount = AccountingConstants.AccrualAccountsForLoan.INCOME_FROM_CHARGE_OFF_FEES;
             }
             totalDebitAmount = totalDebitAmount.add(feesAmount);
@@ -248,7 +251,7 @@ public class AccountingServiceImpl implements AccountingService {
         // penalty entry
         if (MathUtil.isGreaterThanZero(penaltiesAmount)) {
             AccountingConstants.AccrualAccountsForLoan accrualAccount = AccountingConstants.AccrualAccountsForLoan.PENALTIES_RECEIVABLE;
-            if (loan.isChargedOff()) {
+            if (chargedOff) {
                 accrualAccount = AccountingConstants.AccrualAccountsForLoan.INCOME_FROM_CHARGE_OFF_PENALTY;
             }
             totalDebitAmount = totalDebitAmount.add(penaltiesAmount);
@@ -286,11 +289,12 @@ public class AccountingServiceImpl implements AccountingService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountingServiceImpl(final InvestorAccountingHelper helper, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort) {
+        public AccountingServiceImpl(final InvestorAccountingHelper helper, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferJournalContextPort loanTransferJournalContextPort) {
         this.helper = helper;
         this.externalAssetOwnerTransferJournalEntryMappingRepository = externalAssetOwnerTransferJournalEntryMappingRepository;
         this.externalAssetOwnerJournalEntryMappingRepository = externalAssetOwnerJournalEntryMappingRepository;
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
         this.loanTransferSnapshotPort = loanTransferSnapshotPort;
+        this.loanTransferJournalContextPort = loanTransferJournalContextPort;
     }
 }
