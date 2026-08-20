@@ -51,8 +51,8 @@ public class GuarantorFundingTransaction extends AbstractPersistableCustom<Long>
     protected GuarantorFundingTransaction() {}
 
     public GuarantorFundingTransaction(final GuarantorFundingDetails guarantorFundingDetails, final LoanTransaction loanTransaction,
-            final DepositAccountOnHoldTransaction depositAccountOnHoldTransaction) {
-        this.depositAccountOnHoldTransaction = depositAccountOnHoldTransaction;
+            final Object depositAccountOnHoldTransaction) {
+        this.depositAccountOnHoldTransaction = (DepositAccountOnHoldTransaction) depositAccountOnHoldTransaction;
         this.guarantorFundingDetails = guarantorFundingDetails;
         this.loanTransaction = loanTransaction;
         this.reversed = false;

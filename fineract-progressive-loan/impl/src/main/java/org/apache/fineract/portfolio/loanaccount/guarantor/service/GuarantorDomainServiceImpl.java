@@ -357,14 +357,14 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             BigDecimal principal = loan.getPrincipal().getAmount();
             if ((amountForRelease != null) && (totalGuaranteeAmount != null)) {
                 amountForRelease = amountForRelease.multiply(totalGuaranteeAmount).divide(principal, MoneyHelper.getRoundingMode());
-                List<DepositAccountOnHoldTransaction> accountOnHoldTransactions = new ArrayList<>();
+                List<Object> accountOnHoldTransactions = new ArrayList<>();
                 BigDecimal amountLeft = calculateAndRelaseGuarantorFunds(externalGuarantorList, guarantorGuarantee, amountForRelease, loanTransaction, accountOnHoldTransactions);
                 if (amountLeft.compareTo(BigDecimal.ZERO) > 0) {
                     calculateAndRelaseGuarantorFunds(selfGuarantorList, selfGuarantee, amountLeft, loanTransaction, accountOnHoldTransactions);
                     externalGuarantorList.addAll(selfGuarantorList);
                 }
                 if (!externalGuarantorList.isEmpty()) {
-                    this.depositAccountOnHoldTransactionRepository.saveAll(accountOnHoldTransactions);
+                    this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) accountOnHoldTransactions);
                     this.guarantorFundingRepository.saveAll(externalGuarantorList);
                 }
             }
@@ -414,14 +414,14 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             BigDecimal amountForRelease = loanTransaction.getAmount(loan.getCurrency()).getAmount();
             BigDecimal guarantorGuarantee = amountForRelease;
             List<GuarantorFundingDetails> guarantorList = Arrays.asList(guarantorFundingDetails);
-            final List<DepositAccountOnHoldTransaction> accountOnHoldTransactions = new ArrayList<>();
+            final List<Object> accountOnHoldTransactions = new ArrayList<>();
             calculateAndRelaseGuarantorFunds(guarantorList, guarantorGuarantee, amountForRelease, loanTransaction, accountOnHoldTransactions);
-            this.depositAccountOnHoldTransactionRepository.saveAll(accountOnHoldTransactions);
+            this.depositAccountOnHoldTransactionRepository.saveAll((List<DepositAccountOnHoldTransaction>) (List<?>) accountOnHoldTransactions);
             this.guarantorFundingRepository.saveAndFlush(guarantorFundingDetails);
         }
     }
 
-    private BigDecimal calculateAndRelaseGuarantorFunds(List<GuarantorFundingDetails> guarantorList, BigDecimal totalGuaranteeAmount, BigDecimal amountForRelease, LoanTransaction loanTransaction, final List<DepositAccountOnHoldTransaction> accountOnHoldTransactions) {
+    private BigDecimal calculateAndRelaseGuarantorFunds(List<GuarantorFundingDetails> guarantorList, BigDecimal totalGuaranteeAmount, BigDecimal amountForRelease, LoanTransaction loanTransaction, final List<Object> accountOnHoldTransactions) {
         BigDecimal amountLeft = amountForRelease;
         for (GuarantorFundingDetails fundingDetails : guarantorList) {
             BigDecimal guarantorAmount = amountForRelease.multiply(fundingDetails.getAmountRemaining()).divide(totalGuaranteeAmount, MoneyHelper.getRoundingMode());
