@@ -19,7 +19,11 @@
 package org.apache.fineract.portfolio.client.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -85,6 +89,19 @@ public class ClientActivePortAdapter implements ClientActivePort {
     @Override
     public ExternalId externalId(final Long clientId) {
         return client(clientId).getExternalId();
+    }
+
+    @Override
+    public List<Long> groupIds(final Long clientId) {
+        final Set<Group> groups = client(clientId).getGroups();
+        if (groups == null || groups.isEmpty()) {
+            return List.of();
+        }
+        final List<Long> groupIds = new ArrayList<>(groups.size());
+        for (final Group group : groups) {
+            groupIds.add(group.getId());
+        }
+        return groupIds;
     }
 
     private Client client(final Long clientId) {

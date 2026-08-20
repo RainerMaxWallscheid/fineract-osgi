@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.client.moduleapi;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
@@ -44,4 +45,6 @@ public interface ClientActivePort {
     String accountNumber(Long clientId);
 
     ExternalId externalId(Long clientId);
+
+    List<Long> groupIds(Long clientId);
 }

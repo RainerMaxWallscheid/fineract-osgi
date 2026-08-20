@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.client.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.portfolio.group.domain,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.clients.impl'
                 )

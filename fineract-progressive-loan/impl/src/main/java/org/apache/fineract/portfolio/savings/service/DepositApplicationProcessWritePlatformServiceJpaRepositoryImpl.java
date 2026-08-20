@@ -264,16 +264,16 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         CalendarInstance calendarInstance = null;
         final boolean isCalendarInherited = command.booleanPrimitiveValueOfParameterNamed(isCalendarInheritedParamName);
         if (isCalendarInherited) {
-            Set<Group> groups = account.getClient().getGroups();
+            final java.util.List<Long> groupIds = this.clientActivePort.groupIds(account.clientId());
             Long groupId = null;
-            if (groups.isEmpty()) {
+            if (groupIds.isEmpty()) {
                 final String defaultUserMessage = "Client does not belong to group/center. Cannot follow group/center meeting frequency.";
                 throw new GeneralPlatformDomainRuleException("error.msg.recurring.deposit.account.cannot.create.not.belongs.to.any.groups.to.follow.meeting.frequency", defaultUserMessage, account.clientId());
-            } else if (groups.size() > 1) {
+            } else if (groupIds.size() > 1) {
                 final String defaultUserMessage = "Client belongs to more than one group. Cannot support recurring deposit.";
                 throw new GeneralPlatformDomainRuleException("error.msg.recurring.deposit.account.cannot.create.belongs.to.multiple.groups", defaultUserMessage, account.clientId());
             } else {
-                Group group = groups.iterator().next();
+                Group group = this.groupRepository.findById(groupIds.get(0)).orElseThrow(() -> new GroupNotFoundException(groupIds.get(0)));
                 Group parent = group.getParent();
                 Integer entityType = CalendarEntityType.GROUPS.getValue();
                 if (parent != null) {

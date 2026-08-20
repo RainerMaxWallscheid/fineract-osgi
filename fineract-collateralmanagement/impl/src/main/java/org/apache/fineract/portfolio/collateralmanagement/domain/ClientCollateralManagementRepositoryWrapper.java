@@ -21,9 +21,9 @@ package org.apache.fineract.portfolio.collateralmanagement.domain;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.exception.ClientCollateralNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -34,8 +34,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ClientCollateralManagementRepositoryWrapper {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
 
     private final ClientCollateralManagementRepository clientCollateralManagementRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover {@code ClientRepository}
+     * ctor/field (do not retarget alone).
+     */
+    @SuppressWarnings("unused")
     private final ClientRepository clientRepository;
     private final LoanProductRepository loanProductRepository;
 
@@ -48,19 +59,23 @@ public class ClientCollateralManagementRepositoryWrapper {
     }
 
     public List<ClientCollateralManagement> getCollateralsPerClient(final Long clientId) {
-        final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
-        return this.clientCollateralManagementRepository.findByClientId(client);
+        if (!this.clientActivePort.exists(clientId)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return this.clientCollateralManagementRepository.findByClientId(clientId);
     }
 
     public List<ClientCollateralManagementData> getClientCollateralData(final Long clientId, final Long prodId) {
-        final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+        if (!this.clientActivePort.exists(clientId)) {
+            throw new ClientNotFoundException(clientId);
+        }
         String currency = null;
         if (prodId != null) {
             final LoanProduct loanProduct = this.loanProductRepository.findById(prodId)
                     .orElseThrow(() -> new LoanProductNotFoundException(prodId));
             currency = loanProduct.getCurrency().getCode();
         }
-        List<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepository.findByClientId(client);
+        List<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepository.findByClientId(clientId);
         List<ClientCollateralManagementData> clientCollateralManagementDataSet = new ArrayList<>();
         for (ClientCollateralManagement clientCollateralManagement : clientCollateralManagements) {
             BigDecimal quantity = clientCollateralManagement.getQuantity();
