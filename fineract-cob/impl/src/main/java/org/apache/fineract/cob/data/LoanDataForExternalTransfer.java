@@ -52,6 +52,13 @@ public class LoanDataForExternalTransfer {
         return this.loanStatus;
     }
 
+    /**
+     * Enum name for foreign BCs that must not depend on leftover {@link LoanStatus}.
+     */
+    public String getLoanStatusName() {
+        return this.loanStatus == null ? null : this.loanStatus.name();
+    }
+
     @java.lang.SuppressWarnings("all")
         public Long getLoanProductId() {
         return this.loanProductId;

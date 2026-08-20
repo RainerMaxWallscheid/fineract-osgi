@@ -62,7 +62,6 @@ import org.apache.fineract.investor.exception.ExternalAssetOwnerDuplicateExcepti
 import org.apache.fineract.investor.exception.ExternalAssetOwnerInitiateTransferException;
 import org.apache.fineract.investor.serialization.ExternalAssetOwnerValidator;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -327,20 +326,20 @@ public class ExternalAssetOwnersWriteServiceImpl implements ExternalAssetOwnersW
     }
 
     private void validateLoanStatus(LoanDataForExternalTransfer loanDataForExternalTransfer, boolean isDelayedSettlementEnabled) {
-        LoanStatus loanStatus = loanDataForExternalTransfer.getLoanStatus();
+        String loanStatus = loanDataForExternalTransfer.getLoanStatusName();
         if (!getValidLoanStatusList(isDelayedSettlementEnabled).contains(loanStatus)) {
             throw new ExternalAssetOwnerInitiateTransferException(String.format("Loan status %s is not valid for transfer.", loanStatus));
         }
     }
 
     private void validateLoanStatusIntermediarySale(LoanDataForExternalTransfer loanDataForExternalTransfer) {
-        LoanStatus loanStatus = loanDataForExternalTransfer.getLoanStatus();
+        String loanStatus = loanDataForExternalTransfer.getLoanStatusName();
         if (!getAllowedLoanStatuses().contains(loanStatus)) {
             throw new ExternalAssetOwnerInitiateTransferException(String.format("Loan status %s is not valid for transfer.", loanStatus));
         }
     }
 
-    private List<LoanStatus> getValidLoanStatusList(boolean isDelayedSettlementEnabled) {
+    private List<String> getValidLoanStatusList(boolean isDelayedSettlementEnabled) {
         if (isDelayedSettlementEnabled) {
             return getAllowedLoanStatusesForDelayedSettlement();
         } else {
@@ -510,12 +509,12 @@ public class ExternalAssetOwnersWriteServiceImpl implements ExternalAssetOwnersW
         return externalAssetOwnerRepository.saveAndFlush(externalAssetOwner);
     }
 
-    private List<LoanStatus> getAllowedLoanStatuses() {
-        return configurationDomainService.getAllowedLoanStatusesForExternalAssetTransfer().stream().map(LoanStatus::valueOf).collect(Collectors.toList());
+    private List<String> getAllowedLoanStatuses() {
+        return configurationDomainService.getAllowedLoanStatusesForExternalAssetTransfer();
     }
 
-    private List<LoanStatus> getAllowedLoanStatusesForDelayedSettlement() {
-        return configurationDomainService.getAllowedLoanStatusesOfDelayedSettlementForExternalAssetTransfer().stream().map(LoanStatus::valueOf).collect(Collectors.toList());
+    private List<String> getAllowedLoanStatusesForDelayedSettlement() {
+        return configurationDomainService.getAllowedLoanStatusesOfDelayedSettlementForExternalAssetTransfer();
     }
 
     @Override

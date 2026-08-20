@@ -188,7 +188,7 @@ public class ExternalAssetOwnersWriteServiceTest {
                 .thenReturn(Optional.of(testContext.loanDataForExternalTransfer));
         when(testContext.externalAssetOwnerRepository.findByExternalId(any(ExternalId.class)))
                 .thenReturn(Optional.of(testContext.externalAssetOwner));
-        when(testContext.loanDataForExternalTransfer.getLoanStatus()).thenReturn(loanStatus);
+        when(testContext.loanDataForExternalTransfer.getLoanStatusName()).thenReturn(loanStatus.name());
         when(testContext.delayedSettlementAttributeService.isEnabled(testContext.loanProductId)).thenReturn(true);
 
         // when
@@ -212,7 +212,7 @@ public class ExternalAssetOwnersWriteServiceTest {
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommand, testContext.loanId);
 
-        when(testContext.loanDataForExternalTransfer.getLoanStatus()).thenReturn(loanStatus);
+        when(testContext.loanDataForExternalTransfer.getLoanStatusName()).thenReturn(loanStatus.name());
         when(testContext.delayedSettlementAttributeService.isEnabled(testContext.loanProductId)).thenReturn(true);
         when(testContext.loanRepository.findLoanDataForExternalTransferByLoanId(testContext.loanId))
                 .thenReturn(Optional.of(testContext.loanDataForExternalTransfer));
@@ -245,7 +245,7 @@ public class ExternalAssetOwnersWriteServiceTest {
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommand, testContext.loanId);
 
-        when(testContext.loanDataForExternalTransfer.getLoanStatus()).thenReturn(loanStatus);
+        when(testContext.loanDataForExternalTransfer.getLoanStatusName()).thenReturn(loanStatus.name());
         when(testContext.delayedSettlementAttributeService.isEnabled(testContext.loanProductId)).thenReturn(true);
         when(testContext.loanRepository.findLoanDataForExternalTransferByLoanId(testContext.loanId))
                 .thenReturn(Optional.of(testContext.loanDataForExternalTransfer));
@@ -281,7 +281,7 @@ public class ExternalAssetOwnersWriteServiceTest {
         // given
         final JsonCommand command = createJsonCommand(testContext.jsonCommand, testContext.loanId);
 
-        when(testContext.loanDataForExternalTransfer.getLoanStatus()).thenReturn(loanStatus);
+        when(testContext.loanDataForExternalTransfer.getLoanStatusName()).thenReturn(loanStatus.name());
         when(testContext.delayedSettlementAttributeService.isEnabled(testContext.loanProductId)).thenReturn(true);
         when(testContext.loanRepository.findLoanDataForExternalTransferByLoanId(testContext.loanId))
                 .thenReturn(Optional.of(testContext.loanDataForExternalTransfer));
@@ -1019,7 +1019,7 @@ public class ExternalAssetOwnersWriteServiceTest {
 
             lenient().when(loanDataForExternalTransfer.getId()).thenReturn(loanId);
             lenient().when(loanDataForExternalTransfer.getExternalId()).thenReturn(new ExternalId(externalLoanId));
-            lenient().when(loanDataForExternalTransfer.getLoanStatus()).thenReturn(LoanStatus.ACTIVE);
+            lenient().when(loanDataForExternalTransfer.getLoanStatusName()).thenReturn(LoanStatus.ACTIVE.name());
             lenient().when(loanDataForExternalTransfer.getLoanProductId()).thenReturn(loanProductId);
             lenient().when(loanDataForExternalTransfer.getLoanProductShortName()).thenReturn(loanProductShortName);
             lenient().when(configurationDomainService.getAllowedLoanStatusesForExternalAssetTransfer())
