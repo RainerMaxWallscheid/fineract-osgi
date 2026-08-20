@@ -100,7 +100,8 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
 
     private void handleSale(final Object loan, final LocalDate settlementDate, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
         ExternalAssetOwnerTransfer newExternalAssetOwnerTransfer = sellAssetOrDecline(loan, settlementDate, externalAssetOwnerTransfer);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
         if (!ExternalTransferStatus.DECLINED.equals(newExternalAssetOwnerTransfer.getStatus())) {
             businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
         }
@@ -115,7 +116,8 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         } else {
             newExternalAssetOwnerTransfer = buybackAsset(loan, settlementDate, buybackExternalAssetOwnerTransfer, optActiveExternalAssetOwnerTransfer.get());
         }
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
     }
 
@@ -217,8 +219,10 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     private void handleSameDaySaleAndBuyback(final LocalDate settlementDate, final List<ExternalAssetOwnerTransfer> transferDataList, Object loan) {
         ExternalAssetOwnerTransfer cancelledPendingTransfer = cancelTransfer(settlementDate, transferDataList.get(0));
         ExternalAssetOwnerTransfer cancelledBuybackTransfer = cancelTransfer(settlementDate, transferDataList.get(1));
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledPendingTransfer, (Loan) loan));
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledBuybackTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledPendingTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledBuybackTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
     }
 
     private ExternalAssetOwnerTransfer cancelTransfer(final LocalDate settlementDate, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {

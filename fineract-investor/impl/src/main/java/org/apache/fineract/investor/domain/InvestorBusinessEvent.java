@@ -19,15 +19,16 @@
 package org.apache.fineract.investor.domain;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 public abstract class InvestorBusinessEvent extends AbstractBusinessEvent<ExternalAssetOwnerTransfer> {
-    private final Loan loan;
+    private final Object loan;
+    private final Long loanId;
     private static final String CATEGORY = "Investor";
 
-    public InvestorBusinessEvent(ExternalAssetOwnerTransfer value, Loan loan) {
+    public InvestorBusinessEvent(ExternalAssetOwnerTransfer value, Object loan, Long loanId) {
         super(value);
         this.loan = loan;
+        this.loanId = loanId;
     }
 
     @Override
@@ -37,11 +38,10 @@ public abstract class InvestorBusinessEvent extends AbstractBusinessEvent<Extern
 
     @Override
     public Long getAggregateRootId() {
-        return loan.getId();
+        return loanId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Object getLoan() {
         return this.loan;
     }
 }

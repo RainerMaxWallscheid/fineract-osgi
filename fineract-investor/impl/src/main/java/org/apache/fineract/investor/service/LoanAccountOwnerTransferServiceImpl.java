@@ -90,13 +90,15 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     private void cancelTransfer(Object loan, ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
         updatePendingTransfer(pendingTransfer);
         ExternalAssetOwnerTransfer cancelledTransfer = createCancelledTransfer(pendingTransfer, subStatus);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
     }
 
     private void declineTransfer(Object loan, ExternalAssetOwnerTransfer pendingTransfer) {
         ExternalAssetOwnerTransfer declinedSaleTransfer = createDeclinedTransfer(pendingTransfer, loan);
         updatePendingTransfer(pendingTransfer);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(declinedSaleTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(declinedSaleTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
     }
 
     private void executePendingBuybackTransfer(final Object loan, ExternalAssetOwnerTransfer buybackTransfer) {
@@ -105,7 +107,8 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         buybackTransfer = updatePendingBuybackTransfer(loan, buybackTransfer);
         externalAssetOwnerTransferLoanMappingRepository.deleteByLoanIdAndOwnerTransfer(loanTransferBalancePort.loanId(loan), activeTransfer);
         externalOwnerTransferJournalPort.postTransfer(loan, buybackTransfer, null);
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, (Loan) loan));
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, loan,
+                loanTransferBalancePort.loanId(loan)));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
     }
 

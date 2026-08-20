@@ -136,7 +136,7 @@ public class InvestorBusinessEventSerializerTest {
         when(loanOwnershipEventDataPort.currency(loan)).thenReturn(new CurrencyData("EUR", 2, 1));
         when(loanOwnershipEventDataPort.unpaidCharges(loan)).thenReturn(createUnpaidCharges());
         LoanOwnershipTransferBusinessEvent loanOwnershipTransferBusinessEvent = new LoanOwnershipTransferBusinessEvent(
-                createExternalAssetOwnerTransfer(status, subStatus), loan);
+                createExternalAssetOwnerTransfer(status, subStatus), loan, 1L);
 
         // when
         InvestorBusinessEventSerializer serializer = new InvestorBusinessEventSerializer(mockReadService, createCustomDataForEvents(),

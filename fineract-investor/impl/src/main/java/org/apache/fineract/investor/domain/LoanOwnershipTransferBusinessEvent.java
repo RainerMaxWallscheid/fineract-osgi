@@ -18,14 +18,12 @@
  */
 package org.apache.fineract.investor.domain;
 
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-
 public class LoanOwnershipTransferBusinessEvent extends InvestorBusinessEvent {
 
     private static final String TYPE = "LoanOwnershipTransferBusinessEvent";
 
-    public LoanOwnershipTransferBusinessEvent(ExternalAssetOwnerTransfer value, Loan loan) {
-        super(value, loan);
+    public LoanOwnershipTransferBusinessEvent(ExternalAssetOwnerTransfer value, Object loan, Long loanId) {
+        super(value, loan, loanId);
     }
 
     @Override
