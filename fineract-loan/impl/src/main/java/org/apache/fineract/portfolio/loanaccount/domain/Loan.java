@@ -67,9 +67,11 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.LoanRepaymentScheduleTransactionProcessor;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -84,6 +86,14 @@ import org.springframework.lang.NonNull;
 @Entity
 @Table(name = "m_loan", uniqueConstraints = {@UniqueConstraint(columnNames = {"account_no"}, name = "loan_account_no_UNIQUE"), @UniqueConstraint(columnNames = {"external_id"}, name = "loan_externalid_UNIQUE")})
 public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+    private static ClientActivePort clientActivePort;
+    private static GroupActivePort groupActivePort;
+
+    public static void setActivePorts(final ClientActivePort clientActivePort, final GroupActivePort groupActivePort) {
+        Loan.clientActivePort = clientActivePort;
+        Loan.groupActivePort = groupActivePort;
+    }
+
     public static final String RECALCULATE_LOAN_SCHEDULE = "recalculateLoanSchedule";
     public static final String EXTERNAL_ID = "externalId";
     public static final String DATE_FORMAT = "dateFormat";
@@ -891,11 +901,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public Long getClientId() {
-        return this.client == null ? null : this.client.getId();
+        return clientActivePort.id(this.client);
     }
 
     public Long getGroupId() {
-        return this.group == null ? null : this.group.getId();
+        return groupActivePort.id(this.group);
     }
 
     public Long getGlimId() {
@@ -903,11 +913,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public Long getOfficeId() {
-        return this.client != null ? this.client.officeId() : this.group.officeId();
+        return this.client != null ? clientActivePort.officeId(getClientId()) : groupActivePort.officeId(getGroupId());
     }
 
     public Office getOffice() {
-        return this.client != null ? this.client.getOffice() : this.group.getOffice();
+        return this.client != null ? (Office) clientActivePort.office(getClientId()) : (Office) groupActivePort.office(getGroupId());
     }
 
     public Boolean isCashBasedAccountingEnabledOnLoanProduct() {
