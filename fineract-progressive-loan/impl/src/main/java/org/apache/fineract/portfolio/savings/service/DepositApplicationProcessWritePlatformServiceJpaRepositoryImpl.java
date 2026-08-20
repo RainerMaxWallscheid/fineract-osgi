@@ -65,7 +65,6 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -122,7 +121,6 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final DepositAccountAssembler depositAccountAssembler;
     private final DepositAccountDataValidator depositAccountDataValidator;
     private final AccountNumberGenerator accountNumberGenerator;
-    private final ClientRepositoryWrapper clientRepository;
     private final GroupRepository groupRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteRepository noteRepository;
@@ -444,14 +442,13 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         if (changes.containsKey(SavingsApiConstants.clientIdParamName)) {
             final Long clientId = command.longValueOfParameterNamed(SavingsApiConstants.clientIdParamName);
             if (clientId != null) {
-                final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+                final Object client = this.clientActivePort.persistableById(clientId);
                 if (!this.clientActivePort.isActive(clientId)) {
                     throw new ClientNotActiveException(clientId);
                 }
-                account.update(client);
+                account.update((Client) client);
             } else {
-                final Client client = null;
-                account.update(client);
+                account.update((Client) null);
             }
         }
         if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
@@ -646,7 +643,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final ClientRepositoryWrapper clientRepository, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;
@@ -654,7 +651,6 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.depositAccountAssembler = depositAccountAssembler;
         this.depositAccountDataValidator = depositAccountDataValidator;
         this.accountNumberGenerator = accountNumberGenerator;
-        this.clientRepository = clientRepository;
         this.groupRepository = groupRepository;
         this.savingsProductRepository = savingsProductRepository;
         this.noteRepository = noteRepository;

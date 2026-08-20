@@ -52,4 +52,12 @@ public interface ClientActivePort {
      * Client id from a persistable client instance (Object-typed, ADR-021).
      */
     Long id(Object client);
+
+    /**
+     * Persistable client for association writes (Object-typed, ADR-021).
+     *
+     * @throws org.apache.fineract.portfolio.client.exception.ClientNotFoundException
+     *             when the id does not exist
+     */
+    Object persistableById(Long clientId);
 }

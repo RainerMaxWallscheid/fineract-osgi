@@ -100,6 +100,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public Object persistableById(final Long clientId) {
+        return this.clientRepository.findOneWithNotFoundDetection(clientId);
+    }
+
+    @Override
     public List<Long> groupIds(final Long clientId) {
         final Set<Group> groups = client(clientId).getGroups();
         if (groups == null || groups.isEmpty()) {
