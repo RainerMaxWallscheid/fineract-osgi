@@ -319,8 +319,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
-    private void updateLinkedAccountAssociation(AccountAssociations accountAssociations, SavingsAccount savingsAccount, Map<String, Object> changes) {
-        accountAssociations.updateLinkedSavingsAccount(savingsAccount);
+    private void updateLinkedAccountAssociation(AccountAssociations accountAssociations, Object savingsAccount, Map<String, Object> changes) {
+        accountAssociations.updateLinkedSavingsAccount((SavingsAccount) savingsAccount);
         this.accountAssociationsRepository.save(accountAssociations);
         changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }
@@ -332,9 +332,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
-    private void createLinkedAccountAssociation(final Loan loan, final SavingsAccount savingsAccount, final Map<String, Object> changes) {
+    private void createLinkedAccountAssociation(final Loan loan, final Object savingsAccount, final Map<String, Object> changes) {
         boolean isActive = true;
-        final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+        final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(loan, (SavingsAccount) savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
         this.accountAssociationsRepository.save(accountAssociations);
         changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }

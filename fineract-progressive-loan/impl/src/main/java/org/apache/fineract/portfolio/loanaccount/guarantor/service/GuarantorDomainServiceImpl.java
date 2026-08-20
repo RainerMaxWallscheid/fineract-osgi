@@ -148,7 +148,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     @Override
     public void assignGuarantor(final GuarantorFundingDetails guarantorFundingDetails, final LocalDate transactionDate) {
         if (guarantorFundingDetails.getStatus().isActive()) {
-            SavingsAccount savingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
+            SavingsAccount savingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
             savingsAccount.holdFunds(guarantorFundingDetails.getAmount());
             if (savingsAccount.getWithdrawableBalance().compareTo(BigDecimal.ZERO) < 0) {
                 final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -170,7 +170,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     public void releaseGuarantor(final GuarantorFundingDetails guarantorFundingDetails, final LocalDate transactionDate) {
         BigDecimal amoutForWithdraw = guarantorFundingDetails.getAmountRemaining();
         if (amoutForWithdraw.compareTo(BigDecimal.ZERO) > 0 && guarantorFundingDetails.getStatus().isActive()) {
-            SavingsAccount savingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
+            SavingsAccount savingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
             savingsAccount.releaseFunds(amoutForWithdraw);
             DepositAccountOnHoldTransaction onHoldTransaction = DepositAccountOnHoldTransaction.release(savingsAccount, amoutForWithdraw, transactionDate);
             GuarantorFundingTransaction guarantorFundingTransaction = new GuarantorFundingTransaction(guarantorFundingDetails, null, onHoldTransaction);
@@ -216,7 +216,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             for (GuarantorFundingDetails guarantorFundingDetails : fundingDetails) {
                 Loan freshLoan = loanRepository.findById(loanId).orElseThrow();
                 if (guarantorFundingDetails.getStatus().isActive()) {
-                    final SavingsAccount fromSavingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
+                    final SavingsAccount fromSavingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
                     final Long fromAccountId = guarantorFundingDetails.linkedSavingsAccountId();
                     releaseLoanIds.put(loanId, guarantorFundingDetails.getId());
                     try {
@@ -286,7 +286,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 final List<GuarantorFundingDetails> fundingDetails = guarantor.getGuarantorFundDetails();
                 for (GuarantorFundingDetails guarantorFundingDetails : fundingDetails) {
                     if (guarantorFundingDetails.getStatus().isActive()) {
-                        final SavingsAccount savingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
+                        final SavingsAccount savingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
                         if (loan.isApproved() && !loan.isDisbursed()) {
                             final List<SavingsAccountTransaction> transactions = new ArrayList<>();
                             for (final SavingsAccountTransaction transaction : savingsAccount.getTransactions()) {
@@ -385,7 +385,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 for (GuarantorFundingDetails guarantorFundingDetails : fundingDetails) {
                     BigDecimal amoutForRelease = guarantorFundingDetails.getAmountRemaining();
                     if (amoutForRelease.compareTo(BigDecimal.ZERO) > 0 && guarantorFundingDetails.getStatus().isActive()) {
-                        SavingsAccount savingsAccount = guarantorFundingDetails.getLinkedSavingsAccount();
+                        SavingsAccount savingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
                         savingsAccount.releaseFunds(amoutForRelease);
                         DepositAccountOnHoldTransaction onHoldTransaction = DepositAccountOnHoldTransaction.release(savingsAccount, amoutForRelease, loanTransaction.getTransactionDate());
                         onHoldTransactions.add(onHoldTransaction);
@@ -429,7 +429,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                 guarantorAmount = fundingDetails.getAmountRemaining();
             }
             fundingDetails.releaseFunds(guarantorAmount);
-            SavingsAccount savingsAccount = fundingDetails.getLinkedSavingsAccount();
+            SavingsAccount savingsAccount = (SavingsAccount) fundingDetails.getLinkedSavingsAccount();
             savingsAccount.releaseFunds(guarantorAmount);
             DepositAccountOnHoldTransaction onHoldTransaction = DepositAccountOnHoldTransaction.release(savingsAccount, guarantorAmount, loanTransaction.getTransactionDate());
             accountOnHoldTransactions.add(onHoldTransaction);
