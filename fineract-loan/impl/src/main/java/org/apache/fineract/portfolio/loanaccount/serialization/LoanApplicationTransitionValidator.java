@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -47,10 +48,18 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanStateTransitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class LoanApplicationTransitionValidator {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanLifecycleStateMachine defaultLoanLifecycleStateMachine;
 
@@ -230,9 +239,9 @@ public final class LoanApplicationTransitionValidator {
     }
 
     public void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null && group.isNotActive()) {

@@ -89,6 +89,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.note.domain.Note;
@@ -127,6 +128,7 @@ import org.apache.fineract.portfolio.savings.exception.TransactionUpdateNotAllow
 import org.apache.fineract.portfolio.transfer.api.TransferApiConstants;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepositoryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -134,6 +136,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements SavingsAccountWritePlatformService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsAccountWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
@@ -792,11 +801,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     }
 
     private void checkClientOrGroupActive(final SavingsAccount account) {
-        final Client client = account.getClient();
-        if (client != null) {
-            if (client.isNotActive()) {
-                throw new ClientNotActiveException(client.getId());
-            }
+        final Long clientId = account.clientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = account.group();
         if (group != null) {

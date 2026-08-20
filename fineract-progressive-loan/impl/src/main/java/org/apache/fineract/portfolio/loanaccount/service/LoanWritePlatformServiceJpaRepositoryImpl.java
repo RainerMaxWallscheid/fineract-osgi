@@ -143,6 +143,7 @@ import org.apache.fineract.portfolio.calendar.exception.CalendarParameterUpdateN
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleDisbursalCommand;
@@ -224,11 +225,19 @@ import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.Repaym
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.transfer.api.TransferApiConstants;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
 public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatformService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
@@ -1773,9 +1782,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     }
 
     private void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null && group.isNotActive()) {

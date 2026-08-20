@@ -42,6 +42,7 @@ import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformServic
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
@@ -54,8 +55,16 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleGeneratorFactory;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoanUtilService implements ILoanUtilService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -256,9 +265,9 @@ public class LoanUtilService implements ILoanUtilService {
 
     @Override
     public void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null && group.isNotActive()) {

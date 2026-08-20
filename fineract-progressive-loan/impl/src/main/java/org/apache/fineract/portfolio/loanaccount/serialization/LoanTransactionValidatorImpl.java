@@ -64,6 +64,7 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.exception.LoanCollateralAmountNotSufficientException;
 import org.apache.fineract.portfolio.common.service.Validator;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -94,6 +95,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanRepaymentSchedule
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -112,6 +114,12 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     private final LoanDisbursementValidator loanDisbursementValidator;
     private final CodeValueRepository codeValueRepository;
     private final ConfigurationDomainService configurationDomainService;
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
@@ -504,9 +512,9 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
 
     @Override
     public void validateLoanClientIsActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
     }
 
@@ -842,9 +850,9 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     }
 
     private void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null && group.isNotActive()) {

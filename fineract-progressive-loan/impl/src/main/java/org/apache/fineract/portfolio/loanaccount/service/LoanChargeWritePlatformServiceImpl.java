@@ -87,6 +87,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundExc
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWaiveCannotBeReversedException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
@@ -137,9 +138,17 @@ import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatformService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeWritePlatformServiceImpl.class);
     private static final String AMOUNT = "amount";
@@ -1163,11 +1172,9 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
     }
 
     private void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null) {
-            if (client.isNotActive()) {
-                throw new ClientNotActiveException(client.getId());
-            }
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null) {

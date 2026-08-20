@@ -38,6 +38,7 @@ import org.apache.fineract.infrastructure.event.business.service.BusinessEventNo
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanTransactionApiConstants;
@@ -52,9 +53,17 @@ import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformService {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BuyDownFeeWritePlatformServiceImpl.class);
     private final ProgressiveLoanTransactionValidator loanTransactionValidator;
@@ -162,9 +171,9 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
     }
 
     private void checkClientOrGroupActive(final Loan loan) {
-        final Client client = loan.client();
-        if (client != null && client.isNotActive()) {
-            throw new ClientNotActiveException(client.getId());
+        final Long clientId = loan.getClientId();
+        if (clientId != null && !this.clientActivePort.isActive(clientId)) {
+            throw new ClientNotActiveException(clientId);
         }
         final Group group = loan.group();
         if (group != null && group.isNotActive()) {
