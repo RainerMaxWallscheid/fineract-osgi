@@ -43,7 +43,6 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.ExpectedDisbursementDateValidator;
@@ -82,12 +81,6 @@ public class WorkingCapitalLoanApplicationDataValidator {
     private final FromJsonHelper fromApiJsonHelper;
     private final WorkingCapitalPaymentAllocationDataValidator paymentAllocationDataValidator;
     private final WorkingCapitalLoanProductRepository productRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover {@code ClientRepository}
-     * ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final ClientRepository clientRepository;
     private ClientActivePort clientActivePort;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final ExpectedDisbursementDateValidator expectedDisbursementDateValidator;
@@ -587,11 +580,10 @@ public class WorkingCapitalLoanApplicationDataValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanApplicationDataValidator(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalPaymentAllocationDataValidator paymentAllocationDataValidator, final WorkingCapitalLoanProductRepository productRepository, final ClientRepository clientRepository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final ExpectedDisbursementDateValidator expectedDisbursementDateValidator, final WorkingCapitalNearBreachParseAndValidator workingCapitalNearBreachValidator) {
+        public WorkingCapitalLoanApplicationDataValidator(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalPaymentAllocationDataValidator paymentAllocationDataValidator, final WorkingCapitalLoanProductRepository productRepository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final ExpectedDisbursementDateValidator expectedDisbursementDateValidator, final WorkingCapitalNearBreachParseAndValidator workingCapitalNearBreachValidator) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.paymentAllocationDataValidator = paymentAllocationDataValidator;
         this.productRepository = productRepository;
-        this.clientRepository = clientRepository;
         this.workingCapitalLoanRepository = workingCapitalLoanRepository;
         this.expectedDisbursementDateValidator = expectedDisbursementDateValidator;
         this.workingCapitalNearBreachValidator = workingCapitalNearBreachValidator;

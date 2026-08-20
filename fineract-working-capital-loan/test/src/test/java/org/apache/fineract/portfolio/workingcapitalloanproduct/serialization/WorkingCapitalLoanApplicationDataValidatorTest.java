@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
-import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
@@ -42,9 +41,7 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.infrastructure.core.exception.UnsupportedParameterException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.ExpectedDisbursementDateValidator;
 import org.apache.fineract.portfolio.workingcapitalloan.WorkingCapitalLoanConstants;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
@@ -72,7 +69,7 @@ class WorkingCapitalLoanApplicationDataValidatorTest {
     @Mock
     private WorkingCapitalLoanProductRepository productRepository;
     @Mock
-    private ClientRepository clientRepository;
+    private ClientActivePort clientActivePort;
     @Mock
     private WorkingCapitalLoanRepository workingCapitalLoanRepository;
     @Mock
@@ -93,20 +90,18 @@ class WorkingCapitalLoanApplicationDataValidatorTest {
 
         final FromJsonHelper fromApiJsonHelper = new FromJsonHelper();
         validator = new WorkingCapitalLoanApplicationDataValidator(fromApiJsonHelper, paymentAllocationDataValidator, productRepository,
-                clientRepository, workingCapitalLoanRepository, expectedDisbursementDateValidator, workingCapitalNearBreachValidator);
+                workingCapitalLoanRepository, expectedDisbursementDateValidator, workingCapitalNearBreachValidator);
+        validator.setClientActivePort(clientActivePort);
 
-        final Client client = createMockClient();
-        final Office office = org.mockito.Mockito.mock(Office.class);
-        when(office.getId()).thenReturn(1L);
-        lenient().when(client.getOffice()).thenReturn(office);
-        lenient().when(client.isNotActive()).thenReturn(false);
-        lenient().when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
+        lenient().when(clientActivePort.isActive(CLIENT_ID)).thenReturn(true);
+        lenient().when(clientActivePort.exists(CLIENT_ID)).thenReturn(true);
+        lenient().when(clientActivePort.officeId(CLIENT_ID)).thenReturn(1L);
+        lenient().when(clientActivePort.isActivatedAfter(anyLong(), any())).thenReturn(false);
+        lenient().when(clientActivePort.activationDate(CLIENT_ID)).thenReturn(LocalDate.now(ZoneId.systemDefault()).minusYears(1));
+        lenient().when(clientActivePort.officeJoiningDate(CLIENT_ID)).thenReturn(LocalDate.now(ZoneId.systemDefault()).minusYears(1));
 
         final WorkingCapitalLoanProduct product = createMockProduct();
         lenient().when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
-
-        final GlobalConfigurationProperty officeSpecificProp = new GlobalConfigurationProperty();
-        officeSpecificProp.setEnabled(false);
 
         lenient().when(workingCapitalLoanRepository.existsByAccountNumber(any())).thenReturn(false);
         lenient().when(workingCapitalLoanRepository.existsByExternalId(any())).thenReturn(false);
@@ -281,12 +276,6 @@ class WorkingCapitalLoanApplicationDataValidatorTest {
             json.addProperty(fieldName, (String) value);
         }
         return json.toString();
-    }
-
-    private Client createMockClient() {
-        final Client client = org.mockito.Mockito.mock(Client.class);
-        when(client.getId()).thenReturn(CLIENT_ID);
-        return client;
     }
 
     private WorkingCapitalLoanProduct createMockProduct() {
