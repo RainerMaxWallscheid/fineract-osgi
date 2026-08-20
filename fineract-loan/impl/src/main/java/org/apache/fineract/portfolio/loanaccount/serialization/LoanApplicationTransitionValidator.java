@@ -203,9 +203,10 @@ public final class LoanApplicationTransitionValidator {
     }
 
     private void validateActivityNotBeforeClientOrGroupTransferDate(final Loan loan, final LoanEvent event, final LocalDate activityDate) {
-        if (loan.getClient() != null && loan.getClient().getOfficeJoiningDate() != null) {
-            final LocalDate clientOfficeJoiningDate = loan.getClient().getOfficeJoiningDate();
-            if (DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
+        final Long clientId = loan.getClientId();
+        if (clientId != null) {
+            final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (clientOfficeJoiningDate != null && DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
                 String errorMessage = null;
                 String action = null;
                 String postfix = null;

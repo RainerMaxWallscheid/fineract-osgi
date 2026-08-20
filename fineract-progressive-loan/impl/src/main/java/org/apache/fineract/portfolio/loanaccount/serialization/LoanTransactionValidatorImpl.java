@@ -583,9 +583,10 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     }
 
     protected void validateClientOfficeJoiningDateIsBeforeTransactionDate(Loan loan, LocalDate transactionDate) {
-        if (loan.getClient() != null && loan.getClient().getOfficeJoiningDate() != null) {
-            final LocalDate clientOfficeJoiningDate = loan.getClient().getOfficeJoiningDate();
-            if (DateUtils.isBefore(transactionDate, clientOfficeJoiningDate)) {
+        final Long clientId = loan.getClientId();
+        if (clientId != null) {
+            final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (clientOfficeJoiningDate != null && DateUtils.isBefore(transactionDate, clientOfficeJoiningDate)) {
                 String errorMessage = "The date on which a repayment or waiver is made cannot be earlier than client\'s transfer date to this office";
                 String action = "repayment.or.waiver";
                 String postfix = "cannot.be.made.before.client.transfer.date";
@@ -732,9 +733,10 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
 
     @Override
     public void validateActivityNotBeforeClientOrGroupTransferDate(final Loan loan, final LoanEvent event, final LocalDate activityDate) {
-        if (loan.getClient() != null && loan.getClient().getOfficeJoiningDate() != null) {
-            final LocalDate clientOfficeJoiningDate = loan.getClient().getOfficeJoiningDate();
-            if (DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
+        final Long clientId = loan.getClientId();
+        if (clientId != null) {
+            final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (clientOfficeJoiningDate != null && DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
                 String errorMessage = null;
                 String action = null;
                 String postfix = null;
@@ -869,9 +871,10 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     }
 
     private void validateActivityNotBeforeClientOrGroupTransferDate(final Loan loan, final LocalDate transactionDate) {
-        if (loan.getClient() != null && loan.getClient().getOfficeJoiningDate() != null) {
-            final LocalDate clientOfficeJoiningDate = loan.getClient().getOfficeJoiningDate();
-            if (DateUtils.isBefore(transactionDate, clientOfficeJoiningDate)) {
+        final Long clientId = loan.getClientId();
+        if (clientId != null) {
+            final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId);
+            if (clientOfficeJoiningDate != null && DateUtils.isBefore(transactionDate, clientOfficeJoiningDate)) {
                 String errorMessage = "The date on which the transaction is made cannot be earlier than client\'s transfer date to this office";
                 String action = "repayment.or.waiver";
                 String postfix = "cannot.be.made.before.client.transfer.date";
