@@ -64,4 +64,10 @@ public interface ExternalOwnerTransferJournalPort {
      * Charge-off GL account as {@code Object} ({@code null} when no mapping).
      */
     Object chargeOffGlAccount(Long loanProductId, int productTypeValue, Long chargeOffReasonId);
+
+    /**
+     * Journal entry by id as {@code Object} so investor owner mapping need not
+     * call leftover {@code JournalEntryRepository.findById}.
+     */
+    Object journalEntryById(Long journalEntryId);
 }

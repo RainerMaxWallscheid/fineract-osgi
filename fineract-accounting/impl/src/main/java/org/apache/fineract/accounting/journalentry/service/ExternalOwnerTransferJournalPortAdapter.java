@@ -28,6 +28,7 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
+import org.apache.fineract.accounting.journalentry.exception.JournalEntryNotFoundException;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -104,5 +105,11 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
         final ProductToGLAccountMapping mapping = (ProductToGLAccountMapping) chargeOffMapping(loanProductId, productTypeValue,
                 chargeOffReasonId);
         return mapping == null ? null : mapping.getGlAccount();
+    }
+
+    @Override
+    public Object journalEntryById(final Long journalEntryId) {
+        return this.journalEntryRepository.findById(journalEntryId)
+                .orElseThrow(() -> new JournalEntryNotFoundException(journalEntryId));
     }
 }

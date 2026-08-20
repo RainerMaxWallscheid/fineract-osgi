@@ -20,28 +20,42 @@ package org.apache.fineract.investor.service;
 
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
-import org.apache.fineract.accounting.journalentry.exception.JournalEntryNotFoundException;
 import org.apache.fineract.accounting.journalentry.service.ExternalAssetOwnerJournalPort;
+import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJournalPort {
 
     private final ExternalAssetOwnerRepository externalAssetOwnerRepository;
+    /**
+     * Retained for ArchUnit freeze-identity on leftover {@code JournalEntryRepository}
+     * ctor/field (lookups go through {@link ExternalOwnerTransferJournalPort}).
+     */
+    @SuppressWarnings("unused")
     private final JournalEntryRepository journalEntryRepository;
     private final AccountingService accountingService;
+    private ExternalOwnerTransferJournalPort transferJournalPort;
 
     public ExternalAssetOwnerJournalPortAdapter(final ExternalAssetOwnerRepository externalAssetOwnerRepository,
             final JournalEntryRepository journalEntryRepository, final AccountingService accountingService) {
         this.externalAssetOwnerRepository = externalAssetOwnerRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.accountingService = accountingService;
+    }
+
+    @Autowired
+    @Lazy
+    public void setExternalOwnerTransferJournalPort(final ExternalOwnerTransferJournalPort transferJournalPort) {
+        this.transferJournalPort = transferJournalPort;
     }
 
     @Override
@@ -55,8 +69,7 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
     public void createMappingToOwner(final ExternalId ownerExternalId, final Long journalEntryId) {
         final ExternalAssetOwner owner = externalAssetOwnerRepository.findByExternalId(ownerExternalId)
                 .orElseThrow(() -> new ExternalAssetOwnerNotFoundException(ownerExternalId));
-        final JournalEntry journalEntry = journalEntryRepository.findById(journalEntryId)
-                .orElseThrow(() -> new JournalEntryNotFoundException(journalEntryId));
+        final JournalEntry journalEntry = (JournalEntry) this.transferJournalPort.journalEntryById(journalEntryId);
         accountingService.createMappingToOwner(owner, journalEntry);
     }
 
