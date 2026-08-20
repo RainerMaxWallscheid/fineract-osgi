@@ -2128,11 +2128,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.a.future.date");
         }
 
-        if (this.client != null && this.client.isActivatedAfter(submittedOn)) {
-            baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(this.client.getActivationDate())
+        if (this.client != null && this.clientActivePort.isActivatedAfter(clientId(), submittedOn)) {
+            baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(this.clientActivePort.activationDate(clientId()))
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
-        } else if (this.group != null && this.group.isActivatedAfter(submittedOn)) {
-            baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(this.group.getActivationDate())
+        } else if (this.group != null && this.groupActivePort.isActivatedAfter(groupId(), submittedOn)) {
+            baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(this.groupActivePort.activationDate(groupId()))
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
         }
 
@@ -2559,9 +2559,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         /*
          * if (annualFeeSettingsSet()) { updateToNextAnnualFeeDueDateFrom(getActivationLocalDate()); }
          */
-        if (this.client != null && this.client.isActivatedAfter(activationDate)) {
+        if (this.client != null && this.clientActivePort.isActivatedAfter(clientId(), activationDate)) {
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(command.extractLocale());
-            final String dateAsString = formatter.format(this.client.getActivationDate());
+            final String dateAsString = formatter.format(this.clientActivePort.activationDate(clientId()));
             baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName).value(dateAsString)
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
             if (!dataValidationErrors.isEmpty()) {
@@ -2569,9 +2569,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             }
         }
 
-        if (this.group != null && this.group.isActivatedAfter(activationDate)) {
+        if (this.group != null && this.groupActivePort.isActivatedAfter(groupId(), activationDate)) {
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(command.extractLocale());
-            final String dateAsString = formatter.format(this.client.getActivationDate());
+            final String dateAsString = formatter.format(this.groupActivePort.activationDate(groupId()));
             baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName).value(dateAsString)
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.group.activation.date");
             if (!dataValidationErrors.isEmpty()) {
@@ -2693,7 +2693,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     protected void validateActivityNotBeforeClientOrGroupTransferDate(final SavingsEvent event, final LocalDate activityDate) {
         if (this.client != null) {
-            final LocalDate clientOfficeJoiningDate = this.client.getOfficeJoiningDate();
+            final LocalDate clientOfficeJoiningDate = this.clientActivePort.officeJoiningDate(clientId());
             if (DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
                 throw new SavingsActivityPriorToClientTransferException(event.toString(), clientOfficeJoiningDate);
             }

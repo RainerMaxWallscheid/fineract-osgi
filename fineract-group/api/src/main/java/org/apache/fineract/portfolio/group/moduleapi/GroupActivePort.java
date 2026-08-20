@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.group.moduleapi;
 
+import java.time.LocalDate;
+
 /**
  * ID-only group activity check (ADR-021). Foreign BCs must not depend on
  * leftover {@code Group} graphs for {@code checkClientOrGroupActive}.
@@ -27,6 +29,10 @@ public interface GroupActivePort {
     boolean isActive(Long groupId);
 
     boolean isCenter(Long groupId);
+
+    boolean isActivatedAfter(Long groupId, LocalDate date);
+
+    LocalDate activationDate(Long groupId);
 
     Long officeId(Long groupId);
 

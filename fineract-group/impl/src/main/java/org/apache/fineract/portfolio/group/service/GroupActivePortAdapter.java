@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.group.service;
 
+import java.time.LocalDate;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -40,6 +41,16 @@ public class GroupActivePortAdapter implements GroupActivePort {
     @Override
     public boolean isCenter(final Long groupId) {
         return group(groupId).isCenter();
+    }
+
+    @Override
+    public boolean isActivatedAfter(final Long groupId, final LocalDate date) {
+        return group(groupId).isActivatedAfter(date);
+    }
+
+    @Override
+    public LocalDate activationDate(final Long groupId) {
+        return group(groupId).getActivationDate();
     }
 
     @Override
