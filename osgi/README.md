@@ -729,7 +729,7 @@ python3 osgi/check-archunit-freeze.py
 ./gradlew checkArchUnitFreeze
 ```
 
-Fails when leftover ArchUnit freeze-store lines exceed `osgi/archunit-freeze-budget.txt`, or when the budget is stale after a shrink. Remaining lines are leftover JPA / entity residuals (ADR-022 B5). Freeze shrink started at 679 leftover JPA/entity lines. Leftover catalog enums are closed onto `moduleapi`. WC journals use `WorkingCapitalLoanJournalPort`. Savings journals use `SavingsJournalPort`. Loan-transaction journals use `LoanJournalPort`. Investor external-transfer allowed-status checks compare config strings to `LoanDataForExternalTransfer.getLoanStatusName()`. Do not peel `fineract-core` or the composition root to force a shrink.
+Fails when leftover ArchUnit freeze-store lines exceed `osgi/archunit-freeze-budget.txt`, or when the budget is stale after a shrink. Remaining lines are leftover JPA / entity residuals (ADR-022 B5). Freeze shrink started at 672 leftover JPA/entity lines. Leftover catalog enums are closed onto `moduleapi`. WC journals use `WorkingCapitalLoanJournalPort`. Savings journals use `SavingsJournalPort`. Loan-transaction journals use `LoanJournalPort`. Investor external-transfer allowed-status checks compare config strings to `LoanDataForExternalTransfer.getLoanStatusName()`. External-owner transfer journals post through `ExternalOwnerTransferJournalPort`. Do not peel `fineract-core` or the composition root to force a shrink.
 
 ## Layout
 

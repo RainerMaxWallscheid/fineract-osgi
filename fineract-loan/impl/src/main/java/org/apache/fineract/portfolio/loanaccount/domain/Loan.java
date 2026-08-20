@@ -729,6 +729,10 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return getStatus().isActive();
     }
 
+    public boolean isOverpaid() {
+        return getStatus().isOverpaid();
+    }
+
     public boolean isAllTranchesNotDisbursed() {
         LoanStatus actualLoanStatus = getStatus();
         boolean isInRightStatus = actualLoanStatus.isActive() || actualLoanStatus.isApproved() || actualLoanStatus.isClosedObligationsMet() || actualLoanStatus.isOverpaid();

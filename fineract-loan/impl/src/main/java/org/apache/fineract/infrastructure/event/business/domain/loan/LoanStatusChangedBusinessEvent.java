@@ -39,4 +39,15 @@ public class LoanStatusChangedBusinessEvent extends LoanBusinessEvent {
     public LoanStatus getOldStatus() {
         return oldStatus;
     }
+
+    /** Foreign BCs use this instead of leftover {@link LoanStatus#isActive()}. */
+    public boolean wasActive() {
+        return oldStatus != null && oldStatus.isActive();
+    }
+
+    /** Foreign BCs use this instead of leftover {@link LoanStatus} / {@link Loan} status probes. */
+    public boolean isNowClosedOrOverpaid() {
+        final Loan loan = get();
+        return loan.isClosed() || loan.isOverpaid();
+    }
 }
