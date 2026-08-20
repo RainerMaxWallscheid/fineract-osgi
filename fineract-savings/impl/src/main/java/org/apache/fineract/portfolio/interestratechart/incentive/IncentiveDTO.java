@@ -19,22 +19,25 @@
 package org.apache.fineract.portfolio.interestratechart.incentive;
 
 import java.math.BigDecimal;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestIncentivesFields;
 
 public class IncentiveDTO {
 
-    private final Client client;
+    /**
+     * Client as {@code Object} so incentive calc need not keep leftover
+     * {@code Client} on the DTO surface (ADR-021).
+     */
+    private final Object client;
     private final BigDecimal interest;
     private final InterestIncentivesFields incentives;
 
-    public IncentiveDTO(final Client client, final BigDecimal interest, final InterestIncentivesFields incentives) {
+    public IncentiveDTO(final Object client, final BigDecimal interest, final InterestIncentivesFields incentives) {
         this.client = client;
         this.interest = interest;
         this.incentives = incentives;
     }
 
-    public Client client() {
+    public Object client() {
         return this.client;
     }
 

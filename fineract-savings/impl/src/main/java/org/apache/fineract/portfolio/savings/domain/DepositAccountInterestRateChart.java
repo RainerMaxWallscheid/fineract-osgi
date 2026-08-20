@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartFields;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartSlab;
@@ -128,7 +127,7 @@ public class DepositAccountInterestRateChart extends AbstractPersistableCustom<L
     }
 
     public BigDecimal getApplicableInterestRate(final BigDecimal depositAmount, final LocalDate periodStartDate,
-            final LocalDate periodEndDate, final Client client) {
+            final LocalDate periodEndDate, final Object client) {
         BigDecimal effectiveInterestRate = BigDecimal.ZERO;
         for (DepositAccountInterestRateChartSlabs slab : setOfChartSlabs()) {
             if (slab.slabFields().isBetweenPeriod(periodStartDate, periodEndDate) && slab.slabFields().isAmountBetween(depositAmount)) {

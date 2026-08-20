@@ -29,7 +29,7 @@ public class ClientAttributeIncentiveCalculation extends AttributeIncentiveCalcu
 
     @Override
     public BigDecimal calculateIncentive(IncentiveDTO incentiveDTO) {
-        final Client client = incentiveDTO.client();
+        final Client client = (Client) incentiveDTO.client();
         BigDecimal interest = incentiveDTO.interest();
         final InterestIncentivesFields incentivesFields = incentiveDTO.incentives();
         boolean applyIncentive = false;
