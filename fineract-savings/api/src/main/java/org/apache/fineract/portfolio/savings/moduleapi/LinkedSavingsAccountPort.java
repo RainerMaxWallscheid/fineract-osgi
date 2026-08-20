@@ -40,4 +40,10 @@ public interface LinkedSavingsAccountPort {
      *             when the id does not exist
      */
     Object persistableById(Long savingsAccountId);
+
+    /**
+     * Child savings account id for a GSIM parent and client member. Returns
+     * {@code null} when the client is not a GSIM member.
+     */
+    Long childAccountIdForGsimClient(Long gsimAccountId, Long clientId);
 }

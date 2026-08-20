@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.portfolio.savings.service;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
@@ -28,9 +31,12 @@ import org.springframework.stereotype.Service;
 public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort {
 
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
+    private final GSIMReadPlatformService gsimReadPlatformService;
 
-    public LinkedSavingsAccountPortAdapter(final SavingsAccountRepositoryWrapper savingsAccountRepository) {
+    public LinkedSavingsAccountPortAdapter(final SavingsAccountRepositoryWrapper savingsAccountRepository,
+            final GSIMReadPlatformService gsimReadPlatformService) {
         this.savingsAccountRepository = savingsAccountRepository;
+        this.gsimReadPlatformService = gsimReadPlatformService;
     }
 
     @Override
@@ -43,5 +49,21 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     @Override
     public Object persistableById(final Long savingsAccountId) {
         return this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
+    }
+
+    @Override
+    public Long childAccountIdForGsimClient(final Long gsimAccountId, final Long clientId) {
+        if (gsimAccountId == null || clientId == null) {
+            return null;
+        }
+        final Collection<GroupSavingsIndividualMonitoringAccountData> childSavings = this.gsimReadPlatformService
+                .findGSIMAccountsByGSIMId(gsimAccountId);
+        final BigDecimal clientIdValue = BigDecimal.valueOf(clientId);
+        for (final GroupSavingsIndividualMonitoringAccountData childSaving : childSavings) {
+            if (clientIdValue.equals(childSaving.getClientId()) && childSaving.getChildAccountId() != null) {
+                return childSaving.getChildAccountId().longValue();
+            }
+        }
+        return null;
     }
 }

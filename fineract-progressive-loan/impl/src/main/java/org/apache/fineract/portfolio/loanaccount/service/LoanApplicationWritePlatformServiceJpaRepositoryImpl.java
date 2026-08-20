@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,11 +91,8 @@ import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyTy
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
-import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
-import org.apache.fineract.portfolio.savings.service.GSIMReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -114,7 +110,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoanAssembler loanAssembler;
     private final CalendarRepository calendarRepository;
     private final CalendarInstanceRepository calendarInstanceRepository;
-    private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanScheduleAssembler loanScheduleAssembler;
@@ -123,7 +118,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final GLIMAccountInfoRepository glimRepository;
     private final LoanRepository loanRepository;
-    private final GSIMReadPlatformService gsimReadPlatformService;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
@@ -699,18 +693,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             Object savingsAccount;
             AccountAssociations accountAssociations;
             if (loan.getLoanType().isGLIMAccount()) {
-                List<GroupSavingsIndividualMonitoringAccountData> childSavings = (List<GroupSavingsIndividualMonitoringAccountData>) gsimReadPlatformService.findGSIMAccountsByGSIMId(savingsAccountId);
-                List<BigDecimal> gsimClientMembers = new ArrayList<>();
-                Map<BigDecimal, BigDecimal> clientAccountMappings = new HashMap<>();
-                for (GroupSavingsIndividualMonitoringAccountData childSaving : childSavings) {
-                    gsimClientMembers.add(childSaving.getClientId());
-                    clientAccountMappings.put(childSaving.getClientId(), childSaving.getChildAccountId());
-                }
-                if (gsimClientMembers.contains(BigDecimal.valueOf(loan.getClientId()))) {
-                    savingsAccount = this.linkedSavingsAccountPort.persistableById(clientAccountMappings.get(BigDecimal.valueOf(loan.getClientId())).longValue());
-                } else {
+                final Long childAccountId = this.linkedSavingsAccountPort.childAccountIdForGsimClient(savingsAccountId, loan.getClientId());
+                if (childAccountId == null) {
                     throw new GroupMemberNotFoundInGSIMException(loan.getClientId());
                 }
+                savingsAccount = this.linkedSavingsAccountPort.persistableById(childAccountId);
             } else {
                 savingsAccount = this.linkedSavingsAccountPort.persistableById(savingsAccountId);
             }
@@ -800,7 +787,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final SavingsAccountRepositoryWrapper savingsAccountRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final GSIMReadPlatformService gsimReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
+        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
         this.context = context;
         this.loanApplicationTransitionValidator = loanApplicationTransitionValidator;
         this.loanApplicationValidator = loanApplicationValidator;
@@ -809,7 +796,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.loanAssembler = loanAssembler;
         this.calendarRepository = calendarRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;
-        this.savingsAccountRepository = savingsAccountRepository;
         this.accountAssociationsRepository = accountAssociationsRepository;
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanScheduleAssembler = loanScheduleAssembler;
@@ -818,7 +804,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
         this.glimRepository = glimRepository;
         this.loanRepository = loanRepository;
-        this.gsimReadPlatformService = gsimReadPlatformService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
         this.loanDownPaymentTransactionValidator = loanDownPaymentTransactionValidator;
