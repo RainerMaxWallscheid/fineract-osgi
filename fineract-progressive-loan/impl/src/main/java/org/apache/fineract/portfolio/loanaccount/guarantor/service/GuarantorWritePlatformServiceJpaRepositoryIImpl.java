@@ -38,7 +38,6 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
@@ -56,7 +55,6 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.exception.DuplicateGu
 import org.apache.fineract.portfolio.loanaccount.guarantor.exception.GuarantorNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.guarantor.exception.InvalidGuarantorException;
 import org.apache.fineract.portfolio.loanaccount.guarantor.serialization.GuarantorCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,37 +81,28 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
 
     private static final Logger LOG = LoggerFactory.getLogger(GuarantorWritePlatformServiceJpaRepositoryIImpl.class);
 
-    /**
-     * Retained for ArchUnit freeze-identity on leftover
-     * {@code ClientRepositoryWrapper} ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final StaffRepositoryWrapper staffRepositoryWrapper;
     private final GroupRepositoryWrapper groupRepositoryWrapper;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final GuarantorRepository guarantorRepository;
     private final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
-    private final SavingsAccountAssembler savingsAccountAssembler;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final GuarantorDomainService guarantorDomainService;
 
     @Autowired
     public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
-            final GuarantorRepository guarantorRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
-            final StaffRepositoryWrapper staffRepositoryWrapper, final GroupRepositoryWrapper groupRepositoryWrapper,
+            final GuarantorRepository guarantorRepository, final StaffRepositoryWrapper staffRepositoryWrapper,
+            final GroupRepositoryWrapper groupRepositoryWrapper,
             final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-            final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final SavingsAccountAssembler savingsAccountAssembler,
+            final CodeValueRepositoryWrapper codeValueRepositoryWrapper,
             final AccountAssociationsRepository accountAssociationsRepository, final GuarantorDomainService guarantorDomainService) {
         this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.groupRepositoryWrapper = groupRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.guarantorRepository = guarantorRepository;
         this.staffRepositoryWrapper = staffRepositoryWrapper;
         this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
-        this.savingsAccountAssembler = savingsAccountAssembler;
         this.accountAssociationsRepository = accountAssociationsRepository;
         this.guarantorDomainService = guarantorDomainService;
     }

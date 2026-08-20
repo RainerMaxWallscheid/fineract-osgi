@@ -74,8 +74,6 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
@@ -127,7 +125,6 @@ import org.apache.fineract.portfolio.loanproduct.exception.EqualAmortizationUnsu
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,12 +155,6 @@ public final class LoanApplicationValidator {
     private final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
     private final ConfigurationDomainService configurationDomainService;
     private final LoanProductRepository loanProductRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover
-     * {@code ClientRepositoryWrapper} ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final ClientRepositoryWrapper clientRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanProductDataValidator loanProductDataValidator;
@@ -175,12 +166,6 @@ public final class LoanApplicationValidator {
     private final LoanCollateralAssembler collateralAssembler;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final HolidayRepository holidayRepository;
-    /**
-     * Retained for ArchUnit freeze-identity: ctor still shares leftover
-     * {@code ClientRepositoryWrapper} / group siblings (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
     private final CalendarInstanceRepository calendarInstanceRepository;
@@ -1619,7 +1604,7 @@ public final class LoanApplicationValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final FineractEntityToEntityMappingRepository entityMappingRepository, final FineractEntityRelationRepository fineractEntityRelationRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final SavingsAccountRepositoryWrapper savingsAccountRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
+        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final FineractEntityToEntityMappingRepository entityMappingRepository, final FineractEntityRelationRepository fineractEntityRelationRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanScheduleValidator = loanScheduleValidator;
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
@@ -1628,7 +1613,6 @@ public final class LoanApplicationValidator {
         this.advancedPaymentAllocationsValidator = advancedPaymentAllocationsValidator;
         this.configurationDomainService = configurationDomainService;
         this.loanProductRepository = loanProductRepository;
-        this.clientRepository = clientRepository;
         this.groupRepository = groupRepository;
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanProductDataValidator = loanProductDataValidator;
@@ -1640,7 +1624,6 @@ public final class LoanApplicationValidator {
         this.collateralAssembler = collateralAssembler;
         this.workingDaysRepository = workingDaysRepository;
         this.holidayRepository = holidayRepository;
-        this.savingsAccountRepository = savingsAccountRepository;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.loanUtilService = loanUtilService;
