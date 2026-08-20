@@ -29,4 +29,7 @@ public interface ClientCollateralManagementRepository
 
     @Query("select clientCollateral from ClientCollateralManagement clientCollateral where clientCollateral.client.id = :clientId")
     List<ClientCollateralManagement> findByClientId(@Param("clientId") Long clientId);
+
+    @Query("select clientCollateral.client.id from ClientCollateralManagement clientCollateral where clientCollateral.id = :collateralId")
+    Long findClientIdById(@Param("collateralId") Long collateralId);
 }

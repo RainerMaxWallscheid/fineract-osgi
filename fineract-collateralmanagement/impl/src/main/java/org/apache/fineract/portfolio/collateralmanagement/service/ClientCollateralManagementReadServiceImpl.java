@@ -78,7 +78,7 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
                 loanTransactionDataList.add(loanTransactionData);
             }
         }
-        return ClientCollateralManagementData.instance(clientCollateralManagement.getCollaterals().getName(), clientCollateralManagement.getQuantity(), total, totalCollateral, clientCollateralManagement.getClient().getId(), loanTransactionDataList, clientCollateralManagement.getId());
+        return ClientCollateralManagementData.instance(clientCollateralManagement.getCollaterals().getName(), clientCollateralManagement.getQuantity(), total, totalCollateral, this.clientCollateralManagementRepositoryWrapper.findClientId(collateralId), loanTransactionDataList, clientCollateralManagement.getId());
     }
 
     @java.lang.SuppressWarnings("all")

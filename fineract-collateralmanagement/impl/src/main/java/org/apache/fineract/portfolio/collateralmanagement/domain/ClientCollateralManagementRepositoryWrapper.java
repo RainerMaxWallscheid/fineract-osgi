@@ -96,6 +96,14 @@ public class ClientCollateralManagementRepositoryWrapper {
                 .orElseThrow(() -> new ClientCollateralNotFoundException(collateralId));
     }
 
+    public Long findClientId(final Long collateralId) {
+        final Long clientId = this.clientCollateralManagementRepository.findClientIdById(collateralId);
+        if (clientId == null) {
+            throw new ClientCollateralNotFoundException(collateralId);
+        }
+        return clientId;
+    }
+
     public ClientCollateralManagement updateClientCollateralProduct(final ClientCollateralManagement clientCollateralManagement) {
         return this.clientCollateralManagementRepository.saveAndFlush(clientCollateralManagement);
     }
