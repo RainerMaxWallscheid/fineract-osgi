@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.collateralmanagement.domain;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
@@ -42,19 +41,12 @@ public class ClientCollateralManagementRepositoryWrapper {
     }
 
     private final ClientCollateralManagementRepository clientCollateralManagementRepository;
-    /**
-     * Retained for ArchUnit freeze-identity on leftover {@code ClientRepository}
-     * ctor/field (do not retarget alone).
-     */
-    @SuppressWarnings("unused")
-    private final ClientRepository clientRepository;
     private final LoanProductRepository loanProductRepository;
 
     @Autowired
     public ClientCollateralManagementRepositoryWrapper(final ClientCollateralManagementRepository clientCollateralManagementRepository,
-            final ClientRepository clientRepository, final LoanProductRepository loanProductRepository) {
+            final LoanProductRepository loanProductRepository) {
         this.clientCollateralManagementRepository = clientCollateralManagementRepository;
-        this.clientRepository = clientRepository;
         this.loanProductRepository = loanProductRepository;
     }
 

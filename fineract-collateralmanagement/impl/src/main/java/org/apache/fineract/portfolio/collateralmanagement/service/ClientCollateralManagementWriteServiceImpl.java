@@ -24,9 +24,8 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralCreateRequest;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralCreateResponse;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralDeleteRequest;
@@ -45,17 +44,18 @@ import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralM
 public class ClientCollateralManagementWriteServiceImpl implements ClientCollateralManagementWriteService {
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
     private final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper;
-    private final ClientRepository clientRepository;
+    private final ClientActivePort clientActivePort;
     private static final String COLLATERAL_ID = "collateralId";
     private static final String QUANTITY = "quantity";
 
     @Override
     public ClientCollateralCreateResponse createClientCollateralProduct(final ClientCollateralCreateRequest request) {
         validateForCreation(request);
-        final Client client = this.clientRepository.findById(request.getClientId())
-                .orElseThrow(() -> new ClientNotFoundException(request.getClientId()));
+        if (!this.clientActivePort.exists(request.getClientId())) {
+            throw new ClientNotFoundException(request.getClientId());
+        }
         final CollateralManagementDomain collateralManagementData = this.collateralManagementRepositoryWrapper.getCollateral(request.getCollateralId());
-        final ClientCollateralManagement clientCollateralManagement = ClientCollateralManagement.createNew(request.getQuantity(), client, collateralManagementData);
+        final ClientCollateralManagement clientCollateralManagement = ClientCollateralManagement.createNew(request.getQuantity(), request.getClientId(), collateralManagementData);
         this.clientCollateralManagementRepositoryWrapper.saveAndFlush(clientCollateralManagement);
         return ClientCollateralCreateResponse.builder().resourceId(clientCollateralManagement.getId()).clientId(request.getClientId()).build();
     }
@@ -144,9 +144,9 @@ public class ClientCollateralManagementWriteServiceImpl implements ClientCollate
     @java.lang.SuppressWarnings("all")
     public ClientCollateralManagementWriteServiceImpl(
             final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper,
-            final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper, final ClientRepository clientRepository) {
+            final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper, final ClientActivePort clientActivePort) {
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
         this.collateralManagementRepositoryWrapper = collateralManagementRepositoryWrapper;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
     }
 }

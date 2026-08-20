@@ -27,9 +27,9 @@ import org.springframework.data.repository.query.Param;
 public interface ClientCollateralManagementRepository
         extends JpaRepository<ClientCollateralManagement, Long>, JpaSpecificationExecutor<ClientCollateralManagement> {
 
-    @Query("select clientCollateral from ClientCollateralManagement clientCollateral where clientCollateral.client.id = :clientId")
+    @Query("select clientCollateral from ClientCollateralManagement clientCollateral where clientCollateral.clientId = :clientId")
     List<ClientCollateralManagement> findByClientId(@Param("clientId") Long clientId);
 
-    @Query("select clientCollateral.client.id from ClientCollateralManagement clientCollateral where clientCollateral.id = :collateralId")
+    @Query("select clientCollateral.clientId from ClientCollateralManagement clientCollateral where clientCollateral.id = :collateralId")
     Long findClientIdById(@Param("collateralId") Long collateralId);
 }

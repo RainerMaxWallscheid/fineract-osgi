@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.collateralmanagement.api.CollateralManagementJsonInputParams;
 
 @Entity
@@ -41,9 +40,11 @@ import org.apache.fineract.portfolio.collateralmanagement.api.CollateralManageme
 public class ClientCollateralManagement extends AbstractPersistableCustom<Long> {
     @Column(name = "quantity", nullable = false, scale = 5, precision = 20)
     private BigDecimal quantity;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021 / charge Step 8).
+     */
+    @Column(name = "client_id", nullable = false)
+    private Long clientId;
     @ManyToOne(optional = false)
     @JoinColumn(name = "collateral_id", nullable = false)
     private CollateralManagementDomain collateral;
@@ -53,18 +54,13 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
     public ClientCollateralManagement() {
     }
 
-    public ClientCollateralManagement(final BigDecimal quantity, final Client client) {
-        this.client = client;
-        this.quantity = quantity;
-    }
-
     public ClientCollateralManagement(final BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    private ClientCollateralManagement(final BigDecimal quantity, final Client client, final CollateralManagementDomain collateralManagementData) {
+    private ClientCollateralManagement(final BigDecimal quantity, final Long clientId, final CollateralManagementDomain collateralManagementData) {
         this.quantity = quantity;
-        this.client = client;
+        this.clientId = clientId;
         this.collateral = collateralManagementData;
     }
 
@@ -73,8 +69,8 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
         return new ClientCollateralManagement(quantity);
     }
 
-    public static ClientCollateralManagement createNew(final BigDecimal quantity, final Client client, final CollateralManagementDomain collateral) {
-        return new ClientCollateralManagement(quantity, client, collateral);
+    public static ClientCollateralManagement createNew(final BigDecimal quantity, final Long clientId, final CollateralManagementDomain collateral) {
+        return new ClientCollateralManagement(quantity, clientId, collateral);
     }
 
     public Map<String, Object> update(JsonCommand command) {
@@ -114,8 +110,8 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
         return this.quantity;
     }
 
-    public Client getClient() {
-        return this.client;
+    public Long getClientId() {
+        return this.clientId;
     }
 
     public CollateralManagementDomain getCollaterals() {
