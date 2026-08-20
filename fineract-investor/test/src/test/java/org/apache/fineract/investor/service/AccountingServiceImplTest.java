@@ -473,7 +473,7 @@ class AccountingServiceImplTest {
 
     private ExternalAssetOwnerJournalEntryMapping ownerJournalEntryMapping(JournalEntry journalEntry, ExternalAssetOwner owner) {
         ExternalAssetOwnerJournalEntryMapping ownerJournalEntryMapping = new ExternalAssetOwnerJournalEntryMapping();
-        ownerJournalEntryMapping.setJournalEntry(journalEntry);
+        ownerJournalEntryMapping.setJournalEntryId(journalEntry.getId());
         ownerJournalEntryMapping.setOwner(owner);
         return ownerJournalEntryMapping;
     }
@@ -489,14 +489,14 @@ class AccountingServiceImplTest {
     private void assertOwnerJournalEntryMapping(ExternalAssetOwnerJournalEntryMapping expectedOwnerJournalEntryMapping,
             ExternalAssetOwnerJournalEntryMapping actualOwnerJournalEntryMapping) {
         assertNotNull(actualOwnerJournalEntryMapping);
-        assertSame(expectedOwnerJournalEntryMapping.getJournalEntry(), actualOwnerJournalEntryMapping.getJournalEntry());
+        assertEquals(expectedOwnerJournalEntryMapping.getJournalEntryId(), actualOwnerJournalEntryMapping.getJournalEntryId());
         assertSame(expectedOwnerJournalEntryMapping.getOwner(), actualOwnerJournalEntryMapping.getOwner());
     }
 
     private ExternalAssetOwnerTransferJournalEntryMapping transferJournalEntryMapping(JournalEntry journalEntry,
             ExternalAssetOwnerTransfer transfer) {
         ExternalAssetOwnerTransferJournalEntryMapping transferJournalEntryMapping = new ExternalAssetOwnerTransferJournalEntryMapping();
-        transferJournalEntryMapping.setJournalEntry(journalEntry);
+        transferJournalEntryMapping.setJournalEntryId(journalEntry.getId());
         transferJournalEntryMapping.setOwnerTransfer(transfer);
         return transferJournalEntryMapping;
     }
@@ -513,7 +513,7 @@ class AccountingServiceImplTest {
     private void assertTransferJournalEntryMapping(ExternalAssetOwnerTransferJournalEntryMapping expectedTransferJournalEntryMapping,
             ExternalAssetOwnerTransferJournalEntryMapping actualTransferJournalEntryMapping) {
         assertNotNull(actualTransferJournalEntryMapping);
-        assertSame(expectedTransferJournalEntryMapping.getJournalEntry(), actualTransferJournalEntryMapping.getJournalEntry());
+        assertEquals(expectedTransferJournalEntryMapping.getJournalEntryId(), actualTransferJournalEntryMapping.getJournalEntryId());
         assertSame(expectedTransferJournalEntryMapping.getOwnerTransfer(), actualTransferJournalEntryMapping.getOwnerTransfer());
     }
 

@@ -18,27 +18,28 @@
  */
 package org.apache.fineract.investor.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Table(name = "m_external_asset_owner_transfer_journal_entry_mapping")
 @Entity
 public class ExternalAssetOwnerTransferJournalEntryMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-    @OneToOne
-    @JoinColumn(name = "journal_entry_id", nullable = false)
-    private JournalEntry journalEntry;
+    /**
+     * Journal entry id (no JPA association to leftover JournalEntry — ADR-021 / charge Step 8).
+     */
+    @Column(name = "journal_entry_id", nullable = false)
+    private Long journalEntryId;
     @ManyToOne
     @JoinColumn(name = "owner_transfer_id", nullable = false)
     private ExternalAssetOwnerTransfer ownerTransfer;
 
     @java.lang.SuppressWarnings("all")
-        public JournalEntry getJournalEntry() {
-        return this.journalEntry;
+        public Long getJournalEntryId() {
+        return this.journalEntryId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -47,8 +48,8 @@ public class ExternalAssetOwnerTransferJournalEntryMapping extends AbstractAudit
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setJournalEntry(final JournalEntry journalEntry) {
-        this.journalEntry = journalEntry;
+        public void setJournalEntryId(final Long journalEntryId) {
+        this.journalEntryId = journalEntryId;
     }
 
     @java.lang.SuppressWarnings("all")

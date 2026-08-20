@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.investor.service;
 
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
@@ -60,8 +59,7 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
     public void createMappingToOwner(final ExternalId ownerExternalId, final Long journalEntryId) {
         final ExternalAssetOwner owner = externalAssetOwnerRepository.findByExternalId(ownerExternalId)
                 .orElseThrow(() -> new ExternalAssetOwnerNotFoundException(ownerExternalId));
-        final JournalEntry journalEntry = (JournalEntry) this.transferJournalPort.journalEntryById(journalEntryId);
-        accountingService.createMappingToOwner(owner, journalEntry);
+        accountingService.createMappingToOwner(owner, this.transferJournalPort.journalEntryById(journalEntryId));
     }
 
     @Override

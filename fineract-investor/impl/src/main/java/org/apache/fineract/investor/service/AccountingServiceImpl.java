@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.fineract.accounting.common.AccountingConstants;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.investor.accounting.journalentry.service.InvestorAccountingHelper;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
@@ -150,7 +150,7 @@ public class AccountingServiceImpl implements AccountingService {
             return;
         }
         ExternalAssetOwnerJournalEntryMapping mapping = new ExternalAssetOwnerJournalEntryMapping();
-        mapping.setJournalEntry((JournalEntry) journalEntry);
+        mapping.setJournalEntryId((Long) ((AbstractPersistableCustom<?>) journalEntry).getId());
         mapping.setOwner(owner);
         externalAssetOwnerJournalEntryMappingRepository.saveAndFlush(mapping);
     }
@@ -184,7 +184,7 @@ public class AccountingServiceImpl implements AccountingService {
     private void createMappingToTransfer(ExternalAssetOwnerTransfer transfer, List<?> journalEntryList) {
         journalEntryList.forEach(journalEntry -> {
             ExternalAssetOwnerTransferJournalEntryMapping mapping = new ExternalAssetOwnerTransferJournalEntryMapping();
-            mapping.setJournalEntry((JournalEntry) journalEntry);
+            mapping.setJournalEntryId((Long) ((AbstractPersistableCustom<?>) journalEntry).getId());
             mapping.setOwnerTransfer(transfer);
             externalAssetOwnerTransferJournalEntryMappingRepository.saveAndFlush(mapping);
         });
