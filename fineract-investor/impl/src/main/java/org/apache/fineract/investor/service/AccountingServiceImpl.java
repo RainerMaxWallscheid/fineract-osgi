@@ -72,11 +72,19 @@ public class AccountingServiceImpl implements AccountingService {
      */
     private final ThreadLocal<Set<Object>> currentAssetTransferJournalEntries = new ThreadLocal<>();
 
+    /**
+     * In-flight journal credit/debit recorded at creation so owner mapping
+     * need not call leftover {@code JournalEntry.isCreditEntry()} /
+     * {@code isDebitEntry()} / {@code getType()}.
+     */
+    private final ThreadLocal<Map<Object, Boolean>> currentJournalEntryCredit = new ThreadLocal<>();
+
     @Override
     public void createJournalEntriesForSaleAssetTransfer(final Loan loan, final ExternalAssetOwnerTransfer transfer, final ExternalAssetOwner previousOwner) {
         final ExternalAssetOwner newOwner = transfer.getOwner();
         try {
             currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
+            currentJournalEntryCredit.set(new IdentityHashMap<>());
             List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, true);
             createMappingToTransfer(transfer, journalEntryList);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
@@ -91,6 +99,7 @@ public class AccountingServiceImpl implements AccountingService {
         } finally {
             currentTransferOverpaid.remove();
             currentAssetTransferJournalEntries.remove();
+            currentJournalEntryCredit.remove();
         }
     }
 
@@ -99,6 +108,7 @@ public class AccountingServiceImpl implements AccountingService {
         final ExternalAssetOwner previousOwner = transfer.getOwner();
         try {
             currentAssetTransferJournalEntries.set(Collections.newSetFromMap(new IdentityHashMap<>()));
+            currentJournalEntryCredit.set(new IdentityHashMap<>());
             List<JournalEntry> journalEntryList = createJournalEntries(loan, transfer, false);
             createMappingToTransfer(transfer, journalEntryList);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
@@ -113,6 +123,7 @@ public class AccountingServiceImpl implements AccountingService {
         } finally {
             currentTransferOverpaid.remove();
             currentAssetTransferJournalEntries.remove();
+            currentJournalEntryCredit.remove();
         }
     }
 
@@ -152,31 +163,24 @@ public class AccountingServiceImpl implements AccountingService {
         // loan retained for ArchUnit freeze-identity on this method; overpaid comes from createJournalEntries.
         Objects.requireNonNull(loan, "loan");
         final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
-        if (isOverpaid) {
-            if (journalEntry.isCreditEntry()) {
-                return newOwner;
-            }
-            if (journalEntry.isDebitEntry()) {
-                return previousOwner;
-            }
-        } else {
-            if (journalEntry.isCreditEntry()) {
-                return previousOwner;
-            }
-            if (journalEntry.isDebitEntry()) {
-                return newOwner;
-            }
+        final Boolean credit = currentJournalEntryCredit.get() == null ? null : currentJournalEntryCredit.get().get(journalEntry);
+        if (credit == null) {
+            throw new IllegalArgumentException("Given journalEntry has invalid type");
         }
-        throw new IllegalArgumentException("Given journalEntry has invalid type: " + journalEntry.getType());
+        if (isOverpaid) {
+            return credit ? newOwner : previousOwner;
+        }
+        return credit ? previousOwner : newOwner;
     }
 
     private ExternalAssetOwner determineOwnerForBuyback(final JournalEntry journalEntry, final Loan loan, final ExternalAssetOwner previousOwner) {
         Objects.requireNonNull(loan, "loan");
         final boolean isOverpaid = Boolean.TRUE.equals(currentTransferOverpaid.get());
-        if (isOverpaid && journalEntry.isDebitEntry()) {
+        final Boolean credit = currentJournalEntryCredit.get() == null ? null : currentJournalEntryCredit.get().get(journalEntry);
+        if (isOverpaid && Boolean.FALSE.equals(credit)) {
             return previousOwner;
         }
-        if (!isOverpaid && journalEntry.isCreditEntry()) {
+        if (!isOverpaid && Boolean.TRUE.equals(credit)) {
             return previousOwner;
         }
         return null;
@@ -276,16 +280,27 @@ public class AccountingServiceImpl implements AccountingService {
         }
         // asset transfer entry
         for (Map.Entry<GLAccount, BigDecimal> entry : accountMap.entrySet()) {
-            journalEntryList.add(this.helper.createCreditJournalEntryOrReversalForInvestor(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), isReversalOrder, entry.getKey()));
+            final JournalEntry journalEntry = this.helper.createCreditJournalEntryOrReversalForInvestor(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), isReversalOrder, entry.getKey());
+            journalEntryList.add(journalEntry);
+            rememberCredit(journalEntry, !isReversalOrder);
         }
         if (MathUtil.isGreaterThanZero(totalDebitAmount)) {
-            journalEntryList.add(this.helper.createDebitJournalEntryOrReversalForInvestor(office, currencyCode, AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue(), loanProductId, loanId, transactionId, transactionDate, totalDebitAmount, isReversalOrder));
+            final JournalEntry assetTransferEntry = this.helper.createDebitJournalEntryOrReversalForInvestor(office, currencyCode, AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue(), loanProductId, loanId, transactionId, transactionDate, totalDebitAmount, isReversalOrder);
+            journalEntryList.add(assetTransferEntry);
+            rememberCredit(assetTransferEntry, isReversalOrder);
             final Set<Object> assetTransferEntries = currentAssetTransferJournalEntries.get();
             if (assetTransferEntries != null) {
-                assetTransferEntries.add(journalEntryList.get(journalEntryList.size() - 1));
+                assetTransferEntries.add(assetTransferEntry);
             }
         }
         return journalEntryList;
+    }
+
+    private void rememberCredit(final Object journalEntry, final boolean credit) {
+        final Map<Object, Boolean> credits = currentJournalEntryCredit.get();
+        if (credits != null) {
+            credits.put(journalEntry, credit);
+        }
     }
 
     @java.lang.SuppressWarnings("all")
