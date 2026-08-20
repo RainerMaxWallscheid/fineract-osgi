@@ -129,7 +129,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         declinedTransfer.setExternalId(pendingSaleTransfer.getExternalId());
         declinedTransfer.setExternalGroupId(pendingSaleTransfer.getExternalGroupId());
         declinedTransfer.setStatus(DECLINED);
-        declinedTransfer.setSubStatus(isBiggerThanZero(loan.getTotalOverpaid()) ? BALANCE_NEGATIVE : BALANCE_ZERO);
+        declinedTransfer.setSubStatus(isBiggerThanZero(loanTransferSnapshotPort.totalOverpaid(loan)) ? BALANCE_NEGATIVE : BALANCE_ZERO);
         declinedTransfer.setSettlementDate(pendingSaleTransfer.getSettlementDate());
         declinedTransfer.setLoanId(pendingSaleTransfer.getLoanId());
         declinedTransfer.setExternalLoanId(pendingSaleTransfer.getExternalLoanId());

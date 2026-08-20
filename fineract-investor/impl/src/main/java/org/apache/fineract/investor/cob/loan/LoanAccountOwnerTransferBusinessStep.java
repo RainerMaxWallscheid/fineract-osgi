@@ -43,6 +43,7 @@ import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Sort;
@@ -66,6 +67,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
     private final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort;
     private final LoanTransferSnapshotPort loanTransferSnapshotPort;
+    private final LoanTransferBalancePort loanTransferBalancePort;
 
     @Override
     public Loan execute(Loan loan) {
@@ -77,7 +79,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         if (size == 2) {
             ExternalTransferStatus firstTransferStatus = transferDataList.get(0).getStatus();
             ExternalTransferStatus secondTransferStatus = transferDataList.get(1).getStatus();
-            if (delayedSettlementAttributeService.isEnabled(loan.getLoanProduct().getId())) {
+            if (delayedSettlementAttributeService.isEnabled(loanTransferBalancePort.loanProductId(loan))) {
                 throw new IllegalStateException(String.format("Delayed Settlement enabled, but found 2 transfers of statuses: %s and %s", firstTransferStatus, secondTransferStatus));
             }
             if (!ExternalTransferStatus.PENDING.equals(firstTransferStatus) || !ExternalTransferStatus.BUYBACK.equals(secondTransferStatus)) {
@@ -150,7 +152,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     }
 
     private ExternalAssetOwner determinePreviousOwnerAndCleanupIfNeeded(final Loan loan, final LocalDate settlementDate, final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
-        if (!delayedSettlementAttributeService.isEnabled(loan.getLoanProduct().getId()) || ExternalTransferStatus.PENDING_INTERMEDIATE == externalAssetOwnerTransfer.getStatus()) {
+        if (!delayedSettlementAttributeService.isEnabled(loanTransferBalancePort.loanProductId(loan)) || ExternalTransferStatus.PENDING_INTERMEDIATE == externalAssetOwnerTransfer.getStatus()) {
             // Use the loan mapping as the source of truth for the current owner.
             // If a mapping exists, this is an owner-to-owner transfer — expire the current active and clean up.
             return expireCurrentOwnerIfPresent(loan, settlementDate);
@@ -277,7 +279,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort, final LoanTransferSnapshotPort loanTransferSnapshotPort) {
+        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferBalancePort loanTransferBalancePort) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
         this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
@@ -287,5 +289,6 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
         this.loanSaleDeferredIncomePort = loanSaleDeferredIncomePort;
         this.loanTransferSnapshotPort = loanTransferSnapshotPort;
+        this.loanTransferBalancePort = loanTransferBalancePort;
     }
 }
