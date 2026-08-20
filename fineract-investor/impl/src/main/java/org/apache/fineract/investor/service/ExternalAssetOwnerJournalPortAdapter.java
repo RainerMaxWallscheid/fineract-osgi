@@ -20,7 +20,7 @@ package org.apache.fineract.investor.service;
 
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
-import org.apache.fineract.accounting.journalentry.service.ExternalAssetOwnerJournalPort;
+import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;

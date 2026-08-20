@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.accounting.journalentry.service;
+package org.apache.fineract.accounting.moduleapi;
 
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
- * Investor bridge used by journal write. Implemented in investor-impl so
- * accounting-impl does not depend on investor-impl (cycle break). Object params
- * avoid accounting → leftover {@code Loan} / investor entity edges (ADR-021).
+ * Investor bridge used by journal write (ADR-021). Lives on accounting-api so
+ * investor-impl need not implement leftover {@code accounting.journalentry.service}
+ * types. Object params avoid accounting-api → loan-api / investor-api cycles.
  */
 public interface ExternalAssetOwnerJournalPort {
 
