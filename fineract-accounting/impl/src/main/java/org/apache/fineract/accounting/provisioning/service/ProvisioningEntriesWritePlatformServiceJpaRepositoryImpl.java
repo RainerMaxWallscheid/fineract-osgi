@@ -60,8 +60,7 @@ import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategory
 import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategoryRepository;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
 import org.apache.fineract.portfolio.PortfolioProductType;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +72,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl.class);
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
     private final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final GLAccountRepository glAccountRepository;
     private final OfficeRepository officeRepository;
     private final ProvisioningCategoryRepository provisioningCategoryRepository;
@@ -190,23 +189,23 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     private Collection<LoanProductProvisioningEntry> generateLoanProvisioningEntry(ProvisioningEntry parent, LocalDate date) {
         Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveLoanProductsProvisioningData(date);
-        // Collect all referenced IDs upfront and bulk-fetch via findAllById,
-        // replacing the previous pattern of N x 5 individual repository calls per
-        // loop iteration (consistent with the optimisation in FINERACT-2561).
+        // Collect all referenced IDs upfront and bulk-fetch office/category/GL via
+        // findAllById; loan products are existence-checked through the already-on-loan-api
+        // port (no leftover LoanProductRepository — FINERACT-2561 / ADR-021).
         Set<Long> productIds = entries.stream().map(LoanProductProvisioningEntryData::getProductId).collect(Collectors.toSet());
         Set<Long> officeIds = entries.stream().map(LoanProductProvisioningEntryData::getOfficeId).collect(Collectors.toSet());
         Set<Long> categoryIds = entries.stream().map(LoanProductProvisioningEntryData::getCategoryId).collect(Collectors.toSet());
         Set<Long> glAccountIds = entries.stream().flatMap(d -> Stream.of(d.getLiablityAccount(), d.getExpenseAccount())).collect(Collectors.toSet());
-        Map<Long, LoanProduct> loanProductMap = loanProductRepository.findAllById(productIds).stream().collect(Collectors.toMap(LoanProduct::getId, Function.identity()));
+        for (Long productId : productIds) {
+            if (!loanProductExistencePort.existsById(productId)) {
+                throw new LoanProductNotFoundException(productId);
+            }
+        }
         Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
         Map<Long, ProvisioningCategory> categoryMap = provisioningCategoryRepository.findAllById(categoryIds).stream().collect(Collectors.toMap(ProvisioningCategory::getId, Function.identity()));
         Map<Long, GLAccount> glAccountMap = glAccountRepository.findAllById(glAccountIds).stream().collect(Collectors.toMap(GLAccount::getId, Function.identity()));
         Map<Integer, LoanProductProvisioningEntry> provisioningEntries = new HashMap<>();
         for (LoanProductProvisioningEntryData data : entries) {
-            LoanProduct loanProduct = loanProductMap.get(data.getProductId());
-            if (loanProduct == null) {
-                throw new LoanProductNotFoundException(data.getProductId());
-            }
             Office office = officeMap.get(data.getOfficeId());
             if (office == null) {
                 throw new OfficeNotFoundException(data.getOfficeId());
@@ -225,7 +224,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             Money money = Money.of(currency, data.getBalance());
             Money amountToReserve = money.percentageOf(data.getPercentage(), MoneyHelper.getMathContext());
             Long criteraId = data.getCriteriaId();
-            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setLoanProduct(loanProduct).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setProvisioningCategory(provisioningCategory).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
+            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setProductId(data.getProductId()).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setProvisioningCategory(provisioningCategory).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
             entry.setEntry(parent);
             if (!provisioningEntries.containsKey(entry.partialHashCode())) {
                 provisioningEntries.put(entry.partialHashCode(), entry);
@@ -238,10 +237,10 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductRepository loanProductRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductExistencePort loanProductExistencePort, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
         this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.glAccountRepository = glAccountRepository;
         this.officeRepository = officeRepository;
         this.provisioningCategoryRepository = provisioningCategoryRepository;

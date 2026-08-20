@@ -29,7 +29,6 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategory;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 
 @Entity
 @Table(name = "m_loanproduct_provisioning_entry")
@@ -44,9 +43,11 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     private Office office;
     @Column(name = "currency_code", length = 3)
     private String currencyCode;
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private LoanProduct loanProduct;
+    /**
+     * Loan product id (no JPA association to leftover LoanProduct — ADR-021 / charge Step 8).
+     */
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private ProvisioningCategory provisioningCategory;
@@ -69,23 +70,23 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
             return false;
         }
         LoanProductProvisioningEntry other = (LoanProductProvisioningEntry) obj;
-        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.office.getId(), this.office.getId()) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.loanProduct.getId(), this.loanProduct.getId()) && Objects.equals(other.provisioningCategory.getId(), this.provisioningCategory.getId()) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
+        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.office.getId(), this.office.getId()) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.provisioningCategory.getId(), this.provisioningCategory.getId()) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
     }
 
     @Override
     public int hashCode() {
         // NOT return Objects.hash(entry, criteriaId, office, currencyCode,
-        // loanProduct, provisioningCategory, overdueInDays, reservedAmount,
+        // productId, provisioningCategory, overdueInDays, reservedAmount,
         // liabilityAccount, expenseAccount);
         // to remain consistent with the implementation in equals(), also use
         // getId() here.
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, loanProduct.getId(), provisioningCategory.getId(), overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, provisioningCategory.getId(), overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     public int partialHashCode() {
         // this is used to group together all the entries that have similar parameters (excluding the amount reserved)
         // rather than a check for if the objects are the same based on their values, this tells if they are similar
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, loanProduct.getId(), provisioningCategory.getId(), overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, provisioningCategory.getId(), overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     @java.lang.SuppressWarnings("all")
@@ -109,8 +110,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProduct getLoanProduct() {
-        return this.loanProduct;
+        public Long getProductId() {
+        return this.productId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -178,8 +179,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public LoanProductProvisioningEntry setLoanProduct(final LoanProduct loanProduct) {
-        this.loanProduct = loanProduct;
+        public LoanProductProvisioningEntry setProductId(final Long productId) {
+        this.productId = productId;
         return this;
     }
 
