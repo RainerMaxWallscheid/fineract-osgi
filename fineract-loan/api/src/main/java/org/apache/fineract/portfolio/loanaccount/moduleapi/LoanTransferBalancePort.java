@@ -30,4 +30,6 @@ public interface LoanTransferBalancePort {
     boolean hasOverpaidBalance(Object loan);
 
     Long loanProductId(Object loan);
+
+    Long loanId(Object loan);
 }

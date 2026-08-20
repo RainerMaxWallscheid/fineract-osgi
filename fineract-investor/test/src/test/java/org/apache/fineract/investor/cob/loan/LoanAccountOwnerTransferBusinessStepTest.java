@@ -155,7 +155,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
         Long loanId = 1L;
-        when(loanForProcessing.getId()).thenReturn(loanId);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(loanId);
         // when
         final Loan processedLoan = underTest.execute(loanForProcessing);
         // then
@@ -169,7 +169,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(false);
 
@@ -193,7 +193,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(true);
 
@@ -217,7 +217,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(false);
 
@@ -294,7 +294,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
     public void givenLoanBuyback(final ExternalTransferStatus buybackStatus) {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         ExternalAssetOwnerTransfer firstResponseItem = Mockito.mock(ExternalAssetOwnerTransfer.class);
         ExternalAssetOwnerTransfer secondResponseItem = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(firstResponseItem.getStatus()).thenReturn(buybackStatus);
@@ -339,7 +339,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(isDelayedSettlementEnabled);
 
@@ -406,7 +406,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
             final ExternalTransferSubStatus expectedSubStatus) {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
 
         ExternalAssetOwnerTransfer pendingTransfer = new ExternalAssetOwnerTransfer();
         pendingTransfer.setStatus(pendingStatus);
@@ -454,7 +454,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(true);
 
@@ -524,7 +524,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // given
 
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
         when(loanTransferBalancePort.loanProductId(loanForProcessing)).thenReturn(LOAN_PRODUCT_ID);
         when(delayedSettlementAttributeService.isEnabled(LOAN_PRODUCT_ID)).thenReturn(true);
 

@@ -50,6 +50,7 @@ import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -88,6 +89,9 @@ public class LoanAccountOwnerTransferServiceTest {
     @Mock
     private LoanTransferSnapshotPort loanTransferSnapshotPort;
 
+    @Mock
+    private LoanTransferBalancePort loanTransferBalancePort;
+
     @InjectMocks
     private LoanAccountOwnerTransferServiceImpl underTest;
     private final LocalDate actualDate = LocalDate.now(ZoneId.systemDefault());
@@ -112,7 +116,7 @@ public class LoanAccountOwnerTransferServiceTest {
     public void verifyWhenCancelPendingAndIntermediateSaleAndBuybackTransferThenBusinessEventsAreSent() {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
 
         ExternalAssetOwnerTransfer pendingSaleTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
         ExternalAssetOwnerTransfer pendingBuybackTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
@@ -146,7 +150,7 @@ public class LoanAccountOwnerTransferServiceTest {
     public void verifyWhenDeclineCancelPendingAndIntermediateSaleAndBuybackTransferThenBusinessEventsAreSent() {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
 
         ExternalAssetOwnerTransfer pendingSaleTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(pendingSaleTransfer.getSettlementDate()).thenReturn(actualDate.minusDays(1));
@@ -187,7 +191,7 @@ public class LoanAccountOwnerTransferServiceTest {
     public void verifyWhenDeclinePendingSaleTransferThenBusinessEventIsSent(final ExternalTransferStatus pendingStatus) {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
 
         ExternalAssetOwnerTransfer pendingSaleTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(pendingSaleTransfer.getStatus()).thenReturn(pendingStatus);
@@ -211,7 +215,7 @@ public class LoanAccountOwnerTransferServiceTest {
     public void verifyWhenExecutePendingBuybackTransferThenBusinessEventIsSent(final ExternalTransferStatus buybackStatus) {
         // given
         final Loan loanForProcessing = Mockito.mock(Loan.class);
-        when(loanForProcessing.getId()).thenReturn(1L);
+        when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(1L);
 
         ExternalAssetOwnerTransfer pendingBuybackTransfer = Mockito.mock(ExternalAssetOwnerTransfer.class);
         when(pendingBuybackTransfer.getStatus()).thenReturn(buybackStatus);

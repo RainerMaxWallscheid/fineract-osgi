@@ -44,4 +44,9 @@ public class LoanTransferBalancePortAdapter implements LoanTransferBalancePort {
         final Loan loan = (Loan) loanObj;
         return loan.getLoanProduct().getId();
     }
+
+    @Override
+    public Long loanId(final Object loanObj) {
+        return ((Loan) loanObj).getId();
+    }
 }
