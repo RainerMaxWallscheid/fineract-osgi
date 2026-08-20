@@ -47,11 +47,11 @@ public interface WorkingCapitalLoanMapper {
 
     @Mapping(target = "accountNo", source = "accountNumber")
     @Mapping(target = "client", ignore = true)
-    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "clientId", source = "clientId")
     @Mapping(target = "clientAccountNo", source = "client.accountNumber")
     @Mapping(target = "clientName", source = "client.displayName")
     @Mapping(target = "clientExternalId", source = "client.externalId")
-    @Mapping(target = "clientOfficeId", source = "client.office.id")
+    @Mapping(target = "clientOfficeId", source = "officeId")
     @Mapping(target = "fundId", source = "fund.id")
     @Mapping(target = "fundName", source = "fund.name")
     @Mapping(target = "product", ignore = true)

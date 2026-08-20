@@ -538,7 +538,7 @@ public final class LoanApplicationValidator {
             validateCollateral(element);
             // validate if disbursement date is a holiday or a non-working day
             validateDisbursementDateIsOnNonWorkingDay(expectedDisbursementDate);
-            Long officeId = resolveOfficeId(client, group);
+            Long officeId = resolveOfficeId(clientId, groupId);
             validateDisbursementDateIsOnHoliday(expectedDisbursementDate, officeId);
             final Integer recurringMoratoriumOnPrincipalPeriods = this.fromApiJsonHelper.extractIntegerWithLocaleNamed("recurringMoratoriumOnPrincipalPeriods", element);
             if (numberOfRepayments != null) {
@@ -1034,7 +1034,7 @@ public final class LoanApplicationValidator {
             validateClientOrGroup(client, group, productId);
             // validate if disbursement date is a holiday or a non-working day
             validateDisbursementDateIsOnNonWorkingDay(expectedDisbursementDate);
-            final Long officeId = resolveOfficeId(client, group);
+            final Long officeId = resolveOfficeId(clientId, groupId);
             validateDisbursementDateIsOnHoliday(expectedDisbursementDate, officeId);
             Integer recurringMoratoriumOnPrincipalPeriods = loan.getLoanProductRelatedDetail().getRecurringMoratoriumOnPrincipalPeriods();
             if (this.fromApiJsonHelper.parameterExists("recurringMoratoriumOnPrincipalPeriods", element)) {
@@ -1595,12 +1595,12 @@ public final class LoanApplicationValidator {
         return configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled() && loanUtilService.isLoanRepaymentsSyncWithMeeting(loan.group(), calendar);
     }
 
-    public Long resolveOfficeId(Client client, Group group) {
-        if (client != null) {
-            return client.getOffice().getId();
+    public Long resolveOfficeId(Long clientId, Long groupId) {
+        if (clientId != null) {
+            return this.clientActivePort.officeId(clientId);
         }
-        if (group != null) {
-            return group.getOffice().getId();
+        if (groupId != null) {
+            return this.groupActivePort.officeId(groupId);
         }
         return null;
     }

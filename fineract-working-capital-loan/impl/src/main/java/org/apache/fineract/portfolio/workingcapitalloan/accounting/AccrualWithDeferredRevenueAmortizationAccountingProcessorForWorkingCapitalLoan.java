@@ -39,7 +39,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
     @Override
     public void postJournalEntries(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction txn,
             final WorkingCapitalLoanTransactionAllocation allocation, final boolean isChargedOff) {
-        final long officeId = loan.getClient().getOffice().getId();
+        final long officeId = loan.getOfficeId();
         final Long productId = loan.getLoanProduct().getId();
         final String currencyCode = loan.getLoanProductRelatedDetails().getCurrency().getCode();
         final LocalDate transactionDate = txn.getTransactionDate();
@@ -122,7 +122,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
 
     @Override
     public void postReversalJournalEntries(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction txn) {
-        final long officeId = loan.getClient().getOffice().getId();
+        final long officeId = loan.getOfficeId();
         final LocalDate transactionDate = txn.getReversedOnDate() != null ? txn.getReversedOnDate() : DateUtils.getBusinessLocalDate();
         this.journalPort.reverse(officeId, txn.getId(), transactionDate);
     }
@@ -183,7 +183,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
     @Override
     public void postJournalEntriesForDiscountFeeAmortization(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction txn,
             final boolean isChargedOff) {
-        final long officeId = loan.getClient().getOffice().getId();
+        final long officeId = loan.getOfficeId();
         final Long productId = loan.getLoanProduct().getId();
         final String currencyCode = loan.getLoanProductRelatedDetails().getCurrency().getCode();
         final LocalDate transactionDate = txn.getTransactionDate();
@@ -204,7 +204,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
     @Override
     public void postJournalEntriesForDiscountFeeAmortizationAdjustment(final WorkingCapitalLoan loan,
             final WorkingCapitalLoanTransaction txn, final boolean isChargedOff) {
-        final long officeId = loan.getClient().getOffice().getId();
+        final long officeId = loan.getOfficeId();
         final Long productId = loan.getLoanProduct().getId();
         final String currencyCode = loan.getLoanProductRelatedDetails().getCurrency().getCode();
         final LocalDate transactionDate = txn.getTransactionDate();
@@ -234,7 +234,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
 
     private void postDiscountFeeDeferralEntries(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction txn,
             final CashAccountsForLoan debitAccountType, final CashAccountsForLoan creditAccountType) {
-        final long officeId = loan.getClient().getOffice().getId();
+        final long officeId = loan.getOfficeId();
         final Long productId = loan.getLoanProduct().getId();
         final String currencyCode = loan.getLoanProductRelatedDetails().getCurrency().getCode();
         final LocalDate transactionDate = txn.getTransactionDate();
@@ -271,7 +271,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
             transactionDate = txn.getTransactionDate();
             currencyCode = loan.getLoanProductRelatedDetails().getCurrency().getCode();
             productId = loan.getLoanProduct().getId();
-            officeId = loan.getClient().getOffice().getId();
+            officeId = loan.getOfficeId();
             loanId = loan.getId();
             txnId = txn.getId();
         }

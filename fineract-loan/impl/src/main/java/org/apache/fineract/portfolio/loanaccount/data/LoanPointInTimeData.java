@@ -54,11 +54,11 @@ public class LoanPointInTimeData {
     public interface Mapper {
         @Mapping(source = "accountNumber", target = "accountNo")
         @Mapping(source = "source", target = "status")
-        @Mapping(source = "client.id", target = "clientId")
+        @Mapping(source = "clientId", target = "clientId")
         @Mapping(source = "client.accountNumber", target = "clientAccountNo")
         @Mapping(source = "client.externalId", target = "clientExternalId")
         @Mapping(source = "client.displayName", target = "clientDisplayName")
-        @Mapping(source = "client.office.id", target = "clientOfficeId")
+        @Mapping(source = "officeId", target = "clientOfficeId")
         @Mapping(source = "summary", target = "principal")
         @Mapping(source = "summary", target = "interest")
         @Mapping(source = "summary", target = "fee")
