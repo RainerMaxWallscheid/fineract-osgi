@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.moduleapi;
+package org.apache.fineract.cob.service;
 
 import java.util.Optional;
+import org.apache.fineract.cob.data.LoanDataForExternalTransfer;
 
-public interface LoanReadPlatformServiceCommon {
+/**
+ * ID/DTO lookup for external-owner transfer initiation (ADR-021). Foreign BCs
+ * must not depend on leftover {@code LoanRepository}.
+ */
+public interface LoanDataForExternalTransferPort {
 
-    Long getLoanIdByLoanExternalId(String externalId);
-
-    /** Loan id for a loan transaction id (ADR-021). */
-    Optional<Long> findLoanIdByTransactionId(Long loanTransactionId);
+    Optional<LoanDataForExternalTransfer> findByLoanId(Long loanId);
 }

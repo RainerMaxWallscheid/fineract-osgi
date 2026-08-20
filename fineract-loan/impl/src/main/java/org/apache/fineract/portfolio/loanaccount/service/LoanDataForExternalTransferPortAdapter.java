@@ -16,14 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.moduleapi;
+package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.util.Optional;
+import org.apache.fineract.cob.data.LoanDataForExternalTransfer;
+import org.apache.fineract.cob.service.LoanDataForExternalTransferPort;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.springframework.stereotype.Service;
 
-public interface LoanReadPlatformServiceCommon {
+@Service
+public class LoanDataForExternalTransferPortAdapter implements LoanDataForExternalTransferPort {
 
-    Long getLoanIdByLoanExternalId(String externalId);
+    private final LoanRepository loanRepository;
 
-    /** Loan id for a loan transaction id (ADR-021). */
-    Optional<Long> findLoanIdByTransactionId(Long loanTransactionId);
+    public LoanDataForExternalTransferPortAdapter(final LoanRepository loanRepository) {
+        this.loanRepository = loanRepository;
+    }
+
+    @Override
+    public Optional<LoanDataForExternalTransfer> findByLoanId(final Long loanId) {
+        return loanRepository.findLoanDataForExternalTransferByLoanId(loanId);
+    }
 }

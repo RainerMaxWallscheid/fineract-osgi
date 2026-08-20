@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.cob.data.LoanDataForExternalTransfer;
+import org.apache.fineract.cob.service.LoanDataForExternalTransferPort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -61,7 +62,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerDuplicateException;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerInitiateTransferException;
 import org.apache.fineract.investor.serialization.ExternalAssetOwnerValidator;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -78,7 +78,7 @@ public class ExternalAssetOwnersWriteServiceImpl implements ExternalAssetOwnersW
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalAssetOwnerRepository externalAssetOwnerRepository;
     private final FromJsonHelper fromApiJsonHelper;
-    private final LoanRepository loanRepository;
+    private final LoanDataForExternalTransferPort loanDataForExternalTransferPort;
     private final DelayedSettlementAttributeService delayedSettlementAttributeService;
     private final ConfigurationDomainService configurationDomainService;
     private final ExternalAssetOwnersReadService externalAssetOwnersReadService;
@@ -145,7 +145,7 @@ public class ExternalAssetOwnersWriteServiceImpl implements ExternalAssetOwnersW
     }
 
     private LoanDataForExternalTransfer fetchAndValidateLoanDataForExternalTransfer(Long loanId) {
-        return loanRepository.findLoanDataForExternalTransferByLoanId(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
+        return loanDataForExternalTransferPort.findByLoanId(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
     }
 
     @Override
@@ -532,11 +532,11 @@ public class ExternalAssetOwnersWriteServiceImpl implements ExternalAssetOwnersW
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExternalAssetOwnersWriteServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerRepository externalAssetOwnerRepository, final FromJsonHelper fromApiJsonHelper, final LoanRepository loanRepository, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ConfigurationDomainService configurationDomainService, final ExternalAssetOwnersReadService externalAssetOwnersReadService, final ExternalAssetOwnerValidator externalAssetOwnerValidator, final ExternalAssetOwnerHelper externalAssetOwnerHelper) {
+        public ExternalAssetOwnersWriteServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerRepository externalAssetOwnerRepository, final FromJsonHelper fromApiJsonHelper, final LoanDataForExternalTransferPort loanDataForExternalTransferPort, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ConfigurationDomainService configurationDomainService, final ExternalAssetOwnersReadService externalAssetOwnersReadService, final ExternalAssetOwnerValidator externalAssetOwnerValidator, final ExternalAssetOwnerHelper externalAssetOwnerHelper) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerRepository = externalAssetOwnerRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.loanRepository = loanRepository;
+        this.loanDataForExternalTransferPort = loanDataForExternalTransferPort;
         this.delayedSettlementAttributeService = delayedSettlementAttributeService;
         this.configurationDomainService = configurationDomainService;
         this.externalAssetOwnersReadService = externalAssetOwnersReadService;

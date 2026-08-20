@@ -602,6 +602,11 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
         return loanId;
     }
 
+    @Override
+    public Optional<Long> findLoanIdByTransactionId(final Long loanTransactionId) {
+        return loanTransactionRepository.findLoanIdById(loanTransactionId);
+    }
+
 
     private static final class LoanCurrencyDataMapper implements RowMapper<CurrencyData> {
         private final DatabaseSpecificSQLGenerator sqlGenerator;
