@@ -57,7 +57,6 @@ import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepository
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralAssembler;
@@ -121,7 +120,6 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanRepositoryWrapper loanRepository;
     private final LoanProductRepository loanProductRepository;
-    private final ClientRepositoryWrapper clientRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final FundRepository fundRepository;
     private final StaffRepository staffRepository;
@@ -221,7 +219,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         final BigDecimal interestRateDifferential = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed(LoanApiConstants.interestRateDifferentialParameterName, element);
         final Boolean isFloatingInterestRate = this.fromApiJsonHelper.extractBooleanNamed(LoanApiConstants.isFloatingInterestRateParameterName, element);
         if (clientId != null) {
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            client = (Client) this.clientActivePort.persistableById(clientId);
         }
         if (groupId != null) {
             group = this.groupRepository.findOneWithNotFoundDetection(groupId);
@@ -487,7 +485,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         if (command.isChangeInLongParameterNamed(LoanApiConstants.clientIdParameterName, clientId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.clientIdParameterName);
             changes.put(LoanApiConstants.clientIdParameterName, newValue);
-            final Client client = this.clientRepository.findOneWithNotFoundDetection(newValue);
+            final Client client = (Client) this.clientActivePort.persistableById(newValue);
             loan.updateClient(client);
         }
         // FIXME: AA - We may require separate api command to move loan from one
@@ -779,11 +777,10 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository, final LoanProductRepository loanProductRepository, final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository, final FundRepository fundRepository, final StaffRepository staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanScheduleAssembler loanScheduleAssembler, final LoanChargeAssembler loanChargeAssembler, final LoanCollateralAssembler collateralAssembler, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final RateAssembler rateAssembler, final ExternalIdFactory externalIdFactory, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final GLIMAccountInfoRepository glimRepository, final AccountNumberGenerator accountNumberGenerator, final GLIMAccountInfoWritePlatformService glimAccountInfoWritePlatformService, final LoanCollateralAssembler loanCollateralAssembler, final LoanScheduleCalculationPlatformService calculationPlatformService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanChargeMapper loanChargeMapper, final LoanCollateralManagementMapper loanCollateralManagementMapper, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanOfficerService loanOfficerService, final LoanScheduleComponent loanSchedule) {
+        public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final FundRepository fundRepository, final StaffRepository staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanScheduleAssembler loanScheduleAssembler, final LoanChargeAssembler loanChargeAssembler, final LoanCollateralAssembler collateralAssembler, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final RateAssembler rateAssembler, final ExternalIdFactory externalIdFactory, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final GLIMAccountInfoRepository glimRepository, final AccountNumberGenerator accountNumberGenerator, final GLIMAccountInfoWritePlatformService glimAccountInfoWritePlatformService, final LoanCollateralAssembler loanCollateralAssembler, final LoanScheduleCalculationPlatformService calculationPlatformService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanChargeMapper loanChargeMapper, final LoanCollateralManagementMapper loanCollateralManagementMapper, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanOfficerService loanOfficerService, final LoanScheduleComponent loanSchedule) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanRepository = loanRepository;
         this.loanProductRepository = loanProductRepository;
-        this.clientRepository = clientRepository;
         this.groupRepository = groupRepository;
         this.fundRepository = fundRepository;
         this.staffRepository = staffRepository;
