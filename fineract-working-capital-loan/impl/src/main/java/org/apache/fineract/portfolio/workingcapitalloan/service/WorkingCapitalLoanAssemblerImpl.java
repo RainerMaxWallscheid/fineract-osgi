@@ -39,8 +39,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
 import org.apache.fineract.portfolio.fund.domain.Fund;
@@ -70,13 +69,20 @@ import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCap
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProductRelatedDetails;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.exception.WorkingCapitalLoanProductNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.repository.WorkingCapitalLoanProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssembler {
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
+
     private final FromJsonHelper fromApiJsonHelper;
     private final WorkingCapitalLoanProductRepository loanProductRepository;
-    private final ClientRepository clientRepository;
     private final FundRepository fundRepository;
     private final DelinquencyBucketRepository delinquencyBucketRepository;
     private final ExternalIdFactory externalIdFactory;
@@ -92,7 +98,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     public WorkingCapitalLoan assembleFrom(final JsonCommand command) {
         final JsonElement element = command.parsedJson();
         final Long clientId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
-        final Client client = clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+        final Client client = (Client) this.clientActivePort.persistableById(clientId);
         final Long productId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.productIdParameterName, element);
         final WorkingCapitalLoanProduct product = loanProductRepository.findById(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         final Long fundId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.fundIdParameterName, element);
@@ -212,7 +218,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         final JsonElement element = command.parsedJson();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.clientIdParameterName, loan.getClientId())) {
             final Long clientId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
-            final Client client = clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+            final Client client = (Client) this.clientActivePort.persistableById(clientId);
             loan.setClient(client);
             changes.put(WorkingCapitalLoanConstants.clientIdParameterName, clientId);
         }
@@ -380,10 +386,9 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final ClientRepository clientRepository, final FundRepository fundRepository, final DelinquencyBucketRepository delinquencyBucketRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
+        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final FundRepository fundRepository, final DelinquencyBucketRepository delinquencyBucketRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanProductRepository = loanProductRepository;
-        this.clientRepository = clientRepository;
         this.fundRepository = fundRepository;
         this.delinquencyBucketRepository = delinquencyBucketRepository;
         this.externalIdFactory = externalIdFactory;
