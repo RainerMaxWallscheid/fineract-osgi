@@ -31,8 +31,10 @@ import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.data.GlobalConfigurationPropertyData;
 import org.apache.fineract.infrastructure.configuration.service.ConfigurationReadPlatformService;
+import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
@@ -41,6 +43,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -63,6 +66,12 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     private final LoanRepository loanRepository;
     private final SavingsAccountRepository savingsAccountRepository;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
+    private ClientActivePort clientActivePort;
+
+    @Autowired
+    public void setClientActivePort(final ClientActivePort clientActivePort) {
+        this.clientActivePort = clientActivePort;
+    }
 
     public String generate(Client client, AccountNumberFormat accountNumberFormat) {
         Map<String, String> propertyMap = new HashMap<>();
@@ -105,7 +114,15 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     public String generate(WorkingCapitalLoan wcl, AccountNumberFormat accountNumberFormat) {
         Map<String, String> propertyMap = new HashMap<>();
         propertyMap.put(ID, wcl.getId().toString());
-        propertyMap.put(OFFICE_NAME, wcl.getClient() != null && wcl.getClient().getOffice() != null ? wcl.getClient().getOffice().getName() : "");
+        final Long clientId = wcl.getClientId();
+        String officeName = "";
+        if (clientId != null) {
+            final Object office = this.clientActivePort.office(clientId);
+            if (office != null) {
+                officeName = ((Office) office).getName();
+            }
+        }
+        propertyMap.put(OFFICE_NAME, officeName);
         propertyMap.put(LOAN_PRODUCT_SHORT_NAME, wcl.getLoanProduct() != null ? wcl.getLoanProduct().getShortName() : "");
         propertyMap.put(ENTITY_TYPE, "workingCapitalLoan");
         return generateAccountNumber(propertyMap, accountNumberFormat);

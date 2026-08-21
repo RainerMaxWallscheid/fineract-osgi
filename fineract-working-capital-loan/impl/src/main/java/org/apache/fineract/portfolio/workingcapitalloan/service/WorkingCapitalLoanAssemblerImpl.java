@@ -38,7 +38,6 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
@@ -98,7 +97,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     public WorkingCapitalLoan assembleFrom(final JsonCommand command) {
         final JsonElement element = command.parsedJson();
         final Long clientId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
-        final Client client = (Client) this.clientActivePort.persistableById(clientId);
+        this.clientActivePort.persistableById(clientId);
         final Long productId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.productIdParameterName, element);
         final WorkingCapitalLoanProduct product = loanProductRepository.findById(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         final Long fundId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.fundIdParameterName, element);
@@ -114,7 +113,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         final WorkingCapitalLoan loan = new WorkingCapitalLoan();
         loan.setAccountNumber(accountNo != null ? accountNo : "");
         loan.setExternalId(externalId);
-        loan.setClient(client);
+        loan.setClientId(clientId);
         loan.setFund(fund);
         loan.setLoanProduct(product);
         loan.setLoanStatus(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL);
@@ -218,8 +217,8 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         final JsonElement element = command.parsedJson();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.clientIdParameterName, loan.getClientId())) {
             final Long clientId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.clientIdParameterName, element);
-            final Client client = (Client) this.clientActivePort.persistableById(clientId);
-            loan.setClient(client);
+            this.clientActivePort.persistableById(clientId);
+            loan.setClientId(clientId);
             changes.put(WorkingCapitalLoanConstants.clientIdParameterName, clientId);
         }
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.productIdParameterName, loan.getLoanProduct() != null ? loan.getLoanProduct().getId() : null)) {

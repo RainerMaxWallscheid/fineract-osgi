@@ -248,7 +248,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
 
     @Override
     public List<WorkingCapitalLoanAccountSummaryData> retrieveLoanSummaryData(final Long clientId) {
-        return workingCapitalLoanSummaryMapper.toDataList(repository.findByClient_Id(clientId));
+        return workingCapitalLoanSummaryMapper.toDataList(repository.findByClientId(clientId));
     }
 
     @Override

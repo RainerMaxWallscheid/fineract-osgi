@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
@@ -63,9 +62,11 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     private String accountNumber;
     @Column(name = "external_id")
     private ExternalId externalId;
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021 / charge Step 8).
+     */
+    @Column(name = "client_id")
+    private Long clientId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fund_id")
     private Fund fund;
@@ -125,11 +126,11 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     private BigDecimal totalPaymentVolume;
 
     public Long getOfficeId() {
-        return this.client != null ? clientActivePort.officeId(getClientId()) : null;
+        return this.clientId != null ? clientActivePort.officeId(this.clientId) : null;
     }
 
     public Long getClientId() {
-        return clientActivePort.id(this.client);
+        return this.clientId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -150,11 +151,6 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     @java.lang.SuppressWarnings("all")
         public ExternalId getExternalId() {
         return this.externalId;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Client getClient() {
-        return this.client;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -287,8 +283,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClient(final Object client) {
-        this.client = (Client) client;
+        public void setClientId(final Long clientId) {
+        this.clientId = clientId;
     }
 
     @java.lang.SuppressWarnings("all")

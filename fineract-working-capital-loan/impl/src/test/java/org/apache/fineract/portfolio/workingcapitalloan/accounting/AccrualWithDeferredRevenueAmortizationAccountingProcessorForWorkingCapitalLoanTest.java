@@ -38,8 +38,6 @@ import org.apache.fineract.accounting.moduleapi.WorkingCapitalLoanJournalPort;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
@@ -87,19 +85,13 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
     private WorkingCapitalLoanProductRelatedDetails loanProductRelatedDetails;
     @Mock
     private MonetaryCurrency currency;
-    @Mock
-    private Client client;
-    @Mock
-    private Office office;
 
     @BeforeEach
     void setUp() {
         ThreadLocalContextUtil.setBusinessDates(new HashMap<>(
                 Map.of(BusinessDateType.BUSINESS_DATE, TXN_DATE, BusinessDateType.COB_DATE, LocalDate.of(2026, 4, 30))));
 
-        lenient().when(loan.getClient()).thenReturn(client);
-        lenient().when(client.getOffice()).thenReturn(office);
-        lenient().when(office.getId()).thenReturn(OFFICE_ID);
+        lenient().when(loan.getOfficeId()).thenReturn(OFFICE_ID);
         lenient().when(loan.getLoanProduct()).thenReturn(loanProduct);
         lenient().when(loanProduct.getId()).thenReturn(PRODUCT_ID);
         lenient().when(loan.getLoanProductRelatedDetails()).thenReturn(loanProductRelatedDetails);
