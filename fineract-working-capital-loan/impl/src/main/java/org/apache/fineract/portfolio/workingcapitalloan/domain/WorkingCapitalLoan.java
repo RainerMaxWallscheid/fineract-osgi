@@ -287,8 +287,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClient(final Client client) {
-        this.client = client;
+        public void setClient(final Object client) {
+        this.client = (Client) client;
     }
 
     @java.lang.SuppressWarnings("all")
