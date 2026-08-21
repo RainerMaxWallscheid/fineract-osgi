@@ -47,4 +47,12 @@ public interface GroupActivePort {
      * Group id from a persistable group instance (Object-typed, ADR-021).
      */
     Long id(Object group);
+
+    /**
+     * Persistable group for association writes (Object-typed, ADR-021).
+     *
+     * @throws org.apache.fineract.portfolio.group.exception.GroupNotFoundException
+     *             when the id does not exist
+     */
+    Object persistableById(Long groupId);
 }

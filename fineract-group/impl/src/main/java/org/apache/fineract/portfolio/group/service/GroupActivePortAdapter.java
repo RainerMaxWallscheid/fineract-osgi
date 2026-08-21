@@ -76,6 +76,11 @@ public class GroupActivePortAdapter implements GroupActivePort {
         return ((Group) group).getId();
     }
 
+    @Override
+    public Object persistableById(final Long groupId) {
+        return this.groupRepository.findOneWithNotFoundDetection(groupId);
+    }
+
     private Group group(final Long groupId) {
         return this.groupRepository.findOneWithNotFoundDetection(groupId);
     }

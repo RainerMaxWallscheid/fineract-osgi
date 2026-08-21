@@ -62,12 +62,10 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
@@ -106,8 +104,6 @@ public class SavingsAccountAssembler {
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
     private final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper;
     private final SavingsHelper savingsHelper;
-    private final ClientRepositoryWrapper clientRepository;
-    private final GroupRepositoryWrapper groupRepository;
     private final StaffRepositoryWrapper staffRepository;
     private final SavingsProductRepository savingProductRepository;
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
@@ -121,7 +117,6 @@ public class SavingsAccountAssembler {
     @Autowired
     public SavingsAccountAssembler(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper,
-            final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository,
             final StaffRepositoryWrapper staffRepository, final SavingsProductRepository savingProductRepository,
             final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final FromJsonHelper fromApiJsonHelper,
@@ -130,8 +125,6 @@ public class SavingsAccountAssembler {
             final ChargeTaxApplicationService chargeTaxApplicationService) {
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsAccountTransactionDataSummaryWrapper = savingsAccountTransactionDataSummaryWrapper;
-        this.clientRepository = clientRepository;
-        this.groupRepository = groupRepository;
         this.staffRepository = staffRepository;
         this.savingProductRepository = savingProductRepository;
         this.savingsAccountRepository = savingsAccountRepository;
@@ -166,7 +159,7 @@ public class SavingsAccountAssembler {
 
         final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, element);
         if (clientId != null) {
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            client = (Client) this.clientActivePort.persistableById(clientId);
             accountType = AccountType.INDIVIDUAL;
             if (!this.clientActivePort.isActive(clientId)) {
                 throw new ClientNotActiveException(clientId);
@@ -175,7 +168,7 @@ public class SavingsAccountAssembler {
 
         final Long groupId = this.fromApiJsonHelper.extractLongNamed(groupIdParamName, element);
         if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
+            group = (Group) this.groupActivePort.persistableById(groupId);
             accountType = AccountType.GROUP;
             if (!this.groupActivePort.isActive(groupId)) {
                 if (this.groupActivePort.isCenter(groupId)) {
