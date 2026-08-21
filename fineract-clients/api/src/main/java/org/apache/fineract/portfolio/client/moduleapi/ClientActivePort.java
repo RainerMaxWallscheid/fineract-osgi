@@ -67,6 +67,16 @@ public interface ClientActivePort {
     Object persistableById(Long clientId);
 
     /**
+     * Persistable client for association writes (Object-typed, ADR-021).
+     *
+     * @param loadLazyCollections
+     *            when true, load client group collections (calendar inherit)
+     * @throws org.apache.fineract.portfolio.client.exception.ClientNotFoundException
+     *             when the id does not exist
+     */
+    Object persistableById(Long clientId, boolean loadLazyCollections);
+
+    /**
      * Incentive attributes from a persistable client instance (Object-typed,
      * ADR-021).
      */

@@ -77,13 +77,11 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
@@ -126,8 +124,6 @@ public class DepositAccountAssembler {
     private final PlatformSecurityContext context;
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
     private final SavingsHelper savingsHelper;
-    private final ClientRepositoryWrapper clientRepository;
-    private final GroupRepositoryWrapper groupRepository;
     private final StaffRepositoryWrapper staffRepository;
     private final FixedDepositProductRepository fixedDepositProductRepository;
     private final RecurringDepositProductRepository recurringDepositProductRepository;
@@ -143,7 +139,6 @@ public class DepositAccountAssembler {
 
     @Autowired
     public DepositAccountAssembler(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
-            final ClientRepositoryWrapper clientRepository, final GroupRepositoryWrapper groupRepository,
             final StaffRepositoryWrapper staffRepository, final FixedDepositProductRepository fixedDepositProductRepository,
             final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final FromJsonHelper fromApiJsonHelper,
@@ -154,8 +149,6 @@ public class DepositAccountAssembler {
             final ConfigurationDomainService configurationDomainService, final ChargeTaxApplicationService chargeTaxApplicationService) {
 
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
-        this.clientRepository = clientRepository;
-        this.groupRepository = groupRepository;
         this.staffRepository = staffRepository;
         this.fixedDepositProductRepository = fixedDepositProductRepository;
         this.savingsAccountRepository = savingsAccountRepository;
@@ -203,14 +196,7 @@ public class DepositAccountAssembler {
         final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, element);
         if (clientId != null) {
             final boolean isCalendarInherited = command.booleanPrimitiveValueOfParameterNamed(isCalendarInheritedParamName);
-            client = this.clientRepository.findOneWithNotFoundDetection(clientId, isCalendarInherited); // we
-                                                                                                        // need
-                                                                                                        // group
-                                                                                                        // collection
-                                                                                                        // if
-                                                                                                        // isCalendarInherited
-                                                                                                        // is
-                                                                                                        // true
+            client = (Client) this.clientActivePort.persistableById(clientId, isCalendarInherited);
             accountType = AccountType.INDIVIDUAL;
             if (!this.clientActivePort.isActive(clientId)) {
                 throw new ClientNotActiveException(clientId);
@@ -219,7 +205,7 @@ public class DepositAccountAssembler {
 
         final Long groupId = this.fromApiJsonHelper.extractLongNamed(groupIdParamName, element);
         if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
+            group = (Group) this.groupActivePort.persistableById(groupId);
             accountType = AccountType.GROUP;
         }
 

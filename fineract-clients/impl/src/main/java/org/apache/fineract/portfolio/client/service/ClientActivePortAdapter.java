@@ -107,7 +107,12 @@ public class ClientActivePortAdapter implements ClientActivePort {
 
     @Override
     public Object persistableById(final Long clientId) {
-        return this.clientRepository.findOneWithNotFoundDetection(clientId);
+        return persistableById(clientId, false);
+    }
+
+    @Override
+    public Object persistableById(final Long clientId, final boolean loadLazyCollections) {
+        return this.clientRepository.findOneWithNotFoundDetection(clientId, loadLazyCollections);
     }
 
     @Override
