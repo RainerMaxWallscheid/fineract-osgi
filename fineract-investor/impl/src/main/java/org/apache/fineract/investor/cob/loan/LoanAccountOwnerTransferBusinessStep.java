@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.apache.fineract.cob.loan.LoanCOBBusinessStep;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -41,6 +40,7 @@ import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.investor.service.ExternalAssetOwnerTransferOutstandingInterestCalculation;
 import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.investor.moduleapi.ExternalAssetOwnerTransferCobPort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Conditional(InvestorModuleIsEnabledCondition.class)
-public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep {
+public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerTransferCobPort {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountOwnerTransferBusinessStep.class);
     public static final LocalDate FUTURE_DATE_9999_12_31 = LocalDate.of(9999, 12, 31);
@@ -70,7 +70,7 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
     private final LoanTransferBalancePort loanTransferBalancePort;
 
     @Override
-    public Loan execute(Loan loan) {
+    public Object execute(Object loan) {
         Long loanId = loanTransferBalancePort.loanId(loan);
         log.debug("start processing loan ownership transfer business step for loan with Id [{}]", loanId);
         LocalDate settlementDate = DateUtils.getBusinessLocalDate();
@@ -272,12 +272,10 @@ public class LoanAccountOwnerTransferBusinessStep implements LoanCOBBusinessStep
         return ExternalTransferStatus.ACTIVE;
     }
 
-    @Override
     public String getEnumStyledName() {
         return "EXTERNAL_ASSET_OWNER_TRANSFER";
     }
 
-    @Override
     public String getHumanReadableName() {
         return "Execute external asset owner transfer";
     }

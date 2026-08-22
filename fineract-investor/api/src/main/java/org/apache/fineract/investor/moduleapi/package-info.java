@@ -24,6 +24,7 @@
  * {@code fineract-investor-api}:
  * <ul>
  *   <li>{@code …investor.service} — pure ports (read/write owners, loan-product attributes, delayed settlement)</li>
+ *   <li>{@code ExternalAssetOwnerTransferCobPort} — Object-typed COB execute for leftover {@code Loan} graphs</li>
  *   <li>{@code …investor.data} — pure DTOs and status enums</li>
  *   <li>{@code …investor.exception} — domain rule / not-found exceptions</li>
  * </ul>

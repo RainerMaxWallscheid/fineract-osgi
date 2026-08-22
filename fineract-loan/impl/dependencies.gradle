@@ -57,6 +57,8 @@ dependencies {
     implementation(project(path: ':fineract-tax-api'))
     // Loan origination: pure DTO LoanOriginatorData
     implementation(project(path: ':fineract-loan-origination-api'))
+    // Investor COB execute port (Object-typed leftover Loan graphs)
+    implementation(project(path: ':fineract-investor-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

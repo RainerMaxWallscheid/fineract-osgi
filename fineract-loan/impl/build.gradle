@@ -64,6 +64,7 @@ jar {
                         + 'org.apache.fineract.portfolio.group.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanproduct.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
+                        + 'org.apache.fineract.investor.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.loan.impl'
                 )

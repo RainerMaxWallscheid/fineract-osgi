@@ -1,2 +1,0 @@
-Method <org.apache.fineract.investor.cob.loan.LoanAccountOwnerTransferBusinessStep.execute(org.apache.fineract.portfolio.loanaccount.domain.Loan)> has parameter of type <org.apache.fineract.portfolio.loanaccount.domain.Loan> in (LoanAccountOwnerTransferBusinessStep.java:0)
-Method <org.apache.fineract.investor.cob.loan.LoanAccountOwnerTransferBusinessStep.execute(org.apache.fineract.portfolio.loanaccount.domain.Loan)> has return type <org.apache.fineract.portfolio.loanaccount.domain.Loan> in (LoanAccountOwnerTransferBusinessStep.java:0)

@@ -157,7 +157,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         Long loanId = 1L;
         when(loanTransferBalancePort.loanId(loanForProcessing)).thenReturn(loanId);
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
         verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort);
@@ -240,7 +240,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         ArgumentCaptor<ExternalAssetOwnerTransfer> externalAssetOwnerTransferArgumentCaptor = ArgumentCaptor
                 .forClass(ExternalAssetOwnerTransfer.class);
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
         verify(firstResponseItem).setEffectiveDateTo(actualDate);
@@ -307,7 +307,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(externalAssetOwnerTransferRepository.save(firstResponseItem)).thenReturn(firstResponseItem);
         when(externalAssetOwnerTransferRepository.save(secondResponseItem)).thenReturn(secondResponseItem);
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verifyNoInteractions(loanTransferabilityService);
 
@@ -356,7 +356,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(externalAssetOwnerTransferRepository.save(any())).thenReturn(pendingTransfer).thenReturn(savedNewTransfer);
 
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(loanTransferabilityService).isTransferable(loanForProcessing, pendingTransfer);
         verifyNoMoreInteractions(loanTransferabilityService);
@@ -422,7 +422,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(externalAssetOwnerTransferRepository.save(any())).thenReturn(pendingTransfer).thenReturn(savedNewTransfer);
 
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(loanTransferabilityService).isTransferable(loanForProcessing, pendingTransfer);
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
@@ -477,7 +477,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         when(externalAssetOwnerTransferRepository.save(any())).thenReturn(pendingTransfer).thenReturn(savedNewTransfer);
 
         // when
-        final Loan processedLoan = underTest.execute(loanForProcessing);
+        final Object processedLoan = underTest.execute(loanForProcessing);
 
         // then
         verify(loanTransferabilityService).isTransferable(loanForProcessing, pendingTransfer);
