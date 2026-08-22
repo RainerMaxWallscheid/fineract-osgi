@@ -37,9 +37,7 @@ fineract-charge/impl/dependencies.gradle	fineract-entityaccess-impl
 fineract-collateral/impl/dependencies.gradle	fineract-loan-impl
 fineract-collateralmanagement/impl/dependencies.gradle	fineract-loan-impl
 fineract-collectionsheet/impl/dependencies.gradle	fineract-paymentdetail-impl
-fineract-command/impl/dependencies.gradle	fineract-security-impl
 fineract-command/impl/dependencies.gradle	fineract-loan-impl
-fineract-configuration/impl/dependencies.gradle	fineract-security-impl
 fineract-configuration/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-creditbureau/impl/dependencies.gradle	fineract-loan-impl
 fineract-dataqueries/impl/dependencies.gradle	fineract-security-impl
@@ -65,8 +63,6 @@ fineract-interoperation/impl/dependencies.gradle	fineract-note-impl
 fineract-investor/impl/dependencies.gradle	fineract-cob-impl
 fineract-investor/impl/dependencies.gradle	fineract-accounting-impl
 fineract-investor/impl/dependencies.gradle	fineract-loan-impl
-fineract-jobs/impl/dependencies.gradle	fineract-businessdate-impl
-fineract-jobs/impl/dependencies.gradle	fineract-security-impl
 fineract-jobs/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-jobs/impl/dependencies.gradle	fineract-cob-impl
 fineract-jobs/impl/dependencies.gradle	fineract-accounting-impl
@@ -110,7 +106,6 @@ fineract-reportmailingjob/impl/dependencies.gradle	fineract-security-impl
 fineract-savings/impl/dependencies.gradle	fineract-cob-impl
 fineract-savings/impl/dependencies.gradle	fineract-accounting-impl
 fineract-savings/impl/dependencies.gradle	fineract-security-impl
-fineract-sms/impl/dependencies.gradle	fineract-security-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-loan-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-accounting-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-cob-impl

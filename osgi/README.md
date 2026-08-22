@@ -721,7 +721,7 @@ python3 osgi/check-foreign-impl-deps.py
 ./gradlew checkForeignImplDeps
 ```
 
-Fails on a new domain `*-impl` dependency on a foreign `*-impl`, any `*-api` dependency on a `*-impl`, or a stale `osgi/foreign-impl-allowlist.txt` row. Composition roots are not scanned. Remaining allow-listed edges are leftover JPA residuals. S3 datatable report export implements `DatatableReportExportService` on s3-impl (not dataqueries-impl). Full OSGi lookup is started (ADR-022 B4): `ChargeDefinitionPort` Boot consumers resolve via a `@Primary` Service Registry façade when `fineract.osgi.enabled=true`; remaining PILOT_PORTs still Spring-inject.
+Fails on a new domain `*-impl` dependency on a foreign `*-impl`, any `*-api` dependency on a `*-impl`, or a stale `osgi/foreign-impl-allowlist.txt` row. Composition roots are not scanned. Remaining allow-listed edges are leftover JPA residuals. S3 datatable report export implements `DatatableReportExportService` on s3-impl (not dataqueries-impl). SMS, jobs, command, and configuration consume security/business-date types from core or `*-api` (not those `*-impl` jars). Full OSGi lookup is started (ADR-022 B4): `ChargeDefinitionPort` Boot consumers resolve via a `@Primary` Service Registry façade when `fineract.osgi.enabled=true`; remaining PILOT_PORTs still Spring-inject.
 
 ```bash
 python3 osgi/check-archunit-freeze.py

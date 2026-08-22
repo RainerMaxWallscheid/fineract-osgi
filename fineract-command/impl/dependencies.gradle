@@ -24,7 +24,6 @@ dependencies {
     implementation(project(path: ':fineract-clients-api'))
     // Maker-checker / audit residual (portfolio command source is in core)
     implementation(project(path: ':fineract-security-api'))
-    implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-organisation-api'))
     implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-loan-api'))
