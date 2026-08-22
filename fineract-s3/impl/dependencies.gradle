@@ -21,11 +21,11 @@ dependencies {
     api project(path: ':fineract-s3-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-dataqueries-api'))
-    implementation(project(path: ':fineract-dataqueries-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter',
             'org.apache.commons:commons-lang3',
+            'jakarta.ws.rs:jakarta.ws.rs-api',
             )
     implementation ('software.amazon.awssdk:s3') {
         // keep version from BOM / platform

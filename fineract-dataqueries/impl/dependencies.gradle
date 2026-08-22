@@ -45,7 +45,6 @@ dependencies {
             'com.github.librepdf:openpdf',
             'io.swagger.core.v3:swagger-annotations-jakarta',
             'io.github.resilience4j:resilience4j-spring-boot3',
-            'software.amazon.awssdk:s3',
             // Batch command strategies use org.apache.http.HttpStatus
             'org.apache.httpcomponents:httpcore',
             )

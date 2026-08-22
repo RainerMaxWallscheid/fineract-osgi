@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.dataqueries.service.export;
+package org.apache.fineract.infrastructure.s3.service;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -28,6 +28,9 @@ import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDoma
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableExportTargetParameter;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.dataqueries.service.export.DatatableExportUtil;
+import org.apache.fineract.infrastructure.dataqueries.service.export.DatatableReportExportService;
+import org.apache.fineract.infrastructure.dataqueries.service.export.ResponseHolder;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -39,14 +42,18 @@ public class S3DatatableReportExportServiceImpl implements DatatableReportExport
     private final FineractProperties properties;
 
     @Override
-    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams, String parameterTypeValue) {
+    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams,
+            String parameterTypeValue) {
         try {
             StreamingOutput output = this.readExtraDataAndReportingService.retrieveReportCSV(reportName, parameterTypeValue, reportParams);
             try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 output.write(byteArrayOutputStream);
                 String folder = configurationDomainService.retrieveReportExportS3FolderName();
-                String filePath = DatatableExportUtil.generateS3DatatableExportFileName(AWS_S3_MAXIMUM_KEY_LENGTH, folder, "csv", reportName, reportParams);
-                s3Client.putObject(builder -> builder.bucket(properties.getReport().getExport().getS3().getBucketName()).key(filePath).build(), RequestBody.fromBytes(byteArrayOutputStream.toByteArray()));
+                String filePath = DatatableExportUtil.generateS3DatatableExportFileName(AWS_S3_MAXIMUM_KEY_LENGTH, folder, "csv",
+                        reportName, reportParams);
+                s3Client.putObject(
+                        builder -> builder.bucket(properties.getReport().getExport().getS3().getBucketName()).key(filePath).build(),
+                        RequestBody.fromBytes(byteArrayOutputStream.toByteArray()));
                 return new ResponseHolder(Response.Status.NO_CONTENT);
             }
         } catch (IOException e) {
@@ -59,8 +66,8 @@ public class S3DatatableReportExportServiceImpl implements DatatableReportExport
         return DatatableExportTargetParameter.S3 == exportType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public S3DatatableReportExportServiceImpl(final ReadReportingService readExtraDataAndReportingService, final ConfigurationDomainService configurationDomainService, final S3Client s3Client, final FineractProperties properties) {
+    public S3DatatableReportExportServiceImpl(final ReadReportingService readExtraDataAndReportingService,
+            final ConfigurationDomainService configurationDomainService, final S3Client s3Client, final FineractProperties properties) {
         this.readExtraDataAndReportingService = readExtraDataAndReportingService;
         this.configurationDomainService = configurationDomainService;
         this.s3Client = s3Client;

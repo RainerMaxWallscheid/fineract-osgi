@@ -107,7 +107,6 @@ fineract-progressive-loan/impl/dependencies.gradle	fineract-organisation-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-cob-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-rates-impl
 fineract-reportmailingjob/impl/dependencies.gradle	fineract-security-impl
-fineract-s3/impl/dependencies.gradle	fineract-dataqueries-impl
 fineract-savings/impl/dependencies.gradle	fineract-cob-impl
 fineract-savings/impl/dependencies.gradle	fineract-accounting-impl
 fineract-savings/impl/dependencies.gradle	fineract-security-impl
