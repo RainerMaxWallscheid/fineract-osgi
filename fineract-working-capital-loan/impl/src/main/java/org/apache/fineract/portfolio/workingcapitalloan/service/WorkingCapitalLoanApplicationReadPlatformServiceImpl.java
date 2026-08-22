@@ -138,7 +138,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         final Specification<WorkingCapitalLoan> spec = (root, query, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (clientId != null) {
-                predicates.add(cb.equal(root.get("client").get("id"), clientId));
+                predicates.add(cb.equal(root.get("clientId"), clientId));
             }
             if (StringUtils.isNotBlank(externalId)) {
                 predicates.add(cb.equal(root.get("externalId").get("value"), externalId));
