@@ -1,4 +1,0 @@
-Field <org.apache.fineract.portfolio.savings.domain.SavingsAccount.client> has type <org.apache.fineract.portfolio.client.domain.Client> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount._persistence_get_client()> has return type <org.apache.fineract.portfolio.client.domain.Client> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount._persistence_set_client(org.apache.fineract.portfolio.client.domain.Client)> has parameter of type <org.apache.fineract.portfolio.client.domain.Client> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount.getClient()> has return type <org.apache.fineract.portfolio.client.domain.Client> in (SavingsAccount.java:0)

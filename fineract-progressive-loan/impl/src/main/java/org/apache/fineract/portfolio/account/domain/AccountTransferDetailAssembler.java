@@ -171,7 +171,8 @@ public class AccountTransferDetailAssembler {
     public AccountTransferDetails assembleSavingsToLoanTransfer(final SavingsAccount fromSavingsAccount, final Loan toLoanAccount,
             Integer transferType) {
         final Office fromOffice = fromSavingsAccount.office();
-        final Client fromClient = fromSavingsAccount.getClient();
+        final Client fromClient = fromSavingsAccount.clientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(fromSavingsAccount.clientId());
         final Office toOffice = toLoanAccount.getOffice();
         final Client toClient = toLoanAccount.client();
 
@@ -183,9 +184,11 @@ public class AccountTransferDetailAssembler {
     public AccountTransferDetails assembleSavingsToSavingsTransfer(final SavingsAccount fromSavingsAccount,
             final SavingsAccount toSavingsAccount, Integer transferType) {
         final Office fromOffice = fromSavingsAccount.office();
-        final Client fromClient = fromSavingsAccount.getClient();
+        final Client fromClient = fromSavingsAccount.clientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(fromSavingsAccount.clientId());
         final Office toOffice = toSavingsAccount.office();
-        final Client toClient = toSavingsAccount.getClient();
+        final Client toClient = toSavingsAccount.clientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(toSavingsAccount.clientId());
 
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient,
                 toSavingsAccount, transferType);
@@ -196,7 +199,8 @@ public class AccountTransferDetailAssembler {
         final Office fromOffice = fromLoanAccount.getOffice();
         final Client fromClient = fromLoanAccount.client();
         final Office toOffice = toSavingsAccount.office();
-        final Client toClient = toSavingsAccount.getClient();
+        final Client toClient = toSavingsAccount.clientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(toSavingsAccount.clientId());
 
         return AccountTransferDetails.loanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccount,
                 transferType);

@@ -443,7 +443,7 @@ public class InteropServiceImpl implements InteropService {
     @NonNull
     public InteropKycResponseData getKyc(@NonNull String accountId) {
         SavingsAccount savingsAccount = validateAndGetSavingAccount(accountId);
-        Long clientId = savingsAccount.getClient().getId();
+        Long clientId = savingsAccount.clientId();
         try {
             final InteropServiceImpl.KycMapper rm = new InteropServiceImpl.KycMapper(sqlGenerator);
             final String sql = "select " + rm.schema() + " where c.id = ?";

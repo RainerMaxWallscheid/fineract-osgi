@@ -110,14 +110,14 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 final var savingAccount = savingsAccountRepository.findById(request.getResourceId())
                         .orElseThrow(() -> new SavingsAccountNotFoundException(request.getResourceId()));
                 note = noteRepository.saveAndFlush(Note.savingNote(savingAccount, request.getNote()));
-                officeId = savingAccount.getClient().getOffice().getId();
+                officeId = savingAccount.officeId();
             }
             case SAVINGS_TRANSACTION -> {
                 final var savingsTransaction = savingsAccountTransactionRepository.findById(request.getResourceId())
                         .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, request.getResourceId()));
                 final var savingsAccount = savingsTransaction.getSavingsAccount();
                 note = noteRepository.saveAndFlush(Note.savingsTransactionNote(savingsAccount, savingsTransaction, request.getNote()));
-                officeId = savingsAccount.getClient().getOffice().getId();
+                officeId = savingsAccount.officeId();
             }
             case SHARE_ACCOUNT -> {
                 final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
@@ -181,13 +181,13 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 final var savingAccount = savingsAccountRepository.findById(resourceId)
                         .orElseThrow(() -> new SavingsAccountNotFoundException(resourceId));
                 note = noteRepository.findBySavingsAccountIdAndId(savingAccount.getId(), noteId);
-                officeId = savingAccount.getClient().getOffice().getId();
+                officeId = savingAccount.officeId();
             }
             case SAVINGS_TRANSACTION -> {
                 final var savingsTransaction = savingsAccountTransactionRepository.findById(resourceId)
                         .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, resourceId));
                 note = noteRepository.findBySavingsTransactionIdAndId(savingsTransaction.getId(), noteId);
-                officeId = savingsTransaction.getSavingsAccount().getClient().getOffice().getId();
+                officeId = savingsTransaction.getSavingsAccount().officeId();
             }
             case SHARE_ACCOUNT -> {
                 final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();

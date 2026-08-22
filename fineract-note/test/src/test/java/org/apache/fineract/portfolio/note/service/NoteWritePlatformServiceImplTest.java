@@ -25,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import java.util.Optional;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -77,10 +75,6 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private SavingsAccount savingsAccount;
     @Mock
-    private Client client;
-    @Mock
-    private Office office;
-    @Mock
     private Note note;
 
     private NoteWritePlatformServiceImpl subject;
@@ -112,9 +106,8 @@ class NoteWritePlatformServiceImplTest {
                 .note("savings transaction note").build();
         when(savingsAccountTransactionRepository.findById(22L)).thenReturn(Optional.of(savingsAccountTransaction));
         when(savingsAccountTransaction.getSavingsAccount()).thenReturn(savingsAccount);
-        when(savingsAccount.getClient()).thenReturn(client);
-        when(client.getOffice()).thenReturn(office);
-        when(office.getId()).thenReturn(8L);
+        when(savingsAccount.clientId()).thenReturn(5L);
+        when(savingsAccount.officeId()).thenReturn(8L);
         when(noteRepository.saveAndFlush(any(Note.class))).thenReturn(note);
         when(note.getId()).thenReturn(202L);
 
@@ -149,9 +142,7 @@ class NoteWritePlatformServiceImplTest {
         when(savingsAccountTransaction.getId()).thenReturn(22L);
         when(noteRepository.findBySavingsTransactionIdAndId(22L, 3L)).thenReturn(note);
         when(savingsAccountTransaction.getSavingsAccount()).thenReturn(savingsAccount);
-        when(savingsAccount.getClient()).thenReturn(client);
-        when(client.getOffice()).thenReturn(office);
-        when(office.getId()).thenReturn(8L);
+        when(savingsAccount.officeId()).thenReturn(8L);
 
         NoteDeleteResponse response = subject.deleteNote(request);
 

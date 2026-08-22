@@ -61,6 +61,8 @@ import org.apache.fineract.portfolio.account.domain.StandingInstructionRepositor
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeDataValidator;
@@ -153,6 +155,10 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
     private ExternalIdFactory externalIdFactory;
     @Mock
     private ErrorHandler errorHandler;
+    @Mock
+    private ClientActivePort clientActivePort;
+    @Mock
+    private GroupActivePort groupActivePort;
 
     @InjectMocks
     private SavingsAccountWritePlatformServiceJpaRepositoryImpl service;
@@ -164,6 +170,10 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         validateTransactionsForTransfer = SavingsAccountWritePlatformServiceJpaRepositoryImpl.class
                 .getDeclaredMethod("validateTransactionsForTransfer", SavingsAccount.class, LocalDate.class);
         validateTransactionsForTransfer.setAccessible(true);
+        service.setClientActivePort(clientActivePort);
+        service.setGroupActivePort(groupActivePort);
+        when(clientActivePort.isActive(any())).thenReturn(true);
+        when(groupActivePort.isActive(any())).thenReturn(true);
     }
 
     @AfterEach
@@ -271,7 +281,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(command.stringValueOfParameterNamed("reasonForBlock")).thenReturn("manual hold");
         when(command.json()).thenReturn("{\"externalId\":\"hold-external-id\"}");
         when(externalIdFactory.createFromCommand(command, "externalId")).thenReturn(externalId);
-        when(account.getClient()).thenReturn(null);
+
         when(account.group()).thenReturn(null);
         when(account.getCurrency()).thenReturn(currency);
         when(account.getAccountBalance()).thenReturn(BigDecimal.valueOf(100));
@@ -310,7 +320,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(externalIdFactory.createFromCommand(command, "externalId")).thenReturn(externalId);
         when(savingAccountAssembler.getPivotConfigStatus()).thenReturn(false);
         when(savingAccountAssembler.assembleFrom(savingsId, false)).thenReturn(account);
-        when(account.getClient()).thenReturn(null);
+
         when(account.group()).thenReturn(null);
         when(account.getCurrency()).thenReturn(currency);
         when(account.getAccountBalance()).thenReturn(BigDecimal.valueOf(100));
@@ -365,7 +375,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(externalIdFactory.createFromCommand(command, "externalId")).thenReturn(externalId);
         when(savingAccountAssembler.getPivotConfigStatus()).thenReturn(false);
         when(savingAccountAssembler.assembleFrom(savingsId, false)).thenReturn(account);
-        when(account.getClient()).thenReturn(null);
+
         when(account.group()).thenReturn(null);
         when(account.getTransactions()).thenReturn(transactions);
         when(account.accountSubmittedOrActivationDate()).thenReturn(transactionDate.minusDays(1));

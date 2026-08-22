@@ -88,13 +88,13 @@ public class Note extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public static Note savingNote(final SavingsAccount account, final String note) {
-        final Long clientId = account.getClient() == null ? null : account.getClient().getId();
+        final Long clientId = account.clientId();
         return new Note(clientId, null, null, null, note, NoteType.SAVING_ACCOUNT.getValue(), account.getId(), null, null);
     }
 
     public static Note savingsTransactionNote(final SavingsAccount savingsAccount, final SavingsAccountTransaction savingsTransaction,
             final String note) {
-        final Long clientId = savingsAccount.getClient() == null ? null : savingsAccount.getClient().getId();
+        final Long clientId = savingsAccount.clientId();
         return new Note(clientId, null, null, null, note, NoteType.SAVINGS_TRANSACTION.getValue(), savingsAccount.getId(),
                 savingsTransaction.getId(), null);
     }

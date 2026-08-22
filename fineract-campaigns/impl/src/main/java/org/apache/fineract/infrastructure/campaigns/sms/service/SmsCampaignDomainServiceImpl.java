@@ -57,6 +57,7 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
@@ -65,6 +66,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -79,6 +81,12 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     private final GroupRepository groupRepository;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
     private final SmsCampaignValidator smsCampaignValidator;
+    private ClientRepositoryWrapper clientRepositoryWrapper;
+
+    @Autowired
+    public void setClientRepositoryWrapper(final ClientRepositoryWrapper clientRepositoryWrapper) {
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+    }
 
     @PostConstruct
     public void addListeners() {
@@ -219,7 +227,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
             for (SmsCampaign smsCampaign : smsCampaigns) {
                 try {
                     final SavingsAccount savingsAccount = savingsTransaction.getSavingsAccount();
-                    final Client client = savingsAccount.getClient();
+                    final Client client = savingsAccount.clientId() == null ? null
+                            : this.clientRepositoryWrapper.findOneWithNotFoundDetection(savingsAccount.clientId());
                     HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
                     });
                     HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(savingsTransaction, client);

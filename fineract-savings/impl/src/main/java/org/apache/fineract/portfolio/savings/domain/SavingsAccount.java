@@ -95,7 +95,6 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFoundException;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -149,9 +148,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Column(name = "external_id", nullable = true)
     protected ExternalId externalId;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "client_id", nullable = true)
-    protected Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021 / charge Step 8).
+     */
+    @Column(name = "client_id", nullable = true)
+    protected Long clientId;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = true)
@@ -414,7 +415,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final BigDecimal maxAllowedLienLimit, final boolean lienAllowed,
             final BigDecimal nominalAnnualInterestRateOverdraft, final BigDecimal minOverdraftForInterestCalculation, boolean withHoldTax) {
-        this.client = (Client) client;
+        this.clientId = client == null ? null : clientActivePort.id(client);
         this.group = (Group) group;
         this.product = product;
         this.savingsOfficer = savingsOfficer;
@@ -1877,7 +1878,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public void updateClient(final Object client) {
-        this.client = (Client) client;
+        this.clientId = client == null ? null : clientActivePort.id(client);
     }
 
     public void updateGroup(final Object group) {
@@ -1920,8 +1921,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     public Long officeId() {
         Long officeId = null;
-        if (this.client != null) {
-            officeId = clientActivePort.officeId(clientId());
+        if (this.clientId != null) {
+            officeId = clientActivePort.officeId(this.clientId);
         } else if (this.group != null) {
             officeId = groupActivePort.officeId(groupId());
         }
@@ -1930,8 +1931,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     public Office office() {
         Office office = null;
-        if (this.client != null) {
-            office = (Office) clientActivePort.office(clientId());
+        if (this.clientId != null) {
+            office = (Office) clientActivePort.office(this.clientId);
         } else if (this.group != null) {
             office = (Office) groupActivePort.office(groupId());
         }
@@ -1959,7 +1960,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public Long clientId() {
-        return clientActivePort.id(this.client);
+        return this.clientId;
+    }
+
+    protected Object persistableClient() {
+        return this.clientId == null ? null : clientActivePort.persistableById(this.clientId);
     }
 
     public Long groupId() {
@@ -2130,7 +2135,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.a.future.date");
         }
 
-        if (this.client != null && clientActivePort.isActivatedAfter(clientId(), submittedOn)) {
+        if (this.clientId != null && clientActivePort.isActivatedAfter(this.clientId, submittedOn)) {
             baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(clientActivePort.activationDate(clientId()))
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
         } else if (this.group != null && groupActivePort.isActivatedAfter(groupId(), submittedOn)) {
@@ -2141,10 +2146,6 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-    }
-
-    public Client getClient() {
-        return this.client;
     }
 
     public BigDecimal getNominalAnnualInterestRate() {
@@ -2561,7 +2562,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         /*
          * if (annualFeeSettingsSet()) { updateToNextAnnualFeeDueDateFrom(getActivationLocalDate()); }
          */
-        if (this.client != null && clientActivePort.isActivatedAfter(clientId(), activationDate)) {
+        if (this.clientId != null && clientActivePort.isActivatedAfter(this.clientId, activationDate)) {
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(command.extractLocale());
             final String dateAsString = formatter.format(clientActivePort.activationDate(clientId()));
             baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName).value(dateAsString)
@@ -2694,8 +2695,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     protected void validateActivityNotBeforeClientOrGroupTransferDate(final SavingsEvent event, final LocalDate activityDate) {
-        if (this.client != null) {
-            final LocalDate clientOfficeJoiningDate = clientActivePort.officeJoiningDate(clientId());
+        if (this.clientId != null) {
+            final LocalDate clientOfficeJoiningDate = clientActivePort.officeJoiningDate(this.clientId);
             if (DateUtils.isBefore(activityDate, clientOfficeJoiningDate)) {
                 throw new SavingsActivityPriorToClientTransferException(event.toString(), clientOfficeJoiningDate);
             }
@@ -3225,7 +3226,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             return false;
         }
 
-        if (this.client != null && !clientActivePort.isActive(clientId())) {
+        if (this.clientId != null && !clientActivePort.isActive(this.clientId)) {
             return false;
         }
         if (this.group != null && !groupActivePort.isActive(groupId())) {

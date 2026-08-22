@@ -307,7 +307,8 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
             queryParamForRunReport.put("savingsId", savingsAccount.getId().toString());
-            Client client = savingsAccount.getClient();
+            Client client = savingsAccount.clientId() == null ? null
+                    : this.clientRepositoryWrapper.findOneWithNotFoundDetection(savingsAccount.clientId());
             List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
             if (runReportObject != null && runReportObject.size() > 0) {
                 for (HashMap<String, Object> entry : runReportObject) {

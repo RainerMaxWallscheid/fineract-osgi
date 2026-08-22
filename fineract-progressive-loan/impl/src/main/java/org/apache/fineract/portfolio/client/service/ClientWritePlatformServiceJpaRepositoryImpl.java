@@ -771,7 +771,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         final Long savingsId = command.longValueOfParameterNamed(ClientApiConstants.savingsAccountIdParamName);
         if (savingsId != null) {
             savingsAccount = this.savingsRepositoryWrapper.findOneWithNotFoundDetection(savingsId);
-            if (!savingsAccount.getClient().identifiedBy(clientId)) {
+            if (!clientId.equals(savingsAccount.clientId())) {
                 String defaultUserMessage = "saving account must belongs to client";
                 throw new InvalidClientSavingProductException("saving.account", "must.belongs.to.client", defaultUserMessage, savingsId, clientForUpdate.getId());
             }

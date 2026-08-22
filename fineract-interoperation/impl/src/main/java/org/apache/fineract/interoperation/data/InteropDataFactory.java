@@ -59,7 +59,7 @@ public final class InteropDataFactory {
                 product.getShortName(), account.getCurrency().getCode(), account.getAccountBalance(), account.getWithdrawableBalance(),
                 account.getStatus(), subStatus, account.getAccountType(), account.depositAccountType(), account.getActivationDate(),
                 calcStatusUpdateOn(account), account.getWithdrawnOnDate(), account.retrieveLastTransactionDate(), ids,
-                account.getClient().getId());
+                account.clientId());
     }
 
     public static InteropIdentifiersResponseData identifiers(SavingsAccount account) {
