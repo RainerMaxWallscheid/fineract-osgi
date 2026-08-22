@@ -282,7 +282,6 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(command.json()).thenReturn("{\"externalId\":\"hold-external-id\"}");
         when(externalIdFactory.createFromCommand(command, "externalId")).thenReturn(externalId);
 
-        when(account.group()).thenReturn(null);
         when(account.getCurrency()).thenReturn(currency);
         when(account.getAccountBalance()).thenReturn(BigDecimal.valueOf(100));
         when(account.getSavingsHoldAmount()).thenReturn(null);
@@ -321,7 +320,6 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(savingAccountAssembler.getPivotConfigStatus()).thenReturn(false);
         when(savingAccountAssembler.assembleFrom(savingsId, false)).thenReturn(account);
 
-        when(account.group()).thenReturn(null);
         when(account.getCurrency()).thenReturn(currency);
         when(account.getAccountBalance()).thenReturn(BigDecimal.valueOf(100));
         when(account.getSavingsHoldAmount()).thenReturn(BigDecimal.TEN);
@@ -376,7 +374,6 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         when(savingAccountAssembler.getPivotConfigStatus()).thenReturn(false);
         when(savingAccountAssembler.assembleFrom(savingsId, false)).thenReturn(account);
 
-        when(account.group()).thenReturn(null);
         when(account.getTransactions()).thenReturn(transactions);
         when(account.accountSubmittedOrActivationDate()).thenReturn(transactionDate.minusDays(1));
         when(account.getNominalAnnualInterestRate()).thenReturn(BigDecimal.ONE);

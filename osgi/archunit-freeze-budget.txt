@@ -1,4 +1,4 @@
 # ADR-022 B5 leftover ArchUnit freeze-store lines (not stored.rules).
 # Lower this number when :fineract-architecture:test shrinks the store.
 # Do not raise it to hide new coupling.
-21
+17

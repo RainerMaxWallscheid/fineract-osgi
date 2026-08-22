@@ -97,7 +97,6 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFoundException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -154,9 +153,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Column(name = "client_id", nullable = true)
     protected Long clientId;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = true)
-    protected Group group;
+    /**
+     * Group id (no JPA association to leftover Group — ADR-021 / charge Step 8).
+     */
+    @Column(name = "group_id", nullable = true)
+    protected Long groupId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gsim_id", nullable = true)
@@ -416,7 +417,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             final BigDecimal minRequiredBalance, final BigDecimal maxAllowedLienLimit, final boolean lienAllowed,
             final BigDecimal nominalAnnualInterestRateOverdraft, final BigDecimal minOverdraftForInterestCalculation, boolean withHoldTax) {
         this.clientId = client == null ? null : clientActivePort.id(client);
-        this.group = (Group) group;
+        this.groupId = group == null ? null : groupActivePort.id(group);
         this.product = product;
         this.savingsOfficer = savingsOfficer;
         if (StringUtils.isBlank(accountNo)) {
@@ -1882,7 +1883,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public void updateGroup(final Object group) {
-        this.group = (Group) group;
+        this.groupId = group == null ? null : groupActivePort.id(group);
     }
 
     public void update(final SavingsProduct product) {
@@ -1923,8 +1924,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         Long officeId = null;
         if (this.clientId != null) {
             officeId = clientActivePort.officeId(this.clientId);
-        } else if (this.group != null) {
-            officeId = groupActivePort.officeId(groupId());
+        } else if (this.groupId != null) {
+            officeId = groupActivePort.officeId(this.groupId);
         }
         return officeId;
     }
@@ -1933,8 +1934,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         Office office = null;
         if (this.clientId != null) {
             office = (Office) clientActivePort.office(this.clientId);
-        } else if (this.group != null) {
-            office = (Office) groupActivePort.office(groupId());
+        } else if (this.groupId != null) {
+            office = (Office) groupActivePort.office(this.groupId);
         }
         return office;
     }
@@ -1968,7 +1969,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public Long groupId() {
-        return groupActivePort.id(this.group);
+        return this.groupId;
+    }
+
+    protected Object persistableGroup() {
+        return this.groupId == null ? null : groupActivePort.persistableById(this.groupId);
     }
 
     public GroupSavingsIndividualMonitoring getGsim() {
@@ -2138,7 +2143,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         if (this.clientId != null && clientActivePort.isActivatedAfter(this.clientId, submittedOn)) {
             baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(clientActivePort.activationDate(clientId()))
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
-        } else if (this.group != null && groupActivePort.isActivatedAfter(groupId(), submittedOn)) {
+        } else if (this.groupId != null && groupActivePort.isActivatedAfter(this.groupId, submittedOn)) {
             baseDataValidator.reset().parameter(SavingsApiConstants.submittedOnDateParamName).value(groupActivePort.activationDate(groupId()))
                     .failWithCodeNoParameterAddedToErrorCode("cannot.be.before.client.activation.date");
         }
@@ -2572,7 +2577,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             }
         }
 
-        if (this.group != null && groupActivePort.isActivatedAfter(groupId(), activationDate)) {
+        if (this.groupId != null && groupActivePort.isActivatedAfter(this.groupId, activationDate)) {
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(command.extractLocale());
             final String dateAsString = formatter.format(groupActivePort.activationDate(groupId()));
             baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName).value(dateAsString)
@@ -2734,10 +2739,6 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         }
 
         return lockedInUntilLocalDate;
-    }
-
-    public Group group() {
-        return this.group;
     }
 
     public boolean isWithdrawalFeeApplicableForTransfer() {
@@ -3229,7 +3230,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         if (this.clientId != null && !clientActivePort.isActive(this.clientId)) {
             return false;
         }
-        if (this.group != null && !groupActivePort.isActive(groupId())) {
+        if (this.groupId != null && !groupActivePort.isActive(this.groupId)) {
             return false;
         }
 
@@ -3390,9 +3391,6 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         transactions.size();
         charges.size();
         savingsOfficerHistory.size();
-        if (group != null) {
-            groupActivePort.office(groupId());
-        } // Ensure lazy loading of group if set
     }
 
     public void updateSavingsAccountSummary(final List<SavingsAccountTransaction> transactions) {

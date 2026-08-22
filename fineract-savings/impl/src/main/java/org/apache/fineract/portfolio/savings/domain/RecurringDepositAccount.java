@@ -55,7 +55,6 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.savings.DepositAccountOnClosureType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -1111,7 +1110,7 @@ public class RecurringDepositAccount extends SavingsAccount {
         LocalDate now = getClosedOnDate();
         newAccountTermAndPreClosure.updateExpectedFirstDepositDate(now);
 
-        RecurringDepositAccount rdAccount = RecurringDepositAccount.createNewActivatedAccount(persistableClient(), group, product, savingsOfficer,
+        RecurringDepositAccount rdAccount = RecurringDepositAccount.createNewActivatedAccount(persistableClient(), persistableGroup(), product, savingsOfficer,
                 accountNumber, externalId, accountType, getClosedOnDate(), closedBy, interestRate, compoundingPeriodType, postingPeriodType,
                 interestCalculationType, daysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType,
                 withdrawalFeeApplicableForTransfer, savingsAccountCharges, newAccountTermAndPreClosure, recurringDetail, newChart,

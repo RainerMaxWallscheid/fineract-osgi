@@ -1,4 +1,0 @@
-Field <org.apache.fineract.portfolio.savings.domain.SavingsAccount.group> has type <org.apache.fineract.portfolio.group.domain.Group> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount._persistence_get_group()> has return type <org.apache.fineract.portfolio.group.domain.Group> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount._persistence_set_group(org.apache.fineract.portfolio.group.domain.Group)> has parameter of type <org.apache.fineract.portfolio.group.domain.Group> in (SavingsAccount.java:0)
-Method <org.apache.fineract.portfolio.savings.domain.SavingsAccount.group()> has return type <org.apache.fineract.portfolio.group.domain.Group> in (SavingsAccount.java:0)
