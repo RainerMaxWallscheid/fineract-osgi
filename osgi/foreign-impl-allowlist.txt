@@ -4,9 +4,7 @@
 # Format: <consumer dependencies.gradle> <target project>
 fineract-accounting/impl/dependencies.gradle	fineract-loan-impl
 fineract-accounting/impl/dependencies.gradle	fineract-organisation-impl
-fineract-accounting/impl/dependencies.gradle	fineract-security-impl
 fineract-branch/impl/dependencies.gradle	fineract-accounting-impl
-fineract-bulkimport/impl/dependencies.gradle	fineract-security-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-document-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-organisation-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-codes-impl
@@ -20,7 +18,6 @@ fineract-bulkimport/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-collateralmanagement-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-fund-impl
 fineract-calendar/impl/dependencies.gradle	fineract-loan-impl
-fineract-campaigns/impl/dependencies.gradle	fineract-security-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-gcm-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-configuration-impl
@@ -40,7 +37,6 @@ fineract-collectionsheet/impl/dependencies.gradle	fineract-paymentdetail-impl
 fineract-command/impl/dependencies.gradle	fineract-loan-impl
 fineract-configuration/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-creditbureau/impl/dependencies.gradle	fineract-loan-impl
-fineract-dataqueries/impl/dependencies.gradle	fineract-security-impl
 fineract-dataqueries/impl/dependencies.gradle	fineract-loan-impl
 fineract-dataqueries/impl/dependencies.gradle	fineract-savings-impl
 fineract-dataqueries/impl/dependencies.gradle	fineract-useradministration-impl
@@ -56,7 +52,6 @@ fineract-gcm/impl/dependencies.gradle	fineract-sms-impl
 fineract-hooks/impl/dependencies.gradle	fineract-template-impl
 fineract-hooks/impl/dependencies.gradle	fineract-sms-impl
 fineract-hooks/impl/dependencies.gradle	fineract-campaigns-impl
-fineract-interoperation/impl/dependencies.gradle	fineract-security-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-loan-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-note-impl
@@ -102,10 +97,8 @@ fineract-progressive-loan/impl/dependencies.gradle	fineract-event-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-organisation-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-cob-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-rates-impl
-fineract-reportmailingjob/impl/dependencies.gradle	fineract-security-impl
 fineract-savings/impl/dependencies.gradle	fineract-cob-impl
 fineract-savings/impl/dependencies.gradle	fineract-accounting-impl
-fineract-savings/impl/dependencies.gradle	fineract-security-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-loan-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-accounting-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-cob-impl

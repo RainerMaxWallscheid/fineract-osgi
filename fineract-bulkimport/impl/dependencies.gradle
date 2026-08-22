@@ -29,7 +29,6 @@ dependencies {
     // Share product/account ports and pure DTOs
     implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-command-api'))
-    implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-document-impl'))
     implementation(project(path: ':fineract-organisation-api'))

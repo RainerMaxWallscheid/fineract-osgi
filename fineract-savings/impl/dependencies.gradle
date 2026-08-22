@@ -48,8 +48,6 @@ dependencies {
     implementation(project(path: ':fineract-tax-api'))
     // Product REST templates use CurrencyReadPlatformService
     implementation(project(path: ':fineract-monetary-api'))
-    // ColumnValidator (SQL order-by safety) lives in security-impl residual
-    implementation(project(path: ':fineract-security-impl'))
     // Office-scoped product SQL clauses for leftover product read
     implementation(project(path: ':fineract-entityaccess-api'))
     // Deposit account read templates use CalendarReadPlatformService

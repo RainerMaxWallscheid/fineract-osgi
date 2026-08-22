@@ -21,7 +21,7 @@ dependencies {
     api project(path: ':fineract-dataqueries-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
-    implementation(project(path: ':fineract-security-impl'))
+    implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-report'))
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-loan-impl'))

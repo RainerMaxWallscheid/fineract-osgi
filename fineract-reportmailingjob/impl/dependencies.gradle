@@ -21,8 +21,6 @@ dependencies {
     api project(path: ':fineract-reportmailingjob-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
-    // ColumnValidator (SQL order-by safety) lives in security-impl
-    implementation(project(path: ':fineract-security-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

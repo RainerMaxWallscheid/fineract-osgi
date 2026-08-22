@@ -39,8 +39,7 @@ dependencies {
     implementation(project(path: ':fineract-note-api'))
     // ExternalAssetOwner* domain types for journal write port signatures (impl via investor-impl)
     implementation(project(path: ':fineract-investor-api'))
-    // ColumnValidator for journal entry SQL order-by safety
-    implementation(project(path: ':fineract-security-impl'))
+
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 

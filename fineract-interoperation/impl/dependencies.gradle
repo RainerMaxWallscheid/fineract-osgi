@@ -26,7 +26,6 @@ dependencies {
     implementation(project(path: ':fineract-accounttransfer-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-security-api'))
-    implementation(project(path: ':fineract-security-impl'))
     implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-savings-impl'))
     implementation(project(path: ':fineract-clients-api'))
