@@ -171,7 +171,9 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         Group group = this.groupRepository.findById(loan.getGroupId()).orElseThrow(() -> new GroupNotFoundException(loan.getGroupId()));
                         groupClients.addAll(group.getClientMembers());
                     } else {
-                        groupClients.add(loan.client());
+                        if (loan.getClientId() != null) {
+                            groupClients.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(loan.getClientId()));
+                        }
                     }
                     HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
                     });
@@ -286,7 +288,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         if (loan.isGroupLoan() && groupClient != null) {
             client = groupClient;
         } else if (loan.isIndividualLoan()) {
-            client = loan.getClient();
+            client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(loan.getClientId());
         } else {
             throw new InvalidParameterException("");
         }

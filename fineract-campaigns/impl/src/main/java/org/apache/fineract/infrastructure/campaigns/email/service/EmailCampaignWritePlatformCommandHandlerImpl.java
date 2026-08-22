@@ -175,7 +175,10 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
             if (runReportObject != null) {
                 for (HashMap<String, Object> entry : runReportObject) {
                     String message = this.compileEmailTemplate(emailCampaign.getEmailMessage(), emailCampaign.getCampaignName(), entry);
-                    Client client = loan.getClient();
+                    if (loan.getClientId() == null) {
+                        continue;
+                    }
+                    Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(loan.getClientId());
                     String emailAddress = client.emailAddress();
                     if (emailAddress != null && isValidEmail(emailAddress)) {
                         EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailCampaign.getEmailSubject(), message, emailAddress, emailCampaign.getCampaignName());

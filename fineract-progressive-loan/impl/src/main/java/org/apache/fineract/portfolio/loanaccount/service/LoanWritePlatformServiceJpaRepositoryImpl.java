@@ -594,9 +594,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 // name is auto-generated
                 final String name = "To loan " + loan.getAccountNumber() + " from savings " + accountAssociations.linkedSavingsAccountNumber();
                 final Office fromOffice = loan.getOffice();
-                final Client fromClient = loan.getClient();
+                final Client fromClient = loan.getClientId() == null ? null
+                        : (Client) this.clientActivePort.persistableById(loan.getClientId());
                 final Office toOffice = loan.getOffice();
-                final Client toClient = loan.getClient();
+                final Client toClient = fromClient;
                 final Integer priority = StandingInstructionPriority.MEDIUM.getValue();
                 final Integer transferType = AccountTransferType.LOAN_REPAYMENT.getValue();
                 final Integer instructionType = StandingInstructionType.DUES.getValue();

@@ -64,7 +64,7 @@ public interface CalendarInstanceRepository extends JpaRepository<CalendarInstan
 
     /** Should use in clause, can I do it without creating a new class? **/
     @Cacheable(key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('groupId_' + #groupId + '_clientId_' + #clientId + '_statuses_' + T(org.springframework.util.StringUtils).collectionToCommaDelimitedString(#loanStatuses))")
-    @Query("select ci from CalendarInstance ci where ci.entityId in (select loan.id from Loan loan where loan.client.id = :clientId and loan.groupId = :groupId and loan.loanStatus in :loanStatuses) and ci.entityTypeId = 3")
+    @Query("select ci from CalendarInstance ci where ci.entityId in (select loan.id from Loan loan where loan.clientId = :clientId and loan.groupId = :groupId and loan.loanStatus in :loanStatuses) and ci.entityTypeId = 3")
     List<CalendarInstance> findCalendarInstancesForLoansByGroupIdAndClientIdAndStatuses(@Param("groupId") Long groupId,
             @Param("clientId") Long clientId, @Param("loanStatuses") Collection<LoanStatus> loanStatuses);
 

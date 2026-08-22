@@ -174,7 +174,8 @@ public class AccountTransferDetailAssembler {
         final Client fromClient = fromSavingsAccount.clientId() == null ? null
                 : this.clientRepository.findOneWithNotFoundDetection(fromSavingsAccount.clientId());
         final Office toOffice = toLoanAccount.getOffice();
-        final Client toClient = toLoanAccount.client();
+        final Client toClient = toLoanAccount.getClientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(toLoanAccount.getClientId());
 
         return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
                 transferType);
@@ -197,7 +198,8 @@ public class AccountTransferDetailAssembler {
     public AccountTransferDetails assembleLoanToSavingsTransfer(final Loan fromLoanAccount, final SavingsAccount toSavingsAccount,
             Integer transferType) {
         final Office fromOffice = fromLoanAccount.getOffice();
-        final Client fromClient = fromLoanAccount.client();
+        final Client fromClient = fromLoanAccount.getClientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(fromLoanAccount.getClientId());
         final Office toOffice = toSavingsAccount.office();
         final Client toClient = toSavingsAccount.clientId() == null ? null
                 : this.clientRepository.findOneWithNotFoundDetection(toSavingsAccount.clientId());
@@ -208,9 +210,11 @@ public class AccountTransferDetailAssembler {
 
     public AccountTransferDetails assembleLoanToLoanTransfer(Loan fromLoanAccount, Loan toLoanAccount, Integer transferType) {
         final Office fromOffice = fromLoanAccount.getOffice();
-        final Client fromClient = fromLoanAccount.client();
+        final Client fromClient = fromLoanAccount.getClientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(fromLoanAccount.getClientId());
         final Office toOffice = toLoanAccount.getOffice();
-        final Client toClient = toLoanAccount.client();
+        final Client toClient = toLoanAccount.getClientId() == null ? null
+                : this.clientRepository.findOneWithNotFoundDetection(toLoanAccount.getClientId());
 
         return AccountTransferDetails.loanToLoanTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toLoanAccount,
                 transferType);

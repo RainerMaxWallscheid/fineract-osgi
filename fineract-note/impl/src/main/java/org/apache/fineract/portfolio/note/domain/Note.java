@@ -77,12 +77,12 @@ public class Note extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public static Note loanNote(final Loan loan, final String note) {
-        final Long clientId = loan.client() == null ? null : loan.client().getId();
+        final Long clientId = loan.getClientId();
         return new Note(clientId, null, loan.getId(), null, note, NoteType.LOAN.getValue(), null, null, null);
     }
 
     public static Note loanTransactionNote(final Loan loan, final LoanTransaction loanTransaction, final String note) {
-        final Long clientId = loan.client() == null ? null : loan.client().getId();
+        final Long clientId = loan.getClientId();
         return new Note(clientId, null, loan.getId(), loanTransaction.getId(), note, NoteType.LOAN_TRANSACTION.getValue(), null, null,
                 null);
     }

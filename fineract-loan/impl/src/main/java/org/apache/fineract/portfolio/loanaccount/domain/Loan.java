@@ -65,8 +65,6 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
-
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
@@ -119,9 +117,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     private String accountNumber;
     @Column(name = "external_id")
     private ExternalId externalId;
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021 / charge Step 8).
+     */
+    @Column(name = "client_id")
+    private Long clientId;
     /**
      * Group id (no JPA association to leftover Group — ADR-021 / charge Step 8).
      */
@@ -338,7 +338,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         } else {
             this.accountNumber = accountNo;
         }
-        this.client = (Client) client;
+        this.clientId = client == null ? null : clientActivePort.id(client);
         this.groupId = group == null ? null : groupActivePort.id(group);
         this.loanType = loanType;
         this.fund = fund;
@@ -474,16 +474,12 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.summary.getTotalWrittenOff();
     }
 
-    public Client client() {
-        return this.client;
-    }
-
     public LoanProduct loanProduct() {
         return this.loanProduct;
     }
 
     public void updateClient(final Object client) {
-        this.client = (Client) client;
+        this.clientId = client == null ? null : clientActivePort.id(client);
     }
 
     public void updateLoanProduct(final LoanProduct loanProduct) {
@@ -902,7 +898,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public Long getClientId() {
-        return clientActivePort.id(this.client);
+        return this.clientId;
     }
 
     public Long getGroupId() {
@@ -914,11 +910,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public Long getOfficeId() {
-        return this.client != null ? clientActivePort.officeId(getClientId()) : groupActivePort.officeId(getGroupId());
+        return this.clientId != null ? clientActivePort.officeId(this.clientId) : groupActivePort.officeId(getGroupId());
     }
 
     public Office getOffice() {
-        return this.client != null ? (Office) clientActivePort.office(getClientId()) : (Office) groupActivePort.office(getGroupId());
+        return this.clientId != null ? (Office) clientActivePort.office(this.clientId) : (Office) groupActivePort.office(getGroupId());
     }
 
     public Boolean isCashBasedAccountingEnabledOnLoanProduct() {
@@ -1598,11 +1594,6 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public ExternalId getExternalId() {
         return this.externalId;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Client getClient() {
-        return this.client;
     }
 
     @java.lang.SuppressWarnings("all")
