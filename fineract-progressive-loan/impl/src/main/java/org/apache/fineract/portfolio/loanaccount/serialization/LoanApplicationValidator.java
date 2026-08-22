@@ -1572,7 +1572,7 @@ public final class LoanApplicationValidator {
     }
 
     private boolean isLoanRepaymentsSyncWithMeeting(Loan loan, Calendar calendar) {
-        return configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled() && loanUtilService.isLoanRepaymentsSyncWithMeeting(loan.group(), calendar);
+        return configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled() && loanUtilService.isLoanRepaymentsSyncWithMeeting(loan.getGroupId(), calendar);
     }
 
     public Long resolveOfficeId(Long clientId, Long groupId) {

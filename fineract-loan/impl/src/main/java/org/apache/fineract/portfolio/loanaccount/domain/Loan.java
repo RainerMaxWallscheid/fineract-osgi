@@ -70,7 +70,6 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.LoanRepaymentScheduleTransactionProcessor;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
@@ -123,9 +122,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    /**
+     * Group id (no JPA association to leftover Group — ADR-021 / charge Step 8).
+     */
+    @Column(name = "group_id")
+    private Long groupId;
     @ManyToOne
     @JoinColumn(name = "glim_id")
     private GroupLoanIndividualMonitoringAccount glim;
@@ -338,7 +339,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
             this.accountNumber = accountNo;
         }
         this.client = (Client) client;
-        this.group = (Group) group;
+        this.groupId = group == null ? null : groupActivePort.id(group);
         this.loanType = loanType;
         this.fund = fund;
         this.loanOfficer = loanOfficer;
@@ -905,7 +906,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public Long getGroupId() {
-        return groupActivePort.id(this.group);
+        return this.groupId;
     }
 
     public Long getGlimId() {
@@ -952,12 +953,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.syncDisbursementWithMeeting != null && this.syncDisbursementWithMeeting;
     }
 
-    public Group group() {
-        return this.group;
-    }
-
     public void updateGroup(final Object newGroup) {
-        this.group = (Group) newGroup;
+        this.groupId = newGroup == null ? null : groupActivePort.id(newGroup);
     }
 
     public Integer getCurrentLoanCounter() {
@@ -1606,11 +1603,6 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public Client getClient() {
         return this.client;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Group getGroup() {
-        return this.group;
     }
 
     @java.lang.SuppressWarnings("all")

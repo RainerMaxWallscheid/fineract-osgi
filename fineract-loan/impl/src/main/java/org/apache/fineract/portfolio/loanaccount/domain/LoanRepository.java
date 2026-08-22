@@ -59,7 +59,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
             + "l.client.id = :clientId order by l.loanCounter";
 
     String FIND_GROUP_LOANS_TO_UPDATE_LOANPRODUCT_COUNTER = "select l from Loan l where l.loanProductCounter > :loanProductCounter"
-            + " and l.group.id = :groupId and l.loanType = :groupLoanType and l.loanCounter is NULL order by l.loanProductCounter";
+            + " and l.groupId = :groupId and l.loanType = :groupLoanType and l.loanCounter is NULL order by l.loanProductCounter";
 
     String FIND_CLIENT_LOANS_TO_UPDATE_LOANPRODUCT_COUNTER = "select l from Loan l where l.loanProductCounter > :loanProductCounter"
             + " and l.client.id = :clientId and l.loanCounter is NULL order by l.loanProductCounter";
@@ -68,7 +68,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
             + "loan.client.id = :clientId and loan.loanStatus = :loanStatus group by loan.loanProduct.id";
 
     String FIND_ACTIVE_LOANS_PRODUCT_IDS_BY_GROUP = "Select loan.loanProduct.id from Loan loan where "
-            + "loan.group.id = :groupId and loan.loanStatus = :loanStatus and loan.client.id is NULL group by loan.loanProduct.id";
+            + "loan.groupId = :groupId and loan.loanStatus = :loanStatus and loan.client.id is NULL group by loan.loanProduct.id";
 
     String DOES_CLIENT_HAVE_LOANS_WITH_STATUSES = "select case when (count (loan) > 0) then 'true' else 'false' end from Loan loan where loan.client.id = :clientId and loan.loanStatus in :loanStatuses";
 
@@ -155,17 +155,17 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
     List<Loan> getClientLoansToUpdateLoanProductCounter(@Param("loanProductCounter") Integer loanProductCounter,
             @Param("clientId") Long clientId);
 
-    @Query("select loan from Loan loan where loan.client.id = :clientId and loan.group.id = :groupId")
+    @Query("select loan from Loan loan where loan.client.id = :clientId and loan.groupId = :groupId")
     List<Loan> findByClientIdAndGroupId(@Param("clientId") Long clientId, @Param("groupId") Long groupId);
 
-    @Query("select loan from Loan loan where loan.client.id = :clientId and loan.group.id = :groupId and loan.loanStatus IN :loanStatuses")
+    @Query("select loan from Loan loan where loan.client.id = :clientId and loan.groupId = :groupId and loan.loanStatus IN :loanStatuses")
     List<Loan> findByClientIdAndGroupIdAndLoanStatus(@Param("clientId") Long clientId, @Param("groupId") Long groupId,
             @Param("loanStatuses") Collection<LoanStatus> loanStatuses);
 
     @Query("select loan from Loan loan where loan.client.id = :clientId")
     List<Loan> findLoanByClientId(@Param("clientId") Long clientId);
 
-    @Query("select loan from Loan loan where loan.group.id = :groupId and loan.client.id is null")
+    @Query("select loan from Loan loan where loan.groupId = :groupId and loan.client.id is null")
     List<Loan> findByGroupId(@Param("groupId") Long groupId);
 
     @Query("select loan from Loan loan where loan.glim.id = :glimId")
@@ -182,7 +182,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
     List<Loan> findByClientOfficeIdsAndLoanStatus(@Param("officeIds") Collection<Long> officeIds,
             @Param("loanStatuses") Collection<LoanStatus> loanStatuses);
 
-    @Query("select loan from Loan loan where loan.group.office.id IN :officeIds and loan.loanStatus IN :loanStatuses")
+    @Query("select loan from Loan loan where loan.groupId in (select g.id from Group g where g.office.id IN :officeIds) and loan.loanStatus IN :loanStatuses")
     List<Loan> findByGroupOfficeIdsAndLoanStatus(@Param("officeIds") Collection<Long> officeIds,
             @Param("loanStatuses") Collection<LoanStatus> loanStatuses);
 

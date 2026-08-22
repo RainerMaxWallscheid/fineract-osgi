@@ -1,5 +1,0 @@
-Field <org.apache.fineract.portfolio.loanaccount.domain.Loan.group> has type <org.apache.fineract.portfolio.group.domain.Group> in (Loan.java:0)
-Method <org.apache.fineract.portfolio.loanaccount.domain.Loan._persistence_get_group()> has return type <org.apache.fineract.portfolio.group.domain.Group> in (Loan.java:0)
-Method <org.apache.fineract.portfolio.loanaccount.domain.Loan._persistence_set_group(org.apache.fineract.portfolio.group.domain.Group)> has parameter of type <org.apache.fineract.portfolio.group.domain.Group> in (Loan.java:0)
-Method <org.apache.fineract.portfolio.loanaccount.domain.Loan.getGroup()> has return type <org.apache.fineract.portfolio.group.domain.Group> in (Loan.java:0)
-Method <org.apache.fineract.portfolio.loanaccount.domain.Loan.group()> has return type <org.apache.fineract.portfolio.group.domain.Group> in (Loan.java:0)

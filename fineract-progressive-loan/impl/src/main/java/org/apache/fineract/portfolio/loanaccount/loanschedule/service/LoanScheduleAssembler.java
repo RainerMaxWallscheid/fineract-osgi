@@ -83,7 +83,6 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -295,15 +294,11 @@ public class LoanScheduleAssembler {
          * If it is JLG loan/Group Loan synched with a meeting, then make sure first repayment falls on meeting date
          */
         final Long groupId = this.fromApiJsonHelper.extractLongNamed("groupId", element);
-        Group group = null;
-        if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
-        }
         Boolean isSkipMeetingOnFirstDay = false;
         Integer numberOfDays = 0;
         boolean isSkipRepaymentOnFirstMonthEnabled = configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled();
         if (isSkipRepaymentOnFirstMonthEnabled) {
-            isSkipMeetingOnFirstDay = this.loanUtilService.isLoanRepaymentsSyncWithMeeting(group, calendar);
+            isSkipMeetingOnFirstDay = this.loanUtilService.isLoanRepaymentsSyncWithMeeting(groupId, calendar);
             if (isSkipMeetingOnFirstDay) {
                 numberOfDays = configurationDomainService.retreivePeriodInNumberOfDaysForSkipMeetingDate().intValue();
             }
@@ -751,7 +746,7 @@ public class LoanScheduleAssembler {
         Integer numberOfDays = 0;
         boolean isSkipRepaymentOnFirstMonthEnabled = configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled();
         if (isSkipRepaymentOnFirstMonthEnabled) {
-            isSkipRepaymentOnFirstMonth = this.loanUtilService.isLoanRepaymentsSyncWithMeeting(loan.group(), loanCalendar);
+            isSkipRepaymentOnFirstMonth = this.loanUtilService.isLoanRepaymentsSyncWithMeeting(loan.getGroupId(), loanCalendar);
             if (isSkipRepaymentOnFirstMonth) {
                 numberOfDays = configurationDomainService.retreivePeriodInNumberOfDaysForSkipMeetingDate().intValue();
             }

@@ -275,7 +275,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         // TODO: It is really weird to set GLIM info only if account number was not provided
         // if application is of GLIM type
         if (loan.getLoanType().isGLIMAccount()) {
-            Group group = loan.getGroup();
+            final Object group = loan.getGroupId() == null ? null : this.groupActivePort.persistableById(loan.getGroupId());
             String accountNumber;
             BigDecimal applicationId = BigDecimal.ZERO;
             // GLIM specific parameters
@@ -329,7 +329,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         }
     }
 
-    private void createAndSetGLIMAccount(BigDecimal totalLoan, Loan loan, AccountNumberFormat accountNumberFormat, Group group, BigDecimal applicationId) {
+    private void createAndSetGLIMAccount(BigDecimal totalLoan, Loan loan, AccountNumberFormat accountNumberFormat, Object group, BigDecimal applicationId) {
         final String accountNumber = this.accountNumberGenerator.generate(loan, accountNumberFormat);
         loan.setAccountNumber(accountNumber + "1");
         GroupLoanIndividualMonitoringAccount glimAccount = glimAccountInfoWritePlatformService.createGLIMAccount(accountNumber, group, totalLoan, 1L, true, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
@@ -490,12 +490,11 @@ public class LoanAssemblerImpl implements LoanAssembler {
         }
         // FIXME: AA - We may require separate api command to move loan from one
         // group to another
-        final Long groupId = loan.getGroup() == null ? null : loan.getGroup().getId();
+        final Long groupId = loan.getGroupId();
         if (command.isChangeInLongParameterNamed(LoanApiConstants.groupIdParameterName, groupId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.groupIdParameterName);
             changes.put(LoanApiConstants.groupIdParameterName, newValue);
-            final Group group = this.groupRepository.findOneWithNotFoundDetection(newValue);
-            loan.updateGroup(group);
+            loan.updateGroup(this.groupActivePort.persistableById(newValue));
         }
         if (command.isChangeInLongParameterNamed(LoanApiConstants.productIdParameterName, loan.getLoanProduct().getId())) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.productIdParameterName);

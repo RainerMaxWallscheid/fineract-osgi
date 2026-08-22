@@ -44,6 +44,11 @@ public interface GroupActivePort {
     boolean hasClientAsMember(Long groupId, Long clientId);
 
     /**
+     * Parent group/center id, or null when the group has no parent.
+     */
+    Long parentId(Long groupId);
+
+    /**
      * Group id from a persistable group instance (Object-typed, ADR-021).
      */
     Long id(Object group);

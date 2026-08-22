@@ -69,6 +69,12 @@ public class GroupActivePortAdapter implements GroupActivePort {
     }
 
     @Override
+    public Long parentId(final Long groupId) {
+        final Group parent = group(groupId).getParent();
+        return parent == null ? null : parent.getId();
+    }
+
+    @Override
     public Long id(final Object group) {
         if (group == null) {
             return null;

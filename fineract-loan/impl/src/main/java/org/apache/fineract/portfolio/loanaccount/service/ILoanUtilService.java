@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.time.LocalDate;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -35,7 +34,7 @@ public interface ILoanUtilService {
     ScheduleGeneratorDTO buildScheduleGeneratorDTO(Loan loan, LocalDate recalculateFrom, LocalDate recalculateTill,
             HolidayDetailDTO holidayDetailDTO);
 
-    Boolean isLoanRepaymentsSyncWithMeeting(Group group, Calendar calendar);
+    Boolean isLoanRepaymentsSyncWithMeeting(Long groupId, Calendar calendar);
 
     LocalDate getCalculatedRepaymentsStartingFromDate(Loan loan);
 

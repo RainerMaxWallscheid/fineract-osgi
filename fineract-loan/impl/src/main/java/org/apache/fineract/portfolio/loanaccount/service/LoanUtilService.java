@@ -48,7 +48,6 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
@@ -125,7 +124,7 @@ public class LoanUtilService implements ILoanUtilService {
         Integer numberOfDays = 0;
         boolean isSkipRepaymentOnFirstMonthEnabled = configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled();
         if (isSkipRepaymentOnFirstMonthEnabled) {
-            isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.group(), calendar);
+            isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.getGroupId(), calendar);
             if (isSkipRepaymentOnFirstMonth) {
                 numberOfDays = configurationDomainService.retreivePeriodInNumberOfDaysForSkipMeetingDate().intValue();
             }
@@ -139,16 +138,17 @@ public class LoanUtilService implements ILoanUtilService {
     }
 
     @Override
-    public Boolean isLoanRepaymentsSyncWithMeeting(final Group group, final Calendar calendar) {
+    public Boolean isLoanRepaymentsSyncWithMeeting(final Long groupId, final Calendar calendar) {
         Boolean isSkipRepaymentOnFirstMonth = false;
         Long entityId = null;
         Long entityTypeId = null;
-        if (group != null) {
-            if (group.getParent() != null) {
-                entityId = group.getParent().getId();
+        if (groupId != null) {
+            final Long parentId = this.groupActivePort.parentId(groupId);
+            if (parentId != null) {
+                entityId = parentId;
                 entityTypeId = CalendarEntityType.CENTERS.getValue().longValue();
             } else {
-                entityId = group.getId();
+                entityId = groupId;
                 entityTypeId = CalendarEntityType.GROUPS.getValue().longValue();
             }
         }
@@ -233,7 +233,7 @@ public class LoanUtilService implements ILoanUtilService {
                     boolean isSkipRepaymentOnFirstMonthEnabled = this.configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled();
                     if (isSkipRepaymentOnFirstMonthEnabled) {
                         numberOfDays = configurationDomainService.retreivePeriodInNumberOfDaysForSkipMeetingDate().intValue();
-                        isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.group(), calendar);
+                        isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.getGroupId(), calendar);
                     }
                     calculatedRepaymentsStartingFromDate = CalendarUtils.getFirstRepaymentMeetingDate(calendar, actualDisbursementDate, repayEvery, frequency, isSkipRepaymentOnFirstMonth, numberOfDays);
                 }
@@ -256,7 +256,7 @@ public class LoanUtilService implements ILoanUtilService {
                 boolean isSkipRepaymentOnFirstMonthEnabled = this.configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled();
                 if (isSkipRepaymentOnFirstMonthEnabled) {
                     numberOfDays = configurationDomainService.retreivePeriodInNumberOfDaysForSkipMeetingDate().intValue();
-                    isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.group(), historyList.get(0).getCalendar());
+                    isSkipRepaymentOnFirstMonth = isLoanRepaymentsSyncWithMeeting(loan.getGroupId(), historyList.get(0).getCalendar());
                 }
                 calculatedRepaymentsStartingFromDate = CalendarUtils.getNextRepaymentMeetingDate(historyList.get(0).getRecurrence(), historyList.get(0).getStartDate(), actualDisbursementDate, repayEvery, frequency, workingDays, isSkipRepaymentOnFirstMonth, numberOfDays);
             }
