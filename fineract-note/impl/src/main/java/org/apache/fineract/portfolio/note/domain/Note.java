@@ -27,13 +27,12 @@ import org.apache.commons.lang3.Strings;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
 /**
  * Note entity. Foreign keys are stored as Long columns (no cross-module
  * {@code @ManyToOne}) for static weaving safety across loan/savings/share peels.
- * Factory helpers still accept aggregate roots for call-site convenience.
+ * Loan/savings factory helpers take ids; client/group factories still accept
+ * aggregate roots for call-site convenience.
  */
 @Entity
 @Table(name = "m_note")
@@ -82,16 +81,14 @@ public class Note extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return new Note(clientId, null, loanId, loanTransactionId, note, NoteType.LOAN_TRANSACTION.getValue(), null, null, null);
     }
 
-    public static Note savingNote(final SavingsAccount account, final String note) {
-        final Long clientId = account.clientId();
-        return new Note(clientId, null, null, null, note, NoteType.SAVING_ACCOUNT.getValue(), account.getId(), null, null);
+    public static Note savingNote(final Long savingsAccountId, final Long clientId, final String note) {
+        return new Note(clientId, null, null, null, note, NoteType.SAVING_ACCOUNT.getValue(), savingsAccountId, null, null);
     }
 
-    public static Note savingsTransactionNote(final SavingsAccount savingsAccount, final SavingsAccountTransaction savingsTransaction,
+    public static Note savingsTransactionNote(final Long savingsAccountId, final Long savingsTransactionId, final Long clientId,
             final String note) {
-        final Long clientId = savingsAccount.clientId();
-        return new Note(clientId, null, null, null, note, NoteType.SAVINGS_TRANSACTION.getValue(), savingsAccount.getId(),
-                savingsTransaction.getId(), null);
+        return new Note(clientId, null, null, null, note, NoteType.SAVINGS_TRANSACTION.getValue(), savingsAccountId, savingsTransactionId,
+                null);
     }
 
     public static Note shareNote(final Long shareAccountId, final Long clientId, final String note) {

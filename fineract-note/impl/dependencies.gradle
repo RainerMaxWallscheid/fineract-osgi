@@ -25,8 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     // Loan/loan-transaction notes via LoanExistencePort
     implementation(project(path: ':fineract-loan-api'))
-    // Factory helpers + write service resolve leftover savings aggregates
-    implementation(project(path: ':fineract-savings-impl'))
+    // Savings/savings-transaction notes via SavingsAccountExistencePort
+    implementation(project(path: ':fineract-savings-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

@@ -739,7 +739,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.depositAccountDomainService.handleFDAccountClosure(account, paymentDetail, user, command, changes);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingNote(account, noteText);
+            final Note note = Note.savingNote(account.getId(), account.clientId(), noteText);
             changes.put("note", noteText);
             this.noteRepository.save(note);
         }
@@ -764,7 +764,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.depositAccountDomainService.handleRDAccountClosure(account, paymentDetail, user, command, changes);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingNote(account, noteText);
+            final Note note = Note.savingNote(account.getId(), account.clientId(), noteText);
             changes.put("note", noteText);
             this.noteRepository.save(note);
         }
@@ -789,7 +789,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.depositAccountDomainService.handleFDAccountPreMatureClosure(account, paymentDetail, user, command, changes);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingNote(account, noteText);
+            final Note note = Note.savingNote(account.getId(), account.clientId(), noteText);
             changes.put("note", noteText);
             this.noteRepository.save(note);
         }
@@ -822,7 +822,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.depositAccountDomainService.handleRDAccountPreMatureClosure(account, paymentDetail, user, command, changes);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingNote(account, noteText);
+            final Note note = Note.savingNote(account.getId(), account.clientId(), noteText);
             changes.put("note", noteText);
             this.noteRepository.save(note);
         }

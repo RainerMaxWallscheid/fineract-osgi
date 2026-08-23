@@ -24,10 +24,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
-import java.util.Optional;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.data.NoteCreateResponse;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
@@ -37,10 +37,6 @@ import org.apache.fineract.portfolio.note.data.NoteUpdateResponse;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.note.domain.NoteType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,17 +56,11 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private LoanExistencePort loanExistencePort;
     @Mock
-    private SavingsAccountRepository savingsAccountRepository;
-    @Mock
-    private SavingsAccountTransactionRepository savingsAccountTransactionRepository;
+    private SavingsAccountExistencePort savingsAccountExistencePort;
     @Mock
     private ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
     @Mock
     private ShareAccountNoteSupport shareSupport;
-    @Mock
-    private SavingsAccountTransaction savingsAccountTransaction;
-    @Mock
-    private SavingsAccount savingsAccount;
     @Mock
     private Note note;
 
@@ -79,7 +69,7 @@ class NoteWritePlatformServiceImplTest {
     @BeforeEach
     void setUp() {
         subject = new NoteWritePlatformServiceImpl(noteRepository, clientRepository, groupRepository, loanExistencePort,
-                savingsAccountRepository, savingsAccountTransactionRepository, shareAccountNoteSupport);
+                savingsAccountExistencePort, shareAccountNoteSupport);
     }
 
     @Test
@@ -101,10 +91,8 @@ class NoteWritePlatformServiceImplTest {
     void createNoteShouldSupportSavingsTransaction() {
         NoteCreateRequest request = NoteCreateRequest.builder().resourceId(22L).type(NoteType.SAVINGS_TRANSACTION)
                 .note("savings transaction note").build();
-        when(savingsAccountTransactionRepository.findById(22L)).thenReturn(Optional.of(savingsAccountTransaction));
-        when(savingsAccountTransaction.getSavingsAccount()).thenReturn(savingsAccount);
-        when(savingsAccount.clientId()).thenReturn(5L);
-        when(savingsAccount.officeId()).thenReturn(8L);
+        when(savingsAccountExistencePort.requireTransaction(22L))
+                .thenReturn(new SavingsAccountExistencePort.SavingsTransactionNoteRef(11L, 22L, 5L, 8L));
         when(noteRepository.saveAndFlush(any(Note.class))).thenReturn(note);
         when(note.getId()).thenReturn(202L);
 
@@ -135,11 +123,9 @@ class NoteWritePlatformServiceImplTest {
     @Test
     void deleteNoteShouldSupportSavingsTransaction() {
         NoteDeleteRequest request = NoteDeleteRequest.builder().id(3L).resourceId(22L).type(NoteType.SAVINGS_TRANSACTION).build();
-        when(savingsAccountTransactionRepository.findById(22L)).thenReturn(Optional.of(savingsAccountTransaction));
-        when(savingsAccountTransaction.getId()).thenReturn(22L);
+        when(savingsAccountExistencePort.requireTransaction(22L))
+                .thenReturn(new SavingsAccountExistencePort.SavingsTransactionNoteRef(11L, 22L, 5L, 8L));
         when(noteRepository.findBySavingsTransactionIdAndId(22L, 3L)).thenReturn(note);
-        when(savingsAccountTransaction.getSavingsAccount()).thenReturn(savingsAccount);
-        when(savingsAccount.officeId()).thenReturn(8L);
 
         NoteDeleteResponse response = subject.deleteNote(request);
 

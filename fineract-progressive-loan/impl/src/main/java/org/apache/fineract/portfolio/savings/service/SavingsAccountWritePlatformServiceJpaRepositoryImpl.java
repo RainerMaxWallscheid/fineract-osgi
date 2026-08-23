@@ -305,7 +305,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingsTransactionNote(account, deposit, noteText);
+            final Note note = Note.savingsTransactionNote(account.getId(), deposit.getId(), account.clientId(), noteText);
             this.noteRepository.save(note);
         }
         return  //
@@ -359,7 +359,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingsTransactionNote(account, withdrawal, noteText);
+            final Note note = Note.savingsTransactionNote(account.getId(), withdrawal.getId(), account.clientId(), noteText);
             this.noteRepository.save(note);
         }
         return  //
@@ -409,7 +409,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingsTransactionNote(account, withdrawal, noteText);
+            final Note note = Note.savingsTransactionNote(account.getId(), withdrawal.getId(), account.clientId(), noteText);
             this.noteRepository.save(note);
         }
         return  //
@@ -886,7 +886,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             this.savingAccountRepositoryWrapper.save(account);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(account, noteText);
+                final Note note = Note.savingNote(account.getId(), account.clientId(), noteText);
                 changes.put("note", noteText);
                 this.noteRepository.save(note);
             }
@@ -1170,7 +1170,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         SavingsAccountTransaction chargeTransaction = this.payCharge(savingsAccountCharge, transactionDate, amountPaid, fmt, backdatedTxnsAllowedTill);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.savingsTransactionNote(savingsAccountCharge.savingsAccount(), chargeTransaction, noteText);
+            final var savingsAccount = savingsAccountCharge.savingsAccount();
+            final Note note = Note.savingsTransactionNote(savingsAccount.getId(), chargeTransaction.getId(), savingsAccount.clientId(),
+                    noteText);
             this.noteRepository.save(note);
         }
         return  //

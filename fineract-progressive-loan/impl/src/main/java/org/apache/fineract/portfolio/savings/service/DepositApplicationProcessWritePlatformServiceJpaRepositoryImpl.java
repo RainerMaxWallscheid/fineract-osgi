@@ -526,7 +526,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount, noteText);
+                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
                 this.noteRepository.save(note);
             }
@@ -554,7 +554,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount, noteText);
+                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
                 this.noteRepository.save(note);
             }
@@ -582,7 +582,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount, noteText);
+                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
                 this.noteRepository.save(note);
             }
@@ -610,7 +610,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount, noteText);
+                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
                 this.noteRepository.save(note);
             }

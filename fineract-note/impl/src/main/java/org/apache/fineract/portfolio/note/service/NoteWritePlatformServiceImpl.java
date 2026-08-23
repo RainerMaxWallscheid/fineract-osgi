@@ -26,6 +26,7 @@ import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.data.NoteCreateResponse;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
@@ -37,10 +38,6 @@ import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteNotFoundException;
 import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
-import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
-import org.apache.fineract.portfolio.savings.exception.SavingsAccountTransactionNotFoundException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
@@ -55,21 +52,17 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
     private final ClientRepository clientRepository;
     private final GroupRepository groupRepository;
     private final LoanExistencePort loanExistencePort;
-    private final SavingsAccountRepository savingsAccountRepository;
-    private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
+    private final SavingsAccountExistencePort savingsAccountExistencePort;
     private final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
 
     public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientRepository clientRepository,
             final GroupRepository groupRepository, final LoanExistencePort loanExistencePort,
-            final SavingsAccountRepository savingsAccountRepository,
-            final SavingsAccountTransactionRepository savingsAccountTransactionRepository,
-            final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport) {
+            final SavingsAccountExistencePort savingsAccountExistencePort, final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport) {
         this.noteRepository = noteRepository;
         this.clientRepository = clientRepository;
         this.groupRepository = groupRepository;
         this.loanExistencePort = loanExistencePort;
-        this.savingsAccountRepository = savingsAccountRepository;
-        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
+        this.savingsAccountExistencePort = savingsAccountExistencePort;
         this.shareAccountNoteSupport = shareAccountNoteSupport;
     }
 
@@ -102,17 +95,15 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 officeId = ref.officeId();
             }
             case SAVING_ACCOUNT -> {
-                final var savingAccount = savingsAccountRepository.findById(request.getResourceId())
-                        .orElseThrow(() -> new SavingsAccountNotFoundException(request.getResourceId()));
-                note = noteRepository.saveAndFlush(Note.savingNote(savingAccount, request.getNote()));
-                officeId = savingAccount.officeId();
+                final var ref = savingsAccountExistencePort.require(request.getResourceId());
+                note = noteRepository.saveAndFlush(Note.savingNote(ref.savingsAccountId(), ref.clientId(), request.getNote()));
+                officeId = ref.officeId();
             }
             case SAVINGS_TRANSACTION -> {
-                final var savingsTransaction = savingsAccountTransactionRepository.findById(request.getResourceId())
-                        .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, request.getResourceId()));
-                final var savingsAccount = savingsTransaction.getSavingsAccount();
-                note = noteRepository.saveAndFlush(Note.savingsTransactionNote(savingsAccount, savingsTransaction, request.getNote()));
-                officeId = savingsAccount.officeId();
+                final var ref = savingsAccountExistencePort.requireTransaction(request.getResourceId());
+                note = noteRepository.saveAndFlush(Note.savingsTransactionNote(ref.savingsAccountId(), ref.savingsTransactionId(),
+                        ref.clientId(), request.getNote()));
+                officeId = ref.officeId();
             }
             case SHARE_ACCOUNT -> {
                 final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
@@ -172,16 +163,14 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 officeId = ref.officeId();
             }
             case SAVING_ACCOUNT -> {
-                final var savingAccount = savingsAccountRepository.findById(resourceId)
-                        .orElseThrow(() -> new SavingsAccountNotFoundException(resourceId));
-                note = noteRepository.findBySavingsAccountIdAndId(savingAccount.getId(), noteId);
-                officeId = savingAccount.officeId();
+                final var ref = savingsAccountExistencePort.require(resourceId);
+                note = noteRepository.findBySavingsAccountIdAndId(ref.savingsAccountId(), noteId);
+                officeId = ref.officeId();
             }
             case SAVINGS_TRANSACTION -> {
-                final var savingsTransaction = savingsAccountTransactionRepository.findById(resourceId)
-                        .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, resourceId));
-                note = noteRepository.findBySavingsTransactionIdAndId(savingsTransaction.getId(), noteId);
-                officeId = savingsTransaction.getSavingsAccount().officeId();
+                final var ref = savingsAccountExistencePort.requireTransaction(resourceId);
+                note = noteRepository.findBySavingsTransactionIdAndId(ref.savingsTransactionId(), noteId);
+                officeId = ref.officeId();
             }
             case SHARE_ACCOUNT -> {
                 final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
