@@ -42,9 +42,7 @@ import org.apache.fineract.infrastructure.dataqueries.exception.ReportParameterN
 import org.apache.fineract.infrastructure.dataqueries.serialization.ReportCommandFromApiJsonDeserializer;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.useradministration.domain.Permission;
-import org.apache.fineract.useradministration.domain.PermissionRepository;
-import org.apache.fineract.useradministration.exception.PermissionNotFoundException;
+import org.apache.fineract.useradministration.moduleapi.ReportPermissionPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,20 +61,20 @@ public class ReportWritePlatformServiceImpl implements ReportWritePlatformServic
     private final ReportRepository reportRepository;
     private final ReportParameterUsageRepository reportParameterUsageRepository;
     private final ReportParameterRepository reportParameterRepository;
-    private final PermissionRepository permissionRepository;
+    private final ReportPermissionPort reportPermissionPort;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
 
     @Autowired
     public ReportWritePlatformServiceImpl(final PlatformSecurityContext context,
             final ReportCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ReportRepository reportRepository,
             final ReportParameterRepository reportParameterRepository, final ReportParameterUsageRepository reportParameterUsageRepository,
-            final PermissionRepository permissionRepository, final ReportingProcessServiceProvider reportingProcessServiceProvider) {
+            final ReportPermissionPort reportPermissionPort, final ReportingProcessServiceProvider reportingProcessServiceProvider) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.reportRepository = reportRepository;
         this.reportParameterRepository = reportParameterRepository;
         this.reportParameterUsageRepository = reportParameterUsageRepository;
-        this.permissionRepository = permissionRepository;
+        this.reportPermissionPort = reportPermissionPort;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
     }
 
@@ -95,8 +93,7 @@ public class ReportWritePlatformServiceImpl implements ReportWritePlatformServic
 
             this.reportRepository.saveAndFlush(report);
 
-            final Permission permission = new Permission("report", report.getReportName(), "READ");
-            this.permissionRepository.save(permission);
+            this.reportPermissionPort.saveReadPermission(report.getReportName());
 
             return new CommandProcessingResultBuilder() //
                     .withCommandId(command.commandId()) //
@@ -163,13 +160,9 @@ public class ReportWritePlatformServiceImpl implements ReportWritePlatformServic
             throw new PlatformDataIntegrityException("error.msg.cant.delete.core.report", "Core Reports Can't be Deleted", "");
         }
 
-        final Permission permission = this.permissionRepository.findOneByCode("READ" + "_" + report.getReportName());
-        if (permission == null) {
-            throw new PermissionNotFoundException("READ" + "_" + report.getReportName());
-        }
+        this.reportPermissionPort.deleteReadPermission(report.getReportName());
 
         this.reportRepository.delete(report);
-        this.permissionRepository.delete(permission);
 
         return new CommandProcessingResultBuilder() //
                 .withEntityId(reportId) //
