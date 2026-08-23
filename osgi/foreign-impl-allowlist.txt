@@ -8,7 +8,6 @@ fineract-bulkimport/impl/dependencies.gradle	fineract-loan-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-savings-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-accounting-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl
-fineract-campaigns/impl/dependencies.gradle	fineract-gcm-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-dataqueries-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-event-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-reportmailingjob-impl

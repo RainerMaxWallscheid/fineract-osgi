@@ -35,9 +35,10 @@ import org.apache.fineract.infrastructure.gcm.domain.Sender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class NotificationSenderService {
+public class NotificationSenderServiceImpl implements NotificationSenderService {
     private final NotificationConfigurationReadService notificationConfigurationReadService;
 
+    @Override
     public void sendNotification(List<GcmPushNotification> notifications) {
         Map<Long, List<GcmPushNotification>> notificationByEachClient = getNotificationListByClient(notifications);
         for (Map.Entry<Long, List<GcmPushNotification>> entry : notificationByEachClient.entrySet()) {
@@ -76,7 +77,7 @@ public class NotificationSenderService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public NotificationSenderService(final NotificationConfigurationReadService notificationConfigurationReadService) {
+        public NotificationSenderServiceImpl(final NotificationConfigurationReadService notificationConfigurationReadService) {
         this.notificationConfigurationReadService = notificationConfigurationReadService;
     }
 }

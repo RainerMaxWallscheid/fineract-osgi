@@ -26,7 +26,6 @@ dependencies {
     implementation(project(path: ':fineract-sms-api'))
     implementation(project(path: ':fineract-sms-impl'))
     implementation(project(path: ':fineract-gcm-api'))
-    implementation(project(path: ':fineract-gcm-impl'))
     implementation(project(path: ':fineract-configuration-api'))
     implementation(project(path: ':fineract-dataqueries-api'))
     implementation(project(path: ':fineract-dataqueries-impl'))
