@@ -30,9 +30,7 @@ import org.apache.fineract.portfolio.loanorigination.exception.LoanOriginatorNot
 import org.apache.fineract.portfolio.loanorigination.exception.LoanOriginatorNotFoundException;
 import org.apache.fineract.portfolio.loanorigination.exception.WorkingCapitalLoanNotInSubmittedStatusForOriginationException;
 import org.apache.fineract.portfolio.loanorigination.exception.WorkingCapitalLoanOriginatorMappingNotFoundException;
-import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
-import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
-import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
+import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,15 +39,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class WorkingCapitalLoanOriginatorWritePlatformServiceImpl implements WorkingCapitalLoanOriginatorWritePlatformService {
-    private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
+    private final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort;
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final WorkingCapitalLoanOriginatorMappingRepository workingCapitalLoanOriginatorMappingRepository;
 
     @Override
     public CommandProcessingResult attachOriginatorToWorkingCapitalLoan(final Long loanId, final Long originatorId) {
-        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-        if (!loan.getLoanStatus().isSubmittedAndPendingApproval()) {
-            throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, loan.getLoanStatus().getCode());
+        if (!this.workingCapitalLoanExistencePort.isSubmittedAndPendingApproval(loanId)) {
+            throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, this.workingCapitalLoanExistencePort.statusCode(loanId));
         }
         final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId).orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
         if (originator.getStatus() != LoanOriginatorStatus.ACTIVE) {
@@ -65,14 +62,13 @@ public class WorkingCapitalLoanOriginatorWritePlatformServiceImpl implements Wor
         //
         //
         //
-        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(loan.getExternalId()).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
+        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(this.workingCapitalLoanExistencePort.externalId(loanId)).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
     }
 
     @Override
     public CommandProcessingResult detachOriginatorFromWorkingCapitalLoan(final Long loanId, final Long originatorId) {
-        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-        if (!loan.getLoanStatus().isSubmittedAndPendingApproval()) {
-            throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, loan.getLoanStatus().getCode());
+        if (!this.workingCapitalLoanExistencePort.isSubmittedAndPendingApproval(loanId)) {
+            throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, this.workingCapitalLoanExistencePort.statusCode(loanId));
         }
         final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId).orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
         final WorkingCapitalLoanOriginatorMapping mapping = this.workingCapitalLoanOriginatorMappingRepository.findByLoanIdAndOriginatorId(loanId, originatorId).orElseThrow(() -> new WorkingCapitalLoanOriginatorMappingNotFoundException(loanId, originatorId));
@@ -82,12 +78,12 @@ public class WorkingCapitalLoanOriginatorWritePlatformServiceImpl implements Wor
         //
         //
         //
-        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(loan.getExternalId()).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
+        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(this.workingCapitalLoanExistencePort.externalId(loanId)).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanOriginatorWritePlatformServiceImpl(final WorkingCapitalLoanRepository workingCapitalLoanRepository, final LoanOriginatorRepository loanOriginatorRepository, final WorkingCapitalLoanOriginatorMappingRepository workingCapitalLoanOriginatorMappingRepository) {
-        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        public WorkingCapitalLoanOriginatorWritePlatformServiceImpl(final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort, final LoanOriginatorRepository loanOriginatorRepository, final WorkingCapitalLoanOriginatorMappingRepository workingCapitalLoanOriginatorMappingRepository) {
+        this.workingCapitalLoanExistencePort = workingCapitalLoanExistencePort;
         this.loanOriginatorRepository = loanOriginatorRepository;
         this.workingCapitalLoanOriginatorMappingRepository = workingCapitalLoanOriginatorMappingRepository;
     }

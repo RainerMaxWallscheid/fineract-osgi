@@ -34,6 +34,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.portfolio.workingcapitalloan.data,'
                         + 'org.apache.fineract.portfolio.workingcapitalloan.domain,'
                         + 'org.apache.fineract.portfolio.workingcapitalloan.exception,'
+                        + 'org.apache.fineract.portfolio.workingcapitalloan.moduleapi,'
                         + 'org.apache.fineract.portfolio.workingcapitalloan.service,'
                         + 'org.apache.fineract.portfolio.workingcapitalloanbreach.data,'
                         + 'org.apache.fineract.portfolio.workingcapitalloanbreach.exception,'

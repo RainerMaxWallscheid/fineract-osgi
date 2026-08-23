@@ -25,7 +25,6 @@ dependencies {
     implementation(project(path: ':fineract-avro-schemas'))
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
-    implementation(project(path: ':fineract-working-capital-loan-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
