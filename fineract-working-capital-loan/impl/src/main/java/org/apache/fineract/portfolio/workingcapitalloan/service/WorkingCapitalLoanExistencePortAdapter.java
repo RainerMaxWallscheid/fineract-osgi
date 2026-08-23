@@ -18,7 +18,11 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
@@ -27,6 +31,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class WorkingCapitalLoanExistencePortAdapter implements WorkingCapitalLoanExistencePort {
+
+    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = List.of(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL,
+            LoanStatus.APPROVED, LoanStatus.ACTIVE, LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD);
 
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
 
@@ -56,11 +63,25 @@ public class WorkingCapitalLoanExistencePortAdapter implements WorkingCapitalLoa
 
     @Override
     public Long idByExternalId(final ExternalId externalId) {
-        final Long loanId = workingCapitalLoanRepository.findIdByExternalId(externalId);
+        final Long loanId = findIdByExternalId(externalId);
         if (loanId == null) {
             throw new WorkingCapitalLoanNotFoundException(externalId);
         }
         return loanId;
+    }
+
+    @Override
+    public Long findIdByExternalId(final ExternalId externalId) {
+        return workingCapitalLoanRepository.findIdByExternalId(externalId);
+    }
+
+    @Override
+    public boolean anyBehindCobDate(final LocalDate cobDate, final List<Long> loanIds) {
+        if (loanIds == null || loanIds.isEmpty()) {
+            return false;
+        }
+        return !workingCapitalLoanRepository.findAllLoansBehindByLoanIdsAndStatuses(cobDate, loanIds, NON_CLOSED_LOAN_STATUSES).isEmpty()
+                || !workingCapitalLoanRepository.findAllLoansBehindOnDisbursementDate(cobDate, loanIds, NON_CLOSED_LOAN_STATUSES).isEmpty();
     }
 
     private WorkingCapitalLoan requireLoan(final Long loanId) {

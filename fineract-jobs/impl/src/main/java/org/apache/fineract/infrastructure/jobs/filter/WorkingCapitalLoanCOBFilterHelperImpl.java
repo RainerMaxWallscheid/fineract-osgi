@@ -24,19 +24,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
-import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.cob.service.AccountLockService;
-import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanRetrieveIdService;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
@@ -45,7 +43,7 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedException;
 import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
+import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Conditional;
@@ -62,9 +60,8 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
     private final AccountLockService<?> loanAccountLockService;
     private final PlatformSecurityContext context;
     private final InlineExecutorService<Long> inlineLoanCOBExecutorService;
-    private final WorkingCapitalLoanRepository loanRepository;
+    private final WorkingCapitalLoanExistencePort existencePort;
     private final FineractProperties fineractProperties;
-    private final WorkingCapitalLoanRetrieveIdService retrieveIdService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
     public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/working-capital-loans/catch-up");
@@ -75,7 +72,7 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
         String id = LOAN_PATH_PATTERN.matcher(pathInfo).replaceAll("$1");
         if (isExternal(pathInfo)) {
             String externalId = id;
-            return loanRepository.findIdByExternalId(new ExternalId(externalId));
+            return existencePort.findIdByExternalId(new ExternalId(externalId));
         } else if (StringUtils.isNumeric(id)) {
             return Long.valueOf(id);
         } else {
@@ -116,13 +113,14 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
     @Override
     @Transactional(readOnly = true)
     public boolean isLoanBehind(List<Long> loanIds) {
-        List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDates = new ArrayList<>();
+        final LocalDate cobDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE);
         List<List<Long>> partitions = Lists.partition(loanIds, fineractProperties.getQuery().getInClauseParameterSizeLimit());
-        partitions.forEach(partition -> {
-            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanIdsBehindDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
-            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanBehindOnDisbursementDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
-        });
-        return CollectionUtils.isNotEmpty(loanIdAndLastClosedBusinessDates);
+        for (List<Long> partition : partitions) {
+            if (existencePort.anyBehindCobDate(cobDate, partition)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -202,13 +200,11 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
             final @Qualifier("workingCapitalAccountLockServiceImpl") AccountLockService<?> loanAccountLockService,
             final PlatformSecurityContext context,
             final @Qualifier("inlineWorkingCapitalLoanCOBExecutorServiceImpl") InlineExecutorService<Long> inlineLoanCOBExecutorService,
-            final WorkingCapitalLoanRepository loanRepository, final FineractProperties fineractProperties,
-            final WorkingCapitalLoanRetrieveIdService retrieveIdService) {
+            final WorkingCapitalLoanExistencePort existencePort, final FineractProperties fineractProperties) {
         this.loanAccountLockService = loanAccountLockService;
         this.context = context;
         this.inlineLoanCOBExecutorService = inlineLoanCOBExecutorService;
-        this.loanRepository = loanRepository;
+        this.existencePort = existencePort;
         this.fineractProperties = fineractProperties;
-        this.retrieveIdService = retrieveIdService;
     }
 }

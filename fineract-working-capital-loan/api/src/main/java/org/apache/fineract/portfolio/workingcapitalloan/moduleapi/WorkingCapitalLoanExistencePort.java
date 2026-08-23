@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.moduleapi;
 
+import java.time.LocalDate;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
@@ -47,4 +49,15 @@ public interface WorkingCapitalLoanExistencePort {
      * Throws {@code WorkingCapitalLoanNotFoundException} when {@code externalId} is unknown.
      */
     Long idByExternalId(ExternalId externalId);
+
+    /**
+     * Nullable external-id lookup. Returns {@code null} when unknown.
+     */
+    Long findIdByExternalId(ExternalId externalId);
+
+    /**
+     * True when any of {@code loanIds} is behind {@code cobDate} or disbursed on that date
+     * with a null last-closed business date.
+     */
+    boolean anyBehindCobDate(LocalDate cobDate, List<Long> loanIds);
 }
