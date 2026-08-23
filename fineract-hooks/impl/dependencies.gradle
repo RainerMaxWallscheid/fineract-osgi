@@ -21,9 +21,8 @@ dependencies {
     api project(path: ':fineract-hooks-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
-    // UGD template residual entity + template ports
+    // UGD template id + TemplateDomainService / TemplateMergeService
     implementation(project(path: ':fineract-template-api'))
-    implementation(project(path: ':fineract-template-impl'))
     // MessageGatewayHookProcessor → SMS + campaigns scheduler residual
     implementation(project(path: ':fineract-sms-api'))
     implementation(project(path: ':fineract-sms-impl'))

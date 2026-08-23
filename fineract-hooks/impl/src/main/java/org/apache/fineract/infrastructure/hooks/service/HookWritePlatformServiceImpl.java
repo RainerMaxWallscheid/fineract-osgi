@@ -56,9 +56,8 @@ import org.apache.fineract.infrastructure.hooks.exception.HookNotFoundException;
 import org.apache.fineract.infrastructure.hooks.exception.HookTemplateNotFoundException;
 import org.apache.fineract.infrastructure.hooks.mapper.HookEventMapper;
 import org.apache.fineract.infrastructure.hooks.processor.ProcessorHelper;
-import org.apache.fineract.template.domain.Template;
-import org.apache.fineract.template.domain.TemplateRepository;
 import org.apache.fineract.template.exception.TemplateNotFoundException;
+import org.apache.fineract.template.service.TemplateDomainService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -73,7 +72,7 @@ public class HookWritePlatformServiceImpl implements HookWritePlatformService {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HookWritePlatformServiceImpl.class);
     private final HookRepository hookRepository;
     private final HookTemplateRepository hookTemplateRepository;
-    private final TemplateRepository ugdTemplateRepository;
+    private final TemplateDomainService templateDomainService;
     private final ProcessorHelper processorHelper;
     private final HookEventMapper hookEventMapper;
 
@@ -85,11 +84,12 @@ public class HookWritePlatformServiceImpl implements HookWritePlatformService {
             var template = retrieveHookTemplateBy(request.getName());
             var resources = hookEventMapper.map(request.getEvents());
             var configurations = assembleConfig(request.getConfig(), template);
-            Template ugdTemplate = null;
+            Long ugdTemplateId = null;
             if (request.getTemplateId() != null) {
-                ugdTemplate = ugdTemplateRepository.findById(request.getTemplateId()).orElseThrow(() -> new TemplateNotFoundException(request.getTemplateId()));
+                templateDomainService.findOneById(request.getTemplateId());
+                ugdTemplateId = request.getTemplateId();
             }
-            var hook = new Hook().setIsActive(Boolean.TRUE.equals(request.getIsActive())).setTemplate(template).setUgdTemplate(ugdTemplate).setConfig(configurations).setEvents(resources).setName(StringUtils.isNotBlank(request.getDisplayName()) ? request.getDisplayName().trim() : template.getName());
+            var hook = new Hook().setIsActive(Boolean.TRUE.equals(request.getIsActive())).setTemplate(template).setUgdTemplateId(ugdTemplateId).setConfig(configurations).setEvents(resources).setName(StringUtils.isNotBlank(request.getDisplayName()) ? request.getDisplayName().trim() : template.getName());
             hook.getConfig().forEach(hookConfiguration -> hookConfiguration.setHook(hook));
             hook.getEvents().forEach(hookResource -> hookResource.setHook(hook));
             validateHookRules(template, configurations, resources);
@@ -119,12 +119,13 @@ public class HookWritePlatformServiceImpl implements HookWritePlatformService {
             var optionalTemplateId = Optional.ofNullable(request.getTemplateId());
             if (optionalTemplateId.isPresent() && !Objects.equals(request.getTemplateId(), Optional.ofNullable(hook.getTemplate()).map(AbstractPersistableCustom::getId).orElse(null))) {
                 changes.put(HookUpdateRequest.Fields.templateId, request.getTemplateId());
-                var ugdTemplate = ugdTemplateRepository.findById(request.getTemplateId()).orElse(null);
-                if (ugdTemplate == null) {
+                try {
+                    templateDomainService.findOneById(request.getTemplateId());
+                } catch (final TemplateNotFoundException ex) {
                     changes.remove(HookUpdateRequest.Fields.templateId);
-                    throw new TemplateNotFoundException(request.getTemplateId());
+                    throw ex;
                 }
-                hook.setUgdTemplate(ugdTemplate);
+                hook.setUgdTemplateId(request.getTemplateId());
             }
             if (Objects.nonNull(request.getEvents()) && !request.getEvents().isEmpty()) {
                 changes.put(HookUpdateRequest.Fields.events, request.getEvents());
@@ -237,10 +238,10 @@ public class HookWritePlatformServiceImpl implements HookWritePlatformService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public HookWritePlatformServiceImpl(final HookRepository hookRepository, final HookTemplateRepository hookTemplateRepository, final TemplateRepository ugdTemplateRepository, final ProcessorHelper processorHelper, final HookEventMapper hookEventMapper) {
+        public HookWritePlatformServiceImpl(final HookRepository hookRepository, final HookTemplateRepository hookTemplateRepository, final TemplateDomainService templateDomainService, final ProcessorHelper processorHelper, final HookEventMapper hookEventMapper) {
         this.hookRepository = hookRepository;
         this.hookTemplateRepository = hookTemplateRepository;
-        this.ugdTemplateRepository = ugdTemplateRepository;
+        this.templateDomainService = templateDomainService;
         this.processorHelper = processorHelper;
         this.hookEventMapper = hookEventMapper;
     }

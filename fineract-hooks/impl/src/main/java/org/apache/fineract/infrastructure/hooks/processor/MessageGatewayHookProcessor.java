@@ -36,7 +36,6 @@ import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobSe
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.template.data.TemplateData;
-import org.apache.fineract.template.mapper.TemplateMapper;
 import org.apache.fineract.template.service.TemplateDomainService;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,6 @@ public class MessageGatewayHookProcessor implements HookProcessor {
     private final ClientRepositoryWrapper clientRepository;
     private final TemplateDomainService templateDomainService;
     private final TemplateMergeService templateMergeService;
-    private final TemplateMapper templateMapper;
     private final SmsMessageRepository smsMessageRepository;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
 
@@ -68,7 +66,11 @@ public class MessageGatewayHookProcessor implements HookProcessor {
         var templates = templateDomainService.getTemplate("SMS_template_Key", templateName);
         if (templates.isEmpty()) {
             // load default template if set.
-            template = templateMapper.map(hook.getUgdTemplate());
+            if (hook.getUgdTemplateId() == null) {
+                log.error("Error : {} with name {}", "Template not found", templateName);
+                throw new GeneralPlatformDomainRuleException("error.msg.templates.not.found", "Template not found", templateName);
+            }
+            template = templateDomainService.findOneById(hook.getUgdTemplateId());
         } else {
             template = templates.get(0);
         }
@@ -95,11 +97,10 @@ public class MessageGatewayHookProcessor implements HookProcessor {
     }
 
     @java.lang.SuppressWarnings("all")
-        public MessageGatewayHookProcessor(final ClientRepositoryWrapper clientRepository, final TemplateDomainService templateDomainService, final TemplateMergeService templateMergeService, final TemplateMapper templateMapper, final SmsMessageRepository smsMessageRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
+        public MessageGatewayHookProcessor(final ClientRepositoryWrapper clientRepository, final TemplateDomainService templateDomainService, final TemplateMergeService templateMergeService, final SmsMessageRepository smsMessageRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
         this.clientRepository = clientRepository;
         this.templateDomainService = templateDomainService;
         this.templateMergeService = templateMergeService;
-        this.templateMapper = templateMapper;
         this.smsMessageRepository = smsMessageRepository;
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;
     }

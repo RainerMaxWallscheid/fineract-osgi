@@ -36,7 +36,7 @@ import org.apache.fineract.infrastructure.hooks.domain.HookConfigurationReposito
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.template.mapper.TemplateMapper;
+import org.apache.fineract.template.service.TemplateDomainService;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.springframework.stereotype.Service;
 import retrofit2.Callback;
@@ -47,7 +47,7 @@ public class TwilioHookProcessor implements HookProcessor {
     private final TemplateMergeService templateMergeService;
     private final ClientRepository clientRepository;
     private final ProcessorHelper processorHelper;
-    private final TemplateMapper templateMapper;
+    private final TemplateDomainService templateDomainService;
 
     @Override
     public void process(final Hook hook, final String payload, final String entityName, final String actionName, final FineractContext context) throws IOException {
@@ -72,7 +72,7 @@ public class TwilioHookProcessor implements HookProcessor {
         }
         if (apiKey != null && !apiKey.equals("")) {
             JsonObject json;
-            if (hook.getUgdTemplate() != null) {
+            if (hook.getUgdTemplateId() != null) {
                 entityName = ENTITY_SMS;
                 actionName = ACTION_SEND;
                 json = processUgdTemplate(payload, hook);
@@ -96,7 +96,7 @@ public class TwilioHookProcessor implements HookProcessor {
             final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
             final String mobileNo = client.mobileNo();
             if (mobileNo != null && !mobileNo.isEmpty()) {
-                final String compiledMessage = this.templateMergeService.compile(templateMapper.map(hook.getUgdTemplate()), map).replace("<p>", "").replace("</p>", "");
+                final String compiledMessage = this.templateMergeService.compile(templateDomainService.findOneById(hook.getUgdTemplateId()), map).replace("<p>", "").replace("</p>", "");
                 final Map<String, String> jsonMap = new HashMap<>();
                 jsonMap.put("mobileNo", mobileNo);
                 jsonMap.put("message", compiledMessage);
@@ -110,11 +110,11 @@ public class TwilioHookProcessor implements HookProcessor {
     @java.lang.SuppressWarnings("all")
     public TwilioHookProcessor(final HookConfigurationRepository hookConfigurationRepository,
             final TemplateMergeService templateMergeService, final ClientRepository clientRepository,
-            final ProcessorHelper processorHelper, final TemplateMapper templateMapper) {
+            final ProcessorHelper processorHelper, final TemplateDomainService templateDomainService) {
         this.hookConfigurationRepository = hookConfigurationRepository;
         this.templateMergeService = templateMergeService;
         this.clientRepository = clientRepository;
         this.processorHelper = processorHelper;
-        this.templateMapper = templateMapper;
+        this.templateDomainService = templateDomainService;
     }
 }

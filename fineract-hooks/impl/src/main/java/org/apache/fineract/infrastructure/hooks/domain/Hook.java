@@ -29,7 +29,6 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
-import org.apache.fineract.template.domain.Template;
 
 @Entity
 @Table(name = "m_hook")
@@ -45,9 +44,8 @@ public final class Hook extends AbstractAuditableCustom {
     @ManyToOne(optional = true)
     @JoinColumn(name = "template_id", referencedColumnName = "id", nullable = false)
     private HookTemplate template;
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "ugd_template_id", referencedColumnName = "id", nullable = true)
-    private Template ugdTemplate;
+    @Column(name = "ugd_template_id")
+    private Long ugdTemplateId;
 
     @java.lang.SuppressWarnings("all")
         public String getName() {
@@ -75,8 +73,8 @@ public final class Hook extends AbstractAuditableCustom {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Template getUgdTemplate() {
-        return this.ugdTemplate;
+        public Long getUgdTemplateId() {
+        return this.ugdTemplateId;
     }
 
     /**
@@ -128,8 +126,8 @@ public final class Hook extends AbstractAuditableCustom {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Hook setUgdTemplate(final Template ugdTemplate) {
-        this.ugdTemplate = ugdTemplate;
+        public Hook setUgdTemplateId(final Long ugdTemplateId) {
+        this.ugdTemplateId = ugdTemplateId;
         return this;
     }
 
