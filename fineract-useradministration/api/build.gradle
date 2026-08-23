@@ -30,6 +30,7 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.useradministration.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.useradministration.data,'
+                        + 'org.apache.fineract.useradministration.moduleapi,'
                         + 'org.apache.fineract.useradministration.service',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'

@@ -27,9 +27,7 @@ import org.apache.fineract.infrastructure.cache.domain.PlatformCache;
 import org.apache.fineract.infrastructure.cache.domain.PlatformCacheRepository;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.data.GlobalConfigurationPropertyData;
-import org.apache.fineract.useradministration.domain.Permission;
-import org.apache.fineract.useradministration.domain.PermissionRepository;
-import org.apache.fineract.useradministration.exception.PermissionNotFoundException;
+import org.apache.fineract.useradministration.moduleapi.MakerCheckerPermissionPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,22 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConfigurationDomainServiceJpa implements ConfigurationDomainService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConfigurationDomainServiceJpa.class);
-    private final PermissionRepository permissionRepository;
+    private final MakerCheckerPermissionPort makerCheckerPermissionPort;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
     private final PlatformCacheRepository cacheTypeRepository;
 
     @Override
     public boolean isMakerCheckerEnabledForTask(final String taskPermissionCode) {
         if (StringUtils.isBlank(taskPermissionCode)) {
-            throw new PermissionNotFoundException(taskPermissionCode);
+            return this.makerCheckerPermissionPort.hasMakerCheckerEnabled(taskPermissionCode);
         }
         final GlobalConfigurationPropertyData property = getGlobalConfigurationPropertyData(GlobalConfigurationConstants.MAKER_CHECKER);
         if (property.isEnabled()) {
-            final Permission thisTask = this.permissionRepository.findOneByCode(taskPermissionCode);
-            if (thisTask == null) {
-                throw new PermissionNotFoundException(taskPermissionCode);
-            }
-            return thisTask.hasMakerCheckerEnabled();
+            return this.makerCheckerPermissionPort.hasMakerCheckerEnabled(taskPermissionCode);
         }
         return false;
     }
@@ -581,8 +575,8 @@ public class ConfigurationDomainServiceJpa implements ConfigurationDomainService
     }
 
     @java.lang.SuppressWarnings("all")
-        public ConfigurationDomainServiceJpa(final PermissionRepository permissionRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final PlatformCacheRepository cacheTypeRepository) {
-        this.permissionRepository = permissionRepository;
+        public ConfigurationDomainServiceJpa(final MakerCheckerPermissionPort makerCheckerPermissionPort, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final PlatformCacheRepository cacheTypeRepository) {
+        this.makerCheckerPermissionPort = makerCheckerPermissionPort;
         this.globalConfigurationRepository = globalConfigurationRepository;
         this.cacheTypeRepository = cacheTypeRepository;
     }

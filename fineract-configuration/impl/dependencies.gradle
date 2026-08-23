@@ -23,7 +23,6 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-useradministration-api'))
-    implementation(project(path: ':fineract-useradministration-impl'))
     implementation(project(path: ':fineract-gcm-api'))
     implementation(project(path: ':fineract-campaigns-api'))
 
