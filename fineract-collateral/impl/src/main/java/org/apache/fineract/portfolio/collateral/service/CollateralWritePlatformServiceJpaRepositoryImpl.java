@@ -39,8 +39,8 @@ import org.apache.fineract.portfolio.collateral.exception.CollateralCannotBeUpda
 import org.apache.fineract.portfolio.collateral.exception.CollateralCannotBeUpdatedException.LoanCollateralCannotBeUpdatedReason;
 import org.apache.fineract.portfolio.collateral.exception.CollateralNotFoundException;
 import org.apache.fineract.portfolio.collateral.serialization.CollateralCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -50,7 +50,7 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CollateralWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
-    private final LoanRepositoryWrapper loanRepositoryWrapper;
+    private final LoanExistencePort loanExistencePort;
     private final LoanCollateralRepository collateralRepository;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer;
@@ -62,18 +62,17 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
         final CollateralCommand collateralCommand = this.collateralCommandFromApiJsonDeserializer.commandFromApiJson(command.json());
         collateralCommand.validateForCreate();
         try {
-            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-            final CodeValue collateralType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralCommand.getCollateralTypeId());
-            final LoanCollateral collateral = LoanCollateral.fromJson(loan, collateralType, command);
-            if (!loan.getStatus().isSubmittedAndPendingApproval()) {
-                throw new CollateralCannotBeCreatedException(LoanCollateralCannotBeCreatedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loan.getId());
+            if (!this.loanExistencePort.isSubmittedAndPendingApproval(loanId)) {
+                throw new CollateralCannotBeCreatedException(LoanCollateralCannotBeCreatedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loanId);
             }
+            final CodeValue collateralType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralCommand.getCollateralTypeId());
+            final LoanCollateral collateral = LoanCollateral.fromJson(loanId, collateralType, command);
             this.collateralRepository.saveAndFlush(collateral);
             return  //
             //
             //
             //
-            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withLoanId(loan.getId()).withEntityId(collateral.getId()).build();
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withLoanId(loanId).withEntityId(collateral.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleCollateralDataIntegrityViolation(dve);
             return CommandProcessingResult.empty();
@@ -88,7 +87,9 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
         collateralCommand.validateForUpdate();
         final Long collateralTypeId = collateralCommand.getCollateralTypeId();
         try {
-            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+            if (!this.loanExistencePort.existsById(loanId)) {
+                throw new LoanNotFoundException(loanId);
+            }
             CodeValue collateralType = null;
             final LoanCollateral collateralForUpdate = this.collateralRepository.findById(collateralId).orElseThrow(() -> new CollateralNotFoundException(loanId, collateralId));
             final Map<String, Object> changes = collateralForUpdate.update(command);
@@ -96,8 +97,8 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
                 collateralType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralTypeId);
                 collateralForUpdate.setCollateralType(collateralType);
             }
-            if (!loan.getStatus().isSubmittedAndPendingApproval()) {
-                throw new CollateralCannotBeUpdatedException(LoanCollateralCannotBeUpdatedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loan.getId());
+            if (!this.loanExistencePort.isSubmittedAndPendingApproval(loanId)) {
+                throw new CollateralCannotBeUpdatedException(LoanCollateralCannotBeUpdatedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loanId);
             }
             if (!changes.isEmpty()) {
                 this.collateralRepository.saveAndFlush(collateralForUpdate);
@@ -117,12 +118,14 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     @Transactional
     @Override
     public CommandProcessingResult deleteCollateral(final Long loanId, final Long collateralId, final Long commandId) {
-        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        if (!this.loanExistencePort.existsById(loanId)) {
+            throw new LoanNotFoundException(loanId);
+        }
         final LoanCollateral collateral = this.collateralRepository.findByLoanIdAndId(loanId, collateralId);
         if (collateral == null) {
             throw new CollateralNotFoundException(loanId, collateralId);
         }
-        if (!loan.getStatus().isSubmittedAndPendingApproval()) {
+        if (!this.loanExistencePort.isSubmittedAndPendingApproval(loanId)) {
             throw new CollateralCannotBeDeletedException(LoanCollateralCannotBeDeletedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loanId, collateralId);
         }
         this.collateralRepository.delete(collateral);
@@ -142,9 +145,9 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     }
 
     @java.lang.SuppressWarnings("all")
-        public CollateralWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanCollateralRepository collateralRepository, final CodeValueRepositoryWrapper codeValueRepository, final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
+        public CollateralWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanExistencePort loanExistencePort, final LoanCollateralRepository collateralRepository, final CodeValueRepositoryWrapper codeValueRepository, final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
         this.context = context;
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.loanExistencePort = loanExistencePort;
         this.collateralRepository = collateralRepository;
         this.codeValueRepository = codeValueRepository;
         this.collateralCommandFromApiJsonDeserializer = collateralCommandFromApiJsonDeserializer;

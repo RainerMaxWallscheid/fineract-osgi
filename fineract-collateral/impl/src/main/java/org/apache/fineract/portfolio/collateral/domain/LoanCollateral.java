@@ -33,7 +33,6 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.collateral.api.CollateralApiConstants.CollateralJSONinputParams;
 import org.apache.fineract.portfolio.collateral.data.CollateralData;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 @Entity
 @Table(name = "m_loan_collateral")
@@ -73,10 +72,6 @@ public class LoanCollateral extends AbstractPersistableCustom<Long> {
         this.value = value;
     }
 
-    public void associateWith(final Loan loan) {
-        this.loanId = loan == null ? null : loan.getId();
-    }
-
     public void setLoanId(final Long loanId) {
         this.loanId = loanId;
     }
@@ -85,10 +80,10 @@ public class LoanCollateral extends AbstractPersistableCustom<Long> {
         return this.loanId;
     }
 
-    public static LoanCollateral fromJson(final Loan loan, final CodeValue collateralType, final JsonCommand command) {
+    public static LoanCollateral fromJson(final Long loanId, final CodeValue collateralType, final JsonCommand command) {
         final String description = command.stringValueOfParameterNamed(CollateralJSONinputParams.DESCRIPTION.getValue());
         final BigDecimal value = command.bigDecimalValueOfParameterNamed(CollateralJSONinputParams.VALUE.getValue());
-        return new LoanCollateral(loan == null ? null : loan.getId(), collateralType, value, description);
+        return new LoanCollateral(loanId, collateralType, value, description);
     }
 
     public Map<String, Object> update(final JsonCommand command) {

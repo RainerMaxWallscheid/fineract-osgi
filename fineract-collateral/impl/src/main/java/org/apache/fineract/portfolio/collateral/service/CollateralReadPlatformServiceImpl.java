@@ -28,7 +28,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.collateral.data.CollateralData;
 import org.apache.fineract.portfolio.collateral.exception.CollateralNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -36,7 +37,7 @@ import org.springframework.jdbc.core.RowMapper;
 public class CollateralReadPlatformServiceImpl implements CollateralReadPlatformService {
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
-    private final LoanRepositoryWrapper loanRepositoryWrapper;
+    private final LoanExistencePort loanExistencePort;
 
 
     private static final class CollateralMapper implements RowMapper<CollateralData> {
@@ -90,14 +91,16 @@ public class CollateralReadPlatformServiceImpl implements CollateralReadPlatform
 
     @Override
     public List<CollateralData> retrieveCollateralsForValidLoan(final Long loanId) {
-        this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
+        if (!this.loanExistencePort.existsById(loanId)) {
+            throw new LoanNotFoundException(loanId);
+        }
         return retrieveCollaterals(loanId);
     }
 
     @java.lang.SuppressWarnings("all")
-        public CollateralReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate, final LoanRepositoryWrapper loanRepositoryWrapper) {
+        public CollateralReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate, final LoanExistencePort loanExistencePort) {
         this.context = context;
         this.jdbcTemplate = jdbcTemplate;
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.loanExistencePort = loanExistencePort;
     }
 }

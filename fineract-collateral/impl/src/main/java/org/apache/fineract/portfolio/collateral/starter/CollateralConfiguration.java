@@ -29,7 +29,7 @@ import org.apache.fineract.portfolio.collateral.service.CollateralReadPlatformSe
 import org.apache.fineract.portfolio.collateral.service.CollateralReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformService;
 import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,17 +48,17 @@ public class CollateralConfiguration {
     @Bean
     @ConditionalOnMissingBean(CollateralReadPlatformService.class)
     public CollateralReadPlatformService collateralReadPlatformService(PlatformSecurityContext context, JdbcTemplate jdbcTemplate,
-            LoanRepositoryWrapper loanRepositoryWrapper) {
-        return new CollateralReadPlatformServiceImpl(context, jdbcTemplate, loanRepositoryWrapper);
+            LoanExistencePort loanExistencePort) {
+        return new CollateralReadPlatformServiceImpl(context, jdbcTemplate, loanExistencePort);
     }
 
     @Bean
     @ConditionalOnMissingBean(CollateralWritePlatformService.class)
     public CollateralWritePlatformService collateralWritePlatformService(PlatformSecurityContext context,
-            LoanRepositoryWrapper loanRepositoryWrapper, LoanCollateralRepository collateralRepository,
+            LoanExistencePort loanExistencePort, LoanCollateralRepository collateralRepository,
             CodeValueRepositoryWrapper codeValueRepository,
             CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
-        return new CollateralWritePlatformServiceJpaRepositoryImpl(context, loanRepositoryWrapper, collateralRepository,
+        return new CollateralWritePlatformServiceJpaRepositoryImpl(context, loanExistencePort, collateralRepository,
                 codeValueRepository, collateralCommandFromApiJsonDeserializer);
     }
 
