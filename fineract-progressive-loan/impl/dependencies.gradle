@@ -25,7 +25,6 @@ dependencies {
     implementation(project(path: ':fineract-paymentdetail-api'))
     // Bulk import ports/DTOs on loans/clients/groups REST
     implementation(project(path: ':fineract-bulkimport-api'))
-    implementation(project(path: ':fineract-paymentdetail-impl'))
     // Generic products REST ports (share product read facade)
     implementation(project(path: ':fineract-products-api'))
     // Client office/group transfer ports + validator

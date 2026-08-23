@@ -86,8 +86,9 @@ import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
+import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailAssembler;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountOnClosureType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodType;
@@ -131,7 +132,7 @@ public class DepositAccountAssembler {
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
     private final FromJsonHelper fromApiJsonHelper;
     private final DepositProductAssembler depositProductAssembler;
-    private final PaymentDetailAssembler paymentDetailAssembler;
+    private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
 
     private final ExternalIdFactory externalIdFactory;
     private final ConfigurationDomainService configurationDomainService;
@@ -145,7 +146,7 @@ public class DepositAccountAssembler {
             final DepositProductAssembler depositProductAssembler,
             final RecurringDepositProductRepository recurringDepositProductRepository,
             final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final PlatformSecurityContext context,
-            final PaymentDetailAssembler paymentDetailAssembler, ExternalIdFactory externalIdFactory,
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService, ExternalIdFactory externalIdFactory,
             final ConfigurationDomainService configurationDomainService, final ChargeTaxApplicationService chargeTaxApplicationService) {
 
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
@@ -158,7 +159,7 @@ public class DepositAccountAssembler {
         this.recurringDepositProductRepository = recurringDepositProductRepository;
         this.savingsHelper = new SavingsHelper(accountTransfersReadPlatformService);
         this.context = context;
-        this.paymentDetailAssembler = paymentDetailAssembler;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
         this.externalIdFactory = externalIdFactory;
         this.configurationDomainService = configurationDomainService;
         this.chargeTaxApplicationService = chargeTaxApplicationService;
@@ -486,7 +487,19 @@ public class DepositAccountAssembler {
                             .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
                     PaymentDetail detail = paymentDetail;
                     if (paymentDetail == null) {
-                        detail = this.paymentDetailAssembler.fetchPaymentDetail(savingsTransactionElement);
+                        detail = this.paymentDetailWritePlatformService.createPaymentDetail(
+                                this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName,
+                                        savingsTransactionElement),
+                                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.accountNumberParamName,
+                                        savingsTransactionElement),
+                                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.checkNumberParamName,
+                                        savingsTransactionElement),
+                                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.routingCodeParamName,
+                                        savingsTransactionElement),
+                                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.receiptNumberParamName,
+                                        savingsTransactionElement),
+                                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.bankNumberParamName,
+                                        savingsTransactionElement));
                     }
                     final SavingsAccountTransactionDTO savingsAccountTransactionDTO = new SavingsAccountTransactionDTO(formatter,
                             transactionDate, dueAmount, detail, savingsId, depositAccountType);
