@@ -26,7 +26,6 @@ dependencies {
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-calendar-api'))
-    implementation(project(path: ':fineract-calendar-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

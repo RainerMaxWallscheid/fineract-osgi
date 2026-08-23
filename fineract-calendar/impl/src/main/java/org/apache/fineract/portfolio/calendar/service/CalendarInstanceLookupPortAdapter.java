@@ -35,4 +35,10 @@ public class CalendarInstanceLookupPortAdapter implements CalendarInstanceLookup
     public CalendarInstance findCalendarInstanceByEntityId(final Long entityId, final Integer entityTypeId) {
         return this.calendarInstanceRepository.findCalendarInstanceByEntityId(entityId, entityTypeId);
     }
+
+    @Override
+    public CalendarInstance findByCalendarIdAndEntityIdAndEntityTypeId(final Long calendarId, final Long entityId,
+            final Integer entityTypeId) {
+        return this.calendarInstanceRepository.findByCalendarIdAndEntityIdAndEntityTypeId(calendarId, entityId, entityTypeId);
+    }
 }

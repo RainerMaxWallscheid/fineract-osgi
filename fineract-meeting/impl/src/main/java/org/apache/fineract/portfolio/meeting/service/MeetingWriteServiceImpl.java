@@ -31,11 +31,11 @@ import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityEx
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.exception.CalendarInstanceNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -64,7 +64,7 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingWriteServiceImpl.class);
     private final MeetingRepository meetingRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceLookupPort;
     private final CalendarRepository calendarRepository;
     private final ClientRepository clientRepository;
     private final GroupRepository groupRepository;
@@ -150,7 +150,7 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
                 entityId = group.getParent().getId();
             }
         }
-        final var calendarInstance = this.calendarInstanceRepository.findByCalendarIdAndEntityIdAndEntityTypeId(calendar.getId(), entityId, entityType.getValue());
+        final var calendarInstance = this.calendarInstanceLookupPort.findByCalendarIdAndEntityIdAndEntityTypeId(calendar.getId(), entityId, entityType.getValue());
         if (calendarInstance == null) {
             throw new CalendarInstanceNotFoundException("for." + entityType.name().toLowerCase() + "not.found", "No Calendar Instance details found for group with identifier " + entityId + " and calendar with identifier " + calendarId, entityId, calendarId);
         }
@@ -184,9 +184,9 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public MeetingWriteServiceImpl(final MeetingRepository meetingRepository, final CalendarInstanceRepository calendarInstanceRepository, final CalendarRepository calendarRepository, final ClientRepository clientRepository, final GroupRepository groupRepository, final ConfigurationDomainService configurationDomainService) {
+        public MeetingWriteServiceImpl(final MeetingRepository meetingRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final CalendarRepository calendarRepository, final ClientRepository clientRepository, final GroupRepository groupRepository, final ConfigurationDomainService configurationDomainService) {
         this.meetingRepository = meetingRepository;
-        this.calendarInstanceRepository = calendarInstanceRepository;
+        this.calendarInstanceLookupPort = calendarInstanceLookupPort;
         this.calendarRepository = calendarRepository;
         this.clientRepository = clientRepository;
         this.groupRepository = groupRepository;

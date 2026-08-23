@@ -38,11 +38,11 @@ import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityEx
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.exception.CalendarInstanceNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
@@ -66,7 +66,7 @@ final class LegacyMeetingAttendanceListener {
     private static final String COLLECTIONSHEET_ENTITY_NAME = "collectionsheet";
     private final ConfigurationDomainService configurationDomainService;
     private final CalendarRepository calendarRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceLookupPort;
     private final MeetingRepository meetingRepository;
     private final MeetingRepositoryWrapper meetingRepositoryWrapper;
     private final GroupRepository groupRepository;
@@ -217,7 +217,7 @@ final class LegacyMeetingAttendanceListener {
                 entityId = group.getParent().getId();
             }
         }
-        final CalendarInstance calendarInstance = this.calendarInstanceRepository.findByCalendarIdAndEntityIdAndEntityTypeId(calendarForUpdate.getId(), entityId, entityType.getValue());
+        final CalendarInstance calendarInstance = this.calendarInstanceLookupPort.findByCalendarIdAndEntityIdAndEntityTypeId(calendarForUpdate.getId(), entityId, entityType.getValue());
         if (calendarInstance == null) {
             final String postFix = "for." + entityType.name().toLowerCase() + "not.found";
             final String defaultUserMessage = "No Calendar Instance details found for group with identifier " + entityId + " and calendar with identifier " + calendarId;
@@ -227,10 +227,10 @@ final class LegacyMeetingAttendanceListener {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepository clientRepository, final FromJsonHelper fromApiJsonHelper) {
+        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepository clientRepository, final FromJsonHelper fromApiJsonHelper) {
         this.configurationDomainService = configurationDomainService;
         this.calendarRepository = calendarRepository;
-        this.calendarInstanceRepository = calendarInstanceRepository;
+        this.calendarInstanceLookupPort = calendarInstanceLookupPort;
         this.meetingRepository = meetingRepository;
         this.meetingRepositoryWrapper = meetingRepositoryWrapper;
         this.groupRepository = groupRepository;

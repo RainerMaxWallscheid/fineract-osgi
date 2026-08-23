@@ -27,4 +27,6 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 public interface CalendarInstanceLookupPort {
 
     CalendarInstance findCalendarInstanceByEntityId(Long entityId, Integer entityTypeId);
+
+    CalendarInstance findByCalendarIdAndEntityIdAndEntityTypeId(Long calendarId, Long entityId, Integer entityTypeId);
 }
