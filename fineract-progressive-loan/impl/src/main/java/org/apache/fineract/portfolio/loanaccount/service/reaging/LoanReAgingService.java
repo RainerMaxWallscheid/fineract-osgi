@@ -245,7 +245,7 @@ public class LoanReAgingService {
     private void persistNote(Loan loan, JsonCommand command, Map<String, Object> changes) {
         if (command.hasParameter(LoanReAgingApiConstants.noteParamName)) {
             final String note = command.stringValueOfParameterNamed(LoanReAgingApiConstants.noteParamName);
-            final Note newNote = Note.loanNote(loan, note);
+            final Note newNote = Note.loanNote(loan.getId(), loan.getClientId(), note);
             changes.put(LoanReAgingApiConstants.noteParamName, note);
             this.noteRepository.saveAndFlush(newNote);
         }

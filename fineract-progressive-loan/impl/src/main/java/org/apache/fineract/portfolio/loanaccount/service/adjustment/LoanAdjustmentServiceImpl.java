@@ -198,9 +198,9 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
              * If a new transaction is not created, associate note with the transaction to be adjusted
              */
             if (thereIsNewTransaction) {
-                note = Note.loanTransactionNote(loan, newTransactionDetail, noteText);
+                note = Note.loanTransactionNote(loan.getId(), newTransactionDetail.getId(), loan.getClientId(), noteText);
             } else {
-                note = Note.loanTransactionNote(loan, transactionToAdjust, noteText);
+                note = Note.loanTransactionNote(loan.getId(), transactionToAdjust.getId(), loan.getClientId(), noteText);
             }
             this.noteRepository.save(note);
         }

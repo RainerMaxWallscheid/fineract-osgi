@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.data.NoteCreateResponse;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
@@ -59,9 +58,7 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private GroupRepository groupRepository;
     @Mock
-    private LoanRepositoryWrapper loanRepository;
-    @Mock
-    private LoanTransactionRepository loanTransactionRepository;
+    private LoanExistencePort loanExistencePort;
     @Mock
     private SavingsAccountRepository savingsAccountRepository;
     @Mock
@@ -81,8 +78,8 @@ class NoteWritePlatformServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        subject = new NoteWritePlatformServiceImpl(noteRepository, clientRepository, groupRepository, loanRepository,
-                loanTransactionRepository, savingsAccountRepository, savingsAccountTransactionRepository, shareAccountNoteSupport);
+        subject = new NoteWritePlatformServiceImpl(noteRepository, clientRepository, groupRepository, loanExistencePort,
+                savingsAccountRepository, savingsAccountTransactionRepository, shareAccountNoteSupport);
     }
 
     @Test

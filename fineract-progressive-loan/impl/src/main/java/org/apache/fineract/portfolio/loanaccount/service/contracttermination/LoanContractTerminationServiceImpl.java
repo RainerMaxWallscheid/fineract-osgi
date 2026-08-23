@@ -95,7 +95,7 @@ public class LoanContractTerminationServiceImpl {
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanTransactionNote(loan, contractTermination, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), contractTermination.getId(), loan.getClientId(), noteText);
             noteRepository.save(note);
         }
         loanTransactionRepository.saveAndFlush(contractTermination);
@@ -128,7 +128,7 @@ public class LoanContractTerminationServiceImpl {
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanTransactionNote(loan, contractTerminationTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), contractTerminationTransaction.getId(), loan.getClientId(), noteText);
             noteRepository.save(note);
         }
         loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(contractTerminationTransaction.getLoan(), contractTerminationTransaction, "reversed");

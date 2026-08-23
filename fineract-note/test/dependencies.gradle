@@ -20,7 +20,7 @@
 dependencies {
     testImplementation(project(path: ':fineract-note-impl'))
     testImplementation(project(path: ':fineract-core'))
-    testImplementation(project(path: ':fineract-loan-impl'))
+    testImplementation(project(path: ':fineract-loan-api'))
     testImplementation(project(path: ':fineract-savings-impl'))
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

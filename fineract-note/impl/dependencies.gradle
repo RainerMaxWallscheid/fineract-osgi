@@ -23,8 +23,9 @@ dependencies {
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))
-    // Factory helpers + write service resolve loan/savings aggregates
-    implementation(project(path: ':fineract-loan-impl'))
+    // Loan/loan-transaction notes via LoanExistencePort
+    implementation(project(path: ':fineract-loan-api'))
+    // Factory helpers + write service resolve leftover savings aggregates
     implementation(project(path: ':fineract-savings-impl'))
 
     implementation(

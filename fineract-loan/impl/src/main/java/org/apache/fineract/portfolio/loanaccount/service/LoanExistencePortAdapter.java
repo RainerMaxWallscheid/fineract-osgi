@@ -21,7 +21,10 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +32,11 @@ import org.springframework.stereotype.Service;
 public class LoanExistencePortAdapter implements LoanExistencePort {
 
     private final LoanRepository loanRepository;
+    private final LoanTransactionRepository loanTransactionRepository;
 
-    public LoanExistencePortAdapter(final LoanRepository loanRepository) {
+    public LoanExistencePortAdapter(final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository) {
         this.loanRepository = loanRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
     }
 
     @Override
@@ -52,6 +57,20 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
     @Override
     public ExternalId externalId(final Long loanId) {
         return requireLoan(loanId).getExternalId();
+    }
+
+    @Override
+    public LoanNoteRef require(final Long loanId) {
+        final Loan loan = requireLoan(loanId);
+        return new LoanNoteRef(loan.getId(), loan.getClientId(), loan.getOfficeId());
+    }
+
+    @Override
+    public LoanTransactionNoteRef requireTransaction(final Long loanTransactionId) {
+        final LoanTransaction transaction = loanTransactionRepository.findById(loanTransactionId)
+                .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
+        final Loan loan = transaction.getLoan();
+        return new LoanTransactionNoteRef(loan.getId(), transaction.getId(), loan.getClientId(), loan.getOfficeId());
     }
 
     private Loan requireLoan(final Long loanId) {

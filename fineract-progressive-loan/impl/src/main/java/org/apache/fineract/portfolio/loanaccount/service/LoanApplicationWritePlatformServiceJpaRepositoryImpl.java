@@ -746,7 +746,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private Optional<Note> createNote(String submittedOnNote, Loan newLoanApplication) {
         if (StringUtils.isNotBlank(submittedOnNote)) {
-            final Note note = Note.loanNote(newLoanApplication, submittedOnNote);
+            final Note note = Note.loanNote(newLoanApplication.getId(), newLoanApplication.getClientId(), submittedOnNote);
             this.noteRepository.save(note);
             return Optional.of(note);
         } else {

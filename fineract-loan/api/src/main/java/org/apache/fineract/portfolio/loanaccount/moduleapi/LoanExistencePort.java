@@ -42,4 +42,18 @@ public interface LoanExistencePort {
      * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
      */
     ExternalId externalId(Long loanId);
+
+    record LoanNoteRef(Long loanId, Long clientId, Long officeId) {}
+
+    record LoanTransactionNoteRef(Long loanId, Long loanTransactionId, Long clientId, Long officeId) {}
+
+    /**
+     * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
+     */
+    LoanNoteRef require(Long loanId);
+
+    /**
+     * Throws {@code LoanTransactionNotFoundException} when {@code loanTransactionId} is unknown.
+     */
+    LoanTransactionNoteRef requireTransaction(Long loanTransactionId);
 }

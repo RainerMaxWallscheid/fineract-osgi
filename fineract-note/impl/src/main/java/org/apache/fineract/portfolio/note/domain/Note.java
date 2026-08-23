@@ -27,8 +27,6 @@ import org.apache.commons.lang3.Strings;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
@@ -76,15 +74,12 @@ public class Note extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return new Note(null, group.getId(), null, null, note, NoteType.GROUP.getValue(), null, null, null);
     }
 
-    public static Note loanNote(final Loan loan, final String note) {
-        final Long clientId = loan.getClientId();
-        return new Note(clientId, null, loan.getId(), null, note, NoteType.LOAN.getValue(), null, null, null);
+    public static Note loanNote(final Long loanId, final Long clientId, final String note) {
+        return new Note(clientId, null, loanId, null, note, NoteType.LOAN.getValue(), null, null, null);
     }
 
-    public static Note loanTransactionNote(final Loan loan, final LoanTransaction loanTransaction, final String note) {
-        final Long clientId = loan.getClientId();
-        return new Note(clientId, null, loan.getId(), loanTransaction.getId(), note, NoteType.LOAN_TRANSACTION.getValue(), null, null,
-                null);
+    public static Note loanTransactionNote(final Long loanId, final Long loanTransactionId, final Long clientId, final String note) {
+        return new Note(clientId, null, loanId, loanTransactionId, note, NoteType.LOAN_TRANSACTION.getValue(), null, null, null);
     }
 
     public static Note savingNote(final SavingsAccount account, final String note) {

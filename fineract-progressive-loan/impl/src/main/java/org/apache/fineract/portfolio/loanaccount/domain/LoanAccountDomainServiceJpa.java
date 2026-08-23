@@ -248,7 +248,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newRepaymentTransaction);
         loan = loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, newRepaymentTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), newRepaymentTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -366,7 +366,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newPaymentTransaction);
         loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, newPaymentTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), newPaymentTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -424,7 +424,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newRefundTransaction);
         this.loanRepositoryWrapper.saveAndFlush(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, newRefundTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         journalEntryPoster.postJournalEntriesForLoanTransaction(newRefundTransaction, true, false);
@@ -457,7 +457,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(disbursementTransaction);
         loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, disbursementTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), disbursementTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         journalEntryPoster.postJournalEntriesForLoanTransaction(disbursementTransaction, true, isLoanToLoanTransfer);
@@ -518,7 +518,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanRefundService.creditBalanceRefund(loan, newCreditBalanceRefundTransaction);
         newCreditBalanceRefundTransaction = this.loanTransactionRepository.saveAndFlush(newCreditBalanceRefundTransaction);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, newCreditBalanceRefundTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), newCreditBalanceRefundTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -550,7 +550,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanRefundService.makeRefundForActiveLoan(loan, newRefundTransaction);
         this.loanTransactionRepository.saveAndFlush(newRefundTransaction);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, newRefundTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -605,7 +605,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loan = loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanNote(loan, noteText);
+            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));

@@ -651,7 +651,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanNote(loan, noteText);
+            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
             changes.put("note", noteText);
             this.noteRepository.save(note);
         }

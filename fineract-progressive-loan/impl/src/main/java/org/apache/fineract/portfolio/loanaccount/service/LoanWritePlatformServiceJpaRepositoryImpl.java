@@ -517,7 +517,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanNote(loan, noteText);
+            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
     }
@@ -956,7 +956,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
     private void saveNote(String noteText, Loan loan, LoanTransaction loanTransaction) {
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan, loanTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), loanTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
     }
@@ -1152,7 +1152,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final String noteText = command.stringValueOfParameterNamed(LoanApiConstants.noteParamName);
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            Note note = Note.loanTransactionNote(loan, newTransaction, noteText);
+            Note note = Note.loanTransactionNote(loan.getId(), newTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         this.loanAccountDomainService.setLoanDelinquencyTag(loan, transactionDate);
@@ -1228,7 +1228,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanTransactionNote(loan, waiveInterestTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), waiveInterestTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -1300,7 +1300,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
                 changes.put("note", noteText);
-                final Note note = Note.loanTransactionNote(loan, loanTransaction, noteText);
+                final Note note = Note.loanTransactionNote(loan.getId(), loanTransaction.getId(), loan.getClientId(), noteText);
                 this.noteRepository.save(note);
             }
             loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -1349,7 +1349,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanNote(loan, noteText);
+            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -1406,7 +1406,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanNote(loan, noteText);
+            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         businessEventNotifierService.notifyPostBusinessEvent(new LoanCloseAsRescheduleBusinessEvent(loan));
@@ -2319,7 +2319,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         String noteText = command.stringValueOfParameterNamed(LoanApiConstants.noteParameterName);
         if (StringUtils.isNotBlank(noteText)) {
             changes.put(LoanApiConstants.noteParameterName, noteText);
-            final Note note = Note.loanTransactionNote(loan, chargeOffTransaction, noteText);
+            final Note note = Note.loanTransactionNote(loan.getId(), chargeOffTransaction.getId(), loan.getClientId(), noteText);
             this.noteRepository.save(note);
         }
         final LoanChargeOffBehaviour chargeOffBehaviour = loan.getLoanProductRelatedDetail().getChargeOffBehaviour();
