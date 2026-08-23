@@ -28,12 +28,9 @@ import org.springframework.stereotype.Service;
 public class LoanProductExistencePortAdapter implements LoanProductExistencePort {
 
     private final LoanProductRepository loanProductRepository;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
 
-    public LoanProductExistencePortAdapter(final LoanProductRepository loanProductRepository,
-            final LoanProductReadPlatformService loanProductReadPlatformService) {
+    public LoanProductExistencePortAdapter(final LoanProductRepository loanProductRepository) {
         this.loanProductRepository = loanProductRepository;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
     }
 
     @Override
@@ -43,7 +40,7 @@ public class LoanProductExistencePortAdapter implements LoanProductExistencePort
 
     @Override
     public boolean existsForCurrency(final String currencyCode) {
-        return !loanProductReadPlatformService.retrieveAllLoanProductsForCurrency(currencyCode).isEmpty();
+        return loanProductRepository.existsByCurrencyCode(currencyCode);
     }
 
     @Override

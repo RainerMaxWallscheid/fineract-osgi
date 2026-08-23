@@ -44,6 +44,9 @@ public interface LoanProductRepository extends JpaRepository<LoanProduct, Long>,
     @Query("SELECT CASE WHEN COUNT(loanProduct)>0 THEN TRUE ELSE FALSE END FROM LoanProduct loanProduct WHERE loanProduct.id = :loanProductId")
     boolean existsById(@NonNull @Param("loanProductId") Long loanProductId);
 
+    @Query("SELECT CASE WHEN COUNT(loanProduct)>0 THEN TRUE ELSE FALSE END FROM LoanProduct loanProduct WHERE loanProduct.loanProductRelatedDetail.currency.code = :currencyCode")
+    boolean existsByCurrencyCode(@Param("currencyCode") String currencyCode);
+
     @Query("select loanProduct from LoanProduct loanProduct where loanProduct.closeDate is null or loanProduct.closeDate >= :businessDate")
     List<LoanProduct> fetchActiveLoanProducts(LocalDate businessDate);
 
