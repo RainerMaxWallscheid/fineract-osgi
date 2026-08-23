@@ -237,7 +237,7 @@ Inventory after the provider composition-root floor closed (`~1180` main Java ty
 | `fineract-calendar` | **complete** (api/impl/test); Equinox DS `CalendarDropdownReadPlatformService`; entity residual in core; GroupRepository residual to core |
 | `fineract-meeting` | **complete** (api/impl/test); Equinox DS `OSGI-INF/meeting.xml` (`MeetingAttendanceDropdownReadService`); depends on calendar-api/impl |
 | `fineract-address` | **complete** (api/impl/test); Equinox DS `OSGI-INF/address.xml` (`FieldConfigurationReadPlatformService`); AddressData residual in core; ClientAddress on impl |
-| `fineract-creditbureau` | **complete** (api/impl/test); Equinox DS `OSGI-INF/creditbureau.xml` (`CreditBureauReadPlatformService`); loan product mapping via loan-impl |
+| `fineract-creditbureau` | **complete** (api/impl/test); Equinox DS `OSGI-INF/creditbureau.xml` (`CreditBureauReadPlatformService`); loan product mapping via `LoanProductExistencePort` |
 | `fineract-collateral` | **complete** (api/impl/test); Equinox DS `OSGI-INF/collateral.xml` (`CollateralWritePlatformService`); legacy loan collateral residual **closed** (entity/DTO on collateral; Loan inverse collection removed) |
 | `fineract-collateralmanagement` | **complete** (api/impl/test); Equinox DS `OSGI-INF/collateralmanagement.xml` (`CollateralManagementReadService`); entity residual **closed** (entities on impl; Loan inverse collection removed) |
 | `fineract-note` | **complete** (api/impl/test); Equinox DS `OSGI-INF/note.xml` (`NoteReadPlatformService`); FK-based Note entity; share residual via ShareAccountNoteSupport |

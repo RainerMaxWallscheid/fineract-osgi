@@ -21,7 +21,7 @@ dependencies {
     api project(path: ':fineract-creditbureau-api')
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
-    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-loan-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

@@ -27,8 +27,8 @@ import org.apache.fineract.infrastructure.creditbureau.domain.OrganisationCredit
 import org.apache.fineract.infrastructure.creditbureau.domain.OrganisationCreditBureauRepository;
 import org.apache.fineract.infrastructure.creditbureau.serialization.CreditBureauLoanProductCommandFromApiJsonDeserializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
+import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,19 +42,20 @@ public class CreditBureauLoanProductMappingWritePlatformServiceImpl implements C
 
     private final OrganisationCreditBureauRepository organisationCreditBureauRepository;
 
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
 
     private final CreditBureauLoanProductCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 
     @Autowired
     public CreditBureauLoanProductMappingWritePlatformServiceImpl(final PlatformSecurityContext context,
             final CreditBureauLoanProductMappingRepository creditBureauLoanProductMappingRepository,
-            final OrganisationCreditBureauRepository organisationCreditBureauRepository, LoanProductRepository loanProductRepository,
+            final OrganisationCreditBureauRepository organisationCreditBureauRepository,
+            final LoanProductExistencePort loanProductExistencePort,
             final CreditBureauLoanProductCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
         this.context = context;
         this.creditBureauLoanProductMappingRepository = creditBureauLoanProductMappingRepository;
         this.organisationCreditBureauRepository = organisationCreditBureauRepository;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 
     }
@@ -66,13 +67,14 @@ public class CreditBureauLoanProductMappingWritePlatformServiceImpl implements C
 
         this.fromApiJsonDeserializer.validateForCreate(command.json(), organisationCreditBureauId);
 
-        final long lpid = command.longValueOfParameterNamed("loanProductId");
+        final Long lpid = command.longValueOfParameterNamed("loanProductId");
+        if (!this.loanProductExistencePort.existsById(lpid)) {
+            throw new LoanProductNotFoundException(lpid);
+        }
 
         final OrganisationCreditBureau orgcb = this.organisationCreditBureauRepository.getReferenceById(organisationCreditBureauId);
 
-        final LoanProduct lp = this.loanProductRepository.getReferenceById(lpid);
-
-        final CreditBureauLoanProductMapping cb_lp = CreditBureauLoanProductMapping.fromJson(command, orgcb, lp);
+        final CreditBureauLoanProductMapping cb_lp = CreditBureauLoanProductMapping.fromJson(command, orgcb, lpid);
 
         this.creditBureauLoanProductMappingRepository.saveAndFlush(cb_lp);
 

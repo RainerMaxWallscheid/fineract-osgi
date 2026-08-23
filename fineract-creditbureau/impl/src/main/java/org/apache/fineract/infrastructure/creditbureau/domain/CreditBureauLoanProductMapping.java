@@ -20,13 +20,10 @@ package org.apache.fineract.infrastructure.creditbureau.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 
 @SuppressWarnings({"MemberName"})
 @Entity
@@ -42,11 +39,11 @@ public class CreditBureauLoanProductMapping extends AbstractPersistableCustom<Lo
     private boolean active;
     @ManyToOne
     private OrganisationCreditBureau organisation_creditbureau;
-    @OneToOne
-    @JoinColumn(name = "loan_product_id")
-    private LoanProduct loanProduct;
+    /** Loan product id (column loan_product_id). No JPA association to leftover LoanProduct. */
+    @Column(name = "loan_product_id", nullable = false)
+    private Long loanProductId;
 
-    public static CreditBureauLoanProductMapping fromJson(final JsonCommand command, OrganisationCreditBureau organisation_creditbureau, LoanProduct loanProduct) {
+    public static CreditBureauLoanProductMapping fromJson(final JsonCommand command, OrganisationCreditBureau organisation_creditbureau, Long loanProductId) {
         Boolean isCreditCheckMandatory = false;
         Boolean skipCreditCheckInFailure = false;
         Integer stalePeriod = -1;
@@ -63,7 +60,7 @@ public class CreditBureauLoanProductMapping extends AbstractPersistableCustom<Lo
         if ((Boolean) command.booleanPrimitiveValueOfParameterNamed("isActive")) {
             isActive = command.booleanPrimitiveValueOfParameterNamed("isActive");
         }
-        return new CreditBureauLoanProductMapping().setCreditCheckMandatory(isCreditCheckMandatory).setSkipCreditCheckInFailure(skipCreditCheckInFailure).setStalePeriod(stalePeriod).setActive(isActive).setOrganisation_creditbureau(organisation_creditbureau).setLoanProduct(loanProduct);
+        return new CreditBureauLoanProductMapping().setCreditCheckMandatory(isCreditCheckMandatory).setSkipCreditCheckInFailure(skipCreditCheckInFailure).setStalePeriod(stalePeriod).setActive(isActive).setOrganisation_creditbureau(organisation_creditbureau).setLoanProductId(loanProductId);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -92,8 +89,8 @@ public class CreditBureauLoanProductMapping extends AbstractPersistableCustom<Lo
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProduct getLoanProduct() {
-        return this.loanProduct;
+        public Long getLoanProductId() {
+        return this.loanProductId;
     }
 
     /**
@@ -145,8 +142,8 @@ public class CreditBureauLoanProductMapping extends AbstractPersistableCustom<Lo
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public CreditBureauLoanProductMapping setLoanProduct(final LoanProduct loanProduct) {
-        this.loanProduct = loanProduct;
+        public CreditBureauLoanProductMapping setLoanProductId(final Long loanProductId) {
+        this.loanProductId = loanProductId;
         return this;
     }
 
