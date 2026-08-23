@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ClientTransactionJournalPort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -78,7 +78,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     private final ClientChargeRepositoryWrapper clientChargeRepository;
     private final ClientTransactionRepository clientTransactionRepository;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final ClientTransactionJournalPort clientTransactionJournalPort;
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper;
 
     @Override
@@ -165,7 +165,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
 
     private void generateAccountingEntries(ClientTransaction clientTransaction) {
         Map<String, Object> accountingBridgeData = clientTransaction.toMapData();
-        journalEntryWritePlatformService.createJournalEntriesForClientTransactions(accountingBridgeData);
+        clientTransactionJournalPort.postClientTransactions(accountingBridgeData);
     }
 
     @Override
@@ -387,7 +387,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientChargeWritePlatformServiceImpl(final ChargeDefinitionPort chargeDefinitionPort, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
+        public ClientChargeWritePlatformServiceImpl(final ChargeDefinitionPort chargeDefinitionPort, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ClientTransactionJournalPort clientTransactionJournalPort, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.clientRepository = clientRepository;
         this.clientChargeDataValidator = clientChargeDataValidator;
@@ -397,7 +397,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         this.clientChargeRepository = clientChargeRepository;
         this.clientTransactionRepository = clientTransactionRepository;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
-        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.clientTransactionJournalPort = clientTransactionJournalPort;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
     }
 }

@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.client.service;
 
 import java.util.Map;
 import java.util.Set;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.ClientTransactionJournalPort;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
@@ -38,7 +38,7 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
     private final ClientTransactionRepositoryWrapper clientTransactionRepository;
     private final ClientRepositoryWrapper clientRepository;
     private final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository;
-    private final JournalEntryWritePlatformService journalEntryWritePlatformService;
+    private final ClientTransactionJournalPort clientTransactionJournalPort;
 
     @Override
     public CommandProcessingResult undo(Long clientId, Long transactionId) {
@@ -76,14 +76,14 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
 
     private void generateAccountingEntries(ClientTransaction clientTransaction) {
         Map<String, Object> accountingBridgeData = clientTransaction.toMapData();
-        journalEntryWritePlatformService.createJournalEntriesForClientTransactions(accountingBridgeData);
+        clientTransactionJournalPort.postClientTransactions(accountingBridgeData);
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientTransactionWritePlatformServiceJpaRepositoryImpl(final ClientTransactionRepositoryWrapper clientTransactionRepository, final ClientRepositoryWrapper clientRepository, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final JournalEntryWritePlatformService journalEntryWritePlatformService) {
+        public ClientTransactionWritePlatformServiceJpaRepositoryImpl(final ClientTransactionRepositoryWrapper clientTransactionRepository, final ClientRepositoryWrapper clientRepository, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final ClientTransactionJournalPort clientTransactionJournalPort) {
         this.clientTransactionRepository = clientTransactionRepository;
         this.clientRepository = clientRepository;
         this.organisationCurrencyRepository = organisationCurrencyRepository;
-        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.clientTransactionJournalPort = clientTransactionJournalPort;
     }
 }
