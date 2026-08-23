@@ -45,6 +45,7 @@ jar {
                         + 'org.apache.fineract.infrastructure.core.service,'
                         + 'org.apache.fineract.infrastructure.dataqueries.data,'
                         + 'org.apache.fineract.organisation.staff.domain,'
+                        + 'org.apache.fineract.portfolio.client.domain,'
                         + 'org.apache.fineract.portfolio.common.domain,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.campaigns.api'

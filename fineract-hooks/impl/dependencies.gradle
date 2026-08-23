@@ -23,11 +23,8 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     // UGD template id + TemplateDomainService / TemplateMergeService
     implementation(project(path: ':fineract-template-api'))
-    // MessageGatewayHookProcessor → SMS + campaigns scheduler residual
-    implementation(project(path: ':fineract-sms-api'))
-    implementation(project(path: ':fineract-sms-impl'))
+    // MessageGatewayHookProcessor → TwoFactorSmsDeliveryPort
     implementation(project(path: ':fineract-campaigns-api'))
-    implementation(project(path: ':fineract-campaigns-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

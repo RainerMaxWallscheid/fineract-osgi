@@ -19,11 +19,12 @@
 package org.apache.fineract.infrastructure.campaigns.sms.service;
 
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.portfolio.client.domain.Client;
 
 /**
- * Narrow campaigns/sms port for 2FA OTP delivery.
+ * Narrow campaigns/sms port for triggered outbound SMS.
  * <p>
- * Breaks the security-impl ↔ sms-impl cycle: security uses this api port; campaigns-impl implements it using
+ * Security 2FA and hooks message-gateway use this api port; campaigns-impl implements it using leftover
  * SmsMessage + triggered gateway send.
  */
 public interface TwoFactorSmsDeliveryPort {
@@ -32,4 +33,9 @@ public interface TwoFactorSmsDeliveryPort {
      * Persist a pending OTP SMS and trigger immediate delivery via the configured provider.
      */
     void deliverOtpSms(Staff staff, String mobileNo, String messageText, long smsProviderId);
+
+    /**
+     * Persist a pending client SMS and trigger immediate delivery via the configured provider.
+     */
+    void deliverClientSms(Client client, String messageText, long smsProviderId);
 }

@@ -23,6 +23,7 @@ import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.portfolio.client.domain.Client;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,17 @@ public class TwoFactorSmsDeliveryPortAdapter implements TwoFactorSmsDeliveryPort
     @Override
     @Transactional
     public void deliverOtpSms(final Staff staff, final String mobileNo, final String messageText, final long smsProviderId) {
-        final SmsMessage smsMessage = SmsMessage.pendingSms(null, null, null, staff, messageText, mobileNo, null, false);
+        persistAndTrigger(SmsMessage.pendingSms(null, null, null, staff, messageText, mobileNo, null, false), smsProviderId);
+    }
+
+    @Override
+    @Transactional
+    public void deliverClientSms(final Client client, final String messageText, final long smsProviderId) {
+        persistAndTrigger(SmsMessage.pendingSms(null, null, client, null, messageText, client.mobileNo(), null, false),
+                smsProviderId);
+    }
+
+    private void persistAndTrigger(final SmsMessage smsMessage, final long smsProviderId) {
         this.smsMessageRepository.save(smsMessage);
         this.smsMessageScheduledJobService.sendTriggeredMessage(Collections.singleton(smsMessage), smsProviderId);
     }
