@@ -26,7 +26,6 @@ dependencies {
     testImplementation(project(path: ':fineract-accounting-api'))
     testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-cob-api'))
-    testImplementation(project(path: ':fineract-cob-impl'))
     testImplementation(project(path: ':fineract-avro-schemas'))
     testImplementation('org.apache.avro:avro')
 

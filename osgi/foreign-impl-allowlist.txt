@@ -20,7 +20,6 @@ fineract-event/impl/dependencies.gradle	fineract-savings-impl
 fineract-event/impl/dependencies.gradle	fineract-cob-impl
 fineract-event/impl/dependencies.gradle	fineract-working-capital-loan-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl
-fineract-investor/impl/dependencies.gradle	fineract-cob-impl
 fineract-investor/impl/dependencies.gradle	fineract-accounting-impl
 fineract-investor/impl/dependencies.gradle	fineract-loan-impl
 fineract-jobs/impl/dependencies.gradle	fineract-cob-impl
