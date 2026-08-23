@@ -30,7 +30,8 @@ import org.apache.fineract.interoperation.service.InteropServiceImpl;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepository;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
@@ -49,8 +50,9 @@ public class InteroperationConfiguration {
     @ConditionalOnMissingBean(InteropService.class)
     public InteropService interopService(PlatformSecurityContext securityContext, InteropDataValidator interopDataValidator,
             SavingsAccountRepository savingsAccountRepository, SavingsAccountTransactionRepository savingsAccountTransactionRepository,
-            ApplicationCurrencyRepository applicationCurrencyRepository, NoteRepository noteRepository,
-            PaymentTypeRepository paymentTypeRepository, InteropIdentifierRepository identifierRepository,
+            ApplicationCurrencyRepository applicationCurrencyRepository, NoteReadPlatformService noteReadPlatformService,
+            NoteWritePlatformService noteWritePlatformService, PaymentTypeRepository paymentTypeRepository,
+            InteropIdentifierRepository identifierRepository,
             LoanRepositoryWrapper loanRepositoryWrapper, SavingsHelper savingsHelper,
             SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             SavingsAccountDomainService savingsAccountService, ConfigurationDomainService configurationDomainService,
@@ -58,7 +60,8 @@ public class InteroperationConfiguration {
             DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, DatabaseSpecificSQLGenerator sqlGenerator,
             org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
         return new InteropServiceImpl(securityContext, interopDataValidator, savingsAccountRepository, savingsAccountTransactionRepository,
-                applicationCurrencyRepository, noteRepository, paymentTypeRepository, identifierRepository, loanRepositoryWrapper,
+                applicationCurrencyRepository, noteReadPlatformService, noteWritePlatformService, paymentTypeRepository,
+                identifierRepository, loanRepositoryWrapper,
                 savingsHelper, savingsAccountTransactionSummaryWrapper, savingsAccountService, configurationDomainService, jdbcTemplate,
                 commandsSourceWritePlatformService, toApiJsonSerializer, sqlGenerator, chargeTaxApplicationService);
     }

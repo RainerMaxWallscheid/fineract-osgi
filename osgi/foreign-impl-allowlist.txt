@@ -28,7 +28,6 @@ fineract-hooks/impl/dependencies.gradle	fineract-sms-impl
 fineract-hooks/impl/dependencies.gradle	fineract-campaigns-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-loan-impl
-fineract-interoperation/impl/dependencies.gradle	fineract-note-impl
 fineract-investor/impl/dependencies.gradle	fineract-cob-impl
 fineract-investor/impl/dependencies.gradle	fineract-accounting-impl
 fineract-investor/impl/dependencies.gradle	fineract-loan-impl

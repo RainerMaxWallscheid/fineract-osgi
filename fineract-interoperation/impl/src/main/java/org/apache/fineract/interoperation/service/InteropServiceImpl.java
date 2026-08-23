@@ -90,8 +90,11 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
+import org.apache.fineract.portfolio.note.data.NoteData;
+import org.apache.fineract.portfolio.note.domain.NoteType;
+import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
@@ -126,7 +129,8 @@ public class InteropServiceImpl implements InteropService {
     private final SavingsAccountRepository savingsAccountRepository;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     private final ApplicationCurrencyRepository currencyRepository;
-    private final NoteRepository noteRepository;
+    private final NoteReadPlatformService noteReadPlatformService;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final PaymentTypeRepository paymentTypeRepository;
     private final InteropIdentifierRepository identifierRepository;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
@@ -213,10 +217,10 @@ public class InteropServiceImpl implements InteropService {
         };
         InteropTransactionsData interopTransactionsData = InteropDataFactory.transactions(savingsAccount, transFilter);
         for (InteropTransactionData interopTransactionData : interopTransactionsData.getTransactions()) {
-            final List<Note> transactionNotes = noteRepository
-                    .findBySavingsTransactionId(Long.valueOf(interopTransactionData.getSavingTransactionId()));
+            final List<NoteData> transactionNotes = this.noteReadPlatformService.retrieveNotesByResource(
+                    Long.valueOf(interopTransactionData.getSavingTransactionId()), NoteType.SAVINGS_TRANSACTION.getValue());
             StringBuilder sb = new StringBuilder();
-            for (final Note note : transactionNotes) {
+            for (final NoteData note : transactionNotes) {
                 String s = note.getNote();
                 if (s == null) {
                     continue;
@@ -409,7 +413,8 @@ public class InteropServiceImpl implements InteropService {
         }
         String note = request.getNote();
         if (!StringUtils.isBlank(note)) {
-            noteRepository.save(Note.savingsTransactionNote(savingsAccount, transaction, note));
+            this.noteWritePlatformService.createNote(NoteCreateRequest.builder().resourceId(transaction.getId())
+                    .type(NoteType.SAVINGS_TRANSACTION).note(note).build());
         }
         return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getTransferCode(), transactionDateTime);
     }
@@ -585,13 +590,14 @@ public class InteropServiceImpl implements InteropService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteRepository noteRepository, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator, final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
+        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteReadPlatformService noteReadPlatformService, final NoteWritePlatformService noteWritePlatformService, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator, final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
         this.securityContext = securityContext;
         this.dataValidator = dataValidator;
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.currencyRepository = currencyRepository;
-        this.noteRepository = noteRepository;
+        this.noteReadPlatformService = noteReadPlatformService;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.paymentTypeRepository = paymentTypeRepository;
         this.identifierRepository = identifierRepository;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
