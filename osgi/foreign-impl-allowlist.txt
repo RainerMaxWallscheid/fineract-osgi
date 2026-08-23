@@ -18,7 +18,6 @@ fineract-campaigns/impl/dependencies.gradle	fineract-event-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-reportmailingjob-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-savings-impl
-fineract-charge/impl/dependencies.gradle	fineract-clients-impl
 fineract-charge/impl/dependencies.gradle	fineract-shares-impl
 fineract-charge/impl/dependencies.gradle	fineract-accounting-impl
 fineract-collateral/impl/dependencies.gradle	fineract-loan-impl
