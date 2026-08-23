@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import java.util.List;
 import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanInterestScheduleModel;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +39,11 @@ public class ProgressiveLoanModelRebuildPortAdapter implements ProgressiveLoanMo
     @Override
     public void recalculateModelAndSave(final Long loanId) {
         progressiveLoanModelProcessingService.recalculateModelAndSave(loanId);
+    }
+
+    @Override
+    public List<Long> findLoanIdsRequiringModelRecalculation(final List<Long> loanIds) {
+        return progressiveLoanModelProcessingService.findLoanIdsRequiringModelRecalculation(loanIds,
+                ProgressiveLoanInterestScheduleModel.getModelVersion());
     }
 }

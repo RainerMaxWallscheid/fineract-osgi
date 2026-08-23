@@ -18,14 +18,19 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import java.util.List;
+
 /**
- * Narrow loan-api port for progressive-model rebuild used by loan COB processors.
+ * Narrow loan-api port for progressive-model rebuild used by loan COB processors
+ * and the jobs model-checker filter.
  * <p>
- * Avoids loan-impl depending on progressive-loan-impl (progressive-loan-impl already depends on loan-impl).
+ * Avoids loan-impl / jobs-impl depending on progressive-loan-impl (progressive-loan-impl already depends on loan-impl).
  */
 public interface ProgressiveLoanModelRebuildPort {
 
     boolean hasValidModel(Long loanId);
 
     void recalculateModelAndSave(Long loanId);
+
+    List<Long> findLoanIdsRequiringModelRecalculation(List<Long> loanIds);
 }

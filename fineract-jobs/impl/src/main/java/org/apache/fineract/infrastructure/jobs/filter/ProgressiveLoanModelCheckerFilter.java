@@ -25,14 +25,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
-import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
-import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanInterestScheduleModel;
+import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelRebuildPort;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class ProgressiveLoanModelCheckerFilter extends OncePerRequestFilter {
-    private final ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService;
+    private final ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort;
     private final ProgressiveLoanModelCheckerHelper helper;
 
     @Override
@@ -43,7 +42,8 @@ public class ProgressiveLoanModelCheckerFilter extends OncePerRequestFilter {
         } else {
             List<Long> loanIds = helper.calculateRelevantLoanIds((BodyCachingHttpServletRequestWrapper) request);
             if (!loanIds.isEmpty()) {
-                progressiveLoanModelProcessingService.findLoanIdsRequiringModelRecalculation(loanIds, ProgressiveLoanInterestScheduleModel.getModelVersion()).forEach(progressiveLoanModelProcessingService::recalculateModelAndSave);
+                progressiveLoanModelRebuildPort.findLoanIdsRequiringModelRecalculation(loanIds)
+                        .forEach(progressiveLoanModelRebuildPort::recalculateModelAndSave);
             }
             proceed(filterChain, request, response);
         }
@@ -54,8 +54,8 @@ public class ProgressiveLoanModelCheckerFilter extends OncePerRequestFilter {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProgressiveLoanModelCheckerFilter(final ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService, final ProgressiveLoanModelCheckerHelper helper) {
-        this.progressiveLoanModelProcessingService = progressiveLoanModelProcessingService;
+        public ProgressiveLoanModelCheckerFilter(final ProgressiveLoanModelRebuildPort progressiveLoanModelRebuildPort, final ProgressiveLoanModelCheckerHelper helper) {
+        this.progressiveLoanModelRebuildPort = progressiveLoanModelRebuildPort;
         this.helper = helper;
     }
 }
