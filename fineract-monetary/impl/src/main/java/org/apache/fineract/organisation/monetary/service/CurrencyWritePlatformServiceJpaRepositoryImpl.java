@@ -30,14 +30,14 @@ import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepository;
 import org.apache.fineract.organisation.monetary.exception.CurrencyInUseException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.springframework.transaction.annotation.Transactional;
 
 public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWritePlatformService {
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
     private final OrganisationCurrencyRepository organisationCurrencyRepository;
-    private final LoanProductReadPlatformService loanProductService;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final SavingsProductReadPlatformService savingsProductService;
     private final ChargeReadPlatformService chargeService;
 
@@ -56,7 +56,7 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
         for (OrganisationCurrency priorCurrency : organisationCurrencyRepository.findAll()) {
             if (!allowedCurrencyCodes.contains(priorCurrency.getCode())) {
                 // check if it's safe to remove this currency.
-                if (!loanProductService.retrieveAllLoanProductsForCurrency(priorCurrency.getCode()).isEmpty() || !savingsProductService.retrieveAllForCurrency(priorCurrency.getCode()).isEmpty() || !chargeService.retrieveAllChargesForCurrency(priorCurrency.getCode()).isEmpty()) {
+                if (loanProductExistencePort.existsForCurrency(priorCurrency.getCode()) || !savingsProductService.retrieveAllForCurrency(priorCurrency.getCode()).isEmpty() || !chargeService.retrieveAllChargesForCurrency(priorCurrency.getCode()).isEmpty()) {
                     throw new CurrencyInUseException(priorCurrency.getCode());
                 }
             }
@@ -67,10 +67,10 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
     }
 
     @java.lang.SuppressWarnings("all")
-        public CurrencyWritePlatformServiceJpaRepositoryImpl(final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final OrganisationCurrencyRepository organisationCurrencyRepository, final LoanProductReadPlatformService loanProductService, final SavingsProductReadPlatformService savingsProductService, final ChargeReadPlatformService chargeService) {
+        public CurrencyWritePlatformServiceJpaRepositoryImpl(final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final OrganisationCurrencyRepository organisationCurrencyRepository, final LoanProductExistencePort loanProductExistencePort, final SavingsProductReadPlatformService savingsProductService, final ChargeReadPlatformService chargeService) {
         this.applicationCurrencyRepository = applicationCurrencyRepository;
         this.organisationCurrencyRepository = organisationCurrencyRepository;
-        this.loanProductService = loanProductService;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.savingsProductService = savingsProductService;
         this.chargeService = chargeService;
     }

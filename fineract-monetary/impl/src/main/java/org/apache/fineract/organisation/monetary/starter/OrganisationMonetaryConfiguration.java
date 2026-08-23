@@ -27,7 +27,7 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 import org.apache.fineract.organisation.monetary.service.OrganisationCurrencyReadPlatformService;
 import org.apache.fineract.organisation.monetary.service.OrganisationCurrencyReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -46,10 +46,10 @@ public class OrganisationMonetaryConfiguration {
     @Bean
     @ConditionalOnMissingBean(CurrencyWritePlatformService.class)
     public CurrencyWritePlatformService currencyWritePlatformService(ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository,
-            OrganisationCurrencyRepository organisationCurrencyRepository, LoanProductReadPlatformService loanProductService,
+            OrganisationCurrencyRepository organisationCurrencyRepository, LoanProductExistencePort loanProductExistencePort,
             SavingsProductReadPlatformService savingsProductService, ChargeReadPlatformService chargeService) {
         return new CurrencyWritePlatformServiceJpaRepositoryImpl(applicationCurrencyRepository, organisationCurrencyRepository,
-                loanProductService, savingsProductService, chargeService);
+                loanProductExistencePort, savingsProductService, chargeService);
     }
 
     @Bean

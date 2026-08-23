@@ -25,4 +25,6 @@ package org.apache.fineract.portfolio.loanaccount.moduleapi;
 public interface LoanProductExistencePort {
 
     boolean existsById(Long loanProductId);
+
+    boolean existsForCurrency(String currencyCode);
 }
