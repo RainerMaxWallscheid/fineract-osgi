@@ -28,7 +28,6 @@ dependencies {
     implementation(project(path: ':fineract-gcm-api'))
     implementation(project(path: ':fineract-gcm-impl'))
     implementation(project(path: ':fineract-configuration-api'))
-    implementation(project(path: ':fineract-configuration-impl'))
     implementation(project(path: ':fineract-dataqueries-api'))
     implementation(project(path: ':fineract-dataqueries-impl'))
     implementation(project(path: ':fineract-event-api'))
@@ -40,7 +39,6 @@ dependencies {
     implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-savings-impl'))
     implementation(project(path: ':fineract-calendar-api'))
-    implementation(project(path: ':fineract-calendar-impl'))
     implementation(project(path: ':fineract-report'))
 
     implementation(

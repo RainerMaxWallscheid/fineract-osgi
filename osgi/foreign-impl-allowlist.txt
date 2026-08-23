@@ -13,13 +13,11 @@ fineract-bulkimport/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-calendar/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-gcm-impl
-fineract-campaigns/impl/dependencies.gradle	fineract-configuration-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-dataqueries-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-event-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-reportmailingjob-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-savings-impl
-fineract-campaigns/impl/dependencies.gradle	fineract-calendar-impl
 fineract-charge/impl/dependencies.gradle	fineract-clients-impl
 fineract-charge/impl/dependencies.gradle	fineract-shares-impl
 fineract-charge/impl/dependencies.gradle	fineract-accounting-impl
