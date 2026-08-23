@@ -36,11 +36,10 @@ import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanReadPlatformServiceCommon;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorMappingResponse;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorsResponse;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
@@ -54,7 +53,8 @@ import org.springframework.stereotype.Component;
 public class LoanOriginatorsApiResource {
     private static final String LOAN_RESOURCE_NAME = "LOAN";
     private final PlatformSecurityContext context;
-    private final LoanReadPlatformService loanReadPlatformService;
+    private final LoanExistencePort loanExistencePort;
+    private final LoanReadPlatformServiceCommon loanReadPlatformService;
     private final LoanOriginatorReadPlatformService loanOriginatorReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
@@ -67,7 +67,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "404", description = "Loan not found")
     public LoanOriginatorsResponse retrieveOriginatorsByLoanId(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(LOAN_RESOURCE_NAME);
-        if (!this.loanReadPlatformService.existsByLoanId(loanId)) {
+        if (!this.loanExistencePort.existsById(loanId)) {
             throw new LoanNotFoundException(loanId);
         }
         return LoanOriginatorsResponse.of(this.loanOriginatorReadPlatformService.retrieveByLoanId(loanId));
@@ -82,11 +82,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "404", description = "Loan not found")
     public LoanOriginatorsResponse retrieveOriginatorsByLoanExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
         this.context.authenticatedUser().validateHasReadPermission(LOAN_RESOURCE_NAME);
-        final ExternalId externalId = ExternalIdFactory.produce(loanExternalId);
-        final Long loanId = this.loanReadPlatformService.retrieveLoanIdByExternalId(externalId);
-        if (loanId == null) {
-            throw new LoanNotFoundException(externalId);
-        }
+        final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         return LoanOriginatorsResponse.of(this.loanOriginatorReadPlatformService.retrieveByLoanId(loanId));
     }
 
@@ -128,11 +124,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Loan not in correct status, originator not ACTIVE, duplicate mapping")
     @ApiResponse(responseCode = "404", description = "Loan or originator not found")
     public LoanOriginatorMappingResponse attachOriginatorToLoanByLoanExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("originatorId") @Parameter(description = "originatorId") final Long originatorId) {
-        final ExternalId externalId = ExternalIdFactory.produce(loanExternalId);
-        final Long loanId = this.loanReadPlatformService.retrieveLoanIdByExternalId(externalId);
-        if (loanId == null) {
-            throw new LoanNotFoundException(externalId);
-        }
+        final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().attachLoanOriginator(loanId, originatorId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return buildMappingResponse(result);
@@ -147,11 +139,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Loan not in correct status, originator not ACTIVE, duplicate mapping")
     @ApiResponse(responseCode = "404", description = "Loan or originator not found")
     public LoanOriginatorMappingResponse attachOriginatorToLoanByExternalIds(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("originatorExternalId") @Parameter(description = "originatorExternalId") final String originatorExternalId) {
-        final ExternalId loanExtId = ExternalIdFactory.produce(loanExternalId);
-        final Long loanId = this.loanReadPlatformService.retrieveLoanIdByExternalId(loanExtId);
-        if (loanId == null) {
-            throw new LoanNotFoundException(loanExtId);
-        }
+        final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         final Long originatorId = this.loanOriginatorReadPlatformService.resolveIdByExternalId(originatorExternalId);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().attachLoanOriginator(loanId, originatorId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -193,11 +181,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Loan not in correct status")
     @ApiResponse(responseCode = "404", description = "Loan, originator, or mapping not found")
     public LoanOriginatorMappingResponse detachOriginatorFromLoanByLoanExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("originatorId") @Parameter(description = "originatorId") final Long originatorId) {
-        final ExternalId externalId = ExternalIdFactory.produce(loanExternalId);
-        final Long loanId = this.loanReadPlatformService.retrieveLoanIdByExternalId(externalId);
-        if (loanId == null) {
-            throw new LoanNotFoundException(externalId);
-        }
+        final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().detachLoanOriginator(loanId, originatorId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return buildMappingResponse(result);
@@ -211,11 +195,7 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Loan not in correct status")
     @ApiResponse(responseCode = "404", description = "Loan, originator, or mapping not found")
     public LoanOriginatorMappingResponse detachOriginatorFromLoanByExternalIds(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("originatorExternalId") @Parameter(description = "originatorExternalId") final String originatorExternalId) {
-        final ExternalId loanExtId = ExternalIdFactory.produce(loanExternalId);
-        final Long loanId = this.loanReadPlatformService.retrieveLoanIdByExternalId(loanExtId);
-        if (loanId == null) {
-            throw new LoanNotFoundException(loanExtId);
-        }
+        final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         final Long originatorId = this.loanOriginatorReadPlatformService.resolveIdByExternalId(originatorExternalId);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().detachLoanOriginator(loanId, originatorId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -227,8 +207,9 @@ public class LoanOriginatorsApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanOriginatorsApiResource(final PlatformSecurityContext context, final LoanReadPlatformService loanReadPlatformService, final LoanOriginatorReadPlatformService loanOriginatorReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        public LoanOriginatorsApiResource(final PlatformSecurityContext context, final LoanExistencePort loanExistencePort, final LoanReadPlatformServiceCommon loanReadPlatformService, final LoanOriginatorReadPlatformService loanOriginatorReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
         this.context = context;
+        this.loanExistencePort = loanExistencePort;
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanOriginatorReadPlatformService = loanOriginatorReadPlatformService;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;

@@ -38,7 +38,6 @@ fineract-jobs/impl/dependencies.gradle	fineract-loan-impl
 fineract-jobs/impl/dependencies.gradle	fineract-progressive-loan-impl
 fineract-jobs/impl/dependencies.gradle	fineract-working-capital-loan-impl
 fineract-loan/impl/dependencies.gradle	fineract-cob-impl
-fineract-loan-origination/impl/dependencies.gradle	fineract-loan-impl
 fineract-loan-origination/impl/dependencies.gradle	fineract-working-capital-loan-impl
 fineract-note/impl/dependencies.gradle	fineract-loan-impl
 fineract-note/impl/dependencies.gradle	fineract-savings-impl

@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
+
 /**
  * ID-only loan existence/status check (ADR-021). Foreign BCs must not depend
  * on leftover {@code LoanRepositoryWrapper}.
@@ -30,4 +32,14 @@ public interface LoanExistencePort {
      * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
      */
     boolean isSubmittedAndPendingApproval(Long loanId);
+
+    /**
+     * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
+     */
+    String statusCode(Long loanId);
+
+    /**
+     * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
+     */
+    ExternalId externalId(Long loanId);
 }

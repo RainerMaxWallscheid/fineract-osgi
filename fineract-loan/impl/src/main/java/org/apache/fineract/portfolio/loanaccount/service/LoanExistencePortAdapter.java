@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
@@ -39,6 +41,20 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
 
     @Override
     public boolean isSubmittedAndPendingApproval(final Long loanId) {
-        return loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId)).isSubmittedAndPendingApproval();
+        return requireLoan(loanId).isSubmittedAndPendingApproval();
+    }
+
+    @Override
+    public String statusCode(final Long loanId) {
+        return requireLoan(loanId).getStatus().getCode();
+    }
+
+    @Override
+    public ExternalId externalId(final Long loanId) {
+        return requireLoan(loanId).getExternalId();
+    }
+
+    private Loan requireLoan(final Long loanId) {
+        return loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
     }
 }
