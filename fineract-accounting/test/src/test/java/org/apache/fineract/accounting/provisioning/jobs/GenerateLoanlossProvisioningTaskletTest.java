@@ -26,14 +26,12 @@ import static org.springframework.batch.repeat.RepeatStatus.FINISHED;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.fineract.accounting.provisioning.exception.ProvisioningEntryAlreadyCreatedException;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesWritePlatformService;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.organisation.provisioning.data.ProvisioningCriteriaData;
-import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +57,7 @@ class GenerateLoanlossProvisioningTaskletTest {
     private ChunkContext chunkContext;
 
     @Mock
-    private ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
+    private ProvisioningExistencePort provisioningExistencePort;
     @Mock
     private ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService;
 
@@ -75,8 +73,7 @@ class GenerateLoanlossProvisioningTaskletTest {
     @Test
     public void testExecuteShouldCreateProvisioningEntry() throws Exception {
         // given
-        List<ProvisioningCriteriaData> provisioningCriterias = List.of(new ProvisioningCriteriaData());
-        given(provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias()).willReturn(provisioningCriterias);
+        given(provisioningExistencePort.hasAnyCriteria()).willReturn(true);
         // when
         RepeatStatus result = underTest.execute(stepContribution, chunkContext);
         // then
@@ -87,19 +84,7 @@ class GenerateLoanlossProvisioningTaskletTest {
     @Test
     public void testExecuteShouldNotCreateProvisioningEntryWhenNoProvisioningCriteriasArePresent() throws Exception {
         // given
-        List<ProvisioningCriteriaData> provisioningCriterias = List.of();
-        given(provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias()).willReturn(provisioningCriterias);
-        // when
-        RepeatStatus result = underTest.execute(stepContribution, chunkContext);
-        // then
-        verifyNoInteractions(provisioningEntriesWritePlatformService);
-        assertThat(result).isEqualTo(FINISHED);
-    }
-
-    @Test
-    public void testExecuteShouldNotCreateProvisioningEntryWhenNullProvisioningCriteriasArePresent() throws Exception {
-        // given
-        given(provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias()).willReturn(null);
+        given(provisioningExistencePort.hasAnyCriteria()).willReturn(false);
         // when
         RepeatStatus result = underTest.execute(stepContribution, chunkContext);
         // then
@@ -110,8 +95,7 @@ class GenerateLoanlossProvisioningTaskletTest {
     @Test
     public void testExecuteShouldNotFailWhenProvisioningEntryIsAlreadyCreated() throws Exception {
         // given
-        List<ProvisioningCriteriaData> provisioningCriterias = List.of(new ProvisioningCriteriaData());
-        given(provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias()).willReturn(provisioningCriterias);
+        given(provisioningExistencePort.hasAnyCriteria()).willReturn(true);
         given(provisioningEntriesWritePlatformService.createProvisioningEntry(BUSINESS_DATE, true))
                 .willThrow(new ProvisioningEntryAlreadyCreatedException(1L, BUSINESS_DATE));
         // when
@@ -124,8 +108,7 @@ class GenerateLoanlossProvisioningTaskletTest {
     @Test
     public void testExecuteShouldNotFailWhenExceptionIsThrownInProvisioningEntryCreation() throws Exception {
         // given
-        List<ProvisioningCriteriaData> provisioningCriterias = List.of(new ProvisioningCriteriaData());
-        given(provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias()).willReturn(provisioningCriterias);
+        given(provisioningExistencePort.hasAnyCriteria()).willReturn(true);
         given(provisioningEntriesWritePlatformService.createProvisioningEntry(BUSINESS_DATE, true)).willThrow(new RuntimeException("Test"));
         // when
         RepeatStatus result = underTest.execute(stepContribution, chunkContext);

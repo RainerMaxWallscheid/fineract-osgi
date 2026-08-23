@@ -20,7 +20,7 @@ package org.apache.fineract.accounting.provisioning.jobs;
 
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesWritePlatformService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -40,7 +40,7 @@ public class GenerateLoanlossProvisioningConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
+    private ProvisioningExistencePort provisioningExistencePort;
     @Autowired
     private ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService;
 
@@ -58,6 +58,6 @@ public class GenerateLoanlossProvisioningConfig {
 
     @Bean
     public GenerateLoanlossProvisioningTasklet generateLoanlossProvisioningTasklet() {
-        return new GenerateLoanlossProvisioningTasklet(provisioningCriteriaReadPlatformService, provisioningEntriesWritePlatformService);
+        return new GenerateLoanlossProvisioningTasklet(provisioningExistencePort, provisioningEntriesWritePlatformService);
     }
 }

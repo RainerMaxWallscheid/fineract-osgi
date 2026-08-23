@@ -19,13 +19,10 @@
 package org.apache.fineract.accounting.provisioning.jobs;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.accounting.provisioning.exception.ProvisioningEntryAlreadyCreatedException;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesWritePlatformService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.provisioning.data.ProvisioningCriteriaData;
-import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -34,7 +31,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class GenerateLoanlossProvisioningTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenerateLoanlossProvisioningTasklet.class);
-    private final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
+    private final ProvisioningExistencePort provisioningExistencePort;
     private final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService;
 
     @Override
@@ -42,8 +39,7 @@ public class GenerateLoanlossProvisioningTasklet implements Tasklet {
         LocalDate currentDate = DateUtils.getBusinessLocalDate();
         boolean addJournalEntries = true;
         try {
-            Collection<ProvisioningCriteriaData> criteriaCollection = provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias();
-            if (CollectionUtils.isNotEmpty(criteriaCollection)) {
+            if (provisioningExistencePort.hasAnyCriteria()) {
                 provisioningEntriesWritePlatformService.createProvisioningEntry(currentDate, addJournalEntries);
             }
         } catch (ProvisioningEntryAlreadyCreatedException e) {
@@ -55,8 +51,8 @@ public class GenerateLoanlossProvisioningTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GenerateLoanlossProvisioningTasklet(final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService) {
-        this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
+        public GenerateLoanlossProvisioningTasklet(final ProvisioningExistencePort provisioningExistencePort, final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService) {
+        this.provisioningExistencePort = provisioningExistencePort;
         this.provisioningEntriesWritePlatformService = provisioningEntriesWritePlatformService;
     }
 }

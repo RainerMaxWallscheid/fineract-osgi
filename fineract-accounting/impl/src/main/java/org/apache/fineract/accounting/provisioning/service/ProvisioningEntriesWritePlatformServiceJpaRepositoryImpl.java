@@ -55,10 +55,8 @@ import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
-import org.apache.fineract.organisation.provisioning.data.ProvisioningCriteriaData;
-import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategory;
-import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategoryRepository;
-import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.exception.ProvisioningCategoryNotFoundException;
+import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
@@ -71,11 +69,10 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl.class);
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
-    private final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
+    private final ProvisioningExistencePort provisioningExistencePort;
     private final LoanProductExistencePort loanProductExistencePort;
     private final GLAccountRepository glAccountRepository;
     private final OfficeRepository officeRepository;
-    private final ProvisioningCategoryRepository provisioningCategoryRepository;
     private final PlatformSecurityContext platformSecurityContext;
     private final ProvisioningEntryRepository provisioningEntryRepository;
     private final ProvisioningJournalEntryService provisioningJournalEntryService;
@@ -140,8 +137,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         LocalDate createdDate = parseDate(command);
         boolean addJournalEntries = isJournalEntriesRequired(command);
         try {
-            Collection<ProvisioningCriteriaData> criteriaCollection = this.provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias();
-            if (criteriaCollection == null || criteriaCollection.isEmpty()) {
+            if (!this.provisioningExistencePort.hasAnyCriteria()) {
                 throw new NoProvisioningCriteriaDefinitionFound();
             }
             ProvisioningEntry requestedEntry = createProvisioningEntry(createdDate, addJournalEntries);
@@ -189,9 +185,10 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     private Collection<LoanProductProvisioningEntry> generateLoanProvisioningEntry(ProvisioningEntry parent, LocalDate date) {
         Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveLoanProductsProvisioningData(date);
-        // Collect all referenced IDs upfront and bulk-fetch office/category/GL via
-        // findAllById; loan products are existence-checked through the already-on-loan-api
-        // port (no leftover LoanProductRepository — FINERACT-2561 / ADR-021).
+        // Collect all referenced IDs upfront and bulk-fetch office/GL via
+        // findAllById; loan products and provision categories are existence-checked
+        // through already-on-api ports (no leftover LoanProductRepository /
+        // ProvisioningCategoryRepository — FINERACT-2561 / ADR-021).
         Set<Long> productIds = entries.stream().map(LoanProductProvisioningEntryData::getProductId).collect(Collectors.toSet());
         Set<Long> officeIds = entries.stream().map(LoanProductProvisioningEntryData::getOfficeId).collect(Collectors.toSet());
         Set<Long> categoryIds = entries.stream().map(LoanProductProvisioningEntryData::getCategoryId).collect(Collectors.toSet());
@@ -201,8 +198,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
                 throw new LoanProductNotFoundException(productId);
             }
         }
+        for (Long categoryId : categoryIds) {
+            if (!provisioningExistencePort.categoryExistsById(categoryId)) {
+                throw new ProvisioningCategoryNotFoundException(categoryId);
+            }
+        }
         Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
-        Map<Long, ProvisioningCategory> categoryMap = provisioningCategoryRepository.findAllById(categoryIds).stream().collect(Collectors.toMap(ProvisioningCategory::getId, Function.identity()));
         Map<Long, GLAccount> glAccountMap = glAccountRepository.findAllById(glAccountIds).stream().collect(Collectors.toMap(GLAccount::getId, Function.identity()));
         Map<Integer, LoanProductProvisioningEntry> provisioningEntries = new HashMap<>();
         for (LoanProductProvisioningEntryData data : entries) {
@@ -218,13 +219,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             if (expenseAccount == null) {
                 throw new GLAccountNotFoundException(data.getExpenseAccount());
             }
-            ProvisioningCategory provisioningCategory = categoryMap.get(data.getCategoryId());
             final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(data.getCurrencyCode());
             MonetaryCurrency currency = MonetaryCurrency.fromApplicationCurrency(applicationCurrency);
             Money money = Money.of(currency, data.getBalance());
             Money amountToReserve = money.percentageOf(data.getPercentage(), MoneyHelper.getMathContext());
             Long criteraId = data.getCriteriaId();
-            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setProductId(data.getProductId()).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setProvisioningCategory(provisioningCategory).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
+            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setProductId(data.getProductId()).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setCategoryId(data.getCategoryId()).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
             entry.setEntry(parent);
             if (!provisioningEntries.containsKey(entry.partialHashCode())) {
                 provisioningEntries.put(entry.partialHashCode(), entry);
@@ -237,13 +237,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductExistencePort loanProductExistencePort, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningExistencePort provisioningExistencePort, final LoanProductExistencePort loanProductExistencePort, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
-        this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
+        this.provisioningExistencePort = provisioningExistencePort;
         this.loanProductExistencePort = loanProductExistencePort;
         this.glAccountRepository = glAccountRepository;
         this.officeRepository = officeRepository;
-        this.provisioningCategoryRepository = provisioningCategoryRepository;
         this.platformSecurityContext = platformSecurityContext;
         this.provisioningEntryRepository = provisioningEntryRepository;
         this.provisioningJournalEntryService = provisioningJournalEntryService;

@@ -37,6 +37,7 @@ jar {
                         + 'org.apache.fineract.organisation.workingdays.service,'
                         + 'org.apache.fineract.organisation.provisioning.data,'
                         + 'org.apache.fineract.organisation.provisioning.exception,'
+                        + 'org.apache.fineract.organisation.provisioning.moduleapi,'
                         + 'org.apache.fineract.organisation.provisioning.service',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'

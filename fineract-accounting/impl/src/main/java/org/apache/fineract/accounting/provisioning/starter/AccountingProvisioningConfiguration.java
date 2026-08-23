@@ -31,8 +31,7 @@ import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
-import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategoryRepository;
-import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformService;
+import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -55,15 +54,13 @@ public class AccountingProvisioningConfiguration {
     @ConditionalOnMissingBean(ProvisioningEntriesWritePlatformService.class)
     public ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService(
             ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService,
-            ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService,
-            LoanProductExistencePort loanProductExistencePort, GLAccountRepository glAccountRepository, OfficeRepository officeRepository,
-            ProvisioningCategoryRepository provisioningCategoryRepository, PlatformSecurityContext platformSecurityContext,
+            ProvisioningExistencePort provisioningExistencePort, LoanProductExistencePort loanProductExistencePort,
+            GLAccountRepository glAccountRepository, OfficeRepository officeRepository, PlatformSecurityContext platformSecurityContext,
             ProvisioningEntryRepository provisioningEntryRepository, ProvisioningJournalEntryService provisioningJournalEntryService,
             ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, FromJsonHelper fromApiJsonHelper) {
         return new ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(provisioningEntriesReadPlatformService,
-                provisioningCriteriaReadPlatformService, loanProductExistencePort, glAccountRepository, officeRepository,
-                provisioningCategoryRepository, platformSecurityContext, provisioningEntryRepository, provisioningJournalEntryService,
-                fromApiJsonDeserializer, fromApiJsonHelper) {};
+                provisioningExistencePort, loanProductExistencePort, glAccountRepository, officeRepository, platformSecurityContext,
+                provisioningEntryRepository, provisioningJournalEntryService, fromApiJsonDeserializer, fromApiJsonHelper) {};
     }
 
 }

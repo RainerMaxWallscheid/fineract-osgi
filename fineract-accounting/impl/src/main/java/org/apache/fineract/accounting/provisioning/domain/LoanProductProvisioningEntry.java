@@ -28,7 +28,6 @@ import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.provisioning.domain.ProvisioningCategory;
 
 @Entity
 @Table(name = "m_loanproduct_provisioning_entry")
@@ -48,9 +47,11 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      */
     @Column(name = "product_id", nullable = false)
     private Long productId;
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private ProvisioningCategory provisioningCategory;
+    /**
+     * Provision category id (no JPA association to leftover ProvisioningCategory — ADR-021 / charge Step 8).
+     */
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
     @Column(name = "overdue_in_days", nullable = false)
     private Long overdueInDays;
     @Column(name = "reseve_amount", nullable = false)
@@ -70,23 +71,23 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
             return false;
         }
         LoanProductProvisioningEntry other = (LoanProductProvisioningEntry) obj;
-        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.office.getId(), this.office.getId()) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.provisioningCategory.getId(), this.provisioningCategory.getId()) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
+        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.office.getId(), this.office.getId()) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.categoryId, this.categoryId) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
     }
 
     @Override
     public int hashCode() {
         // NOT return Objects.hash(entry, criteriaId, office, currencyCode,
-        // productId, provisioningCategory, overdueInDays, reservedAmount,
+        // productId, categoryId, overdueInDays, reservedAmount,
         // liabilityAccount, expenseAccount);
         // to remain consistent with the implementation in equals(), also use
         // getId() here.
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, provisioningCategory.getId(), overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, categoryId, overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     public int partialHashCode() {
         // this is used to group together all the entries that have similar parameters (excluding the amount reserved)
         // rather than a check for if the objects are the same based on their values, this tells if they are similar
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, provisioningCategory.getId(), overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, categoryId, overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     @java.lang.SuppressWarnings("all")
@@ -115,8 +116,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningCategory getProvisioningCategory() {
-        return this.provisioningCategory;
+        public Long getCategoryId() {
+        return this.categoryId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -188,8 +189,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public LoanProductProvisioningEntry setProvisioningCategory(final ProvisioningCategory provisioningCategory) {
-        this.provisioningCategory = provisioningCategory;
+        public LoanProductProvisioningEntry setCategoryId(final Long categoryId) {
+        this.categoryId = categoryId;
         return this;
     }
 
