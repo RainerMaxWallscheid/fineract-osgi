@@ -51,10 +51,8 @@ import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
-import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.util.CollectionUtils;
 
 public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWritePlatformService {
@@ -62,10 +60,9 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
     private final CalendarHistoryRepository calendarHistoryRepository;
     private final CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final CalendarInstanceRepository calendarInstanceRepository;
-    private final LoanWritePlatformService loanWritePlatformService;
+    private final LoanExistencePort loanExistencePort;
     private final ConfigurationDomainService configurationDomainService;
     private final GroupRepository groupRepository;
-    private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final ClientRepository clientRepository;
 
     @Override
@@ -81,8 +78,8 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
             entityType = centerOrGroup.isCenter() ? CalendarEntityType.CENTERS : CalendarEntityType.GROUPS;
             entityId = command.getGroupId();
         } else if (command.getLoanId() != null) {
-            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(command.getLoanId(), true);
-            entityActivationDate = (loan.getApprovedOnDate() == null) ? loan.getSubmittedOnDate() : loan.getApprovedOnDate();
+            final var dates = this.loanExistencePort.requireCalendarDates(command.getLoanId());
+            entityActivationDate = (dates.approvedOnDate() == null) ? dates.submittedOnDate() : dates.approvedOnDate();
             entityType = CalendarEntityType.LOANS;
             entityId = command.getLoanId();
         } else if (command.getClientId() != null) {
@@ -171,7 +168,8 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
          */
         Boolean areActiveEntitiesSynced = false;
         final Long calendarId = command.entityId();
-        final Collection<LoanStatus> loanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE));
+        final Collection<Integer> loanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL.getValue(),
+                LoanStatus.APPROVED.getValue(), LoanStatus.ACTIVE.getValue()));
         final Integer numberOfActiveLoansSyncedWithThisCalendar = this.calendarInstanceRepository.countOfLoansSyncedWithCalendar(calendarId, loanStatuses);
         /*
          * areActiveEntitiesSynced is set to true, if there are any active loans synced to this calendar.
@@ -231,8 +229,12 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
                 // calendar.
                 final Collection<CalendarInstance> loanCalendarInstances = this.calendarInstanceRepository.findByCalendarIdAndEntityTypeId(calendarId, CalendarEntityType.LOANS.getValue());
                 if (!CollectionUtils.isEmpty(loanCalendarInstances)) {
-                    // update all loans associated with modifying calendar
-                    this.loanWritePlatformService.applyMeetingDateChanges(calendarForUpdate, loanCalendarInstances, reschedulebasedOnMeetingDates, presentMeetingDate, newMeetingDate);
+                    final List<Long> loanIds = new ArrayList<>(loanCalendarInstances.size());
+                    for (final CalendarInstance loanCalendarInstance : loanCalendarInstances) {
+                        loanIds.add(loanCalendarInstance.getEntityId());
+                    }
+                    this.loanExistencePort.applyMeetingDateChanges(calendarForUpdate.getId(), loanIds, reschedulebasedOnMeetingDates,
+                            presentMeetingDate, newMeetingDate);
                 }
             }
         }
@@ -276,15 +278,14 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
     }
 
     @java.lang.SuppressWarnings("all")
-        public CalendarWritePlatformServiceJpaRepositoryImpl(final CalendarRepository calendarRepository, final CalendarHistoryRepository calendarHistoryRepository, final CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CalendarInstanceRepository calendarInstanceRepository, final LoanWritePlatformService loanWritePlatformService, final ConfigurationDomainService configurationDomainService, final GroupRepository groupRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final ClientRepository clientRepository) {
+        public CalendarWritePlatformServiceJpaRepositoryImpl(final CalendarRepository calendarRepository, final CalendarHistoryRepository calendarHistoryRepository, final CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CalendarInstanceRepository calendarInstanceRepository, final LoanExistencePort loanExistencePort, final ConfigurationDomainService configurationDomainService, final GroupRepository groupRepository, final ClientRepository clientRepository) {
         this.calendarRepository = calendarRepository;
         this.calendarHistoryRepository = calendarHistoryRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.calendarInstanceRepository = calendarInstanceRepository;
-        this.loanWritePlatformService = loanWritePlatformService;
+        this.loanExistencePort = loanExistencePort;
         this.configurationDomainService = configurationDomainService;
         this.groupRepository = groupRepository;
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.clientRepository = clientRepository;
     }
 }

@@ -18,7 +18,13 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.portfolio.calendar.domain.Calendar;
+import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
@@ -26,6 +32,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,10 +40,15 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
 
     private final LoanRepository loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
+    private final CalendarRepositoryWrapper calendarRepositoryWrapper;
+    private final LoanWritePlatformService loanWritePlatformService;
 
-    public LoanExistencePortAdapter(final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository) {
+    public LoanExistencePortAdapter(final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository,
+            final CalendarRepositoryWrapper calendarRepositoryWrapper, @Lazy final LoanWritePlatformService loanWritePlatformService) {
         this.loanRepository = loanRepository;
         this.loanTransactionRepository = loanTransactionRepository;
+        this.calendarRepositoryWrapper = calendarRepositoryWrapper;
+        this.loanWritePlatformService = loanWritePlatformService;
     }
 
     @Override
@@ -71,6 +83,21 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
                 .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
         final Loan loan = transaction.getLoan();
         return new LoanTransactionNoteRef(loan.getId(), transaction.getId(), loan.getClientId(), loan.getOfficeId());
+    }
+
+    @Override
+    public LoanCalendarDates requireCalendarDates(final Long loanId) {
+        final Loan loan = requireLoan(loanId);
+        return new LoanCalendarDates(loan.getSubmittedOnDate(), loan.getApprovedOnDate());
+    }
+
+    @Override
+    public void applyMeetingDateChanges(final Long calendarId, final Collection<Long> loanIds, final Boolean reschedulebasedOnMeetingDates,
+            final LocalDate presentMeetingDate, final LocalDate newMeetingDate) {
+        final Calendar calendar = this.calendarRepositoryWrapper.findOneWithNotFoundDetection(calendarId);
+        final List<Long> ids = loanIds == null ? List.of() : new ArrayList<>(loanIds);
+        this.loanWritePlatformService.applyMeetingDateChangesForLoanIds(calendar, ids, reschedulebasedOnMeetingDates, presentMeetingDate,
+                newMeetingDate);
     }
 
     private Loan requireLoan(final Long loanId) {

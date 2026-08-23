@@ -97,6 +97,9 @@ public interface LoanWritePlatformService {
 
     void applyMeetingDateChanges(Calendar calendar, Collection<CalendarInstance> loanCalendarInstances);
 
+    void applyMeetingDateChangesForLoanIds(Calendar calendar, java.util.List<Long> loanIds, Boolean reschedulebasedOnMeetingDates,
+            LocalDate presentMeetingDate, LocalDate newMeetingDate);
+
     CommandProcessingResult makeLoanRefund(Long loanId, JsonCommand command);
 
     CommandProcessingResult addAndDeleteLoanDisburseDetails(Long loanId, JsonCommand command);

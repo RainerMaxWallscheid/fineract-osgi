@@ -31,8 +31,7 @@ import org.apache.fineract.portfolio.calendar.service.CalendarWritePlatformServi
 import org.apache.fineract.portfolio.calendar.service.CalendarWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,11 +57,9 @@ public class CalendarConfiguration {
     @ConditionalOnMissingBean(CalendarWritePlatformService.class)
     public CalendarWritePlatformService calendarWritePlatformService(CalendarRepository calendarRepository,
             CalendarHistoryRepository calendarHistoryRepository, CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-            CalendarInstanceRepository calendarInstanceRepository, LoanWritePlatformService loanWritePlatformService,
-            ConfigurationDomainService configurationDomainService, GroupRepository groupRepository,
-            LoanRepositoryWrapper loanRepositoryWrapper, ClientRepository clientRepository) {
+            CalendarInstanceRepository calendarInstanceRepository, LoanExistencePort loanExistencePort,
+            ConfigurationDomainService configurationDomainService, GroupRepository groupRepository, ClientRepository clientRepository) {
         return new CalendarWritePlatformServiceJpaRepositoryImpl(calendarRepository, calendarHistoryRepository, fromApiJsonDeserializer,
-                calendarInstanceRepository, loanWritePlatformService, configurationDomainService, groupRepository, loanRepositoryWrapper,
-                clientRepository);
+                calendarInstanceRepository, loanExistencePort, configurationDomainService, groupRepository, clientRepository);
     }
 }

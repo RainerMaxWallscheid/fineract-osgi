@@ -1611,17 +1611,22 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Transactional
     @Override
     public void applyMeetingDateChanges(final Calendar calendar, final Collection<CalendarInstance> loanCalendarInstances, final Boolean rescheduleBasedOnMeetingDates, final LocalDate presentMeetingDate, final LocalDate newMeetingDate) {
+        final List<Long> loanIds = new ArrayList<>(loanCalendarInstances.size());
+        for (final CalendarInstance calendarInstance : loanCalendarInstances) {
+            loanIds.add(calendarInstance.getEntityId());
+        }
+        applyMeetingDateChangesForLoanIds(calendar, loanIds, rescheduleBasedOnMeetingDates, presentMeetingDate, newMeetingDate);
+    }
+
+    @Transactional
+    @Override
+    public void applyMeetingDateChangesForLoanIds(final Calendar calendar, final List<Long> loanIds, final Boolean rescheduleBasedOnMeetingDates, final LocalDate presentMeetingDate, final LocalDate newMeetingDate) {
         final boolean isHolidayEnabled = this.configurationDomainService.isRescheduleRepaymentsOnHolidaysEnabled();
         final WorkingDays workingDays = this.workingDaysRepository.findOne();
         final List<Long> existingTransactionIds = new ArrayList<>();
         final List<Long> existingReversedTransactionIds = new ArrayList<>();
         final Collection<LoanStatus> loanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE));
         final Collection<AccountType> loanTypes = new ArrayList<>(Arrays.asList(AccountType.GROUP, AccountType.JLG));
-        final Collection<Long> loanIds = new ArrayList<>(loanCalendarInstances.size());
-        // loop through loanCalendarInstances to get loan ids
-        for (final CalendarInstance calendarInstance : loanCalendarInstances) {
-            loanIds.add(calendarInstance.getEntityId());
-        }
         final List<Loan> loans = this.loanRepositoryWrapper.findByIdsAndLoanStatusAndLoanType(loanIds, loanStatuses, loanTypes);
         List<Holiday> holidays;
         final LocalDate recalculateFrom = null;

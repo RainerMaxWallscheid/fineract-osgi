@@ -23,7 +23,8 @@ dependencies {
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))
-    implementation(project(path: ':fineract-loan-impl'))
+    // Loan calendar dates and meeting reschedule via LoanExistencePort
+    implementation(project(path: ':fineract-loan-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

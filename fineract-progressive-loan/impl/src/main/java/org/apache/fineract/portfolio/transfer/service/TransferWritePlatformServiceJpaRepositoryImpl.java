@@ -147,7 +147,8 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
          */
         final CalendarInstance sourceGroupCalendarInstance = this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(sourceGroup.getId(), CalendarEntityType.GROUPS.getValue(), CalendarType.COLLECTION.getValue());
         // get all customer loans synced with this group calendar Instance
-        final Collection<LoanStatus> activeLoanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE));
+        final Collection<Integer> activeLoanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL.getValue(),
+                LoanStatus.APPROVED.getValue(), LoanStatus.ACTIVE.getValue()));
         final List<CalendarInstance> activeLoanCalendarInstances = this.calendarInstanceRepository.findCalendarInstancesForLoansByGroupIdAndClientIdAndStatuses(sourceGroup.getId(), client.getId(), activeLoanStatuses);
         if (sourceGroupCalendarInstance != null && !activeLoanCalendarInstances.isEmpty()) {
             // get the destination calendar

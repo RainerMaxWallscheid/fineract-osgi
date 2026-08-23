@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
@@ -56,4 +58,17 @@ public interface LoanExistencePort {
      * Throws {@code LoanTransactionNotFoundException} when {@code loanTransactionId} is unknown.
      */
     LoanTransactionNoteRef requireTransaction(Long loanTransactionId);
+
+    record LoanCalendarDates(LocalDate submittedOnDate, LocalDate approvedOnDate) {}
+
+    /**
+     * Throws {@code LoanNotFoundException} when {@code loanId} is unknown.
+     */
+    LoanCalendarDates requireCalendarDates(Long loanId);
+
+    /**
+     * Reschedules loan repayment dates for loans linked to the calendar.
+     */
+    void applyMeetingDateChanges(Long calendarId, Collection<Long> loanIds, Boolean reschedulebasedOnMeetingDates,
+            LocalDate presentMeetingDate, LocalDate newMeetingDate);
 }
