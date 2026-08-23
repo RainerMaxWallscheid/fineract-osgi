@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
+import java.util.Collection;
+
 /**
  * ID-only loan-product existence check (ADR-021). Foreign BCs must not depend
  * on leftover {@code LoanProductRepository}.
@@ -27,4 +29,6 @@ public interface LoanProductExistencePort {
     boolean existsById(Long loanProductId);
 
     boolean existsForCurrency(String currencyCode);
+
+    Collection<Long> retrieveAllIds();
 }

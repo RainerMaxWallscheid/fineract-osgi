@@ -25,8 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-bulkimport-api'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-monetary-api'))
-    // Criteria maps loan products + GL accounts; entries check uses accounting port
-    implementation(project(path: ':fineract-loan-impl'))
+    // Criteria maps loan product ids via LoanProductExistencePort / LoanProductLookupReadPort
+    implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-accounting-api'))
 
     implementation(

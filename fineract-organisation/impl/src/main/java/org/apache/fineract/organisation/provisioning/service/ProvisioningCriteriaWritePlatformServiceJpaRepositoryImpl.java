@@ -46,7 +46,6 @@ import org.apache.fineract.organisation.provisioning.exception.ProvisioningCateg
 import org.apache.fineract.organisation.provisioning.exception.ProvisioningCriteriaCannotBeDeletedException;
 import org.apache.fineract.organisation.provisioning.exception.ProvisioningCriteriaNotFoundException;
 import org.apache.fineract.organisation.provisioning.serialization.ProvisioningCriteriaDefinitionJsonDeserializer;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
@@ -100,7 +99,7 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
             if (provisioningCriteria == null) {
                 throw new ProvisioningCategoryNotFoundException(criteriaId);
             }
-            List<LoanProduct> products = this.provisioningCriteriaAssembler.parseLoanProducts(command.parsedJson());
+            List<Long> products = this.provisioningCriteriaAssembler.parseLoanProductIds(command.parsedJson());
             final Map<String, Object> changes = provisioningCriteria.update(command, products);
             if (!changes.isEmpty()) {
                 updateProvisioningCriteriaDefinitions(provisioningCriteria, command);

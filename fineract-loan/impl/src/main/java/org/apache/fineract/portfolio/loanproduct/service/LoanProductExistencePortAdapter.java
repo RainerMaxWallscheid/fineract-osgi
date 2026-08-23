@@ -18,7 +18,9 @@
  */
 package org.apache.fineract.portfolio.loanproduct.service;
 
+import java.util.Collection;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
+import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +44,10 @@ public class LoanProductExistencePortAdapter implements LoanProductExistencePort
     @Override
     public boolean existsForCurrency(final String currencyCode) {
         return !loanProductReadPlatformService.retrieveAllLoanProductsForCurrency(currencyCode).isEmpty();
+    }
+
+    @Override
+    public Collection<Long> retrieveAllIds() {
+        return loanProductRepository.findAll().stream().map(LoanProduct::getId).toList();
     }
 }

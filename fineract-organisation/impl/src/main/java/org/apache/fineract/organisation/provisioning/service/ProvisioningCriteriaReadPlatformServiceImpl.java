@@ -30,8 +30,8 @@ import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryDa
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCriteriaData;
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCriteriaDefinitionData;
 import org.apache.fineract.organisation.provisioning.exception.ProvisioningCriteriaNotFoundException;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -39,15 +39,14 @@ import org.springframework.jdbc.core.RowMapper;
 public class ProvisioningCriteriaReadPlatformServiceImpl implements ProvisioningCriteriaReadPlatformService {
     private final JdbcTemplate jdbcTemplate;
     private final ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final GLAccountReadPlatformService glAccountReadPlatformService;
-    private final LoanProductReadPlatformService loanProductReaPlatformService;
 
     @Override
     public ProvisioningCriteriaData retrievePrivisiongCriteriaTemplate() {
         boolean onlyActive = true;
         final Collection<ProvisioningCategoryData> categories = this.provisioningCategoryReadPlatformService.retrieveAllProvisionCategories();
-        final Collection<LoanProductData> allLoanProducts = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(onlyActive);
+        final Collection<LoanProductLookupData> allLoanProducts = this.loanProductLookupReadPort.retrieveAllLoanProductsForLookup(onlyActive);
         final Collection<GLAccountData> glAccounts = this.glAccountReadPlatformService.retrieveAllEnabledDetailGLAccounts();
         return ProvisioningCriteriaData.toTemplate(constructCriteriaTemplate(categories), allLoanProducts, glAccounts);
     }
@@ -56,7 +55,7 @@ public class ProvisioningCriteriaReadPlatformServiceImpl implements Provisioning
     public ProvisioningCriteriaData retrievePrivisiongCriteriaTemplate(ProvisioningCriteriaData data) {
         boolean onlyActive = true;
         final Collection<ProvisioningCategoryData> categories = this.provisioningCategoryReadPlatformService.retrieveAllProvisionCategories();
-        final Collection<LoanProductData> allLoanProducts = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(onlyActive);
+        final Collection<LoanProductLookupData> allLoanProducts = this.loanProductLookupReadPort.retrieveAllLoanProductsForLookup(onlyActive);
         final Collection<GLAccountData> glAccounts = this.glAccountReadPlatformService.retrieveAllEnabledDetailGLAccounts();
         return ProvisioningCriteriaData.toTemplate(data, constructCriteriaTemplate(categories), allLoanProducts, glAccounts);
     }
@@ -95,12 +94,19 @@ public class ProvisioningCriteriaReadPlatformServiceImpl implements Provisioning
     public ProvisioningCriteriaData retrieveProvisioningCriteria(Long criteriaId) {
         try {
             String criteriaName = retrieveCriteriaName(criteriaId);
-            Collection<LoanProductData> loanProducts = loanProductReaPlatformService.retrieveAllLoanProductsForLookup("select product_id from m_loanproduct_provisioning_mapping where m_loanproduct_provisioning_mapping.criteria_id=" + criteriaId);
+            Collection<LoanProductLookupData> loanProducts = retrieveMappedLoanProducts(criteriaId);
             List<ProvisioningCriteriaDefinitionData> definitions = retrieveProvisioningDefinitions(criteriaId);
             return ProvisioningCriteriaData.toLookup(criteriaId, criteriaName, loanProducts, definitions);
         } catch (EmptyResultDataAccessException e) {
             throw new ProvisioningCriteriaNotFoundException(criteriaId, e);
         }
+    }
+
+    private Collection<LoanProductLookupData> retrieveMappedLoanProducts(final Long criteriaId) {
+        final String sql = "select lp.id as id, lp.name as name, lp.allow_multiple_disbursals as multiDisburseLoan "
+                + "from m_product_loan lp join m_loanproduct_provisioning_mapping m on m.product_id = lp.id where m.criteria_id = ?";
+        return this.jdbcTemplate.query(sql, (rs, rowNum) -> LoanProductLookupData.lookup(rs.getLong("id"), rs.getString("name"),
+                rs.getBoolean("multiDisburseLoan")), criteriaId);
     }
 
     private List<ProvisioningCriteriaDefinitionData> retrieveProvisioningDefinitions(Long criteriaId) {
@@ -161,11 +167,10 @@ public class ProvisioningCriteriaReadPlatformServiceImpl implements Provisioning
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningCriteriaReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService, final LoanProductReadPlatformService loanProductReadPlatformService, final GLAccountReadPlatformService glAccountReadPlatformService, final LoanProductReadPlatformService loanProductReaPlatformService) {
+        public ProvisioningCriteriaReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService, final LoanProductLookupReadPort loanProductLookupReadPort, final GLAccountReadPlatformService glAccountReadPlatformService) {
         this.jdbcTemplate = jdbcTemplate;
         this.provisioningCategoryReadPlatformService = provisioningCategoryReadPlatformService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.glAccountReadPlatformService = glAccountReadPlatformService;
-        this.loanProductReaPlatformService = loanProductReaPlatformService;
     }
 }

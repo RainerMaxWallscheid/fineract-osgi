@@ -104,7 +104,7 @@ class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImplTest {
         // The criteria exposes its definitions indexed by categoryId; the service looks up directly into this.
         when(criteria.getDefinitionsByCategoryId()).thenReturn(Map.of(7L, definition));
         when(criteriaRepository.findById(CRITERIA_ID)).thenReturn(Optional.of(criteria));
-        when(assembler.parseLoanProducts(any())).thenReturn(List.of());
+        when(assembler.parseLoanProductIds(any())).thenReturn(List.of());
         when(glAccountRepository.findById(anyLong())).thenReturn(Optional.of(mock(GLAccount.class)));
     }
 

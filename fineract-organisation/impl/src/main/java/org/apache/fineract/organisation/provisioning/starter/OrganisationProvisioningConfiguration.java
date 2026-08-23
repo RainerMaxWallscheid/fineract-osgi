@@ -36,8 +36,8 @@ import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteri
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaReadPlatformServiceImpl;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaWritePlatformService;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,9 +64,9 @@ public class OrganisationProvisioningConfiguration {
     @Bean
     @ConditionalOnMissingBean(ProvisioningCriteriaAssembler.class)
     public ProvisioningCriteriaAssembler provisioningCriteriaAssembler(FromJsonHelper fromApiJsonHelper,
-            ProvisioningCategoryRepository provisioningCategoryRepository, LoanProductRepository loanProductRepository,
+            ProvisioningCategoryRepository provisioningCategoryRepository, LoanProductExistencePort loanProductExistencePort,
             GLAccountRepository glAccountRepository, PlatformSecurityContext platformSecurityContext) {
-        return new ProvisioningCriteriaAssembler(fromApiJsonHelper, provisioningCategoryRepository, loanProductRepository,
+        return new ProvisioningCriteriaAssembler(fromApiJsonHelper, provisioningCategoryRepository, loanProductExistencePort,
                 glAccountRepository, platformSecurityContext);
     }
 
@@ -74,10 +74,9 @@ public class OrganisationProvisioningConfiguration {
     @ConditionalOnMissingBean(ProvisioningCriteriaReadPlatformService.class)
     public ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService(JdbcTemplate jdbcTemplate,
             ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService,
-            LoanProductReadPlatformService loanProductReadPlatformService, GLAccountReadPlatformService glAccountReadPlatformService,
-            LoanProductReadPlatformService loanProductReaPlatformService) {
+            LoanProductLookupReadPort loanProductLookupReadPort, GLAccountReadPlatformService glAccountReadPlatformService) {
         return new ProvisioningCriteriaReadPlatformServiceImpl(jdbcTemplate, provisioningCategoryReadPlatformService,
-                loanProductReadPlatformService, glAccountReadPlatformService, loanProductReaPlatformService);
+                loanProductLookupReadPort, glAccountReadPlatformService);
     }
 
     @Bean
