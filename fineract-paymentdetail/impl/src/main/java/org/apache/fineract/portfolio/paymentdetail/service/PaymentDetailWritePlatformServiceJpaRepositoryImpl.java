@@ -60,6 +60,17 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         return paymentDetail;
     }
 
+    @Override
+    public PaymentDetail createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
+            final String routingCode, final String receiptNumber, final String bankNumber) {
+        if (paymentTypeId == null) {
+            return null;
+        }
+        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
+                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
+        return PaymentDetail.instance(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
+    }
+
     @java.lang.SuppressWarnings("all")
         public PaymentDetailWritePlatformServiceJpaRepositoryImpl(final PaymentDetailRepository paymentDetailRepository, final PaymentTypeRepository paymentTypeRepository) {
         this.paymentDetailRepository = paymentDetailRepository;

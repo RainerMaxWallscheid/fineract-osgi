@@ -22,7 +22,6 @@ fineract-charge/impl/dependencies.gradle	fineract-shares-impl
 fineract-charge/impl/dependencies.gradle	fineract-accounting-impl
 fineract-collateral/impl/dependencies.gradle	fineract-loan-impl
 fineract-collateralmanagement/impl/dependencies.gradle	fineract-loan-impl
-fineract-collectionsheet/impl/dependencies.gradle	fineract-paymentdetail-impl
 fineract-command/impl/dependencies.gradle	fineract-loan-impl
 fineract-configuration/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-creditbureau/impl/dependencies.gradle	fineract-loan-impl

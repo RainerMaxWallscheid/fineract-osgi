@@ -43,4 +43,10 @@ public final class OsgiPaymentDetailWritePlatformService implements PaymentDetai
     public PaymentDetail persistPaymentDetail(final PaymentDetail paymentDetail) {
         return null;
     }
+
+    @Override
+    public PaymentDetail createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
+            final String routingCode, final String receiptNumber, final String bankNumber) {
+        return null;
+    }
 }

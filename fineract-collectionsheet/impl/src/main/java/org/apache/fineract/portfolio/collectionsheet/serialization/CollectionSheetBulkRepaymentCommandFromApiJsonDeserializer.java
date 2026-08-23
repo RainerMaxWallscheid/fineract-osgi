@@ -33,8 +33,9 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
+import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailAssembler;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,13 +47,13 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
         extends AbstractFromApiJsonDeserializer<CollectionSheetBulkRepaymentCommand> {
 
     private final FromJsonHelper fromApiJsonHelper;
-    private final PaymentDetailAssembler paymentDetailAssembler;
+    private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
 
     @Autowired
     public CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper,
-            final PaymentDetailAssembler paymentDetailAssembler) {
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.paymentDetailAssembler = paymentDetailAssembler;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
     }
 
     @Override
@@ -62,7 +63,7 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
         }
 
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-        final PaymentDetail paymentDetail = this.paymentDetailAssembler.fetchPaymentDetail(element.getAsJsonObject());
+        final PaymentDetail paymentDetail = fetchPaymentDetail(element.getAsJsonObject());
 
         return commandFromApiJson(json, paymentDetail);
     }
@@ -98,7 +99,7 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
                             loanTransactionElement, locale);
                     PaymentDetail detail = paymentDetail;
                     if (paymentDetail == null) {
-                        detail = this.paymentDetailAssembler.fetchPaymentDetail(loanTransactionElement);
+                        detail = fetchPaymentDetail(loanTransactionElement);
                     }
                     if (transactionAmount != null && transactionAmount.intValue() > 0) {
                         loanRepaymentTransactions[i] = new SingleRepaymentCommand(loanId, externalId, transactionAmount, transactionDate,
@@ -108,6 +109,16 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
             }
         }
         return new CollectionSheetBulkRepaymentCommand(note, transactionDate, loanRepaymentTransactions);
+    }
+
+    private PaymentDetail fetchPaymentDetail(final JsonObject json) {
+        return this.paymentDetailWritePlatformService.createPaymentDetail(
+                this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName, json),
+                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.accountNumberParamName, json),
+                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.checkNumberParamName, json),
+                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.routingCodeParamName, json),
+                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.receiptNumberParamName, json),
+                this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.bankNumberParamName, json));
     }
 
 }

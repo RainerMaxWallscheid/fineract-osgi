@@ -29,4 +29,7 @@ public interface PaymentDetailWritePlatformService {
     PaymentDetail createPaymentDetail(JsonCommand command, Map<String, Object> changes);
 
     PaymentDetail persistPaymentDetail(PaymentDetail paymentDetail);
+
+    PaymentDetail createPaymentDetail(Long paymentTypeId, String accountNumber, String checkNumber, String routingCode,
+            String receiptNumber, String bankNumber);
 }

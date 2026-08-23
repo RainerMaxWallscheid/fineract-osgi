@@ -30,5 +30,6 @@ class OsgiPaymentDetailWritePlatformServiceTest {
         assertNull(port.createAndPersistPaymentDetail(null, null));
         assertNull(port.createPaymentDetail(null, null));
         assertNull(port.persistPaymentDetail(null));
+        assertNull(port.createPaymentDetail(null, null, null, null, null, null));
     }
 }
