@@ -31,7 +31,6 @@ dependencies {
     implementation(project(path: ':fineract-clients-api'))
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-note-api'))
 
     implementation(

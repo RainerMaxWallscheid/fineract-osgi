@@ -27,6 +27,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
@@ -37,6 +38,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanExistencePortAdapter implements LoanExistencePort {
+
+    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = List.of(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL,
+            LoanStatus.APPROVED, LoanStatus.ACTIVE, LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD);
 
     private final LoanRepository loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
@@ -106,6 +110,15 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
                 .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
         return new LoanTransactionCollateralRef(transaction.getLoan().getId(), transaction.getCreatedDate().orElse(null),
                 transaction.getOutstandingLoanBalance(), transaction.getPrincipalPortion());
+    }
+
+    @Override
+    public Long requireNonClosedIdByAccountNumber(final String accountNumber) {
+        final Loan loan = loanRepository.findLoanByAccountNumberAndStatuses(accountNumber, NON_CLOSED_LOAN_STATUSES);
+        if (loan == null) {
+            throw new LoanNotFoundException(accountNumber);
+        }
+        return loan.getId();
     }
 
     private Loan requireLoan(final Long loanId) {

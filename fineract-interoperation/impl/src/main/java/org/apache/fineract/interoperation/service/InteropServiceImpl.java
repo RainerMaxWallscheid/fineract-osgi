@@ -86,10 +86,7 @@ import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepos
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.account.exception.DifferentCurrenciesException;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
@@ -133,14 +130,14 @@ public class InteropServiceImpl implements InteropService {
     private final NoteWritePlatformService noteWritePlatformService;
     private final PaymentTypeRepository paymentTypeRepository;
     private final InteropIdentifierRepository identifierRepository;
-    private final LoanRepositoryWrapper loanRepositoryWrapper;
+    private final LoanExistencePort loanExistencePort;
     private final SavingsHelper savingsHelper;
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
     private final SavingsAccountDomainService savingsAccountService;
     private final ConfigurationDomainService configurationDomainService;
     private final JdbcTemplate jdbcTemplate;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService;
     private ClientActivePort clientActivePort;
@@ -462,8 +459,7 @@ public class InteropServiceImpl implements InteropService {
     @Override
     @NonNull
     public String disburseLoan(@NonNull String accountId, String apiRequestBodyAsJson) {
-        Loan loan = validateAndGetLoan(accountId);
-        Long loanId = loan.getId();
+        Long loanId = loanExistencePort.requireNonClosedIdByAccountNumber(accountId);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
         final CommandWrapper commandRequest = builder.disburseLoanApplication(loanId).build();
         CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -473,8 +469,7 @@ public class InteropServiceImpl implements InteropService {
     @Override
     @NonNull
     public String loanRepayment(@NonNull String accountId, String apiRequestBodyAsJson) {
-        Loan loan = validateAndGetLoan(accountId);
-        Long loanId = loan.getId();
+        Long loanId = loanExistencePort.requireNonClosedIdByAccountNumber(accountId);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
         final CommandWrapper commandRequest = builder.loanRepaymentTransaction(loanId).build();
         CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -487,14 +482,6 @@ public class InteropServiceImpl implements InteropService {
             throw new SavingsAccountNotFoundException(accountId);
         }
         return savingsAccount;
-    }
-
-    private Loan validateAndGetLoan(String accountId) {
-        Loan loan = loanRepositoryWrapper.findNonClosedLoanByAccountNumber(accountId);
-        if (loan == null) {
-            throw new LoanNotFoundException(accountId);
-        }
-        return loan;
     }
 
     private SavingsAccount validateAndGetSavingAccount(@NonNull InteropRequestData request,
@@ -590,7 +577,7 @@ public class InteropServiceImpl implements InteropService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteReadPlatformService noteReadPlatformService, final NoteWritePlatformService noteWritePlatformService, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator, final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
+        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteReadPlatformService noteReadPlatformService, final NoteWritePlatformService noteWritePlatformService, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanExistencePort loanExistencePort, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator, final org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
         this.securityContext = securityContext;
         this.dataValidator = dataValidator;
         this.savingsAccountRepository = savingsAccountRepository;
@@ -600,7 +587,7 @@ public class InteropServiceImpl implements InteropService {
         this.noteWritePlatformService = noteWritePlatformService;
         this.paymentTypeRepository = paymentTypeRepository;
         this.identifierRepository = identifierRepository;
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.loanExistencePort = loanExistencePort;
         this.savingsHelper = savingsHelper;
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsAccountService = savingsAccountService;

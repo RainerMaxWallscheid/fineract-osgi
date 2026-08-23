@@ -81,4 +81,9 @@ public interface LoanExistencePort {
      * Throws {@code LoanTransactionNotFoundException} when {@code loanTransactionId} is unknown.
      */
     LoanTransactionCollateralRef requireTransactionCollateral(Long loanTransactionId);
+
+    /**
+     * Non-closed loan id for account number. Throws {@code LoanNotFoundException} when unknown.
+     */
+    Long requireNonClosedIdByAccountNumber(String accountNumber);
 }
