@@ -40,8 +40,8 @@ import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
-import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsProductExistencePort;
 import org.apache.fineract.useradministration.domain.RoleRepository;
 import org.apache.fineract.useradministration.exception.RoleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class FineractEntityDataValidator {
     private final FromJsonHelper fromApiJsonHelper;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final LoanProductExistencePort loanProductExistencePort;
-    private final SavingsProductRepository savingsProductRepository;
+    private final SavingsProductExistencePort savingsProductExistencePort;
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final RoleRepository roleRepository;
     private static final Set<String> CREATE_ENTITY_MAPPING_REQUEST_DATA_PARAMETERS = new HashSet<>(
@@ -69,12 +69,12 @@ public class FineractEntityDataValidator {
 
     @Autowired
     public FineractEntityDataValidator(final FromJsonHelper fromApiJsonHelper, final OfficeRepositoryWrapper officeRepositoryWrapper,
-            final LoanProductExistencePort loanProductExistencePort, final SavingsProductRepository savingsProductRepository,
+            final LoanProductExistencePort loanProductExistencePort, final SavingsProductExistencePort savingsProductExistencePort,
             final ChargeDefinitionPort chargeDefinitionPort, final RoleRepository roleRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.loanProductExistencePort = loanProductExistencePort;
-        this.savingsProductRepository = savingsProductRepository;
+        this.savingsProductExistencePort = savingsProductExistencePort;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.roleRepository = roleRepository;
     }
@@ -165,7 +165,9 @@ public class FineractEntityDataValidator {
     }
 
     public void checkForSavingsProducts(final Long id) {
-        this.savingsProductRepository.findById(id).orElseThrow(() -> new SavingsProductNotFoundException(id));
+        if (!this.savingsProductExistencePort.existsById(id)) {
+            throw new SavingsProductNotFoundException(id);
+        }
     }
 
     public void checkForCharges(final Long id) {
