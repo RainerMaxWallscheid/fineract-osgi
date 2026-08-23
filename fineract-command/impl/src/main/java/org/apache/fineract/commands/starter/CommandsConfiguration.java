@@ -30,7 +30,7 @@ import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.service.DepositProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.service.AppUserReadPlatformService;
@@ -47,14 +47,14 @@ public class CommandsConfiguration {
     public AuditReadPlatformService auditReadPlatformService(JdbcTemplate jdbcTemplate, PlatformSecurityContext context,
             FromJsonHelper fromApiJsonHelper, AppUserReadPlatformService appUserReadPlatformService,
             OfficeReadPlatformService officeReadPlatformService, ClientReadPlatformService clientReadPlatformService,
-            LoanProductReadPlatformService loanProductReadPlatformService, StaffReadService staffReadPlatformService,
+            LoanProductLookupReadPort loanProductLookupReadPort, StaffReadService staffReadPlatformService,
             PaginationHelper paginationHelper, DatabaseSpecificSQLGenerator sqlGenerator,
             PaginationParametersDataValidator paginationParametersDataValidator,
             SavingsProductReadPlatformService savingsProductReadPlatformService,
             DepositProductReadPlatformService depositProductReadPlatformService, ColumnValidator columnValidator,
             SqlValidator sqlValidator) {
         return new AuditReadPlatformServiceImpl(jdbcTemplate, context, fromApiJsonHelper, appUserReadPlatformService,
-                officeReadPlatformService, clientReadPlatformService, loanProductReadPlatformService, staffReadPlatformService,
+                officeReadPlatformService, clientReadPlatformService, loanProductLookupReadPort, staffReadPlatformService,
                 paginationHelper, sqlGenerator, paginationParametersDataValidator, savingsProductReadPlatformService,
                 depositProductReadPlatformService, columnValidator, sqlValidator);
     }

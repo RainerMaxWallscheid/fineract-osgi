@@ -33,4 +33,14 @@ public final class OsgiLoanProductLookupReadPort implements LoanProductLookupRea
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
         return List.of();
     }
+
+    @Override
+    public String nameById(final Long loanProductId) {
+        return null;
+    }
+
+    @Override
+    public String loanEnumerationValue(final String typeName, final int id) {
+        return null;
+    }
 }

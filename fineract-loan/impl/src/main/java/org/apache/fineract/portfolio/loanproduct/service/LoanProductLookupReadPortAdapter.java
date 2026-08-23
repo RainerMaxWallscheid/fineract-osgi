@@ -39,4 +39,15 @@ public class LoanProductLookupReadPortAdapter implements LoanProductLookupReadPo
         return products.stream().map(p -> LoanProductLookupData.lookup(p.getId(), p.getName(), p.getMultiDisburseLoan()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public String nameById(final Long loanProductId) {
+        return this.loanProductReadPlatformService.retrieveLoanProduct(loanProductId).getName();
+    }
+
+    @Override
+    public String loanEnumerationValue(final String typeName, final int id) {
+        final var data = LoanEnumerations.loanEnumeration(typeName, id);
+        return data == null ? null : data.getValue();
+    }
 }

@@ -55,9 +55,7 @@ import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.FixedDepositProductData;
 import org.apache.fineract.portfolio.savings.data.RecurringDepositProductData;
@@ -82,7 +80,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     private final AppUserReadPlatformService appUserReadPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final StaffReadService staffReadPlatformService;
     private final PaginationHelper paginationHelper;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
@@ -256,8 +254,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
             if (StringUtils.isNotBlank(productIdStr)) {
                 productId = Long.valueOf(productIdStr);
                 if (auditResult.getEntityName().equalsIgnoreCase("LOAN")) {
-                    final LoanProductData loanProduct = this.loanProductReadPlatformService.retrieveLoanProduct(productId);
-                    commandAsJsonMap.put("productName", loanProduct.getName());
+                    commandAsJsonMap.put("productName", this.loanProductLookupReadPort.nameById(productId));
                 } else if (auditResult.getEntityName().equalsIgnoreCase("SAVINGSACCOUNT")) {
                     final SavingsProductData savingProduct = this.savingsProductReadPlatformService.retrieveOne(productId);
                     commandAsJsonMap.put("productName", savingProduct.getName());
@@ -307,7 +304,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
                 if (commandAsJsonMap.containsKey(typeName)) {
                     commandAsJsonMap.remove(typeName);
                     final Integer enumTypeId = auditObject.get(typeName).getAsInt();
-                    final String code = LoanEnumerations.loanEnumeration(typeName, enumTypeId).getValue();
+                    final String code = this.loanProductLookupReadPort.loanEnumerationValue(typeName, enumTypeId);
                     if (code != null) {
                         commandAsJsonMap.put(typeName, code);
                     }
@@ -413,14 +410,14 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AuditReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final FromJsonHelper fromApiJsonHelper, final AppUserReadPlatformService appUserReadPlatformService, final OfficeReadPlatformService officeReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final LoanProductReadPlatformService loanProductReadPlatformService, final StaffReadService staffReadPlatformService, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final PaginationParametersDataValidator paginationParametersDataValidator, final SavingsProductReadPlatformService savingsProductReadPlatformService, final DepositProductReadPlatformService depositProductReadPlatformService, final ColumnValidator columnValidator, final SqlValidator sqlValidator) {
+        public AuditReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final FromJsonHelper fromApiJsonHelper, final AppUserReadPlatformService appUserReadPlatformService, final OfficeReadPlatformService officeReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final LoanProductLookupReadPort loanProductLookupReadPort, final StaffReadService staffReadPlatformService, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final PaginationParametersDataValidator paginationParametersDataValidator, final SavingsProductReadPlatformService savingsProductReadPlatformService, final DepositProductReadPlatformService depositProductReadPlatformService, final ColumnValidator columnValidator, final SqlValidator sqlValidator) {
         this.jdbcTemplate = jdbcTemplate;
         this.context = context;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.appUserReadPlatformService = appUserReadPlatformService;
         this.officeReadPlatformService = officeReadPlatformService;
         this.clientReadPlatformService = clientReadPlatformService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.staffReadPlatformService = staffReadPlatformService;
         this.paginationHelper = paginationHelper;
         this.sqlGenerator = sqlGenerator;

@@ -27,4 +27,8 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 public interface LoanProductLookupReadPort {
 
     Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup();
+
+    String nameById(Long loanProductId);
+
+    String loanEnumerationValue(String typeName, int id);
 }

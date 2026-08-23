@@ -31,4 +31,14 @@ final class HostedLoanProductLookupReadPort implements LoanProductLookupReadPort
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
         return List.of(LoanProductLookupData.lookup(HOSTED_ID, "hosted", false));
     }
+
+    @Override
+    public String nameById(final Long loanProductId) {
+        return HOSTED_ID == loanProductId ? "hosted" : null;
+    }
+
+    @Override
+    public String loanEnumerationValue(final String typeName, final int id) {
+        return null;
+    }
 }

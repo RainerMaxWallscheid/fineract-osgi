@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.impl.osgi;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +26,9 @@ class OsgiLoanProductLookupReadPortTest {
 
     @Test
     void emptyCatalogHasNoProducts() {
-        assertTrue(new OsgiLoanProductLookupReadPort().retrieveAllLoanProductsForLookup().isEmpty());
+        final OsgiLoanProductLookupReadPort port = new OsgiLoanProductLookupReadPort();
+        assertTrue(port.retrieveAllLoanProductsForLookup().isEmpty());
+        assertNull(port.nameById(1L));
+        assertNull(port.loanEnumerationValue("amortizationType", 1));
     }
 }
