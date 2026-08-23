@@ -44,7 +44,6 @@ dependencies {
     implementation(project(path: ':fineract-calendar-api'))
     implementation(project(path: ':fineract-address-api'))
     implementation(project(path: ':fineract-useradministration-api'))
-    implementation(project(path: ':fineract-useradministration-impl'))
     implementation(project(path: ':fineract-collateralmanagement-api'))
     implementation(project(path: ':fineract-fund-api'))
 

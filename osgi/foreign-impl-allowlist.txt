@@ -9,7 +9,6 @@ fineract-bulkimport/impl/dependencies.gradle	fineract-organisation-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-loan-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-savings-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-accounting-impl
-fineract-bulkimport/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-calendar/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-gcm-impl
@@ -38,7 +37,6 @@ fineract-interoperation/impl/dependencies.gradle	fineract-note-impl
 fineract-investor/impl/dependencies.gradle	fineract-cob-impl
 fineract-investor/impl/dependencies.gradle	fineract-accounting-impl
 fineract-investor/impl/dependencies.gradle	fineract-loan-impl
-fineract-jobs/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-jobs/impl/dependencies.gradle	fineract-cob-impl
 fineract-jobs/impl/dependencies.gradle	fineract-accounting-impl
 fineract-jobs/impl/dependencies.gradle	fineract-loan-impl
