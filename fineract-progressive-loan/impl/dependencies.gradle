@@ -63,8 +63,8 @@ dependencies {
     // Leftover groups/centers REST: meetings + datatable checks
     implementation(project(path: ':fineract-meeting-api'))
     implementation(project(path: ':fineract-dataqueries-impl'))
-    // Leftover ClientsApiResourceSwagger: ClientAddressRequest
-    implementation(project(path: ':fineract-address-impl'))
+    // Address read/write ports (ClientAddressRequest lives on clients-api)
+    implementation(project(path: ':fineract-address-api'))
     // Leftover LoansApiResource + client/share read + validators
     implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-collateralmanagement-api'))
