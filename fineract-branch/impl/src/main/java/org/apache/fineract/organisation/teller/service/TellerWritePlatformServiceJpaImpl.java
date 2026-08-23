@@ -22,13 +22,7 @@ import jakarta.persistence.PersistenceException;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
-import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
+import org.apache.fineract.accounting.moduleapi.CashierJournalPort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -67,8 +61,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     private final StaffRepository staffRepository;
     private final CashierRepository cashierRepository;
     private final CashierTransactionRepository cashierTxnRepository;
-    private final JournalEntryRepository glJournalEntryRepository;
-    private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper;
+    private final CashierJournalPort cashierJournalPort;
     private final CashierTransactionDataValidator cashierTransactionDataValidator;
 
     @Override
@@ -335,42 +328,13 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final CashierTransaction cashierTxn = CashierTransaction.fromJson(cashier, command);
             cashierTxn.setTxnType(txnType.getId());
             this.cashierTxnRepository.save(cashierTxn);
-            // Pass the journal entries
-            FinancialActivityAccount mainVaultFinancialActivityAccount = this.financialActivityAccountRepositoryWrapper.findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.CASH_AT_MAINVAULT.getValue());
-            FinancialActivityAccount tellerCashFinancialActivityAccount = this.financialActivityAccountRepositoryWrapper.findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.CASH_AT_TELLER.getValue());
-            GLAccount creditAccount = null;
-            GLAccount debitAccount = null;
-            if (txnType.equals(CashierTxnType.ALLOCATE)) {
-                debitAccount = tellerCashFinancialActivityAccount.getGlAccount();
-                creditAccount = mainVaultFinancialActivityAccount.getGlAccount();
-            } else if (txnType.equals(CashierTxnType.SETTLE)) {
-                debitAccount = mainVaultFinancialActivityAccount.getGlAccount();
-                creditAccount = tellerCashFinancialActivityAccount.getGlAccount();
-            }
             final Office cashierOffice = cashier.getTeller().getOffice();
             final Long time = System.currentTimeMillis();
             final String uniqueVal = String.valueOf(time) + currentUser.getId() + cashierOffice.getId();
             final String transactionId = Long.toHexString(Long.parseLong(uniqueVal));
-            final JournalEntry debitJournalEntry = JournalEntry.createNew(cashierOffice, null,  // payment
-            // detail
-            debitAccount, cashierTxn.getCurrencyCode(), transactionId, false,  // manual entry
-            cashierTxn.getTxnDate(), JournalEntryType.DEBIT, cashierTxn.getTxnAmount(), cashierTxn.getTxnNote(),  // Description
-            null, null, null,  // entity Type, entityId, reference number
-            null, null, null, null); // Loan
-            // and
-            // Savings
-            // Txn
-            final JournalEntry creditJournalEntry = JournalEntry.createNew(cashierOffice, null,  // payment
-            // detail
-            creditAccount, cashierTxn.getCurrencyCode(), transactionId, false,  // manual entry
-            cashierTxn.getTxnDate(), JournalEntryType.CREDIT, cashierTxn.getTxnAmount(), cashierTxn.getTxnNote(),  // Description
-            null, null, null,  // entity Type, entityId, reference number
-            null, null, null, null); // Loan
-            // and
-            // Savings
-            // Txn
-            this.glJournalEntryRepository.saveAndFlush(debitJournalEntry);
-            this.glJournalEntryRepository.saveAndFlush(creditJournalEntry);
+            this.cashierJournalPort.postAllocateOrSettle(txnType.equals(CashierTxnType.ALLOCATE), cashierOffice.getId(),
+                    cashierTxn.getCurrencyCode(), cashierTxn.getTxnDate(), cashierTxn.getTxnAmount(), cashierTxn.getTxnNote(),
+                    transactionId);
             return  //
             //
             //
@@ -387,7 +351,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     }
 
     @java.lang.SuppressWarnings("all")
-        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepository staffRepository, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final JournalEntryRepository glJournalEntryRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper, final CashierTransactionDataValidator cashierTransactionDataValidator) {
+        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepository staffRepository, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final CashierJournalPort cashierJournalPort, final CashierTransactionDataValidator cashierTransactionDataValidator) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.tellerRepositoryWrapper = tellerRepositoryWrapper;
@@ -395,8 +359,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
         this.staffRepository = staffRepository;
         this.cashierRepository = cashierRepository;
         this.cashierTxnRepository = cashierTxnRepository;
-        this.glJournalEntryRepository = glJournalEntryRepository;
-        this.financialActivityAccountRepositoryWrapper = financialActivityAccountRepositoryWrapper;
+        this.cashierJournalPort = cashierJournalPort;
         this.cashierTransactionDataValidator = cashierTransactionDataValidator;
     }
 }

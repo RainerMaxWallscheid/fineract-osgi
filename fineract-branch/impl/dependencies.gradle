@@ -23,8 +23,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-organisation-api'))
+    // Cashier allocate/settle journals via CashierJournalPort
     implementation(project(path: ':fineract-accounting-api'))
-    implementation(project(path: ':fineract-accounting-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
