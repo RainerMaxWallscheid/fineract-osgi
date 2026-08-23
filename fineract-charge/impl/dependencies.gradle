@@ -35,12 +35,11 @@ dependencies {
     implementation(project(path: ':fineract-monetary-api'))
     // Tax Step 8: charge stores taxGroupId; uses TaxCatalogPort + TaxRead from tax-api.
     implementation(project(path: ':fineract-tax-api'))
-    // Residual adapters: accounting dropdown + office entity access
+    // Residual adapters: accounting dropdown; office access via entityaccess-api
     implementation(project(path: ':fineract-accounting-api'))
     // Leftover client charge/transaction write: JournalEntryWritePlatformService
     implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-entityaccess-api'))
-    implementation(project(path: ':fineract-entityaccess-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

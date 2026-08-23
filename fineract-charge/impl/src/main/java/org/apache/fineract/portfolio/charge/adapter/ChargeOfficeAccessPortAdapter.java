@@ -20,31 +20,31 @@ package org.apache.fineract.portfolio.charge.adapter;
 
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.portfolio.charge.service.ChargeOfficeAccessPort;
 import org.springframework.stereotype.Component;
 
 /**
- * Bridges charge-impl office-access port to provider entity-access infrastructure.
+ * Bridges charge-impl office-access port to entity-access {@link OfficeProductRestrictionService}.
  */
 @Component
 public class ChargeOfficeAccessPortAdapter implements ChargeOfficeAccessPort {
 
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final OfficeProductRestrictionService officeProductRestrictionService;
 
-    public ChargeOfficeAccessPortAdapter(final FineractEntityAccessUtil fineractEntityAccessUtil) {
-        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+    public ChargeOfficeAccessPortAdapter(final OfficeProductRestrictionService officeProductRestrictionService) {
+        this.officeProductRestrictionService = officeProductRestrictionService;
     }
 
     @Override
     public String chargeIdsInClauseForCurrentUserOfficeIfEnabled() {
-        return this.fineractEntityAccessUtil
+        return this.officeProductRestrictionService
                 .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.CHARGE);
     }
 
     @Override
     public void restrictNewChargeToCurrentUserOfficeIfEnabled(final Long chargeId) {
-        this.fineractEntityAccessUtil.checkConfigurationAndAddProductResrictionsForUserOffice(
+        this.officeProductRestrictionService.checkConfigurationAndAddProductResrictionsForUserOffice(
                 FineractEntityAccessType.OFFICE_ACCESS_TO_CHARGES, chargeId);
     }
 }

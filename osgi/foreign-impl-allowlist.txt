@@ -21,7 +21,6 @@ fineract-campaigns/impl/dependencies.gradle	fineract-savings-impl
 fineract-charge/impl/dependencies.gradle	fineract-clients-impl
 fineract-charge/impl/dependencies.gradle	fineract-shares-impl
 fineract-charge/impl/dependencies.gradle	fineract-accounting-impl
-fineract-charge/impl/dependencies.gradle	fineract-entityaccess-impl
 fineract-collateral/impl/dependencies.gradle	fineract-loan-impl
 fineract-collateralmanagement/impl/dependencies.gradle	fineract-loan-impl
 fineract-collectionsheet/impl/dependencies.gradle	fineract-paymentdetail-impl
