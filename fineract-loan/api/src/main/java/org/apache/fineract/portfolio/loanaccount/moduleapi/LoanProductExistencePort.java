@@ -31,4 +31,9 @@ public interface LoanProductExistencePort {
     boolean existsForCurrency(String currencyCode);
 
     Collection<Long> retrieveAllIds();
+
+    /**
+     * Throws {@code LoanProductNotFoundException} when {@code loanProductId} is unknown.
+     */
+    String currencyCode(Long loanProductId);
 }

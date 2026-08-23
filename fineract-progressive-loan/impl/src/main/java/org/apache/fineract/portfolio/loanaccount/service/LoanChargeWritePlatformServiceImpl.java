@@ -648,7 +648,8 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
         LoanTransaction loanTransaction = applyChargeAdjustment(loan, loanCharge, transactionAmount, transactionDate, externalId, paymentDetail);
         // Update loan transaction on repayment.
-        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), loanTransaction.getId());
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);

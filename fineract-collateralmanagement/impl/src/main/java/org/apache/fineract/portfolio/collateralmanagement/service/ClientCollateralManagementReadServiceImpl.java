@@ -29,15 +29,13 @@ import org.apache.fineract.portfolio.collateralmanagement.data.LoanTransactionDa
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
 import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
-import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 public class ClientCollateralManagementReadServiceImpl implements ClientCollateralManagementReadService {
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
-    private final LoanTransactionRepository loanTransactionRepository;
+    private final LoanExistencePort loanExistencePort;
 
     @Override
     public List<ClientCollateralManagementData> getClientCollaterals(final Long clientId, final Long prodId) {
@@ -73,8 +71,9 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagementSet) {
             if (loanCollateralManagement.getLoanTransactionId() != null) {
                 Long transactionId = loanCollateralManagement.getLoanTransactionId();
-                LoanTransaction loanTransaction = this.loanTransactionRepository.findById(transactionId).orElseThrow(() -> new LoanTransactionNotFoundException(transactionId));
-                LoanTransactionData loanTransactionData = LoanTransactionData.instance(loanTransaction.getLoan().getId(), loanTransaction.getCreatedDate().orElse(null), loanTransaction.getOutstandingLoanBalance(), loanTransaction.getPrincipalPortion());
+                final var ref = this.loanExistencePort.requireTransactionCollateral(transactionId);
+                LoanTransactionData loanTransactionData = LoanTransactionData.instance(ref.loanId(), ref.createdDate(),
+                        ref.outstandingLoanBalance(), ref.principalPortion());
                 loanTransactionDataList.add(loanTransactionData);
             }
         }
@@ -82,8 +81,8 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientCollateralManagementReadServiceImpl(final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository) {
+        public ClientCollateralManagementReadServiceImpl(final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanExistencePort loanExistencePort) {
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
-        this.loanTransactionRepository = loanTransactionRepository;
+        this.loanExistencePort = loanExistencePort;
     }
 }

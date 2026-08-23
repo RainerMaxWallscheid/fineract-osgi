@@ -937,7 +937,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // disable all active standing orders linked to this loan if status changes to closed
         loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, newInterestPaymentWaiverTransaction);
-        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, newInterestPaymentWaiverTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), newInterestPaymentWaiverTransaction.getId());
         // Finished Notification
         final LoanTransactionBusinessEvent transactionRepaymentEvent = new LoanTransactionInterestPaymentWaiverPostBusinessEvent(newInterestPaymentWaiverTransaction);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
@@ -989,7 +990,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         boolean isAccountTransfer = false;
         LoanTransaction loanTransaction = this.loanAccountDomainService.makeRepayment(repaymentTransactionType, loan, transactionDate, transactionAmount, paymentDetail, noteText, txnExternalId, isRecoveryRepayment, chargeRefundChargeType, isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
         loan = loanTransaction.getLoan();
-        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, loanTransaction);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), loanTransaction.getId());
         return  //
         //
         //
@@ -1356,7 +1358,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         loanAccountDomainService.setLoanDelinquencyTag(loan, DateUtils.getBusinessLocalDate());
         businessEventNotifierService.notifyPostBusinessEvent(new LoanCloseBusinessEvent(loan));
         // Update loan transaction on repayment.
-        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), null);
         // disable all active standing instructions linked to the loan
         this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         CommandProcessingResult result;
@@ -1413,7 +1416,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // disable all active standing instructions linked to the loan
         this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         // Update loan transaction on repayment.
-        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, null);
+        this.loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), null);
         return  //
         //
         //
@@ -2438,9 +2442,11 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, interestRefundTransaction);
         }
         // Collateral management
-        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, refundTransaction);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), refundTransaction.getId());
         if (interestRefundTransaction != null) {
-            loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTransaction);
+            loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), interestRefundTransaction.getId());
         }
         // Raise business events
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -2540,7 +2546,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         loanAccountDomainService.setLoanDelinquencyTag(loan, transactionDate);
         loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         loanAccountDomainService.updateAndSavePostDatedChecksForIndividualAccount(loan, interestRefundTxn);
-        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan, interestRefundTxn);
+        loanCollateralLifecycleService.updateAndSaveLoanCollateralTransactionsForIndividualAccounts(loan.getId(),
+                loan.getLoanType().isIndividualAccount(), loan.getStatus().isClosed(), interestRefundTxn.getId());
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         journalEntryPoster.postJournalEntriesForLoanTransaction(interestRefundTxn, false, false);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));

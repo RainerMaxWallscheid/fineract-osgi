@@ -176,7 +176,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
                 final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.disbursal.account.is.not.approve.not.disbursed.state", defaultUserMessage);
                 baseDataValidator.getDataValidationErrors().add(error);
             }
-            final Set<LoanCollateralManagement> loanCollateralManagements = new java.util.HashSet<>(this.loanCollateralLifecycleService.findByLoan(loan));
+            final Set<LoanCollateralManagement> loanCollateralManagements = new java.util.HashSet<>(this.loanCollateralLifecycleService.findByLoan(loan.getId()));
             if ((loanCollateralManagements != null && !loanCollateralManagements.isEmpty()) && loan.getLoanType().isIndividualAccount()) {
                 BigDecimal totalCollateral = collectTotalCollateral(loanCollateralManagements);
                 // Validate the loan collateral value against the total disbursed amount after this transaction

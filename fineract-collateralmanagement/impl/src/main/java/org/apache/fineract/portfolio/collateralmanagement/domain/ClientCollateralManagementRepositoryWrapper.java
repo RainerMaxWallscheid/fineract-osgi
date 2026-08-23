@@ -25,9 +25,7 @@ import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.exception.ClientCollateralNotFoundException;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
-import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +39,13 @@ public class ClientCollateralManagementRepositoryWrapper {
     }
 
     private final ClientCollateralManagementRepository clientCollateralManagementRepository;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
 
     @Autowired
     public ClientCollateralManagementRepositoryWrapper(final ClientCollateralManagementRepository clientCollateralManagementRepository,
-            final LoanProductRepository loanProductRepository) {
+            final LoanProductExistencePort loanProductExistencePort) {
         this.clientCollateralManagementRepository = clientCollateralManagementRepository;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
     }
 
     public List<ClientCollateralManagement> getCollateralsPerClient(final Long clientId) {
@@ -63,9 +61,7 @@ public class ClientCollateralManagementRepositoryWrapper {
         }
         String currency = null;
         if (prodId != null) {
-            final LoanProduct loanProduct = this.loanProductRepository.findById(prodId)
-                    .orElseThrow(() -> new LoanProductNotFoundException(prodId));
-            currency = loanProduct.getCurrency().getCode();
+            currency = this.loanProductExistencePort.currencyCode(prodId);
         }
         List<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepository.findByClientId(clientId);
         List<ClientCollateralManagementData> clientCollateralManagementDataSet = new ArrayList<>();

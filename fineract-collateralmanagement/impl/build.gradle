@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.collateralmanagement.service,'
                         + 'org.apache.fineract.portfolio.collateralmanagement.data,'
                         + 'org.apache.fineract.portfolio.client.moduleapi,'
+                        + 'org.apache.fineract.portfolio.loanaccount.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.collateralmanagement.impl'
                 )

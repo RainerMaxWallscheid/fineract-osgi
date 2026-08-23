@@ -18,7 +18,9 @@
  */
 package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
@@ -71,4 +73,12 @@ public interface LoanExistencePort {
      */
     void applyMeetingDateChanges(Long calendarId, Collection<Long> loanIds, Boolean reschedulebasedOnMeetingDates,
             LocalDate presentMeetingDate, LocalDate newMeetingDate);
+
+    record LoanTransactionCollateralRef(Long loanId, OffsetDateTime createdDate, BigDecimal outstandingLoanBalance,
+            BigDecimal principalPortion) {}
+
+    /**
+     * Throws {@code LoanTransactionNotFoundException} when {@code loanTransactionId} is unknown.
+     */
+    LoanTransactionCollateralRef requireTransactionCollateral(Long loanTransactionId);
 }

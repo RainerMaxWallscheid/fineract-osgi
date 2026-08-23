@@ -38,8 +38,7 @@ import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateral
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementWriteService;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementWriteServiceImpl;
 import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,9 +49,8 @@ public class CollateralManagementConfiguration {
     @Bean
     @ConditionalOnMissingBean(ClientCollateralManagementReadService.class)
     public ClientCollateralManagementReadService clientCollateralManagementReadService(
-            ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper,
-            LoanTransactionRepository loanTransactionRepository) {
-        return new ClientCollateralManagementReadServiceImpl(clientCollateralManagementRepositoryWrapper, loanTransactionRepository);
+            ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, LoanExistencePort loanExistencePort) {
+        return new ClientCollateralManagementReadServiceImpl(clientCollateralManagementRepositoryWrapper, loanExistencePort);
     }
 
     @Bean
@@ -91,8 +89,8 @@ public class CollateralManagementConfiguration {
     @Bean
     @ConditionalOnMissingBean(LoanCollateralManagementReadService.class)
     public LoanCollateralManagementReadService loanCollateralManagementReadService(
-            LoanCollateralManagementRepository loanCollateralManagementRepository, LoanRepository loanRepository) {
-        return new LoanCollateralManagementReadServiceImpl(loanCollateralManagementRepository, loanRepository);
+            LoanCollateralManagementRepository loanCollateralManagementRepository, LoanExistencePort loanExistencePort) {
+        return new LoanCollateralManagementReadServiceImpl(loanCollateralManagementRepository, loanExistencePort);
     }
 
     @Bean

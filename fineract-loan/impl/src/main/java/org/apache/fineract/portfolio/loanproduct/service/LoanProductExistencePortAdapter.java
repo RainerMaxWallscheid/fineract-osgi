@@ -22,6 +22,7 @@ import java.util.Collection;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,5 +47,12 @@ public class LoanProductExistencePortAdapter implements LoanProductExistencePort
     @Override
     public Collection<Long> retrieveAllIds() {
         return loanProductRepository.findAll().stream().map(LoanProduct::getId).toList();
+    }
+
+    @Override
+    public String currencyCode(final Long loanProductId) {
+        final LoanProduct loanProduct = loanProductRepository.findById(loanProductId)
+                .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+        return loanProduct.getCurrency().getCode();
     }
 }

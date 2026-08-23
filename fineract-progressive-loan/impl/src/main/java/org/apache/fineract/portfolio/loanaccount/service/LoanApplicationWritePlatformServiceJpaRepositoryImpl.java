@@ -450,7 +450,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             this.accountAssociationsRepository.delete(accountAssociations);
         }
         // Note: check if releaseAttachedCollaterals method can be used here
-        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan);
+        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan.getId());
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
             BigDecimal quantity = loanCollateralManagement.getQuantity();
             ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
@@ -458,7 +458,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             loanCollateralManagement.setIsReleased(true);
             loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
         }
-        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loanCollateralManagements);
+        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loanCollateralManagements);
         this.loanRepositoryWrapper.delete(loanId);
         return  //
         //
@@ -739,7 +739,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void persistPendingCollaterals(final Loan loan) {
         if (loan.getPendingLoanCollaterals() != null) {
-            this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loan.getPendingLoanCollaterals());
+            this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loan.getPendingLoanCollaterals());
             loan.clearPendingLoanCollaterals();
         }
     }
@@ -755,14 +755,14 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     private void releaseAttachedCollaterals(Loan loan) {
-        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan);
+        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan.getId());
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
             ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
             clientCollateralManagement.updateQuantity(clientCollateralManagement.getQuantity().add(loanCollateralManagement.getQuantity()));
             loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
             loanCollateralManagement.setIsReleased(true);
         }
-        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan, loanCollateralManagements);
+        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loanCollateralManagements);
     }
 
     private Map<String, Object> undoApproval(final Loan loan) {

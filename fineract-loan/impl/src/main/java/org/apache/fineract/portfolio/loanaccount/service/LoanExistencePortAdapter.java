@@ -100,6 +100,14 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
                 newMeetingDate);
     }
 
+    @Override
+    public LoanTransactionCollateralRef requireTransactionCollateral(final Long loanTransactionId) {
+        final LoanTransaction transaction = loanTransactionRepository.findById(loanTransactionId)
+                .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
+        return new LoanTransactionCollateralRef(transaction.getLoan().getId(), transaction.getCreatedDate().orElse(null),
+                transaction.getOutstandingLoanBalance(), transaction.getPrincipalPortion());
+    }
+
     private Loan requireLoan(final Long loanId) {
         return loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
     }

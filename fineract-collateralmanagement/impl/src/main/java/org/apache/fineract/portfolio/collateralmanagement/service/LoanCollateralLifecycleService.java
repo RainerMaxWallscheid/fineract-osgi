@@ -25,13 +25,11 @@ import java.util.Set;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagementRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Lifecycle operations for loan↔collateral links after {@link Loan} no longer owns an inverse collection.
+ * Lifecycle operations for loan↔collateral links after leftover Loan no longer owns an inverse collection.
  */
 @Service
 public class LoanCollateralLifecycleService {
@@ -42,21 +40,21 @@ public class LoanCollateralLifecycleService {
         this.loanCollateralManagementRepository = loanCollateralManagementRepository;
     }
 
-    public List<LoanCollateralManagement> findByLoan(final Loan loan) {
-        return this.loanCollateralManagementRepository.findByLoanId(loan.getId());
+    public List<LoanCollateralManagement> findByLoan(final Long loanId) {
+        return this.loanCollateralManagementRepository.findByLoanId(loanId);
     }
 
-    public Set<LoanCollateralManagement> findByLoanAsSet(final Loan loan) {
-        return new HashSet<>(findByLoan(loan));
+    public Set<LoanCollateralManagement> findByLoanAsSet(final Long loanId) {
+        return new HashSet<>(findByLoan(loanId));
     }
 
     @Transactional
-    public void associateWithLoan(final Loan loan, final Set<LoanCollateralManagement> collaterals) {
+    public void associateWithLoan(final Long loanId, final Set<LoanCollateralManagement> collaterals) {
         if (collaterals == null || collaterals.isEmpty()) {
             return;
         }
         for (final LoanCollateralManagement item : collaterals) {
-            item.setLoanId(loan.getId());
+            item.setLoanId(loanId);
         }
         this.loanCollateralManagementRepository.saveAll(collaterals);
     }
@@ -65,13 +63,13 @@ public class LoanCollateralLifecycleService {
      * Replaces all collaterals for the loan (orphan-remove semantics of former {@code Loan.updateLoanCollateral}).
      */
     @Transactional
-    public void replaceLoanCollaterals(final Loan loan, final Set<LoanCollateralManagement> collaterals) {
-        final List<LoanCollateralManagement> existing = findByLoan(loan);
+    public void replaceLoanCollaterals(final Long loanId, final Set<LoanCollateralManagement> collaterals) {
+        final List<LoanCollateralManagement> existing = findByLoan(loanId);
         if (!existing.isEmpty()) {
             this.loanCollateralManagementRepository.deleteAll(existing);
             this.loanCollateralManagementRepository.flush();
         }
-        associateWithLoan(loan, collaterals);
+        associateWithLoan(loanId, collaterals);
     }
 
     @Transactional
@@ -86,17 +84,18 @@ public class LoanCollateralLifecycleService {
     }
 
     @Transactional
-    public void updateAndSaveLoanCollateralTransactionsForIndividualAccounts(final Loan loan, final LoanTransaction loanTransaction) {
-        if (!loan.getLoanType().isIndividualAccount()) {
+    public void updateAndSaveLoanCollateralTransactionsForIndividualAccounts(final Long loanId, final boolean individualAccount,
+            final boolean closed, final Long loanTransactionId) {
+        if (!individualAccount) {
             return;
         }
-        final List<LoanCollateralManagement> loanCollateralManagements = findByLoan(loan);
+        final List<LoanCollateralManagement> loanCollateralManagements = findByLoan(loanId);
         for (final LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
-            if (loanTransaction != null) {
-                loanCollateralManagement.setLoanTransactionData(loanTransaction);
+            if (loanTransactionId != null) {
+                loanCollateralManagement.setLoanTransactionId(loanTransactionId);
             }
             final ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
-            if (loan.getStatus().isClosed()) {
+            if (closed) {
                 loanCollateralManagement.setIsReleased(true);
                 final BigDecimal quantity = loanCollateralManagement.getQuantity();
                 clientCollateralManagement.updateQuantity(clientCollateralManagement.getQuantity().add(quantity));

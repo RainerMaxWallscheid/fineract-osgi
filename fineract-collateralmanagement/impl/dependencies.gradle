@@ -27,8 +27,8 @@ dependencies {
     implementation(project(path: ':fineract-monetary-api'))
     // Legacy CollateralNotFoundException used by product repository wrapper
     implementation(project(path: ':fineract-collateral-api'))
-    // Residual: ClientCollateralManagement, CollateralManagementDomain, LoanCollateralManagement, Loan
-    implementation(project(path: ':fineract-loan-impl'))
+    // Loan existence/product currency via LoanExistencePort / LoanProductExistencePort
+    implementation(project(path: ':fineract-loan-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

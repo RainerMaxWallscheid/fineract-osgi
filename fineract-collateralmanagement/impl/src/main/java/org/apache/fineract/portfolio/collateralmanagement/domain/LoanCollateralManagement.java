@@ -26,12 +26,10 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.data.LoanCollateralManagementData;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
 /**
- * Loan↔client-collateral link. Uses FK ids for loan/transaction to avoid static-weaving
- * cross-module entity relationships with {@link Loan} / {@link LoanTransaction}.
+ * Loan↔client-collateral link. Uses FK ids for loan/transaction (no leftover Loan /
+ * LoanTransaction association).
  */
 @Entity
 @Table(name = "m_loan_collateral_management")
@@ -67,10 +65,6 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
         this.quantity = quantity;
     }
 
-    public void setLoan(final Loan loan) {
-        this.loanId = loan == null ? null : loan.getId();
-    }
-
     public void setLoanId(final Long loanId) {
         this.loanId = loanId;
     }
@@ -90,10 +84,6 @@ public class LoanCollateralManagement extends AbstractPersistableCustom<Long> {
 
     public void setClientCollateralManagement(final ClientCollateralManagement clientCollateralManagement) {
         this.clientCollateralManagement = clientCollateralManagement;
-    }
-
-    public void setLoanTransactionData(final LoanTransaction loanTransaction) {
-        this.loanTransactionId = loanTransaction == null ? null : loanTransaction.getId();
     }
 
     public void setLoanTransactionId(final Long loanTransactionId) {
