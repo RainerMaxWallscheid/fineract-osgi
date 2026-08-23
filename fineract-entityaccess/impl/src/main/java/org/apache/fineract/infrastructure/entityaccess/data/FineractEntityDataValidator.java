@@ -38,7 +38,7 @@ import org.apache.fineract.infrastructure.entityaccess.api.FineractEntityApiReso
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
@@ -52,7 +52,7 @@ public class FineractEntityDataValidator {
 
     private final FromJsonHelper fromApiJsonHelper;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final SavingsProductRepository savingsProductRepository;
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final RoleRepository roleRepository;
@@ -69,11 +69,11 @@ public class FineractEntityDataValidator {
 
     @Autowired
     public FineractEntityDataValidator(final FromJsonHelper fromApiJsonHelper, final OfficeRepositoryWrapper officeRepositoryWrapper,
-            final LoanProductRepository loanProductRepository, final SavingsProductRepository savingsProductRepository,
+            final LoanProductExistencePort loanProductExistencePort, final SavingsProductRepository savingsProductRepository,
             final ChargeDefinitionPort chargeDefinitionPort, final RoleRepository roleRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.savingsProductRepository = savingsProductRepository;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.roleRepository = roleRepository;
@@ -159,7 +159,9 @@ public class FineractEntityDataValidator {
     }
 
     public void checkForLoanProducts(final Long id) {
-        this.loanProductRepository.findById(id).orElseThrow(() -> new LoanProductNotFoundException(id));
+        if (!this.loanProductExistencePort.existsById(id)) {
+            throw new LoanProductNotFoundException(id);
+        }
     }
 
     public void checkForSavingsProducts(final Long id) {

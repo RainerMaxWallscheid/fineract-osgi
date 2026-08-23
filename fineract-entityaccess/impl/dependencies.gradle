@@ -22,7 +22,7 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-loan-impl'))
+    implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-savings-impl'))
     implementation(project(path: ':fineract-useradministration-impl'))
     implementation(project(path: ':fineract-codes-api'))
