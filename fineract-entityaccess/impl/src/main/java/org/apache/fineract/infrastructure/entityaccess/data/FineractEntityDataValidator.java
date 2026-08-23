@@ -42,8 +42,7 @@ import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistenceP
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsProductExistencePort;
-import org.apache.fineract.useradministration.domain.RoleRepository;
-import org.apache.fineract.useradministration.exception.RoleNotFoundException;
+import org.apache.fineract.useradministration.service.RoleReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +54,7 @@ public class FineractEntityDataValidator {
     private final LoanProductExistencePort loanProductExistencePort;
     private final SavingsProductExistencePort savingsProductExistencePort;
     private final ChargeDefinitionPort chargeDefinitionPort;
-    private final RoleRepository roleRepository;
+    private final RoleReadPlatformService roleReadPlatformService;
     private static final Set<String> CREATE_ENTITY_MAPPING_REQUEST_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList(FineractEntityApiResourceConstants.fromEnityType, FineractEntityApiResourceConstants.toEntityType,
                     FineractEntityApiResourceConstants.startDate, FineractEntityApiResourceConstants.LOCALE,
@@ -70,13 +69,13 @@ public class FineractEntityDataValidator {
     @Autowired
     public FineractEntityDataValidator(final FromJsonHelper fromApiJsonHelper, final OfficeRepositoryWrapper officeRepositoryWrapper,
             final LoanProductExistencePort loanProductExistencePort, final SavingsProductExistencePort savingsProductExistencePort,
-            final ChargeDefinitionPort chargeDefinitionPort, final RoleRepository roleRepository) {
+            final ChargeDefinitionPort chargeDefinitionPort, final RoleReadPlatformService roleReadPlatformService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.loanProductExistencePort = loanProductExistencePort;
         this.savingsProductExistencePort = savingsProductExistencePort;
         this.chargeDefinitionPort = chargeDefinitionPort;
-        this.roleRepository = roleRepository;
+        this.roleReadPlatformService = roleReadPlatformService;
     }
 
     public void validateForCreate(final String json) {
@@ -175,7 +174,7 @@ public class FineractEntityDataValidator {
     }
 
     public void checkForRoles(final Long id) {
-        this.roleRepository.findById(id).orElseThrow(() -> new RoleNotFoundException(id));
+        this.roleReadPlatformService.retrieveOne(id);
     }
 
     public void validateForUpdate(final String json) {
