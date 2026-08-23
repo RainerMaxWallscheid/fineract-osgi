@@ -20,8 +20,6 @@
 dependencies {
     api project(path: ':fineract-gcm-api')
     implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-sms-api'))
-    implementation(project(path: ':fineract-sms-impl'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter',

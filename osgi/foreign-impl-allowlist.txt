@@ -19,7 +19,6 @@ fineract-event/impl/dependencies.gradle	fineract-loan-impl
 fineract-event/impl/dependencies.gradle	fineract-savings-impl
 fineract-event/impl/dependencies.gradle	fineract-cob-impl
 fineract-event/impl/dependencies.gradle	fineract-working-capital-loan-impl
-fineract-gcm/impl/dependencies.gradle	fineract-sms-impl
 fineract-hooks/impl/dependencies.gradle	fineract-sms-impl
 fineract-hooks/impl/dependencies.gradle	fineract-campaigns-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl

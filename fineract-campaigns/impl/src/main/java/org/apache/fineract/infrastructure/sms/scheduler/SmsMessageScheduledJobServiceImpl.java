@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.campaigns.sms.exception.ConnectionFail
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+import org.apache.fineract.infrastructure.gcm.domain.GcmPushNotification;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.sms.data.SmsMessageApiQueueResourceData;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
@@ -112,7 +113,7 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
                     }
                 }
                 if (!toSendNotificationMessages.isEmpty()) {
-                    this.notificationSenderService.sendNotification(toSendNotificationMessages);
+                    sendGcmNotifications(toSendNotificationMessages);
                 }
             }
         } catch (Exception e) {
@@ -139,6 +140,32 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
         }
     }
 
+
+    private void sendGcmNotifications(final List<SmsMessage> smsMessages) {
+        final List<GcmPushNotification> pushes = new ArrayList<>(smsMessages.size());
+        for (final SmsMessage smsMessage : smsMessages) {
+            final Long clientId = smsMessage.getClient() == null ? null : smsMessage.getClient().getId();
+            pushes.add(new GcmPushNotification(clientId, smsMessage.getMessage()));
+        }
+        this.notificationSenderService.sendNotification(pushes);
+        final List<SmsMessage> toSave = new ArrayList<>();
+        for (int i = 0; i < smsMessages.size(); i++) {
+            if (smsMessages.get(i).getClient() == null) {
+                continue;
+            }
+            final GcmPushNotification push = pushes.get(i);
+            if (push.isSent()) {
+                smsMessages.get(i).setStatusType(SmsMessageStatusType.SENT.getValue());
+                smsMessages.get(i).setDeliveredOnDate(push.getDeliveredOnDate());
+            } else if (push.isFailed()) {
+                smsMessages.get(i).setStatusType(SmsMessageStatusType.FAILED.getValue());
+            }
+            toSave.add(smsMessages.get(i));
+        }
+        if (!toSave.isEmpty()) {
+            this.smsMessageRepository.saveAll(toSave);
+        }
+    }
 
     class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
         private final FineractContext context;

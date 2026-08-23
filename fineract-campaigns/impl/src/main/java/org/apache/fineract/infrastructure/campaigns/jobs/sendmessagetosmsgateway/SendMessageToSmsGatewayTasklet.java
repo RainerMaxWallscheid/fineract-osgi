@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignReposi
 import org.apache.fineract.infrastructure.campaigns.sms.exception.ConnectionFailureException;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+import org.apache.fineract.infrastructure.gcm.domain.GcmPushNotification;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.sms.data.SmsMessageApiQueueResourceData;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
@@ -96,7 +97,7 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
                         taskExecutor.execute(new SmsTask(ThreadLocalContextUtil.getTenant(), apiQueueResourceDataCollection));
                     }
                     if (!toSendNotificationMessages.isEmpty()) {
-                        notificationSenderService.sendNotification(toSendNotificationMessages);
+                        sendGcmNotifications(toSendNotificationMessages);
                     }
                 }
             } catch (Exception e) {
@@ -108,6 +109,32 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
+
+    private void sendGcmNotifications(final List<SmsMessage> smsMessages) {
+        final List<GcmPushNotification> pushes = new ArrayList<>(smsMessages.size());
+        for (final SmsMessage smsMessage : smsMessages) {
+            final Long clientId = smsMessage.getClient() == null ? null : smsMessage.getClient().getId();
+            pushes.add(new GcmPushNotification(clientId, smsMessage.getMessage()));
+        }
+        notificationSenderService.sendNotification(pushes);
+        final List<SmsMessage> toSave = new ArrayList<>();
+        for (int i = 0; i < smsMessages.size(); i++) {
+            if (smsMessages.get(i).getClient() == null) {
+                continue;
+            }
+            final GcmPushNotification push = pushes.get(i);
+            if (push.isSent()) {
+                smsMessages.get(i).setStatusType(SmsMessageStatusType.SENT.getValue());
+                smsMessages.get(i).setDeliveredOnDate(push.getDeliveredOnDate());
+            } else if (push.isFailed()) {
+                smsMessages.get(i).setStatusType(SmsMessageStatusType.FAILED.getValue());
+            }
+            toSave.add(smsMessages.get(i));
+        }
+        if (!toSave.isEmpty()) {
+            smsMessageRepository.saveAll(toSave);
+        }
+    }
 
     class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
         private final FineractPlatformTenant tenant;

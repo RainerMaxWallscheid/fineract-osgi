@@ -25,71 +25,58 @@ import java.util.List;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.gcm.GcmConstants;
+import org.apache.fineract.infrastructure.gcm.domain.GcmPushNotification;
 import org.apache.fineract.infrastructure.gcm.domain.Message;
 import org.apache.fineract.infrastructure.gcm.domain.Message.Priority;
 import org.apache.fineract.infrastructure.gcm.domain.Notification;
 import org.apache.fineract.infrastructure.gcm.domain.NotificationConfigurationData;
 import org.apache.fineract.infrastructure.gcm.domain.Result;
 import org.apache.fineract.infrastructure.gcm.domain.Sender;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationSenderService {
-    private final SmsMessageRepository smsMessageRepository;
     private final NotificationConfigurationReadService notificationConfigurationReadService;
 
-    public void sendNotification(List<SmsMessage> smsMessages) {
-        Map<Long, List<SmsMessage>> notificationByEachClient = getNotificationListByClient(smsMessages);
-        for (Map.Entry<Long, List<SmsMessage>> entry : notificationByEachClient.entrySet()) {
+    public void sendNotification(List<GcmPushNotification> notifications) {
+        Map<Long, List<GcmPushNotification>> notificationByEachClient = getNotificationListByClient(notifications);
+        for (Map.Entry<Long, List<GcmPushNotification>> entry : notificationByEachClient.entrySet()) {
             sendNotification(entry.getKey(), entry.getValue());
         }
     }
 
-    public Map<Long, List<SmsMessage>> getNotificationListByClient(List<SmsMessage> smsMessages) {
-        Map<Long, List<SmsMessage>> notificationByEachClient = new HashMap<>();
-        for (SmsMessage smsMessage : smsMessages) {
-            if (smsMessage.getClient() != null) {
-                Long clientId = smsMessage.getClient().getId();
-                if (notificationByEachClient.containsKey(clientId)) {
-                    notificationByEachClient.get(clientId).add(smsMessage);
-                } else {
-                    List<SmsMessage> msgList = new ArrayList<>(List.of(smsMessage));
-                    notificationByEachClient.put(clientId, msgList);
-                }
+    public Map<Long, List<GcmPushNotification>> getNotificationListByClient(List<GcmPushNotification> notifications) {
+        Map<Long, List<GcmPushNotification>> notificationByEachClient = new HashMap<>();
+        for (GcmPushNotification notification : notifications) {
+            if (notification.getClientId() != null) {
+                notificationByEachClient.computeIfAbsent(notification.getClientId(), key -> new ArrayList<>()).add(notification);
             }
         }
         return notificationByEachClient;
     }
 
-    public void sendNotification(Long clientId, List<SmsMessage> smsList) {
+    public void sendNotification(Long clientId, List<GcmPushNotification> notifications) {
         NotificationConfigurationData notificationConfigurationData = notificationConfigurationReadService.getNotificationConfiguration();
         String registrationId = null;
-        for (SmsMessage smsMessage : smsList) {
+        for (GcmPushNotification push : notifications) {
             try {
-                Notification notification = new Notification.Builder(GcmConstants.defaultIcon).title(GcmConstants.title).body(smsMessage.getMessage()).build();
+                Notification notification = new Notification.Builder(GcmConstants.defaultIcon).title(GcmConstants.title).body(push.getMessage()).build();
                 Message message = new Message.Builder().notification(notification).dryRun(false).contentAvailable(true).timeToLive(GcmConstants.TIME_TO_LIVE).priority(Priority.HIGH).delayWhileIdle(true).build();
                 Sender sender = new Sender(notificationConfigurationData.getServerKey(), notificationConfigurationData.getFcmEndPoint());
                 Result res = sender.send(message, registrationId, 3);
                 if (res.getSuccess() != null && res.getSuccess() > 0) {
-                    smsMessage.setStatusType(SmsMessageStatusType.SENT.getValue());
-                    smsMessage.setDeliveredOnDate(DateUtils.getLocalDateTimeOfTenant());
+                    push.markSent(DateUtils.getLocalDateTimeOfTenant());
                 } else if (res.getFailure() != null && res.getFailure() > 0) {
-                    smsMessage.setStatusType(SmsMessageStatusType.FAILED.getValue());
+                    push.markFailed();
                 }
             } catch (IOException e) {
-                smsMessage.setStatusType(SmsMessageStatusType.FAILED.getValue());
+                push.markFailed();
             }
         }
-        smsMessageRepository.saveAll(smsList);
     }
 
     @java.lang.SuppressWarnings("all")
-        public NotificationSenderService(final SmsMessageRepository smsMessageRepository,
-            final NotificationConfigurationReadService notificationConfigurationReadService) {
-        this.smsMessageRepository = smsMessageRepository;
+        public NotificationSenderService(final NotificationConfigurationReadService notificationConfigurationReadService) {
         this.notificationConfigurationReadService = notificationConfigurationReadService;
     }
 }
