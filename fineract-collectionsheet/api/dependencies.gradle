@@ -24,7 +24,12 @@ dependencies {
     api project(path: ':fineract-loan-api')
     // PaymentTypeData on collection-sheet DTOs
     api project(path: ':fineract-paymenttype-api')
+    // Bulk-repayment deserializer uses PaymentDetailWritePlatformService
+    api project(path: ':fineract-paymentdetail-api')
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
+    compileOnly 'org.springframework:spring-context'
+    compileOnly 'com.google.code.gson:gson'
+    compileOnly 'org.apache.commons:commons-lang3'
 }
