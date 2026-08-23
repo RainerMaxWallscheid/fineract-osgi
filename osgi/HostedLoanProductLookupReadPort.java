@@ -29,6 +29,11 @@ final class HostedLoanProductLookupReadPort implements LoanProductLookupReadPort
 
     @Override
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
+        return retrieveAllLoanProductsForLookup(false);
+    }
+
+    @Override
+    public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
         return List.of(LoanProductLookupData.lookup(HOSTED_ID, "hosted", false));
     }
 

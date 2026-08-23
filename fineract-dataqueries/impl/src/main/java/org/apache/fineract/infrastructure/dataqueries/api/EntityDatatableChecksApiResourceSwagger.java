@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableCheckStatusData;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableChecksData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 
 /**
@@ -72,7 +72,7 @@ final class EntityDatatableChecksApiResourceSwagger {
         public List<DatatableCheckStatusData> statusSavings;
         public List<DatatableCheckStatusData> statusLoans;
         public List<DatatableChecksData> datatables;
-        public Collection<LoanProductData> loanProductDatas;
+        public Collection<LoanProductLookupData> loanProductDatas;
         public Collection<SavingsProductData> savingsProductDatas;
     }
 

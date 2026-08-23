@@ -24,7 +24,6 @@ fineract-collateral/impl/dependencies.gradle	fineract-loan-impl
 fineract-collateralmanagement/impl/dependencies.gradle	fineract-loan-impl
 fineract-configuration/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-creditbureau/impl/dependencies.gradle	fineract-loan-impl
-fineract-dataqueries/impl/dependencies.gradle	fineract-loan-impl
 fineract-dataqueries/impl/dependencies.gradle	fineract-useradministration-impl
 fineract-entityaccess/impl/dependencies.gradle	fineract-loan-impl
 fineract-entityaccess/impl/dependencies.gradle	fineract-savings-impl

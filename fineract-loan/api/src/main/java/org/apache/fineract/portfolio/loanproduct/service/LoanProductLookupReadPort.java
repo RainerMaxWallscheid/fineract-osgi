@@ -28,6 +28,8 @@ public interface LoanProductLookupReadPort {
 
     Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup();
 
+    Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(boolean activeOnly);
+
     String nameById(Long loanProductId);
 
     String loanEnumerationValue(String typeName, int id);

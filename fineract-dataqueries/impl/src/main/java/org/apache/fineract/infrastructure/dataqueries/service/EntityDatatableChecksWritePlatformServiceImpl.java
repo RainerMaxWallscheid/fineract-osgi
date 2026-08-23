@@ -43,7 +43,8 @@ import org.apache.fineract.infrastructure.dataqueries.exception.EntityDatatableC
 import org.apache.fineract.infrastructure.dataqueries.exception.EntityDatatableCheckNotSupportedException;
 import org.apache.fineract.infrastructure.dataqueries.exception.EntityDatatableChecksNotFoundException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
+import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataAccessException;
@@ -59,7 +60,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     private final EntityDatatableChecksRepository entityDatatableChecksRepository;
     private final DatatableReadService datatableReadService;
     private final DatatableWriteService datatableWriteService;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductExistencePort loanProductExistencePort;
     private final SavingsProductReadPlatformService savingsProductReadPlatformService;
     private final FromJsonHelper fromApiJsonHelper;
     private final ConfigurationDomainService configurationDomainService;
@@ -95,7 +96,9 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
                 EntityTables entityTable = EntityTables.fromEntityName(entity);
                 if (entityTable == EntityTables.LOAN) {
                     // if invalid loan product id, throws exception
-                    this.loanProductReadPlatformService.retrieveLoanProduct(productId);
+                    if (!this.loanProductExistencePort.existsById(productId)) {
+                        throw new LoanProductNotFoundException(productId);
+                    }
                 } else if (entityTable == EntityTables.SAVINGS) {
                     // if invalid savings product id, throws exception
                     this.savingsProductReadPlatformService.retrieveOne(productId);
@@ -242,13 +245,13 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     }
 
     @java.lang.SuppressWarnings("all")
-        public EntityDatatableChecksWritePlatformServiceImpl(final PlatformSecurityContext context, final EntityDatatableChecksDataValidator fromApiJsonDeserializer, final EntityDatatableChecksRepository entityDatatableChecksRepository, final DatatableReadService datatableReadService, final DatatableWriteService datatableWriteService, final LoanProductReadPlatformService loanProductReadPlatformService, final SavingsProductReadPlatformService savingsProductReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService) {
+        public EntityDatatableChecksWritePlatformServiceImpl(final PlatformSecurityContext context, final EntityDatatableChecksDataValidator fromApiJsonDeserializer, final EntityDatatableChecksRepository entityDatatableChecksRepository, final DatatableReadService datatableReadService, final DatatableWriteService datatableWriteService, final LoanProductExistencePort loanProductExistencePort, final SavingsProductReadPlatformService savingsProductReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.entityDatatableChecksRepository = entityDatatableChecksRepository;
         this.datatableReadService = datatableReadService;
         this.datatableWriteService = datatableWriteService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductExistencePort = loanProductExistencePort;
         this.savingsProductReadPlatformService = savingsProductReadPlatformService;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.configurationDomainService = configurationDomainService;

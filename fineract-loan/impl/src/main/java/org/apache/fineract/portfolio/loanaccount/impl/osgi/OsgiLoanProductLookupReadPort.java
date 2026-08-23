@@ -31,6 +31,11 @@ public final class OsgiLoanProductLookupReadPort implements LoanProductLookupRea
 
     @Override
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
+        return retrieveAllLoanProductsForLookup(false);
+    }
+
+    @Override
+    public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
         return List.of();
     }
 

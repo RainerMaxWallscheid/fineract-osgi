@@ -24,7 +24,6 @@ dependencies {
     implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-report'))
     implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-useradministration-impl'))

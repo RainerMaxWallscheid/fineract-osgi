@@ -40,8 +40,8 @@ import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecks;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecksRepository;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -58,19 +58,19 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     private final EntityDataTableChecksMapper entityDataTableChecksMapper;
     private final EntityDatatableChecksRepository entityDatatableChecksRepository;
     private final DatatableReadService datatableReadService;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final SavingsProductReadPlatformService savingsProductReadPlatformService;
     private final PaginationHelper paginationHelper;
 
     public EntityDatatableChecksReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator,
             final EntityDatatableChecksRepository entityDatatableChecksRepository, final DatatableReadService datatableReadService,
-            final LoanProductReadPlatformService loanProductReadPlatformService,
+            final LoanProductLookupReadPort loanProductLookupReadPort,
             final SavingsProductReadPlatformService savingsProductReadPlatformService, final PaginationHelper paginationHelper) {
         this.jdbcTemplate = jdbcTemplate;
         this.sqlGenerator = sqlGenerator;
         this.entityDatatableChecksRepository = entityDatatableChecksRepository;
         this.datatableReadService = datatableReadService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.savingsProductReadPlatformService = savingsProductReadPlatformService;
         this.paginationHelper = paginationHelper;
         this.registerDataTableMapper = new RegisterDataTableMapper();
@@ -143,7 +143,7 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         List<DatatableCheckStatusData> groupstatuses = getStatusList(EntityTables.GROUP.getCheckStatuses());
         List<DatatableCheckStatusData> savingsStatuses = getStatusList(EntityTables.SAVINGS.getCheckStatuses());
 
-        Collection<LoanProductData> loanProductDatas = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(true);
+        Collection<LoanProductLookupData> loanProductDatas = this.loanProductLookupReadPort.retrieveAllLoanProductsForLookup(true);
         Collection<SavingsProductData> savingsProductDatas = this.savingsProductReadPlatformService.retrieveAllForLookup();
 
         return new EntityDataTableChecksTemplateData(entities, clientStatuses, groupstatuses, savingsStatuses, loanStatuses, dataTables,

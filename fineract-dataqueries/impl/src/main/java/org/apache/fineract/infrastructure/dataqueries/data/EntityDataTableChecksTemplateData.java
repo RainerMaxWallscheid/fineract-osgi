@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 
 /**
@@ -37,13 +37,13 @@ public class EntityDataTableChecksTemplateData implements Serializable {
     private final List<DatatableCheckStatusData> statusSavings;
     private final List<DatatableCheckStatusData> statusLoans;
     private final List<DatatableChecksData> datatables;
-    private final Collection<LoanProductData> loanProductDatas;
+    private final Collection<LoanProductLookupData> loanProductDatas;
     private final Collection<SavingsProductData> savingsProductDatas;
 
     public EntityDataTableChecksTemplateData(final List<String> entities, List<DatatableCheckStatusData> statusClient,
             List<DatatableCheckStatusData> statusGroup, List<DatatableCheckStatusData> statusSavings,
-            List<DatatableCheckStatusData> statusLoans, List<DatatableChecksData> datatables, Collection<LoanProductData> loanProductDatas,
-            Collection<SavingsProductData> savingsProductDatas) {
+            List<DatatableCheckStatusData> statusLoans, List<DatatableChecksData> datatables,
+            Collection<LoanProductLookupData> loanProductDatas, Collection<SavingsProductData> savingsProductDatas) {
 
         this.entities = entities;
         this.statusClient = statusClient;

@@ -35,7 +35,12 @@ public class LoanProductLookupReadPortAdapter implements LoanProductLookupReadPo
 
     @Override
     public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
-        final Collection<LoanProductData> products = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup();
+        return retrieveAllLoanProductsForLookup(false);
+    }
+
+    @Override
+    public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
+        final Collection<LoanProductData> products = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(activeOnly);
         return products.stream().map(p -> LoanProductLookupData.lookup(p.getId(), p.getName(), p.getMultiDisburseLoan()))
                 .collect(Collectors.toList());
     }
