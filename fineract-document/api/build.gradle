@@ -41,7 +41,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.documentmanagement.exception,'
                         + 'org.apache.fineract.infrastructure.documentmanagement.api,'
                         + 'org.apache.fineract.infrastructure.documentmanagement.adapter,'
-                        + 'org.apache.fineract.infrastructure.documentmanagement.command',
+                        + 'org.apache.fineract.infrastructure.documentmanagement.command,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain.document',
                 'Import-Package': 'org.apache.fineract.command.core,'
                         + 'org.apache.fineract.infrastructure.core.exception,'
                         + '*',

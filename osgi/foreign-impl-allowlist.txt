@@ -13,7 +13,6 @@ fineract-campaigns/impl/dependencies.gradle	fineract-event-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-reportmailingjob-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-savings-impl
-fineract-event/impl/dependencies.gradle	fineract-document-impl
 fineract-event/impl/dependencies.gradle	fineract-loan-impl
 fineract-event/impl/dependencies.gradle	fineract-savings-impl
 fineract-event/impl/dependencies.gradle	fineract-working-capital-loan-impl

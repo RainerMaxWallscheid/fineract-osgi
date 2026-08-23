@@ -28,7 +28,6 @@ dependencies {
     implementation(project(path: ':fineract-shares-api'))
     implementation(project(path: ':fineract-avro-schemas'))
     implementation(project(path: ':fineract-document-api'))
-    implementation(project(path: ':fineract-document-impl'))
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-savings-api'))
