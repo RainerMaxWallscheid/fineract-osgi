@@ -25,4 +25,7 @@ dependencies {
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
     compileOnly 'jakarta.ws.rs:jakarta.ws.rs-api'
     compileOnly 'org.springframework:spring-tx'
+    compileOnly 'org.springframework:spring-context'
+    compileOnly 'com.google.code.gson:gson'
+    compileOnly 'org.apache.commons:commons-lang3'
 }

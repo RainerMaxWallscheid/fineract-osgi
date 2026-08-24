@@ -42,7 +42,6 @@ dependencies {
     implementation(project(path: ':fineract-shares-impl'))
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
-    implementation(project(path: ':fineract-accounttransfer-impl'))
     // Collection sheet ports/DTOs/commands + deserializers/validator/read (write impl residual here)
     implementation(project(path: ':fineract-collectionsheet-api'))
     implementation(project(path: ':fineract-note-api'))
