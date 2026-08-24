@@ -35,7 +35,6 @@ fineract-progressive-loan/impl/dependencies.gradle	fineract-accounting-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-loan-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-working-capital-loan-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-savings-impl
-fineract-progressive-loan/impl/dependencies.gradle	fineract-dataqueries-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-collateralmanagement-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-calendar-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-entityaccess-impl

@@ -19,8 +19,11 @@
 
 dependencies {
     api project(path: ':fineract-core')
+    // LoanProductLookupData on entity-datatable checks template
+    api project(path: ':fineract-loan-api')
 
     implementation 'org.apache.commons:commons-lang3'
+    implementation 'org.apache.commons:commons-collections4'
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api'
     implementation 'com.google.code.gson:gson'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
