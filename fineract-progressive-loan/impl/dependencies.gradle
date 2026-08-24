@@ -73,7 +73,6 @@ dependencies {
     implementation(project(path: ':fineract-calendar-impl'))
     implementation(project(path: ':fineract-entityaccess-impl'))
     implementation(project(path: ':fineract-monetary-api'))
-    implementation(project(path: ':fineract-charge-impl'))
     // Leftover write/assembler residual
     implementation(project(path: ':fineract-tax-api'))
     implementation(project(path: ':fineract-event-impl'))
