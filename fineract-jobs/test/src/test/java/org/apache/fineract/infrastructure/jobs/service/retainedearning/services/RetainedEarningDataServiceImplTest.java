@@ -43,7 +43,7 @@ import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.Acco
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.helper.DataParser;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.model.AccountGLJournalEntryAnnualSummaryRecord;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -64,7 +64,7 @@ class RetainedEarningDataServiceImplTest {
     private AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
 
     @Mock
-    private LoanProductRepository loanProductRepository;
+    private LoanProductLookupReadPort loanProductLookupReadPort;
 
     @Mock
     private RetainedEarningConfigurationService retainedEarningConfigurationService;

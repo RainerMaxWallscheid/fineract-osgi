@@ -30,7 +30,6 @@ dependencies {
     implementation(project(path: ':fineract-accounting-api'))
     implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
     implementation(project(path: ':fineract-dataqueries-api'))
     implementation(project(path: ':fineract-report'))

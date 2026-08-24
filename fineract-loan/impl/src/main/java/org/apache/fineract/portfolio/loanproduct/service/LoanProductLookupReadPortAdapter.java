@@ -19,18 +19,26 @@
 package org.apache.fineract.portfolio.loanproduct.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
+import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductLookupReadPortAdapter implements LoanProductLookupReadPort {
 
     private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final LoanProductRepository loanProductRepository;
 
-    public LoanProductLookupReadPortAdapter(final LoanProductReadPlatformService loanProductReadPlatformService) {
+    public LoanProductLookupReadPortAdapter(final LoanProductReadPlatformService loanProductReadPlatformService,
+            final LoanProductRepository loanProductRepository) {
         this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.loanProductRepository = loanProductRepository;
     }
 
     @Override
@@ -54,5 +62,20 @@ public class LoanProductLookupReadPortAdapter implements LoanProductLookupReadPo
     public String loanEnumerationValue(final String typeName, final int id) {
         final var data = LoanEnumerations.loanEnumeration(typeName, id);
         return data == null ? null : data.getValue();
+    }
+
+    @Override
+    public Collection<LoanProductLookupData> findAllByNameIgnoreCase(final Collection<String> names) {
+        if (names == null || names.isEmpty()) {
+            return List.of();
+        }
+        return this.loanProductRepository.findAllByNameIgnoreCase(names).stream().map(this::toLookupWithCurrency)
+                .collect(Collectors.toList());
+    }
+
+    private LoanProductLookupData toLookupWithCurrency(final LoanProduct product) {
+        final MonetaryCurrency currency = product.getCurrency();
+        final CurrencyData currencyData = currency == null ? null : new CurrencyData(currency.getCode());
+        return LoanProductLookupData.lookupWithCurrency(product.getId(), product.getName(), currencyData);
     }
 }

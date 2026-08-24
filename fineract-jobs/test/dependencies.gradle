@@ -25,7 +25,7 @@ dependencies {
     testImplementation(project(path: ':fineract-cob-impl'))
     testImplementation 'jakarta.servlet:jakarta.servlet-api'
     testImplementation(project(path: ':fineract-accounting-impl'))
-    testImplementation(project(path: ':fineract-loan-impl'))
+    testImplementation(project(path: ':fineract-loan-api'))
     testImplementation(project(path: ':fineract-report'))
     testImplementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.batch:spring-batch-core'

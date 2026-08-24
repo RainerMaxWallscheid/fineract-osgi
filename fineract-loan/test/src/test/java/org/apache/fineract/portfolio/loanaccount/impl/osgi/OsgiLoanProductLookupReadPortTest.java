@@ -29,6 +29,7 @@ class OsgiLoanProductLookupReadPortTest {
         final OsgiLoanProductLookupReadPort port = new OsgiLoanProductLookupReadPort();
         assertTrue(port.retrieveAllLoanProductsForLookup().isEmpty());
         assertTrue(port.retrieveAllLoanProductsForLookup(true).isEmpty());
+        assertTrue(port.findAllByNameIgnoreCase(java.util.List.of("hosted")).isEmpty());
         assertNull(port.nameById(1L));
         assertNull(port.loanEnumerationValue("amortizationType", 1));
     }

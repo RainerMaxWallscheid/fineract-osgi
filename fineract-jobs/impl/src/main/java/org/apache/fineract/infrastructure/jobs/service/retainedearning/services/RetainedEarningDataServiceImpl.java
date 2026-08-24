@@ -43,8 +43,8 @@ import org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedE
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.helper.DataParser;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +58,7 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
     private final ReportingProcessService reportingProcessService;
     private final DataParser dataParser;
     private final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
-    private final LoanProductRepository loanProductRepository;
+    private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
 
 
@@ -123,15 +123,16 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
             return Collections.emptyList();
         }
         final Set<String> distinctProductNamesLower = incomeExpenseRecords.stream().map(AccountGLJournalEntryAnnualSummaryData::getProductName).filter(name -> name != null && !name.isBlank()).map(String::toLowerCase).collect(Collectors.toSet());
-        final Map<String, LoanProduct> productByName = loanProductRepository.findAllByNameIgnoreCase(distinctProductNamesLower).stream().collect(Collectors.toMap(p -> p.getName().toLowerCase(), p -> p, (a, b) -> a));
+        final Map<String, LoanProductLookupData> productByName = loanProductLookupReadPort.findAllByNameIgnoreCase(distinctProductNamesLower).stream().collect(Collectors.toMap(p -> p.getName().toLowerCase(), p -> p, (a, b) -> a));
         final Map<ProductOwnerKey, BigDecimal> retainedByProductAndOwner = incomeExpenseRecords.stream().collect(Collectors.toMap(r -> new ProductOwnerKey(r.getProductName(), r.getOwnerExternalId()), r -> Optional.ofNullable(r.getEndingBalanceAmount()).orElse(BigDecimal.ZERO), BigDecimal::add));
         final List<AccountGLJournalEntryAnnualSummaryData> retainedEarningRecords = createRetainedEarningRecords(retainedByProductAndOwner, incomeExpenseRecords, lastDayOfPreviousFiscalYear);
         final List<AccountGLJournalEntryAnnualSummaryData> allRecords = Stream.concat(incomeExpenseRecords.stream(), retainedEarningRecords.stream()).map(data -> {
-            LoanProduct loanProduct = data.getProductName() != null ? productByName.get(data.getProductName().toLowerCase()) : null;
+            LoanProductLookupData loanProduct = data.getProductName() != null ? productByName.get(data.getProductName().toLowerCase()) : null;
             if (loanProduct == null) {
                 return data;
             }
-            return data.toBuilder().productId(loanProduct.getId()).currencyCode(loanProduct.getCurrency().getCode()).build();
+            final String currencyCode = loanProduct.getCurrency() == null ? null : loanProduct.getCurrency().getCode();
+            return data.toBuilder().productId(loanProduct.getId()).currencyCode(currencyCode).build();
         }).collect(Collectors.toList());
         log.info("Retained earning processing complete: incomeExpenseOffsetRecords={}, retainedEarningRecords={}, totalRecordsToWrite={}, assetOwners={}", incomeExpenseRecords.size(), retainedEarningRecords.size(), allRecords.size(), distinctOwners);
         return allRecords;
@@ -187,11 +188,11 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
     }
 
     @java.lang.SuppressWarnings("all")
-        public RetainedEarningDataServiceImpl(final ReportingProcessService reportingProcessService, final DataParser dataParser, final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository, final LoanProductRepository loanProductRepository, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        public RetainedEarningDataServiceImpl(final ReportingProcessService reportingProcessService, final DataParser dataParser, final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository, final LoanProductLookupReadPort loanProductLookupReadPort, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
         this.reportingProcessService = reportingProcessService;
         this.dataParser = dataParser;
         this.retainedEarningSummaryRepository = retainedEarningSummaryRepository;
-        this.loanProductRepository = loanProductRepository;
+        this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.retainedEarningConfigurationService = retainedEarningConfigurationService;
     }
 }

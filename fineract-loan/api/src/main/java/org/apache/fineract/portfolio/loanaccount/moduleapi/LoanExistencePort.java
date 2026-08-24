@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
@@ -86,4 +87,19 @@ public interface LoanExistencePort {
      * Non-closed loan id for account number. Throws {@code LoanNotFoundException} when unknown.
      */
     Long requireNonClosedIdByAccountNumber(String accountNumber);
+
+    /**
+     * Nullable external-id lookup. Returns {@code null} when unknown.
+     */
+    Long findIdByExternalId(ExternalId externalId);
+
+    /**
+     * Loan id for a reschedule request. Returns {@code null} when unknown.
+     */
+    Long findIdByRescheduleRequestId(Long rescheduleRequestId);
+
+    /**
+     * Child loan ids of a GLIM account that is accepting children.
+     */
+    List<Long> findGlimChildLoanIds(Long glimAccountId);
 }

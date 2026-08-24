@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
@@ -33,6 +35,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -46,13 +49,19 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
     private final LoanTransactionRepository loanTransactionRepository;
     private final CalendarRepositoryWrapper calendarRepositoryWrapper;
     private final LoanWritePlatformService loanWritePlatformService;
+    private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
+    private final GLIMAccountInfoRepository glimAccountInfoRepository;
 
     public LoanExistencePortAdapter(final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository,
-            final CalendarRepositoryWrapper calendarRepositoryWrapper, @Lazy final LoanWritePlatformService loanWritePlatformService) {
+            final CalendarRepositoryWrapper calendarRepositoryWrapper, @Lazy final LoanWritePlatformService loanWritePlatformService,
+            final LoanRescheduleRequestRepository loanRescheduleRequestRepository,
+            final GLIMAccountInfoRepository glimAccountInfoRepository) {
         this.loanRepository = loanRepository;
         this.loanTransactionRepository = loanTransactionRepository;
         this.calendarRepositoryWrapper = calendarRepositoryWrapper;
         this.loanWritePlatformService = loanWritePlatformService;
+        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
+        this.glimAccountInfoRepository = glimAccountInfoRepository;
     }
 
     @Override
@@ -119,6 +128,23 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
             throw new LoanNotFoundException(accountNumber);
         }
         return loan.getId();
+    }
+
+    @Override
+    public Long findIdByExternalId(final ExternalId externalId) {
+        return loanRepository.findIdByExternalId(externalId);
+    }
+
+    @Override
+    public Long findIdByRescheduleRequestId(final Long rescheduleRequestId) {
+        return loanRescheduleRequestRepository.getLoanIdByRescheduleRequestId(rescheduleRequestId).orElse(null);
+    }
+
+    @Override
+    public List<Long> findGlimChildLoanIds(final Long glimAccountId) {
+        final List<Long> ids = glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true,
+                BigDecimal.valueOf(glimAccountId));
+        return ids == null ? List.of() : ids;
     }
 
     private Loan requireLoan(final Long loanId) {

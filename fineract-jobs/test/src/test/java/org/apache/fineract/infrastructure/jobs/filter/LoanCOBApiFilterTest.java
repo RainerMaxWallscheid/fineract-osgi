@@ -40,13 +40,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.cob.service.InlineLoanCOBExecutorServiceImpl;
@@ -58,9 +56,7 @@ import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.exception.UnAuthenticatedUserException;
 import org.apache.http.HttpStatus;
@@ -88,19 +84,15 @@ class LoanCOBApiFilterTest {
     @Mock
     private LoanAccountLockService loanAccountLockService;
     @Mock
-    private GLIMAccountInfoRepository glimAccountInfoRepository;
+    private LoanExistencePort existencePort;
     @Mock
     private PlatformSecurityContext context;
     @Mock
     private InlineLoanCOBExecutorServiceImpl inlineLoanCOBExecutorService;
     @Mock
-    private LoanRepository loanRepository;
-    @Mock
     private FineractProperties fineractProperties;
     @Mock
     private FineractProperties.FineractQueryProperties fineractQueryProperties;
-    @Mock
-    private LoanRescheduleRequestRepository loanRescheduleRequestRepository;
     @Mock
     private RetrieveLoanIdService retrieveIdService;
 
@@ -255,7 +247,7 @@ class LoanCOBApiFilterTest {
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
         given(loanAccountLockService.isAnyLoanHardLocked(List.of(2L))).willReturn(false);
         given(context.authenticatedUser()).willReturn(appUser);
-        given(loanRepository.findIdByExternalId(any())).willReturn(2L);
+        given(existencePort.findIdByExternalId(any())).willReturn(2L);
         given(fineractProperties.getQuery()).willReturn(fineractQueryProperties);
         given(fineractQueryProperties.getInClauseParameterSizeLimit()).willReturn(65000);
         given(retrieveIdService.retrieveLoanIdsBehindDate(eq(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE)),
@@ -286,7 +278,7 @@ class LoanCOBApiFilterTest {
         given(loanAccountLockService.isAnyLoanHardLocked(List.of(2L))).willReturn(false);
         given(fineractProperties.getQuery()).willReturn(fineractQueryProperties);
         given(fineractQueryProperties.getInClauseParameterSizeLimit()).willReturn(65000);
-        given(loanRescheduleRequestRepository.getLoanIdByRescheduleRequestId(resourceId)).willReturn(Optional.of(2L));
+        given(existencePort.findIdByRescheduleRequestId(resourceId)).willReturn(2L);
         given(context.authenticatedUser()).willReturn(appUser);
 
         given(retrieveIdService.retrieveLoanIdsBehindDate(eq(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE)),
@@ -439,8 +431,7 @@ class LoanCOBApiFilterTest {
         final byte[] cachedBody = new byte[0];
         given(request.getInputStream())
                 .willReturn(new BodyCachingHttpServletRequestWrapper.CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody)));
-        given(glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true, BigDecimal.valueOf(2)))
-                .willReturn(Collections.singletonList(loanId));
+        given(existencePort.findGlimChildLoanIds(2L)).willReturn(Collections.singletonList(loanId));
         given(loanAccountLockService.isAnyLoanHardLocked(List.of(loanId))).willReturn(true);
         given(response.getWriter()).willReturn(writer);
         given(context.authenticatedUser()).willReturn(appUser);

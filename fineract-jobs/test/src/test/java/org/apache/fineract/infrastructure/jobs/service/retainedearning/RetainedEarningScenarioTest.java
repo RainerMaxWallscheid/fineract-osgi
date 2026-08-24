@@ -35,8 +35,9 @@ import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.Acco
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.helper.DataParser;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.services.RetainedEarningDataServiceImpl;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -71,7 +72,7 @@ class RetainedEarningScenarioTest {
     private AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
 
     @Mock
-    private LoanProductRepository loanProductRepository;
+    private LoanProductLookupReadPort loanProductLookupReadPort;
 
     @Mock
     private RetainedEarningConfigurationService retainedEarningConfigurationService;
@@ -79,19 +80,14 @@ class RetainedEarningScenarioTest {
     @InjectMocks
     private RetainedEarningDataServiceImpl retainedEarningDataService;
 
-    @Mock
-    private LoanProduct loanProduct;
-
     private static final LocalDate FISCAL_YEAR_END = LocalDate.of(2023, 12, 31);
     private static final String RETAINED_EARNING_GL = "320000";
 
     private void setupConfigMocks() {
         when(retainedEarningConfigurationService.getIncomeExpenseGlAccounts()).thenReturn("400000-899999");
         when(retainedEarningConfigurationService.getRetainedEarningGlAccount()).thenReturn(RETAINED_EARNING_GL);
-        when(loanProductRepository.findAllByNameIgnoreCase(any())).thenReturn(List.of(loanProduct));
-        when(loanProduct.getId()).thenReturn(1L);
-        when(loanProduct.getName()).thenReturn("GPL_DE_PI30");
-        when(loanProduct.getCurrency()).thenReturn(new org.apache.fineract.organisation.monetary.domain.MonetaryCurrency("EUR", 2, null));
+        when(loanProductLookupReadPort.findAllByNameIgnoreCase(any()))
+                .thenReturn(List.of(LoanProductLookupData.lookupWithCurrency(1L, "GPL_DE_PI30", new CurrencyData("EUR"))));
     }
 
     /**

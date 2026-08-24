@@ -33,4 +33,9 @@ public interface LoanProductLookupReadPort {
     String nameById(Long loanProductId);
 
     String loanEnumerationValue(String typeName, int id);
+
+    /**
+     * Products whose names match {@code names} case-insensitively. Currency is populated.
+     */
+    Collection<LoanProductLookupData> findAllByNameIgnoreCase(Collection<String> names);
 }

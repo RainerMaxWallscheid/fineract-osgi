@@ -48,4 +48,9 @@ public final class OsgiLoanProductLookupReadPort implements LoanProductLookupRea
     public String loanEnumerationValue(final String typeName, final int id) {
         return null;
     }
+
+    @Override
+    public Collection<LoanProductLookupData> findAllByNameIgnoreCase(final Collection<String> names) {
+        return List.of();
+    }
 }

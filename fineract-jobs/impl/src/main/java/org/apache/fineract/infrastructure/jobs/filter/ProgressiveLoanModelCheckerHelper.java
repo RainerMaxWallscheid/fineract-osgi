@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
-import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -44,9 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher implements InitializingBean {
-    private final GLIMAccountInfoRepository glimAccountInfoRepository;
-    private final LoanRepository loanRepository;
-    private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
+    private final LoanExistencePort existencePort;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
     public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/catch-up");
@@ -59,9 +54,9 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
             String id = LOAN_PATH_PATTERN.matcher(pathInfo).replaceAll("$1");
             if (isExternal(pathInfo)) {
                 String externalId = id;
-                return loanRepository.findIdByExternalId(new ExternalId(externalId));
+                return existencePort.findIdByExternalId(new ExternalId(externalId));
             } else if (isRescheduleLoans(pathInfo)) {
-                return loanRescheduleRequestRepository.getLoanIdByRescheduleRequestId(Long.valueOf(id)).orElse(null);
+                return existencePort.findIdByRescheduleRequestId(Long.valueOf(id));
             } else if (StringUtils.isNumeric(id)) {
                 return Long.valueOf(id);
             } else {
@@ -90,7 +85,7 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
     }
 
     private List<Long> getGlimChildLoanIds(Long loanIdFromRequest) {
-        return glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true, BigDecimal.valueOf(loanIdFromRequest));
+        return existencePort.findGlimChildLoanIds(loanIdFromRequest);
     }
 
     @Override
@@ -172,9 +167,7 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProgressiveLoanModelCheckerHelper(final GLIMAccountInfoRepository glimAccountInfoRepository, final LoanRepository loanRepository, final LoanRescheduleRequestRepository loanRescheduleRequestRepository) {
-        this.glimAccountInfoRepository = glimAccountInfoRepository;
-        this.loanRepository = loanRepository;
-        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
+        public ProgressiveLoanModelCheckerHelper(final LoanExistencePort existencePort) {
+        this.existencePort = existencePort;
     }
 }

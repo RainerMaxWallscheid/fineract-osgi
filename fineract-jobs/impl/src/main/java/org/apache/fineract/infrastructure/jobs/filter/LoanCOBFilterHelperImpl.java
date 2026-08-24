@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,9 +44,7 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedException;
 import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Conditional;
@@ -61,14 +58,12 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
     /** Keep in sync with LoanCOBConstant.INLINE_LOAN_COB_JOB_NAME. */
     private static final String INLINE_LOAN_COB_JOB_NAME = "INLINE_LOAN_COB";
 
-    private final GLIMAccountInfoRepository glimAccountInfoRepository;
+    private final LoanExistencePort existencePort;
     private final AccountLockService<?> loanAccountLockService;
     private final PlatformSecurityContext context;
     private final InlineExecutorService<Long> inlineLoanCOBExecutorService;
-    private final LoanRepository loanRepository;
     private final FineractProperties fineractProperties;
     private final RetrieveLoanIdService retrieveIdService;
-    private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
     private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
     public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/catch-up");
     public static final Pattern LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/(?:reschedule)?loans/(?:external-id/)?([^/?]+).*");
@@ -80,9 +75,9 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
             String id = LOAN_PATH_PATTERN.matcher(pathInfo).replaceAll("$1");
             if (isExternal(pathInfo)) {
                 String externalId = id;
-                return loanRepository.findIdByExternalId(new ExternalId(externalId));
+                return existencePort.findIdByExternalId(new ExternalId(externalId));
             } else if (isRescheduleLoans(pathInfo)) {
-                return loanRescheduleRequestRepository.getLoanIdByRescheduleRequestId(Long.valueOf(id)).orElse(null);
+                return existencePort.findIdByRescheduleRequestId(Long.valueOf(id));
             } else if (StringUtils.isNumeric(id)) {
                 return Long.valueOf(id);
             } else {
@@ -116,7 +111,7 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
     }
 
     private List<Long> getGlimChildLoanIds(Long loanIdFromRequest) {
-        return glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true, BigDecimal.valueOf(loanIdFromRequest));
+        return existencePort.findGlimChildLoanIds(loanIdFromRequest);
     }
 
     private boolean isLoanHardLocked(Long... loanIds) {
@@ -225,18 +220,15 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCOBFilterHelperImpl(final GLIMAccountInfoRepository glimAccountInfoRepository,
+        public LoanCOBFilterHelperImpl(final LoanExistencePort existencePort,
             final @Qualifier("loanAccountLockService") AccountLockService<?> loanAccountLockService, final PlatformSecurityContext context,
             final @Qualifier("inlineLoanCOBExecutorServiceImpl") InlineExecutorService<Long> inlineLoanCOBExecutorService,
-            final LoanRepository loanRepository, final FineractProperties fineractProperties,
-            final RetrieveLoanIdService retrieveIdService, final LoanRescheduleRequestRepository loanRescheduleRequestRepository) {
-        this.glimAccountInfoRepository = glimAccountInfoRepository;
+            final FineractProperties fineractProperties, final RetrieveLoanIdService retrieveIdService) {
+        this.existencePort = existencePort;
         this.loanAccountLockService = loanAccountLockService;
         this.context = context;
         this.inlineLoanCOBExecutorService = inlineLoanCOBExecutorService;
-        this.loanRepository = loanRepository;
         this.fineractProperties = fineractProperties;
         this.retrieveIdService = retrieveIdService;
-        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
     }
 }

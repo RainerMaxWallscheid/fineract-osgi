@@ -28,9 +28,7 @@ import org.apache.fineract.cob.service.RetrieveIdService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class LoanCOBFilterHelperTest {
 
     @Mock
-    private GLIMAccountInfoRepository glimAccountInfoRepository;
+    private LoanExistencePort existencePort;
     @Mock
     private LoanAccountLockService loanAccountLockService;
     @Mock
@@ -52,14 +50,9 @@ public class LoanCOBFilterHelperTest {
     @Mock
     private InlineLoanCOBExecutorServiceImpl inlineLoanCOBExecutorService;
     @Mock
-    private LoanRepository loanRepository;
-    @Mock
     private FineractProperties fineractProperties;
     @Mock
     private RetrieveIdService retrieveIdService;
-
-    @Mock
-    private LoanRescheduleRequestRepository loanRescheduleRequestRepository;
 
     @InjectMocks
     private LoanCOBFilterHelperImpl helper;
