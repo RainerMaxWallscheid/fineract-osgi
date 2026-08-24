@@ -26,7 +26,6 @@ fineract-loan/impl/dependencies.gradle	fineract-cob-impl
 fineract-notification/impl/dependencies.gradle	fineract-event-impl
 fineract-notification/impl/dependencies.gradle	fineract-loan-impl
 fineract-notification/impl/dependencies.gradle	fineract-savings-impl
-fineract-progressive-loan/impl/dependencies.gradle	fineract-clients-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-note-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-accounting-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-loan-impl

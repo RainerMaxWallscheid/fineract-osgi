@@ -33,7 +33,6 @@ dependencies {
     implementation(project(path: ':fineract-postdatedchecks-api'))
     // Client pure ports/DTOs (entity residual stays in core)
     implementation(project(path: ':fineract-clients-api'))
-    implementation(project(path: ':fineract-clients-impl'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     // Share product/account ports and pure DTOs

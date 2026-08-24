@@ -20,6 +20,7 @@
 dependencies {
     // ClientData residual + kernel types
     api project(path: ':fineract-core')
+    implementation(project(path: ':fineract-validation'))
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
@@ -28,4 +29,7 @@ dependencies {
     compileOnly 'org.mapstruct:mapstruct'
     compileOnly 'org.springframework:spring-tx'
     compileOnly 'org.springframework:spring-context'
+    compileOnly 'com.google.code.gson:gson'
+    compileOnly 'org.apache.commons:commons-lang3'
+    compileOnly 'jakarta.validation:jakarta.validation-api'
 }
