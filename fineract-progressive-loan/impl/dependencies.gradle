@@ -39,7 +39,6 @@ dependencies {
     implementation(project(path: ':fineract-group-impl'))
     // Share product/account ports and pure DTOs
     implementation(project(path: ':fineract-shares-api'))
-    implementation(project(path: ':fineract-shares-impl'))
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
     // Collection sheet ports/DTOs/commands + deserializers/validator/read (write impl residual here)
