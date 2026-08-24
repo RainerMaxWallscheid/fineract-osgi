@@ -38,7 +38,6 @@ dependencies {
     // Interop domain enums live in interoperation-api; entity residual in savings-impl
     implementation(project(path: ':fineract-interoperation-api'))
     implementation(project(path: ':fineract-cob-api'))
-    implementation(project(path: ':fineract-cob-impl'))
     implementation(project(path: ':fineract-accounting-api'))
     implementation(project(path: ':fineract-accounting-impl'))
     implementation(project(path: ':fineract-charge-api'))

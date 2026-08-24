@@ -18,9 +18,7 @@
  */
 package org.apache.fineract.cob;
 
-import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-
-public interface COBBusinessStep<T extends AbstractPersistableCustom<Long>> {
+public interface COBBusinessStep<T> {
 
     T execute(T input);
 
