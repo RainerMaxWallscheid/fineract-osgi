@@ -31,12 +31,16 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.cob.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'COB contracts (ports, pure DTOs, exceptions)',
-                'Export-Package': 'org.apache.fineract.cob.data,'
+                'Export-Package': 'org.apache.fineract.cob,'
+                        + 'org.apache.fineract.cob.conditions,'
+                        + 'org.apache.fineract.cob.data,'
                         + 'org.apache.fineract.cob.domain,'
                         + 'org.apache.fineract.cob.exceptions,'
                         + 'org.apache.fineract.cob.loan,'
                         + 'org.apache.fineract.cob.service',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
+                        + 'org.apache.fineract.infrastructure.core.condition,'
+                        + 'org.apache.fineract.infrastructure.core.config,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + 'org.apache.fineract.infrastructure.core.domain,'
                         + 'org.apache.fineract.infrastructure.core.exception,'

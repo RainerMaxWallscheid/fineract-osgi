@@ -19,9 +19,8 @@
 package org.apache.fineract.cob.service;
 
 import java.util.List;
-import org.apache.fineract.cob.domain.AccountLock;
 
-public interface AccountLockService<T extends AccountLock> {
+public interface AccountLockService<T> {
 
     List<T> getLockedLoanAccountByPage(int page, int limit);
 

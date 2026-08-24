@@ -25,7 +25,6 @@ dependencies {
     implementation(project(path: ':fineract-security-api'))
     implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-cob-api'))
-    implementation(project(path: ':fineract-cob-impl'))
     // SpringBatchJobConstants on COB job parameter provider
     implementation(project(path: ':fineract-springbatch-api'))
     implementation(project(path: ':fineract-accounting-api'))
