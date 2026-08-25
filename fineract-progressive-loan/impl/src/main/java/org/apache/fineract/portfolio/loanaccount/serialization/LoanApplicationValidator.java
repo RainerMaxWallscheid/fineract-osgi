@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
@@ -54,12 +53,7 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityRelation;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityRelationRepository;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityToEntityMapping;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityToEntityMappingRepository;
-import org.apache.fineract.infrastructure.entityaccess.exception.NotOfficeSpecificProductException;
+import org.apache.fineract.infrastructure.entityaccess.service.OfficeProductRestrictionService;
 import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.holiday.domain.HolidayRepository;
 import org.apache.fineract.organisation.holiday.domain.HolidayStatusType;
@@ -159,8 +153,7 @@ public final class LoanApplicationValidator {
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanProductDataValidator loanProductDataValidator;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
-    private final FineractEntityToEntityMappingRepository entityMappingRepository;
-    private final FineractEntityRelationRepository fineractEntityRelationRepository;
+    private final OfficeProductRestrictionService officeProductRestrictionService;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
     private final LoanCollateralAssembler collateralAssembler;
@@ -1286,14 +1279,7 @@ public final class LoanApplicationValidator {
     }
 
     private void officeSpecificLoanProductValidation(final Long productId, final Long officeId) {
-        final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository.findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.OFFICE_SPECIFIC_PRODUCTS_ENABLED);
-        if (restrictToUserOfficeProperty.isEnabled()) {
-            FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepository.findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.getStr());
-            FineractEntityToEntityMapping officeToLoanProductMappingList = this.entityMappingRepository.findListByProductId(fineractEntityRelation, productId, officeId);
-            if (officeToLoanProductMappingList == null) {
-                throw new NotOfficeSpecificProductException(productId, officeId);
-            }
-        }
+        this.officeProductRestrictionService.validateOfficeHasAccessToLoanProduct(productId, officeId);
     }
 
     private void validateTransactionProcessingStrategy(final String transactionProcessingStrategy, final LoanProduct loanProduct) {
@@ -1604,7 +1590,7 @@ public final class LoanApplicationValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final FineractEntityToEntityMappingRepository entityMappingRepository, final FineractEntityRelationRepository fineractEntityRelationRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
+        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanScheduleValidator = loanScheduleValidator;
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
@@ -1617,8 +1603,7 @@ public final class LoanApplicationValidator {
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanProductDataValidator = loanProductDataValidator;
         this.globalConfigurationRepository = globalConfigurationRepository;
-        this.entityMappingRepository = entityMappingRepository;
-        this.fineractEntityRelationRepository = fineractEntityRelationRepository;
+        this.officeProductRestrictionService = officeProductRestrictionService;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanProductReadPlatformService = loanProductReadPlatformService;
         this.collateralAssembler = collateralAssembler;

@@ -30,6 +30,7 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityRela
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityToEntityMapping;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityToEntityMappingRepository;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
+import org.apache.fineract.infrastructure.entityaccess.exception.NotOfficeSpecificProductException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,21 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
     public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType fineractEntityType) {
         return this.fineractEntityAccessReadService
                 .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(fineractEntityType);
+    }
+
+    @Override
+    public void validateOfficeHasAccessToLoanProduct(final Long productId, final Long officeId) {
+        final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository
+                .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.OFFICE_SPECIFIC_PRODUCTS_ENABLED);
+        if (restrictToUserOfficeProperty.isEnabled()) {
+            final FineractEntityRelation fineractEntityRelation = this.fineractEntityRelationRepositoryWrapper
+                    .findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.getStr());
+            final FineractEntityToEntityMapping officeToLoanProductMapping = this.fineractEntityToEntityMappingRepository
+                    .findListByProductId(fineractEntityRelation, productId, officeId);
+            if (officeToLoanProductMapping == null) {
+                throw new NotOfficeSpecificProductException(productId, officeId);
+            }
+        }
     }
 
 }

@@ -31,4 +31,10 @@ public interface OfficeProductRestrictionService {
             Long productOrChargeId);
 
     String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType fineractEntityType);
+
+    /**
+     * Throws {@code NotOfficeSpecificProductException} when office-specific products
+     * are enabled and {@code officeId} has no mapping to {@code productId}.
+     */
+    void validateOfficeHasAccessToLoanProduct(Long productId, Long officeId);
 }
