@@ -35,8 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummary;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
+import org.apache.fineract.accounting.moduleapi.AnnualJournalSummaryPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableExportTargetParameter;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningConfigurationService;
@@ -57,7 +56,7 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningDataServiceImpl.class);
     private final ReportingProcessService reportingProcessService;
     private final DataParser dataParser;
-    private final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
+    private final AnnualJournalSummaryPort annualJournalSummaryPort;
     private final LoanProductLookupReadPort loanProductLookupReadPort;
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
 
@@ -71,20 +70,13 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
             log.warn("No retained earning summaries provided for insertion, skipping batch save.");
             return;
         }
-        List<AccountGLJournalEntryAnnualSummary> entities = retainedEarningSummaries.stream().map(this::convertToRetainedEarningSummary).toList();
-        retainedEarningSummaryRepository.saveAll(entities);
+        annualJournalSummaryPort.saveAll(retainedEarningSummaries.stream().map(this::toWrite).toList());
     }
 
-    private AccountGLJournalEntryAnnualSummary convertToRetainedEarningSummary(final AccountGLJournalEntryAnnualSummaryData summaryDTO) {
-        AccountGLJournalEntryAnnualSummary entrySummary = new AccountGLJournalEntryAnnualSummary();
-        entrySummary.setProductId(summaryDTO.getProductId());
-        entrySummary.setGlCode(String.valueOf(summaryDTO.getGlAccountCode()));
-        entrySummary.setOfficeId(summaryDTO.getOfficeId());
-        entrySummary.setOwnerExternalId(summaryDTO.getOwnerExternalId());
-        entrySummary.setOpeningBalanceAmount(summaryDTO.getOpeningBalanceAmount());
-        entrySummary.setYearEndDate(summaryDTO.getYearEndDate());
-        entrySummary.setCurrencyCode(summaryDTO.getCurrencyCode());
-        return entrySummary;
+    private AnnualJournalSummaryPort.AnnualJournalSummaryWrite toWrite(final AccountGLJournalEntryAnnualSummaryData summaryDTO) {
+        return new AnnualJournalSummaryPort.AnnualJournalSummaryWrite(String.valueOf(summaryDTO.getGlAccountCode()),
+                summaryDTO.getProductId(), summaryDTO.getOfficeId(), summaryDTO.getOpeningBalanceAmount(), summaryDTO.getCurrencyCode(),
+                summaryDTO.getOwnerExternalId(), summaryDTO.getYearEndDate());
     }
 
     @Override
@@ -188,10 +180,10 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
     }
 
     @java.lang.SuppressWarnings("all")
-        public RetainedEarningDataServiceImpl(final ReportingProcessService reportingProcessService, final DataParser dataParser, final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository, final LoanProductLookupReadPort loanProductLookupReadPort, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        public RetainedEarningDataServiceImpl(final ReportingProcessService reportingProcessService, final DataParser dataParser, final AnnualJournalSummaryPort annualJournalSummaryPort, final LoanProductLookupReadPort loanProductLookupReadPort, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
         this.reportingProcessService = reportingProcessService;
         this.dataParser = dataParser;
-        this.retainedEarningSummaryRepository = retainedEarningSummaryRepository;
+        this.annualJournalSummaryPort = annualJournalSummaryPort;
         this.loanProductLookupReadPort = loanProductLookupReadPort;
         this.retainedEarningConfigurationService = retainedEarningConfigurationService;
     }

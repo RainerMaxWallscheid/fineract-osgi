@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
+import org.apache.fineract.accounting.moduleapi.AnnualJournalSummaryPort;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.helper.DataParser;
@@ -69,7 +69,7 @@ class RetainedEarningScenarioTest {
     private DataParser dataParser;
 
     @Mock
-    private AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
+    private AnnualJournalSummaryPort annualJournalSummaryPort;
 
     @Mock
     private LoanProductLookupReadPort loanProductLookupReadPort;

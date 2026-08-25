@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
+import org.apache.fineract.accounting.moduleapi.AnnualJournalSummaryPort;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
@@ -48,7 +48,7 @@ public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntr
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningJobWriter.class);
     private final RetainedEarningDataService retainedEarningDataService;
-    private final AccountGLJournalEntryAnnualSummaryRepository annualSummaryRepository;
+    private final AnnualJournalSummaryPort annualJournalSummaryPort;
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
     private boolean shouldWrite;
 
@@ -56,7 +56,7 @@ public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntr
     public void beforeStep(StepExecution stepExecution) {
         final LocalDate currentDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE);
         final LocalDate lastDayOfPreviousFiscalYear = retainedEarningConfigurationService.getLastDayOfPreviousFiscalYear(currentDate);
-        final boolean entriesExist = !annualSummaryRepository.findByYearEndDate(lastDayOfPreviousFiscalYear).isEmpty();
+        final boolean entriesExist = annualJournalSummaryPort.existsByYearEndDate(lastDayOfPreviousFiscalYear);
         if (entriesExist) {
             shouldWrite = false;
             log.info("Retained earning Writer: entries already exist for yearEndDate={}. Will run as dry run.", lastDayOfPreviousFiscalYear);
@@ -86,9 +86,9 @@ public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntr
     }
 
     @java.lang.SuppressWarnings("all")
-        public RetainedEarningJobWriter(final RetainedEarningDataService retainedEarningDataService, final AccountGLJournalEntryAnnualSummaryRepository annualSummaryRepository, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        public RetainedEarningJobWriter(final RetainedEarningDataService retainedEarningDataService, final AnnualJournalSummaryPort annualJournalSummaryPort, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
         this.retainedEarningDataService = retainedEarningDataService;
-        this.annualSummaryRepository = annualSummaryRepository;
+        this.annualJournalSummaryPort = annualJournalSummaryPort;
         this.retainedEarningConfigurationService = retainedEarningConfigurationService;
     }
 }

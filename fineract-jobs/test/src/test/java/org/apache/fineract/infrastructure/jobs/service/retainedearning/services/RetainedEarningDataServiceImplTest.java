@@ -35,8 +35,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummary;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
+import org.apache.fineract.accounting.moduleapi.AnnualJournalSummaryPort;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningConfigurationService;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
@@ -61,7 +60,7 @@ class RetainedEarningDataServiceImplTest {
     private DataParser dataParser;
 
     @Mock
-    private AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
+    private AnnualJournalSummaryPort annualJournalSummaryPort;
 
     @Mock
     private LoanProductLookupReadPort loanProductLookupReadPort;
@@ -82,20 +81,20 @@ class RetainedEarningDataServiceImplTest {
         retainedEarningDataService.insertRetainedEarningSummaryBatch(summaries);
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<AccountGLJournalEntryAnnualSummary>> captor = ArgumentCaptor.forClass(List.class);
-        verify(retainedEarningSummaryRepository).saveAll(captor.capture());
+        ArgumentCaptor<List<AnnualJournalSummaryPort.AnnualJournalSummaryWrite>> captor = ArgumentCaptor.forClass(List.class);
+        verify(annualJournalSummaryPort).saveAll(captor.capture());
 
-        List<AccountGLJournalEntryAnnualSummary> savedEntities = captor.getValue();
+        List<AnnualJournalSummaryPort.AnnualJournalSummaryWrite> savedEntities = captor.getValue();
         assertEquals(1, savedEntities.size());
 
-        AccountGLJournalEntryAnnualSummary entity = savedEntities.get(0);
-        assertEquals("400001", entity.getGlCode());
-        assertEquals(10L, entity.getProductId());
-        assertEquals(1L, entity.getOfficeId());
-        assertEquals(ExternalIdFactory.produce("OWNER1"), entity.getOwnerExternalId());
-        assertEquals(new BigDecimal("1000.50"), entity.getOpeningBalanceAmount());
-        assertEquals(yearEndDate, entity.getYearEndDate());
-        assertEquals("USD", entity.getCurrencyCode());
+        AnnualJournalSummaryPort.AnnualJournalSummaryWrite entity = savedEntities.get(0);
+        assertEquals("400001", entity.glCode());
+        assertEquals(10L, entity.productId());
+        assertEquals(1L, entity.officeId());
+        assertEquals(ExternalIdFactory.produce("OWNER1"), entity.ownerExternalId());
+        assertEquals(new BigDecimal("1000.50"), entity.openingBalanceAmount());
+        assertEquals(yearEndDate, entity.yearEndDate());
+        assertEquals("USD", entity.currencyCode());
     }
 
     @Test
@@ -112,21 +111,21 @@ class RetainedEarningDataServiceImplTest {
         retainedEarningDataService.insertRetainedEarningSummaryBatch(summaries);
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<AccountGLJournalEntryAnnualSummary>> captor = ArgumentCaptor.forClass(List.class);
-        verify(retainedEarningSummaryRepository).saveAll(captor.capture());
+        ArgumentCaptor<List<AnnualJournalSummaryPort.AnnualJournalSummaryWrite>> captor = ArgumentCaptor.forClass(List.class);
+        verify(annualJournalSummaryPort).saveAll(captor.capture());
         assertEquals(2, captor.getValue().size());
     }
 
     @Test
     void shouldSkipSaveWhenEmptyBatch() {
         retainedEarningDataService.insertRetainedEarningSummaryBatch(List.of());
-        verifyNoInteractions(retainedEarningSummaryRepository);
+        verifyNoInteractions(annualJournalSummaryPort);
     }
 
     @Test
     void shouldSkipSaveWhenNullBatch() {
         retainedEarningDataService.insertRetainedEarningSummaryBatch(null);
-        verifyNoInteractions(retainedEarningSummaryRepository);
+        verifyNoInteractions(annualJournalSummaryPort);
     }
 
     @Test
@@ -206,11 +205,11 @@ class RetainedEarningDataServiceImplTest {
         retainedEarningDataService.insertRetainedEarningSummaryBatch(summaries);
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<AccountGLJournalEntryAnnualSummary>> captor = ArgumentCaptor.forClass(List.class);
-        verify(retainedEarningSummaryRepository).saveAll(captor.capture());
+        ArgumentCaptor<List<AnnualJournalSummaryPort.AnnualJournalSummaryWrite>> captor = ArgumentCaptor.forClass(List.class);
+        verify(annualJournalSummaryPort).saveAll(captor.capture());
 
-        AccountGLJournalEntryAnnualSummary entity = captor.getValue().get(0);
-        assertEquals(null, entity.getCurrencyCode());
+        AnnualJournalSummaryPort.AnnualJournalSummaryWrite entity = captor.getValue().get(0);
+        assertEquals(null, entity.currencyCode());
     }
 
     private Response mockOkResponse(String body) {

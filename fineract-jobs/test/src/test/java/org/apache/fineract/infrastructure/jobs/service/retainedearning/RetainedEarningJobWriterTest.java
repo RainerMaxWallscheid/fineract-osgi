@@ -35,8 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummary;
-import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
+import org.apache.fineract.accounting.moduleapi.AnnualJournalSummaryPort;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
@@ -59,7 +58,7 @@ class RetainedEarningJobWriterTest {
     private RetainedEarningDataService retainedEarningDataService;
 
     @Mock
-    private AccountGLJournalEntryAnnualSummaryRepository annualSummaryRepository;
+    private AnnualJournalSummaryPort annualJournalSummaryPort;
 
     @Mock
     private RetainedEarningConfigurationService retainedEarningConfigurationService;
@@ -86,7 +85,7 @@ class RetainedEarningJobWriterTest {
         setBusinessDate(businessDate);
         LocalDate fiscalEnd = LocalDate.of(businessDate.getYear() - 1, 12, 31);
         when(retainedEarningConfigurationService.getLastDayOfPreviousFiscalYear(businessDate)).thenReturn(fiscalEnd);
-        when(annualSummaryRepository.findByYearEndDate(fiscalEnd)).thenReturn(Collections.emptyList());
+        when(annualJournalSummaryPort.existsByYearEndDate(fiscalEnd)).thenReturn(false);
         retainedEarningJobWriter.beforeStep(stepExecution);
     }
 
@@ -154,7 +153,7 @@ class RetainedEarningJobWriterTest {
         setBusinessDate(businessDate);
         LocalDate fiscalEnd = LocalDate.of(businessDate.getYear() - 1, 12, 31);
         when(retainedEarningConfigurationService.getLastDayOfPreviousFiscalYear(businessDate)).thenReturn(fiscalEnd);
-        when(annualSummaryRepository.findByYearEndDate(fiscalEnd)).thenReturn(List.of(new AccountGLJournalEntryAnnualSummary()));
+        when(annualJournalSummaryPort.existsByYearEndDate(fiscalEnd)).thenReturn(true);
         retainedEarningJobWriter.beforeStep(stepExecution);
 
         List<AccountGLJournalEntryAnnualSummaryData> testItems = createTestData();
