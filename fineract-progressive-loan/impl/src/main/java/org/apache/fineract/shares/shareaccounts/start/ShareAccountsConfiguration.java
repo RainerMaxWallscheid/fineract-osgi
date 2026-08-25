@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.shares.shareaccounts.start;
 
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.accounting.moduleapi.SharesJournalPort;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
@@ -113,10 +113,10 @@ public class ShareAccountsConfiguration {
     public ShareAccountWritePlatformService shareAccountWritePlatformService(ShareAccountDataSerializer accountDataSerializer,
             ShareAccountRepositoryWrapper shareAccountRepository, ShareProductRepositoryWrapper shareProductRepository,
             AccountNumberGenerator accountNumberGenerator, AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
-            JournalEntryWritePlatformService journalEntryWritePlatformService, NoteRepository noteRepository,
+            SharesJournalPort sharesJournalPort, NoteRepository noteRepository,
             BusinessEventNotifierService businessEventNotifierService) {
         return new ShareAccountWritePlatformServiceJpaRepositoryImpl(accountDataSerializer, shareAccountRepository, shareProductRepository,
-                accountNumberGenerator, accountNumberFormatRepository, journalEntryWritePlatformService, noteRepository,
+                accountNumberGenerator, accountNumberFormatRepository, sharesJournalPort, noteRepository,
                 businessEventNotifierService);
     }
 }

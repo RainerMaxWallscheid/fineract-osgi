@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.cob.service.AccountLockService;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -114,8 +113,6 @@ class LoanAdjustmentServiceImplTest {
     private LoanTransactionRelationRepository loanTransactionRelationRepository;
     @Mock
     private LoanAssembler loanAssembler;
-    @Mock
-    private JournalEntryWritePlatformService journalEntryWritePlatformService;
     @Mock
     private CalendarInstanceRepository calendarInstanceRepository;
     @Mock

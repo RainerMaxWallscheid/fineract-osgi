@@ -33,7 +33,6 @@ dependencies {
     testImplementation(project(path: ':fineract-clients-impl'))
     testImplementation(project(path: ':fineract-group-api'))
     testImplementation(project(path: ':fineract-accounting-api'))
-    testImplementation(project(path: ':fineract-accounting-impl'))
     testImplementation(project(path: ':fineract-charge-api'))
     testImplementation(project(path: ':fineract-charge-impl'))
     testImplementation(project(path: ':fineract-dataqueries-impl'))

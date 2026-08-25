@@ -33,7 +33,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Stream;
-import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -45,7 +44,9 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
+
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountService;
@@ -136,9 +137,6 @@ class LoanChargeWritePlatformServiceImplTest {
     private MonetaryCurrency monetaryCurrency;
 
     @Mock
-    private JournalEntryWritePlatformService journalEntryWritePlatformService;
-
-    @Mock
     private LoanChargeValidator loanChargeValidator;
 
     @Mock
@@ -168,9 +166,19 @@ class LoanChargeWritePlatformServiceImplTest {
     @Mock
     private LoanScheduleService loanScheduleService;
 
+    @Mock
+    private ClientActivePort clientActivePort;
+
+    @Mock
+    private GroupActivePort groupActivePort;
+
     @BeforeEach
     void setUp() {
+        loanChargeWritePlatformService.setClientActivePort(clientActivePort);
+        loanChargeWritePlatformService.setGroupActivePort(groupActivePort);
         when(loanAssembler.assembleFrom(LOAN_ID)).thenReturn(loan);
+        when(clientActivePort.isActive(anyLong())).thenReturn(true);
+        when(groupActivePort.isActive(anyLong())).thenReturn(true);
         when(chargeDefinitionPort.getActiveCharge(anyLong())).thenReturn(chargeDefinition);
         when(chargeDefinition.getChargeTimeType()).thenReturn(SPECIFIED_DUE_DATE);
         when(chargeDefinition.getChargeCalculationType()).thenReturn(1); // FLAT
@@ -204,7 +212,6 @@ class LoanChargeWritePlatformServiceImplTest {
         when(loan.isCashBasedAccountingEnabledOnLoanProduct()).thenReturn(false);
         when(loan.isUpfrontAccrualAccountingEnabledOnLoanProduct()).thenReturn(false);
 
-        doNothing().when(journalEntryWritePlatformService).createJournalEntriesForLoan(any(AccountingBridgeDataDTO.class));
         doNothing().when(loanChargeService).addLoanCharge(any(Loan.class), any(LoanCharge.class));
     }
 
