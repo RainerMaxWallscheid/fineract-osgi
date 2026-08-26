@@ -76,6 +76,7 @@ jar {
                         + 'org.apache.fineract.infrastructure.core.domain,'
                         + 'org.apache.fineract.infrastructure.core.exception,'
                         + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain,'
                         + 'org.apache.fineract.organisation.monetary.data,'
                         + 'org.apache.fineract.organisation.office.data,'
                         + 'org.apache.fineract.portfolio,'

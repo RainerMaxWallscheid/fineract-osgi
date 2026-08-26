@@ -16,17 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.business.domain.journalentry;
+package org.apache.fineract.accounting.moduleapi;
 
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
+import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.NoExternalEvent;
 
-public class LoanJournalEntryCreatedBusinessEvent extends JournalEntryBusinessEvent implements NoExternalEvent {
+/**
+ * Loan journal-created event wrapping journal-entry and loan-transaction ids
+ * (no leftover {@code JournalEntry} JPA on accounting-api).
+ */
+public class LoanJournalEntryCreatedBusinessEvent extends AbstractBusinessEvent<Long> implements NoExternalEvent {
 
     private static final String TYPE = "JournalEntryCreatedBusinessEvent";
+    private static final String CATEGORY = "Accounting";
 
-    public LoanJournalEntryCreatedBusinessEvent(JournalEntry value) {
-        super(value);
+    private final Long loanTransactionId;
+
+    public LoanJournalEntryCreatedBusinessEvent(final Long journalEntryId, final Long loanTransactionId) {
+        super(journalEntryId);
+        this.loanTransactionId = loanTransactionId;
     }
 
     @Override
@@ -35,7 +43,12 @@ public class LoanJournalEntryCreatedBusinessEvent extends JournalEntryBusinessEv
     }
 
     @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
     public Long getAggregateRootId() {
-        return get().getLoanTransactionId();
+        return loanTransactionId;
     }
 }

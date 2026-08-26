@@ -146,11 +146,19 @@ public class AccountingServiceImpl implements AccountingService {
 
     @Override
     public void createMappingToOwner(final ExternalAssetOwner owner, final Object journalEntry) {
-        if (owner == null) {
+        if (journalEntry == null) {
+            return;
+        }
+        createMappingToOwner(owner, (Long) ((AbstractPersistableCustom<?>) journalEntry).getId());
+    }
+
+    @Override
+    public void createMappingToOwner(final ExternalAssetOwner owner, final Long journalEntryId) {
+        if (owner == null || journalEntryId == null) {
             return;
         }
         ExternalAssetOwnerJournalEntryMapping mapping = new ExternalAssetOwnerJournalEntryMapping();
-        mapping.setJournalEntryId((Long) ((AbstractPersistableCustom<?>) journalEntry).getId());
+        mapping.setJournalEntryId(journalEntryId);
         mapping.setOwner(owner);
         externalAssetOwnerJournalEntryMappingRepository.saveAndFlush(mapping);
     }

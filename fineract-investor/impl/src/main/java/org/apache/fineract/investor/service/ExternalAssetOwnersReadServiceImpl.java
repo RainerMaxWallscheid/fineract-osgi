@@ -20,8 +20,6 @@ package org.apache.fineract.investor.service;
 
 import java.util.List;
 import java.util.Optional;
-import org.apache.fineract.accounting.journalentry.JournalEntryMapper;
-import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
@@ -53,7 +51,6 @@ public class ExternalAssetOwnersReadServiceImpl implements ExternalAssetOwnersRe
     private final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository;
     private final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository;
     private final ExternalAssetOwnersTransferMapper mapper;
-    private final JournalEntryMapper journalEntryMapper;
     private final ExternalOwnerTransferJournalPort transferJournalPort;
     private final ExternalAssetOwnerRepository externalAssetOwnerRepository;
 
@@ -94,7 +91,7 @@ public class ExternalAssetOwnersReadServiceImpl implements ExternalAssetOwnersRe
         Page<ExternalAssetOwnerTransferJournalEntryMapping> result = externalAssetOwnerTransferJournalEntryMappingRepository.findByTransferId(transferId, pageRequest);
         ExternalOwnerTransferJournalEntryData mappedResult = new ExternalOwnerTransferJournalEntryData();
         if (result.hasContent()) {
-            mappedResult.setJournalEntryData(result.map(entry -> journalEntryMapper.map((JournalEntry) transferJournalPort.journalEntryById(entry.getJournalEntryId()))));
+            mappedResult.setJournalEntryData(result.map(entry -> transferJournalPort.journalEntryById(entry.getJournalEntryId())));
             mappedResult.setTransferData(mapper.mapTransfer(result.stream().findFirst().get().getOwnerTransfer()));
         }
         return mappedResult;
@@ -106,7 +103,7 @@ public class ExternalAssetOwnersReadServiceImpl implements ExternalAssetOwnersRe
         Page<ExternalAssetOwnerJournalEntryMapping> result = externalAssetOwnerJournalEntryMappingRepository.findByExternalOwnerId(ExternalIdFactory.produce(ownerExternalId), pageRequest);
         ExternalOwnerJournalEntryData mappedResult = new ExternalOwnerJournalEntryData();
         if (result.hasContent()) {
-            mappedResult.setJournalEntryData(result.map(entry -> journalEntryMapper.map((JournalEntry) transferJournalPort.journalEntryById(entry.getJournalEntryId()))));
+            mappedResult.setJournalEntryData(result.map(entry -> transferJournalPort.journalEntryById(entry.getJournalEntryId())));
             mappedResult.setOwnerData(mapper.mapOwner(result.stream().findFirst().get().getOwner()));
         }
         return mappedResult;
@@ -143,13 +140,12 @@ public class ExternalAssetOwnersReadServiceImpl implements ExternalAssetOwnersRe
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExternalAssetOwnersReadServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnersTransferMapper mapper, final JournalEntryMapper journalEntryMapper, final ExternalOwnerTransferJournalPort transferJournalPort, final ExternalAssetOwnerRepository externalAssetOwnerRepository) {
+        public ExternalAssetOwnersReadServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalAssetOwnerTransferJournalEntryMappingRepository externalAssetOwnerTransferJournalEntryMappingRepository, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnersTransferMapper mapper, final ExternalOwnerTransferJournalPort transferJournalPort, final ExternalAssetOwnerRepository externalAssetOwnerRepository) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
         this.externalAssetOwnerTransferJournalEntryMappingRepository = externalAssetOwnerTransferJournalEntryMappingRepository;
         this.externalAssetOwnerJournalEntryMappingRepository = externalAssetOwnerJournalEntryMappingRepository;
         this.mapper = mapper;
-        this.journalEntryMapper = journalEntryMapper;
         this.transferJournalPort = transferJournalPort;
         this.externalAssetOwnerRepository = externalAssetOwnerRepository;
     }

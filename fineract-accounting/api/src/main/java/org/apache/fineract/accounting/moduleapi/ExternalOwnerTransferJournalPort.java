@@ -20,6 +20,7 @@ package org.apache.fineract.accounting.moduleapi;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 
 /**
  * Object-typed external-owner transfer journal posting (ADR-021). Lives on
@@ -66,8 +67,8 @@ public interface ExternalOwnerTransferJournalPort {
     Object chargeOffGlAccount(Long loanProductId, int productTypeValue, Long chargeOffReasonId);
 
     /**
-     * Journal entry by id as {@code Object} so investor owner mapping need not
-     * call leftover {@code JournalEntryRepository.findById}.
+     * Journal entry DTO by id so investor read need not map leftover
+     * {@code JournalEntry}.
      */
-    Object journalEntryById(Long journalEntryId);
+    JournalEntryData journalEntryById(Long journalEntryId);
 }

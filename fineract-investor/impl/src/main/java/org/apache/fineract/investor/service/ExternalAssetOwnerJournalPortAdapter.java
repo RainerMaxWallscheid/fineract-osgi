@@ -19,14 +19,11 @@
 package org.apache.fineract.investor.service;
 
 import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
-import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.exception.ExternalAssetOwnerNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,18 +31,11 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
 
     private final ExternalAssetOwnerRepository externalAssetOwnerRepository;
     private final AccountingService accountingService;
-    private ExternalOwnerTransferJournalPort transferJournalPort;
 
     public ExternalAssetOwnerJournalPortAdapter(final ExternalAssetOwnerRepository externalAssetOwnerRepository,
             final AccountingService accountingService) {
         this.externalAssetOwnerRepository = externalAssetOwnerRepository;
         this.accountingService = accountingService;
-    }
-
-    @Autowired
-    @Lazy
-    public void setExternalOwnerTransferJournalPort(final ExternalOwnerTransferJournalPort transferJournalPort) {
-        this.transferJournalPort = transferJournalPort;
     }
 
     @Override
@@ -59,7 +49,7 @@ public class ExternalAssetOwnerJournalPortAdapter implements ExternalAssetOwnerJ
     public void createMappingToOwner(final ExternalId ownerExternalId, final Long journalEntryId) {
         final ExternalAssetOwner owner = externalAssetOwnerRepository.findByExternalId(ownerExternalId)
                 .orElseThrow(() -> new ExternalAssetOwnerNotFoundException(ownerExternalId));
-        accountingService.createMappingToOwner(owner, this.transferJournalPort.journalEntryById(journalEntryId));
+        accountingService.createMappingToOwner(owner, journalEntryId);
     }
 
     @Override

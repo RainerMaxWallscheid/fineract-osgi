@@ -19,8 +19,7 @@
 package org.apache.fineract.investor.service;
 
 import jakarta.annotation.PostConstruct;
-import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.infrastructure.event.business.domain.journalentry.LoanJournalEntryCreatedBusinessEvent;
+import org.apache.fineract.accounting.moduleapi.LoanJournalEntryCreatedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.investor.config.InvestorModuleIsEnabledCondition;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerJournalEntryMapping;
@@ -43,11 +42,11 @@ public class ExternalAssetOwnerJournalEntryServiceImpl implements ExternalAssetO
     @PostConstruct
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanJournalEntryCreatedBusinessEvent.class, event -> {
-            Object journalEntry = event.get();
+            Long journalEntryId = event.get();
             Long loanId = loanReadPlatformService.findLoanIdByTransactionId(event.getAggregateRootId()).orElseThrow();
             externalAssetOwnerTransferLoanMappingRepository.findByLoanId(loanId).ifPresent(transferLoanMapping -> {
                 ExternalAssetOwnerJournalEntryMapping mapping = new ExternalAssetOwnerJournalEntryMapping();
-                mapping.setJournalEntryId((Long) ((AbstractPersistableCustom<?>) journalEntry).getId());
+                mapping.setJournalEntryId(journalEntryId);
                 mapping.setOwner(transferLoanMapping.getOwnerTransfer().getOwner());
                 externalAssetOwnerJournalEntryMappingRepository.saveAndFlush(mapping);
             });

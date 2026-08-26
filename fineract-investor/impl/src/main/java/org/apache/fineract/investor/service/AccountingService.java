@@ -28,4 +28,6 @@ public interface AccountingService {
     void createJournalEntriesForBuybackAssetTransfer(Object loan, ExternalAssetOwnerTransfer transfer);
 
     void createMappingToOwner(ExternalAssetOwner owner, Object journalEntry);
+
+    void createMappingToOwner(ExternalAssetOwner owner, Long journalEntryId);
 }

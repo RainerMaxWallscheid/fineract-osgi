@@ -25,6 +25,8 @@ import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivi
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.journalentry.JournalEntryMapper;
+import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
@@ -45,14 +47,17 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
     private final JournalEntryRepository journalEntryRepository;
     private final ProductToGLAccountMappingRepository accountMappingRepository;
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
+    private final JournalEntryMapper journalEntryMapper;
 
     public ExternalOwnerTransferJournalPortAdapter(final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort,
             final JournalEntryRepository journalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository,
-            final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository) {
+            final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository,
+            final JournalEntryMapper journalEntryMapper) {
         this.externalAssetOwnerJournalPort = externalAssetOwnerJournalPort;
         this.journalEntryRepository = journalEntryRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.financialActivityAccountRepository = financialActivityAccountRepository;
+        this.journalEntryMapper = journalEntryMapper;
     }
 
     @Override
@@ -109,8 +114,9 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
     }
 
     @Override
-    public Object journalEntryById(final Long journalEntryId) {
-        return this.journalEntryRepository.findById(journalEntryId)
+    public JournalEntryData journalEntryById(final Long journalEntryId) {
+        final JournalEntry journalEntry = this.journalEntryRepository.findById(journalEntryId)
                 .orElseThrow(() -> new JournalEntryNotFoundException(journalEntryId));
+        return this.journalEntryMapper.map(journalEntry);
     }
 }
