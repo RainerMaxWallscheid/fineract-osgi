@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.staff.exception;
+package org.apache.fineract.organisation.staff.moduleapi;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
 
 /**
  * A {@link RuntimeException} thrown when staff resources are not found.
+ * Lives on organisation-api (core already exports leftover {@code organisation.staff.exception}).
  */
 public class StaffRoleException extends AbstractPlatformResourceNotFoundException {
 

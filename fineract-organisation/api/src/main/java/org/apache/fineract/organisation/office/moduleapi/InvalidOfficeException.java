@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.office.exception;
+package org.apache.fineract.organisation.office.moduleapi;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
 /**
- * {@link AbstractPlatformDomainRuleException} thrown when office mismatch occurs
+ * {@link AbstractPlatformDomainRuleException} thrown when office mismatch occurs.
+ * Lives on organisation-api (core already exports leftover {@code organisation.office.exception}).
  */
 public class InvalidOfficeException extends AbstractPlatformDomainRuleException {
 

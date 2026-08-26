@@ -71,7 +71,7 @@ dependencies {
     // Leftover write/assembler residual
     implementation(project(path: ':fineract-tax-api'))
     implementation(project(path: ':fineract-event-impl'))
-    implementation(project(path: ':fineract-organisation-impl'))
+    implementation(project(path: ':fineract-organisation-api'))
     implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-branch-api'))
     implementation('org.apache.avro:avro')
