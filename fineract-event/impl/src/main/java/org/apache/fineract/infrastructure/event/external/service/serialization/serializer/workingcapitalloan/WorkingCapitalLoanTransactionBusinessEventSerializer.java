@@ -22,29 +22,25 @@ import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.workingcapitalloan.v1.WorkingCapitalLoanTransactionDataV1;
 import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.workingcapitalloan.transaction.WorkingCapitalLoanTransactionBusinessEvent;
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.workingcapitalloan.WorkingCapitalLoanTransactionDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanTransactionData;
-import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanTransactionReadPlatformService;
+import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanTransactionEventDataPort;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WorkingCapitalLoanTransactionBusinessEventSerializer implements BusinessEventSerializer {
-    private final WorkingCapitalLoanTransactionReadPlatformService readPlatformService;
+    private final WorkingCapitalLoanTransactionEventDataPort eventDataPort;
     private final WorkingCapitalLoanTransactionDataMapper mapper;
 
     @Override
     public <T> boolean canSerialize(BusinessEvent<T> event) {
-        return event instanceof WorkingCapitalLoanTransactionBusinessEvent;
+        return eventDataPort.isTransactionEvent(event);
     }
 
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
-        final WorkingCapitalLoanTransactionBusinessEvent event = (WorkingCapitalLoanTransactionBusinessEvent) rawEvent;
-        final Long wcLoanId = event.get().getWcLoan().getId();
-        final Long wcLoanTransactionId = event.get().getId();
-        final WorkingCapitalLoanTransactionData data = readPlatformService.retrieveTransaction(wcLoanId, wcLoanTransactionId);
+        final WorkingCapitalLoanTransactionData data = eventDataPort.retrieveForEvent(rawEvent);
         return mapper.map(data);
     }
 
@@ -54,8 +50,8 @@ public class WorkingCapitalLoanTransactionBusinessEventSerializer implements Bus
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanTransactionBusinessEventSerializer(final WorkingCapitalLoanTransactionReadPlatformService readPlatformService, final WorkingCapitalLoanTransactionDataMapper mapper) {
-        this.readPlatformService = readPlatformService;
+        public WorkingCapitalLoanTransactionBusinessEventSerializer(final WorkingCapitalLoanTransactionEventDataPort eventDataPort, final WorkingCapitalLoanTransactionDataMapper mapper) {
+        this.eventDataPort = eventDataPort;
         this.mapper = mapper;
     }
 }
