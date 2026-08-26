@@ -40,15 +40,10 @@ import org.apache.fineract.infrastructure.campaigns.sms.exception.SmsRuntimeExce
 import org.apache.fineract.infrastructure.campaigns.sms.serialization.SmsCampaignValidator;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
-import org.apache.fineract.infrastructure.event.business.domain.client.ClientActivateBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.client.ClientRejectBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanApprovedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanRejectedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.loan.transaction.LoanTransactionMakeRepaymentPostBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsActivateBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsRejectBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.savings.transaction.SavingsDepositBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.savings.transaction.SavingsWithdrawalBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
@@ -81,6 +76,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     private final GroupRepository groupRepository;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
     private final SmsCampaignValidator smsCampaignValidator;
+    private final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort;
     private ClientRepositoryWrapper clientRepositoryWrapper;
 
     @Autowired
@@ -93,12 +89,12 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, new SendSmsOnLoanApproved());
         businessEventNotifierService.addPostBusinessEventListener(LoanRejectedBusinessEvent.class, new SendSmsOnLoanRejected());
         businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, new SendSmsOnLoanRepayment());
-        businessEventNotifierService.addPostBusinessEventListener(ClientActivateBusinessEvent.class, new ClientActivatedListener());
-        businessEventNotifierService.addPostBusinessEventListener(ClientRejectBusinessEvent.class, new ClientRejectedListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsActivateBusinessEvent.class, new SavingsAccountActivatedListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsRejectBusinessEvent.class, new SavingsAccountRejectedListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsDepositBusinessEvent.class, new DepositSavingsAccountTransactionListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsWithdrawalBusinessEvent.class, new NonDepositSavingsAccountTransactionListener());
+        smsCampaignTriggerEventPort.onClientActivated(client -> notifyClientActivated((Client) client));
+        smsCampaignTriggerEventPort.onClientRejected(client -> notifyClientRejected((Client) client));
+        smsCampaignTriggerEventPort.onSavingsActivated(account -> notifySavingsAccountActivated((SavingsAccount) account));
+        smsCampaignTriggerEventPort.onSavingsRejected(account -> notifySavingsAccountRejected((SavingsAccount) account));
+        smsCampaignTriggerEventPort.onSavingsDeposit(transaction -> sendSmsForSavingsTransaction((SavingsAccountTransaction) transaction, true));
+        smsCampaignTriggerEventPort.onSavingsWithdrawal(transaction -> sendSmsForSavingsTransaction((SavingsAccountTransaction) transaction, false));
     }
 
     private void notifyRejectedLoanOwner(Loan loan) {
@@ -384,55 +380,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
 
-    private final class ClientActivatedListener implements BusinessEventListener<ClientActivateBusinessEvent> {
-        @Override
-        public void onBusinessEvent(ClientActivateBusinessEvent event) {
-            notifyClientActivated(event.get());
-        }
-    }
-
-
-    private final class ClientRejectedListener implements BusinessEventListener<ClientRejectBusinessEvent> {
-        @Override
-        public void onBusinessEvent(ClientRejectBusinessEvent event) {
-            notifyClientRejected(event.get());
-        }
-    }
-
-
-    private final class SavingsAccountActivatedListener implements BusinessEventListener<SavingsActivateBusinessEvent> {
-        @Override
-        public void onBusinessEvent(SavingsActivateBusinessEvent event) {
-            notifySavingsAccountActivated(event.get());
-        }
-    }
-
-
-    private final class SavingsAccountRejectedListener implements BusinessEventListener<SavingsRejectBusinessEvent> {
-        @Override
-        public void onBusinessEvent(SavingsRejectBusinessEvent event) {
-            notifySavingsAccountRejected(event.get());
-        }
-    }
-
-
-    private final class DepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsDepositBusinessEvent> {
-        @Override
-        public void onBusinessEvent(SavingsDepositBusinessEvent event) {
-            sendSmsForSavingsTransaction(event.get(), true);
-        }
-    }
-
-
-    private final class NonDepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsWithdrawalBusinessEvent> {
-        @Override
-        public void onBusinessEvent(SavingsWithdrawalBusinessEvent event) {
-            sendSmsForSavingsTransaction(event.get(), false);
-        }
-    }
-
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final BusinessEventNotifierService businessEventNotifierService, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final BusinessEventNotifierService businessEventNotifierService, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort) {
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsMessageRepository = smsMessageRepository;
         this.officeRepository = officeRepository;
@@ -441,5 +390,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         this.groupRepository = groupRepository;
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;
         this.smsCampaignValidator = smsCampaignValidator;
+        this.smsCampaignTriggerEventPort = smsCampaignTriggerEventPort;
     }
 }
