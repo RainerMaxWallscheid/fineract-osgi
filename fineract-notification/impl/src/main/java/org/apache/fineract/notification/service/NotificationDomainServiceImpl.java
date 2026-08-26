@@ -26,13 +26,6 @@ import org.apache.fineract.infrastructure.event.business.domain.deposit.FixedDep
 import org.apache.fineract.infrastructure.event.business.domain.deposit.RecurringDepositAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.group.CentersCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.group.GroupsCreateBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanApprovedBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanChargebackTransactionBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanCloseAsRescheduleBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanCloseBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanCreatedBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.product.LoanProductCreateBusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.transaction.LoanTransactionMakeRepaymentPostBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsApproveBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsCloseBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsCreateBusinessEvent;
@@ -44,9 +37,7 @@ import org.apache.fineract.infrastructure.event.business.domain.share.ShareProdu
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanNotificationEventPort;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 
 public class NotificationDomainServiceImpl implements NotificationDomainService {
@@ -55,6 +46,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final BusinessEventNotifierService businessEventNotifierService;
     private final PlatformSecurityContext context;
     private final UserNotificationService userNotificationService;
+    private final LoanNotificationEventPort loanNotificationEventPort;
 
     @PostConstruct
     public void addListeners() {
@@ -67,13 +59,9 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
         businessEventNotifierService.addPostBusinessEventListener(FixedDepositAccountCreateBusinessEvent.class, new FixedDepositAccountCreatedListener());
         businessEventNotifierService.addPostBusinessEventListener(RecurringDepositAccountCreateBusinessEvent.class, new RecurringDepositAccountCreatedListener());
         businessEventNotifierService.addPostBusinessEventListener(SavingsPostInterestBusinessEvent.class, new SavingsPostInterestListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanCreatedBusinessEvent.class, new LoanCreatedListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, new LoanApprovedListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanCloseBusinessEvent.class, new LoanClosedListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanChargebackTransactionBusinessEvent.class, new LoanChargebackTransactionListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanCloseAsRescheduleBusinessEvent.class, new LoanCloseAsRescheduledListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, new LoanMakeRepaymentListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanProductCreateBusinessEvent.class, new LoanProductCreatedListener());
+        loanNotificationEventPort.onLoanNotifications(notification -> buildNotification(notification.permission(), notification.objectType(),
+                notification.objectId(), notification.notificationContent(), notification.eventType(), context.authenticatedUser().getId(),
+                notification.officeId() != null ? notification.officeId() : context.authenticatedUser().getOffice().getId()));
         businessEventNotifierService.addPostBusinessEventListener(SavingsCreateBusinessEvent.class, new SavingsAccountCreatedListener());
         businessEventNotifierService.addPostBusinessEventListener(SavingsCloseBusinessEvent.class, new SavingsAccountClosedListener());
         businessEventNotifierService.addPostBusinessEventListener(ShareAccountCreateBusinessEvent.class, new ShareAccountCreatedListener());
@@ -163,69 +151,6 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     }
 
 
-    private final class LoanCreatedListener implements BusinessEventListener<LoanCreatedBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanCreatedBusinessEvent event) {
-            Loan loan = event.get();
-            buildNotification("APPROVE_LOAN", "loan", loan.getId(), "New loan created", "created", context.authenticatedUser().getId(), loan.getOfficeId());
-        }
-    }
-
-
-    private final class LoanApprovedListener implements BusinessEventListener<LoanApprovedBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanApprovedBusinessEvent event) {
-            Loan loan = event.get();
-            buildNotification("DISBURSE_LOAN", "loan", loan.getId(), "New loan approved", "approved", context.authenticatedUser().getId(), loan.getOfficeId());
-        }
-    }
-
-
-    private final class LoanClosedListener implements BusinessEventListener<LoanCloseBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanCloseBusinessEvent event) {
-            Loan loan = event.get();
-            buildNotification("READ_LOAN", "loan", loan.getId(), "Loan closed", "loanClosed", context.authenticatedUser().getId(), loan.getOfficeId());
-        }
-    }
-
-
-    private final class LoanCloseAsRescheduledListener implements BusinessEventListener<LoanCloseAsRescheduleBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanCloseAsRescheduleBusinessEvent event) {
-            Loan loan = event.get();
-            buildNotification("READ_Rescheduled Loans", "loan", loan.getId(), "Loan has been rescheduled", "loanRescheduled", context.authenticatedUser().getId(), loan.getOfficeId());
-        }
-    }
-
-
-    private final class LoanChargebackTransactionListener implements BusinessEventListener<LoanChargebackTransactionBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanChargebackTransactionBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
-            buildNotification(LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_PERMISSION, LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_OBJECT_TYPE, loanTransaction.getId(), LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_NOTIFICATION, LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_EVENT_TYPE, context.authenticatedUser().getId(), loanTransaction.getLoan().getOfficeId());
-        }
-    }
-
-
-    private final class LoanMakeRepaymentListener implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanTransactionMakeRepaymentPostBusinessEvent event) {
-            Loan loan = event.get().getLoan();
-            buildNotification("READ_LOAN", "loan", loan.getId(), "Repayment made", "repaymentMade", context.authenticatedUser().getId(), loan.getOfficeId());
-        }
-    }
-
-
-    private final class LoanProductCreatedListener implements BusinessEventListener<LoanProductCreateBusinessEvent> {
-        @Override
-        public void onBusinessEvent(LoanProductCreateBusinessEvent event) {
-            LoanProduct loanProduct = event.get();
-            buildNotification("READ_LOANPRODUCT", "loanProduct", loanProduct.getId(), "New loan product created", "created", context.authenticatedUser().getId(), context.authenticatedUser().getOffice().getId());
-        }
-    }
-
-
     private final class SavingsAccountCreatedListener implements BusinessEventListener<SavingsCreateBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsCreateBusinessEvent event) {
@@ -262,9 +187,10 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public NotificationDomainServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final PlatformSecurityContext context, final UserNotificationService userNotificationService) {
+        public NotificationDomainServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final PlatformSecurityContext context, final UserNotificationService userNotificationService, final LoanNotificationEventPort loanNotificationEventPort) {
         this.businessEventNotifierService = businessEventNotifierService;
         this.context = context;
         this.userNotificationService = userNotificationService;
+        this.loanNotificationEventPort = loanNotificationEventPort;
     }
 }

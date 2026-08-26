@@ -23,6 +23,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.notification.service.NotificationDomainService;
 import org.apache.fineract.notification.service.NotificationDomainServiceImpl;
 import org.apache.fineract.notification.service.UserNotificationService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanNotificationEventPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,9 @@ public class NotificationDomainServiceConfiguration {
     @Bean
     @ConditionalOnMissingBean(NotificationDomainService.class)
     public NotificationDomainService notificationDomainService(BusinessEventNotifierService businessEventNotifierService,
-            PlatformSecurityContext context, UserNotificationService userNotificationService) {
-        return new NotificationDomainServiceImpl(businessEventNotifierService, context, userNotificationService);
+            PlatformSecurityContext context, UserNotificationService userNotificationService,
+            LoanNotificationEventPort loanNotificationEventPort) {
+        return new NotificationDomainServiceImpl(businessEventNotifierService, context, userNotificationService,
+                loanNotificationEventPort);
     }
 }
