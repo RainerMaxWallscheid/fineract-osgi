@@ -52,7 +52,7 @@ import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlat
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDropdownReadPlatformService;
@@ -239,7 +239,7 @@ public class SavingsConfiguration {
             ChargeDefinitionPort chargeDefinitionPort, SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository,
             AccountAssociationsReadPlatformService accountAssociationsReadPlatformService,
             AccountTransfersWritePlatformService accountTransfersWritePlatformService,
-            DepositAccountReadPlatformService depositAccountReadPlatformService, CalendarInstanceRepository calendarInstanceRepository,
+            DepositAccountReadPlatformService depositAccountReadPlatformService, CalendarInstanceLookupPort calendarInstanceRepository,
             ConfigurationDomainService configurationDomainService, HolidayRepositoryWrapper holidayRepository,
             WorkingDaysRepositoryWrapper workingDaysRepository,
             DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository
@@ -265,7 +265,7 @@ public class SavingsConfiguration {
             NoteRepository noteRepository, StaffRepositoryWrapper staffRepository,
             SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator,
             SavingsAccountChargeAssembler savingsAccountChargeAssembler, AccountAssociationsRepository accountAssociationsRepository,
-            FromJsonHelper fromJsonHelper, CalendarInstanceRepository calendarInstanceRepository,
+            FromJsonHelper fromJsonHelper, CalendarInstanceLookupPort calendarInstanceRepository,
             ConfigurationDomainService configurationDomainService, AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
             BusinessEventNotifierService businessEventNotifierService) {
         return new DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(context, savingAccountRepository,

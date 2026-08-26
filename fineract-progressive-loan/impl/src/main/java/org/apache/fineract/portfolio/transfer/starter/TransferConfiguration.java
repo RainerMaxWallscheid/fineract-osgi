@@ -23,7 +23,7 @@ import org.apache.fineract.infrastructure.event.business.service.BusinessEventNo
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.ClientTransferDetailsRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
@@ -45,7 +45,7 @@ public class TransferConfiguration {
     @Bean
     @ConditionalOnMissingBean(TransferWritePlatformService.class)
     public TransferWritePlatformService transferWritePlatformService(ClientRepositoryWrapper clientRepositoryWrapper,
-            OfficeRepositoryWrapper officeRepository, CalendarInstanceRepository calendarInstanceRepository,
+            OfficeRepositoryWrapper officeRepository, CalendarInstanceLookupPort calendarInstanceRepository,
             LoanWritePlatformService loanWritePlatformService, GroupRepositoryWrapper groupRepository,
             LoanRepositoryWrapper loanRepositoryWrapper, TransfersDataValidator transfersDataValidator,
             StaffRepositoryWrapper staffRepositoryWrapper, SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,

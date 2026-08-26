@@ -60,7 +60,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
@@ -109,7 +109,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final NoteRepository noteRepository;
     private final LoanAssembler loanAssembler;
     private final CalendarRepository calendarRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanScheduleAssembler loanScheduleAssembler;
@@ -787,7 +787,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
+        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
         this.context = context;
         this.loanApplicationTransitionValidator = loanApplicationTransitionValidator;
         this.loanApplicationValidator = loanApplicationValidator;

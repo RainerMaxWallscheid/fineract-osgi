@@ -43,7 +43,7 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -76,7 +76,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWritePlatformService {
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final OfficeRepositoryWrapper officeRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final LoanWritePlatformService loanWritePlatformService;
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
@@ -479,7 +479,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     }
 
     @java.lang.SuppressWarnings("all")
-        public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepository, final CalendarInstanceRepository calendarInstanceRepository, final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final TransfersDataValidator transfersDataValidator, final StaffRepositoryWrapper staffRepositoryWrapper, final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, final PlatformSecurityContext context, final LoanOfficerService loanOfficerService, final TransactionBoundApplicationEventPublisher eventPublisher, final BusinessEventNotifierService businessEventNotifierService) {
+        public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final TransfersDataValidator transfersDataValidator, final StaffRepositoryWrapper staffRepositoryWrapper, final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, final PlatformSecurityContext context, final LoanOfficerService loanOfficerService, final TransactionBoundApplicationEventPublisher eventPublisher, final BusinessEventNotifierService businessEventNotifierService) {
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.officeRepository = officeRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;

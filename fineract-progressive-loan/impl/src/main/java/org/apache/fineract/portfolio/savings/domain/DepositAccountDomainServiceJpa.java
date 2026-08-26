@@ -49,7 +49,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -76,7 +76,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
     private final ConfigurationDomainService configurationDomainService;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ExternalIdFactory externalIdFactory;
 
     @Transactional
@@ -461,7 +461,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final SavingsJournalPort savingsJournalPort, final AccountNumberGenerator accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceRepository calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
+        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final SavingsJournalPort savingsJournalPort, final AccountNumberGenerator accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountActivationService = savingsAccountActivationService;
         this.savingsJournalPort = savingsJournalPort;

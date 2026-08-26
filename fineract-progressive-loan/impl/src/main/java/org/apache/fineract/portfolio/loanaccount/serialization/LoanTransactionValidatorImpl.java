@@ -60,7 +60,7 @@ import org.apache.fineract.organisation.workingdays.service.WorkingDaysUtil;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
@@ -110,7 +110,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     private final LoanUtilService loanUtilService;
     private final LoanCollateralLifecycleService loanCollateralLifecycleService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
     private final LoanDisbursementValidator loanDisbursementValidator;
     private final CodeValueRepository codeValueRepository;
@@ -989,7 +989,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionValidatorImpl(final FromJsonHelper fromApiJsonHelper, final LoanApplicationValidator fromApiJsonDeserializer, final LoanRepository loanRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final ApplicationCurrencyRepository applicationCurrencyRepository, final LoanUtilService loanUtilService, final LoanCollateralLifecycleService loanCollateralLifecycleService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CalendarInstanceRepository calendarInstanceRepository, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementValidator loanDisbursementValidator, final CodeValueRepository codeValueRepository, final ConfigurationDomainService configurationDomainService) {
+        public LoanTransactionValidatorImpl(final FromJsonHelper fromApiJsonHelper, final LoanApplicationValidator fromApiJsonDeserializer, final LoanRepository loanRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final ApplicationCurrencyRepository applicationCurrencyRepository, final LoanUtilService loanUtilService, final LoanCollateralLifecycleService loanCollateralLifecycleService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final CalendarInstanceLookupPort calendarInstanceRepository, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanDisbursementValidator loanDisbursementValidator, final CodeValueRepository codeValueRepository, final ConfigurationDomainService configurationDomainService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanRepository = loanRepository;

@@ -52,7 +52,7 @@ import org.apache.fineract.portfolio.account.domain.AccountTransferRepository;
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
@@ -114,7 +114,7 @@ class LoanAdjustmentServiceImplTest {
     @Mock
     private LoanAssembler loanAssembler;
     @Mock
-    private CalendarInstanceRepository calendarInstanceRepository;
+    private CalendarInstanceLookupPort calendarInstanceRepository;
     @Mock
     private PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     @Mock

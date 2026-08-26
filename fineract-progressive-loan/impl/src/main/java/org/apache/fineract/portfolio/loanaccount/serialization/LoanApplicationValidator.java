@@ -66,7 +66,7 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
@@ -161,7 +161,7 @@ public final class LoanApplicationValidator {
     private final HolidayRepository holidayRepository;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final LoanUtilService loanUtilService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final LoanMapper loanMapper;
@@ -1590,7 +1590,7 @@ public final class LoanApplicationValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
+        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceLookupPort calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanScheduleValidator = loanScheduleValidator;
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;

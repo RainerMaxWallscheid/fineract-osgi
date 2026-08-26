@@ -36,7 +36,7 @@ import org.apache.fineract.organisation.office.service.OfficeReadPlatformService
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.GroupLevelRepository;
@@ -87,7 +87,7 @@ public class GroupConfiguration {
             OfficeRepositoryWrapper officeRepositoryWrapper, StaffRepositoryWrapper staffRepository, NoteRepository noteRepository,
             GroupLevelRepository groupLevelRepository, GroupingTypesDataValidator fromApiJsonDeserializer,
             LoanRepositoryWrapper loanRepositoryWrapper, CodeValueRepositoryWrapper codeValueRepository,
-            CommandProcessingService commandProcessingService, CalendarInstanceRepository calendarInstanceRepository,
+            CommandProcessingService commandProcessingService, CalendarInstanceLookupPort calendarInstanceRepository,
             ConfigurationDomainService configurationDomainService, SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
             AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, AccountNumberGenerator accountNumberGenerator,
             EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,

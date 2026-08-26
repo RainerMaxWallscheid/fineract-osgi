@@ -66,7 +66,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
@@ -156,7 +156,7 @@ public class LoanScheduleAssembler {
     private final FloatingRatesReadPlatformService floatingRatesReadPlatformService;
     private final FloatingRatePort floatingRatePort;
     private final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final LoanUtilService loanUtilService;
     private final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
@@ -1280,7 +1280,7 @@ public class LoanScheduleAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleAssembler(final FromJsonHelper fromApiJsonHelper, final LoanProductRepository loanProductRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final LoanChargeAssembler loanChargeAssembler, final LoanScheduleGeneratorFactory loanScheduleFactory, final AprCalculator aprCalculator, final CalendarRepository calendarRepository, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final GroupRepositoryWrapper groupRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final FloatingRatePort floatingRatePort, final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator, final CalendarInstanceRepository calendarInstanceRepository, final LoanUtilService loanUtilService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanProductRelatedDetailUpdateUtil relatedDetailUpdateUtil) {
+        public LoanScheduleAssembler(final FromJsonHelper fromApiJsonHelper, final LoanProductRepository loanProductRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final LoanChargeAssembler loanChargeAssembler, final LoanScheduleGeneratorFactory loanScheduleFactory, final AprCalculator aprCalculator, final CalendarRepository calendarRepository, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final GroupRepositoryWrapper groupRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final FloatingRatePort floatingRatePort, final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator, final CalendarInstanceLookupPort calendarInstanceRepository, final LoanUtilService loanUtilService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanProductRelatedDetailUpdateUtil relatedDetailUpdateUtil) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanProductRepository = loanProductRepository;
         this.applicationCurrencyRepository = applicationCurrencyRepository;

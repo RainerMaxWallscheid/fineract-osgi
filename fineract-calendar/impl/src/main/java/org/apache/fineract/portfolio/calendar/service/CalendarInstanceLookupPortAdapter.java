@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.calendar.service;
 
+import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.springframework.stereotype.Service;
@@ -40,5 +42,36 @@ public class CalendarInstanceLookupPortAdapter implements CalendarInstanceLookup
     public CalendarInstance findByCalendarIdAndEntityIdAndEntityTypeId(final Long calendarId, final Long entityId,
             final Integer entityTypeId) {
         return this.calendarInstanceRepository.findByCalendarIdAndEntityIdAndEntityTypeId(calendarId, entityId, entityTypeId);
+    }
+
+    @Override
+    public Collection<CalendarInstance> findByEntityIdAndEntityTypeId(final Long entityId, final Integer entityTypeId) {
+        return this.calendarInstanceRepository.findByEntityIdAndEntityTypeId(entityId, entityTypeId);
+    }
+
+    @Override
+    public CalendarInstance findByEntityIdAndEntityTypeIdAndCalendarTypeId(final Long entityId, final Integer entityTypeId,
+            final Integer calendarTypeId) {
+        return this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(entityId, entityTypeId, calendarTypeId);
+    }
+
+    @Override
+    public List<CalendarInstance> findCalendarInstancesForLoansByGroupIdAndClientIdAndStatuses(final Long groupId, final Long clientId) {
+        return this.calendarInstanceRepository.findCalendarInstancesForLoansByGroupIdAndClientIdAndStatuses(groupId, clientId);
+    }
+
+    @Override
+    public CalendarInstance save(final CalendarInstance calendarInstance) {
+        return this.calendarInstanceRepository.save(calendarInstance);
+    }
+
+    @Override
+    public CalendarInstance saveAndFlush(final CalendarInstance calendarInstance) {
+        return this.calendarInstanceRepository.saveAndFlush(calendarInstance);
+    }
+
+    @Override
+    public void delete(final CalendarInstance calendarInstance) {
+        this.calendarInstanceRepository.delete(calendarInstance);
     }
 }

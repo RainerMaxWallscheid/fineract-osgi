@@ -18,15 +18,29 @@
  */
 package org.apache.fineract.portfolio.calendar.service;
 
+import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 
 /**
- * Thin calendar-instance lookup for loan residual peels without depending on calendar-impl
- * ({@code CalendarInstanceRepository} stays there: Loan JPQL).
+ * Calendar-instance lookup/write for residual peels without depending on calendar-impl
+ * ({@code CalendarInstanceRepository} stays there: leftover Loan native SQL).
  */
 public interface CalendarInstanceLookupPort {
 
     CalendarInstance findCalendarInstanceByEntityId(Long entityId, Integer entityTypeId);
 
     CalendarInstance findByCalendarIdAndEntityIdAndEntityTypeId(Long calendarId, Long entityId, Integer entityTypeId);
+
+    Collection<CalendarInstance> findByEntityIdAndEntityTypeId(Long entityId, Integer entityTypeId);
+
+    CalendarInstance findByEntityIdAndEntityTypeIdAndCalendarTypeId(Long entityId, Integer entityTypeId, Integer calendarTypeId);
+
+    List<CalendarInstance> findCalendarInstancesForLoansByGroupIdAndClientIdAndStatuses(Long groupId, Long clientId);
+
+    CalendarInstance save(CalendarInstance calendarInstance);
+
+    CalendarInstance saveAndFlush(CalendarInstance calendarInstance);
+
+    void delete(CalendarInstance calendarInstance);
 }

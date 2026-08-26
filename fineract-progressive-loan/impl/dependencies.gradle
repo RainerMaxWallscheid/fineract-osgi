@@ -66,7 +66,6 @@ dependencies {
     implementation(project(path: ':fineract-collateralmanagement-impl'))
     implementation(project(path: ':fineract-loan-origination-api'))
     implementation(project(path: ':fineract-calendar-api'))
-    implementation(project(path: ':fineract-calendar-impl'))
     implementation(project(path: ':fineract-entityaccess-api'))
     implementation(project(path: ':fineract-monetary-api'))
     // Leftover write/assembler residual

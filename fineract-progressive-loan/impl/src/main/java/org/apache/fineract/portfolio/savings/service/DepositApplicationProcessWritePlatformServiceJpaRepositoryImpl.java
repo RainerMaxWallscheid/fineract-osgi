@@ -61,7 +61,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
@@ -128,7 +128,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final FromJsonHelper fromJsonHelper;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
@@ -641,7 +641,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;

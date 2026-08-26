@@ -61,7 +61,7 @@ import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
+import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -107,7 +107,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final CommandProcessingService commandProcessingService;
-    private final CalendarInstanceRepository calendarInstanceRepository;
+    private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
     private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
@@ -767,7 +767,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     }
 
     @java.lang.SuppressWarnings("all")
-        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteRepository noteRepository, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
+        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteRepository noteRepository, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
         this.context = context;
         this.groupRepository = groupRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;

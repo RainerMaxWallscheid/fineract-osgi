@@ -48,9 +48,8 @@ import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
-import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
-import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
+import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDropdownReadPlatformService;
@@ -226,7 +225,7 @@ public class LoanAccountConfiguration {
     public LoanApplicationWritePlatformService loanApplicationWritePlatformService(PlatformSecurityContext context,
             LoanApplicationTransitionValidator loanApplicationTransitionValidator, LoanApplicationValidator loanApplicationValidator,
             LoanRepositoryWrapper loanRepositoryWrapper, NoteRepository noteRepository, LoanAssembler loanAssembler,
-            CalendarRepository calendarRepository, CalendarInstanceRepository calendarInstanceRepository,
+            CalendarRepository calendarRepository, CalendarInstanceLookupPort calendarInstanceRepository,
             AccountAssociationsRepository accountAssociationsRepository,
             BusinessEventNotifierService businessEventNotifierService, LoanScheduleAssembler loanScheduleAssembler,
             LoanUtilService loanUtilService, CalendarReadPlatformService calendarReadPlatformService,
@@ -420,7 +419,7 @@ public class LoanAccountConfiguration {
             LoanUpdateCommandFromApiJsonDeserializer loanUpdateCommandFromApiJsonDeserializer, LoanRepositoryWrapper loanRepositoryWrapper,
             LoanAccountDomainService loanAccountDomainService, LoanCollateralLifecycleService loanCollateralLifecycleService, NoteRepository noteRepository,
             LoanTransactionRepository loanTransactionRepository, LoanTransactionRelationRepository loanTransactionRelationRepository,
-            LoanAssembler loanAssembler, CalendarInstanceRepository calendarInstanceRepository,
+            LoanAssembler loanAssembler, CalendarInstanceLookupPort calendarInstanceRepository,
             PaymentDetailWritePlatformService paymentDetailWritePlatformService, HolidayRepositoryWrapper holidayRepository,
             ConfigurationDomainService configurationDomainService, WorkingDaysRepositoryWrapper workingDaysRepository,
             AccountTransfersWritePlatformService accountTransfersWritePlatformService,
