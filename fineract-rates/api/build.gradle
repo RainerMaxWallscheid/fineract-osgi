@@ -42,6 +42,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + 'org.apache.fineract.infrastructure.core.exception,'
                         + 'org.apache.fineract.infrastructure.core.service,'
+                        + 'org.apache.fineract.infrastructure.core.serialization,'
+                        + 'org.apache.fineract.portfolio.rate.domain,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.api'
                 )

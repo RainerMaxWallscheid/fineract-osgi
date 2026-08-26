@@ -74,7 +74,6 @@ dependencies {
     implementation(project(path: ':fineract-organisation-impl'))
     implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-branch-api'))
-    implementation(project(path: ':fineract-rates-impl'))
     implementation('org.apache.avro:avro')
     implementation(project(path: ':fineract-avro-schemas'))
 
