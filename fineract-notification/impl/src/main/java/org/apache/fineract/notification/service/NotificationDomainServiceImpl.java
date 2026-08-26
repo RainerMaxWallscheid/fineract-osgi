@@ -48,8 +48,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
 public class NotificationDomainServiceImpl implements NotificationDomainService {
     @java.lang.SuppressWarnings("all")
@@ -113,8 +111,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class SavingsAccountDepositListener implements BusinessEventListener<SavingsDepositBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsDepositBusinessEvent event) {
-            SavingsAccountTransaction savingsAccountTransaction = event.get();
-            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", savingsAccountTransaction.getSavingsAccount().getId(), "Deposit made", "depositMade", context.authenticatedUser().getId(), savingsAccountTransaction.getSavingsAccount().officeId());
+            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", event.getAggregateRootId(), "Deposit made", "depositMade", context.authenticatedUser().getId(), event.officeId());
         }
     }
 
@@ -147,13 +144,12 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class SavingsAccountApprovedListener implements BusinessEventListener<SavingsApproveBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsApproveBusinessEvent event) {
-            SavingsAccount savingsAccount = event.get();
-            if (savingsAccount.depositAccountType().equals(DepositAccountType.FIXED_DEPOSIT)) {
-                buildNotification("ACTIVATE_FIXEDDEPOSITACCOUNT", "fixedDeposit", savingsAccount.getId(), "Fixed deposit account approved", "approved", context.authenticatedUser().getId(), savingsAccount.officeId());
-            } else if (savingsAccount.depositAccountType().equals(DepositAccountType.RECURRING_DEPOSIT)) {
-                buildNotification("ACTIVATE_RECURRINGDEPOSITACCOUNT", "recurringDepositAccount", savingsAccount.getId(), "Recurring deposit account approved", "approved", context.authenticatedUser().getId(), savingsAccount.officeId());
-            } else if (savingsAccount.depositAccountType().equals(DepositAccountType.SAVINGS_DEPOSIT)) {
-                buildNotification("ACTIVATE_SAVINGSACCOUNT", "savingsAccount", savingsAccount.getId(), "Savings account approved", "approved", context.authenticatedUser().getId(), savingsAccount.officeId());
+            if (event.depositAccountType().equals(DepositAccountType.FIXED_DEPOSIT)) {
+                buildNotification("ACTIVATE_FIXEDDEPOSITACCOUNT", "fixedDeposit", event.getAggregateRootId(), "Fixed deposit account approved", "approved", context.authenticatedUser().getId(), event.officeId());
+            } else if (event.depositAccountType().equals(DepositAccountType.RECURRING_DEPOSIT)) {
+                buildNotification("ACTIVATE_RECURRINGDEPOSITACCOUNT", "recurringDepositAccount", event.getAggregateRootId(), "Recurring deposit account approved", "approved", context.authenticatedUser().getId(), event.officeId());
+            } else if (event.depositAccountType().equals(DepositAccountType.SAVINGS_DEPOSIT)) {
+                buildNotification("ACTIVATE_SAVINGSACCOUNT", "savingsAccount", event.getAggregateRootId(), "Savings account approved", "approved", context.authenticatedUser().getId(), event.officeId());
             }
         }
     }
@@ -162,8 +158,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class SavingsPostInterestListener implements BusinessEventListener<SavingsPostInterestBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsPostInterestBusinessEvent event) {
-            SavingsAccount savingsAccount = event.get();
-            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", savingsAccount.getId(), "Interest posted to account", "interestPosted", context.authenticatedUser().getId(), savingsAccount.officeId());
+            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", event.getAggregateRootId(), "Interest posted to account", "interestPosted", context.authenticatedUser().getId(), event.officeId());
         }
     }
 
@@ -234,8 +229,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class SavingsAccountCreatedListener implements BusinessEventListener<SavingsCreateBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsCreateBusinessEvent event) {
-            SavingsAccount savingsAccount = event.get();
-            buildNotification("APPROVE_SAVINGSACCOUNT", "savingsAccount", savingsAccount.getId(), "New savings account created", "created", context.authenticatedUser().getId(), savingsAccount.officeId());
+            buildNotification("APPROVE_SAVINGSACCOUNT", "savingsAccount", event.getAggregateRootId(), "New savings account created", "created", context.authenticatedUser().getId(), event.officeId());
         }
     }
 
@@ -243,8 +237,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     private final class SavingsAccountClosedListener implements BusinessEventListener<SavingsCloseBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsCloseBusinessEvent event) {
-            SavingsAccount savingsAccount = event.get();
-            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", savingsAccount.getId(), "Savings has gone into dormant", "closed", context.authenticatedUser().getId(), savingsAccount.officeId());
+            buildNotification("READ_SAVINGSACCOUNT", "savingsAccount", event.getAggregateRootId(), "Savings has gone into dormant", "closed", context.authenticatedUser().getId(), event.officeId());
         }
     }
 

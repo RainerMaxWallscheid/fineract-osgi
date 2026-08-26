@@ -38,4 +38,8 @@ public abstract class SavingsAccountTransactionBusinessEvent extends AbstractBus
     public Long getAggregateRootId() {
         return get().getSavingsAccount().getId();
     }
+
+    public Long officeId() {
+        return get().getSavingsAccount().officeId();
+    }
 }

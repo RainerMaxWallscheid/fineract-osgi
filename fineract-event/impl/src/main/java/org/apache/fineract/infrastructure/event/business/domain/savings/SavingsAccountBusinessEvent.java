@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.event.business.domain.savings;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
+import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 public abstract class SavingsAccountBusinessEvent extends AbstractBusinessEvent<SavingsAccount> {
@@ -37,5 +38,13 @@ public abstract class SavingsAccountBusinessEvent extends AbstractBusinessEvent<
     @Override
     public Long getAggregateRootId() {
         return get().getId();
+    }
+
+    public Long officeId() {
+        return get().officeId();
+    }
+
+    public DepositAccountType depositAccountType() {
+        return get().depositAccountType();
     }
 }
