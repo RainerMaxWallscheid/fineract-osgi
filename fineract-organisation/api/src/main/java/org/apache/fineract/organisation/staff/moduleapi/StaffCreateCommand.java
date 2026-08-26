@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.staff.command;
+package org.apache.fineract.organisation.staff.moduleapi;
 
 import org.apache.fineract.command.core.Command;
-import org.apache.fineract.organisation.staff.data.StaffCreateRequest;
 
 public class StaffCreateCommand extends Command<StaffCreateRequest> {
 	@java.lang.SuppressWarnings("all")

@@ -3,7 +3,6 @@
 # Do not add rows to avoid a retarget. Delete a row when the Gradle edge is gone.
 # Format: <consumer dependencies.gradle> <target project>
 fineract-accounting/impl/dependencies.gradle	fineract-loan-impl
-fineract-bulkimport/impl/dependencies.gradle	fineract-organisation-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-loan-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-savings-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl

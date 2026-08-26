@@ -19,9 +19,12 @@
 
 dependencies {
     api project(path: ':fineract-core')
+    api project(path: ':fineract-command-api')
 
     implementation 'org.apache.commons:commons-lang3'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
+    compileOnly 'jakarta.validation:jakarta.validation-api'
+    compileOnly 'org.hibernate.validator:hibernate-validator'
 }

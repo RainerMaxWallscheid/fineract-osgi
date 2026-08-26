@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.staff.mapper;
+package org.apache.fineract.infrastructure.bulkimport.importhandler.staff;
 
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
-import org.apache.fineract.organisation.staff.data.StaffCreateRequest;
 import org.apache.fineract.organisation.staff.data.StaffData;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateRequest;
+import org.apache.fineract.organisation.staff.moduleapi.StaffDateMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

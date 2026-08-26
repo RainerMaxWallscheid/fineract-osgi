@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.staff.data;
+package org.apache.fineract.organisation.staff.moduleapi;
 
 import java.io.Serial;
 import java.io.Serializable;

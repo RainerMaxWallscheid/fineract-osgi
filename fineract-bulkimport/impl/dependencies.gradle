@@ -31,7 +31,6 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-document-api'))
     implementation(project(path: ':fineract-organisation-api'))
-    implementation(project(path: ':fineract-organisation-impl'))
     implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-charge-api'))

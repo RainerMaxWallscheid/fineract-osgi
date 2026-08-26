@@ -18,8 +18,8 @@
  */
 package org.apache.fineract.organisation.staff.service;
 
-import org.apache.fineract.organisation.staff.data.StaffCreateRequest;
-import org.apache.fineract.organisation.staff.data.StaffCreateResponse;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateRequest;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateResponse;
 import org.apache.fineract.organisation.staff.data.StaffUpdateRequest;
 import org.apache.fineract.organisation.staff.data.StaffUpdateResponse;
 

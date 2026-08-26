@@ -31,11 +31,10 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
-import org.apache.fineract.organisation.staff.command.StaffCreateCommand;
-import org.apache.fineract.organisation.staff.data.StaffCreateResponse;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateCommand;
 import org.apache.fineract.organisation.staff.data.StaffData;
-import org.apache.fineract.organisation.staff.mapper.StaffDataMapper;
-import org.apache.fineract.organisation.staff.mapper.StaffDateMapper;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateResponse;
+import org.apache.fineract.organisation.staff.moduleapi.StaffDateMapper;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -49,7 +48,7 @@ public class StaffImportHandler implements ImportHandler {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffImportHandler.class);
     private final CommandDispatcher dispatcher;
     private final StaffDataMapper staffDataMapper;
-    private final StaffDateMapper staffDateMapper;
+    private final StaffDateMapper staffDateMapper = new StaffDateMapper();
 
     @Override
     public Count process(final Workbook workbook, final String locale, final String dateFormat) {
@@ -119,9 +118,8 @@ public class StaffImportHandler implements ImportHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public StaffImportHandler(final CommandDispatcher dispatcher, final StaffDataMapper staffDataMapper, final StaffDateMapper staffDateMapper) {
+        public StaffImportHandler(final CommandDispatcher dispatcher, final StaffDataMapper staffDataMapper) {
         this.dispatcher = dispatcher;
         this.staffDataMapper = staffDataMapper;
-        this.staffDateMapper = staffDateMapper;
     }
 }

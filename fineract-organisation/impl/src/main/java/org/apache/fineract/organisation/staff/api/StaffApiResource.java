@@ -47,11 +47,11 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookP
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
-import org.apache.fineract.organisation.staff.command.StaffCreateCommand;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateCommand;
 import org.apache.fineract.organisation.staff.command.StaffUpdateCommand;
 import org.apache.fineract.organisation.staff.command.StaffUploadCommand;
-import org.apache.fineract.organisation.staff.data.StaffCreateRequest;
-import org.apache.fineract.organisation.staff.data.StaffCreateResponse;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateRequest;
+import org.apache.fineract.organisation.staff.moduleapi.StaffCreateResponse;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.organisation.staff.data.StaffUpdateRequest;
 import org.apache.fineract.organisation.staff.data.StaffUpdateResponse;
