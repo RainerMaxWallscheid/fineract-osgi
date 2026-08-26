@@ -59,8 +59,7 @@ import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +76,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
     private final SmsCampaignValidator smsCampaignValidator;
     private final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort;
+    private final SavingsAccountExistencePort savingsAccountExistencePort;
     private ClientRepositoryWrapper clientRepositoryWrapper;
 
     @Autowired
@@ -91,10 +91,10 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, new SendSmsOnLoanRepayment());
         smsCampaignTriggerEventPort.onClientActivated(client -> notifyClientActivated((Client) client));
         smsCampaignTriggerEventPort.onClientRejected(client -> notifyClientRejected((Client) client));
-        smsCampaignTriggerEventPort.onSavingsActivated(account -> notifySavingsAccountActivated((SavingsAccount) account));
-        smsCampaignTriggerEventPort.onSavingsRejected(account -> notifySavingsAccountRejected((SavingsAccount) account));
-        smsCampaignTriggerEventPort.onSavingsDeposit(transaction -> sendSmsForSavingsTransaction((SavingsAccountTransaction) transaction, true));
-        smsCampaignTriggerEventPort.onSavingsWithdrawal(transaction -> sendSmsForSavingsTransaction((SavingsAccountTransaction) transaction, false));
+        smsCampaignTriggerEventPort.onSavingsActivated(this::notifySavingsAccountActivated);
+        smsCampaignTriggerEventPort.onSavingsRejected(this::notifySavingsAccountRejected);
+        smsCampaignTriggerEventPort.onSavingsDeposit(transaction -> sendSmsForSavingsTransaction(transaction, true));
+        smsCampaignTriggerEventPort.onSavingsWithdrawal(transaction -> sendSmsForSavingsTransaction(transaction, false));
     }
 
     private void notifyRejectedLoanOwner(Loan loan) {
@@ -135,20 +135,24 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         }
     }
 
-    private void notifySavingsAccountActivated(final SavingsAccount savingsAccount) {
+    private void notifySavingsAccountActivated(final Object leftover) {
+        final var ref = this.savingsAccountExistencePort.campaignSource(leftover);
         List<SmsCampaign> smsCampaigns = retrieveSmsCampaigns("Savings Activated");
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign campaign : smsCampaigns) {
-                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(savingsAccount, campaign);
+                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(ref.savingsAccountId(),
+                        ref.clientId(), campaign);
             }
         }
     }
 
-    private void notifySavingsAccountRejected(final SavingsAccount savingsAccount) {
+    private void notifySavingsAccountRejected(final Object leftover) {
+        final var ref = this.savingsAccountExistencePort.campaignSource(leftover);
         List<SmsCampaign> smsCampaigns = retrieveSmsCampaigns("Savings Rejected");
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign campaign : smsCampaigns) {
-                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(savingsAccount, campaign);
+                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(ref.savingsAccountId(),
+                        ref.clientId(), campaign);
             }
         }
     }
@@ -218,18 +222,18 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         }
     }
 
-    private void sendSmsForSavingsTransaction(final SavingsAccountTransaction savingsTransaction, boolean isDeposit) {
+    private void sendSmsForSavingsTransaction(final Object leftoverTransaction, boolean isDeposit) {
         String campaignName = isDeposit ? "Savings Deposit" : "Savings Withdrawal";
         List<SmsCampaign> smsCampaigns = retrieveSmsCampaigns(campaignName);
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign smsCampaign : smsCampaigns) {
                 try {
-                    final SavingsAccount savingsAccount = savingsTransaction.getSavingsAccount();
-                    final Client client = savingsAccount.clientId() == null ? null
-                            : this.clientRepositoryWrapper.findOneWithNotFoundDetection(savingsAccount.clientId());
+                    final var view = this.savingsAccountExistencePort.transactionSmsView(leftoverTransaction);
+                    final Client client = view.clientId() == null ? null
+                            : this.clientRepositoryWrapper.findOneWithNotFoundDetection(view.clientId());
                     HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
                     });
-                    HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(savingsTransaction, client);
+                    HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(view, client);
                     for (Map.Entry<String, String> entry : campaignParams.entrySet()) {
                         String value = entry.getValue();
                         String spvalue = null;
@@ -318,13 +322,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         return smsParams;
     }
 
-    private HashMap<String, Object> processSavingsTransactionDataForSms(final SavingsAccountTransaction savingsAccountTransaction, Client client) {
+    private HashMap<String, Object> processSavingsTransactionDataForSms(final SavingsAccountExistencePort.TransactionSmsView view,
+            Client client) {
         // {{savingsId}} {{id}} {{firstname}} {{middlename}} {{lastname}}
         // {{FullName}} {{mobileNo}} {{savingsAccountId}} {{depositAmount}}
         // {{balance}}
         // transactionDate
         HashMap<String, Object> smsParams = new HashMap<>();
-        SavingsAccount savingsAccount = savingsAccountTransaction.getSavingsAccount();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM:d:yyyy");
         smsParams.put("clientId", client.getId());
         smsParams.put("firstname", client.getFirstname());
@@ -332,21 +336,21 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         smsParams.put("lastname", client.getLastname());
         smsParams.put("FullName", client.getDisplayName());
         smsParams.put("mobileNo", client.mobileNo());
-        smsParams.put("savingsId", savingsAccount.getId());
-        smsParams.put("savingsAccountNo", savingsAccount.getAccountNumber());
-        smsParams.put("withdrawAmount", savingsAccountTransaction.getAmount(savingsAccount.getCurrency()));
-        smsParams.put("depositAmount", savingsAccountTransaction.getAmount(savingsAccount.getCurrency()));
-        smsParams.put("balance", savingsAccount.getWithdrawableBalance());
+        smsParams.put("savingsId", view.savingsAccountId());
+        smsParams.put("savingsAccountNo", view.accountNumber());
+        smsParams.put("withdrawAmount", view.amount());
+        smsParams.put("depositAmount", view.amount());
+        smsParams.put("balance", view.balance());
         smsParams.put("officeId", client.getOffice().getId());
-        smsParams.put("transactionDate", savingsAccountTransaction.getTransactionDate().format(dateFormatter));
-        smsParams.put("savingsTransactionId", savingsAccountTransaction.getId());
+        smsParams.put("transactionDate", view.transactionDate().format(dateFormatter));
+        smsParams.put("savingsTransactionId", view.transactionId());
         if (client.getStaff() != null) {
             smsParams.put("loanOfficerId", client.getStaff().getId());
         } else {
             smsParams.put("loanOfficerId", -1);
         }
-        if (savingsAccountTransaction.getPaymentDetail() != null) {
-            smsParams.put("receiptNumber", savingsAccountTransaction.getPaymentDetail().getReceiptNumber());
+        if (view.receiptNumber() != null) {
+            smsParams.put("receiptNumber", view.receiptNumber());
         } else {
             smsParams.put("receiptNumber", -1);
         }
@@ -381,7 +385,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
 
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final BusinessEventNotifierService businessEventNotifierService, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final BusinessEventNotifierService businessEventNotifierService, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort) {
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsMessageRepository = smsMessageRepository;
         this.officeRepository = officeRepository;
@@ -391,5 +395,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;
         this.smsCampaignValidator = smsCampaignValidator;
         this.smsCampaignTriggerEventPort = smsCampaignTriggerEventPort;
+        this.savingsAccountExistencePort = savingsAccountExistencePort;
     }
 }

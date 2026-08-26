@@ -27,7 +27,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -53,7 +53,7 @@ public class ExecuteEmailConfig {
     @Autowired
     private LoanRepository loanRepository;
     @Autowired
-    private SavingsAccountRepository savingsAccountRepository;
+    private SavingsAccountExistencePort savingsAccountExistencePort;
     @Autowired
     private EmailMessageJobEmailService emailMessageJobEmailService;
     @Autowired
@@ -79,7 +79,7 @@ public class ExecuteEmailConfig {
 
     @Bean
     public ExecuteEmailTasklet executeEmailTasklet() {
-        return new ExecuteEmailTasklet(emailMessageRepository, emailCampaignRepository, loanRepository, savingsAccountRepository,
+        return new ExecuteEmailTasklet(emailMessageRepository, emailCampaignRepository, loanRepository, savingsAccountExistencePort,
                 emailMessageJobEmailService, readReportingService, reportLookupPort, reportMailingJobValidator, fineractProperties);
     }
 }

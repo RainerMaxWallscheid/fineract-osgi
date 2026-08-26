@@ -72,7 +72,6 @@ import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -297,16 +296,15 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @Override
-    public void insertDirectCampaignIntoSmsOutboundTable(final SavingsAccount savingsAccount, final SmsCampaign smsCampaign) {
+    public void insertDirectCampaignIntoSmsOutboundTable(final Long savingsAccountId, final Long clientId, final SmsCampaign smsCampaign) {
         try {
             HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            campaignParams.put("savingsId", savingsAccount.getId().toString());
+            campaignParams.put("savingsId", savingsAccountId.toString());
             HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            queryParamForRunReport.put("savingsId", savingsAccount.getId().toString());
-            Client client = savingsAccount.clientId() == null ? null
-                    : this.clientRepositoryWrapper.findOneWithNotFoundDetection(savingsAccount.clientId());
+            queryParamForRunReport.put("savingsId", savingsAccountId.toString());
+            Client client = clientId == null ? null : this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
             List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
             if (runReportObject != null && runReportObject.size() > 0) {
                 for (HashMap<String, Object> entry : runReportObject) {

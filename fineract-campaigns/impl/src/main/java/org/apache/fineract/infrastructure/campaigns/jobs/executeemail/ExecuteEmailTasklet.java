@@ -47,8 +47,7 @@ import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMail
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -60,7 +59,7 @@ public class ExecuteEmailTasklet implements Tasklet {
     private final EmailMessageRepository emailMessageRepository;
     private final EmailCampaignRepository emailCampaignRepository;
     private final LoanRepository loanRepository;
-    private final SavingsAccountRepository savingsAccountRepository;
+    private final SavingsAccountExistencePort savingsAccountExistencePort;
     private final EmailMessageJobEmailService emailMessageJobEmailService;
     private final ReadReportingService readReportingService;
     private final ReportLookupPort reportLookupPort;
@@ -106,17 +105,15 @@ public class ExecuteEmailTasklet implements Tasklet {
                             }
                         } else if (reportStretchyParams.containsKey("savingId")) {
                             if (emailMessage.getClient() != null) {
-                                final List<SavingsAccount> savingsAccounts = savingsAccountRepository.findSavingAccountByClientId(emailMessage.getClient().getId());
+                                final List<Long> savingsIds = savingsAccountExistencePort.activeIdsByClientId(emailMessage.getClient().getId());
                                 HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
-                                for (final SavingsAccount savingsAccount : savingsAccounts) {
-                                    if (savingsAccount.isActive()) {
-                                        reportParams.put("savingId", savingsAccount.getId().toString());
-                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
-                                        if (file != null) {
-                                            attachmentList.add(file);
-                                        } else {
-                                            errorLog.append(reportParams);
-                                        }
+                                for (final Long savingsId : savingsIds) {
+                                    reportParams.put("savingId", savingsId.toString());
+                                    File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
+                                    if (file != null) {
+                                        attachmentList.add(file);
+                                    } else {
+                                        errorLog.append(reportParams);
                                     }
                                 }
                             }
@@ -214,11 +211,11 @@ public class ExecuteEmailTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
+        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountExistencePort savingsAccountExistencePort, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
         this.emailMessageRepository = emailMessageRepository;
         this.emailCampaignRepository = emailCampaignRepository;
         this.loanRepository = loanRepository;
-        this.savingsAccountRepository = savingsAccountRepository;
+        this.savingsAccountExistencePort = savingsAccountExistencePort;
         this.emailMessageJobEmailService = emailMessageJobEmailService;
         this.readReportingService = readReportingService;
         this.reportLookupPort = reportLookupPort;

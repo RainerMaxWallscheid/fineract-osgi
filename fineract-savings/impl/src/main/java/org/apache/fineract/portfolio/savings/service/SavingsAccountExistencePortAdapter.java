@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.savings.service;
 
+import java.util.List;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
@@ -52,5 +53,27 @@ public class SavingsAccountExistencePortAdapter implements SavingsAccountExisten
                 .orElseThrow(() -> new SavingsAccountTransactionNotFoundException(null, savingsTransactionId));
         final SavingsAccount account = transaction.getSavingsAccount();
         return new SavingsTransactionNoteRef(account.getId(), transaction.getId(), account.clientId(), account.officeId());
+    }
+
+    @Override
+    public CampaignSource campaignSource(final Object savingsAccount) {
+        final SavingsAccount account = (SavingsAccount) savingsAccount;
+        return new CampaignSource(account.getId(), account.clientId());
+    }
+
+    @Override
+    public TransactionSmsView transactionSmsView(final Object savingsTransaction) {
+        final SavingsAccountTransaction transaction = (SavingsAccountTransaction) savingsTransaction;
+        final SavingsAccount account = transaction.getSavingsAccount();
+        final String receiptNumber = transaction.getPaymentDetail() != null ? transaction.getPaymentDetail().getReceiptNumber() : null;
+        return new TransactionSmsView(account.getId(), account.clientId(), account.getAccountNumber(),
+                transaction.getAmount(account.getCurrency()), account.getWithdrawableBalance(), transaction.getTransactionDate(),
+                transaction.getId(), receiptNumber);
+    }
+
+    @Override
+    public List<Long> activeIdsByClientId(final Long clientId) {
+        return savingsAccountRepository.findSavingAccountByClientId(clientId).stream().filter(SavingsAccount::isActive)
+                .map(SavingsAccount::getId).toList();
     }
 }

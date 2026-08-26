@@ -18,6 +18,10 @@
  */
 package org.apache.fineract.portfolio.savings.moduleapi;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 /**
  * ID-only savings-account existence check (ADR-021). Foreign BCs must not
  * depend on leftover {@code SavingsAccountRepository} /
@@ -29,6 +33,11 @@ public interface SavingsAccountExistencePort {
 
     record SavingsTransactionNoteRef(Long savingsAccountId, Long savingsTransactionId, Long clientId, Long officeId) {}
 
+    record CampaignSource(Long savingsAccountId, Long clientId) {}
+
+    record TransactionSmsView(Long savingsAccountId, Long clientId, String accountNumber, Object amount, BigDecimal balance,
+            LocalDate transactionDate, Long transactionId, String receiptNumber) {}
+
     /**
      * Throws {@code SavingsAccountNotFoundException} when {@code savingsAccountId} is unknown.
      */
@@ -39,4 +48,10 @@ public interface SavingsAccountExistencePort {
      * {@code savingsTransactionId} is unknown.
      */
     SavingsTransactionNoteRef requireTransaction(Long savingsTransactionId);
+
+    CampaignSource campaignSource(Object savingsAccount);
+
+    TransactionSmsView transactionSmsView(Object savingsTransaction);
+
+    List<Long> activeIdsByClientId(Long clientId);
 }
