@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.starter;
 
-import org.apache.fineract.cob.service.LoanAccountLockService;
+import org.apache.fineract.cob.service.LoanHardLockPort;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
@@ -436,7 +436,7 @@ public class LoanAccountConfiguration {
             RepaymentWithPostDatedChecksAssembler repaymentWithPostDatedChecksAssembler,
             PostDatedChecksRepository postDatedChecksRepository,
             LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository,
-            LoanLifecycleStateMachine loanLifecycleStateMachine, LoanAccountLockService loanAccountLockService,
+            LoanLifecycleStateMachine loanLifecycleStateMachine, LoanHardLockPort loanAccountLockService,
             ExternalIdFactory externalIdFactory, LoanAccrualTransactionBusinessEventService loanAccrualTransactionBusinessEventService,
             ErrorHandler errorHandler, LoanDownPaymentHandlerService loanDownPaymentHandlerService,
             LoanTransactionAssembler loanTransactionAssembler, LoanAccrualsProcessingService loanAccrualsProcessingService,

@@ -18,16 +18,12 @@
  */
 package org.apache.fineract.cob.service;
 
-import org.apache.fineract.cob.domain.AccountLockRepository;
-import org.apache.fineract.cob.domain.CustomLoanAccountLockRepository;
-import org.apache.fineract.cob.domain.LoanAccountLock;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class LoanAccountLockService extends AbstractAccountLockService<LoanAccountLock> implements LoanHardLockPort {
+/**
+ * Hard-lock query for loan write without leftover {@code LoanAccountLock} JPA.
+ */
+public interface LoanHardLockPort {
 
-    public LoanAccountLockService(final AccountLockRepository<LoanAccountLock> loanAccountLockRepository,
-            final CustomLoanAccountLockRepository<LoanAccountLock> customLoanAccountLockRepository) {
-        super(loanAccountLockRepository, customLoanAccountLockRepository);
-    }
+    boolean isAnyLoanHardLocked(List<Long> loanIds);
 }

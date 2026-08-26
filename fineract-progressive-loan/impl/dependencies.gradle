@@ -72,7 +72,7 @@ dependencies {
     implementation(project(path: ':fineract-tax-api'))
     implementation(project(path: ':fineract-event-impl'))
     implementation(project(path: ':fineract-organisation-impl'))
-    implementation(project(path: ':fineract-cob-impl'))
+    implementation(project(path: ':fineract-cob-api'))
     implementation(project(path: ':fineract-branch-api'))
     implementation(project(path: ':fineract-rates-impl'))
     implementation('org.apache.avro:avro')

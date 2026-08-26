@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.fineract.cob.service.AccountLockService;
+import org.apache.fineract.cob.service.LoanHardLockPort;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
@@ -170,7 +170,7 @@ class LoanAdjustmentServiceImplTest {
     @Mock
     private LoanLifecycleStateMachine loanLifecycleStateMachine;
     @Mock
-    private AccountLockService loanAccountLockService;
+    private LoanHardLockPort loanAccountLockService;
     @Mock
     private ExternalIdFactory externalIdFactory;
     @Mock
