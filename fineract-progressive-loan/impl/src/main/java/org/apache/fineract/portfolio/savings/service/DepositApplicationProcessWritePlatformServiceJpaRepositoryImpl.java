@@ -73,8 +73,7 @@ import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.DepositsApiConstants;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
@@ -122,7 +121,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final AccountNumberGenerator accountNumberGenerator;
     private final GroupRepository groupRepository;
     private final SavingsProductRepository savingsProductRepository;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final StaffRepositoryWrapper staffRepository;
     private final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator;
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
@@ -502,8 +501,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-        final List<Note> relatedNotes = this.noteRepository.findBySavingsAccountId(account.getId());
-        this.noteRepository.deleteAllInBatch(relatedNotes);
+        this.noteWritePlatformService.deleteAllBySavingsAccountId(account.getId());
         this.savingAccountRepository.delete(account);
         return  //
         //
@@ -526,9 +524,8 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
+                this.noteWritePlatformService.saveSavingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
-                this.noteRepository.save(note);
             }
         }
         return  //
@@ -554,9 +551,8 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
+                this.noteWritePlatformService.saveSavingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
-                this.noteRepository.save(note);
             }
         }
         return  //
@@ -582,9 +578,8 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
+                this.noteWritePlatformService.saveSavingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
-                this.noteRepository.save(note);
             }
         }
         return  //
@@ -610,9 +605,8 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.savingAccountRepository.save(savingsAccount);
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
-                final Note note = Note.savingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
+                this.noteWritePlatformService.saveSavingNote(savingsAccount.getId(), savingsAccount.clientId(), noteText);
                 changes.put("note", noteText);
-                this.noteRepository.save(note);
             }
         }
         return  //
@@ -641,7 +635,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;
@@ -651,7 +645,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.accountNumberGenerator = accountNumberGenerator;
         this.groupRepository = groupRepository;
         this.savingsProductRepository = savingsProductRepository;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.staffRepository = staffRepository;
         this.savingsAccountApplicationTransitionApiJsonValidator = savingsAccountApplicationTransitionApiJsonValidator;
         this.savingsAccountChargeAssembler = savingsAccountChargeAssembler;

@@ -89,8 +89,7 @@ import org.apache.fineract.portfolio.group.exception.GroupMemberCountNotInPermis
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountDataDTO;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
@@ -111,7 +110,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ClientRepositoryWrapper clientRepository;
     private final ClientNonPersonRepositoryWrapper clientNonPersonRepository;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final GroupRepository groupRepository;
     private final ClientDataValidator fromApiJsonDeserializer;
     private final AccountNumberGenerator accountNumberGenerator;
@@ -139,8 +138,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if (client.isNotPending()) {
                 throw new ClientMustBePendingToBeDeletedException(clientId);
             }
-            final List<Note> relatedNotes = this.noteRepository.findByClientId(client.getId());
-            this.noteRepository.deleteAllInBatch(relatedNotes);
+            this.noteWritePlatformService.deleteAllByClientId(client.getId());
             final ClientNonPerson clientNonPerson = this.clientNonPersonRepository.findOneByClientId(clientId);
             if (clientNonPerson != null) {
                 this.clientNonPersonRepository.delete(clientNonPerson);
@@ -938,12 +936,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteRepository noteRepository, final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsRepositoryWrapper, final SavingsProductRepository savingsProductRepository, final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService, final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper, final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final ExternalIdFactory externalIdFactory) {
+        public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsRepositoryWrapper, final SavingsProductRepository savingsProductRepository, final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService, final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper, final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final ExternalIdFactory externalIdFactory) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientNonPersonRepository = clientNonPersonRepository;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.groupRepository = groupRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.accountNumberGenerator = accountNumberGenerator;

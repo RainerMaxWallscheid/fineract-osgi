@@ -138,6 +138,52 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
         return NoteDeleteResponse.builder().resourceId(request.getId()).build();
     }
 
+    @Override
+    public void saveLoanNote(final Long loanId, final Long clientId, final String note) {
+        noteRepository.save(Note.loanNote(loanId, clientId, note));
+    }
+
+    @Override
+    public void saveLoanTransactionNote(final Long loanId, final Long loanTransactionId, final Long clientId, final String note) {
+        noteRepository.save(Note.loanTransactionNote(loanId, loanTransactionId, clientId, note));
+    }
+
+    @Override
+    public void saveSavingNote(final Long savingsAccountId, final Long clientId, final String note) {
+        noteRepository.save(Note.savingNote(savingsAccountId, clientId, note));
+    }
+
+    @Override
+    public void saveSavingsTransactionNote(final Long savingsAccountId, final Long savingsTransactionId, final Long clientId,
+            final String note) {
+        noteRepository.save(Note.savingsTransactionNote(savingsAccountId, savingsTransactionId, clientId, note));
+    }
+
+    @Override
+    public void saveShareNote(final Long shareAccountId, final Long clientId, final String note) {
+        noteRepository.save(Note.shareNote(shareAccountId, clientId, note));
+    }
+
+    @Override
+    public void deleteAllByClientId(final Long clientId) {
+        noteRepository.deleteAllInBatch(noteRepository.findByClientId(clientId));
+    }
+
+    @Override
+    public void deleteAllByGroupId(final Long groupId) {
+        noteRepository.deleteAllInBatch(noteRepository.findByGroupId(groupId));
+    }
+
+    @Override
+    public void deleteAllByLoanId(final Long loanId) {
+        noteRepository.deleteAllInBatch(noteRepository.findByLoanId(loanId));
+    }
+
+    @Override
+    public void deleteAllBySavingsAccountId(final Long savingsAccountId) {
+        noteRepository.deleteAllBySavingsAccountId(savingsAccountId);
+    }
+
     private Pair<Note, Long> getNote(NoteType type, Long resourceId, Long noteId) {
         Note note = null;
         Long officeId = null;

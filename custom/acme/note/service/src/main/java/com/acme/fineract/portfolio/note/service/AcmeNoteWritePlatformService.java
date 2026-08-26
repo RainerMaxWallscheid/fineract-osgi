@@ -54,4 +54,49 @@ public class AcmeNoteWritePlatformService implements NoteWritePlatformService, I
     public NoteDeleteResponse deleteNote(NoteDeleteRequest request) {
         throw new UnsupportedOperationException("deleteNote() is not yet implemented.");
     }
+
+    @Override
+    public void saveLoanNote(Long loanId, Long clientId, String note) {
+        throw new UnsupportedOperationException("saveLoanNote() is not yet implemented.");
+    }
+
+    @Override
+    public void saveLoanTransactionNote(Long loanId, Long loanTransactionId, Long clientId, String note) {
+        throw new UnsupportedOperationException("saveLoanTransactionNote() is not yet implemented.");
+    }
+
+    @Override
+    public void saveSavingNote(Long savingsAccountId, Long clientId, String note) {
+        throw new UnsupportedOperationException("saveSavingNote() is not yet implemented.");
+    }
+
+    @Override
+    public void saveSavingsTransactionNote(Long savingsAccountId, Long savingsTransactionId, Long clientId, String note) {
+        throw new UnsupportedOperationException("saveSavingsTransactionNote() is not yet implemented.");
+    }
+
+    @Override
+    public void saveShareNote(Long shareAccountId, Long clientId, String note) {
+        throw new UnsupportedOperationException("saveShareNote() is not yet implemented.");
+    }
+
+    @Override
+    public void deleteAllByClientId(Long clientId) {
+        throw new UnsupportedOperationException("deleteAllByClientId() is not yet implemented.");
+    }
+
+    @Override
+    public void deleteAllByGroupId(Long groupId) {
+        throw new UnsupportedOperationException("deleteAllByGroupId() is not yet implemented.");
+    }
+
+    @Override
+    public void deleteAllByLoanId(Long loanId) {
+        throw new UnsupportedOperationException("deleteAllByLoanId() is not yet implemented.");
+    }
+
+    @Override
+    public void deleteAllBySavingsAccountId(Long savingsAccountId) {
+        throw new UnsupportedOperationException("deleteAllBySavingsAccountId() is not yet implemented.");
+    }
 }

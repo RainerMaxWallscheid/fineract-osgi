@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -89,8 +88,7 @@ import org.apache.fineract.portfolio.loanaccount.serialization.LoanDownPaymentTr
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyType;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -106,7 +104,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoanApplicationTransitionValidator loanApplicationTransitionValidator;
     private final LoanApplicationValidator loanApplicationValidator;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final LoanAssembler loanAssembler;
     private final CalendarRepository calendarRepository;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
@@ -443,8 +441,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         if (loan.isNotSubmittedAndPendingApproval()) {
             throw new LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted(loanId);
         }
-        final List<Note> relatedNotes = this.noteRepository.findByLoanId(loan.getId());
-        this.noteRepository.deleteAllInBatch(relatedNotes);
+        this.noteWritePlatformService.deleteAllByLoanId(loan.getId());
         final AccountAssociations accountAssociations = this.accountAssociationsRepository.findByLoanIdAndType(loanId, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
         if (accountAssociations != null) {
             this.accountAssociationsRepository.delete(accountAssociations);
@@ -513,7 +510,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         final Map<String, Object> changes = loanAndChanges.getRight();
         if (!changes.isEmpty()) {
             final String noteText = command.stringValueOfParameterNamed("note");
-            createNote(noteText, loan).ifPresent(note -> changes.put("note", noteText));
+            if (createNote(noteText, loan)) {
+                changes.put("note", noteText);
+            }
             businessEventNotifierService.notifyPostBusinessEvent(new LoanApprovedBusinessEvent(loan));
         }
         return  //
@@ -744,14 +743,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
-    private Optional<Note> createNote(String submittedOnNote, Loan newLoanApplication) {
+    private boolean createNote(String submittedOnNote, Loan newLoanApplication) {
         if (StringUtils.isNotBlank(submittedOnNote)) {
-            final Note note = Note.loanNote(newLoanApplication.getId(), newLoanApplication.getClientId(), submittedOnNote);
-            this.noteRepository.save(note);
-            return Optional.of(note);
-        } else {
-            return Optional.empty();
+            this.noteWritePlatformService.saveLoanNote(newLoanApplication.getId(), newLoanApplication.getClientId(), submittedOnNote);
+            return true;
         }
+        return false;
     }
 
     private void releaseAttachedCollaterals(Loan loan) {
@@ -787,12 +784,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteRepository noteRepository, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
+        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
         this.context = context;
         this.loanApplicationTransitionValidator = loanApplicationTransitionValidator;
         this.loanApplicationValidator = loanApplicationValidator;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.loanAssembler = loanAssembler;
         this.calendarRepository = calendarRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;

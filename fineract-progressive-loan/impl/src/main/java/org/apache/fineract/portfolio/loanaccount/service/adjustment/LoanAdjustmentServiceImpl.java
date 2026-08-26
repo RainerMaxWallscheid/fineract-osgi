@@ -66,8 +66,7 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanJournalEntryPoster;
 import org.apache.fineract.portfolio.loanaccount.service.LoanScheduleService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanaccount.service.ReprocessLoanTransactionsService;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -79,7 +78,7 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
     private final LoanTransactionValidator loanTransactionValidator;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanAccountDomainService loanAccountDomainService;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final LoanTransactionRepository loanTransactionRepository;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     private final BusinessEventNotifierService businessEventNotifierService;
@@ -193,16 +192,11 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
         loan = saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            Note note;
             /*
              * If a new transaction is not created, associate note with the transaction to be adjusted
              */
-            if (thereIsNewTransaction) {
-                note = Note.loanTransactionNote(loan.getId(), newTransactionDetail.getId(), loan.getClientId(), noteText);
-            } else {
-                note = Note.loanTransactionNote(loan.getId(), transactionToAdjust.getId(), loan.getClientId(), noteText);
-            }
-            this.noteRepository.save(note);
+            final Long transactionId = thereIsNewTransaction ? newTransactionDetail.getId() : transactionToAdjust.getId();
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), transactionId, loan.getClientId(), noteText);
         }
         loanLifecycleStateMachine.determineAndTransition(loan, loan.getLastUserTransactionDate());
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
@@ -292,11 +286,11 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAdjustmentServiceImpl(final LoanTransactionValidator loanTransactionValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final NoteRepository noteRepository, final LoanTransactionRepository loanTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanChargeValidator loanChargeValidator, final LoanJournalEntryPoster journalEntryPoster, final LoanBalanceService loanBalanceService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final LoanScheduleService loanScheduleService) {
+        public LoanAdjustmentServiceImpl(final LoanTransactionValidator loanTransactionValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final NoteWritePlatformService noteWritePlatformService, final LoanTransactionRepository loanTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanChargeValidator loanChargeValidator, final LoanJournalEntryPoster journalEntryPoster, final LoanBalanceService loanBalanceService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final LoanScheduleService loanScheduleService) {
         this.loanTransactionValidator = loanTransactionValidator;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanAccountDomainService = loanAccountDomainService;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.loanTransactionRepository = loanTransactionRepository;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
         this.businessEventNotifierService = businessEventNotifierService;

@@ -51,8 +51,7 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanTransactionValidator;
 import org.apache.fineract.portfolio.loanaccount.service.ReprocessLoanTransactionsService;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +61,7 @@ public class LoanContractTerminationServiceImpl {
     private final LoanAssembler loanAssembler;
     private final LoanRepository loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final ReprocessLoanTransactionsService reprocessLoanTransactionsService;
     private final LoanUtilService loanUtilService;
     private final ExternalIdFactory externalIdFactory;
@@ -95,8 +94,7 @@ public class LoanContractTerminationServiceImpl {
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanTransactionNote(loan.getId(), contractTermination.getId(), loan.getClientId(), noteText);
-            noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), contractTermination.getId(), loan.getClientId(), noteText);
         }
         loanTransactionRepository.saveAndFlush(contractTermination);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
@@ -128,8 +126,7 @@ public class LoanContractTerminationServiceImpl {
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanTransactionNote(loan.getId(), contractTerminationTransaction.getId(), loan.getClientId(), noteText);
-            noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), contractTerminationTransaction.getId(), loan.getClientId(), noteText);
         }
         loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(contractTerminationTransaction.getLoan(), contractTerminationTransaction, "reversed");
         contractTerminationTransaction.reverse(reversalTxnExternalId);
@@ -187,11 +184,11 @@ public class LoanContractTerminationServiceImpl {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanContractTerminationServiceImpl(final LoanAssembler loanAssembler, final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository, final NoteRepository noteRepository, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanUtilService loanUtilService, final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleService loanScheduleService, final LoanChargeValidator loanChargeValidator, final ProgressiveLoanTransactionValidator loanTransactionValidator, final LoanTransactionService loanTransactionService) {
+        public LoanContractTerminationServiceImpl(final LoanAssembler loanAssembler, final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository, final NoteWritePlatformService noteWritePlatformService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanUtilService loanUtilService, final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleService loanScheduleService, final LoanChargeValidator loanChargeValidator, final ProgressiveLoanTransactionValidator loanTransactionValidator, final LoanTransactionService loanTransactionService) {
         this.loanAssembler = loanAssembler;
         this.loanRepository = loanRepository;
         this.loanTransactionRepository = loanTransactionRepository;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
         this.loanUtilService = loanUtilService;
         this.externalIdFactory = externalIdFactory;

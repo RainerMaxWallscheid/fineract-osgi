@@ -30,7 +30,7 @@ import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
 import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
@@ -113,10 +113,10 @@ public class ShareAccountsConfiguration {
     public ShareAccountWritePlatformService shareAccountWritePlatformService(ShareAccountDataSerializer accountDataSerializer,
             ShareAccountRepositoryWrapper shareAccountRepository, ShareProductRepositoryWrapper shareProductRepository,
             AccountNumberGenerator accountNumberGenerator, AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
-            SharesJournalPort sharesJournalPort, NoteRepository noteRepository,
+            SharesJournalPort sharesJournalPort, NoteWritePlatformService noteWritePlatformService,
             BusinessEventNotifierService businessEventNotifierService) {
         return new ShareAccountWritePlatformServiceJpaRepositoryImpl(accountDataSerializer, shareAccountRepository, shareProductRepository,
-                accountNumberGenerator, accountNumberFormatRepository, sharesJournalPort, noteRepository,
+                accountNumberGenerator, accountNumberFormatRepository, sharesJournalPort, noteWritePlatformService,
                 businessEventNotifierService);
     }
 }

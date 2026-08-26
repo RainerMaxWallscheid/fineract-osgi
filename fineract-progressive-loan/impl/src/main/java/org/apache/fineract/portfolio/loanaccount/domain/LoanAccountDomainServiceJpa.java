@@ -111,8 +111,7 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanaccount.service.ReprocessLoanTransactionsService;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanSupportedInterestRefundTypes;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.data.PostDatedChecksStatus;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
@@ -145,7 +144,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     private final ConfigurationDomainService configurationDomainService;
     private final HolidayRepository holidayRepository;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanUtilService loanUtilService;
     private final StandingInstructionRepository standingInstructionRepository;
@@ -248,8 +247,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newRepaymentTransaction);
         loan = loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), newRepaymentTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), newRepaymentTransaction.getId(), loan.getClientId(), noteText);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         setLoanDelinquencyTag(loan, transactionDate);
@@ -366,8 +364,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newPaymentTransaction);
         loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), newPaymentTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), newPaymentTransaction.getId(), loan.getClientId(), noteText);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         journalEntryPoster.postJournalEntriesForLoanTransaction(newPaymentTransaction, true, false);
@@ -424,8 +421,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(newRefundTransaction);
         this.loanRepositoryWrapper.saveAndFlush(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
         }
         journalEntryPoster.postJournalEntriesForLoanTransaction(newRefundTransaction, true, false);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
@@ -457,8 +453,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanAccountService.saveLoanTransactionWithDataIntegrityViolationChecks(disbursementTransaction);
         loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), disbursementTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), disbursementTransaction.getId(), loan.getClientId(), noteText);
         }
         journalEntryPoster.postJournalEntriesForLoanTransaction(disbursementTransaction, true, isLoanToLoanTransfer);
         return disbursementTransaction;
@@ -518,8 +513,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanRefundService.creditBalanceRefund(loan, newCreditBalanceRefundTransaction);
         newCreditBalanceRefundTransaction = this.loanTransactionRepository.saveAndFlush(newCreditBalanceRefundTransaction);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), newCreditBalanceRefundTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), newCreditBalanceRefundTransaction.getId(), loan.getClientId(), noteText);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         journalEntryPoster.postJournalEntriesForLoanTransaction(newCreditBalanceRefundTransaction, false, false);
@@ -550,8 +544,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanRefundService.makeRefundForActiveLoan(loan, newRefundTransaction);
         this.loanTransactionRepository.saveAndFlush(newRefundTransaction);
         if (StringUtils.isNotBlank(noteText)) {
-            final Note note = Note.loanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanTransactionNote(loan.getId(), newRefundTransaction.getId(), loan.getClientId(), noteText);
         }
         loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         journalEntryPoster.postJournalEntriesForLoanTransaction(newRefundTransaction, false, false);
@@ -605,8 +598,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loan = loanAccountService.saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
-            final Note note = Note.loanNote(loan.getId(), loan.getClientId(), noteText);
-            this.noteRepository.save(note);
+            this.noteWritePlatformService.saveLoanNote(loan.getId(), loan.getClientId(), noteText);
         }
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanForeClosurePostBusinessEvent(payment));
@@ -793,14 +785,14 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final NoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final StandingInstructionRepository standingInstructionRepository, final PostDatedChecksRepository postDatedChecksRepository, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final ExternalIdFactory externalIdFactory, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final InterestRefundServiceDelegate interestRefundServiceDelegate, final LoanTransactionValidator loanTransactionValidator, final LoanForeclosureValidator loanForeclosureValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanChargeValidator loanChargeValidator, final LoanRefundService loanRefundService, final LoanAccountService loanAccountService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService, final LoanAccountDomainServiceJpaHelper loanAccountDomainServiceJpaHelper, final LoanJournalEntryPoster journalEntryPoster) {
+        public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepository holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final NoteWritePlatformService noteWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final StandingInstructionRepository standingInstructionRepository, final PostDatedChecksRepository postDatedChecksRepository, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final ExternalIdFactory externalIdFactory, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final InterestRefundServiceDelegate interestRefundServiceDelegate, final LoanTransactionValidator loanTransactionValidator, final LoanForeclosureValidator loanForeclosureValidator, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeService loanChargeService, final LoanScheduleService loanScheduleService, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanChargeValidator loanChargeValidator, final LoanRefundService loanRefundService, final LoanAccountService loanAccountService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanBalanceService loanBalanceService, final LoanTransactionService loanTransactionService, final LoanAccountDomainServiceJpaHelper loanAccountDomainServiceJpaHelper, final LoanJournalEntryPoster journalEntryPoster) {
         this.loanAccountAssembler = loanAccountAssembler;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanTransactionRepository = loanTransactionRepository;
         this.configurationDomainService = configurationDomainService;
         this.holidayRepository = holidayRepository;
         this.workingDaysRepository = workingDaysRepository;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanUtilService = loanUtilService;
         this.standingInstructionRepository = standingInstructionRepository;

@@ -44,8 +44,7 @@ import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccou
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionEnumData;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountChargePaidBy;
@@ -64,7 +63,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     private final AccountNumberGenerator accountNumberGenerator;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
     private final SharesJournalPort sharesJournalPort;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final BusinessEventNotifierService businessEventNotifierService;
 
     @Override
@@ -219,9 +218,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
-                    this.noteRepository.save(note);
                 }
             }
             Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions();
@@ -258,9 +256,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
-                    this.noteRepository.save(note);
                 }
             }
             Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions();
@@ -291,9 +288,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
-                    this.noteRepository.save(note);
                 }
             }
             Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions();
@@ -444,9 +440,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.saveAndFlush(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    final Note note = Note.shareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
                     changes.put("note", noteText);
-                    this.noteRepository.save(note);
                 }
                 ShareAccountTransaction transaction = (ShareAccountTransaction) changes.get(ShareAccountApiConstants.requestedshares_paramname);
                 transaction = account.getShareAccountTransaction(transaction);
@@ -472,14 +467,14 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountWritePlatformServiceJpaRepositoryImpl(final ShareAccountDataSerializer accountDataSerializer, final ShareAccountRepositoryWrapper shareAccountRepository, final ShareProductRepositoryWrapper shareProductRepository, final AccountNumberGenerator accountNumberGenerator, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final SharesJournalPort sharesJournalPort, final NoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public ShareAccountWritePlatformServiceJpaRepositoryImpl(final ShareAccountDataSerializer accountDataSerializer, final ShareAccountRepositoryWrapper shareAccountRepository, final ShareProductRepositoryWrapper shareProductRepository, final AccountNumberGenerator accountNumberGenerator, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final SharesJournalPort sharesJournalPort, final NoteWritePlatformService noteWritePlatformService, final BusinessEventNotifierService businessEventNotifierService) {
         this.accountDataSerializer = accountDataSerializer;
         this.shareAccountRepository = shareAccountRepository;
         this.shareProductRepository = shareProductRepository;
         this.accountNumberGenerator = accountNumberGenerator;
         this.accountNumberFormatRepository = accountNumberFormatRepository;
         this.sharesJournalPort = sharesJournalPort;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.businessEventNotifierService = businessEventNotifierService;
     }
 }

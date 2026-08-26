@@ -36,7 +36,7 @@ dependencies {
     testImplementation(project(path: ':fineract-charge-api'))
     testImplementation(project(path: ':fineract-charge-impl'))
     testImplementation(project(path: ':fineract-dataqueries-impl'))
-    testImplementation(project(path: ':fineract-note-impl'))
+    testImplementation(project(path: ':fineract-note-api'))
     testImplementation(project(path: ':fineract-collateralmanagement-impl'))
     testImplementation(project(path: ':fineract-working-capital-loan-impl'))
     testImplementation(project(path: ':fineract-fund-api'))

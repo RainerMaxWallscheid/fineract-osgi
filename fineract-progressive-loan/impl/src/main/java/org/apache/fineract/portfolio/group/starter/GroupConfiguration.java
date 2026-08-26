@@ -58,7 +58,7 @@ import org.apache.fineract.portfolio.group.service.GroupingTypesWritePlatformSer
 import org.apache.fineract.portfolio.group.service.GroupingTypesWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -84,7 +84,7 @@ public class GroupConfiguration {
     @ConditionalOnMissingBean(GroupingTypesWritePlatformService.class)
     public GroupingTypesWritePlatformService groupingTypesWritePlatformService(PlatformSecurityContext context,
             GroupRepositoryWrapper groupRepository, ClientRepositoryWrapper clientRepositoryWrapper,
-            OfficeRepositoryWrapper officeRepositoryWrapper, StaffRepositoryWrapper staffRepository, NoteRepository noteRepository,
+            OfficeRepositoryWrapper officeRepositoryWrapper, StaffRepositoryWrapper staffRepository, NoteWritePlatformService noteWritePlatformService,
             GroupLevelRepository groupLevelRepository, GroupingTypesDataValidator fromApiJsonDeserializer,
             LoanRepositoryWrapper loanRepositoryWrapper, CodeValueRepositoryWrapper codeValueRepository,
             CommandProcessingService commandProcessingService, CalendarInstanceLookupPort calendarInstanceRepository,
@@ -95,7 +95,7 @@ public class GroupConfiguration {
 
     ) {
         return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientRepositoryWrapper,
-                officeRepositoryWrapper, staffRepository, noteRepository, groupLevelRepository, fromApiJsonDeserializer,
+                officeRepositoryWrapper, staffRepository, noteWritePlatformService, groupLevelRepository, fromApiJsonDeserializer,
                 loanRepositoryWrapper, codeValueRepository, commandProcessingService, calendarInstanceRepository,
                 configurationDomainService, savingsAccountRepositoryWrapper, accountNumberFormatRepository, accountNumberGenerator,
                 entityDatatableChecksWritePlatformService, businessEventNotifierService, loanOfficerService

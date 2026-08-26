@@ -73,8 +73,7 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanRepaymentScheduleSe
 import org.apache.fineract.portfolio.loanaccount.service.LoanScheduleService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanaccount.service.ReprocessLoanTransactionsService;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +86,7 @@ public class LoanReAgingService {
     private final ExternalIdFactory externalIdFactory;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanTransactionRepository loanTransactionRepository;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final LoanChargeValidator loanChargeValidator;
     private final LoanUtilService loanUtilService;
     private final LoanScheduleService loanScheduleService;
@@ -245,9 +244,8 @@ public class LoanReAgingService {
     private void persistNote(Loan loan, JsonCommand command, Map<String, Object> changes) {
         if (command.hasParameter(LoanReAgingApiConstants.noteParamName)) {
             final String note = command.stringValueOfParameterNamed(LoanReAgingApiConstants.noteParamName);
-            final Note newNote = Note.loanNote(loan.getId(), loan.getClientId(), note);
+            this.noteWritePlatformService.saveLoanNote(loan.getId(), loan.getClientId(), note);
             changes.put(LoanReAgingApiConstants.noteParamName, note);
-            this.noteRepository.saveAndFlush(newNote);
         }
     }
 
@@ -287,13 +285,13 @@ public class LoanReAgingService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReAgingService(final LoanAssembler loanAssembler, final LoanReAgingValidator reAgingValidator, final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final NoteRepository noteRepository, final LoanChargeValidator loanChargeValidator, final LoanUtilService loanUtilService, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final CodeValueRepository codeValueRepository, final LoanRepaymentScheduleService loanRepaymentScheduleService, final LoanReadPlatformService loanReadPlatformService, final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository) {
+        public LoanReAgingService(final LoanAssembler loanAssembler, final LoanReAgingValidator reAgingValidator, final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final NoteWritePlatformService noteWritePlatformService, final LoanChargeValidator loanChargeValidator, final LoanUtilService loanUtilService, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final CodeValueRepository codeValueRepository, final LoanRepaymentScheduleService loanRepaymentScheduleService, final LoanReadPlatformService loanReadPlatformService, final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository) {
         this.loanAssembler = loanAssembler;
         this.reAgingValidator = reAgingValidator;
         this.externalIdFactory = externalIdFactory;
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanTransactionRepository = loanTransactionRepository;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.loanChargeValidator = loanChargeValidator;
         this.loanUtilService = loanUtilService;
         this.loanScheduleService = loanScheduleService;

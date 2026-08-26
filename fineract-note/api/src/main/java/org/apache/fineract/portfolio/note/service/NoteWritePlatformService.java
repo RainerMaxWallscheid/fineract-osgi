@@ -32,4 +32,27 @@ public interface NoteWritePlatformService {
     NoteUpdateResponse updateNote(NoteUpdateRequest request);
 
     NoteDeleteResponse deleteNote(NoteDeleteRequest request);
+
+    /** Persist a loan note by ids. No existence lookup. */
+    void saveLoanNote(Long loanId, Long clientId, String note);
+
+    /** Persist a loan-transaction note by ids. No existence lookup. */
+    void saveLoanTransactionNote(Long loanId, Long loanTransactionId, Long clientId, String note);
+
+    /** Persist a savings-account note by ids. No existence lookup. */
+    void saveSavingNote(Long savingsAccountId, Long clientId, String note);
+
+    /** Persist a savings-transaction note by ids. No existence lookup. */
+    void saveSavingsTransactionNote(Long savingsAccountId, Long savingsTransactionId, Long clientId, String note);
+
+    /** Persist a share-account note by ids. No existence lookup. */
+    void saveShareNote(Long shareAccountId, Long clientId, String note);
+
+    void deleteAllByClientId(Long clientId);
+
+    void deleteAllByGroupId(Long groupId);
+
+    void deleteAllByLoanId(Long loanId);
+
+    void deleteAllBySavingsAccountId(Long savingsAccountId);
 }

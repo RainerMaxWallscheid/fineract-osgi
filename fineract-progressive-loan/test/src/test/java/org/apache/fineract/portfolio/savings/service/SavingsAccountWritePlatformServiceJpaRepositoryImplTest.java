@@ -63,7 +63,7 @@ import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatfor
 import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeDataValidator;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountDataValidator;
@@ -118,7 +118,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
     @Mock
     private SavingsAccountDomainService savingsAccountDomainService;
     @Mock
-    private NoteRepository noteRepository;
+    private NoteWritePlatformService noteWritePlatformService;
     @Mock
     private AccountTransfersReadPlatformService accountTransfersReadPlatformService;
     @Mock

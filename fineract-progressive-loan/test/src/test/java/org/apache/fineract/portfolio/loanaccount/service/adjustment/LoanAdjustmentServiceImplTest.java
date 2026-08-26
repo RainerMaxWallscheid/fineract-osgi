@@ -76,7 +76,7 @@ import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidat
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanTransactionValidator;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanUpdateCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.loanaccount.service.adjustment.LoanAdjustmentServiceImpl;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecksRepository;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksAssembler;
@@ -106,7 +106,7 @@ class LoanAdjustmentServiceImplTest {
     @Mock
     private LoanAccountDomainService loanAccountDomainService;
     @Mock
-    private NoteRepository noteRepository;
+    private NoteWritePlatformService noteWritePlatformService;
     @Mock
     private LoanTransactionRepository loanTransactionRepository;
     @Mock

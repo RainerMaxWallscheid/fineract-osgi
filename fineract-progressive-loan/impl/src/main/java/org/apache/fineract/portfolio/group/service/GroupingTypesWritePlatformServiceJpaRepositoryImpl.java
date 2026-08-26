@@ -82,8 +82,7 @@ import org.apache.fineract.portfolio.group.serialization.GroupingTypesDataValida
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
-import org.apache.fineract.portfolio.note.domain.Note;
-import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -101,7 +100,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final StaffRepositoryWrapper staffRepository;
-    private final NoteRepository noteRepository;
+    private final NoteWritePlatformService noteWritePlatformService;
     private final GroupLevelRepository groupLevelRepository;
     private final GroupingTypesDataValidator fromApiJsonDeserializer;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
@@ -464,8 +463,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
             if (groupForDelete.isNotPending()) {
                 throw new GroupMustBePendingToBeDeletedException(groupId);
             }
-            final List<Note> relatedNotes = this.noteRepository.findByGroupId(groupForDelete.getId());
-            this.noteRepository.deleteAllInBatch(relatedNotes);
+            this.noteWritePlatformService.deleteAllByGroupId(groupForDelete.getId());
             this.groupRepository.delete(groupForDelete);
             this.groupRepository.flush();
             return  //
@@ -767,13 +765,13 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     }
 
     @java.lang.SuppressWarnings("all")
-        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteRepository noteRepository, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
+        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
         this.context = context;
         this.groupRepository = groupRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.staffRepository = staffRepository;
-        this.noteRepository = noteRepository;
+        this.noteWritePlatformService = noteWritePlatformService;
         this.groupLevelRepository = groupLevelRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
