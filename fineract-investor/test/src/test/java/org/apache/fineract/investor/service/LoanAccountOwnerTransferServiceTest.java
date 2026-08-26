@@ -40,7 +40,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.investor.data.ExternalTransferStatus;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
@@ -50,6 +49,7 @@ import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanAccountSnapshotEventPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.junit.jupiter.api.AfterAll;
@@ -91,6 +91,9 @@ public class LoanAccountOwnerTransferServiceTest {
 
     @Mock
     private LoanTransferBalancePort loanTransferBalancePort;
+
+    @Mock
+    private LoanAccountSnapshotEventPort loanAccountSnapshotEventPort;
 
     @InjectMocks
     private LoanAccountOwnerTransferServiceImpl underTest;
@@ -231,9 +234,9 @@ public class LoanAccountOwnerTransferServiceTest {
         underTest.handleLoanClosedOrOverpaid(loanForProcessing);
 
         // then
-        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(2);
+        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(1);
         verifyLoanTransferBusinessEvent(businessEventArgumentCaptor, 0, loanForProcessing, pendingBuybackTransfer);
-        verifyLoanAccountSnapshotBusinessEvent(businessEventArgumentCaptor, 1, loanForProcessing);
+        verify(loanAccountSnapshotEventPort).notifySnapshot(loanForProcessing);
     }
 
     private static Stream<Arguments> pendingStatusDataProvider() {
@@ -258,12 +261,6 @@ public class LoanAccountOwnerTransferServiceTest {
         assertEquals(expectedLoan, ((LoanOwnershipTransferBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).getLoan());
         assertEquals(expectedAssetOwnerTransfer,
                 ((LoanOwnershipTransferBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).get());
-    }
-
-    private void verifyLoanAccountSnapshotBusinessEvent(ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor, int index,
-            Loan expectedLoan) {
-        assertTrue(businessEventArgumentCaptor.getAllValues().get(index) instanceof LoanAccountSnapshotBusinessEvent);
-        assertEquals(expectedLoan, ((LoanAccountSnapshotBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).get());
     }
 
 }

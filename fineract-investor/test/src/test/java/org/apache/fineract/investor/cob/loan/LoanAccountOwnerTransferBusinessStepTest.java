@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.investor.data.ExternalTransferStatus;
 import org.apache.fineract.investor.data.ExternalTransferSubStatus;
@@ -62,6 +61,7 @@ import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanAccountSnapshotEventPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
@@ -121,6 +121,9 @@ public class LoanAccountOwnerTransferBusinessStepTest {
     @Mock
     private LoanTransferBalancePort loanTransferBalancePort;
 
+    @Mock
+    private LoanAccountSnapshotEventPort loanAccountSnapshotEventPort;
+
     private LoanAccountOwnerTransferBusinessStep underTest;
 
     @BeforeAll
@@ -142,7 +145,7 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         underTest = new LoanAccountOwnerTransferBusinessStep(externalAssetOwnerTransferRepository,
                 externalAssetOwnerTransferLoanMappingRepository, externalOwnerTransferJournalPort, businessEventNotifierService,
                 loanTransferabilityService, delayedSettlementAttributeService, externalAssetOwnerTransferOutstandingInterestCalculation,
-                loanSaleDeferredIncomePort, loanTransferSnapshotPort, loanTransferBalancePort);
+                loanSaleDeferredIncomePort, loanTransferSnapshotPort, loanTransferBalancePort, loanAccountSnapshotEventPort);
     }
 
     @AfterEach
@@ -160,7 +163,8 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         final Object processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
-        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort);
+        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort,
+                loanAccountSnapshotEventPort);
         assertEquals(processedLoan, loanForProcessing);
     }
 
@@ -185,7 +189,8 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // then
         assertEquals("Illegal transfer found. Expected PENDING and BUYBACK, found: PENDING and ACTIVE", exception.getMessage());
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
-        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort);
+        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort,
+                loanAccountSnapshotEventPort);
     }
 
     @Test
@@ -209,7 +214,8 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         // then
         assertEquals("Delayed Settlement enabled, but found 2 transfers of statuses: PENDING and BUYBACK", exception.getMessage());
         verify(externalAssetOwnerTransferRepository, times(1)).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
-        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort);
+        verifyNoInteractions(businessEventNotifierService, loanTransferabilityService, externalOwnerTransferJournalPort,
+                loanAccountSnapshotEventPort);
     }
 
     @Test
@@ -322,9 +328,9 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         verify(externalOwnerTransferJournalPort).postTransfer(loanForProcessing, firstResponseItem, null);
         verifyNoMoreInteractions(externalOwnerTransferJournalPort);
 
-        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(2);
+        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(1);
         verifyLoanTransferBusinessEvent(businessEventArgumentCaptor, 0, loanForProcessing, firstResponseItem);
-        verifyLoanAccountSnapshotBusinessEvent(businessEventArgumentCaptor, 1, loanForProcessing);
+        verify(loanAccountSnapshotEventPort).notifySnapshot(loanForProcessing);
     }
 
     private static Stream<Arguments> loanSaleTransferableDataProvider() {
@@ -388,9 +394,9 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         verify(externalOwnerTransferJournalPort).postTransfer(loanForProcessing, savedNewTransfer, null);
         verifyNoMoreInteractions(externalOwnerTransferJournalPort);
 
-        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(2);
+        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(1);
         verifyLoanTransferBusinessEvent(businessEventArgumentCaptor, 0, loanForProcessing, savedNewTransfer);
-        verifyLoanAccountSnapshotBusinessEvent(businessEventArgumentCaptor, 1, loanForProcessing);
+        verify(loanAccountSnapshotEventPort).notifySnapshot(loanForProcessing);
     }
 
     private static Stream<Arguments> loanSaleNotTransferableDataProvider() {
@@ -514,9 +520,9 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         verify(externalOwnerTransferJournalPort).postTransfer(loanForProcessing, savedNewTransfer, previousOwner);
         verifyNoMoreInteractions(externalOwnerTransferJournalPort);
 
-        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(2);
+        ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor = verifyBusinessEvents(1);
         verifyLoanTransferBusinessEvent(businessEventArgumentCaptor, 0, loanForProcessing, savedNewTransfer);
-        verifyLoanAccountSnapshotBusinessEvent(businessEventArgumentCaptor, 1, loanForProcessing);
+        verify(loanAccountSnapshotEventPort).notifySnapshot(loanForProcessing);
     }
 
     @Test
@@ -581,12 +587,6 @@ public class LoanAccountOwnerTransferBusinessStepTest {
         assertEquals(expectedLoan, ((LoanOwnershipTransferBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).getLoan());
         assertEquals(expectedAssetOwnerTransfer,
                 ((LoanOwnershipTransferBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).get());
-    }
-
-    private void verifyLoanAccountSnapshotBusinessEvent(ArgumentCaptor<BusinessEvent<?>> businessEventArgumentCaptor, int index,
-            Loan expectedLoan) {
-        assertTrue(businessEventArgumentCaptor.getAllValues().get(index) instanceof LoanAccountSnapshotBusinessEvent);
-        assertEquals(expectedLoan, ((LoanAccountSnapshotBusinessEvent) businessEventArgumentCaptor.getAllValues().get(index)).get());
     }
 
     private void assertCommonFieldsOfPendingAndActiveTransfers(final ExternalAssetOwnerTransfer pendingTransfer,

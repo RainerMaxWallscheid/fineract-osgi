@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.investor.config.InvestorModuleIsEnabledCondition;
 import org.apache.fineract.investor.data.ExternalTransferStatus;
@@ -41,7 +40,7 @@ import org.apache.fineract.investor.service.ExternalAssetOwnerTransferOutstandin
 import org.apache.fineract.investor.service.LoanTransferabilityService;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.investor.moduleapi.ExternalAssetOwnerTransferCobPort;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanAccountSnapshotEventPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanSaleDeferredIncomePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
@@ -68,6 +67,7 @@ public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerT
     private final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort;
     private final LoanTransferSnapshotPort loanTransferSnapshotPort;
     private final LoanTransferBalancePort loanTransferBalancePort;
+    private final LoanAccountSnapshotEventPort loanAccountSnapshotEventPort;
 
     @Override
     public Object execute(Object loan) {
@@ -103,7 +103,7 @@ public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerT
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, loan,
                 loanTransferBalancePort.loanId(loan)));
         if (!ExternalTransferStatus.DECLINED.equals(newExternalAssetOwnerTransfer.getStatus())) {
-            businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
+            loanAccountSnapshotEventPort.notifySnapshot(loan);
         }
     }
 
@@ -118,7 +118,7 @@ public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerT
         }
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(newExternalAssetOwnerTransfer, loan,
                 loanTransferBalancePort.loanId(loan)));
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
+        loanAccountSnapshotEventPort.notifySnapshot(loan);
     }
 
     private ExternalAssetOwnerTransfer buybackAsset(final Object loan, final LocalDate settlementDate, ExternalAssetOwnerTransfer buybackExternalAssetOwnerTransfer, ExternalAssetOwnerTransfer activeExternalAssetOwnerTransfer) {
@@ -281,7 +281,7 @@ public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerT
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferBalancePort loanTransferBalancePort) {
+        public LoanAccountOwnerTransferBusinessStep(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransferabilityService loanTransferabilityService, final DelayedSettlementAttributeService delayedSettlementAttributeService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanSaleDeferredIncomePort loanSaleDeferredIncomePort, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferBalancePort loanTransferBalancePort, final LoanAccountSnapshotEventPort loanAccountSnapshotEventPort) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
         this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
@@ -292,5 +292,6 @@ public class LoanAccountOwnerTransferBusinessStep implements ExternalAssetOwnerT
         this.loanSaleDeferredIncomePort = loanSaleDeferredIncomePort;
         this.loanTransferSnapshotPort = loanTransferSnapshotPort;
         this.loanTransferBalancePort = loanTransferBalancePort;
+        this.loanAccountSnapshotEventPort = loanAccountSnapshotEventPort;
     }
 }

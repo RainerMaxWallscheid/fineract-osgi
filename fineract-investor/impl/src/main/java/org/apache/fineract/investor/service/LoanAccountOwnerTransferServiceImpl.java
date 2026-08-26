@@ -35,7 +35,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.investor.data.ExternalTransferSubStatus;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
@@ -44,7 +43,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferLoanMapping
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanAccountSnapshotEventPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferBalancePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.data.domain.Sort;
@@ -64,6 +63,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     private final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation;
     private final LoanTransferSnapshotPort loanTransferSnapshotPort;
     private final LoanTransferBalancePort loanTransferBalancePort;
+    private final LoanAccountSnapshotEventPort loanAccountSnapshotEventPort;
 
     @Override
     public void handleLoanClosedOrOverpaid(Object loan) {
@@ -109,7 +109,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         externalOwnerTransferJournalPort.postTransfer(loan, buybackTransfer, null);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, loan,
                 loanTransferBalancePort.loanId(loan)));
-        businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent((Loan) loan));
+        loanAccountSnapshotEventPort.notifySnapshot(loan);
     }
 
     private ExternalAssetOwnerTransfer createCancelledTransfer(ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
@@ -190,7 +190,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferBalancePort loanTransferBalancePort) {
+        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation, final LoanTransferSnapshotPort loanTransferSnapshotPort, final LoanTransferBalancePort loanTransferBalancePort, final LoanAccountSnapshotEventPort loanAccountSnapshotEventPort) {
         this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
         this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
         this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
@@ -198,5 +198,6 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
         this.loanTransferSnapshotPort = loanTransferSnapshotPort;
         this.loanTransferBalancePort = loanTransferBalancePort;
+        this.loanAccountSnapshotEventPort = loanAccountSnapshotEventPort;
     }
 }
