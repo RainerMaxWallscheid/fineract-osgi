@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.reportmailingjob.service;
 
-dependencies {
-    api project(path: ':fineract-core')
+import java.time.LocalDateTime;
+import java.util.List;
+import org.apache.fineract.infrastructure.reportmailingjob.data.DueReportMailingJob;
 
-    implementation 'org.apache.commons:commons-lang3'
-    implementation 'jakarta.validation:jakarta.validation-api'
-    implementation 'com.google.code.gson:gson'
-    implementation 'com.google.guava:guava'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
-    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
-    compileOnly 'org.springframework:spring-tx'
-    compileOnly 'org.springframework:spring-context'
+/**
+ * Due-job lookup and run recording without leftover {@code ReportMailingJob} JPA.
+ */
+public interface ReportMailingJobRunPort {
+
+    List<DueReportMailingJob> findDueJobs();
+
+    void recordRun(Long jobId, LocalDateTime jobStart, boolean success, String errorLog);
 }

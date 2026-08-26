@@ -25,15 +25,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.domain.Report;
@@ -41,18 +36,14 @@ import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWra
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
+import org.apache.fineract.infrastructure.reportmailingjob.data.DueReportMailingJob;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobEmailAttachmentFileFormat;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobEmailData;
-import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobPreviousRunStatus;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobStretchyReportParamDateOption;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJob;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRepository;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRunHistory;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRunHistoryRepository;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobEmailService;
+import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobRunPort;
 import org.apache.fineract.infrastructure.reportmailingjob.util.ReportMailingJobDateUtil;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
-import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -62,54 +53,51 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class ExecuteReportMailingJobsTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteReportMailingJobsTasklet.class);
-    private final ReportMailingJobRepository reportMailingJobRepository;
+    private final ReportMailingJobRunPort reportMailingJobRunPort;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final ReadReportingService readReportingService;
     private final ReportRepositoryWrapper reportRepositoryWrapper;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
     private final ReportMailingJobEmailService reportMailingJobEmailService;
-    private final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository;
     private final FineractProperties fineractProperties;
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        final Collection<ReportMailingJob> reportMailingJobCollection = reportMailingJobRepository.findByIsActiveTrueAndIsDeletedFalse();
-        for (ReportMailingJob reportMailingJob : reportMailingJobCollection) {
-            final LocalDateTime localDateTimeOftenant = DateUtils.getLocalDateTimeOfTenant();
-            final LocalDateTime nextRunDateTime = reportMailingJob.getNextRunDateTime();
-            if (nextRunDateTime != null && DateUtils.isBefore(nextRunDateTime, localDateTimeOftenant)) {
-                final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat = ReportMailingJobEmailAttachmentFileFormat.newInstance(reportMailingJob.getEmailAttachmentFileFormat());
-                if (emailAttachmentFileFormat != null && emailAttachmentFileFormat != ReportMailingJobEmailAttachmentFileFormat.INVALID) {
-                    final Long stretchyReportId = reportMailingJob.getStretchyReportId();
-                    final Report stretchyReport = stretchyReportId == null ? null
-                            : reportRepositoryWrapper.findOneThrowExceptionIfNotFound(stretchyReportId);
-                    final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
-                    final StringBuilder errorLog = new StringBuilder();
-                    final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator.validateStretchyReportParamMap(reportMailingJob.getStretchyReportParamMap());
-                    MultivaluedMap<String, String> reportParams = new MultivaluedStringMap();
-                    if (validateStretchyReportParamMap != null) {
-                        for (Map.Entry<String, String> validateStretchyReportParamMapEntry : validateStretchyReportParamMap.entrySet()) {
-                            String key = validateStretchyReportParamMapEntry.getKey();
-                            String value = validateStretchyReportParamMapEntry.getValue();
-                            if (key != null && key.toLowerCase(Locale.ROOT).contains("date")) {
-                                ReportMailingJobStretchyReportParamDateOption reportMailingJobStretchyReportParamDateOption = ReportMailingJobStretchyReportParamDateOption.newInstance(value);
-                                if (reportMailingJobStretchyReportParamDateOption != ReportMailingJobStretchyReportParamDateOption.INVALID) {
-                                    value = ReportMailingJobDateUtil.getDateAsString(reportMailingJobStretchyReportParamDateOption);
-                                }
+        for (DueReportMailingJob reportMailingJob : reportMailingJobRunPort.findDueJobs()) {
+            final LocalDateTime jobStart = DateUtils.getLocalDateTimeOfTenant();
+            final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat = ReportMailingJobEmailAttachmentFileFormat
+                    .newInstance(reportMailingJob.emailAttachmentFileFormat());
+            if (emailAttachmentFileFormat != null && emailAttachmentFileFormat != ReportMailingJobEmailAttachmentFileFormat.INVALID) {
+                final Long stretchyReportId = reportMailingJob.stretchyReportId();
+                final Report stretchyReport = stretchyReportId == null ? null
+                        : reportRepositoryWrapper.findOneThrowExceptionIfNotFound(stretchyReportId);
+                final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
+                final StringBuilder errorLog = new StringBuilder();
+                final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator
+                        .validateStretchyReportParamMap(reportMailingJob.stretchyReportParamMap());
+                MultivaluedMap<String, String> reportParams = new MultivaluedStringMap();
+                if (validateStretchyReportParamMap != null) {
+                    for (Map.Entry<String, String> validateStretchyReportParamMapEntry : validateStretchyReportParamMap.entrySet()) {
+                        String key = validateStretchyReportParamMapEntry.getKey();
+                        String value = validateStretchyReportParamMapEntry.getValue();
+                        if (key != null && key.toLowerCase(Locale.ROOT).contains("date")) {
+                            ReportMailingJobStretchyReportParamDateOption reportMailingJobStretchyReportParamDateOption = ReportMailingJobStretchyReportParamDateOption
+                                    .newInstance(value);
+                            if (reportMailingJobStretchyReportParamDateOption != ReportMailingJobStretchyReportParamDateOption.INVALID) {
+                                value = ReportMailingJobDateUtil.getDateAsString(reportMailingJobStretchyReportParamDateOption);
                             }
-                            reportParams.add(key, value);
                         }
+                        reportParams.add(key, value);
                     }
-                    generateReportOutputStream(reportMailingJob, emailAttachmentFileFormat, reportParams, reportName, errorLog);
-                    updateReportMailingJobAfterJobExecution(reportMailingJob, errorLog, localDateTimeOftenant);
                 }
+                generateReportOutputStream(reportMailingJob, emailAttachmentFileFormat, reportParams, reportName, errorLog);
+                reportMailingJobRunPort.recordRun(reportMailingJob.id(), jobStart, errorLog.length() == 0, errorLog.toString());
             }
         }
         return RepeatStatus.FINISHED;
     }
 
-    private void generateReportOutputStream(final ReportMailingJob reportMailingJob, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final MultivaluedMap<String, String> reportParams, final String reportName, final StringBuilder errorLog) {
+    private void generateReportOutputStream(final DueReportMailingJob reportMailingJob, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final MultivaluedMap<String, String> reportParams, final String reportName, final StringBuilder errorLog) {
         try {
             final String reportType = readReportingService.getReportType(reportName, false);
             final ReportingProcessService reportingProcessService = reportingProcessServiceProvider.findReportingProcessService(reportType);
@@ -140,31 +128,8 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
         }
     }
 
-    private void updateReportMailingJobAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog, final LocalDateTime jobStartDateTime) {
-        final String recurrence = reportMailingJob.getRecurrence();
-        final LocalDateTime nextRunDateTime = reportMailingJob.getNextRunDateTime();
-        ReportMailingJobPreviousRunStatus reportMailingJobPreviousRunStatus = ReportMailingJobPreviousRunStatus.SUCCESS;
-        reportMailingJob.setPreviousRunErrorLog(null);
-        if (errorLog != null && errorLog.length() > 0) {
-            reportMailingJobPreviousRunStatus = ReportMailingJobPreviousRunStatus.ERROR;
-            reportMailingJob.setPreviousRunErrorLog(errorLog.toString());
-        }
-        reportMailingJob.increaseNumberOfRunsByOne();
-        reportMailingJob.setPreviousRunStatus(reportMailingJobPreviousRunStatus.getValue());
-        reportMailingJob.setPreviousRunDateTime(reportMailingJob.getNextRunDateTime());
-        if (StringUtils.isEmpty(recurrence)) {
-            reportMailingJob.setActive(false);
-            reportMailingJob.setNextRunDateTime(null);
-        } else if (nextRunDateTime != null) {
-            final LocalDateTime nextRecurringDateTime = createNextRecurringDateTime(recurrence, nextRunDateTime);
-            reportMailingJob.setNextRunDateTime(nextRecurringDateTime);
-        }
-        reportMailingJobRepository.save(reportMailingJob);
-        createReportMailingJobRunHistroryAfterJobExecution(reportMailingJob, errorLog, jobStartDateTime, reportMailingJobPreviousRunStatus.getValue());
-    }
-
-    private void sendReportFileToEmailRecipients(final ReportMailingJob reportMailingJob, final Path fileName, final ByteArrayOutputStream byteArrayOutputStream, final StringBuilder errorLog) {
-        final Set<String> emailRecipients = this.reportMailingJobValidator.validateEmailRecipients(reportMailingJob.getEmailRecipients());
+    private void sendReportFileToEmailRecipients(final DueReportMailingJob reportMailingJob, final Path fileName, final ByteArrayOutputStream byteArrayOutputStream, final StringBuilder errorLog) {
+        final Set<String> emailRecipients = this.reportMailingJobValidator.validateEmailRecipients(reportMailingJob.emailRecipients());
         try {
             final Path parent = fileName.getParent();
             if (parent != null) {
@@ -175,7 +140,7 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
                 byteArrayOutputStream.writeTo(outputStream);
             }
             for (String emailRecipient : emailRecipients) {
-                final ReportMailingJobEmailData reportMailingJobEmailData = new ReportMailingJobEmailData().setTo(emailRecipient).setText(reportMailingJob.getEmailMessage()).setSubject(reportMailingJob.getEmailSubject()).setAttachment(file);
+                final ReportMailingJobEmailData reportMailingJobEmailData = new ReportMailingJobEmailData().setTo(emailRecipient).setText(reportMailingJob.emailMessage()).setSubject(reportMailingJob.emailSubject()).setAttachment(file);
                 reportMailingJobEmailService.sendEmailWithAttachment(reportMailingJobEmailData);
             }
         } catch (IOException e) {
@@ -183,34 +148,14 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
         }
     }
 
-    private LocalDateTime createNextRecurringDateTime(final String recurrencePattern, final LocalDateTime startDateTime) {
-        LocalDateTime nextRecurringDateTime = null;
-        if (StringUtils.isNotBlank(recurrencePattern) && startDateTime != null) {
-            final LocalDate nextDayLocalDate = startDateTime.plus(Duration.ofDays(1)).toLocalDate();
-            final LocalDate nextRecurringLocalDate = CalendarUtils.getNextRecurringDate(recurrencePattern, startDateTime.toLocalDate(), nextDayLocalDate);
-            final String nextDateTimeString = nextRecurringLocalDate + " " + startDateTime.getHour() + ":" + startDateTime.getMinute() + ":" + startDateTime.getSecond();
-            final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
-            nextRecurringDateTime = LocalDateTime.parse(nextDateTimeString, dateTimeFormatter);
-        }
-        return nextRecurringDateTime;
-    }
-
-    private void createReportMailingJobRunHistroryAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog, final LocalDateTime jobStartDateTime, final String jobRunStatus) {
-        final LocalDateTime jobEndDateTime = DateUtils.getLocalDateTimeOfTenant();
-        final String errorLogToString = (errorLog != null) ? errorLog.toString() : null;
-        final ReportMailingJobRunHistory reportMailingJobRunHistory = ReportMailingJobRunHistory.newInstance(reportMailingJob, jobStartDateTime, jobEndDateTime, jobRunStatus, null, errorLogToString);
-        reportMailingJobRunHistoryRepository.save(reportMailingJobRunHistory);
-    }
-
     @java.lang.SuppressWarnings("all")
-        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRepository reportMailingJobRepository, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportRepositoryWrapper reportRepositoryWrapper, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository, final FineractProperties fineractProperties) {
-        this.reportMailingJobRepository = reportMailingJobRepository;
+        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRunPort reportMailingJobRunPort, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportRepositoryWrapper reportRepositoryWrapper, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final FineractProperties fineractProperties) {
+        this.reportMailingJobRunPort = reportMailingJobRunPort;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.readReportingService = readReportingService;
         this.reportRepositoryWrapper = reportRepositoryWrapper;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
         this.reportMailingJobEmailService = reportMailingJobEmailService;
-        this.reportMailingJobRunHistoryRepository = reportMailingJobRunHistoryRepository;
         this.fineractProperties = fineractProperties;
     }
 }

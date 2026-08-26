@@ -23,9 +23,8 @@ import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWra
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRepository;
-import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJobRunHistoryRepository;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobEmailService;
+import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobRunPort;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -46,7 +45,7 @@ public class ExecuteReportMailingJobsConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private ReportMailingJobRepository reportMailingJobRepository;
+    private ReportMailingJobRunPort reportMailingJobRunPort;
     @Autowired
     private ReportMailingJobValidator reportMailingJobValidator;
     @Autowired
@@ -57,8 +56,6 @@ public class ExecuteReportMailingJobsConfig {
     private ReportingProcessServiceProvider reportingProcessServiceProvider;
     @Autowired
     private ReportMailingJobEmailService reportMailingJobEmailService;
-    @Autowired
-    private ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository;
     @Autowired
     private FineractProperties fineractProperties;
 
@@ -76,8 +73,7 @@ public class ExecuteReportMailingJobsConfig {
 
     @Bean
     public ExecuteReportMailingJobsTasklet executeReportMailingJobsTasklet() {
-        return new ExecuteReportMailingJobsTasklet(reportMailingJobRepository, reportMailingJobValidator, readReportingService,
-                reportRepositoryWrapper, reportingProcessServiceProvider, reportMailingJobEmailService,
-                reportMailingJobRunHistoryRepository, fineractProperties);
+        return new ExecuteReportMailingJobsTasklet(reportMailingJobRunPort, reportMailingJobValidator, readReportingService,
+                reportRepositoryWrapper, reportingProcessServiceProvider, reportMailingJobEmailService, fineractProperties);
     }
 }

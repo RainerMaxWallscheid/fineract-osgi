@@ -16,18 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.reportmailingjob.data;
 
-dependencies {
-    api project(path: ':fineract-core')
-
-    implementation 'org.apache.commons:commons-lang3'
-    implementation 'jakarta.validation:jakarta.validation-api'
-    implementation 'com.google.code.gson:gson'
-    implementation 'com.google.guava:guava'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    compileOnly 'io.swagger.core.v3:swagger-annotations-jakarta'
-    compileOnly 'com.fasterxml.jackson.core:jackson-annotations'
-    compileOnly 'org.springframework:spring-tx'
-    compileOnly 'org.springframework:spring-context'
-}
+/**
+ * Due report-mailing job snapshot (no leftover {@code ReportMailingJob} JPA).
+ */
+public record DueReportMailingJob(Long id, String emailAttachmentFileFormat, Long stretchyReportId, String stretchyReportParamMap,
+        String emailRecipients, String emailMessage, String emailSubject, String recurrence) {}
