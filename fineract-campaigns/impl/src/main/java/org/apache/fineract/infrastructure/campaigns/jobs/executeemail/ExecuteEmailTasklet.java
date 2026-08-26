@@ -45,8 +45,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.reportmailingjob.helper.IPv4Helper;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -58,7 +57,7 @@ public class ExecuteEmailTasklet implements Tasklet {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteEmailTasklet.class);
     private final EmailMessageRepository emailMessageRepository;
     private final EmailCampaignRepository emailCampaignRepository;
-    private final LoanRepository loanRepository;
+    private final LoanExistencePort loanExistencePort;
     private final SavingsAccountExistencePort savingsAccountExistencePort;
     private final EmailMessageJobEmailService emailMessageJobEmailService;
     private final ReadReportingService readReportingService;
@@ -85,21 +84,19 @@ public class ExecuteEmailTasklet implements Tasklet {
                         final HashMap<String, String> reportStretchyParams = reportMailingJobValidator.validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
                         if (reportStretchyParams.containsKey("selectLoan") || reportStretchyParams.containsKey("loanId")) {
                             if (emailMessage.getClient() != null) {
-                                final List<Loan> loans = loanRepository.findLoanByClientId(emailMessage.getClient().getId());
+                                final List<Long> loanIds = loanExistencePort.openIdsByClientId(emailMessage.getClient().getId());
                                 HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
-                                for (final Loan loan : loans) {
-                                    if (loan.isOpen()) {
-                                        if (reportStretchyParams.containsKey("selectLoan")) {
-                                            reportParams.put("SelectLoan", loan.getId().toString());
-                                        } else if (reportStretchyParams.containsKey("loanId")) {
-                                            reportParams.put("loanId", loan.getId().toString());
-                                        }
-                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
-                                        if (file != null) {
-                                            attachmentList.add(file);
-                                        } else {
-                                            errorLog.append(reportParams);
-                                        }
+                                for (final Long loanId : loanIds) {
+                                    if (reportStretchyParams.containsKey("selectLoan")) {
+                                        reportParams.put("SelectLoan", loanId.toString());
+                                    } else if (reportStretchyParams.containsKey("loanId")) {
+                                        reportParams.put("loanId", loanId.toString());
+                                    }
+                                    File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
+                                    if (file != null) {
+                                        attachmentList.add(file);
+                                    } else {
+                                        errorLog.append(reportParams);
                                     }
                                 }
                             }
@@ -211,10 +208,10 @@ public class ExecuteEmailTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountExistencePort savingsAccountExistencePort, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
+        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanExistencePort loanExistencePort, final SavingsAccountExistencePort savingsAccountExistencePort, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
         this.emailMessageRepository = emailMessageRepository;
         this.emailCampaignRepository = emailCampaignRepository;
-        this.loanRepository = loanRepository;
+        this.loanExistencePort = loanExistencePort;
         this.savingsAccountExistencePort = savingsAccountExistencePort;
         this.emailMessageJobEmailService = emailMessageJobEmailService;
         this.readReportingService = readReportingService;

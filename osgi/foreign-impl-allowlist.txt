@@ -5,7 +5,6 @@
 fineract-accounting/impl/dependencies.gradle	fineract-loan-impl
 fineract-bulkimport/impl/dependencies.gradle	fineract-loan-impl
 fineract-campaigns/impl/dependencies.gradle	fineract-sms-impl
-fineract-campaigns/impl/dependencies.gradle	fineract-loan-impl
 fineract-event/impl/dependencies.gradle	fineract-loan-impl
 fineract-event/impl/dependencies.gradle	fineract-savings-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl

@@ -70,7 +70,6 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -209,24 +208,25 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @Override
-    public void insertDirectCampaignIntoSmsOutboundTable(final Loan loan, final SmsCampaign smsCampaign) {
+    public void insertDirectCampaignIntoSmsOutboundTable(final Long loanId, final Long clientId, final Long groupId,
+            final boolean groupLoan, final boolean invalidLoanType, final SmsCampaign smsCampaign) {
         try {
-            if (loan.hasInvalidLoanType()) {
+            if (invalidLoanType) {
                 throw new InvalidLoanTypeException("Loan Type cannot be 0 for the Triggered Sms Campaign");
             }
             Set<Client> clientSet = new HashSet<>();
             HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            campaignParams.put("loanId", loan.getId().toString());
+            campaignParams.put("loanId", loanId.toString());
             HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            queryParamForRunReport.put("loanId", loan.getId().toString());
-            if (loan.isGroupLoan()) {
-                Group group = this.groupRepository.findById(loan.getGroupId()).orElse(null);
+            queryParamForRunReport.put("loanId", loanId.toString());
+            if (groupLoan) {
+                Group group = this.groupRepository.findById(groupId).orElse(null);
                 clientSet.addAll(group.getClientMembers());
                 queryParamForRunReport.put("groupId", group.getId().toString());
             } else {
-                Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(loan.getClientId());
+                Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
                 clientSet.add(client);
             }
             for (Client client : clientSet) {

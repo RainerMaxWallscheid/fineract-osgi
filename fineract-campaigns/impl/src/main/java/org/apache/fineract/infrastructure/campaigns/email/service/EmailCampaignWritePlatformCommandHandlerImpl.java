@@ -63,7 +63,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -161,16 +161,17 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     }
 
     @Override
-    public void insertDirectCampaignIntoEmailOutboundTable(final Loan loan, final EmailCampaign emailCampaign, HashMap<String, String> campaignParams) {
+    public void insertDirectCampaignIntoEmailOutboundTable(final Long clientId, final EmailCampaign emailCampaign,
+            HashMap<String, String> campaignParams) {
         try {
             List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), campaignParams);
             if (runReportObject != null) {
                 for (HashMap<String, Object> entry : runReportObject) {
                     String message = this.compileEmailTemplate(emailCampaign.getEmailMessage(), emailCampaign.getCampaignName(), entry);
-                    if (loan.getClientId() == null) {
+                    if (clientId == null) {
                         continue;
                     }
-                    Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(loan.getClientId());
+                    Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
                     String emailAddress = client.emailAddress();
                     if (emailAddress != null && isValidEmail(emailAddress)) {
                         EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailCampaign.getEmailSubject(), message, emailAddress, emailCampaign.getCampaignName());

@@ -27,7 +27,6 @@ import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaign;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 public interface EmailCampaignWritePlatformService {
 
@@ -48,6 +47,6 @@ public interface EmailCampaignWritePlatformService {
 
     PreviewCampaignMessage previewMessage(JsonQuery query);
 
-    void insertDirectCampaignIntoEmailOutboundTable(Loan loan, EmailCampaign emailCampaign, HashMap<String, String> campaignParams);
+    void insertDirectCampaignIntoEmailOutboundTable(Long clientId, EmailCampaign emailCampaign, HashMap<String, String> campaignParams);
 
 }

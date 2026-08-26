@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
@@ -102,4 +103,22 @@ public interface LoanExistencePort {
      * Child loan ids of a GLIM account that is accepting children.
      */
     List<Long> findGlimChildLoanIds(Long glimAccountId);
+
+    record CampaignSource(Long loanId, Long clientId, Long groupId, boolean groupLoan, boolean invalidLoanType) {}
+
+    CampaignSource campaignSource(Object loan);
+
+    record RepaymentSmsView(Long loanId, Long loanTransactionId, Long clientId, Long groupId, boolean invalidLoanType, boolean groupLoan,
+            boolean individualLoan, Object principal, Object outstanding, String accountNumber, Object amount, OffsetDateTime createdDate,
+            String receiptNumber) {}
+
+    RepaymentSmsView repaymentSmsView(Object loanTransaction);
+
+    List<Long> openIdsByClientId(Long clientId);
+
+    void onApproved(Consumer<Object> handler);
+
+    void onRejected(Consumer<Object> handler);
+
+    void onRepayment(Consumer<Object> handler);
 }

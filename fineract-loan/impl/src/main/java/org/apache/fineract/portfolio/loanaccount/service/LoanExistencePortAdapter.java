@@ -23,7 +23,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.infrastructure.event.business.domain.loan.LoanApprovedBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.loan.LoanRejectedBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.loan.transaction.LoanTransactionMakeRepaymentPostBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
@@ -51,17 +56,19 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
     private final LoanWritePlatformService loanWritePlatformService;
     private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
     private final GLIMAccountInfoRepository glimAccountInfoRepository;
+    private final BusinessEventNotifierService businessEventNotifierService;
 
     public LoanExistencePortAdapter(final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository,
             final CalendarRepositoryWrapper calendarRepositoryWrapper, @Lazy final LoanWritePlatformService loanWritePlatformService,
             final LoanRescheduleRequestRepository loanRescheduleRequestRepository,
-            final GLIMAccountInfoRepository glimAccountInfoRepository) {
+            final GLIMAccountInfoRepository glimAccountInfoRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.loanRepository = loanRepository;
         this.loanTransactionRepository = loanTransactionRepository;
         this.calendarRepositoryWrapper = calendarRepositoryWrapper;
         this.loanWritePlatformService = loanWritePlatformService;
         this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
         this.glimAccountInfoRepository = glimAccountInfoRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
     }
 
     @Override
@@ -145,6 +152,45 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
         final List<Long> ids = glimAccountInfoRepository.findChildLoanIdsByIsAcceptingChildAndApplicationId(true,
                 BigDecimal.valueOf(glimAccountId));
         return ids == null ? List.of() : ids;
+    }
+
+    @Override
+    public CampaignSource campaignSource(final Object loan) {
+        final Loan leftover = (Loan) loan;
+        return new CampaignSource(leftover.getId(), leftover.getClientId(), leftover.getGroupId(), leftover.isGroupLoan(),
+                leftover.hasInvalidLoanType());
+    }
+
+    @Override
+    public RepaymentSmsView repaymentSmsView(final Object loanTransaction) {
+        final LoanTransaction transaction = (LoanTransaction) loanTransaction;
+        final Loan loan = transaction.getLoan();
+        final String receiptNumber = transaction.getPaymentDetail() != null ? transaction.getPaymentDetail().getReceiptNumber() : null;
+        return new RepaymentSmsView(loan.getId(), transaction.getId(), loan.getClientId(), loan.getGroupId(), loan.hasInvalidLoanType(),
+                loan.isGroupLoan(), loan.isIndividualLoan(), loan.getPrincipal(), transaction.getOutstandingLoanBalance(),
+                loan.getAccountNumber(), transaction.getAmount(loan.getCurrency()), transaction.getCreatedDate().orElse(null),
+                receiptNumber);
+    }
+
+    @Override
+    public List<Long> openIdsByClientId(final Long clientId) {
+        return loanRepository.findLoanByClientId(clientId).stream().filter(Loan::isOpen).map(Loan::getId).toList();
+    }
+
+    @Override
+    public void onApproved(final Consumer<Object> handler) {
+        businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, event -> handler.accept(event.get()));
+    }
+
+    @Override
+    public void onRejected(final Consumer<Object> handler) {
+        businessEventNotifierService.addPostBusinessEventListener(LoanRejectedBusinessEvent.class, event -> handler.accept(event.get()));
+    }
+
+    @Override
+    public void onRepayment(final Consumer<Object> handler) {
+        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class,
+                event -> handler.accept(event.get()));
     }
 
     private Loan requireLoan(final Long loanId) {
