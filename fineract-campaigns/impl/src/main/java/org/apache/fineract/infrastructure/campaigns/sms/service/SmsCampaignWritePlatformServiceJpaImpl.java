@@ -57,11 +57,9 @@ import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRu
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
-import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepository;
-import org.apache.fineract.infrastructure.dataqueries.exception.ReportNotFoundException;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
@@ -88,7 +86,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     private final PlatformSecurityContext context;
     private final SmsCampaignRepository smsCampaignRepository;
     private final SmsCampaignValidator smsCampaignValidator;
-    private final ReportRepository reportRepository;
+    private final ReportLookupPort reportLookupPort;
     private final SmsMessageRepository smsMessageRepository;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final GroupRepository groupRepository;
@@ -108,7 +106,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                 throw new SmsCampaignNameAlreadyExistsException(campaignName);
             }
             final Long runReportId = command.longValueOfParameterNamed(SmsCampaignValidator.runReportId);
-            this.reportRepository.findById(runReportId).orElseThrow(() -> new ReportNotFoundException(runReportId));
+            this.reportLookupPort.assertExists(runReportId);
             LocalDateTime tenantDateTime = DateUtils.getLocalDateTimeOfTenant();
             SmsCampaign smsCampaign = SmsCampaign.instance(currentUser, runReportId, command);
             LocalDateTime recurrenceStartDate = smsCampaign.getRecurrenceStartDate();
@@ -146,7 +144,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             }
             if (changes.containsKey(SmsCampaignValidator.runReportId)) {
                 final Long newValue = command.longValueOfParameterNamed(SmsCampaignValidator.runReportId);
-                this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
+                this.reportLookupPort.assertExists(newValue);
                 smsCampaign.updateBusinessRuleId(newValue);
             }
             if (!changes.isEmpty()) {
@@ -500,11 +498,11 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportRepository reportRepository, final SmsMessageRepository smsMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupRepository groupRepository, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
+        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessageRepository smsMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupRepository groupRepository, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
         this.context = context;
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsCampaignValidator = smsCampaignValidator;
-        this.reportRepository = reportRepository;
+        this.reportLookupPort = reportLookupPort;
         this.smsMessageRepository = smsMessageRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.groupRepository = groupRepository;

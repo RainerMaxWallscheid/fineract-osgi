@@ -28,7 +28,6 @@ dependencies {
     implementation(project(path: ':fineract-gcm-api'))
     implementation(project(path: ':fineract-configuration-api'))
     implementation(project(path: ':fineract-dataqueries-api'))
-    implementation(project(path: ':fineract-dataqueries-impl'))
     implementation(project(path: ':fineract-event-api'))
     implementation(project(path: ':fineract-event-impl'))
     implementation(project(path: ':fineract-reportmailingjob-api'))

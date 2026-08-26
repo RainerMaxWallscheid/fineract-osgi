@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailCampaignValidator;
 import org.apache.fineract.infrastructure.campaigns.email.data.PreviewCampaignMessage;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaign;
@@ -57,12 +56,9 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
-import org.apache.fineract.infrastructure.dataqueries.domain.ReportParameterUsage;
-import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepository;
-import org.apache.fineract.infrastructure.dataqueries.exception.ReportNotFoundException;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -82,7 +78,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     private final PlatformSecurityContext context;
     private final EmailCampaignRepository emailCampaignRepository;
     private final EmailCampaignValidator emailCampaignValidator;
-    private final ReportRepository reportRepository;
+    private final ReportLookupPort reportLookupPort;
     private final EmailMessageRepository emailMessageRepository;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final ReadReportingService readReportingService;
@@ -95,17 +91,13 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
         final AppUser currentUser = this.context.authenticatedUser();
         this.emailCampaignValidator.validateCreate(command.json());
         final Long businessRuleId = command.longValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
-        this.reportRepository.findById(businessRuleId).orElseThrow(() -> new ReportNotFoundException(businessRuleId));
+        this.reportLookupPort.assertExists(businessRuleId);
         final Long reportId = command.longValueOfParameterNamed(EmailCampaignValidator.stretchyReportId);
         Map<String, String> stretchyReportParams = null;
         if (reportId != null) {
-            final Report report = this.reportRepository.findById(reportId).orElseThrow(() -> new ReportNotFoundException(reportId));
-            final Set<ReportParameterUsage> reportParameterUsages = report.getReportParameterUsages();
             stretchyReportParams = new HashMap<>();
-            if (reportParameterUsages != null && !reportParameterUsages.isEmpty()) {
-                for (final ReportParameterUsage reportParameterUsage : reportParameterUsages) {
-                    stretchyReportParams.put(reportParameterUsage.getReportParameterName(), "");
-                }
+            for (final String parameterName : this.reportLookupPort.findParameterNames(reportId)) {
+                stretchyReportParams.put(parameterName, "");
             }
         }
         EmailCampaign emailCampaign = EmailCampaign.instance(currentUser, businessRuleId, reportId, command);
@@ -132,7 +124,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
             final Map<String, Object> changes = emailCampaign.update(command);
             if (changes.containsKey(EmailCampaignValidator.businessRuleId)) {
                 final Long newValue = command.longValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
-                this.reportRepository.findById(newValue).orElseThrow(() -> new ReportNotFoundException(newValue));
+                this.reportLookupPort.assertExists(newValue);
                 emailCampaign.setBusinessRuleId(newValue);
             }
             if (!changes.isEmpty()) {
@@ -381,11 +373,11 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     }
 
     @java.lang.SuppressWarnings("all")
-        public EmailCampaignWritePlatformCommandHandlerImpl(final PlatformSecurityContext context, final EmailCampaignRepository emailCampaignRepository, final EmailCampaignValidator emailCampaignValidator, final ReportRepository reportRepository, final EmailMessageRepository emailMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper) {
+        public EmailCampaignWritePlatformCommandHandlerImpl(final PlatformSecurityContext context, final EmailCampaignRepository emailCampaignRepository, final EmailCampaignValidator emailCampaignValidator, final ReportLookupPort reportLookupPort, final EmailMessageRepository emailMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper) {
         this.context = context;
         this.emailCampaignRepository = emailCampaignRepository;
         this.emailCampaignValidator = emailCampaignValidator;
-        this.reportRepository = reportRepository;
+        this.reportLookupPort = reportLookupPort;
         this.emailMessageRepository = emailMessageRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.readReportingService = readReportingService;

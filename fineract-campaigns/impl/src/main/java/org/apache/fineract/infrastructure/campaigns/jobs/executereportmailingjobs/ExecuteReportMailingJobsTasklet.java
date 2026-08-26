@@ -31,9 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.dataqueries.domain.Report;
-import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
 import org.apache.fineract.infrastructure.reportmailingjob.data.DueReportMailingJob;
@@ -56,7 +55,7 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
     private final ReportMailingJobRunPort reportMailingJobRunPort;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final ReadReportingService readReportingService;
-    private final ReportRepositoryWrapper reportRepositoryWrapper;
+    private final ReportLookupPort reportLookupPort;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
     private final ReportMailingJobEmailService reportMailingJobEmailService;
     private final FineractProperties fineractProperties;
@@ -69,9 +68,10 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
                     .newInstance(reportMailingJob.emailAttachmentFileFormat());
             if (emailAttachmentFileFormat != null && emailAttachmentFileFormat != ReportMailingJobEmailAttachmentFileFormat.INVALID) {
                 final Long stretchyReportId = reportMailingJob.stretchyReportId();
-                final Report stretchyReport = stretchyReportId == null ? null
-                        : reportRepositoryWrapper.findOneThrowExceptionIfNotFound(stretchyReportId);
-                final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
+                if (stretchyReportId != null) {
+                    reportLookupPort.assertExists(stretchyReportId);
+                }
+                final String reportName = reportLookupPort.findReportName(stretchyReportId);
                 final StringBuilder errorLog = new StringBuilder();
                 final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator
                         .validateStretchyReportParamMap(reportMailingJob.stretchyReportParamMap());
@@ -149,11 +149,11 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRunPort reportMailingJobRunPort, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportRepositoryWrapper reportRepositoryWrapper, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final FineractProperties fineractProperties) {
+        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRunPort reportMailingJobRunPort, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final FineractProperties fineractProperties) {
         this.reportMailingJobRunPort = reportMailingJobRunPort;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.readReportingService = readReportingService;
-        this.reportRepositoryWrapper = reportRepositoryWrapper;
+        this.reportLookupPort = reportLookupPort;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
         this.reportMailingJobEmailService = reportMailingJobEmailService;
         this.fineractProperties = fineractProperties;
