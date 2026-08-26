@@ -16,23 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Event API (provider peel)'
 
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
-apply from: 'dependencies.gradle'
-
-jar {
-    manifest {
-        attributes(
-                'Bundle-ManifestVersion': '2',
-                'Bundle-Name': 'Apache Fineract Event API',
-                'Bundle-SymbolicName': 'org.apache.fineract.event.api',
-                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.event.external.config,'
-                        + 'org.apache.fineract.infrastructure.event.business.moduleapi',
-                'Import-Package': '*',
-                'Automatic-Module-Name': 'org.apache.fineract.event.api'
-                )
-    }
-}
+/**
+ * Module API (ADR-021) — the only package other Gradle modules should depend on
+ * from this bounded context.
+ *
+ * <p>Put port interfaces, stable DTOs/IDs and public contract types here.
+ * Do not place JPA entities, Spring Data repositories or REST resources in this package.
+ *
+ * @see docs/arc42/14_module_api_boundaries.md
+ */
+package org.apache.fineract.infrastructure.event.business.moduleapi;

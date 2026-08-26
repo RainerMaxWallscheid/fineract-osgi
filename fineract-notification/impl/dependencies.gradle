@@ -20,7 +20,7 @@
 dependencies {
     api project(path: ':fineract-notification-api')
     implementation(project(path: ':fineract-core'))
-    implementation(project(path: ':fineract-event-impl'))
+    implementation(project(path: ':fineract-event-api'))
     implementation(project(path: ':fineract-loan-api'))
 
     implementation(

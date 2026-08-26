@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.notification.starter;
 
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.notification.service.NotificationDomainService;
@@ -38,8 +39,8 @@ public class NotificationDomainServiceConfiguration {
     @ConditionalOnMissingBean(NotificationDomainService.class)
     public NotificationDomainService notificationDomainService(BusinessEventNotifierService businessEventNotifierService,
             PlatformSecurityContext context, UserNotificationService userNotificationService,
-            LoanNotificationEventPort loanNotificationEventPort) {
+            LoanNotificationEventPort loanNotificationEventPort, PortfolioNotificationEventPort portfolioNotificationEventPort) {
         return new NotificationDomainServiceImpl(businessEventNotifierService, context, userNotificationService,
-                loanNotificationEventPort);
+                loanNotificationEventPort, portfolioNotificationEventPort);
     }
 }

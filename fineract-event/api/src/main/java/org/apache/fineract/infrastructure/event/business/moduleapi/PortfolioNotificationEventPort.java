@@ -16,23 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Event API (provider peel)'
+package org.apache.fineract.infrastructure.event.business.moduleapi;
 
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
-apply from: 'dependencies.gradle'
+import java.util.function.Consumer;
 
-jar {
-    manifest {
-        attributes(
-                'Bundle-ManifestVersion': '2',
-                'Bundle-Name': 'Apache Fineract Event API',
-                'Bundle-SymbolicName': 'org.apache.fineract.event.api',
-                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.event.external.config,'
-                        + 'org.apache.fineract.infrastructure.event.business.moduleapi',
-                'Import-Package': '*',
-                'Automatic-Module-Name': 'org.apache.fineract.event.api'
-                )
-    }
+/**
+ * Client/group/savings/share/deposit notification events without leftover
+ * domain JPA (ADR-021).
+ */
+public interface PortfolioNotificationEventPort {
+
+    record Notification(String permission, String objectType, Long objectId, String notificationContent, String eventType, Long officeId) {}
+
+    void onNotifications(Consumer<Notification> handler);
 }
