@@ -46,7 +46,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountApplicationTimelineData;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountStatusEnumData;
 import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
-import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
+import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -57,7 +57,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     private final ClientReadPlatformService clientReadPlatformService;
     private final GroupReadPlatformService groupReadPlatformService;
     private final ColumnValidator columnValidator;
-    private final WorkingCapitalLoanApplicationReadPlatformService workingCapitalLoanApplicationReadPlatformService;
+    private final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort;
 
     @Override
     public AccountSummaryCollectionData retrieveClientAccountDetails(final Long clientId) {
@@ -72,7 +72,8 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
         final String guarantorWhereClause = " where g.entity_id = ? and g.is_active = true order by l.account_no ASC";
         final List<LoanAccountSummaryData> glimAccounts = retrieveLoanAccountDetails(glimLoanClause, new Object[] {clientId});
         final List<LoanAccountSummaryData> loanAccounts = retrieveLoanAccountDetails(loanwhereClause, new Object[] {clientId});
-        final List<WorkingCapitalLoanAccountSummaryData> workingCapitalLoanAccounts = workingCapitalLoanApplicationReadPlatformService.retrieveLoanSummaryData(clientId);
+        final List<WorkingCapitalLoanAccountSummaryData> workingCapitalLoanAccounts = workingCapitalLoanExistencePort
+                .retrieveLoanSummaryData(clientId).stream().map(this::toWorkingCapitalLoanAccountSummary).toList();
         final List<SavingsAccountSummaryData> savingsAccounts = retrieveAccountDetails(savingswhereClause, new Object[] {clientId});
         final List<ShareAccountSummaryData> shareAccounts = retrieveShareAccountDetails(clientId);
         final List<GuarantorAccountSummaryData> guarantorloanAccounts = retrieveGuarantorLoanAccountDetails(guarantorWhereClause, new Object[] {clientId});
@@ -466,12 +467,21 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
         }
     }
 
+    private WorkingCapitalLoanAccountSummaryData toWorkingCapitalLoanAccountSummary(
+            final WorkingCapitalLoanExistencePort.SummaryView view) {
+        final LoanStatusEnumData status = view.statusId() == null ? null
+                : new LoanStatusEnumData(view.statusId(), view.statusCode(), view.statusValue());
+        return new WorkingCapitalLoanAccountSummaryData(view.id(), view.accountNo(), view.externalId(), view.productId(), view.productName(),
+                view.shortProductName(), status, view.currency(), view.loanCycle(), view.timeline(), view.inArrears(), view.loanBalance(),
+                view.amountPaid());
+    }
+
     @java.lang.SuppressWarnings("all")
-        public AccountDetailsReadPlatformServiceJpaRepositoryImpl(final JdbcTemplate jdbcTemplate, final ClientReadPlatformService clientReadPlatformService, final GroupReadPlatformService groupReadPlatformService, final ColumnValidator columnValidator, final WorkingCapitalLoanApplicationReadPlatformService workingCapitalLoanApplicationReadPlatformService) {
+        public AccountDetailsReadPlatformServiceJpaRepositoryImpl(final JdbcTemplate jdbcTemplate, final ClientReadPlatformService clientReadPlatformService, final GroupReadPlatformService groupReadPlatformService, final ColumnValidator columnValidator, final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort) {
         this.jdbcTemplate = jdbcTemplate;
         this.clientReadPlatformService = clientReadPlatformService;
         this.groupReadPlatformService = groupReadPlatformService;
         this.columnValidator = columnValidator;
-        this.workingCapitalLoanApplicationReadPlatformService = workingCapitalLoanApplicationReadPlatformService;
+        this.workingCapitalLoanExistencePort = workingCapitalLoanExistencePort;
     }
 }

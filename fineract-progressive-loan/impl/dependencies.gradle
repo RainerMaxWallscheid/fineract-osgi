@@ -50,8 +50,7 @@ dependencies {
     // Leftover loan-read residual: FundReadPlatformService + floating-rate periods
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-rates-api'))
-    // Leftover account-details impl: WorkingCapitalLoanApplicationReadPlatformService
-    implementation(project(path: ':fineract-working-capital-loan-impl'))
+    implementation(project(path: ':fineract-working-capital-loan-api'))
     // Leftover client/groups REST: savings account/GSIM read
     implementation(project(path: ':fineract-savings-api'))
     implementation(project(path: ':fineract-savings-impl'))

@@ -18,9 +18,12 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.moduleapi;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.loanaccount.data.LoanApplicationTimelineData;
 
 /**
  * ID-only working-capital loan existence/status check (ADR-021). Foreign BCs
@@ -60,4 +63,16 @@ public interface WorkingCapitalLoanExistencePort {
      * with a null last-closed business date.
      */
     boolean anyBehindCobDate(LocalDate cobDate, List<Long> loanIds);
+
+    boolean existsByAccountNumber(String accountNumber);
+
+    record AccountNumberSource(Long id, Long clientId, String productShortName) {}
+
+    AccountNumberSource accountNumberSource(Object loan);
+
+    record SummaryView(Long id, String accountNo, String externalId, Long productId, String productName, String shortProductName,
+            Long statusId, String statusCode, String statusValue, CurrencyData currency, Integer loanCycle,
+            LoanApplicationTimelineData timeline, Boolean inArrears, BigDecimal loanBalance, BigDecimal amountPaid) {}
+
+    List<SummaryView> retrieveLoanSummaryData(Long clientId);
 }

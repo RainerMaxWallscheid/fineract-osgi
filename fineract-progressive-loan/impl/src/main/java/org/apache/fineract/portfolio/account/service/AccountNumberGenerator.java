@@ -41,8 +41,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
-import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
+import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +64,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     private final ClientRepository clientRepository;
     private final LoanRepository loanRepository;
     private final SavingsAccountRepository savingsAccountRepository;
-    private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
+    private final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort;
     private ClientActivePort clientActivePort;
 
     @Autowired
@@ -111,10 +110,11 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
         return generateAccountNumber(propertyMap, accountNumberFormat);
     }
 
-    public String generate(WorkingCapitalLoan wcl, AccountNumberFormat accountNumberFormat) {
+    public String generateWorkingCapitalLoan(WorkingCapitalLoanExistencePort.AccountNumberSource source,
+            AccountNumberFormat accountNumberFormat) {
         Map<String, String> propertyMap = new HashMap<>();
-        propertyMap.put(ID, wcl.getId().toString());
-        final Long clientId = wcl.getClientId();
+        propertyMap.put(ID, source.id().toString());
+        final Long clientId = source.clientId();
         String officeName = "";
         if (clientId != null) {
             final Object office = this.clientActivePort.office(clientId);
@@ -123,7 +123,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             }
         }
         propertyMap.put(OFFICE_NAME, officeName);
-        propertyMap.put(LOAN_PRODUCT_SHORT_NAME, wcl.getLoanProduct() != null ? wcl.getLoanProduct().getShortName() : "");
+        propertyMap.put(LOAN_PRODUCT_SHORT_NAME, source.productShortName() != null ? source.productShortName() : "");
         propertyMap.put(ENTITY_TYPE, "workingCapitalLoan");
         return generateAccountNumber(propertyMap, accountNumberFormat);
     }
@@ -135,7 +135,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             case LOAN -> generate((Loan) entity, format);
             case SAVINGS -> generate((SavingsAccount) entity, format);
             case SHARES -> generate((ShareAccount) entity, format);
-            case WORKING_CAPITAL_LOAN -> generate((WorkingCapitalLoan) entity, format);
+            case WORKING_CAPITAL_LOAN -> generateWorkingCapitalLoan(workingCapitalLoanExistencePort.accountNumberSource(entity), format);
             case CENTER, GROUP -> throw new UnsupportedOperationException("Use generateCenterAccountNumber / generateGroupAccountNumber for " + type);
         };
     }
@@ -245,7 +245,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             }
             break;
         case "workingCapitalLoan": 
-            if (this.workingCapitalLoanRepository.existsByAccountNumber(accountNumber)) {
+            if (this.workingCapitalLoanExistencePort.existsByAccountNumber(accountNumber)) {
                 randomNumberConflict = true;
             }
             break;
@@ -284,11 +284,11 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountNumberGenerator(final ConfigurationReadPlatformService configurationReadPlatformService, final ClientRepository clientRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final WorkingCapitalLoanRepository workingCapitalLoanRepository) {
+        public AccountNumberGenerator(final ConfigurationReadPlatformService configurationReadPlatformService, final ClientRepository clientRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort) {
         this.configurationReadPlatformService = configurationReadPlatformService;
         this.clientRepository = clientRepository;
         this.loanRepository = loanRepository;
         this.savingsAccountRepository = savingsAccountRepository;
-        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.workingCapitalLoanExistencePort = workingCapitalLoanExistencePort;
     }
 }

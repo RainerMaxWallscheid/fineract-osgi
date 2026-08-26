@@ -23,8 +23,10 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
+import org.apache.fineract.portfolio.accountdetails.data.WorkingCapitalLoanAccountSummaryData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
+import org.apache.fineract.portfolio.workingcapitalloan.mapper.WorkingCapitalLoanSummaryMapper;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
 import org.springframework.stereotype.Service;
@@ -36,9 +38,12 @@ public class WorkingCapitalLoanExistencePortAdapter implements WorkingCapitalLoa
             LoanStatus.APPROVED, LoanStatus.ACTIVE, LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD);
 
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
+    private final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper;
 
-    public WorkingCapitalLoanExistencePortAdapter(final WorkingCapitalLoanRepository workingCapitalLoanRepository) {
+    public WorkingCapitalLoanExistencePortAdapter(final WorkingCapitalLoanRepository workingCapitalLoanRepository,
+            final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper) {
         this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.workingCapitalLoanSummaryMapper = workingCapitalLoanSummaryMapper;
     }
 
     @Override
@@ -82,6 +87,32 @@ public class WorkingCapitalLoanExistencePortAdapter implements WorkingCapitalLoa
         }
         return !workingCapitalLoanRepository.findAllLoansBehindByLoanIdsAndStatuses(cobDate, loanIds, NON_CLOSED_LOAN_STATUSES).isEmpty()
                 || !workingCapitalLoanRepository.findAllLoansBehindOnDisbursementDate(cobDate, loanIds, NON_CLOSED_LOAN_STATUSES).isEmpty();
+    }
+
+    @Override
+    public boolean existsByAccountNumber(final String accountNumber) {
+        return workingCapitalLoanRepository.existsByAccountNumber(accountNumber);
+    }
+
+    @Override
+    public AccountNumberSource accountNumberSource(final Object loan) {
+        final WorkingCapitalLoan wcl = (WorkingCapitalLoan) loan;
+        return new AccountNumberSource(wcl.getId(), wcl.getClientId(),
+                wcl.getLoanProduct() != null ? wcl.getLoanProduct().getShortName() : "");
+    }
+
+    @Override
+    public List<SummaryView> retrieveLoanSummaryData(final Long clientId) {
+        return workingCapitalLoanSummaryMapper.toDataList(workingCapitalLoanRepository.findByClientId(clientId)).stream()
+                .map(this::toSummaryView).toList();
+    }
+
+    private SummaryView toSummaryView(final WorkingCapitalLoanAccountSummaryData data) {
+        return new SummaryView(data.getId(), data.getAccountNo(), data.getExternalId(), data.getProductId(), data.getProductName(),
+                data.getShortProductName(), data.getStatus() != null ? data.getStatus().getId() : null,
+                data.getStatus() != null ? data.getStatus().getCode() : null,
+                data.getStatus() != null ? data.getStatus().getValue() : null, data.getCurrency(), data.getLoanCycle(), data.getTimeline(),
+                data.getInArrears(), data.getLoanBalance(), data.getAmountPaid());
     }
 
     private WorkingCapitalLoan requireLoan(final Long loanId) {
