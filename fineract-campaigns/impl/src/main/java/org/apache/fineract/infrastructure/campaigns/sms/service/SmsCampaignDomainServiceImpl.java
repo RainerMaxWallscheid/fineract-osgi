@@ -40,9 +40,8 @@ import org.apache.fineract.infrastructure.campaigns.sms.exception.SmsRuntimeExce
 import org.apache.fineract.infrastructure.campaigns.sms.serialization.SmsCampaignValidator;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
@@ -62,7 +61,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SmsCampaignDomainServiceImpl.class);
     private final SmsCampaignRepository smsCampaignRepository;
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final OfficeRepository officeRepository;
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler;
     private final GroupRepository groupRepository;
@@ -204,8 +203,9 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                 if (mobileNo != null) {
                                     mobileNumber = mobileNo.toString();
                                 }
-                                SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                                Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
+                                final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
+                                        client.getId(), null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                                Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                                 smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                                 this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
                             }
@@ -258,12 +258,10 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                        this.smsMessageRepository.save(smsMessage);
-                        Collection<SmsMessage> messages = new ArrayList<>();
-                        messages.add(smsMessage);
-                        Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
-                        smsDataMap.put(smsCampaign, messages);
+                        final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
+                                client.getId(), null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                        Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
+                        smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                         this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
                     }
                 } catch (final IOException e) {
@@ -355,9 +353,9 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort) {
         this.smsCampaignRepository = smsCampaignRepository;
-        this.smsMessageRepository = smsMessageRepository;
+        this.smsMessagePort = smsMessagePort;
         this.officeRepository = officeRepository;
         this.smsCampaignWritePlatformCommandHandler = smsCampaignWritePlatformCommandHandler;
         this.groupRepository = groupRepository;

@@ -23,7 +23,7 @@ import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignReposi
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -45,7 +45,7 @@ public class SendMessageToSmsGatewayConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private SmsMessageRepository smsMessageRepository;
+    private SmsMessagePort smsMessagePort;
     @Autowired
     private SmsCampaignRepository smsCampaignRepository;
     @Autowired
@@ -70,7 +70,7 @@ public class SendMessageToSmsGatewayConfig {
 
     @Bean
     public SendMessageToSmsGatewayTasklet sendMessageToSmsGatewayTasklet() {
-        return new SendMessageToSmsGatewayTasklet(smsMessageRepository, smsCampaignRepository, notificationSenderService, smsConfigUtils,
+        return new SendMessageToSmsGatewayTasklet(smsMessagePort, smsCampaignRepository, notificationSenderService, smsConfigUtils,
                 taskExecutor);
     }
 }

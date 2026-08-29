@@ -34,9 +34,7 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.gcm.domain.GcmPushNotification;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.sms.data.SmsMessageApiQueueResourceData;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
@@ -56,7 +54,7 @@ import org.springframework.web.client.RestTemplate;
 public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJobService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SmsMessageScheduledJobServiceImpl.class);
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final RestTemplate restTemplate = new RestTemplate();
     private final SmsConfigUtils smsConfigUtils;
     private final NotificationSenderService notificationSenderService;
@@ -80,30 +78,30 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
     }
 
     @Override
-    public void sendTriggeredMessages(Map<SmsCampaign, Collection<SmsMessage>> smsDataMap) {
+    public void sendTriggeredMessages(Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap) {
         try {
             if (!smsDataMap.isEmpty()) {
-                List<SmsMessage> toSaveMessages = new ArrayList<>();
-                List<SmsMessage> toSendNotificationMessages = new ArrayList<>();
-                for (Map.Entry<SmsCampaign, Collection<SmsMessage>> entry : smsDataMap.entrySet()) {
-                    for (SmsMessage smsMessage : entry.getValue()) {
-                        if (smsMessage.isNotification()) {
-                            smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
+                List<SmsMessagePort.OutboundView> toSendMessages = new ArrayList<>();
+                List<SmsMessagePort.OutboundView> toSendNotificationMessages = new ArrayList<>();
+                for (Map.Entry<SmsCampaign, Collection<SmsMessagePort.OutboundView>> entry : smsDataMap.entrySet()) {
+                    for (SmsMessagePort.OutboundView smsMessage : entry.getValue()) {
+                        if (smsMessage.notification()) {
                             toSendNotificationMessages.add(smsMessage);
                         } else {
-                            smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
-                            toSaveMessages.add(smsMessage);
+                            toSendMessages.add(smsMessage);
                         }
                     }
                 }
-                if (!toSaveMessages.isEmpty()) {
-                    this.smsMessageRepository.saveAll(toSaveMessages);
-                    this.smsMessageRepository.flush();
-                    for (Map.Entry<SmsCampaign, Collection<SmsMessage>> entry : smsDataMap.entrySet()) {
+                final List<Long> waitingIds = new ArrayList<>();
+                toSendMessages.forEach(view -> waitingIds.add(view.id()));
+                toSendNotificationMessages.forEach(view -> waitingIds.add(view.id()));
+                this.smsMessagePort.markWaitingForDelivery(waitingIds);
+                if (!toSendMessages.isEmpty()) {
+                    for (Map.Entry<SmsCampaign, Collection<SmsMessagePort.OutboundView>> entry : smsDataMap.entrySet()) {
                         Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas = new ArrayList<>();
-                        for (SmsMessage smsMessage : entry.getValue()) {
-                            if (!smsMessage.isNotification()) {
-                                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.getId(), null, null, null, smsMessage.getMobileNo(), smsMessage.getMessage(), entry.getKey().getProviderId());
+                        for (SmsMessagePort.OutboundView smsMessage : entry.getValue()) {
+                            if (!smsMessage.notification()) {
+                                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.id(), null, null, null, smsMessage.mobileNo(), smsMessage.message(), entry.getKey().getProviderId());
                                 apiQueueResourceDatas.add(apiQueueResourceData);
                             }
                         }
@@ -122,16 +120,17 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
     }
 
     @Override
-    public void sendTriggeredMessage(Collection<SmsMessage> smsMessages, long providerId) {
+    public void sendTriggeredMessage(Collection<SmsMessagePort.OutboundView> smsMessages, long providerId) {
         try {
             Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas = new ArrayList<>();
             StringBuilder request = new StringBuilder();
-            for (SmsMessage smsMessage : smsMessages) {
-                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.getId(), null, null, null, smsMessage.getMobileNo(), smsMessage.getMessage(), providerId);
+            final List<Long> waitingIds = new ArrayList<>();
+            for (SmsMessagePort.OutboundView smsMessage : smsMessages) {
+                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.id(), null, null, null, smsMessage.mobileNo(), smsMessage.message(), providerId);
                 apiQueueResourceDatas.add(apiQueueResourceData);
-                smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
+                waitingIds.add(smsMessage.id());
             }
-            this.smsMessageRepository.saveAll(smsMessages);
+            this.smsMessagePort.markWaitingForDelivery(waitingIds);
             request.append(SmsMessageApiQueueResourceData.toJsonString(apiQueueResourceDatas));
             log.debug("Sending triggered SMS to specific provider with request - {}", request);
             this.taskExecutor.execute(new SmsTask(apiQueueResourceDatas, ThreadLocalContextUtil.getContext()));
@@ -140,30 +139,22 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
         }
     }
 
-
-    private void sendGcmNotifications(final List<SmsMessage> smsMessages) {
+    private void sendGcmNotifications(final List<SmsMessagePort.OutboundView> smsMessages) {
         final List<GcmPushNotification> pushes = new ArrayList<>(smsMessages.size());
-        for (final SmsMessage smsMessage : smsMessages) {
-            final Long clientId = smsMessage.getClient() == null ? null : smsMessage.getClient().getId();
-            pushes.add(new GcmPushNotification(clientId, smsMessage.getMessage()));
+        for (final SmsMessagePort.OutboundView smsMessage : smsMessages) {
+            pushes.add(new GcmPushNotification(smsMessage.clientId(), smsMessage.message()));
         }
         this.notificationSenderService.sendNotification(pushes);
-        final List<SmsMessage> toSave = new ArrayList<>();
         for (int i = 0; i < smsMessages.size(); i++) {
-            if (smsMessages.get(i).getClient() == null) {
+            if (smsMessages.get(i).clientId() == null) {
                 continue;
             }
             final GcmPushNotification push = pushes.get(i);
             if (push.isSent()) {
-                smsMessages.get(i).setStatusType(SmsMessageStatusType.SENT.getValue());
-                smsMessages.get(i).setDeliveredOnDate(push.getDeliveredOnDate());
+                this.smsMessagePort.markSent(smsMessages.get(i).id(), push.getDeliveredOnDate());
             } else if (push.isFailed()) {
-                smsMessages.get(i).setStatusType(SmsMessageStatusType.FAILED.getValue());
+                this.smsMessagePort.markFailed(smsMessages.get(i).id());
             }
-            toSave.add(smsMessages.get(i));
-        }
-        if (!toSave.isEmpty()) {
-            this.smsMessageRepository.saveAll(toSave);
         }
     }
 
@@ -194,8 +185,8 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsMessageScheduledJobServiceImpl(final SmsMessageRepository smsMessageRepository, final SmsConfigUtils smsConfigUtils, final NotificationSenderService notificationSenderService, @Qualifier(TaskExecutorConstant.DEFAULT_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
-        this.smsMessageRepository = smsMessageRepository;
+        public SmsMessageScheduledJobServiceImpl(final SmsMessagePort smsMessagePort, final SmsConfigUtils smsConfigUtils, final NotificationSenderService notificationSenderService, @Qualifier(TaskExecutorConstant.DEFAULT_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
+        this.smsMessagePort = smsMessagePort;
         this.smsConfigUtils = smsConfigUtils;
         this.notificationSenderService = notificationSenderService;
         this.taskExecutor = taskExecutor;

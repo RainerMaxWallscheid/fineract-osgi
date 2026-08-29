@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,9 +34,7 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.gcm.domain.GcmPushNotification;
 import org.apache.fineract.infrastructure.gcm.service.NotificationSenderService;
 import org.apache.fineract.infrastructure.sms.data.SmsMessageApiQueueResourceData;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -45,7 +42,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -56,7 +52,7 @@ import org.springframework.web.client.RestTemplate;
 public class SendMessageToSmsGatewayTasklet implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SendMessageToSmsGatewayTasklet.class);
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final SmsCampaignRepository smsCampaignRepository;
     private final NotificationSenderService notificationSenderService;
     private final SmsConfigUtils smsConfigUtils;
@@ -66,34 +62,30 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         int pageLimit = 200;
-        int page = 0;
-        int totalRecords;
+        List<SmsMessagePort.OutboundView> pendingMessages;
         do {
-            PageRequest pageRequest = PageRequest.of(0, pageLimit);
-            org.springframework.data.domain.Page<SmsMessage> pendingMessages = smsMessageRepository.findByStatusType(SmsMessageStatusType.PENDING.getValue(), pageRequest);
-            List<SmsMessage> toSaveMessages = new ArrayList<>();
-            List<SmsMessage> toSendNotificationMessages = new ArrayList<>();
+            pendingMessages = smsMessagePort.findPending(pageLimit);
+            List<SmsMessagePort.OutboundView> toSendMessages = new ArrayList<>();
+            List<SmsMessagePort.OutboundView> toSendNotificationMessages = new ArrayList<>();
             try {
-                if (!CollectionUtils.isEmpty(pendingMessages.getContent())) {
+                if (!CollectionUtils.isEmpty(pendingMessages)) {
                     final String tenantIdentifier = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
-                    Iterator<SmsMessage> pendingMessageIterator = pendingMessages.iterator();
                     Collection<SmsMessageApiQueueResourceData> apiQueueResourceDataCollection = new ArrayList<>();
-                    while (pendingMessageIterator.hasNext()) {
-                        SmsMessage smsData = pendingMessageIterator.next();
-                        if (smsData.isNotification()) {
-                            smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
+                    for (SmsMessagePort.OutboundView smsData : pendingMessages) {
+                        if (smsData.notification()) {
                             toSendNotificationMessages.add(smsData);
                         } else {
-                            final Long providerId = resolveProviderId(smsData.getCampaignId());
-                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.getId(), tenantIdentifier, null, null, smsData.getMobileNo(), smsData.getMessage(), providerId);
+                            final Long providerId = resolveProviderId(smsData.campaignId());
+                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.id(), tenantIdentifier, null, null, smsData.mobileNo(), smsData.message(), providerId);
                             apiQueueResourceDataCollection.add(apiQueueResourceData);
-                            smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
-                            toSaveMessages.add(smsData);
+                            toSendMessages.add(smsData);
                         }
                     }
-                    if (!toSaveMessages.isEmpty()) {
-                        smsMessageRepository.saveAll(toSaveMessages);
-                        smsMessageRepository.flush();
+                    final List<Long> waitingIds = new ArrayList<>();
+                    toSendMessages.forEach(view -> waitingIds.add(view.id()));
+                    toSendNotificationMessages.forEach(view -> waitingIds.add(view.id()));
+                    smsMessagePort.markWaitingForDelivery(waitingIds);
+                    if (!toSendMessages.isEmpty()) {
                         taskExecutor.execute(new SmsTask(ThreadLocalContextUtil.getTenant(), apiQueueResourceDataCollection));
                     }
                     if (!toSendNotificationMessages.isEmpty()) {
@@ -103,36 +95,27 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
             } catch (Exception e) {
                 throw new ConnectionFailureException(SmsCampaignConstants.SMS, e);
             }
-            page++;
-            totalRecords = pendingMessages.getTotalPages();
-        } while (page < totalRecords);
+        } while (!CollectionUtils.isEmpty(pendingMessages) && pendingMessages.size() == pageLimit);
         return RepeatStatus.FINISHED;
     }
 
 
-    private void sendGcmNotifications(final List<SmsMessage> smsMessages) {
+    private void sendGcmNotifications(final List<SmsMessagePort.OutboundView> smsMessages) {
         final List<GcmPushNotification> pushes = new ArrayList<>(smsMessages.size());
-        for (final SmsMessage smsMessage : smsMessages) {
-            final Long clientId = smsMessage.getClient() == null ? null : smsMessage.getClient().getId();
-            pushes.add(new GcmPushNotification(clientId, smsMessage.getMessage()));
+        for (final SmsMessagePort.OutboundView smsMessage : smsMessages) {
+            pushes.add(new GcmPushNotification(smsMessage.clientId(), smsMessage.message()));
         }
         notificationSenderService.sendNotification(pushes);
-        final List<SmsMessage> toSave = new ArrayList<>();
         for (int i = 0; i < smsMessages.size(); i++) {
-            if (smsMessages.get(i).getClient() == null) {
+            if (smsMessages.get(i).clientId() == null) {
                 continue;
             }
             final GcmPushNotification push = pushes.get(i);
             if (push.isSent()) {
-                smsMessages.get(i).setStatusType(SmsMessageStatusType.SENT.getValue());
-                smsMessages.get(i).setDeliveredOnDate(push.getDeliveredOnDate());
+                smsMessagePort.markSent(smsMessages.get(i).id(), push.getDeliveredOnDate());
             } else if (push.isFailed()) {
-                smsMessages.get(i).setStatusType(SmsMessageStatusType.FAILED.getValue());
+                smsMessagePort.markFailed(smsMessages.get(i).id());
             }
-            toSave.add(smsMessages.get(i));
-        }
-        if (!toSave.isEmpty()) {
-            smsMessageRepository.saveAll(toSave);
         }
     }
 
@@ -179,8 +162,8 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SendMessageToSmsGatewayTasklet(final SmsMessageRepository smsMessageRepository, final SmsCampaignRepository smsCampaignRepository, final NotificationSenderService notificationSenderService, final SmsConfigUtils smsConfigUtils, final ThreadPoolTaskExecutor taskExecutor) {
-        this.smsMessageRepository = smsMessageRepository;
+        public SendMessageToSmsGatewayTasklet(final SmsMessagePort smsMessagePort, final SmsCampaignRepository smsCampaignRepository, final NotificationSenderService notificationSenderService, final SmsConfigUtils smsConfigUtils, final ThreadPoolTaskExecutor taskExecutor) {
+        this.smsMessagePort = smsMessagePort;
         this.smsCampaignRepository = smsCampaignRepository;
         this.notificationSenderService = notificationSenderService;
         this.smsConfigUtils = smsConfigUtils;

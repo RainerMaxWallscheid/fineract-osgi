@@ -21,7 +21,7 @@ package org.apache.fineract.infrastructure.sms.scheduler;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 
 /**
  * Scheduled Job service interface for SMS message
@@ -33,7 +33,7 @@ public interface SmsMessageScheduledJobService {
      *
      * @param smsDataMap
      */
-    void sendTriggeredMessages(Map<SmsCampaign, Collection<SmsMessage>> smsDataMap);
+    void sendTriggeredMessages(Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap);
 
     /**
      * Sends a triggered batch of SMS messages to SMS gateway using specified provider.
@@ -43,5 +43,5 @@ public interface SmsMessageScheduledJobService {
      * @param providerId
      *            the provider ID of the SMS gateway to be used
      */
-    void sendTriggeredMessage(Collection<SmsMessage> smsMessage, long providerId);
+    void sendTriggeredMessage(Collection<SmsMessagePort.OutboundView> smsMessage, long providerId);
 }

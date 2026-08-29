@@ -32,6 +32,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.sms,'
                         + 'org.apache.fineract.infrastructure.sms.data,'
                         + 'org.apache.fineract.infrastructure.sms.data.request,'
+                        + 'org.apache.fineract.infrastructure.sms.domain,'
                         + 'org.apache.fineract.infrastructure.sms.exception,'
                         + 'org.apache.fineract.infrastructure.sms.param,'
                         + 'org.apache.fineract.infrastructure.sms.service',

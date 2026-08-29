@@ -20,7 +20,7 @@ package org.apache.fineract.infrastructure.campaigns.jobs.getdeliveryreportsfrom
 
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.infrastructure.sms.service.SmsReadPlatformService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -41,7 +41,7 @@ public class GetDeliveryReportsFromSmsGatewayConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private SmsMessageRepository smsMessageRepository;
+    private SmsMessagePort smsMessagePort;
     @Autowired
     private SmsReadPlatformService smsReadPlatformService;
     @Autowired
@@ -61,6 +61,6 @@ public class GetDeliveryReportsFromSmsGatewayConfig {
 
     @Bean
     public GetDeliveryReportsFromSmsGatewayTasklet getDeliveryReportsFromSmsGatewayTasklet() {
-        return new GetDeliveryReportsFromSmsGatewayTasklet(smsReadPlatformService, smsConfigUtils, smsMessageRepository);
+        return new GetDeliveryReportsFromSmsGatewayTasklet(smsReadPlatformService, smsConfigUtils, smsMessagePort);
     }
 }

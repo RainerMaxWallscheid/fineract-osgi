@@ -26,9 +26,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.sms.data.SmsMessageDeliveryReportData;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.infrastructure.sms.service.SmsReadPlatformService;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -45,7 +44,7 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GetDeliveryReportsFromSmsGatewayTasklet.class);
     private final SmsReadPlatformService smsReadPlatformService;
     private final SmsConfigUtils smsConfigUtils;
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -67,21 +66,19 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
                         for (SmsMessageDeliveryReportData smsMessageDeliveryReportData : smsMessageDeliveryReportDataCollection) {
                             Integer deliveryStatus = smsMessageDeliveryReportData.getDeliveryStatus();
                             if (!smsMessageDeliveryReportData.getHasError() && deliveryStatus != 100) {
-                                SmsMessage smsMessage = smsMessageRepository.findById(smsMessageDeliveryReportData.getId()).orElse(null);
                                 Integer statusType = switch (deliveryStatus) {
                                     case 0 -> SmsMessageStatusType.INVALID.getValue();
                                     case 150 -> SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue();
                                     case 200 -> SmsMessageStatusType.SENT.getValue();
                                     case 300 -> SmsMessageStatusType.DELIVERED.getValue();
                                     case 400 -> SmsMessageStatusType.FAILED.getValue();
-                                    default -> smsMessage.getStatusType();
+                                    default -> null;
                                 };
-                                boolean statusChanged = !statusType.equals(smsMessage.getStatusType());
-                                smsMessage.setStatusType(statusType);
-                                smsMessage.setExternalId(smsMessageDeliveryReportData.getExternalId());
-                                smsMessageRepository.save(smsMessage);
-                                if (statusChanged) {
-                                    log.debug("Status of SMS message id: {} successfully changed to {}", smsMessage.getId(), statusType);
+                                smsMessagePort.applyDeliveryReport(smsMessageDeliveryReportData.getId(), statusType,
+                                        smsMessageDeliveryReportData.getExternalId());
+                                if (statusType != null) {
+                                    log.debug("Status of SMS message id: {} successfully changed to {}", smsMessageDeliveryReportData.getId(),
+                                            statusType);
                                 }
                             }
                         }
@@ -100,9 +97,9 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GetDeliveryReportsFromSmsGatewayTasklet(final SmsReadPlatformService smsReadPlatformService, final SmsConfigUtils smsConfigUtils, final SmsMessageRepository smsMessageRepository) {
+        public GetDeliveryReportsFromSmsGatewayTasklet(final SmsReadPlatformService smsReadPlatformService, final SmsConfigUtils smsConfigUtils, final SmsMessagePort smsMessagePort) {
         this.smsReadPlatformService = smsReadPlatformService;
         this.smsConfigUtils = smsConfigUtils;
-        this.smsMessageRepository = smsMessageRepository;
+        this.smsMessagePort = smsMessagePort;
     }
 }

@@ -19,9 +19,8 @@
 package org.apache.fineract.infrastructure.campaigns.sms.service;
 
 import java.util.Collections;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.springframework.stereotype.Service;
@@ -30,30 +29,31 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TwoFactorSmsDeliveryPortAdapter implements TwoFactorSmsDeliveryPort {
 
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
 
-    public TwoFactorSmsDeliveryPortAdapter(final SmsMessageRepository smsMessageRepository,
+    public TwoFactorSmsDeliveryPortAdapter(final SmsMessagePort smsMessagePort,
             final SmsMessageScheduledJobService smsMessageScheduledJobService) {
-        this.smsMessageRepository = smsMessageRepository;
+        this.smsMessagePort = smsMessagePort;
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;
     }
 
     @Override
     @Transactional
     public void deliverOtpSms(final Staff staff, final String mobileNo, final String messageText, final long smsProviderId) {
-        persistAndTrigger(SmsMessage.pendingSms(null, null, null, staff, messageText, mobileNo, null, false), smsProviderId);
+        persistAndTrigger(staff.getId(), null, messageText, mobileNo, smsProviderId);
     }
 
     @Override
     @Transactional
     public void deliverClientSms(final Client client, final String messageText, final long smsProviderId) {
-        persistAndTrigger(SmsMessage.pendingSms(null, null, client, null, messageText, client.mobileNo(), null, false),
-                smsProviderId);
+        persistAndTrigger(null, client.getId(), messageText, client.mobileNo(), smsProviderId);
     }
 
-    private void persistAndTrigger(final SmsMessage smsMessage, final long smsProviderId) {
-        this.smsMessageRepository.save(smsMessage);
-        this.smsMessageScheduledJobService.sendTriggeredMessage(Collections.singleton(smsMessage), smsProviderId);
+    private void persistAndTrigger(final Long staffId, final Long clientId, final String messageText, final String mobileNo,
+            final long smsProviderId) {
+        final SmsMessagePort.OutboundView view = this.smsMessagePort
+                .persistPending(new SmsMessagePort.PendingRequest(clientId, staffId, messageText, mobileNo, null, false));
+        this.smsMessageScheduledJobService.sendTriggeredMessage(Collections.singleton(view), smsProviderId);
     }
 }

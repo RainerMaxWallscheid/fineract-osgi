@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,10 +62,8 @@ import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
-import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
+import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -85,7 +84,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     private final SmsCampaignRepository smsCampaignRepository;
     private final SmsCampaignValidator smsCampaignValidator;
     private final ReportLookupPort reportLookupPort;
-    private final SmsMessageRepository smsMessageRepository;
+    private final SmsMessagePort smsMessagePort;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final GroupRepository groupRepository;
     private final ReadReportingService readReportingService;
@@ -197,8 +196,8 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                        smsMessageRepository.save(smsMessage);
+                        this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(client.getId(), null, textMessage,
+                                mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
                     }
                 }
             }
@@ -242,13 +241,10 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                             if (mobileNo != null) {
                                 mobileNumber = mobileNo.toString();
                             }
-                            SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                            smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
-                            this.smsMessageRepository.save(smsMessage);
-                            Collection<SmsMessage> messages = new ArrayList<>();
-                            messages.add(smsMessage);
-                            Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
-                            smsDataMap.put(smsCampaign, messages);
+                            final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
+                                    client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                            Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
+                            smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                             this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
                         }
                     }
@@ -279,13 +275,11 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                        smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
-                        this.smsMessageRepository.save(smsMessage);
-                        Collection<SmsMessage> messages = new ArrayList<>();
-                        messages.add(smsMessage);
-                        Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
-                        smsDataMap.put(smsCampaign, messages);
+                        final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
+                                client == null ? null : client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(),
+                                smsCampaign.isNotification()));
+                        Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
+                        smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                         this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
                     }
                 }
@@ -315,13 +309,11 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification());
-                        smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
-                        this.smsMessageRepository.save(smsMessage);
-                        Collection<SmsMessage> messages = new ArrayList<>();
-                        messages.add(smsMessage);
-                        Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
-                        smsDataMap.put(smsCampaign, messages);
+                        final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
+                                client == null ? null : client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(),
+                                smsCampaign.isNotification()));
+                        Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
+                        smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                         this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
                     }
                 }
@@ -496,12 +488,12 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessageRepository smsMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupRepository groupRepository, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
+        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessagePort smsMessagePort, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupRepository groupRepository, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
         this.context = context;
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsCampaignValidator = smsCampaignValidator;
         this.reportLookupPort = reportLookupPort;
-        this.smsMessageRepository = smsMessageRepository;
+        this.smsMessagePort = smsMessagePort;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.groupRepository = groupRepository;
         this.readReportingService = readReportingService;
