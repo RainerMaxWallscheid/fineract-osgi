@@ -42,7 +42,7 @@ public class SavingsAccountBusinessEventSerializer implements BusinessEventSeria
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         SavingsAccountBusinessEvent event = (SavingsAccountBusinessEvent) rawEvent;
-        SavingsAccountData data = service.retrieveOne(event.get().getId());
+        SavingsAccountData data = service.retrieveOne(event.getAggregateRootId());
         return mapper.map(data);
     }
 

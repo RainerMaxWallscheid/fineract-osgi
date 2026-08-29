@@ -223,7 +223,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             this.savingAccountRepositoryWrapper.saveAndFlush(account);
         }
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, false);
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsActivateBusinessEvent(account));
+        businessEventNotifierService.notifyPostBusinessEvent(
+                new SavingsActivateBusinessEvent(account, account.getId(), account.officeId(), account.depositAccountType()));
         return  //
         //
         //
@@ -499,7 +500,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             }
         }
         postInterest(account, postInterestAs, transactionDate, backdatedTxnsAllowedTill, externalId);
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsPostInterestBusinessEvent(account));
+        businessEventNotifierService.notifyPostBusinessEvent(
+                new SavingsPostInterestBusinessEvent(account, account.getId(), account.officeId(), account.depositAccountType()));
         return  //
         //
         //
@@ -886,7 +888,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 changes.put("note", noteText);
             }
         }
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsCloseBusinessEvent(account));
+        businessEventNotifierService.notifyPostBusinessEvent(
+                new SavingsCloseBusinessEvent(account, account.getId(), account.officeId(), account.depositAccountType()));
         // disable all standing orders linked to the savings account
         disableStandingInstructionsLinkedToClosedSavings(account);
         return  //

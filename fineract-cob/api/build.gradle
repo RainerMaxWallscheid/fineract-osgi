@@ -37,6 +37,7 @@ jar {
                         + 'org.apache.fineract.cob.domain,'
                         + 'org.apache.fineract.cob.exceptions,'
                         + 'org.apache.fineract.cob.loan,'
+                        + 'org.apache.fineract.cob.savings,'
                         + 'org.apache.fineract.cob.service',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.condition,'

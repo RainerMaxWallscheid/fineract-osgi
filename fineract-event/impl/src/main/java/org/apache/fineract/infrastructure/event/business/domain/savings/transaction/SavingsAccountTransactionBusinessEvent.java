@@ -19,14 +19,23 @@
 package org.apache.fineract.infrastructure.event.business.domain.savings.transaction;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.DepositAccountType;
 
-public abstract class SavingsAccountTransactionBusinessEvent extends AbstractBusinessEvent<SavingsAccountTransaction> {
+public abstract class SavingsAccountTransactionBusinessEvent extends AbstractBusinessEvent<Object> {
 
     private static final String CATEGORY = "Savings";
+    private final Long savingsAccountId;
+    private final Long transactionId;
+    private final Long officeId;
+    private final DepositAccountType depositAccountType;
 
-    public SavingsAccountTransactionBusinessEvent(SavingsAccountTransaction value) {
+    public SavingsAccountTransactionBusinessEvent(final Object value, final Long savingsAccountId, final Long transactionId,
+            final Long officeId, final DepositAccountType depositAccountType) {
         super(value);
+        this.savingsAccountId = savingsAccountId;
+        this.transactionId = transactionId;
+        this.officeId = officeId;
+        this.depositAccountType = depositAccountType;
     }
 
     @Override
@@ -36,10 +45,18 @@ public abstract class SavingsAccountTransactionBusinessEvent extends AbstractBus
 
     @Override
     public Long getAggregateRootId() {
-        return get().getSavingsAccount().getId();
+        return savingsAccountId;
+    }
+
+    public Long transactionId() {
+        return transactionId;
     }
 
     public Long officeId() {
-        return get().getSavingsAccount().officeId();
+        return officeId;
+    }
+
+    public DepositAccountType depositAccountType() {
+        return depositAccountType;
     }
 }

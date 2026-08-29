@@ -222,7 +222,8 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getName(), savingsId, account.productId(), command.arrayOfParameterNamed(SavingsApiConstants.datatables));
             }
             this.entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(), StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), account.productId());
-            businessEventNotifierService.notifyPostBusinessEvent(new SavingsCreateBusinessEvent(account));
+            businessEventNotifierService.notifyPostBusinessEvent(
+                    new SavingsCreateBusinessEvent(account, account.getId(), account.officeId(), account.depositAccountType()));
             return  //
             //
             //
@@ -408,7 +409,8 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 changes.put("note", noteText);
             }
         }
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsApproveBusinessEvent(savingsAccount));
+        businessEventNotifierService.notifyPostBusinessEvent(new SavingsApproveBusinessEvent(savingsAccount, savingsAccount.getId(),
+                savingsAccount.officeId(), savingsAccount.depositAccountType()));
         return  //
         //
         //
@@ -506,7 +508,8 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 changes.put("note", noteText);
             }
         }
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsRejectBusinessEvent(savingsAccount));
+        businessEventNotifierService.notifyPostBusinessEvent(new SavingsRejectBusinessEvent(savingsAccount, savingsAccount.getId(),
+                savingsAccount.officeId(), savingsAccount.depositAccountType()));
         return  //
         //
         //

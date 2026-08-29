@@ -18,14 +18,15 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.savings;
 
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.savings.DepositAccountType;
 
 public class SavingsApproveBusinessEvent extends SavingsAccountBusinessEvent {
 
     private static final String TYPE = "SavingsApproveBusinessEvent";
 
-    public SavingsApproveBusinessEvent(SavingsAccount value) {
-        super(value);
+    public SavingsApproveBusinessEvent(final Object value, final Long aggregateRootId, final Long officeId,
+            final DepositAccountType depositAccountType) {
+        super(value, aggregateRootId, officeId, depositAccountType);
     }
 
     @Override

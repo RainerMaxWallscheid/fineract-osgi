@@ -149,9 +149,13 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 backdatedTxnsAllowedTill);
 
         if (transactionBooleanValues.isForceWithdrawal()) {
-            businessEventNotifierService.notifyPostBusinessEvent(new SavingsAccountForceWithdrawalBusinessEvent(withdrawal));
+            businessEventNotifierService.notifyPostBusinessEvent(new SavingsAccountForceWithdrawalBusinessEvent(withdrawal,
+                    withdrawal.getSavingsAccount().getId(), withdrawal.getId(), withdrawal.getSavingsAccount().officeId(),
+                    withdrawal.getSavingsAccount().depositAccountType()));
         } else {
-            businessEventNotifierService.notifyPostBusinessEvent(new SavingsWithdrawalBusinessEvent(withdrawal));
+            businessEventNotifierService.notifyPostBusinessEvent(new SavingsWithdrawalBusinessEvent(withdrawal,
+                    withdrawal.getSavingsAccount().getId(), withdrawal.getId(), withdrawal.getSavingsAccount().officeId(),
+                    withdrawal.getSavingsAccount().depositAccountType()));
         }
         return withdrawal;
     }
@@ -222,7 +226,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.savingsAccountRepository.saveAndFlush(account);
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer, backdatedTxnsAllowedTill);
-        businessEventNotifierService.notifyPostBusinessEvent(new SavingsDepositBusinessEvent(deposit));
+        businessEventNotifierService.notifyPostBusinessEvent(new SavingsDepositBusinessEvent(deposit, deposit.getSavingsAccount().getId(),
+                deposit.getId(), deposit.getSavingsAccount().officeId(), deposit.getSavingsAccount().depositAccountType()));
         return deposit;
     }
 

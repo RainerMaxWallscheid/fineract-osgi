@@ -20,14 +20,20 @@ package org.apache.fineract.infrastructure.event.business.domain.savings;
 
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
-public abstract class SavingsAccountBusinessEvent extends AbstractBusinessEvent<SavingsAccount> {
+public abstract class SavingsAccountBusinessEvent extends AbstractBusinessEvent<Object> {
 
     private static final String CATEGORY = "Savings";
+    private final Long aggregateRootId;
+    private final Long officeId;
+    private final DepositAccountType depositAccountType;
 
-    public SavingsAccountBusinessEvent(SavingsAccount value) {
+    public SavingsAccountBusinessEvent(final Object value, final Long aggregateRootId, final Long officeId,
+            final DepositAccountType depositAccountType) {
         super(value);
+        this.aggregateRootId = aggregateRootId;
+        this.officeId = officeId;
+        this.depositAccountType = depositAccountType;
     }
 
     @Override
@@ -37,14 +43,14 @@ public abstract class SavingsAccountBusinessEvent extends AbstractBusinessEvent<
 
     @Override
     public Long getAggregateRootId() {
-        return get().getId();
+        return aggregateRootId;
     }
 
     public Long officeId() {
-        return get().officeId();
+        return officeId;
     }
 
     public DepositAccountType depositAccountType() {
-        return get().depositAccountType();
+        return depositAccountType;
     }
 }

@@ -26,7 +26,6 @@ import org.apache.fineract.infrastructure.event.business.domain.savings.transact
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.savings.SavingsAccountTransactionDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.springframework.stereotype.Component;
 
@@ -43,8 +42,8 @@ public class SavingsAccountTransactionBusinessEventSerializer implements Busines
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         SavingsAccountTransactionBusinessEvent event = (SavingsAccountTransactionBusinessEvent) rawEvent;
-        SavingsAccountTransaction tx = event.get();
-        SavingsAccountTransactionData data = service.retrieveSavingsTransaction(tx.getSavingsAccount().getId(), tx.getId(), tx.getSavingsAccount().depositAccountType());
+        SavingsAccountTransactionData data = service.retrieveSavingsTransaction(event.getAggregateRootId(), event.transactionId(),
+                event.depositAccountType());
         return mapper.map(data);
     }
 
