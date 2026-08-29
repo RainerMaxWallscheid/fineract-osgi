@@ -30,7 +30,7 @@ import org.apache.fineract.infrastructure.bulkimport.populator.LoanProductSheetP
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.PersonnelSheetPopulator;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -464,7 +464,7 @@ public class LoanWorkbookPopulator extends AbstractWorkbookPopulator {
         Workbook loanWorkbook = worksheet.getWorkbook();
         List<String> officeNames = officeSheetPopulator.getOfficeNames();
         List<ChargeData> charges = chargeSheetPopulator.getCharges();
-        List<LoanProductData> products = productSheetPopulator.getProducts();
+        List<BulkImportLoanPort.ProductLookup> products = productSheetPopulator.getProducts();
 
         // Office Names
         Name officeGroup = loanWorkbook.createName();
@@ -571,7 +571,7 @@ public class LoanWorkbookPopulator extends AbstractWorkbookPopulator {
             Name graceOnInterestPaymentName = loanWorkbook.createName();
             Name graceOnInterestChargedName = loanWorkbook.createName();
             Name startDateName = loanWorkbook.createName();
-            String productName = products.get(i).getName().replaceAll("[ ]", "_");
+            String productName = products.get(i).name().replaceAll("[ ]", "_");
             setSanitized(fundName, "FUND_" + productName);
             setSanitized(principalName, "PRINCIPAL_" + productName);
             setSanitized(minPrincipalName, "MIN_PRINCIPAL_" + productName);
@@ -594,7 +594,7 @@ public class LoanWorkbookPopulator extends AbstractWorkbookPopulator {
             setSanitized(graceOnInterestPaymentName, "GRACE_INTEREST_PAYMENT_" + productName);
             setSanitized(graceOnInterestChargedName, "GRACE_INTEREST_CHARGED_" + productName);
             setSanitized(startDateName, "START_DATE_" + productName);
-            if (products.get(i).getFundName() != null) {
+            if (products.get(i).fundName() != null) {
                 fundName.setRefersToFormula(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME + "!$C$" + (i + 2));
             }
             principalName.setRefersToFormula(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME + "!$D$" + (i + 2));

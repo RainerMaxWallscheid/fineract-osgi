@@ -30,8 +30,7 @@ import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateI
 import org.apache.fineract.infrastructure.bulkimport.populator.ClientSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.ExtrasSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,15 +38,14 @@ import org.junit.jupiter.api.Test;
 
 class LoanRepaymentWorkbookPopulatorTest {
 
-    private static final LoanStatusEnumData ACTIVE_STATUS = new LoanStatusEnumData(300L, "loanStatusType.active", "Active");
     private static final String DATE_FORMAT = "yyyyMMdd";
 
-    private LoanAccountData loanWithAccountNo(String accountNo) {
-        return new LoanAccountData().setAccountNo(accountNo).setStatus(ACTIVE_STATUS).setClientName("John Doe").setClientId(1L)
-                .setLoanProductName("TestProduct").setPrincipal(BigDecimal.valueOf(10000));
+    private BulkImportLoanPort.LoanLookup loanWithAccountNo(String accountNo) {
+        return new BulkImportLoanPort.LoanLookup(1L, accountNo, "John Doe", 1L, "Active", "TestProduct", BigDecimal.valueOf(10000), null,
+                null);
     }
 
-    private LoanRepaymentWorkbookPopulator populatorFor(LoanAccountData loan) {
+    private LoanRepaymentWorkbookPopulator populatorFor(BulkImportLoanPort.LoanLookup loan) {
         return LoanRepaymentWorkbookPopulator.full(new ArrayList<>(List.of(loan)), new OfficeSheetPopulator(List.of()),
                 new ClientSheetPopulator(List.of(), List.of()), new ExtrasSheetPopulator(List.of(), List.of(), List.of()));
     }

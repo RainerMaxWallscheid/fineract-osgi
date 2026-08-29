@@ -34,7 +34,7 @@ import org.apache.fineract.infrastructure.bulkimport.populator.ExtrasSheetPopula
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.comparator.LoanComparatorByStatusActive;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -53,14 +53,14 @@ public final class LoanRepaymentWorkbookPopulator extends AbstractWorkbookPopula
     private final OfficeSheetPopulator officeSheetPopulator;
     private final ClientSheetPopulator clientSheetPopulator;
     private final ExtrasSheetPopulator extrasSheetPopulator;
-    private final List<LoanAccountData> allloans;
+    private final List<BulkImportLoanPort.LoanLookup> allloans;
     // FINERACT-2668: when true, the tenant-wide client/office lookup sheets, the per-loan lookup table and the
     // cascading dropdown/VLOOKUP machinery are omitted. The data-entry columns keep their positions (so the import
     // handler, which parses by fixed column index, is unaffected); the user types the loan account number directly.
     private final boolean lean;
     private Map<Long, String> clientIdToClientExternalId;
 
-    private LoanRepaymentWorkbookPopulator(boolean lean, List<LoanAccountData> loans, OfficeSheetPopulator officeSheetPopulator,
+    private LoanRepaymentWorkbookPopulator(boolean lean, List<BulkImportLoanPort.LoanLookup> loans, OfficeSheetPopulator officeSheetPopulator,
             ClientSheetPopulator clientSheetPopulator, ExtrasSheetPopulator extrasSheetPopulator) {
         this.lean = lean;
         this.allloans = loans;
@@ -70,7 +70,7 @@ public final class LoanRepaymentWorkbookPopulator extends AbstractWorkbookPopula
     }
 
     /** Full template: tenant-wide client/office lookup sheets + cascading dropdowns + per-loan lookup table. */
-    public static LoanRepaymentWorkbookPopulator full(List<LoanAccountData> loans, OfficeSheetPopulator officeSheetPopulator,
+    public static LoanRepaymentWorkbookPopulator full(List<BulkImportLoanPort.LoanLookup> loans, OfficeSheetPopulator officeSheetPopulator,
             ClientSheetPopulator clientSheetPopulator, ExtrasSheetPopulator extrasSheetPopulator) {
         return new LoanRepaymentWorkbookPopulator(false, loans, officeSheetPopulator, clientSheetPopulator, extrasSheetPopulator);
     }
@@ -220,12 +220,12 @@ public final class LoanRepaymentWorkbookPopulator extends AbstractWorkbookPopula
         String clientName = "";
         String clientId = "";
         for (int i = 0; i < allloans.size(); i++) {
-            if (!Objects.equals(clientName, allloans.get(i).getClientName())) {
+            if (!Objects.equals(clientName, allloans.get(i).clientName())) {
                 endIndex = i + 1;
                 clientNameToBeginEndIndexes.put(clientName, new Integer[] { startIndex, endIndex });
                 startIndex = i + 2;
-                clientName = allloans.get(i).getClientName();
-                clientId = String.valueOf(allloans.get(i).getClientId());
+                clientName = allloans.get(i).clientName();
+                clientId = String.valueOf(allloans.get(i).clientId());
                 if (!clientsWithActiveLoans.contains(clientName)) {
                     clientsWithActiveLoans.add(clientName);
                     clientIdsWithActiveLoans.add(clientId);
@@ -257,19 +257,19 @@ public final class LoanRepaymentWorkbookPopulator extends AbstractWorkbookPopula
         dateCellStyle.setDataFormat(df);
         DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter();
         Collections.sort(allloans, new LoanComparatorByStatusActive());
-        for (LoanAccountData loan : allloans) {
+        for (BulkImportLoanPort.LoanLookup loan : allloans) {
             row = loanRepaymentSheet.createRow(rowIndex++);
-            writeString(LoanRepaymentConstants.LOOKUP_CLIENT_NAME_COL, row, loan.getClientName() + "(" + loan.getClientId() + ")");
-            writeString(LoanRepaymentConstants.LOOKUP_CLIENT_EXTERNAL_ID, row, clientIdToClientExternalId.get(loan.getClientId()));
-            writeString(LoanRepaymentConstants.LOOKUP_ACCOUNT_NO_COL, row, loan.getAccountNo() + "-" + loan.getStatus().getValue());
-            writeString(LoanRepaymentConstants.LOOKUP_PRODUCT_COL, row, loan.getLoanProductName());
-            writeDouble(LoanRepaymentConstants.LOOKUP_PRINCIPAL_COL, row, loan.getPrincipal().doubleValue());
-            if (loan.getSummary() != null && loan.getSummary().getTotalOutstanding() != null) {
-                writeBigDecimal(LoanRepaymentConstants.LOOKUP_TOTAL_OUTSTANDING_AMOUNT_COL, row, loan.getSummary().getTotalOutstanding());
+            writeString(LoanRepaymentConstants.LOOKUP_CLIENT_NAME_COL, row, loan.clientName() + "(" + loan.clientId() + ")");
+            writeString(LoanRepaymentConstants.LOOKUP_CLIENT_EXTERNAL_ID, row, clientIdToClientExternalId.get(loan.clientId()));
+            writeString(LoanRepaymentConstants.LOOKUP_ACCOUNT_NO_COL, row, loan.accountNo() + "-" + loan.statusValue());
+            writeString(LoanRepaymentConstants.LOOKUP_PRODUCT_COL, row, loan.productName());
+            writeDouble(LoanRepaymentConstants.LOOKUP_PRINCIPAL_COL, row, loan.principal().doubleValue());
+            if (loan.totalOutstanding() != null) {
+                writeBigDecimal(LoanRepaymentConstants.LOOKUP_TOTAL_OUTSTANDING_AMOUNT_COL, row, loan.totalOutstanding());
             }
-            if (loan.getTimeline() != null && loan.getTimeline().getDisbursementDate() != null) {
+            if (loan.disbursementDate() != null) {
                 writeDate(LoanRepaymentConstants.LOOKUP_LOAN_DISBURSEMENT_DATE_COL, row,
-                        outputFormat.format(loan.getTimeline().getDisbursementDate()), dateCellStyle, dateFormat);
+                        outputFormat.format(loan.disbursementDate()), dateCellStyle, dateFormat);
             }
         }
     }

@@ -88,10 +88,7 @@ import org.apache.fineract.portfolio.group.data.CenterData;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
-import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.data.ProductData;
@@ -126,9 +123,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     private final GroupReadPlatformService groupReadPlatformService;
     private final FundReadPlatformService fundReadPlatformService;
     private final PaymentTypeReadService paymentTypeReadPlatformService;
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final BulkImportLoanPort bulkImportLoanPort;
     private final CurrencyReadPlatformService currencyReadPlatformService;
-    private final LoanReadPlatformService loanReadPlatformService;
     private final GLAccountReadPlatformService glAccountReadPlatformService;
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
@@ -144,8 +140,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
             final ClientReadPlatformService clientReadPlatformService, final CenterReadPlatformService centerReadPlatformService,
             final GroupReadPlatformService groupReadPlatformService, final FundReadPlatformService fundReadPlatformService,
             final PaymentTypeReadService paymentTypeReadPlatformService,
-            final LoanProductReadPlatformService loanProductReadPlatformService,
-            final CurrencyReadPlatformService currencyReadPlatformService, final LoanReadPlatformService loanReadPlatformService,
+            final BulkImportLoanPort bulkImportLoanPort, final CurrencyReadPlatformService currencyReadPlatformService,
             final GLAccountReadPlatformService glAccountReadPlatformService,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
             final CodeValueReadPlatformService codeValueReadPlatformService,
@@ -162,9 +157,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         this.groupReadPlatformService = groupReadPlatformService;
         this.fundReadPlatformService = fundReadPlatformService;
         this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.bulkImportLoanPort = bulkImportLoanPort;
         this.currencyReadPlatformService = currencyReadPlatformService;
-        this.loanReadPlatformService = loanReadPlatformService;
         this.glAccountReadPlatformService = glAccountReadPlatformService;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
@@ -383,7 +377,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         List<ClientData> clients = fetchClients(officeId);
         List<GroupGeneralData> groups = fetchGroups(officeId);
         List<ChargeData> charges = fetchCharges();
-        List<LoanProductData> loanproducts = fetchLoanProducts();
+        List<BulkImportLoanPort.ProductLookup> loanproducts = fetchLoanProducts();
         List<FundData> funds = fetchFunds();
         List<PaymentTypeData> paymentTypes = fetchPaymentTypes();
         List<CurrencyData> currencies = fetchCurrencies();
@@ -405,8 +399,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         return this.fundReadPlatformService.retrieveAllFunds();
     }
 
-    private List<LoanProductData> fetchLoanProducts() {
-        return (List<LoanProductData>) this.loanProductReadPlatformService.retrieveAllLoanProducts();
+    private List<BulkImportLoanPort.ProductLookup> fetchLoanProducts() {
+        return this.bulkImportLoanPort.products();
     }
 
     private List<GroupGeneralData> fetchGroups(Long officeId) {
@@ -437,20 +431,13 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         }
         List<OfficeData> offices = fetchOffices(officeId);
         List<ClientData> clients = fetchClients(officeId);
-        List<LoanAccountData> loans = fetchLoanAccounts(officeId);
+        List<BulkImportLoanPort.LoanLookup> loans = fetchLoanAccounts(officeId);
         return LoanRepaymentWorkbookPopulator.full(loans, new OfficeSheetPopulator(offices), new ClientSheetPopulator(clients, offices),
                 extras);
     }
 
-    private List<LoanAccountData> fetchLoanAccounts(final Long officeId) {
-        List<LoanAccountData> loanAccounts = null;
-        if (officeId == null) {
-            loanAccounts = loanReadPlatformService.retrieveAll(null).getPageItems();
-        } else {
-            SearchParameters searchParameters = SearchParameters.builder().officeId(officeId).build();
-            loanAccounts = loanReadPlatformService.retrieveAll(searchParameters).getPageItems();
-        }
-        return loanAccounts;
+    private List<BulkImportLoanPort.LoanLookup> fetchLoanAccounts(final Long officeId) {
+        return this.bulkImportLoanPort.loansByOfficeId(officeId);
     }
 
     private WorkbookPopulator populateJournalEntriesWorkbook(Long officeId) {
@@ -477,7 +464,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.STAFF_ENTITY_TYPE);
         List<OfficeData> offices = fetchOffices(officeId);
         List<ClientData> clients = fetchClients(officeId);
-        List<LoanAccountData> loans = fetchLoanAccounts(officeId);
+        List<BulkImportLoanPort.LoanLookup> loans = fetchLoanAccounts(officeId);
         List<SavingsAccountData> savingsaccounts = fetchSavingsAccounts(officeId);
         List<CodeValueData> guarantorRelationshipTypes = fetchCodeValuesByCodeName("GuarantorRelationship");
         return new GuarantorWorkbookPopulator(new OfficeSheetPopulator(offices), new ClientSheetPopulator(clients, offices), loans,

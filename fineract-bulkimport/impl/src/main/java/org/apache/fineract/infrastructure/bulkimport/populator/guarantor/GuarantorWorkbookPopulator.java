@@ -28,7 +28,7 @@ import org.apache.fineract.infrastructure.bulkimport.populator.AbstractWorkbookP
 import org.apache.fineract.infrastructure.bulkimport.populator.ClientSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -47,12 +47,12 @@ public class GuarantorWorkbookPopulator extends AbstractWorkbookPopulator {
 
     private final OfficeSheetPopulator officeSheetPopulator;
     private final ClientSheetPopulator clientSheetPopulator;
-    private final List<LoanAccountData> loans;
+    private final List<BulkImportLoanPort.LoanLookup> loans;
     private final List<SavingsAccountData> savings;
     private final List<CodeValueData> guarantorRelationshipTypes;
 
     public GuarantorWorkbookPopulator(OfficeSheetPopulator officeSheetPopulator, ClientSheetPopulator clientSheetPopulator,
-            List<LoanAccountData> loans, List<SavingsAccountData> savings, List<CodeValueData> guarantorRelationshipTypes) {
+            List<BulkImportLoanPort.LoanLookup> loans, List<SavingsAccountData> savings, List<CodeValueData> guarantorRelationshipTypes) {
         this.officeSheetPopulator = officeSheetPopulator;
         this.clientSheetPopulator = clientSheetPopulator;
         this.loans = loans;
@@ -146,15 +146,19 @@ public class GuarantorWorkbookPopulator extends AbstractWorkbookPopulator {
         dateCellStyle.setDataFormat(df);
         int rowIndex = 1;
         Row row;
-        loans.sort(LoanAccountData.LOAN_ACCOUNT_DATA_COMPARATOR_BY_CLIENT_NAME);
-        for (LoanAccountData loan : loans) {
+        loans.sort((loan1, loan2) -> {
+            String clientOfLoan1 = loan1.clientName() == null ? "" : loan1.clientName().toUpperCase(java.util.Locale.ENGLISH);
+            String clientOfLoan2 = loan2.clientName() == null ? "" : loan2.clientName().toUpperCase(java.util.Locale.ENGLISH);
+            return clientOfLoan1.compareTo(clientOfLoan2);
+        });
+        for (BulkImportLoanPort.LoanLookup loan : loans) {
             if (addGuarantorSheet.getRow(rowIndex) == null) {
                 row = addGuarantorSheet.createRow(rowIndex++);
             } else {
                 row = addGuarantorSheet.getRow(rowIndex++);
             }
-            writeString(GuarantorConstants.LOOKUP_CLIENT_NAME_COL, row, loan.getClientName() + "(" + loan.getClientId() + ")");
-            writeString(GuarantorConstants.LOOKUP_ACCOUNT_NO_COL, row, loan.getAccountNo() + "-" + loan.getStatus().getValue());
+            writeString(GuarantorConstants.LOOKUP_CLIENT_NAME_COL, row, loan.clientName() + "(" + loan.clientId() + ")");
+            writeString(GuarantorConstants.LOOKUP_ACCOUNT_NO_COL, row, loan.accountNo() + "-" + loan.statusValue());
         }
     }
 
@@ -273,12 +277,12 @@ public class GuarantorWorkbookPopulator extends AbstractWorkbookPopulator {
         String clientName = "";
         String clientId = "";
         for (int i = 0; i < loans.size(); i++) {
-            if (!clientName.equals(loans.get(i).getClientName())) {
+            if (!clientName.equals(loans.get(i).clientName())) {
                 endIndex = i + 1;
                 clientNameToBeginEndIndexes.put(clientName, new Integer[] { startIndex, endIndex });
                 startIndex = i + 2;
-                clientName = loans.get(i).getClientName();
-                clientId = loans.get(i).getClientId().toString();
+                clientName = loans.get(i).clientName();
+                clientId = loans.get(i).clientId().toString();
                 clientsWithActiveLoans.add(clientName);
                 clientIdsWithActiveLoans.add(clientId);
             }

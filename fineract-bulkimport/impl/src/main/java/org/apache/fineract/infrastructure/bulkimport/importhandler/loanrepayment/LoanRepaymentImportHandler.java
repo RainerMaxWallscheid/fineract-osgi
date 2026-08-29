@@ -36,7 +36,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
-import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -53,15 +53,15 @@ public class LoanRepaymentImportHandler implements ImportHandler {
     public static final String SEPARATOR = "-";
     public static final String EMPTY_STR = "";
     private static final Logger LOG = LoggerFactory.getLogger(LoanRepaymentImportHandler.class);
-    private final LoanReadPlatformService loanReadPlatformService;
+    private final BulkImportLoanPort bulkImportLoanPort;
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @Autowired
     public LoanRepaymentImportHandler(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            final LoanReadPlatformService loanReadPlatformService) {
+            final BulkImportLoanPort bulkImportLoanPort) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.loanReadPlatformService = loanReadPlatformService;
+        this.bulkImportLoanPort = bulkImportLoanPort;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class LoanRepaymentImportHandler implements ImportHandler {
         String loanaccountInfo = ImportHandlerUtils.readAsString(LoanRepaymentConstants.LOAN_ACCOUNT_NO_COL, row);
         if (loanaccountInfo != null) {
             List<String> loanAccountAr = Splitter.on(SEPARATOR).splitToList(loanaccountInfo);
-            loanAccountId = this.loanReadPlatformService.retrieveLoanIdByAccountNumber(loanAccountAr.get(0));
+            loanAccountId = this.bulkImportLoanPort.loanIdByAccountNumber(loanAccountAr.get(0));
         }
         BigDecimal repaymentAmount = null;
         if (ImportHandlerUtils.readAsDouble(LoanRepaymentConstants.AMOUNT_COL, row) != null) {

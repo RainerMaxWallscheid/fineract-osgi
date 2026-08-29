@@ -20,7 +20,7 @@ package org.apache.fineract.infrastructure.bulkimport.populator;
 
 import java.util.List;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,7 +28,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class LoanProductSheetPopulator extends AbstractWorkbookPopulator {
 
-    private List<LoanProductData> products;
+    private List<BulkImportLoanPort.ProductLookup> products;
 
     private static final int ID_COL = 0;
     private static final int NAME_COL = 1;
@@ -56,7 +56,7 @@ public class LoanProductSheetPopulator extends AbstractWorkbookPopulator {
     private static final int START_DATE_COL = 23;
     private static final int CLOSE_DATE_COL = 24;
 
-    public LoanProductSheetPopulator(List<LoanProductData> products) {
+    public LoanProductSheetPopulator(List<BulkImportLoanPort.ProductLookup> products) {
         this.products = products;
     }
 
@@ -68,77 +68,77 @@ public class LoanProductSheetPopulator extends AbstractWorkbookPopulator {
         CellStyle dateCellStyle = workbook.createCellStyle();
         short df = workbook.createDataFormat().getFormat(dateFormat);
         dateCellStyle.setDataFormat(df);
-        for (LoanProductData product : products) {
+        for (BulkImportLoanPort.ProductLookup product : products) {
             Row row = productSheet.createRow(rowIndex++);
-            writeLong(ID_COL, row, product.getId());
-            writeString(NAME_COL, row, product.getName().trim().replaceAll("[ )(]", "_"));
-            if (product.getFundName() != null) {
-                writeString(FUND_NAME_COL, row, product.getFundName());
+            writeLong(ID_COL, row, product.id());
+            writeString(NAME_COL, row, product.name().trim().replaceAll("[ )(]", "_"));
+            if (product.fundName() != null) {
+                writeString(FUND_NAME_COL, row, product.fundName());
             }
-            writeBigDecimal(PRINCIPAL_COL, row, product.getPrincipal());
-            if (product.getMinPrincipal() != null) {
-                writeBigDecimal(MIN_PRINCIPAL_COL, row, product.getMinPrincipal());
+            writeBigDecimal(PRINCIPAL_COL, row, product.principal());
+            if (product.minPrincipal() != null) {
+                writeBigDecimal(MIN_PRINCIPAL_COL, row, product.minPrincipal());
             } else {
                 writeInt(MIN_PRINCIPAL_COL, row, 1);
             }
-            if (product.getMaxPrincipal() != null) {
-                writeBigDecimal(MAX_PRINCIPAL_COL, row, product.getMaxPrincipal());
+            if (product.maxPrincipal() != null) {
+                writeBigDecimal(MAX_PRINCIPAL_COL, row, product.maxPrincipal());
             } else {
                 writeInt(MAX_PRINCIPAL_COL, row, 999999999);
             }
-            int numberOfRepayments = product.getNumberOfRepayments();
-            if (product.getRepaymentFrequencyType().getValue().equalsIgnoreCase("Semi Month")) {
-                numberOfRepayments = numberOfRepayments * product.getRepaymentEvery();
+            int numberOfRepayments = product.numberOfRepayments();
+            if (product.repaymentFrequencyValue() != null && product.repaymentFrequencyValue().equalsIgnoreCase("Semi Month")) {
+                numberOfRepayments = numberOfRepayments * product.repaymentEvery();
             }
 
             writeInt(NO_OF_REPAYMENTS_COL, row, numberOfRepayments);
-            if (product.getMinNumberOfRepayments() != null) {
-                writeInt(MIN_REPAYMENTS_COL, row, product.getMinNumberOfRepayments());
+            if (product.minNumberOfRepayments() != null) {
+                writeInt(MIN_REPAYMENTS_COL, row, product.minNumberOfRepayments());
             } else {
                 writeInt(MIN_REPAYMENTS_COL, row, 1);
             }
-            if (product.getMaxNumberOfRepayments() != null) {
-                writeInt(MAX_REPAYMENTS_COL, row, product.getMaxNumberOfRepayments());
+            if (product.maxNumberOfRepayments() != null) {
+                writeInt(MAX_REPAYMENTS_COL, row, product.maxNumberOfRepayments());
             } else {
                 writeInt(MAX_REPAYMENTS_COL, row, 999999999);
             }
-            writeInt(REPAYMENT_EVERY_COL, row, product.getRepaymentEvery());
-            writeString(REPAYMENT_FREQUENCY_COL, row, product.getRepaymentFrequencyType().getValue());
-            writeBigDecimal(INTEREST_RATE_COL, row, product.getInterestRatePerPeriod());
-            if (product.getMinInterestRatePerPeriod() != null) {
-                writeBigDecimal(MIN_INTEREST_RATE_COL, row, product.getMinInterestRatePerPeriod());
+            writeInt(REPAYMENT_EVERY_COL, row, product.repaymentEvery());
+            writeString(REPAYMENT_FREQUENCY_COL, row, product.repaymentFrequencyValue());
+            writeBigDecimal(INTEREST_RATE_COL, row, product.interestRatePerPeriod());
+            if (product.minInterestRatePerPeriod() != null) {
+                writeBigDecimal(MIN_INTEREST_RATE_COL, row, product.minInterestRatePerPeriod());
             } else {
                 writeInt(MIN_INTEREST_RATE_COL, row, 1);
             }
-            if (product.getMaxInterestRatePerPeriod() != null) {
-                writeBigDecimal(MAX_INTEREST_RATE_COL, row, product.getMaxInterestRatePerPeriod());
+            if (product.maxInterestRatePerPeriod() != null) {
+                writeBigDecimal(MAX_INTEREST_RATE_COL, row, product.maxInterestRatePerPeriod());
             } else {
                 writeInt(MAX_INTEREST_RATE_COL, row, 999999999);
             }
-            writeString(INTEREST_RATE_FREQUENCY_COL, row, product.getInterestRateFrequencyType().getValue());
-            writeString(AMORTIZATION_TYPE_COL, row, product.getAmortizationType().getValue());
-            writeString(INTEREST_TYPE_COL, row, product.getInterestType().getValue());
-            writeString(INTEREST_CALCULATION_PERIOD_TYPE_COL, row, product.getInterestCalculationPeriodType().getValue());
-            if (product.getInArrearsTolerance() != null) {
-                writeBigDecimal(IN_ARREARS_TOLERANCE_COL, row, product.getInArrearsTolerance());
+            writeString(INTEREST_RATE_FREQUENCY_COL, row, product.interestRateFrequencyValue());
+            writeString(AMORTIZATION_TYPE_COL, row, product.amortizationTypeValue());
+            writeString(INTEREST_TYPE_COL, row, product.interestTypeValue());
+            writeString(INTEREST_CALCULATION_PERIOD_TYPE_COL, row, product.interestCalculationPeriodTypeValue());
+            if (product.inArrearsTolerance() != null) {
+                writeBigDecimal(IN_ARREARS_TOLERANCE_COL, row, product.inArrearsTolerance());
             }
-            writeString(TRANSACTION_PROCESSING_STRATEGY_NAME_COL, row, product.getTransactionProcessingStrategyName());
-            if (product.getGraceOnPrincipalPayment() != null) {
-                writeInt(GRACE_ON_PRINCIPAL_PAYMENT_COL, row, product.getGraceOnPrincipalPayment());
+            writeString(TRANSACTION_PROCESSING_STRATEGY_NAME_COL, row, product.transactionProcessingStrategyName());
+            if (product.graceOnPrincipalPayment() != null) {
+                writeInt(GRACE_ON_PRINCIPAL_PAYMENT_COL, row, product.graceOnPrincipalPayment());
             }
-            if (product.getGraceOnInterestPayment() != null) {
-                writeInt(GRACE_ON_INTEREST_PAYMENT_COL, row, product.getGraceOnInterestPayment());
+            if (product.graceOnInterestPayment() != null) {
+                writeInt(GRACE_ON_INTEREST_PAYMENT_COL, row, product.graceOnInterestPayment());
             }
-            if (product.getGraceOnInterestCharged() != null) {
-                writeInt(GRACE_ON_INTEREST_CHARGED_COL, row, product.getGraceOnInterestCharged());
+            if (product.graceOnInterestCharged() != null) {
+                writeInt(GRACE_ON_INTEREST_CHARGED_COL, row, product.graceOnInterestCharged());
             }
-            if (product.getStartDate() != null) {
-                writeDate(START_DATE_COL, row, product.getStartDate().toString(), dateCellStyle, dateFormat);
+            if (product.startDate() != null) {
+                writeDate(START_DATE_COL, row, product.startDate().toString(), dateCellStyle, dateFormat);
             } else {
                 writeDate(START_DATE_COL, row, "1/1/1970", dateCellStyle, dateFormat);
             }
-            if (product.getCloseDate() != null) {
-                writeDate(CLOSE_DATE_COL, row, product.getCloseDate().toString(), dateCellStyle, dateFormat);
+            if (product.closeDate() != null) {
+                writeDate(CLOSE_DATE_COL, row, product.closeDate().toString(), dateCellStyle, dateFormat);
             } else {
                 writeDate(CLOSE_DATE_COL, row, "1/1/2040", dateCellStyle, dateFormat);
             }
@@ -203,7 +203,7 @@ public class LoanProductSheetPopulator extends AbstractWorkbookPopulator {
         writeString(CLOSE_DATE_COL, rowHeader, "End Date");
     }
 
-    public List<LoanProductData> getProducts() {
+    public List<BulkImportLoanPort.ProductLookup> getProducts() {
         return products;
 
     }

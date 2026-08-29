@@ -24,22 +24,20 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.infrastructure.bulkimport.populator.ClientSheetPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
 
 class GuarantorWorkbookPopulatorTest {
 
-    private static final LoanStatusEnumData ACTIVE_STATUS = new LoanStatusEnumData(300L, "loanStatusType.active", "Active");
     private static final String DATE_FORMAT = "yyyyMMdd";
 
-    private LoanAccountData loanWithAccountNo(String accountNo) {
-        return new LoanAccountData().setAccountNo(accountNo).setStatus(ACTIVE_STATUS).setClientName("John Doe").setClientId(1L);
+    private BulkImportLoanPort.LoanLookup loanWithAccountNo(String accountNo) {
+        return new BulkImportLoanPort.LoanLookup(1L, accountNo, "John Doe", 1L, "Active", null, null, null, null);
     }
 
-    private GuarantorWorkbookPopulator populatorFor(LoanAccountData loan) {
+    private GuarantorWorkbookPopulator populatorFor(BulkImportLoanPort.LoanLookup loan) {
         return new GuarantorWorkbookPopulator(new OfficeSheetPopulator(List.of()), new ClientSheetPopulator(List.of(), List.of()),
                 new ArrayList<>(List.of(loan)), new ArrayList<>(), List.of());
     }

@@ -33,9 +33,9 @@ import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateI
 import org.apache.fineract.infrastructure.bulkimport.data.Count;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
+import org.apache.fineract.infrastructure.bulkimport.data.GuarantorImportRow;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
-import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -60,12 +60,12 @@ public class GuarantorImportHandler implements ImportHandler {
 
     @Override
     public Count process(final Workbook workbook, final String locale, final String dateFormat) {
-        List<GuarantorData> guarantors = readExcelFile(workbook, locale, dateFormat);
+        List<GuarantorImportRow> guarantors = readExcelFile(workbook, locale, dateFormat);
         return importEntity(workbook, guarantors, dateFormat);
     }
 
-    private List<GuarantorData> readExcelFile(final Workbook workbook, final String locale, final String dateFormat) {
-        List<GuarantorData> guarantors = new ArrayList<>();
+    private List<GuarantorImportRow> readExcelFile(final Workbook workbook, final String locale, final String dateFormat) {
+        List<GuarantorImportRow> guarantors = new ArrayList<>();
         Sheet addGuarantorSheet = workbook.getSheet(TemplatePopulateImportConstants.GUARANTOR_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(addGuarantorSheet, GuarantorConstants.LOAN_ACCOUNT_NO_COL);
         Long loanAccountId = null;
@@ -79,7 +79,7 @@ public class GuarantorImportHandler implements ImportHandler {
         return guarantors;
     }
 
-    private GuarantorData readGuarantor(final Workbook workbook, final Row row, Long loanAccountId, final String locale,
+    private GuarantorImportRow readGuarantor(final Workbook workbook, final Row row, Long loanAccountId, final String locale,
             final String dateFormat) {
         String loanaccountInfo = ImportHandlerUtils.readAsString(GuarantorConstants.LOAN_ACCOUNT_NO_COL, row);
         if (loanaccountInfo != null) {
@@ -116,18 +116,18 @@ public class GuarantorImportHandler implements ImportHandler {
         Integer savingsId = ImportHandlerUtils.readAsInt(GuarantorConstants.SAVINGS_ID_COL, row);
         BigDecimal amount = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(GuarantorConstants.AMOUNT, row));
 
-        return GuarantorData.importInstance(guarantorTypeId, clientRelationshipTypeId, entityId, firstname, lastname, addressLine1,
-                addressLine2, city, dob, zip, savingsId, amount, row.getRowNum(), loanAccountId, locale, dateFormat);
+        return GuarantorImportRow.of(guarantorTypeId, clientRelationshipTypeId, entityId, firstname, lastname, addressLine1, addressLine2,
+                city, dob, zip, savingsId, amount, row.getRowNum(), loanAccountId, locale, dateFormat);
     }
 
-    private Count importEntity(final Workbook workbook, final List<GuarantorData> guarantors, final String dateFormat) {
+    private Count importEntity(final Workbook workbook, final List<GuarantorImportRow> guarantors, final String dateFormat) {
         Sheet addGuarantorSheet = workbook.getSheet(TemplatePopulateImportConstants.GUARANTOR_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         String errorMessage = "";
         GsonBuilder gsonBuilder = GoogleGsonSerializerHelper.createGsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
-        for (GuarantorData guarantor : guarantors) {
+        for (GuarantorImportRow guarantor : guarantors) {
             try {
                 JsonObject guarantorJsonob = gsonBuilder.create().toJsonTree(guarantor).getAsJsonObject();
                 guarantorJsonob.remove("status");

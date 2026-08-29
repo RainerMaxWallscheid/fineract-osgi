@@ -20,19 +20,19 @@ package org.apache.fineract.infrastructure.bulkimport.populator.comparator;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.BulkImportLoanPort;
 
 /**
  * Sorting the loan values based on loan status giving priority to active loans
  */
 
-public class LoanComparatorByStatusActive implements Comparator<LoanAccountData>, Serializable {
+public class LoanComparatorByStatusActive implements Comparator<BulkImportLoanPort.LoanLookup>, Serializable {
 
     @Override
-    public int compare(LoanAccountData o1, LoanAccountData o2) {
+    public int compare(BulkImportLoanPort.LoanLookup o1, BulkImportLoanPort.LoanLookup o2) {
 
-        boolean isData1StatusActive = o1.getStatus() != null && o1.getStatus().getValue().equals("Active");
-        boolean isData2StatusActive = o2.getStatus() != null && o2.getStatus().getValue().equals("Active");
+        boolean isData1StatusActive = o1.statusValue() != null && o1.statusValue().equals("Active");
+        boolean isData2StatusActive = o2.statusValue() != null && o2.statusValue().equals("Active");
 
         // if both status active, these have the same rank
         if (isData1StatusActive && isData2StatusActive) {
