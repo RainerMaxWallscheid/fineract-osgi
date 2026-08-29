@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -59,7 +58,7 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
-import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralAssembler;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.fund.domain.FundRepository;
@@ -72,7 +71,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepositor
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
-import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
+
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCreditAllocationRule;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanDisbursementDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanPaymentAllocationRule;
@@ -90,7 +89,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleAssembler;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleCalculationPlatformService;
 import org.apache.fineract.portfolio.loanaccount.mapper.LoanChargeMapper;
-import org.apache.fineract.portfolio.collateralmanagement.mapper.LoanCollateralManagementMapper;
+
 import org.apache.fineract.portfolio.loanaccount.service.schedule.LoanScheduleComponent;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
@@ -126,7 +125,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final LoanScheduleAssembler loanScheduleAssembler;
     private final LoanChargeAssembler loanChargeAssembler;
-    private final LoanCollateralAssembler collateralAssembler;
+    private final LoanCollateralPort loanCollateralPort;
     private final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory;
     private final HolidayRepository holidayRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -137,11 +136,11 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final GLIMAccountInfoRepository glimRepository;
     private final AccountNumberGenerator accountNumberGenerator;
     private final GLIMAccountInfoWritePlatformService glimAccountInfoWritePlatformService;
-    private final LoanCollateralAssembler loanCollateralAssembler;
+
     private final LoanScheduleCalculationPlatformService calculationPlatformService;
     private final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler;
     private final LoanChargeMapper loanChargeMapper;
-    private final LoanCollateralManagementMapper loanCollateralManagementMapper;
+
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
     private final LoanDisbursementService loanDisbursementService;
     private final LoanChargeService loanChargeService;
@@ -202,10 +201,10 @@ public class LoanAssemblerImpl implements LoanAssembler {
             disbursementDetails = this.loanDisbursementDetailsAssembler.fetchDisbursementData(element.getAsJsonObject());
         }
         final String loanTypeStr = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.loanTypeParameterName, element);
-        Set<LoanCollateralManagement> collateral = new HashSet<>();
+        Set<?> collateral = Set.of();
         final AccountType loanAccountType = AccountType.fromName(loanTypeStr);
         if (loanAccountType.isIndividualAccount()) {
-            collateral = this.collateralAssembler.fromParsedJson(element);
+            collateral = this.loanCollateralPort.assembleFromJson(element.toString());
         }
         final Set<LoanCharge> loanCharges = this.loanChargeAssembler.fromParsedJson(element, disbursementDetails);
         BigDecimal fixedPrincipalPercentagePerInstallment = fromApiJsonHelper.extractBigDecimalWithLocaleNamed(LoanApiConstants.fixedPrincipalPercentagePerInstallmentParamName, element);
@@ -445,12 +444,12 @@ public class LoanAssemblerImpl implements LoanAssembler {
                 }
             }
         }
-        Set<LoanCollateralManagement> possiblyModifedLoanCollateralItems = null;
+        Set<?> possiblyModifedLoanCollateralItems = null;
         if (command.parameterExists("loanType")) {
             final String loanTypeStr = command.stringValueOfParameterNamed("loanType");
             final AccountType loanType = AccountType.fromName(loanTypeStr);
             if (!StringUtils.isBlank(loanTypeStr) && loanType.isIndividualAccount()) {
-                possiblyModifedLoanCollateralItems = this.loanCollateralAssembler.fromParsedJson(command.parsedJson());
+                possiblyModifedLoanCollateralItems = this.loanCollateralPort.assembleFromJson(command.json());
             }
         }
         this.loanScheduleAssembler.updateLoanApplicationAttributes(command, loan, changes);
@@ -602,7 +601,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             changes.put(Loan.RECALCULATE_LOAN_SCHEDULE, true);
         }
         if (command.parameterExists(LoanApiConstants.collateralParameterName) && possiblyModifedLoanCollateralItems != null) {
-            changes.put(LoanApiConstants.collateralParameterName, loanCollateralManagementMapper.map(possiblyModifedLoanCollateralItems));
+            changes.put(LoanApiConstants.collateralParameterName, loanCollateralPort.mapToData(possiblyModifedLoanCollateralItems));
         }
         if (command.isChangeInIntegerParameterNamed(LoanApiConstants.loanTermFrequencyParameterName, loan.getTermFrequency())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanApiConstants.loanTermFrequencyParameterName);
@@ -776,7 +775,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final FundRepository fundRepository, final StaffRepository staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanScheduleAssembler loanScheduleAssembler, final LoanChargeAssembler loanChargeAssembler, final LoanCollateralAssembler collateralAssembler, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final RateAssembler rateAssembler, final ExternalIdFactory externalIdFactory, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final GLIMAccountInfoRepository glimRepository, final AccountNumberGenerator accountNumberGenerator, final GLIMAccountInfoWritePlatformService glimAccountInfoWritePlatformService, final LoanCollateralAssembler loanCollateralAssembler, final LoanScheduleCalculationPlatformService calculationPlatformService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanChargeMapper loanChargeMapper, final LoanCollateralManagementMapper loanCollateralManagementMapper, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanOfficerService loanOfficerService, final LoanScheduleComponent loanSchedule) {
+        public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final FundRepository fundRepository, final StaffRepository staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanScheduleAssembler loanScheduleAssembler, final LoanChargeAssembler loanChargeAssembler, final LoanCollateralPort loanCollateralPort, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository, final RateAssembler rateAssembler, final ExternalIdFactory externalIdFactory, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final GLIMAccountInfoRepository glimRepository, final AccountNumberGenerator accountNumberGenerator, final GLIMAccountInfoWritePlatformService glimAccountInfoWritePlatformService, final LoanScheduleCalculationPlatformService calculationPlatformService, final LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, final LoanChargeMapper loanChargeMapper, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDisbursementService loanDisbursementService, final LoanChargeService loanChargeService, final LoanOfficerService loanOfficerService, final LoanScheduleComponent loanSchedule) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanRepository = loanRepository;
         this.loanProductRepository = loanProductRepository;
@@ -786,7 +785,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.codeValueRepository = codeValueRepository;
         this.loanScheduleAssembler = loanScheduleAssembler;
         this.loanChargeAssembler = loanChargeAssembler;
-        this.collateralAssembler = collateralAssembler;
+        this.loanCollateralPort = loanCollateralPort;
         this.loanRepaymentScheduleTransactionProcessorFactory = loanRepaymentScheduleTransactionProcessorFactory;
         this.holidayRepository = holidayRepository;
         this.configurationDomainService = configurationDomainService;
@@ -797,11 +796,9 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.glimRepository = glimRepository;
         this.accountNumberGenerator = accountNumberGenerator;
         this.glimAccountInfoWritePlatformService = glimAccountInfoWritePlatformService;
-        this.loanCollateralAssembler = loanCollateralAssembler;
         this.calculationPlatformService = calculationPlatformService;
         this.loanDisbursementDetailsAssembler = loanDisbursementDetailsAssembler;
         this.loanChargeMapper = loanChargeMapper;
-        this.loanCollateralManagementMapper = loanCollateralManagementMapper;
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
         this.loanDisbursementService = loanDisbursementService;
         this.loanChargeService = loanChargeService;

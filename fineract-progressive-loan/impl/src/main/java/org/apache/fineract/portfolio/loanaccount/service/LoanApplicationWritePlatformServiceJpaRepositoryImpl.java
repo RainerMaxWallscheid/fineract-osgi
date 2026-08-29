@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -64,7 +63,6 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.exception.GroupMemberNotFoundInGSIMException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -72,8 +70,7 @@ import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
-import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralLifecycleService;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
@@ -121,7 +118,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
     private final LoanScheduleService loanScheduleService;
     private final LoanOriginatorLinkingService loanOriginatorLinkingService;
-    private final LoanCollateralLifecycleService loanCollateralLifecycleService;
+    private final LoanCollateralPort loanCollateralLifecycleService;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Autowired
@@ -446,16 +443,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         if (accountAssociations != null) {
             this.accountAssociationsRepository.delete(accountAssociations);
         }
-        // Note: check if releaseAttachedCollaterals method can be used here
-        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan.getId());
-        for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
-            BigDecimal quantity = loanCollateralManagement.getQuantity();
-            ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
-            clientCollateralManagement.updateQuantityAfterLoanClosed(quantity);
-            loanCollateralManagement.setIsReleased(true);
-            loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
-        }
-        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loanCollateralManagements);
+        this.loanCollateralLifecycleService.releaseOnLoanDelete(loan.getId());
         this.loanRepositoryWrapper.delete(loanId);
         return  //
         //
@@ -738,7 +726,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void persistPendingCollaterals(final Loan loan) {
         if (loan.getPendingLoanCollaterals() != null) {
-            this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loan.getPendingLoanCollaterals());
+            this.loanCollateralLifecycleService.replaceFromPending(loan.getId(), loan.getPendingLoanCollaterals());
             loan.clearPendingLoanCollaterals();
         }
     }
@@ -752,14 +740,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     private void releaseAttachedCollaterals(Loan loan) {
-        Set<LoanCollateralManagement> loanCollateralManagements = this.loanCollateralLifecycleService.findByLoanAsSet(loan.getId());
-        for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
-            ClientCollateralManagement clientCollateralManagement = loanCollateralManagement.getClientCollateralManagement();
-            clientCollateralManagement.updateQuantity(clientCollateralManagement.getQuantity().add(loanCollateralManagement.getQuantity()));
-            loanCollateralManagement.setClientCollateralManagement(clientCollateralManagement);
-            loanCollateralManagement.setIsReleased(true);
-        }
-        this.loanCollateralLifecycleService.replaceLoanCollaterals(loan.getId(), loanCollateralManagements);
+        this.loanCollateralLifecycleService.releaseAttached(loan.getId());
     }
 
     private Map<String, Object> undoApproval(final Loan loan) {
@@ -784,7 +765,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralLifecycleService loanCollateralLifecycleService) {
+        public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanApplicationTransitionValidator loanApplicationTransitionValidator, final LoanApplicationValidator loanApplicationValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final LoanAssembler loanAssembler, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final AccountAssociationsRepository accountAssociationsRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final CalendarReadPlatformService calendarReadPlatformService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanScheduleService loanScheduleService, final LoanOriginatorLinkingService loanOriginatorLinkingService, final LoanCollateralPort loanCollateralLifecycleService) {
         this.context = context;
         this.loanApplicationTransitionValidator = loanApplicationTransitionValidator;
         this.loanApplicationValidator = loanApplicationValidator;

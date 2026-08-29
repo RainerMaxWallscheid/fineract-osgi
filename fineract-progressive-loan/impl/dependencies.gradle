@@ -61,7 +61,6 @@ dependencies {
     // Leftover LoansApiResource + client/share read + validators
     implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-collateralmanagement-api'))
-    implementation(project(path: ':fineract-collateralmanagement-impl'))
     implementation(project(path: ':fineract-loan-origination-api'))
     implementation(project(path: ':fineract-calendar-api'))
     implementation(project(path: ':fineract-entityaccess-api'))

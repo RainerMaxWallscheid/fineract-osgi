@@ -58,7 +58,6 @@ import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.holiday.domain.HolidayRepository;
 import org.apache.fineract.organisation.holiday.domain.HolidayStatusType;
 import org.apache.fineract.organisation.holiday.service.HolidayUtil;
-import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDays;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.organisation.workingdays.service.WorkingDaysUtil;
@@ -70,10 +69,7 @@ import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
-import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
-import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralAssembler;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
 import org.apache.fineract.portfolio.common.service.Validator;
@@ -85,7 +81,6 @@ import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.collateralmanagement.domain.LoanCollateralManagement;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleTransactionProcessorFactory;
@@ -143,7 +138,7 @@ public final class LoanApplicationValidator {
     public static final String LOANAPPLICATION_UNDO = "loanapplication.undo";
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanScheduleValidator loanScheduleValidator;
-    private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
+    private final LoanCollateralPort loanCollateralPort;
     private final LoanChargeApiJsonValidator loanChargeApiJsonValidator;
     private final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory;
     private final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
@@ -156,7 +151,6 @@ public final class LoanApplicationValidator {
     private final OfficeProductRestrictionService officeProductRestrictionService;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
-    private final LoanCollateralAssembler collateralAssembler;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final HolidayRepository holidayRepository;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
@@ -411,9 +405,9 @@ public final class LoanApplicationValidator {
                             baseDataValidator.reset().parameter(LoanApiConstants.collateralParameterName).parameterAtIndexArray(LoanApiConstants.clientCollateralIdParameterName, i).value(clientCollateralId).notNull().integerGreaterThanZero();
                             final BigDecimal quantity = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.quantityParameterName, collateralItemElement, locale);
                             baseDataValidator.reset().parameter(LoanApiConstants.collateralParameterName).parameterAtIndexArray(LoanApiConstants.quantityParameterName, i).value(quantity).notNull().positiveAmount();
-                            final ClientCollateralManagement clientCollateralManagement = this.clientCollateralManagementRepositoryWrapper.getCollateral(clientCollateralId);
-                            if (clientCollateralId != null && BigDecimal.valueOf(0).compareTo(clientCollateralManagement.getQuantity()) >= 0) {
-                                throw new InvalidAmountOfCollateralQuantity(clientCollateralManagement.getQuantity());
+                            final BigDecimal availableQuantity = this.loanCollateralPort.availableQuantity(clientCollateralId);
+                            if (clientCollateralId != null && BigDecimal.valueOf(0).compareTo(availableQuantity) >= 0) {
+                                throw new InvalidAmountOfCollateralQuantity(availableQuantity);
                             }
                         }
                     } else {
@@ -599,24 +593,7 @@ public final class LoanApplicationValidator {
 
     private void validateCollateral(JsonElement element) {
         final BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed(LoanApiConstants.disbursementPrincipalParameterName, element);
-        final String loanTypeStr = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.loanTypeParameterName, element);
-        if (!StringUtils.isBlank(loanTypeStr)) {
-            final AccountType loanAccountType = AccountType.fromName(loanTypeStr);
-            if (loanAccountType.isIndividualAccount()) {
-                Set<LoanCollateralManagement> collateral = this.collateralAssembler.fromParsedJson(element);
-                if (!collateral.isEmpty()) {
-                    BigDecimal totalValue = BigDecimal.ZERO;
-                    for (LoanCollateralManagement collateralManagement : collateral) {
-                        final CollateralManagementDomain collateralManagementDomain = collateralManagement.getClientCollateralManagement().getCollaterals();
-                        BigDecimal totalCollateral = collateralManagement.getQuantity().multiply(collateralManagementDomain.getBasePrice()).multiply(collateralManagementDomain.getPctToBase()).divide(BigDecimal.valueOf(100), MoneyHelper.getMathContext());
-                        totalValue = totalValue.add(totalCollateral);
-                    }
-                    if (amount.compareTo(totalValue) > 0) {
-                        throw new InvalidAmountOfCollaterals(totalValue);
-                    }
-                }
-            }
-        }
+        this.loanCollateralPort.validateIndividualCollateral(element.toString(), amount);
     }
 
     public void validateForModify(final JsonCommand command, final Loan loan) {
@@ -891,9 +868,8 @@ public final class LoanApplicationValidator {
                                     final BigDecimal quantity = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.quantityParameterName, collateralItemElement, locale);
                                     baseDataValidator.reset().parameter(LoanApiConstants.collateralParameterName).parameterAtIndexArray(LoanApiConstants.quantityParameterName, i).value(quantity).notNull().positiveAmount();
                                     if (clientCollateralId != null || quantity != null) {
-                                        BigDecimal baseAmount = this.clientCollateralManagementRepositoryWrapper.getCollateral(clientCollateralId).getCollaterals().getBasePrice();
-                                        BigDecimal pctToBase = this.clientCollateralManagementRepositoryWrapper.getCollateral(clientCollateralId).getCollaterals().getPctToBase();
-                                        BigDecimal total = baseAmount.multiply(pctToBase).multiply(quantity);
+                                        final LoanCollateralPort.CollateralPricing pricing = this.loanCollateralPort.pricing(clientCollateralId);
+                                        BigDecimal total = pricing.basePrice().multiply(pricing.pctToBase()).multiply(quantity);
                                         totalAmount = totalAmount.add(total);
                                     }
                                 }
@@ -1590,10 +1566,10 @@ public final class LoanApplicationValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final LoanCollateralAssembler collateralAssembler, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceLookupPort calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
+        public LoanApplicationValidator(final FromJsonHelper fromApiJsonHelper, final LoanScheduleValidator loanScheduleValidator, final LoanCollateralPort loanCollateralPort, final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator, final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService, final LoanProductDataValidator loanProductDataValidator, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanProductReadPlatformService loanProductReadPlatformService, final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepository holidayRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final CalendarInstanceLookupPort calendarInstanceRepository, final LoanUtilService loanUtilService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final LoanMapper loanMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanScheduleValidator = loanScheduleValidator;
-        this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
+        this.loanCollateralPort = loanCollateralPort;
         this.loanChargeApiJsonValidator = loanChargeApiJsonValidator;
         this.loanRepaymentScheduleTransactionProcessorFactory = loanRepaymentScheduleTransactionProcessorFactory;
         this.advancedPaymentAllocationsValidator = advancedPaymentAllocationsValidator;
@@ -1606,7 +1582,6 @@ public final class LoanApplicationValidator {
         this.officeProductRestrictionService = officeProductRestrictionService;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanProductReadPlatformService = loanProductReadPlatformService;
-        this.collateralAssembler = collateralAssembler;
         this.workingDaysRepository = workingDaysRepository;
         this.holidayRepository = holidayRepository;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.service;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -56,8 +55,7 @@ import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.mapper.ClientMapper;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
-import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
+import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -80,7 +78,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final ClientMembersOfGroupMapper membersOfGroupMapper = new ClientMembersOfGroupMapper();
     private final ParentGroupsMapper clientGroupsMapper = new ParentGroupsMapper();
     private final ColumnValidator columnValidator;
-    private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
+    private final LoanCollateralPort loanCollateralPort;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final ClientMapper clientMapper;
     private final InputValidator inputValidator;
@@ -196,14 +194,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String hierarchySearchString = hierarchy + "%";
             final Client client = clientRepositoryWrapper.getClientByClientIdAndHierarchy(clientId, hierarchySearchString);
             final ClientData clientData = clientMapper.map(client);
-            // Get client collaterals
-            final Collection<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepositoryWrapper.getCollateralsPerClient(clientId);
             final Set<ClientCollateralManagementData> clientCollateralManagementDataSet = new HashSet<>();
-            // Map to client collateral data class
-            for (ClientCollateralManagement clientCollateralManagement : clientCollateralManagements) {
-                BigDecimal total = clientCollateralManagement.getTotal();
-                BigDecimal totalCollateral = clientCollateralManagement.getTotalCollateral(total);
-                clientCollateralManagementDataSet.add(new ClientCollateralManagementData(clientCollateralManagement.getId(), clientCollateralManagement.getCollaterals().getName(), clientCollateralManagement.getQuantity(), clientCollateralManagement.getCollaterals().getPctToBase(), clientCollateralManagement.getCollaterals().getBasePrice(), total, totalCollateral));
+            for (final LoanCollateralPort.ClientCollateralSummary summary : this.loanCollateralPort.collateralsPerClient(clientId)) {
+                clientCollateralManagementDataSet.add(new ClientCollateralManagementData(summary.id(), summary.name(), summary.quantity(),
+                        summary.pctToBase(), summary.basePrice(), summary.total(), summary.totalCollateral()));
             }
             final String clientGroupsSql = "select " + this.clientGroupsMapper.parentGroupsSchema();
             final Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper,  // NOSONAR
@@ -638,14 +632,14 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final CodeValueReadPlatformService codeValueReadPlatformService, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final ClientRepositoryWrapper clientRepositoryWrapper, final ClientMapper clientMapper, final InputValidator inputValidator) {
+        public ClientReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final CodeValueReadPlatformService codeValueReadPlatformService, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator, final LoanCollateralPort loanCollateralPort, final ClientRepositoryWrapper clientRepositoryWrapper, final ClientMapper clientMapper, final InputValidator inputValidator) {
         this.jdbcTemplate = jdbcTemplate;
         this.context = context;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
         this.paginationHelper = paginationHelper;
         this.sqlGenerator = sqlGenerator;
         this.columnValidator = columnValidator;
-        this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
+        this.loanCollateralPort = loanCollateralPort;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.clientMapper = clientMapper;
         this.inputValidator = inputValidator;
