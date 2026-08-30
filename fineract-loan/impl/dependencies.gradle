@@ -59,6 +59,9 @@ dependencies {
     implementation(project(path: ':fineract-loan-origination-api'))
     // Investor COB execute port (Object-typed leftover Loan graphs)
     implementation(project(path: ':fineract-investor-api'))
+    // Avro loan event serializers hosted next to leftover Loan
+    implementation(project(path: ':fineract-avro-schemas'))
+    implementation('org.apache.avro:avro')
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
