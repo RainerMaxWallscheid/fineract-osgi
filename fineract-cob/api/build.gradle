@@ -32,13 +32,19 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'COB contracts (ports, pure DTOs, exceptions)',
                 'Export-Package': 'org.apache.fineract.cob,'
+                        + 'org.apache.fineract.cob.common,'
                         + 'org.apache.fineract.cob.conditions,'
+                        + 'org.apache.fineract.cob.converter,'
                         + 'org.apache.fineract.cob.data,'
                         + 'org.apache.fineract.cob.domain,'
                         + 'org.apache.fineract.cob.exceptions,'
+                        + 'org.apache.fineract.cob.listener,'
                         + 'org.apache.fineract.cob.loan,'
+                        + 'org.apache.fineract.cob.processor,'
+                        + 'org.apache.fineract.cob.resolver,'
                         + 'org.apache.fineract.cob.savings,'
-                        + 'org.apache.fineract.cob.service',
+                        + 'org.apache.fineract.cob.service,'
+                        + 'org.apache.fineract.cob.tasklet',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.condition,'
                         + 'org.apache.fineract.infrastructure.core.config,'

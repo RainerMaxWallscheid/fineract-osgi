@@ -45,7 +45,6 @@ dependencies {
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-cob-api'))
-    implementation(project(path: ':fineract-cob-impl'))
     // PropertyService on loan COB partitioner / worker config
     implementation(project(path: ':fineract-springbatch-api'))
     implementation(project(path: ':fineract-accounting-api'))
