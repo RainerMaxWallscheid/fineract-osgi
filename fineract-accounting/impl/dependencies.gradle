@@ -30,7 +30,6 @@ dependencies {
     // Account transfer / SI ports and shared DTOs
     implementation(project(path: ':fineract-accounttransfer-api'))
     implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
     implementation(project(path: ':fineract-savings-api'))
     // ProvisioningExistencePort for loan-loss category/criteria existence
     implementation(project(path: ':fineract-organisation-api'))

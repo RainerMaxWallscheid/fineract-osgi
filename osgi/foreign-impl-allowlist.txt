@@ -2,7 +2,6 @@
 # Domain *-impl may depend on these until a thinner api port exists.
 # Do not add rows to avoid a retarget. Delete a row when the Gradle edge is gone.
 # Format: <consumer dependencies.gradle> <target project>
-fineract-accounting/impl/dependencies.gradle	fineract-loan-impl
 fineract-event/impl/dependencies.gradle	fineract-loan-impl
 fineract-interoperation/impl/dependencies.gradle	fineract-savings-impl
 fineract-loan/impl/dependencies.gradle	fineract-cob-impl
