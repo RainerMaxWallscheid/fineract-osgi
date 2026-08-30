@@ -53,6 +53,8 @@ jar {
                         + 'org.apache.fineract.portfolio.search.data,'
                         + 'org.apache.fineract.portfolio.tax.data,'
                         + 'org.apache.fineract.useradministration.domain,'
+                        + 'org.apache.fineract.interoperation.data,'
+                        + 'org.apache.fineract.interoperation.domain,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.savings.api'
                 )

@@ -22,6 +22,8 @@ dependencies {
     api project(path: ':fineract-core')
     // ChargeData on charge read port signatures
     api project(path: ':fineract-charge-api')
+    // Interop DTOs on SavingsInteropPort
+    implementation(project(path: ':fineract-interoperation-api'))
 
     implementation 'org.apache.commons:commons-lang3'
     implementation 'com.google.code.gson:gson'

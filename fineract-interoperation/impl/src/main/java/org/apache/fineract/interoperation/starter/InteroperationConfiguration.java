@@ -19,25 +19,17 @@
 package org.apache.fineract.interoperation.starter;
 
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.interoperation.domain.InteropIdentifierRepository;
 import org.apache.fineract.interoperation.serialization.InteropDataValidator;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.interoperation.service.InteropServiceImpl;
-import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepository;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionSummaryWrapper;
-import org.apache.fineract.portfolio.savings.domain.SavingsHelper;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsInteropPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,21 +40,14 @@ public class InteroperationConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(InteropService.class)
-    public InteropService interopService(PlatformSecurityContext securityContext, InteropDataValidator interopDataValidator,
-            SavingsAccountRepository savingsAccountRepository, SavingsAccountTransactionRepository savingsAccountTransactionRepository,
-            ApplicationCurrencyRepository applicationCurrencyRepository, NoteReadPlatformService noteReadPlatformService,
-            NoteWritePlatformService noteWritePlatformService, PaymentTypeRepository paymentTypeRepository,
-            InteropIdentifierRepository identifierRepository,
-            LoanExistencePort loanExistencePort, SavingsHelper savingsHelper,
-            SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
-            SavingsAccountDomainService savingsAccountService, ConfigurationDomainService configurationDomainService,
-            JdbcTemplate jdbcTemplate, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer, DatabaseSpecificSQLGenerator sqlGenerator,
-            org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService chargeTaxApplicationService) {
-        return new InteropServiceImpl(securityContext, interopDataValidator, savingsAccountRepository, savingsAccountTransactionRepository,
-                applicationCurrencyRepository, noteReadPlatformService, noteWritePlatformService, paymentTypeRepository,
-                identifierRepository, loanExistencePort,
-                savingsHelper, savingsAccountTransactionSummaryWrapper, savingsAccountService, configurationDomainService, jdbcTemplate,
-                commandsSourceWritePlatformService, toApiJsonSerializer, sqlGenerator, chargeTaxApplicationService);
+    public InteropService interopService(final PlatformSecurityContext securityContext, final InteropDataValidator interopDataValidator,
+            final NoteReadPlatformService noteReadPlatformService, final NoteWritePlatformService noteWritePlatformService,
+            final LoanExistencePort loanExistencePort, final SavingsInteropPort savingsInteropPort, final JdbcTemplate jdbcTemplate,
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+            final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer,
+            final DatabaseSpecificSQLGenerator sqlGenerator) {
+        return new InteropServiceImpl(securityContext, interopDataValidator, noteReadPlatformService, noteWritePlatformService,
+                loanExistencePort, savingsInteropPort, jdbcTemplate, commandsSourceWritePlatformService, toApiJsonSerializer,
+                sqlGenerator);
     }
 }
