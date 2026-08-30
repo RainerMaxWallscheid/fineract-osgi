@@ -44,6 +44,7 @@ import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountView;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,32 +53,46 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private final SavingsAccountRepository savingsAccountJpaRepository;
     private final GSIMReadPlatformService gsimReadPlatformService;
-    private final SavingsAccountAssembler savingsAccountAssembler;
-    private final SavingsAccountDomainService savingsAccountDomainService;
-    private final DepositAccountAssembler depositAccountAssembler;
-    private final DepositAccountWritePlatformService depositAccountWritePlatformService;
     private final GSIMRepositoy gsimRepository;
     private final ShareAccountRepository shareAccountRepository;
+    private SavingsAccountAssembler savingsAccountAssembler;
+    private SavingsAccountDomainService savingsAccountDomainService;
+    private DepositAccountAssembler depositAccountAssembler;
+    private DepositAccountWritePlatformService depositAccountWritePlatformService;
     private SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     public LinkedSavingsAccountPortAdapter(final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountRepository savingsAccountJpaRepository, final GSIMReadPlatformService gsimReadPlatformService,
-            final SavingsAccountAssembler savingsAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService,
-            final DepositAccountAssembler depositAccountAssembler, final DepositAccountWritePlatformService depositAccountWritePlatformService,
             final GSIMRepositoy gsimRepository, final ShareAccountRepository shareAccountRepository) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountJpaRepository = savingsAccountJpaRepository;
         this.gsimReadPlatformService = gsimReadPlatformService;
-        this.savingsAccountAssembler = savingsAccountAssembler;
-        this.savingsAccountDomainService = savingsAccountDomainService;
-        this.depositAccountAssembler = depositAccountAssembler;
-        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
         this.gsimRepository = gsimRepository;
         this.shareAccountRepository = shareAccountRepository;
     }
 
     @Autowired
-    public void setSavingsAccountWritePlatformService(final SavingsAccountWritePlatformService savingsAccountWritePlatformService) {
+    public void setSavingsAccountAssembler(@Lazy final SavingsAccountAssembler savingsAccountAssembler) {
+        this.savingsAccountAssembler = savingsAccountAssembler;
+    }
+
+    @Autowired
+    public void setSavingsAccountDomainService(@Lazy final SavingsAccountDomainService savingsAccountDomainService) {
+        this.savingsAccountDomainService = savingsAccountDomainService;
+    }
+
+    @Autowired
+    public void setDepositAccountAssembler(@Lazy final DepositAccountAssembler depositAccountAssembler) {
+        this.depositAccountAssembler = depositAccountAssembler;
+    }
+
+    @Autowired
+    public void setDepositAccountWritePlatformService(@Lazy final DepositAccountWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
+    }
+
+    @Autowired
+    public void setSavingsAccountWritePlatformService(@Lazy final SavingsAccountWritePlatformService savingsAccountWritePlatformService) {
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
     }
 

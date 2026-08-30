@@ -41,6 +41,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,7 +72,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     }
 
     @Autowired
-    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+    public void setLinkedSavingsAccountPort(@Lazy final LinkedSavingsAccountPort linkedSavingsAccountPort) {
         this.linkedSavingsAccountPort = linkedSavingsAccountPort;
     }
 
