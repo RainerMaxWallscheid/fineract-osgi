@@ -62,9 +62,7 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.domain.NoteType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.transfer.api.TransferApiConstants;
 import org.apache.fineract.portfolio.transfer.data.TransfersDataValidator;
 import org.apache.fineract.portfolio.transfer.exception.ClientNotAwaitingTransferApprovalException;
@@ -79,9 +77,13 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final LoanWritePlatformService loanWritePlatformService;
-    private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
     private final LoanRepositoryWrapper loanRepositoryWrapper;
-    private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
     private final TransfersDataValidator transfersDataValidator;
     private final StaffRepositoryWrapper staffRepositoryWrapper;
     private final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper;
@@ -364,23 +366,22 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
                 }
             }
         }
-        if (this.savingsAccountRepositoryWrapper.doNonClosedSavingAccountsExistForClient(client.getId())) {
-            // get each individual saving account for the client
-            for (final SavingsAccount savingsAccount : this.savingsAccountRepositoryWrapper.findSavingAccountByClientId(client.getId())) {
-                if (savingsAccount.isActivated() && !savingsAccount.isClosed()) {
-                    switch (transferEventType) {
-                    case ACCEPTANCE: 
-                        this.savingsAccountWritePlatformService.acceptSavingsTransfer(savingsAccount, savingsAccount.retrieveLastTransactionDate(), destinationOffice, staff);
-                        break;
-                    case PROPOSAL: 
-                        this.savingsAccountWritePlatformService.initiateSavingsTransfer(savingsAccount, transferDate);
-                        break;
-                    case REJECTION: 
-                        this.savingsAccountWritePlatformService.rejectSavingsTransfer(savingsAccount);
-                        break;
-                    case WITHDRAWAL: 
-                        this.savingsAccountWritePlatformService.withdrawSavingsTransfer(savingsAccount, savingsAccount.retrieveLastTransactionDate());
-                    }
+        if (this.linkedSavingsAccountPort.hasNonClosedForClient(client.getId())) {
+            for (final Long savingsAccountId : this.linkedSavingsAccountPort.nonClosedIdsByClientId(client.getId())) {
+                switch (transferEventType) {
+                case ACCEPTANCE:
+                    this.linkedSavingsAccountPort.acceptTransfer(savingsAccountId,
+                            this.linkedSavingsAccountPort.requireById(savingsAccountId).getLastTransactionDate(), destinationOffice, staff);
+                    break;
+                case PROPOSAL:
+                    this.linkedSavingsAccountPort.initiateTransfer(savingsAccountId, transferDate);
+                    break;
+                case REJECTION:
+                    this.linkedSavingsAccountPort.rejectTransfer(savingsAccountId);
+                    break;
+                case WITHDRAWAL:
+                    this.linkedSavingsAccountPort.withdrawTransfer(savingsAccountId,
+                            this.linkedSavingsAccountPort.requireById(savingsAccountId).getLastTransactionDate());
                 }
             }
         }
@@ -479,16 +480,14 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     }
 
     @java.lang.SuppressWarnings("all")
-        public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final TransfersDataValidator transfersDataValidator, final StaffRepositoryWrapper staffRepositoryWrapper, final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, final PlatformSecurityContext context, final LoanOfficerService loanOfficerService, final TransactionBoundApplicationEventPublisher eventPublisher, final BusinessEventNotifierService businessEventNotifierService) {
+        public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final TransfersDataValidator transfersDataValidator, final StaffRepositoryWrapper staffRepositoryWrapper, final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, final PlatformSecurityContext context, final LoanOfficerService loanOfficerService, final TransactionBoundApplicationEventPublisher eventPublisher, final BusinessEventNotifierService businessEventNotifierService) {
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.officeRepository = officeRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.groupRepository = groupRepository;
         this.loanWritePlatformService = loanWritePlatformService;
-        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.savingsAccountRepositoryWrapper = savingsAccountRepositoryWrapper;
-        this.transfersDataValidator = transfersDataValidator;
+                this.loanRepositoryWrapper = loanRepositoryWrapper;
+                this.transfersDataValidator = transfersDataValidator;
         this.staffRepositoryWrapper = staffRepositoryWrapper;
         this.clientTransferDetailsRepositoryWrapper = clientTransferDetailsRepositoryWrapper;
         this.context = context;

@@ -41,10 +41,10 @@ import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRu
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.account.data.AccountTransferFundsData;
 import org.apache.fineract.portfolio.account.domain.AccountTransferType;
-import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberGeneratorService;
+import org.apache.fineract.portfolio.account.service.AccountTransferFundsWritePort;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
@@ -70,10 +70,10 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private final SavingsAccountActivationService savingsAccountActivationService;
     private final SavingsJournalPort savingsJournalPort;
-    private final AccountNumberGenerator accountNumberGenerator;
+    private final AccountNumberGeneratorService accountNumberGenerator;
     private final DepositAccountAssembler depositAccountAssembler;
     private final SavingsAccountDomainService savingsAccountDomainService;
-    private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
+    private final AccountTransferFundsWritePort accountTransferFundsWritePort;
     private final ConfigurationDomainService configurationDomainService;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
@@ -193,8 +193,8 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
             final String transferDescription = command.stringValueOfParameterNamed(transferDescriptionParamName);
             final SavingsAccount toSavingsAccount = this.depositAccountAssembler.assembleFrom(toSavingsId, DepositAccountType.SAVINGS_DEPOSIT);
             final boolean isExceptionForBalanceCheck = false;
-            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, null, null, transferDescription, locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, toSavingsAccount, account, isAccountTransfer, isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, account.getId(), toSavingsAccount.getId(), transferDescription, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isAccountTransfer, isExceptionForBalanceCheck);
+            this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
             updateAlreadyPostedTransactions(existingTransactionIds, account);
             postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer);
         } else {
@@ -250,8 +250,8 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
         } else if (onClosureType == DepositAccountOnClosureType.TRANSFER_TO_SAVINGS) {
             final SavingsAccount toSavingsAccount = this.depositAccountAssembler.assembleFrom(toSavingsId, DepositAccountType.SAVINGS_DEPOSIT);
             final boolean isExceptionForBalanceCheck = false;
-            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, null, null, transferDescription, null, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, toSavingsAccount, account, isAccountTransfer, isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, account.getId(), toSavingsAccount.getId(), transferDescription, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isAccountTransfer, isExceptionForBalanceCheck);
+            this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
             updateAlreadyPostedTransactions(existingTransactionIds, account);
             account.updateClosedStatus();
             account.updateOnAccountClosureStatus(onClosureType);
@@ -317,8 +317,8 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
             final String transferDescription = command.stringValueOfParameterNamed(transferDescriptionParamName);
             final SavingsAccount toSavingsAccount = this.depositAccountAssembler.assembleFrom(toSavingsId, DepositAccountType.SAVINGS_DEPOSIT);
             final boolean isExceptionForBalanceCheck = false;
-            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(closedDate, transactionAmount, PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, null, null, transferDescription, locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, toSavingsAccount, account, isRegularTransaction, isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(closedDate, transactionAmount, PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, account.getId(), toSavingsAccount.getId(), transferDescription, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isRegularTransaction, isExceptionForBalanceCheck);
+            this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
             updateAlreadyPostedTransactions(existingTransactionIds, account);
         } else {
             final SavingsAccountTransaction withdrawal = this.handleWithdrawal(account, fmt, closedDate, account.getAccountBalance(), paymentDetail, false, isRegularTransaction);
@@ -353,7 +353,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     private void autoGenerateAccountNumber(final SavingsAccount account) {
         if (account.isAccountNumberRequiresAutoGeneration()) {
             final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.SAVINGS);
-            account.updateAccountNo(this.accountNumberGenerator.generate(account, accountNumberFormat));
+            account.updateAccountNo(this.accountNumberGenerator.generate(EntityAccountType.SAVINGS, account, accountNumberFormat));
         }
     }
 
@@ -382,8 +382,8 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
             final Long toSavingsId = command.longValueOfParameterNamed(toSavingsAccountIdParamName);
             final String transferDescription = command.stringValueOfParameterNamed(transferDescriptionParamName);
             final SavingsAccount toSavingsAccount = this.depositAccountAssembler.assembleFrom(toSavingsId, DepositAccountType.SAVINGS_DEPOSIT);
-            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, null, null, transferDescription, locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, toSavingsAccount, account, isRegularTransaction, isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, account.getId(), toSavingsAccount.getId(), transferDescription, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isRegularTransaction, isExceptionForBalanceCheck);
+            this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
             updateAlreadyPostedTransactions(existingTransactionIds, account);
         } else {
             final SavingsAccountTransaction withdrawal = this.handleWithdrawal(account, fmt, closedDate, account.getAccountBalance(), paymentDetail, false, isRegularTransaction);
@@ -423,8 +423,8 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
             final Long toSavingsId = command.longValueOfParameterNamed(toSavingsAccountIdParamName);
             final String transferDescription = command.stringValueOfParameterNamed(transferDescriptionParamName);
             final SavingsAccount toSavingsAccount = this.depositAccountAssembler.assembleFrom(toSavingsId, DepositAccountType.SAVINGS_DEPOSIT);
-            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, null, null, transferDescription, locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, toSavingsAccount, account, isRegularTransaction, isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(closedDate, account.getAccountBalance(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, account.getId(), toSavingsAccount.getId(), transferDescription, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isRegularTransaction, isExceptionForBalanceCheck);
+            this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
             updateAlreadyPostedTransactions(existingTransactionIds, account);
         } else {
             final SavingsAccountTransaction withdrawal = this.handleWithdrawal(account, fmt, closedDate, account.getAccountBalance(), paymentDetail, false, isRegularTransaction);
@@ -461,14 +461,14 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final SavingsJournalPort savingsJournalPort, final AccountNumberGenerator accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
+        public DepositAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository, final SavingsAccountActivationService savingsAccountActivationService, final SavingsJournalPort savingsJournalPort, final AccountNumberGeneratorService accountNumberGenerator, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountDomainService savingsAccountDomainService, final AccountTransferFundsWritePort accountTransferFundsWritePort, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final CalendarInstanceLookupPort calendarInstanceRepository, final ExternalIdFactory externalIdFactory) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountActivationService = savingsAccountActivationService;
         this.savingsJournalPort = savingsJournalPort;
         this.accountNumberGenerator = accountNumberGenerator;
         this.depositAccountAssembler = depositAccountAssembler;
         this.savingsAccountDomainService = savingsAccountDomainService;
-        this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
+        this.accountTransferFundsWritePort = accountTransferFundsWritePort;
         this.configurationDomainService = configurationDomainService;
         this.accountNumberFormatRepository = accountNumberFormatRepository;
         this.calendarInstanceRepository = calendarInstanceRepository;

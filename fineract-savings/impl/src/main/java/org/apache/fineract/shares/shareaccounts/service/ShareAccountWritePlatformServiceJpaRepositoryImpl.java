@@ -42,7 +42,7 @@ import org.apache.fineract.infrastructure.event.business.domain.PortfolioAccount
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountApproveBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.share.ShareAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
-import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberGeneratorService;
 import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionEnumData;
@@ -51,16 +51,21 @@ import org.apache.fineract.shares.shareaccounts.domain.ShareAccountChargePaidBy;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepositoryWrapper;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountTransaction;
 import org.apache.fineract.shares.shareaccounts.serialization.ShareAccountDataSerializer;
+import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
 import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
 import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.stereotype.Service;
 
+@Service
+@ConditionalOnMissingBean(ShareAccountWritePlatformService.class)
 public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareAccountWritePlatformService {
     private final ShareAccountDataSerializer accountDataSerializer;
     private final ShareAccountRepositoryWrapper shareAccountRepository;
     private final ShareProductRepositoryWrapper shareProductRepository;
-    private final AccountNumberGenerator accountNumberGenerator;
+    private final AccountNumberGeneratorService accountNumberGenerator;
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
     private final SharesJournalPort sharesJournalPort;
     private final NoteWritePlatformService noteWritePlatformService;
@@ -91,7 +96,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     private void generateAccountNumber(final ShareAccount account) {
         if (account.isAccountNumberRequiresAutoGeneration()) {
             final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.SHARES);
-            account.updateAccountNumber(this.accountNumberGenerator.generate(account, accountNumberFormat));
+            account.updateAccountNumber(this.accountNumberGenerator.generate(EntityAccountType.SHARES, account, accountNumberFormat));
             this.shareAccountRepository.save(account);
         }
     }
@@ -467,7 +472,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountWritePlatformServiceJpaRepositoryImpl(final ShareAccountDataSerializer accountDataSerializer, final ShareAccountRepositoryWrapper shareAccountRepository, final ShareProductRepositoryWrapper shareProductRepository, final AccountNumberGenerator accountNumberGenerator, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final SharesJournalPort sharesJournalPort, final NoteWritePlatformService noteWritePlatformService, final BusinessEventNotifierService businessEventNotifierService) {
+        public ShareAccountWritePlatformServiceJpaRepositoryImpl(final ShareAccountDataSerializer accountDataSerializer, final ShareAccountRepositoryWrapper shareAccountRepository, final ShareProductRepositoryWrapper shareProductRepository, final AccountNumberGeneratorService accountNumberGenerator, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final SharesJournalPort sharesJournalPort, final NoteWritePlatformService noteWritePlatformService, final BusinessEventNotifierService businessEventNotifierService) {
         this.accountDataSerializer = accountDataSerializer;
         this.shareAccountRepository = shareAccountRepository;
         this.shareProductRepository = shareProductRepository;

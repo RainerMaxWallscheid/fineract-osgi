@@ -84,10 +84,6 @@ public class GuarantorFundingDetails extends AbstractPersistableCustom<Long> {
         return GuarantorFundStatusType.fromInt(this.status);
     }
 
-    public Object getLinkedSavingsAccount() {
-        return accountAssociations.linkedSavingsAccount();
-    }
-
     public Long linkedSavingsAccountId() {
         return this.accountAssociations == null ? null : this.accountAssociations.linkedSavingsAccountId();
     }

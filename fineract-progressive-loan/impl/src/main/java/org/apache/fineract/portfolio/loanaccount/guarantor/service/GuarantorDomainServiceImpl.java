@@ -64,7 +64,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorRepos
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductGuaranteeDetails;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
@@ -218,7 +218,6 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
             for (GuarantorFundingDetails guarantorFundingDetails : fundingDetails) {
                 Loan freshLoan = loanRepository.findById(loanId).orElseThrow();
                 if (guarantorFundingDetails.getStatus().isActive()) {
-                    final SavingsAccount fromSavingsAccount = (SavingsAccount) guarantorFundingDetails.getLinkedSavingsAccount();
                     final Long fromAccountId = guarantorFundingDetails.linkedSavingsAccountId();
                     releaseLoanIds.put(loanId, guarantorFundingDetails.getId());
                     try {
@@ -227,7 +226,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
                             remainingAmount = remainingAmount.multiply(freshLoan.getPrincipal().getAmount()).divide(freshLoan.getGuaranteeAmount(), MoneyHelper.getRoundingMode());
                         }
                         ExternalId externalId = externalIdFactory.create();
-                        AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, remainingAmount, fromAccountType, toAccountType, fromAccountId, toAccountId, description, locale, fmt, paymentDetail, fromTransferType, toTransferType, chargeId, loanInstallmentNumber, transferType, accountTransferDetails, noteText, externalId, null, null, fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);
+                        AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, remainingAmount, fromAccountType, toAccountType, fromAccountId, toAccountId, description, locale, fmt, paymentDetail, fromTransferType, toTransferType, chargeId, loanInstallmentNumber, transferType, accountTransferDetails, noteText, externalId, null, null, null, isRegularTransaction, isExceptionForBalanceCheck);
                         transferAmount(accountTransferDTO);
                     } finally {
                         releaseLoanIds.remove(loanId);

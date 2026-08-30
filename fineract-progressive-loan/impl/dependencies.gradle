@@ -52,7 +52,6 @@ dependencies {
     implementation(project(path: ':fineract-working-capital-loan-api'))
     // Leftover client/groups REST: savings account/GSIM read
     implementation(project(path: ':fineract-savings-api'))
-    implementation(project(path: ':fineract-savings-impl'))
     // Leftover groups/centers REST: meetings + datatable checks
     implementation(project(path: ':fineract-meeting-api'))
     implementation(project(path: ':fineract-dataqueries-api'))

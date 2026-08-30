@@ -57,12 +57,12 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
-import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.account.data.AccountTransferFundsData;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.domain.AccountTransferType;
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.portfolio.account.service.AccountTransferFundsWritePort;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
@@ -143,7 +143,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository;
     private final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService;
-    private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
+    private final AccountTransferFundsWritePort accountTransferFundsWritePort;
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -177,11 +177,10 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
                     final PaymentDetail paymentDetail = null;
                     this.depositAccountDomainService.handleFDDeposit(account, fmt, account.getActivationDate(), amountForDeposit.getAmount(), paymentDetail);
                 } else {
-                    final SavingsAccount fromSavingsAccount = null;
                     boolean isRegularTransaction = false;
                     final boolean isExceptionForBalanceCheck = false;
-                    final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(account.getActivationDate(), amountForDeposit.getAmount(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, portfolioAccountData.getId(), account.getId(), "Account Transfer", locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, account, fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);
-                    this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+                    final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(account.getActivationDate(), amountForDeposit.getAmount(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, portfolioAccountData.getId(), account.getId(), "Account Transfer", null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isRegularTransaction, isExceptionForBalanceCheck);
+                    this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
                 }
                 final boolean isInterestTransfer = false;
                 final LocalDate postInterestOnDate = null;
@@ -260,9 +259,8 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
                     this.depositAccountDomainService.handleRDDeposit(account, fmt, account.getActivationDate(), amountForDeposit.getAmount(), null, isRegularTransaction);
                 } else {
                     final boolean isExceptionForBalanceCheck = false;
-                    final SavingsAccount fromSavingsAccount = null;
-                    final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(account.getActivationDate(), amountForDeposit.getAmount(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, portfolioAccountData.getId(), account.getId(), "Account Transfer", locale, fmt, null, null, null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, ExternalId.empty(), null, account, fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);
-                    this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+                    final AccountTransferFundsData accountTransferDTO = new AccountTransferFundsData(account.getActivationDate(), amountForDeposit.getAmount(), PortfolioAccountType.SAVINGS, PortfolioAccountType.SAVINGS, portfolioAccountData.getId(), account.getId(), "Account Transfer", null, null, null, AccountTransferType.ACCOUNT_TRANSFER.getValue(), isRegularTransaction, isExceptionForBalanceCheck);
+                    this.accountTransferFundsWritePort.transferFunds(accountTransferDTO);
                 }
                 updateExistingTransactionsDetails(account, existingTransactionIds, existingReversedTransactionIds);
             }
@@ -1204,7 +1202,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final SavingsJournalPort savingsJournalPort, final DepositAccountDomainService depositAccountDomainService, final NoteWritePlatformService noteWritePlatformService, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
+        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final SavingsJournalPort savingsJournalPort, final DepositAccountDomainService depositAccountDomainService, final NoteWritePlatformService noteWritePlatformService, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransferFundsWritePort accountTransferFundsWritePort, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -1221,7 +1219,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountChargeRepository = savingsAccountChargeRepository;
         this.accountAssociationsReadPlatformService = accountAssociationsReadPlatformService;
-        this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
+        this.accountTransferFundsWritePort = accountTransferFundsWritePort;
         this.depositAccountReadPlatformService = depositAccountReadPlatformService;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.configurationDomainService = configurationDomainService;

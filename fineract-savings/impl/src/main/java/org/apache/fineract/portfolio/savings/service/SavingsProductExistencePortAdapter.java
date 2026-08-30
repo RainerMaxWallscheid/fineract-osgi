@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.savings.service;
 
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
+import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsProductExistencePort;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +35,12 @@ public class SavingsProductExistencePortAdapter implements SavingsProductExisten
     @Override
     public boolean existsById(final Long savingsProductId) {
         return savingsProductRepository.existsById(savingsProductId);
+    }
+
+    @Override
+    public void require(final Long savingsProductId) {
+        if (savingsProductId == null || !savingsProductRepository.existsById(savingsProductId)) {
+            throw new SavingsProductNotFoundException(savingsProductId);
+        }
     }
 }

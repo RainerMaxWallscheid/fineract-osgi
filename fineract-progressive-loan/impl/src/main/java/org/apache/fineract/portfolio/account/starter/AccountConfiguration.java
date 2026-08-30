@@ -36,10 +36,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.adjustment.LoanAdjustmentService;
-import org.apache.fineract.portfolio.savings.domain.GSIMRepositoy;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,16 +47,13 @@ public class AccountConfiguration {
     @ConditionalOnMissingBean(AccountTransfersWritePlatformService.class)
     public AccountTransfersWritePlatformService accountTransfersWritePlatformService(
             AccountTransfersDataValidator accountTransfersDataValidator, AccountTransferAssembler accountTransferAssembler,
-            AccountTransferRepository accountTransferRepository, SavingsAccountAssembler savingsAccountAssembler,
-            SavingsAccountDomainService savingsAccountDomainService, LoanAssembler loanAccountAssembler,
-            LoanAccountDomainService loanAccountDomainService, SavingsAccountWritePlatformService savingsAccountWritePlatformService,
-            AccountTransferDetailRepository accountTransferDetailRepository, LoanReadPlatformService loanReadPlatformService,
-            GSIMRepositoy gsimRepository, ConfigurationDomainService configurationDomainService, ExternalIdFactory externalIdFactory,
-            FineractProperties fineractProperties, LoanAdjustmentService loanAdjustmentService) {
+            AccountTransferRepository accountTransferRepository, LoanAssembler loanAccountAssembler,
+            LoanAccountDomainService loanAccountDomainService, AccountTransferDetailRepository accountTransferDetailRepository,
+            LoanReadPlatformService loanReadPlatformService, ConfigurationDomainService configurationDomainService,
+            ExternalIdFactory externalIdFactory, FineractProperties fineractProperties, LoanAdjustmentService loanAdjustmentService) {
         return new AccountTransfersWritePlatformServiceImpl(accountTransfersDataValidator, accountTransferAssembler,
-                accountTransferRepository, savingsAccountAssembler, savingsAccountDomainService, loanAccountAssembler,
-                loanAccountDomainService, savingsAccountWritePlatformService, accountTransferDetailRepository, loanReadPlatformService,
-                gsimRepository, configurationDomainService, externalIdFactory, fineractProperties, loanAdjustmentService);
+                accountTransferRepository, loanAccountAssembler, loanAccountDomainService, accountTransferDetailRepository,
+                loanReadPlatformService, configurationDomainService, externalIdFactory, fineractProperties, loanAdjustmentService);
     }
 
     @Bean

@@ -19,10 +19,7 @@
 package org.apache.fineract.shares.shareaccounts.service;
 
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendDetails;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendRepository;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendStatusType;
@@ -30,23 +27,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class ShareAccountSchedularServiceImpl implements ShareAccountSchedularService {
     private final ShareAccountDividendRepository shareAccountDividendRepository;
-    private final SavingsAccountDomainService savingsAccountDomainService;
-    private final SavingsAccountAssembler savingsAccountAssembler;
+    private final LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Override
     @Transactional
     public void postDividend(final Long dividendDetailId, final Long savingsId) {
         ShareAccountDividendDetails shareAccountDividendDetails = this.shareAccountDividendRepository.findById(dividendDetailId).orElseThrow();
-        final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(savingsId, false);
-        SavingsAccountTransaction savingsAccountTransaction = this.savingsAccountDomainService.handleDividendPayout(savingsAccount, DateUtils.getBusinessLocalDate(), shareAccountDividendDetails.getAmount(), false);
-        shareAccountDividendDetails.update(ShareAccountDividendStatusType.POSTED.getValue(), savingsAccountTransaction.getId());
+        final Long transactionId = this.linkedSavingsAccountPort.handleDividendPayout(savingsId, DateUtils.getBusinessLocalDate(),
+                shareAccountDividendDetails.getAmount());
+        shareAccountDividendDetails.update(ShareAccountDividendStatusType.POSTED.getValue(), transactionId);
         this.shareAccountDividendRepository.saveAndFlush(shareAccountDividendDetails);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public ShareAccountSchedularServiceImpl(final ShareAccountDividendRepository shareAccountDividendRepository, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountAssembler savingsAccountAssembler) {
+    public ShareAccountSchedularServiceImpl(final ShareAccountDividendRepository shareAccountDividendRepository,
+            final LinkedSavingsAccountPort linkedSavingsAccountPort) {
         this.shareAccountDividendRepository = shareAccountDividendRepository;
-        this.savingsAccountDomainService = savingsAccountDomainService;
-        this.savingsAccountAssembler = savingsAccountAssembler;
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
     }
 }

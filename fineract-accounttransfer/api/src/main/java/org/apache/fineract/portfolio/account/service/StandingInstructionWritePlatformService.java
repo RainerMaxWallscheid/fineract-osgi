@@ -29,4 +29,9 @@ public interface StandingInstructionWritePlatformService {
 
     CommandProcessingResult delete(Long id);
 
+    /**
+     * Disables active standing instructions linked to a closed savings account.
+     */
+    void disableActiveForSavingsAccount(Long savingsAccountId);
+
 }

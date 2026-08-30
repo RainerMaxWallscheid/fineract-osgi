@@ -36,10 +36,7 @@ import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionShe
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
-import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +49,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
     private final CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer bulkRepaymentCommandFromApiJsonDeserializer;
     private final CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer bulkDisbursalCommandFromApiJsonDeserializer;
     private final CollectionSheetTransactionDataValidator transactionDataValidator;
-    private final DepositAccountAssembler accountAssembler;
-    private final DepositAccountWritePlatformService accountWritePlatformService;
+    private final LinkedSavingsAccountPort linkedSavingsAccountPort;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     private final TransactionBoundApplicationEventPublisher eventPublisher;
 
@@ -121,28 +117,17 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
 
     private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
-        final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler.assembleBulkMandatorySavingsAccountTransactionDTOs(command, paymentDetail);
-        List<Long> depositTransactionIds = new ArrayList<>();
-        for (SavingsAccountTransactionDTO savingsAccountTransactionDTO : savingsTransactions) {
-            try {
-                SavingsAccountTransaction savingsAccountTransaction = this.accountWritePlatformService.mandatorySavingsAccountDeposit(savingsAccountTransactionDTO);
-                depositTransactionIds.add(savingsAccountTransaction.getId());
-            } catch (Exception e) {
-            }
-            // TODO: handle exception
-        }
-        changes.put("SavingsTransactions", depositTransactionIds);
+        changes.put("SavingsTransactions", this.linkedSavingsAccountPort.mandatoryDeposits(command, paymentDetail));
         return changes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CollectionSheetWritePlatformServiceJpaRepositoryImpl(final LoanWritePlatformService loanWritePlatformService, final CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer bulkRepaymentCommandFromApiJsonDeserializer, final CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer bulkDisbursalCommandFromApiJsonDeserializer, final CollectionSheetTransactionDataValidator transactionDataValidator, final DepositAccountAssembler accountAssembler, final DepositAccountWritePlatformService accountWritePlatformService, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final TransactionBoundApplicationEventPublisher eventPublisher) {
+        public CollectionSheetWritePlatformServiceJpaRepositoryImpl(final LoanWritePlatformService loanWritePlatformService, final CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer bulkRepaymentCommandFromApiJsonDeserializer, final CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer bulkDisbursalCommandFromApiJsonDeserializer, final CollectionSheetTransactionDataValidator transactionDataValidator, final LinkedSavingsAccountPort linkedSavingsAccountPort, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final TransactionBoundApplicationEventPublisher eventPublisher) {
         this.loanWritePlatformService = loanWritePlatformService;
         this.bulkRepaymentCommandFromApiJsonDeserializer = bulkRepaymentCommandFromApiJsonDeserializer;
         this.bulkDisbursalCommandFromApiJsonDeserializer = bulkDisbursalCommandFromApiJsonDeserializer;
         this.transactionDataValidator = transactionDataValidator;
-        this.accountAssembler = accountAssembler;
-        this.accountWritePlatformService = accountWritePlatformService;
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
         this.eventPublisher = eventPublisher;
     }

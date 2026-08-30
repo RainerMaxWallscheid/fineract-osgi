@@ -86,7 +86,6 @@ import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyType;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -303,21 +302,20 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (savingsAccountId == null) {
                 removeLinkedAccountAssociation(accountAssociations, changes);
             } else {
-                final Object savingsAccount = this.linkedSavingsAccountPort.persistableById(savingsAccountId);
                 // If there was no previous
                 if (accountAssociations == null) {
-                    createLinkedAccountAssociation(loan, savingsAccount, changes);
-                } else 
+                    createLinkedAccountAssociation(loan, savingsAccountId, changes);
+                } else
                 // When the previous one was linking to a different account
                 if (!savingsAccountId.equals(accountAssociations.linkedSavingsAccountId())) {
-                    updateLinkedAccountAssociation(accountAssociations, savingsAccount, changes);
+                    updateLinkedAccountAssociation(accountAssociations, savingsAccountId, changes);
                 }
             }
         }
     }
 
-    private void updateLinkedAccountAssociation(AccountAssociations accountAssociations, Object savingsAccount, Map<String, Object> changes) {
-        accountAssociations.updateLinkedSavingsAccount((SavingsAccount) savingsAccount);
+    private void updateLinkedAccountAssociation(AccountAssociations accountAssociations, Long savingsAccountId, Map<String, Object> changes) {
+        accountAssociations.updateLinkedSavingsAccount(savingsAccountId);
         this.accountAssociationsRepository.save(accountAssociations);
         changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }
@@ -329,9 +327,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
-    private void createLinkedAccountAssociation(final Loan loan, final Object savingsAccount, final Map<String, Object> changes) {
+    private void createLinkedAccountAssociation(final Loan loan, final Long savingsAccountId, final Map<String, Object> changes) {
         boolean isActive = true;
-        final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(loan, (SavingsAccount) savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+        final AccountAssociations accountAssociations = AccountAssociations.associateLoanToSavings(loan.getId(), savingsAccountId, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
         this.accountAssociationsRepository.save(accountAssociations);
         changes.put(LoanApiConstants.linkAccountIdParameterName, accountAssociations.linkedSavingsAccountId());
     }
@@ -677,19 +675,19 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void createSavingsAccountAssociation(Long savingsAccountId, Loan loan) {
         if (savingsAccountId != null) {
-            Object savingsAccount;
-            AccountAssociations accountAssociations;
+            Long linkedSavingsId = savingsAccountId;
             if (loan.getLoanType().isGLIMAccount()) {
                 final Long childAccountId = this.linkedSavingsAccountPort.childAccountIdForGsimClient(savingsAccountId, loan.getClientId());
                 if (childAccountId == null) {
                     throw new GroupMemberNotFoundInGSIMException(loan.getClientId());
                 }
-                savingsAccount = this.linkedSavingsAccountPort.persistableById(childAccountId);
+                linkedSavingsId = childAccountId;
             } else {
-                savingsAccount = this.linkedSavingsAccountPort.persistableById(savingsAccountId);
+                this.linkedSavingsAccountPort.requireById(savingsAccountId);
             }
             boolean isActive = true;
-            accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+            final AccountAssociations accountAssociations = AccountAssociations.associateLoanToSavings(loan.getId(), linkedSavingsId,
+                    AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
             this.accountAssociationsRepository.save(accountAssociations);
         }
     }

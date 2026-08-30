@@ -3,4 +3,3 @@
 # Do not add rows to avoid a retarget. Delete a row when the Gradle edge is gone.
 # Format: <consumer dependencies.gradle> <target project>
 fineract-progressive-loan/impl/dependencies.gradle	fineract-loan-impl
-fineract-progressive-loan/impl/dependencies.gradle	fineract-savings-impl

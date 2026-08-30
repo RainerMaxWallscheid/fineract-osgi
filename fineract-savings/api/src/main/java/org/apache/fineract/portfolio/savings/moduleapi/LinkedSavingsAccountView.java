@@ -29,12 +29,37 @@ public final class LinkedSavingsAccountView {
     private final Long clientId;
     private final boolean active;
     private final LocalDate activationDate;
+    private final String accountNumber;
+    private final String currencyCode;
+    private final int digitsAfterDecimal;
+    private final Integer inMultiplesOf;
+    private final boolean withdrawalFeeApplicableForTransfer;
+    private final LocalDate lastTransactionDate;
 
     public LinkedSavingsAccountView(final Long id, final Long clientId, final boolean active, final LocalDate activationDate) {
+        this(id, clientId, active, activationDate, null, null, 0, null, false, null);
+    }
+
+    public LinkedSavingsAccountView(final Long id, final Long clientId, final boolean active, final LocalDate activationDate,
+            final String accountNumber, final String currencyCode, final int digitsAfterDecimal, final Integer inMultiplesOf,
+            final boolean withdrawalFeeApplicableForTransfer) {
+        this(id, clientId, active, activationDate, accountNumber, currencyCode, digitsAfterDecimal, inMultiplesOf,
+                withdrawalFeeApplicableForTransfer, null);
+    }
+
+    public LinkedSavingsAccountView(final Long id, final Long clientId, final boolean active, final LocalDate activationDate,
+            final String accountNumber, final String currencyCode, final int digitsAfterDecimal, final Integer inMultiplesOf,
+            final boolean withdrawalFeeApplicableForTransfer, final LocalDate lastTransactionDate) {
         this.id = id;
         this.clientId = clientId;
         this.active = active;
         this.activationDate = activationDate;
+        this.accountNumber = accountNumber;
+        this.currencyCode = currencyCode;
+        this.digitsAfterDecimal = digitsAfterDecimal;
+        this.inMultiplesOf = inMultiplesOf;
+        this.withdrawalFeeApplicableForTransfer = withdrawalFeeApplicableForTransfer;
+        this.lastTransactionDate = lastTransactionDate;
     }
 
     public Long getId() {
@@ -51,5 +76,29 @@ public final class LinkedSavingsAccountView {
 
     public LocalDate getActivationDate() {
         return this.activationDate;
+    }
+
+    public String getAccountNumber() {
+        return this.accountNumber;
+    }
+
+    public String getCurrencyCode() {
+        return this.currencyCode;
+    }
+
+    public int getDigitsAfterDecimal() {
+        return this.digitsAfterDecimal;
+    }
+
+    public Integer getInMultiplesOf() {
+        return this.inMultiplesOf;
+    }
+
+    public boolean isWithdrawalFeeApplicableForTransfer() {
+        return this.withdrawalFeeApplicableForTransfer;
+    }
+
+    public LocalDate getLastTransactionDate() {
+        return this.lastTransactionDate;
     }
 }

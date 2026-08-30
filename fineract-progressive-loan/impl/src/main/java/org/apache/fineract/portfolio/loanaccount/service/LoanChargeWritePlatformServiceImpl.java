@@ -137,7 +137,7 @@ import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequired
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -602,7 +602,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
             final String errorMessage = "Charge with id:" + loanChargeId + " requires linked savings account for payment";
             throw new LinkedAccountRequiredException("loanCharge.pay", errorMessage, loanChargeId);
         }
-        final SavingsAccount fromSavingsAccount = null;
+        final Object fromSavingsAccount = null;
         final boolean isRegularTransaction = true;
         final boolean isExceptionForBalanceCheck = false;
         final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, amount, PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, portfolioAccountData.getId(), loanId, "Loan Charge Payment", locale, fmt, null, null, LoanTransactionType.CHARGE_PAYMENT.getValue(), loanChargeId, loanInstallmentNumber, AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, externalId, null, null, fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);

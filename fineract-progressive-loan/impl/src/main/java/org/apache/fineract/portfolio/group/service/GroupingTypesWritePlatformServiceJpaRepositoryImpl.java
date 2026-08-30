@@ -83,8 +83,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -108,7 +107,12 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private final CommandProcessingService commandProcessingService;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
-    private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
     private final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository;
     private final AccountNumberGenerator accountNumberGenerator;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
@@ -435,11 +439,9 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                             }
                         }
                     }
-                    if (this.savingsAccountRepositoryWrapper.doNonClosedSavingAccountsExistForClient(client.getId())) {
-                        for (final SavingsAccount savingsAccount : this.savingsAccountRepositoryWrapper.findSavingAccountByClientId(client.getId())) {
-                            if (!savingsAccount.isClosed()) {
-                                savingsAccount.reassignSavingsOfficer(staff, loanOfficerReassignmentDate);
-                            }
+                    if (this.linkedSavingsAccountPort.hasNonClosedForClient(client.getId())) {
+                        for (final Long savingsAccountId : this.linkedSavingsAccountPort.nonClosedIdsByClientId(client.getId())) {
+                            this.linkedSavingsAccountPort.reassignOfficer(savingsAccountId, staff, loanOfficerReassignmentDate);
                         }
                     }
                 }
@@ -518,15 +520,9 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                 throw new InvalidGroupStateTransitionException(groupOrCenter.getGroupLevel().getLevelName(), "close", "loan.not.closed", errorMessage);
             }
         }
-        final List<SavingsAccount> groupSavingAccounts = this.savingsAccountRepositoryWrapper.findByGroupId(groupOrCenter.getId());
-        for (final SavingsAccount saving : groupSavingAccounts) {
-            if (saving.isActive() || saving.isSubmittedAndPendingApproval() || saving.isApproved()) {
-                final String errorMessage = groupOrCenter.getGroupLevel().getLevelName() + " cannot be closed with active savings accounts associated.";
-                throw new InvalidGroupStateTransitionException(groupOrCenter.getGroupLevel().getLevelName(), "close", "savings.account.not.closed", errorMessage);
-            } else if (saving.isClosed() && DateUtils.isAfter(saving.getClosedOnDate(), closureDate)) {
-                final String errorMessage = groupOrCenter.getGroupLevel().getLevelName() + " closureDate cannot be before the loan closedOnDate.";
-                throw new InvalidGroupStateTransitionException(groupOrCenter.getGroupLevel().getLevelName(), "close", "date.cannot.before.loan.closed.date", errorMessage, closureDate, saving.getClosedOnDate());
-            }
+        if (this.linkedSavingsAccountPort.hasOpenForGroup(groupOrCenter.getId())) {
+            final String errorMessage = groupOrCenter.getGroupLevel().getLevelName() + " cannot be closed with active savings accounts associated.";
+            throw new InvalidGroupStateTransitionException(groupOrCenter.getGroupLevel().getLevelName(), "close", "savings.account.not.closed", errorMessage);
         }
     }
 
@@ -721,8 +717,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     @Transactional
     private void validateForJLGSavings(final Long groupId, final Set<Client> clientMembers) {
         for (final Client client : clientMembers) {
-            final Collection<SavingsAccount> savings = this.savingsAccountRepositoryWrapper.findByClientIdAndGroupId(client.getId(), groupId);
-            if (!CollectionUtils.isEmpty(savings)) {
+            if (this.linkedSavingsAccountPort.hasGroupSavings(client.getId(), groupId)) {
                 final String defaultUserMessage = "Client with identifier " + client.getId() + " cannot be disassociated it has group savings.";
                 throw new GroupAccountExistsException("disassociate", "client.has.group.saving", defaultUserMessage, client.getId(), groupId);
             }
@@ -765,7 +760,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     }
 
     @java.lang.SuppressWarnings("all")
-        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
+        public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository, final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper, final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
         this.context = context;
         this.groupRepository = groupRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
@@ -779,7 +774,6 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         this.commandProcessingService = commandProcessingService;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.configurationDomainService = configurationDomainService;
-        this.savingsAccountRepositoryWrapper = savingsAccountRepositoryWrapper;
         this.accountNumberFormatRepository = accountNumberFormatRepository;
         this.accountNumberGenerator = accountNumberGenerator;
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;

@@ -22,6 +22,7 @@ import static org.apache.fineract.portfolio.account.AccountDetailConstants.fromA
 import static org.apache.fineract.portfolio.account.AccountDetailConstants.fromClientIdParamName;
 import static org.apache.fineract.portfolio.account.AccountDetailConstants.toAccountTypeParamName;
 import static org.apache.fineract.portfolio.account.api.StandingInstructionApiConstants.statusParamName;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -118,6 +119,22 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
         //
         //
         new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).with(actualChanges).build();
+    }
+
+    @Override
+    public void disableActiveForSavingsAccount(final Long savingsAccountId) {
+        if (savingsAccountId == null) {
+            return;
+        }
+        final Integer standingInstructionStatus = StandingInstructionStatus.ACTIVE.getValue();
+        final Collection<AccountTransferStandingInstruction> accountTransferStandingInstructions = this.standingInstructionRepository
+                .findBySavingsAccountIdAndStatus(savingsAccountId, standingInstructionStatus);
+        if (accountTransferStandingInstructions != null && !accountTransferStandingInstructions.isEmpty()) {
+            for (final AccountTransferStandingInstruction accountTransferStandingInstruction : accountTransferStandingInstructions) {
+                accountTransferStandingInstruction.updateStatus(StandingInstructionStatus.DISABLED.getValue());
+                this.standingInstructionRepository.save(accountTransferStandingInstruction);
+            }
+        }
     }
 
     @Override

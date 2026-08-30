@@ -33,7 +33,6 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 @Entity
 @Table(name = "m_account_transfer_details")
@@ -47,9 +46,8 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "from_client_id", nullable = false)
     private Client fromClient;
 
-    @ManyToOne
-    @JoinColumn(name = "from_savings_account_id", nullable = true)
-    private SavingsAccount fromSavingsAccount;
+    @Column(name = "from_savings_account_id")
+    private Long fromSavingsAccountId;
 
     @ManyToOne
     @JoinColumn(name = "to_office_id", nullable = false)
@@ -59,9 +57,8 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "to_client_id", nullable = false)
     private Client toClient;
 
-    @ManyToOne
-    @JoinColumn(name = "to_savings_account_id", nullable = true)
-    private SavingsAccount toSavingsAccount;
+    @Column(name = "to_savings_account_id")
+    private Long toSavingsAccountId;
 
     @ManyToOne
     @JoinColumn(name = "to_loan_account_id", nullable = true)
@@ -81,23 +78,23 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     private AccountTransferStandingInstruction accountTransferStandingInstruction;
 
     public static AccountTransferDetails savingsToSavingsTransfer(final Office fromOffice, final Client fromClient,
-            final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
+            final Long fromSavingsAccountId, final Office toOffice, final Client toClient, final Long toSavingsAccountId,
             Integer transferType) {
 
-        return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccount, null, toOffice, toClient, toSavingsAccount, null,
+        return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccountId, null, toOffice, toClient, toSavingsAccountId, null,
                 transferType, null);
     }
 
     public static AccountTransferDetails savingsToLoanTransfer(final Office fromOffice, final Client fromClient,
-            final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final Loan toLoanAccount,
+            final Long fromSavingsAccountId, final Office toOffice, final Client toClient, final Loan toLoanAccount,
             Integer transferType) {
-        return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccount, null, toOffice, toClient, null, toLoanAccount,
+        return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccountId, null, toOffice, toClient, null, toLoanAccount,
                 transferType, null);
     }
 
     public static AccountTransferDetails loanTosavingsTransfer(final Office fromOffice, final Client fromClient, final Loan fromLoanAccount,
-            final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount, Integer transferType) {
-        return new AccountTransferDetails(fromOffice, fromClient, null, fromLoanAccount, toOffice, toClient, toSavingsAccount, null,
+            final Office toOffice, final Client toClient, final Long toSavingsAccountId, Integer transferType) {
+        return new AccountTransferDetails(fromOffice, fromClient, null, fromLoanAccount, toOffice, toClient, toSavingsAccountId, null,
                 transferType, null);
     }
 
@@ -105,28 +102,28 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
         //
     }
 
-    private AccountTransferDetails(final Office fromOffice, final Client fromClient, final SavingsAccount fromSavingsAccount,
-            final Loan fromLoanAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
+    private AccountTransferDetails(final Office fromOffice, final Client fromClient, final Long fromSavingsAccountId,
+            final Loan fromLoanAccount, final Office toOffice, final Client toClient, final Long toSavingsAccountId,
             final Loan toLoanAccount, final Integer transferType,
             final AccountTransferStandingInstruction accountTransferStandingInstruction) {
         this.fromOffice = fromOffice;
         this.fromClient = fromClient;
-        this.fromSavingsAccount = fromSavingsAccount;
+        this.fromSavingsAccountId = fromSavingsAccountId;
         this.fromLoanAccount = fromLoanAccount;
         this.toOffice = toOffice;
         this.toClient = toClient;
-        this.toSavingsAccount = toSavingsAccount;
+        this.toSavingsAccountId = toSavingsAccountId;
         this.toLoanAccount = toLoanAccount;
         this.transferType = transferType;
         this.accountTransferStandingInstruction = accountTransferStandingInstruction;
     }
 
-    public SavingsAccount toSavingsAccount() {
-        return this.toSavingsAccount;
+    public Long toSavingsAccountId() {
+        return this.toSavingsAccountId;
     }
 
-    public SavingsAccount fromSavingsAccount() {
-        return this.fromSavingsAccount;
+    public Long fromSavingsAccountId() {
+        return this.fromSavingsAccountId;
     }
 
     public void addAccountTransferTransaction(AccountTransferTransaction accountTransferTransaction) {

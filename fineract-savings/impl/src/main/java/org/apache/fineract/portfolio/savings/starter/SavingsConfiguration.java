@@ -47,11 +47,11 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
-import org.apache.fineract.portfolio.account.domain.StandingInstructionRepository;
+import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
-import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberGeneratorService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
-import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
+import org.apache.fineract.portfolio.account.service.AccountTransferFundsWritePort;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -238,7 +238,7 @@ public class SavingsConfiguration {
             NoteWritePlatformService noteWritePlatformService, AccountTransfersReadPlatformService accountTransfersReadPlatformService,
             ChargeDefinitionPort chargeDefinitionPort, SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository,
             AccountAssociationsReadPlatformService accountAssociationsReadPlatformService,
-            AccountTransfersWritePlatformService accountTransfersWritePlatformService,
+            AccountTransferFundsWritePort accountTransferFundsWritePort,
             DepositAccountReadPlatformService depositAccountReadPlatformService, CalendarInstanceLookupPort calendarInstanceRepository,
             ConfigurationDomainService configurationDomainService, HolidayRepositoryWrapper holidayRepository,
             WorkingDaysRepositoryWrapper workingDaysRepository,
@@ -250,7 +250,7 @@ public class SavingsConfiguration {
                 depositAccountTransactionDataValidator, savingsAccountChargeDataValidator, paymentDetailWritePlatformService,
                 applicationCurrencyRepositoryWrapper, savingsJournalPort, depositAccountDomainService, noteWritePlatformService,
                 accountTransfersReadPlatformService, chargeDefinitionPort, savingsAccountChargeRepository,
-                accountAssociationsReadPlatformService, accountTransfersWritePlatformService, depositAccountReadPlatformService,
+                accountAssociationsReadPlatformService, accountTransferFundsWritePort, depositAccountReadPlatformService,
                 calendarInstanceRepository, configurationDomainService, holidayRepository, workingDaysRepository,
                 depositAccountOnHoldTransactionRepository);
     }
@@ -260,7 +260,7 @@ public class SavingsConfiguration {
     public DepositApplicationProcessWritePlatformService depositApplicationProcessWritePlatformService(PlatformSecurityContext context,
             SavingsAccountRepositoryWrapper savingAccountRepository, FixedDepositAccountRepository fixedDepositAccountRepository,
             RecurringDepositAccountRepository recurringDepositAccountRepository, DepositAccountAssembler depositAccountAssembler,
-            DepositAccountDataValidator depositAccountDataValidator, AccountNumberGenerator accountNumberGenerator,
+            DepositAccountDataValidator depositAccountDataValidator, AccountNumberGeneratorService accountNumberGenerator,
             GroupRepository groupRepository, SavingsProductRepository savingsProductRepository,
             NoteWritePlatformService noteWritePlatformService, StaffRepositoryWrapper staffRepository,
             SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator,
@@ -400,7 +400,7 @@ public class SavingsConfiguration {
             WorkingDaysRepositoryWrapper workingDaysRepository, ConfigurationDomainService configurationDomainService,
             DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, AppUserRepositoryWrapper appuserRepository,
-            StandingInstructionRepository standingInstructionRepository, BusinessEventNotifierService businessEventNotifierService,
+            StandingInstructionWritePlatformService standingInstructionWritePlatformService, BusinessEventNotifierService businessEventNotifierService,
             GSIMRepositoy gsimRepository, SavingsAccountInterestPostingService savingsAccountInterestPostingService,
             SavingsAccountPostInterestService savingsAccountPostInterestService,
             SavingsAccountActivationService savingsAccountActivationService, ExternalIdFactory externalIdFactory,
@@ -411,7 +411,7 @@ public class SavingsConfiguration {
                 savingsAccountDomainService, noteWritePlatformService, accountTransfersReadPlatformService, accountAssociationsReadPlatformService,
                 chargeDefinitionPort, savingsAccountChargeRepository, holidayRepository, workingDaysRepository, configurationDomainService,
                 depositAccountOnHoldTransactionRepository, entityDatatableChecksWritePlatformService, appuserRepository,
-                standingInstructionRepository, businessEventNotifierService, gsimRepository, savingsAccountInterestPostingService,
+                standingInstructionWritePlatformService, businessEventNotifierService, gsimRepository, savingsAccountInterestPostingService,
                 savingsAccountPostInterestService, savingsAccountActivationService, externalIdFactory, errorHandler);
     }
 
@@ -419,7 +419,7 @@ public class SavingsConfiguration {
     @ConditionalOnMissingBean(SavingsApplicationProcessWritePlatformService.class)
     public SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService(PlatformSecurityContext context,
             SavingsAccountRepositoryWrapper savingAccountRepository, SavingsAccountAssembler savingAccountAssembler,
-            SavingsAccountDataValidator savingsAccountDataValidator, AccountNumberGenerator accountNumberGenerator,
+            SavingsAccountDataValidator savingsAccountDataValidator, AccountNumberGeneratorService accountNumberGenerator,
             GroupRepository groupRepository, SavingsProductRepository savingsProductRepository,
             NoteWritePlatformService noteWritePlatformService, StaffRepositoryWrapper staffRepository,
             SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator,

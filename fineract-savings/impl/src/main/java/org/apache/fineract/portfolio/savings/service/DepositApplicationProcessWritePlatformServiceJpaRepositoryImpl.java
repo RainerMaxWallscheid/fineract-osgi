@@ -56,7 +56,7 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
-import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberGeneratorService;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
@@ -118,7 +118,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final RecurringDepositAccountRepository recurringDepositAccountRepository;
     private final DepositAccountAssembler depositAccountAssembler;
     private final DepositAccountDataValidator depositAccountDataValidator;
-    private final AccountNumberGenerator accountNumberGenerator;
+    private final AccountNumberGeneratorService accountNumberGenerator;
     private final GroupRepository groupRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteWritePlatformService noteWritePlatformService;
@@ -176,7 +176,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.fixedDepositAccountRepository.saveAndFlush(account);
             if (account.isAccountNumberRequiresAutoGeneration()) {
                 AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.CLIENT);
-                account.updateAccountNo(this.accountNumberGenerator.generate(account, accountNumberFormat));
+                account.updateAccountNo(this.accountNumberGenerator.generate(EntityAccountType.SAVINGS, account, accountNumberFormat));
                 this.savingAccountRepository.save(account);
             }
             // Save linked account information
@@ -185,7 +185,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 final SavingsAccount savingsAccount = this.depositAccountAssembler.assembleFrom(savingsAccountId, DepositAccountType.SAVINGS_DEPOSIT);
                 this.depositAccountDataValidator.validatelinkedSavingsAccount(savingsAccount, account);
                 boolean isActive = true;
-                final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(account, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+                final AccountAssociations accountAssociations = AccountAssociations.associateSavingsToSavings(account.getId(), savingsAccount.getId(), AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
                 this.accountAssociationsRepository.save(accountAssociations);
             }
             final Long savingsId = account.getId();
@@ -220,7 +220,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             this.recurringDepositAccountRepository.save(account);
             if (account.isAccountNumberRequiresAutoGeneration()) {
                 final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.SAVINGS);
-                account.updateAccountNo(this.accountNumberGenerator.generate(account, accountNumberFormat));
+                account.updateAccountNo(this.accountNumberGenerator.generate(EntityAccountType.SAVINGS, account, accountNumberFormat));
             }
             final Long savingsId = account.getId();
             final CalendarInstance calendarInstance = getCalendarInstance(command, account);
@@ -342,8 +342,8 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 if (accountAssociations == null) {
                     isModified = true;
                 } else {
-                    final SavingsAccount savingsAccount = accountAssociations.linkedSavingsAccount();
-                    if (savingsAccount == null || !savingsAccount.getId().equals(savingsAccountId)) {
+                    if (accountAssociations.linkedSavingsAccountId() == null
+                            || !accountAssociations.linkedSavingsAccountId().equals(savingsAccountId)) {
                         isModified = true;
                     }
                 }
@@ -352,9 +352,9 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     this.depositAccountDataValidator.validatelinkedSavingsAccount(savingsAccount, account);
                     if (accountAssociations == null) {
                         boolean isActive = true;
-                        accountAssociations = AccountAssociations.associateSavingsAccount(account, savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+                        accountAssociations = AccountAssociations.associateSavingsToSavings(account.getId(), savingsAccount.getId(), AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
                     } else {
-                        accountAssociations.updateLinkedSavingsAccount(savingsAccount);
+                        accountAssociations.updateLinkedSavingsAccount(savingsAccount.getId());
                     }
                     changes.put(DepositsApiConstants.linkedAccountParamName, savingsAccountId);
                     this.accountAssociationsRepository.save(accountAssociations);
@@ -635,7 +635,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;

@@ -25,18 +25,13 @@ import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
-import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
 import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
-import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountDomainService;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendRepository;
-import org.apache.fineract.shares.shareaccounts.domain.ShareAccountRepositoryWrapper;
-import org.apache.fineract.shares.shareaccounts.serialization.ShareAccountDataSerializer;
 import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformService;
 import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformServiceImpl;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountChargeReadPlatformService;
@@ -48,8 +43,6 @@ import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatform
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformServiceImpl;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularServiceImpl;
-import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
-import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
 import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -104,19 +97,7 @@ public class ShareAccountsConfiguration {
     @Bean
     @ConditionalOnMissingBean(ShareAccountSchedularService.class)
     public ShareAccountSchedularService shareAccountSchedularService(ShareAccountDividendRepository shareAccountDividendRepository,
-            SavingsAccountDomainService savingsAccountDomainService, SavingsAccountAssembler savingsAccountAssembler) {
-        return new ShareAccountSchedularServiceImpl(shareAccountDividendRepository, savingsAccountDomainService, savingsAccountAssembler);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ShareAccountWritePlatformService.class)
-    public ShareAccountWritePlatformService shareAccountWritePlatformService(ShareAccountDataSerializer accountDataSerializer,
-            ShareAccountRepositoryWrapper shareAccountRepository, ShareProductRepositoryWrapper shareProductRepository,
-            AccountNumberGenerator accountNumberGenerator, AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
-            SharesJournalPort sharesJournalPort, NoteWritePlatformService noteWritePlatformService,
-            BusinessEventNotifierService businessEventNotifierService) {
-        return new ShareAccountWritePlatformServiceJpaRepositoryImpl(accountDataSerializer, shareAccountRepository, shareProductRepository,
-                accountNumberGenerator, accountNumberFormatRepository, sharesJournalPort, noteWritePlatformService,
-                businessEventNotifierService);
+            LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        return new ShareAccountSchedularServiceImpl(shareAccountDividendRepository, linkedSavingsAccountPort);
     }
 }

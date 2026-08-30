@@ -25,4 +25,10 @@ package org.apache.fineract.portfolio.savings.moduleapi;
 public interface SavingsProductExistencePort {
 
     boolean existsById(Long savingsProductId);
+
+    /**
+     * Throws {@code SavingsProductNotFoundException} when {@code savingsProductId}
+     * is unknown.
+     */
+    void require(Long savingsProductId);
 }

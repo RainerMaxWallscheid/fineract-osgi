@@ -54,6 +54,10 @@ dependencies {
     implementation(project(path: ':fineract-organisation-api'))
     // Thin EntityDatatableTemplatesReadService for savings account templates
     implementation(project(path: ':fineract-dataqueries-api'))
+    // Collection-sheet constants on leftover deposit assembler
+    implementation(project(path: ':fineract-collectionsheet-api'))
+    // TransferApiConstants on leftover savings transfer writes
+    implementation(project(path: ':fineract-transfer-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

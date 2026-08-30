@@ -34,7 +34,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
+import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +45,17 @@ import org.springframework.stereotype.Service;
 public class StandingInstructionAssembler {
 
     private final AccountTransferDetailAssembler accountTransferDetailAssembler;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Autowired
     public StandingInstructionAssembler(final AccountTransferDetailAssembler accountTransferDetailAssembler) {
 
         this.accountTransferDetailAssembler = accountTransferDetailAssembler;
+    }
+
+    @Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
     }
 
     public AccountTransferDetails assembleSavingsToSavingsTransfer(final JsonCommand command) {
@@ -61,7 +70,11 @@ public class StandingInstructionAssembler {
         BigDecimal amount = null;
         final BigDecimal transferAmount = command.bigDecimalValueOfParameterNamed(amountParamName);
         if (transferAmount != null) {
-            final Money monetaryAmount = Money.of(accountTransferDetails.fromSavingsAccount().getCurrency(), transferAmount);
+            final LinkedSavingsAccountView fromSavings = this.linkedSavingsAccountPort
+                    .requireById(accountTransferDetails.fromSavingsAccountId());
+            final MonetaryCurrency currency = new MonetaryCurrency(fromSavings.getCurrencyCode(), fromSavings.getDigitsAfterDecimal(),
+                    fromSavings.getInMultiplesOf());
+            final Money monetaryAmount = Money.of(currency, transferAmount);
             amount = monetaryAmount.getAmount();
         }
         final Integer status = command.integerValueOfParameterNamed(statusParamName);

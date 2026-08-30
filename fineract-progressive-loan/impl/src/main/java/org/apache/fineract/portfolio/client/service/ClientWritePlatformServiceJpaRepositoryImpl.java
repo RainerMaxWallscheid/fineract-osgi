@@ -91,10 +91,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountDataDTO;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
-import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
-import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
+import org.apache.fineract.portfolio.savings.moduleapi.SavingsProductExistencePort;
 import org.apache.fineract.portfolio.savings.service.SavingsApplicationProcessWritePlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -117,8 +115,18 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final StaffRepositoryWrapper staffRepository;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
-    private final SavingsAccountRepositoryWrapper savingsRepositoryWrapper;
-    private final SavingsProductRepository savingsProductRepository;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
+    private SavingsProductExistencePort savingsProductExistencePort;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setLinkedSavingsAccountPort(final LinkedSavingsAccountPort linkedSavingsAccountPort) {
+        this.linkedSavingsAccountPort = linkedSavingsAccountPort;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setSavingsProductExistencePort(final SavingsProductExistencePort savingsProductExistencePort) {
+        this.savingsProductExistencePort = savingsProductExistencePort;
+    }
     private final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService;
     private final CommandProcessingService commandProcessingService;
     private final ConfigurationDomainService configurationDomainService;
@@ -214,7 +222,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
             final Long savingsProductId = command.longValueOfParameterNamed(ClientApiConstants.savingsProductIdParamName);
             if (savingsProductId != null) {
-                this.savingsProductRepository.findById(savingsProductId).orElseThrow(() -> new SavingsProductNotFoundException(savingsProductId));
+                this.savingsProductExistencePort.require(savingsProductId);
             }
             boolean isEntity = false;
             LegalForm legalForm = null;
@@ -489,7 +497,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 }
                 final Long savingsProductId = command.longValueOfParameterNamed(ClientApiConstants.savingsProductIdParamName);
                 if (savingsProductId != null) {
-                    this.savingsProductRepository.findById(savingsProductId).orElseThrow(() -> new SavingsProductNotFoundException(savingsProductId));
+                    this.savingsProductExistencePort.require(savingsProductId);
                 }
                 clientForUpdate.updateSavingsProduct(savingsProductId);
             }
@@ -625,7 +633,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             SavingsAccountDataDTO savingsAccountDataDTO = new SavingsAccountDataDTO(client, null, client.savingsProductId(), client.getActivationDate(), client.activatedBy(), fmt);
             commandProcessingResult = this.savingsApplicationProcessWritePlatformService.createActiveApplication(savingsAccountDataDTO);
             if (commandProcessingResult.getSavingsId() != null) {
-                this.savingsRepositoryWrapper.findOneWithNotFoundDetection(commandProcessingResult.getSavingsId());
+                this.linkedSavingsAccountPort.requireById(commandProcessingResult.getSavingsId());
                 client.updateSavingsAccount(commandProcessingResult.getSavingsId());
                 client.updateSavingsProduct(null);
             }
@@ -737,12 +745,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     throw new InvalidClientStateTransitionException("close", "loan.overpaid", errorMessage);
                 }
             }
-            final List<SavingsAccount> clientSavingAccounts = this.savingsRepositoryWrapper.findSavingAccountByClientId(clientId);
-            for (final SavingsAccount saving : clientSavingAccounts) {
-                if (saving.isActive() || saving.isSubmittedAndPendingApproval() || saving.isApproved()) {
-                    final String errorMessage = "Client cannot be closed because of non-closed savings account.";
-                    throw new InvalidClientStateTransitionException("close", "non-closed.savings.account", errorMessage);
-                }
+            if (this.linkedSavingsAccountPort.hasOpenForClient(clientId)) {
+                final String errorMessage = "Client cannot be closed because of non-closed savings account.";
+                throw new InvalidClientStateTransitionException("close", "non-closed.savings.account", errorMessage);
             }
             client.close(currentUser, closureReason, closureDate);
             this.clientRepository.saveAndFlush(client);
@@ -765,11 +770,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         this.fromApiJsonDeserializer.validateForSavingsAccount(command.json());
         final Client clientForUpdate = this.clientRepository.findOneWithNotFoundDetection(clientId);
-        SavingsAccount savingsAccount = null;
         final Long savingsId = command.longValueOfParameterNamed(ClientApiConstants.savingsAccountIdParamName);
         if (savingsId != null) {
-            savingsAccount = this.savingsRepositoryWrapper.findOneWithNotFoundDetection(savingsId);
-            if (!clientId.equals(savingsAccount.clientId())) {
+            if (!this.linkedSavingsAccountPort.belongsToClient(savingsId, clientId)) {
                 String defaultUserMessage = "saving account must belongs to client";
                 throw new InvalidClientSavingProductException("saving.account", "must.belongs.to.client", defaultUserMessage, savingsId, clientForUpdate.getId());
             }
@@ -936,7 +939,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsAccountRepositoryWrapper savingsRepositoryWrapper, final SavingsProductRepository savingsProductRepository, final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService, final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper, final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final ExternalIdFactory externalIdFactory) {
+        public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService, final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository, final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService, final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper, final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final ExternalIdFactory externalIdFactory) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientNonPersonRepository = clientNonPersonRepository;
@@ -948,8 +951,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.staffRepository = staffRepository;
         this.codeValueRepository = codeValueRepository;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.savingsRepositoryWrapper = savingsRepositoryWrapper;
-        this.savingsProductRepository = savingsProductRepository;
         this.savingsApplicationProcessWritePlatformService = savingsApplicationProcessWritePlatformService;
         this.commandProcessingService = commandProcessingService;
         this.configurationDomainService = configurationDomainService;

@@ -249,7 +249,7 @@ public class AccountTransferStandingInstruction extends AbstractPersistableCusto
             }
         }
 
-        if (this.accountTransferDetails.toSavingsAccount() != null) {
+        if (this.accountTransferDetails.toSavingsAccountId() != null) {
             baseDataValidator.reset().parameter(instructionTypeParamName).value(this.instructionType).notNull().inMinMaxRange(1, 1);
             baseDataValidator.reset().parameter(recurrenceTypeParamName).value(this.recurrenceType).notNull().inMinMaxRange(1, 1);
         }
@@ -260,10 +260,10 @@ public class AccountTransferStandingInstruction extends AbstractPersistableCusto
 
         String errorCode = null;
         if (this.accountTransferDetails.transferType().isAccountTransfer()
-                && (this.accountTransferDetails.fromSavingsAccount() == null || this.accountTransferDetails.toSavingsAccount() == null)) {
+                && (this.accountTransferDetails.fromSavingsAccountId() == null || this.accountTransferDetails.toSavingsAccountId() == null)) {
             errorCode = "not.account.transfer";
         } else if (this.accountTransferDetails.transferType().isLoanRepayment()
-                && (this.accountTransferDetails.fromSavingsAccount() == null || this.accountTransferDetails.toLoanAccount() == null)) {
+                && (this.accountTransferDetails.fromSavingsAccountId() == null || this.accountTransferDetails.toLoanAccount() == null)) {
             errorCode = "not.loan.repayment";
         }
         if (errorCode != null) {

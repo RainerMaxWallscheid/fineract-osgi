@@ -36,11 +36,7 @@ import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
-import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
-import org.apache.fineract.shares.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
+import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +46,7 @@ public class AccountNumberGeneratorTest {
     private ConfigurationReadPlatformService configService;
     private ClientRepository clientRepo;
     private LoanRepository loanRepo;
-    private SavingsAccountRepository savingsRepo;
+    private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     private AccountNumberGenerator generator;
 
@@ -59,10 +55,11 @@ public class AccountNumberGeneratorTest {
         configService = mock(ConfigurationReadPlatformService.class);
         clientRepo = mock(ClientRepository.class);
         loanRepo = mock(LoanRepository.class);
-        savingsRepo = mock(SavingsAccountRepository.class);
+        linkedSavingsAccountPort = mock(LinkedSavingsAccountPort.class);
         final WorkingCapitalLoanExistencePort workingCapitalLoanExistencePort = mock(WorkingCapitalLoanExistencePort.class);
 
-        generator = new AccountNumberGenerator(configService, clientRepo, loanRepo, savingsRepo, workingCapitalLoanExistencePort);
+        generator = new AccountNumberGenerator(configService, clientRepo, loanRepo, workingCapitalLoanExistencePort);
+        generator.setLinkedSavingsAccountPort(linkedSavingsAccountPort);
 
         GlobalConfigurationPropertyData accountLengthConfig = mock(GlobalConfigurationPropertyData.class);
         when(accountLengthConfig.getValue()).thenReturn(Long.valueOf("9"));
@@ -114,36 +111,23 @@ public class AccountNumberGeneratorTest {
 
     @Test
     public void testGenerateSavingsAccountNumber() {
-        SavingsAccount savings = mock(SavingsAccount.class);
-        Office office = mock(Office.class);
-        SavingsProduct product = mock(SavingsProduct.class);
-
-        when(savings.getId()).thenReturn(456L);
-        when(savings.office()).thenReturn(office);
-        when(office.getName()).thenReturn("Branch01");
-        when(savings.savingsProduct()).thenReturn(product);
-        when(product.getShortName()).thenReturn("SP01");
-
+        final LinkedSavingsAccountPort.AccountNumberSource source = new LinkedSavingsAccountPort.AccountNumberSource(456L, "Branch01",
+                "SP01");
         AccountNumberFormat format = mock(AccountNumberFormat.class);
         when(format.getPrefixEnum()).thenReturn(null);
 
-        String accountNumber = generator.generate(savings, format);
+        String accountNumber = generator.generateSavings(source, format);
         assertThat(accountNumber).isEqualTo("000000456");
     }
 
     @Test
     public void testGenerateShareAccountNumber() {
-        ShareAccount share = mock(ShareAccount.class);
-        ShareProduct product = mock(ShareProduct.class);
-
-        when(share.getId()).thenReturn(321L);
-        when(share.getShareProduct()).thenReturn(product);
-        when(product.getShortName()).thenReturn("SH01");
-
+        final LinkedSavingsAccountPort.ShareAccountNumberSource source = new LinkedSavingsAccountPort.ShareAccountNumberSource(321L,
+                "SH01");
         AccountNumberFormat format = mock(AccountNumberFormat.class);
         when(format.getPrefixEnum()).thenReturn(null);
 
-        String accountNumber = generator.generate(share, format);
+        String accountNumber = generator.generateShare(source, format);
         assertThat(accountNumber).isEqualTo("000000321");
     }
 
@@ -198,7 +182,7 @@ public class AccountNumberGeneratorTest {
     public void testCheckAccountNumberConflict_savingsNoConflict() {
         Map<String, String> props = new HashMap<>();
         props.put("entityType", "savingsAccount");
-        when(savingsRepo.findSavingsAccountByAccountNumber("55555")).thenReturn(null);
+        when(linkedSavingsAccountPort.existsByAccountNumber("55555")).thenReturn(false);
 
         boolean result = generator.checkAccountNumberConflict(props, null, "55555");
         assertThat(result).isFalse();
@@ -208,7 +192,7 @@ public class AccountNumberGeneratorTest {
     public void testCheckAccountNumberConflict_savingsWithConflict() {
         Map<String, String> props = new HashMap<>();
         props.put("entityType", "savingsAccount");
-        when(savingsRepo.findSavingsAccountByAccountNumber("55555")).thenReturn(mock(SavingsAccount.class));
+        when(linkedSavingsAccountPort.existsByAccountNumber("55555")).thenReturn(true);
 
         boolean result = generator.checkAccountNumberConflict(props, null, "55555");
         assertThat(result).isTrue();

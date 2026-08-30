@@ -27,7 +27,6 @@ import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 public class AccountTransferDTO {
 
@@ -52,8 +51,8 @@ public class AccountTransferDTO {
     private final Loan loan;
     private final Loan fromLoan;
     private final Loan toLoan;
-    private final SavingsAccount toSavingsAccount;
-    private final SavingsAccount fromSavingsAccount;
+    private final Object toSavingsAccount;
+    private final Object fromSavingsAccount;
     private final Boolean isRegularTransaction;
     private final Boolean isExceptionForBalanceCheck;
 
@@ -62,7 +61,7 @@ public class AccountTransferDTO {
             final Long toAccountId, final String description, final Locale locale, final DateTimeFormatter fmt,
             final PaymentDetail paymentDetail, final Integer fromTransferType, final Integer toTransferType, final Long chargeId,
             Integer loanInstallmentNumber, Integer transferType, final AccountTransferDetails accountTransferDetails, final String noteText,
-            final ExternalId txnExternalId, final Loan loan, SavingsAccount toSavingsAccount, final SavingsAccount fromSavingsAccount,
+            final ExternalId txnExternalId, final Loan loan, Object toSavingsAccount, final Object fromSavingsAccount,
             final Boolean isRegularTransaction, Boolean isExceptionForBalanceCheck) {
         this.transactionDate = transactionDate;
         this.transactionAmount = transactionAmount;
@@ -207,11 +206,11 @@ public class AccountTransferDTO {
         return this.toLoan;
     }
 
-    public SavingsAccount getToSavingsAccount() {
+    public Object getToSavingsAccount() {
         return this.toSavingsAccount;
     }
 
-    public SavingsAccount getFromSavingsAccount() {
+    public Object getFromSavingsAccount() {
         return this.fromSavingsAccount;
     }
 

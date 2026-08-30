@@ -59,7 +59,6 @@ import org.apache.fineract.portfolio.group.service.GroupingTypesWritePlatformSer
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -88,7 +87,7 @@ public class GroupConfiguration {
             GroupLevelRepository groupLevelRepository, GroupingTypesDataValidator fromApiJsonDeserializer,
             LoanRepositoryWrapper loanRepositoryWrapper, CodeValueRepositoryWrapper codeValueRepository,
             CommandProcessingService commandProcessingService, CalendarInstanceLookupPort calendarInstanceRepository,
-            ConfigurationDomainService configurationDomainService, SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
+            ConfigurationDomainService configurationDomainService,
             AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, AccountNumberGenerator accountNumberGenerator,
             EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             BusinessEventNotifierService businessEventNotifierService, LoanOfficerService loanOfficerService
@@ -97,7 +96,7 @@ public class GroupConfiguration {
         return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientRepositoryWrapper,
                 officeRepositoryWrapper, staffRepository, noteWritePlatformService, groupLevelRepository, fromApiJsonDeserializer,
                 loanRepositoryWrapper, codeValueRepository, commandProcessingService, calendarInstanceRepository,
-                configurationDomainService, savingsAccountRepositoryWrapper, accountNumberFormatRepository, accountNumberGenerator,
+                configurationDomainService, accountNumberFormatRepository, accountNumberGenerator,
                 entityDatatableChecksWritePlatformService, businessEventNotifierService, loanOfficerService
 
         );
