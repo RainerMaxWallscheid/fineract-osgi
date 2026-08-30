@@ -19,7 +19,6 @@
 package org.apache.fineract.cob.service;
 
 import java.util.List;
-import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.cob.domain.AccountLockRepository;
 import org.apache.fineract.cob.domain.CustomLoanAccountLockRepository;
 import org.apache.fineract.cob.domain.LockOwner;
@@ -29,7 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractAccountLockService<T extends AccountLock> implements AccountLockService<T> {
+public abstract class AbstractAccountLockService<T> implements AccountLockService<T> {
     protected static final List<LockOwner> COB_LOCK_OWNERS = List.of(LockOwner.LOAN_COB_CHUNK_PROCESSING, LockOwner.LOAN_INLINE_COB_PROCESSING);
     private final AccountLockRepository<T> loanAccountLockRepository;
     private final CustomLoanAccountLockRepository<T> customLoanAccountLockRepository;

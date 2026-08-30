@@ -35,7 +35,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.springframework.data.domain.Persistable;
 
 @MappedSuperclass
-public abstract class AccountLock implements Persistable<Long>, Serializable {
+public abstract class AccountLock implements AccountLockRecord, Persistable<Long>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id

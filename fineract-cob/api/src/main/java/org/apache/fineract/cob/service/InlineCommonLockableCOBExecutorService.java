@@ -34,7 +34,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
-import org.apache.fineract.cob.domain.AccountLock;
+import org.apache.fineract.cob.domain.AccountLockRecord;
 import org.apache.fineract.cob.domain.AccountLockRepository;
 import org.apache.fineract.cob.domain.LockOwner;
 import org.apache.fineract.cob.exceptions.AccountLockCannotBeOverruledException;
@@ -68,7 +68,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLock> implements InlineExecutorService<Long> {
+public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLockRecord> implements InlineExecutorService<Long> {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InlineCommonLockableCOBExecutorService.class);
     private static final String JOB_EXECUTION_FAILED_MESSAGE = "Job execution failed for job with name: ";

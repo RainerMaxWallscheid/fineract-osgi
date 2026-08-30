@@ -18,20 +18,111 @@
  */
 package org.apache.fineract.cob.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.springframework.data.domain.Persistable;
 
 @Entity
 @Table(name = "m_wc_loan_account_locks")
-public class WorkingCapitalLoanAccountLock extends AccountLock {
+public class WorkingCapitalLoanAccountLock implements AccountLockRecord, Persistable<Long>, Serializable {
+    @Serial
     private static final long serialVersionUID = -5476985607461625252L;
+    @Id
+    @Column(name = "loan_id", nullable = false)
+    private Long loanId;
+    @Version
+    @Column(name = "version")
+    private Long version;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lock_owner", nullable = false)
+    private LockOwner lockOwner;
+    @Column(name = "lock_placed_on", nullable = false)
+    private OffsetDateTime lockPlacedOn;
+    @Column(name = "error")
+    private String error;
+    @Column(name = "stacktrace")
+    private String stacktrace;
+    @Column(name = "lock_placed_on_cob_business_date")
+    private LocalDate lockPlacedOnCobBusinessDate;
+    @Transient
+    private boolean isNew = true;
+
+    @PrePersist
+    @PostLoad
+    void markNotNew() {
+        this.isNew = false;
+    }
+
+    @Override
+    public Long getId() {
+        return loanId;
+    }
 
     public WorkingCapitalLoanAccountLock(Long loanId, LockOwner lockOwner, LocalDate lockPlacedOnCobBusinessDate) {
-        super(loanId, lockOwner, lockPlacedOnCobBusinessDate);
+        this.loanId = loanId;
+        this.lockOwner = lockOwner;
+        this.lockPlacedOn = DateUtils.getAuditOffsetDateTime();
+        this.lockPlacedOnCobBusinessDate = lockPlacedOnCobBusinessDate;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanAccountLock() {
+    public void setError(String errorMessage, String stacktrace) {
+        this.error = errorMessage;
+        this.stacktrace = stacktrace;
     }
+
+    @Override
+    public void setNewLockOwner(LockOwner newLockOwner) {
+        this.lockOwner = newLockOwner;
+        this.lockPlacedOn = DateUtils.getAuditOffsetDateTime();
+    }
+
+    @Override
+    public Long getLoanId() {
+        return this.loanId;
+    }
+
+    public Long getVersion() {
+        return this.version;
+    }
+
+    public LockOwner getLockOwner() {
+        return this.lockOwner;
+    }
+
+    public OffsetDateTime getLockPlacedOn() {
+        return this.lockPlacedOn;
+    }
+
+    @Override
+    public String getError() {
+        return this.error;
+    }
+
+    public String getStacktrace() {
+        return this.stacktrace;
+    }
+
+    public LocalDate getLockPlacedOnCobBusinessDate() {
+        return this.lockPlacedOnCobBusinessDate;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    public WorkingCapitalLoanAccountLock() {}
 }

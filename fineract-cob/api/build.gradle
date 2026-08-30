@@ -37,6 +37,7 @@ jar {
                         + 'org.apache.fineract.cob.converter,'
                         + 'org.apache.fineract.cob.data,'
                         + 'org.apache.fineract.cob.domain,'
+                        + 'org.apache.fineract.cob.api,'
                         + 'org.apache.fineract.cob.exceptions,'
                         + 'org.apache.fineract.cob.listener,'
                         + 'org.apache.fineract.cob.loan,'

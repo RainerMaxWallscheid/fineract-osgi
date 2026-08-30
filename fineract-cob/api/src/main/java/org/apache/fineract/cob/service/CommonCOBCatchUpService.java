@@ -24,13 +24,12 @@ import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.cob.data.IsCatchUpRunningDTO;
 import org.apache.fineract.cob.data.OldestCOBProcessedLoanDTO;
-import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.service.JobExecutionQueryPort;
 
-public abstract class CommonCOBCatchUpService<T extends AccountLock> implements COBCatchUpService {
+public abstract class CommonCOBCatchUpService<T> implements COBCatchUpService {
     private final AsyncCOBExecutorService asyncLoanCOBExecutorService;
     private final JobExecutionQueryPort jobExecutionQueryPort;
     private final RetrieveIdService retrieveIdService;

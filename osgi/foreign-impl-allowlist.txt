@@ -5,4 +5,3 @@
 fineract-progressive-loan/impl/dependencies.gradle	fineract-loan-impl
 fineract-progressive-loan/impl/dependencies.gradle	fineract-savings-impl
 fineract-working-capital-loan/impl/dependencies.gradle	fineract-loan-impl
-fineract-working-capital-loan/impl/dependencies.gradle	fineract-cob-impl

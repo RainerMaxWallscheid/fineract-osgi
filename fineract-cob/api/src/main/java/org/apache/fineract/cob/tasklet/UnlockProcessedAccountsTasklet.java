@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.tasklet;
 
-import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.cob.service.AccountLockService;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -33,7 +32,7 @@ import org.springframework.lang.NonNull;
  * {@code lock_placed_on_cob_business_date} on the lock record, proving all COB business steps completed. If the lock
  * still exists with no error, it is orphaned and should be removed.
  */
-public abstract class UnlockProcessedAccountsTasklet<T extends AccountLock> implements Tasklet {
+public abstract class UnlockProcessedAccountsTasklet<T> implements Tasklet {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnlockProcessedAccountsTasklet.class);
     private final AccountLockService<T> accountLockService;

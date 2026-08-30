@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
-public interface AccountLockRepository<T extends AccountLock> {
+public interface AccountLockRepository<T> {
 
     Optional<T> findByLoanIdAndLockOwner(Long loanId, LockOwner lockOwner);
 
