@@ -54,13 +54,9 @@ import org.apache.fineract.shares.shareaccounts.serialization.ShareAccountDataSe
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountWritePlatformService;
 import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
 import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.stereotype.Service;
 
-@Service
-@ConditionalOnMissingBean(ShareAccountWritePlatformService.class)
 public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareAccountWritePlatformService {
     private final ShareAccountDataSerializer accountDataSerializer;
     private final ShareAccountRepositoryWrapper shareAccountRepository;
