@@ -39,8 +39,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
@@ -83,7 +82,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     private final FromJsonHelper fromApiJsonHelper;
     private final WorkingCapitalLoanProductRepository loanProductRepository;
     private final FundRepository fundRepository;
-    private final DelinquencyBucketRepository delinquencyBucketRepository;
+    private final DelinquencyCatalogPort delinquencyCatalogPort;
     private final ExternalIdFactory externalIdFactory;
     private final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser;
     private final AccountNumberFormatLookup accountNumberFormatLookup;
@@ -176,9 +175,9 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         }
         if (fromApiJsonHelper.parameterExists(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, element)) {
             final Long bucketId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, element);
-            detail.setDelinquencyBucket(bucketId != null ? delinquencyBucketRepository.findById(bucketId).orElse(null) : null);
+            detail.setDelinquencyBucketId(bucketId != null && delinquencyCatalogPort.bucketExists(bucketId) ? bucketId : null);
         } else {
-            detail.setDelinquencyBucket(product.getDelinquencyBucket());
+            detail.setDelinquencyBucketId(product.getDelinquencyBucketId());
         }
         return detail;
     }
@@ -317,10 +316,10 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
             }
             if (fromApiJsonHelper.parameterExists(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, element)) {
                 final Long bucketId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, element);
-                final DelinquencyBucket bucket = bucketId != null ? delinquencyBucketRepository.findById(bucketId).orElse(null) : null;
-                final Long existingBucketId = detail.getDelinquencyBucket() != null ? detail.getDelinquencyBucket().getId() : null;
+                final Long resolvedBucketId = bucketId != null && delinquencyCatalogPort.bucketExists(bucketId) ? bucketId : null;
+                final Long existingBucketId = detail.getDelinquencyBucketId();
                 if (!Objects.equals(bucketId, existingBucketId)) {
-                    detail.setDelinquencyBucket(bucket);
+                    detail.setDelinquencyBucketId(resolvedBucketId);
                     changes.put(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, bucketId);
                 }
             }
@@ -385,11 +384,11 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final FundRepository fundRepository, final DelinquencyBucketRepository delinquencyBucketRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
+        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final FundRepository fundRepository, final DelinquencyCatalogPort delinquencyCatalogPort, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanProductRepository = loanProductRepository;
         this.fundRepository = fundRepository;
-        this.delinquencyBucketRepository = delinquencyBucketRepository;
+        this.delinquencyCatalogPort = delinquencyCatalogPort;
         this.externalIdFactory = externalIdFactory;
         this.paymentAllocationParser = paymentAllocationParser;
         this.accountNumberFormatLookup = accountNumberFormatLookup;

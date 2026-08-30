@@ -24,6 +24,8 @@ dependencies {
     implementation(project(path: ':fineract-springbatch-api'))
     // NamedJobLaunchPort / JobExecutionQueryPort / InlineExecutorService on leftover-JPA-free COB helpers
     compileOnly project(path: ':fineract-jobs-api')
+    // LoanNotFoundException on leftover-JPA-free AbstractLoanItemReader
+    compileOnly project(path: ':fineract-loan-api')
     implementation 'org.apache.commons:commons-lang3'
     implementation 'com.google.code.gson:gson'
     implementation 'com.google.guava:guava'

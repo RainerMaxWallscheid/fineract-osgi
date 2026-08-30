@@ -170,7 +170,7 @@ public class DelinquencyWritePlatformServiceImpl implements DelinquencyWritePlat
                 throw new PlatformDataIntegrityException("error.msg.data.integrity.issue.entity.linked", "Data integrity issue with resource: " + delinquencyBucket.getId());
             }
             for (final DelinquencyBucketUsageChecker checker : delinquencyBucketUsageCheckers) {
-                if (checker.hasUsages(delinquencyBucket)) {
+                if (checker.hasUsages(delinquencyBucket.getId())) {
                     throw new PlatformDataIntegrityException("error.msg.data.integrity.issue.entity.linked", String.format("Data integrity issue with resource: %d", delinquencyBucket.getId()));
                 }
             }

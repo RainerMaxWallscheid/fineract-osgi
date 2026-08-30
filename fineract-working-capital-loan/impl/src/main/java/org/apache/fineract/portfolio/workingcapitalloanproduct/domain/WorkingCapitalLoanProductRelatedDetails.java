@@ -28,7 +28,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloanbreach.domain.WorkingCapitalBreach;
@@ -62,9 +61,8 @@ public class WorkingCapitalLoanProductRelatedDetails {
     private BigDecimal discountProposed;
     @Column(name = "discount_approved", scale = 6, precision = 19)
     private BigDecimal discountApproved;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delinquency_bucket_classification_id")
-    private DelinquencyBucket delinquencyBucket;
+    @Column(name = "delinquency_bucket_classification_id")
+    private Long delinquencyBucketId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "breach_id")
     private WorkingCapitalBreach breach;
@@ -130,8 +128,8 @@ public class WorkingCapitalLoanProductRelatedDetails {
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucket getDelinquencyBucket() {
-        return this.delinquencyBucket;
+        public Long getDelinquencyBucketId() {
+        return this.delinquencyBucketId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -210,8 +208,8 @@ public class WorkingCapitalLoanProductRelatedDetails {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyBucket(final DelinquencyBucket delinquencyBucket) {
-        this.delinquencyBucket = delinquencyBucket;
+        public void setDelinquencyBucketId(final Long delinquencyBucketId) {
+        this.delinquencyBucketId = delinquencyBucketId;
     }
 
     @java.lang.SuppressWarnings("all")

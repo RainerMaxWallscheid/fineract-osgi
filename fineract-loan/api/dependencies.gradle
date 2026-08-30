@@ -38,6 +38,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
+    compileOnly 'jakarta.persistence:jakarta.persistence-api'
     // LoanChargePaidByData uses @Default
     compileOnly 'org.springframework.integration:spring-integration-core'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations'

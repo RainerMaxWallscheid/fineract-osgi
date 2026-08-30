@@ -16,11 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.delinquency.spi;
+package org.apache.fineract.portfolio.loanaccount.data;
 
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
+import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.mapstruct.Mapper;
 
-public interface DelinquencyBucketUsageChecker {
+@Mapper(config = MapstructMapperConfig.class)
+public interface LoanStatusEnumDataMapper {
 
-    boolean hasUsages(DelinquencyBucket delinquencyBucket);
+    default LoanStatusEnumData map(Loan source) {
+        return LoanEnumerations.status(source.getStatus());
+    }
 }

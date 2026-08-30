@@ -37,7 +37,6 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.workingcapitalloanbreach.domain.WorkingCapitalBreach;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.domain.WorkingCapitalNearBreach;
@@ -59,9 +58,8 @@ public class WorkingCapitalLoanProduct extends AbstractPersistableCustom<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fund_id")
     private Fund fund;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delinquency_bucket_classification_id")
-    private DelinquencyBucket delinquencyBucket;
+    @Column(name = "delinquency_bucket_classification_id")
+    private Long delinquencyBucketId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "breach_id")
     private WorkingCapitalBreach breach;
@@ -94,12 +92,12 @@ public class WorkingCapitalLoanProduct extends AbstractPersistableCustom<Long> {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "wcProduct", orphanRemoval = true, fetch = FetchType.EAGER)
     private WorkingCapitalLoanProductConfigurableAttributes configurableAttributes;
 
-    public WorkingCapitalLoanProduct(final String name, final String shortName, final ExternalId externalId, final Fund fund, final DelinquencyBucket delinquencyBucket, final LocalDate startDate, final LocalDate closeDate, final String description, final WorkingCapitalAccountingRuleType accountingRule, final MonetaryCurrency currency, final WorkingCapitalLoanProductRelatedDetail relatedDetail, final WorkingCapitalLoanProductMinMaxConstraints minMaxConstraints, final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules, final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes, final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach) {
+    public WorkingCapitalLoanProduct(final String name, final String shortName, final ExternalId externalId, final Fund fund, final Long delinquencyBucketId, final LocalDate startDate, final LocalDate closeDate, final String description, final WorkingCapitalAccountingRuleType accountingRule, final MonetaryCurrency currency, final WorkingCapitalLoanProductRelatedDetail relatedDetail, final WorkingCapitalLoanProductMinMaxConstraints minMaxConstraints, final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules, final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes, final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach) {
         this.name = name;
         this.shortName = shortName;
         this.externalId = externalId;
         this.fund = fund;
-        this.delinquencyBucket = delinquencyBucket;
+        this.delinquencyBucketId = delinquencyBucketId;
         this.breach = breach;
         this.nearBreach = nearBreach;
         this.startDate = startDate;
@@ -149,8 +147,8 @@ public class WorkingCapitalLoanProduct extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucket getDelinquencyBucket() {
-        return this.delinquencyBucket;
+        public Long getDelinquencyBucketId() {
+        return this.delinquencyBucketId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -229,8 +227,8 @@ public class WorkingCapitalLoanProduct extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyBucket(final DelinquencyBucket delinquencyBucket) {
-        this.delinquencyBucket = delinquencyBucket;
+        public void setDelinquencyBucketId(final Long delinquencyBucketId) {
+        this.delinquencyBucketId = delinquencyBucketId;
     }
 
     @java.lang.SuppressWarnings("all")

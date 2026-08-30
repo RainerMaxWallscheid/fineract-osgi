@@ -27,8 +27,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyRange;
+import org.apache.fineract.portfolio.delinquency.data.DelinquencyRangeData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDelinquencyRangeSchedule;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDelinquencyRangeScheduleTagHistory;
@@ -43,6 +43,7 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
     private final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository;
     private final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryRepository delinquencyRangeScheduleTagHistoryRepository;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
+    private final DelinquencyCatalogPort delinquencyCatalogPort;
 
     /**
      * If ENABLE_INSTANT_DELINQUENCY_CALCULATION is set to true in global config, classifies the delinquency of a loan
@@ -70,11 +71,11 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
      */
     @Override
     public void classifyDelinquency(WorkingCapitalLoan loan, LocalDate businessDate) {
-        if (loan.getLoanProductRelatedDetails() == null || loan.getLoanProductRelatedDetails().getDelinquencyBucket() == null) {
+        if (loan.getLoanProductRelatedDetails() == null || loan.getLoanProductRelatedDetails().getDelinquencyBucketId() == null) {
             log.debug("Skipping... Delinquency bucket is not configured for Working Capital Loan {}.", loan.getId());
             return;
         }
-        log.debug("Evaluate {} Working Capital Delinquency bucket", loan.getLoanProductRelatedDetails().getDelinquencyBucket());
+        log.debug("Evaluate {} Working Capital Delinquency bucket", loan.getLoanProductRelatedDetails().getDelinquencyBucketId());
         List<WorkingCapitalLoanDelinquencyRangeSchedule> delinquencyRangeScheduleList = delinquencyRangeScheduleRepository.findByLoanIdOrderByPeriodNumberAsc(loan.getId());
         for (WorkingCapitalLoanDelinquencyRangeSchedule range : delinquencyRangeScheduleList) {
             if (range.getToDate().isBefore(businessDate)) {
@@ -83,7 +84,7 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
                 if (isDelinquent) {
                     range.setDelinquentAmount(range.getOutstandingAmount());
                     range.setDelinquentDays(rangeDelinquentDays);
-                    Optional<DelinquencyRange> delinquencyRangeByDays = findDelinquencyRangeByDays(loan.getLoanProductRelatedDetails().getDelinquencyBucket(), (int) rangeDelinquentDays);
+                    Optional<DelinquencyRangeData> delinquencyRangeByDays = findDelinquencyRangeByDays(loan.getLoanProductRelatedDetails().getDelinquencyBucketId(), (int) rangeDelinquentDays);
                     applyDelinquencyTagForRange(loan, range, delinquencyRangeByDays.orElse(null), businessDate);
                 } else {
                     range.setDelinquentAmount(BigDecimal.ZERO);
@@ -107,8 +108,9 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
      *            the number of days the loan is delinquent
      * @return an Optional containing the matching delinquency range, or empty if not found
      */
-    public Optional<DelinquencyRange> findDelinquencyRangeByDays(final DelinquencyBucket delinquencyBucket, final Integer delinquentDays) {
-        return delinquencyBucket.getRanges().stream().filter(dr -> dr.getMinimumAgeDays() <= delinquentDays).filter(dr -> dr.getMaximumAgeDays() == null || dr.getMaximumAgeDays() >= delinquentDays).findAny();
+    public Optional<DelinquencyRangeData> findDelinquencyRangeByDays(final Long delinquencyBucketId, final Integer delinquentDays) {
+        return delinquencyCatalogPort.rangesOfBucket(delinquencyBucketId).stream().filter(dr -> dr.getMinimumAgeDays() <= delinquentDays)
+                .filter(dr -> dr.getMaximumAgeDays() == null || dr.getMaximumAgeDays() >= delinquentDays).findAny();
     }
 
     /**
@@ -124,12 +126,12 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
      * @param businessDate
      *            the date on which the tagging operation is performed
      */
-    public void applyDelinquencyTagForRange(final WorkingCapitalLoan loan, final WorkingCapitalLoanDelinquencyRangeSchedule range, final DelinquencyRange currentRange, final LocalDate businessDate) {
+    public void applyDelinquencyTagForRange(final WorkingCapitalLoan loan, final WorkingCapitalLoanDelinquencyRangeSchedule range, final DelinquencyRangeData currentRange, final LocalDate businessDate) {
         List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> updatedList = new ArrayList<>();
         List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> rangeScheduleTagHistoryList = delinquencyRangeScheduleTagHistoryRepository.findByRangeScheduleAndLiftedOnDateOrderByAddedOnDateAsc(range, null);
         WorkingCapitalLoanDelinquencyRangeScheduleTagHistory last = rangeScheduleTagHistoryList.isEmpty() ? null : rangeScheduleTagHistoryList.getLast();
         // do nothing if currentRange is in rangeScheduleTagHistoryList or last and currentRange are null
-        if ((last == null && currentRange == null) || (last != null && currentRange != null && rangeScheduleTagHistoryList.stream().anyMatch(tag -> Objects.equals(tag.getDelinquencyRange().getId(), currentRange.getId())))) {
+        if ((last == null && currentRange == null) || (last != null && currentRange != null && rangeScheduleTagHistoryList.stream().anyMatch(tag -> Objects.equals(tag.getDelinquencyRangeId(), currentRange.getId())))) {
             return;
         }
         if (currentRange == null) {
@@ -140,7 +142,7 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
             // add current range
             WorkingCapitalLoanDelinquencyRangeScheduleTagHistory newTag = new WorkingCapitalLoanDelinquencyRangeScheduleTagHistory();
             newTag.setLoan(loan);
-            newTag.setDelinquencyRange(currentRange);
+            newTag.setDelinquencyRangeId(currentRange.getId());
             newTag.setRangeSchedule(range);
             newTag.setAddedOnDate(businessDate);
             newTag.setLiftedOnDate(null);
@@ -150,9 +152,10 @@ public class WorkingCapitalLoanDelinquencyClassificationServiceImpl implements W
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanDelinquencyClassificationServiceImpl(final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryRepository delinquencyRangeScheduleTagHistoryRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository) {
+        public WorkingCapitalLoanDelinquencyClassificationServiceImpl(final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryRepository delinquencyRangeScheduleTagHistoryRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final DelinquencyCatalogPort delinquencyCatalogPort) {
         this.delinquencyRangeScheduleRepository = delinquencyRangeScheduleRepository;
         this.delinquencyRangeScheduleTagHistoryRepository = delinquencyRangeScheduleTagHistoryRepository;
         this.globalConfigurationRepository = globalConfigurationRepository;
+        this.delinquencyCatalogPort = delinquencyCatalogPort;
     }
 }

@@ -41,7 +41,7 @@ import org.apache.fineract.portfolio.accountdetails.data.WorkingCapitalLoanAccou
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.delinquency.data.DelinquencyBucketData;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentType;
-import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanCollectionData;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanData;
@@ -76,7 +76,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     private final WorkingCapitalLoanMapper mapper;
     private final WorkingCapitalLoanProductReadPlatformService productReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
-    private final DelinquencyReadPlatformService delinquencyReadPlatformService;
+    private final DelinquencyCatalogPort delinquencyCatalogPort;
     private final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper;
     private final WorkingCapitalBreachReadPlatformService breachReadPlatformService;
     private final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService;
@@ -93,7 +93,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     public WorkingCapitalLoanTemplateData retrieveTemplate(final Long productId, final Long clientId) {
         final List<WorkingCapitalLoanProductData> productOptions = this.productReadPlatformService.retrieveAllWorkingCapitalLoanProducts();
         final WorkingCapitalLoanProductData productTemplate = this.productReadPlatformService.retrieveNewWorkingCapitalLoanProductDetails();
-        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyReadPlatformService.retrieveAllDelinquencyBuckets();
+        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyCatalogPort.retrieveAllBuckets();
         final List<StringEnumOptionData> periodFrequencyTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
         final List<WorkingCapitalBreachData> breachOptions = breachReadPlatformService.retrieveAll();
         final List<WorkingCapitalNearBreachData> nearBreachOptions = nearBreachReadPlatformService.retrieveAll();
@@ -160,6 +160,9 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         final Map<Long, WorkingCapitalLoan> loansById = loansWithDetails.stream().collect(Collectors.toMap(WorkingCapitalLoan::getId, loan -> loan));
         final List<WorkingCapitalLoan> loansInPageOrder = loanIds.stream().map(loansById::get).filter(Objects::nonNull).toList();
         final List<WorkingCapitalLoanData> content = this.mapper.toDataList(loansInPageOrder);
+        for (int i = 0; i < content.size(); i++) {
+            enrichDelinquencyBucket(loansInPageOrder.get(i), content.get(i));
+        }
         return new PageImpl<>(content, pageable, loanPage.getTotalElements());
     }
 
@@ -167,6 +170,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     public WorkingCapitalLoanData retrieveOne(final Long loanId) {
         final WorkingCapitalLoan loan = this.repository.findByIdWithFullDetails(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         WorkingCapitalLoanData data = this.mapper.toData(loan);
+        enrichDelinquencyBucket(loan, data);
         WorkingCapitalLoanCollectionData collectionData = workingCapitalLoanDelinquencyReadPlatformService.getCollectionData(loanId, ThreadLocalContextUtil.getBusinessDate());
         data.setDelinquent(collectionData);
         data.setCharges(chargeReadPlatformService.retrieveLoanCharges(loanId));
@@ -256,13 +260,19 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         return this.repository.existsById(loanId);
     }
 
+    private void enrichDelinquencyBucket(final WorkingCapitalLoan loan, final WorkingCapitalLoanData data) {
+        if (loan.getLoanProductRelatedDetails() != null) {
+            data.setDelinquencyBucket(delinquencyCatalogPort.retrieveBucket(loan.getLoanProductRelatedDetails().getDelinquencyBucketId()));
+        }
+    }
+
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanApplicationReadPlatformServiceImpl(final WorkingCapitalLoanRepository repository, final WorkingCapitalLoanMapper mapper, final WorkingCapitalLoanProductReadPlatformService productReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService, final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final AppUserRepository appUserRepository) {
+        public WorkingCapitalLoanApplicationReadPlatformServiceImpl(final WorkingCapitalLoanRepository repository, final WorkingCapitalLoanMapper mapper, final WorkingCapitalLoanProductReadPlatformService productReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService, final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final AppUserRepository appUserRepository) {
         this.repository = repository;
         this.mapper = mapper;
         this.productReadPlatformService = productReadPlatformService;
         this.clientReadPlatformService = clientReadPlatformService;
-        this.delinquencyReadPlatformService = delinquencyReadPlatformService;
+        this.delinquencyCatalogPort = delinquencyCatalogPort;
         this.workingCapitalLoanSummaryMapper = workingCapitalLoanSummaryMapper;
         this.breachReadPlatformService = breachReadPlatformService;
         this.workingCapitalLoanDelinquencyReadPlatformService = workingCapitalLoanDelinquencyReadPlatformService;

@@ -29,10 +29,9 @@ import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyAction;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyFrequencyType;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentPeriodAndRule;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentPeriodAndRuleRepository;
+import org.apache.fineract.portfolio.delinquency.data.DelinquencyMinimumPaymentPeriodAndRuleData;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloan.data.TransactionDateAndAmountHolder;
@@ -59,13 +58,13 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
     private final WorkingCapitalLoanDelinquencyRangeScheduleRepository loanDelinquencyRangeScheduleRepository;
     private final WorkingCapitalLoanDelinquencyActionRepository loanDelinquencyActionRepository;
     private final WorkingCapitalLoanDelinquencyRangeScheduleMapper capitalLoanDelinquencyRangeScheduleMapper;
-    private final DelinquencyMinimumPaymentPeriodAndRuleRepository minimumPaymentPeriodAndRuleRepository;
+    private final DelinquencyCatalogPort delinquencyCatalogPort;
     private final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService;
     private final WorkingCapitalLoanTransactionRepository transactionRepository;
 
     @Override
     public void generateInitialPeriod(WorkingCapitalLoan loan) {
-        DelinquencyMinimumPaymentPeriodAndRule rule = getMinimumPaymentRule(loan);
+        DelinquencyMinimumPaymentPeriodAndRuleData rule = getMinimumPaymentRule(loan);
         if (rule == null) {
             return;
         }
@@ -88,7 +87,7 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
 
     @Override
     public void generateNextPeriodIfNeeded(WorkingCapitalLoan loan, LocalDate businessDate) {
-        final DelinquencyMinimumPaymentPeriodAndRule rule = getMinimumPaymentRule(loan);
+        final DelinquencyMinimumPaymentPeriodAndRuleData rule = getMinimumPaymentRule(loan);
         if (rule == null) {
             return;
         }
@@ -213,7 +212,7 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
     @Override
     public void rescheduleMinimumPayment(final WorkingCapitalLoan loan) {
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
-        final DelinquencyMinimumPaymentPeriodAndRule rule = getMinimumPaymentRule(loan);
+        final DelinquencyMinimumPaymentPeriodAndRuleData rule = getMinimumPaymentRule(loan);
         if (rule == null) {
             log.warn("No minimum payment rule found for WC loan {}, skipping reschedule", loan.getId());
             return;
@@ -301,16 +300,12 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
         return loan.getDisbursementDetails().stream().map(WorkingCapitalLoanDisbursementDetails::getActualDisbursementDate).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
-    private DelinquencyMinimumPaymentPeriodAndRule getMinimumPaymentRule(WorkingCapitalLoan loan) {
+    private DelinquencyMinimumPaymentPeriodAndRuleData getMinimumPaymentRule(WorkingCapitalLoan loan) {
         WorkingCapitalLoanProduct product = loan.getLoanProduct();
         if (product == null) {
             return null;
         }
-        DelinquencyBucket bucket = product.getDelinquencyBucket();
-        if (bucket == null) {
-            return null;
-        }
-        return minimumPaymentPeriodAndRuleRepository.findByBucketId(bucket.getId()).orElse(null);
+        return delinquencyCatalogPort.minimumPaymentRuleOfBucket(product.getDelinquencyBucketId());
     }
 
     private LocalDate calculateToDate(LocalDate fromDate, Integer frequency, DelinquencyFrequencyType frequencyType) {
@@ -408,7 +403,7 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
         return true;
     }
 
-    private EffectiveDelinquencyRescheduleParams resolveEffectiveRescheduleParams(final Long loanId, final DelinquencyMinimumPaymentPeriodAndRule rule) {
+    private EffectiveDelinquencyRescheduleParams resolveEffectiveRescheduleParams(final Long loanId, final DelinquencyMinimumPaymentPeriodAndRuleData rule) {
         final List<WorkingCapitalLoanDelinquencyAction> reschedules = loanDelinquencyActionRepository.findByWorkingCapitalLoanIdAndActionOrderByIdDesc(loanId, DelinquencyAction.RESCHEDULE);
         final Optional<WorkingCapitalLoanDelinquencyAction> latestWithPayment = reschedules.stream().filter(action -> action.getMinimumPayment() != null).findFirst();
         final Optional<WorkingCapitalLoanDelinquencyAction> latestWithFrequency = reschedules.stream().filter(action -> action.getFrequency() != null).findFirst();
@@ -482,11 +477,11 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl implements Wo
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl(final WorkingCapitalLoanDelinquencyRangeScheduleRepository loanDelinquencyRangeScheduleRepository, final WorkingCapitalLoanDelinquencyActionRepository loanDelinquencyActionRepository, final WorkingCapitalLoanDelinquencyRangeScheduleMapper capitalLoanDelinquencyRangeScheduleMapper, final DelinquencyMinimumPaymentPeriodAndRuleRepository minimumPaymentPeriodAndRuleRepository, final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService, final WorkingCapitalLoanTransactionRepository transactionRepository) {
+        public WorkingCapitalLoanDelinquencyRangeScheduleServiceImpl(final WorkingCapitalLoanDelinquencyRangeScheduleRepository loanDelinquencyRangeScheduleRepository, final WorkingCapitalLoanDelinquencyActionRepository loanDelinquencyActionRepository, final WorkingCapitalLoanDelinquencyRangeScheduleMapper capitalLoanDelinquencyRangeScheduleMapper, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService, final WorkingCapitalLoanTransactionRepository transactionRepository) {
         this.loanDelinquencyRangeScheduleRepository = loanDelinquencyRangeScheduleRepository;
         this.loanDelinquencyActionRepository = loanDelinquencyActionRepository;
         this.capitalLoanDelinquencyRangeScheduleMapper = capitalLoanDelinquencyRangeScheduleMapper;
-        this.minimumPaymentPeriodAndRuleRepository = minimumPaymentPeriodAndRuleRepository;
+        this.delinquencyCatalogPort = delinquencyCatalogPort;
         this.delinquencyClassificationService = delinquencyClassificationService;
         this.transactionRepository = transactionRepository;
     }

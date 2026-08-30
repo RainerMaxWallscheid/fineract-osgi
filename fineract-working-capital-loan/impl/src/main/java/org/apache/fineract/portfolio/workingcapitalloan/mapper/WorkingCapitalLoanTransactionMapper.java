@@ -24,7 +24,7 @@ import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
@@ -52,7 +52,7 @@ public interface WorkingCapitalLoanTransactionMapper {
 
     @Named("loanTransactionTypeToEnumData")
     default LoanTransactionEnumData loanTransactionTypeToEnumData(final LoanTransactionType type) {
-        return type == null ? null : LoanEnumerations.transactionType(type);
+        return type == null ? null : LoanTransactionEnumerations.transactionType(type);
     }
 
     @Named("paymentDetailToData")

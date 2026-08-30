@@ -27,14 +27,13 @@ import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
-import org.apache.fineract.portfolio.delinquency.domain.DelinquencyRange;
+
 
 @Entity
 @Table(name = "m_wc_loan_range_delinquency_tag")
 public class WorkingCapitalLoanDelinquencyRangeScheduleTagHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-    @ManyToOne
-    @JoinColumn(name = "delinquency_range_id", nullable = false)
-    private DelinquencyRange delinquencyRange;
+    @Column(name = "delinquency_range_id", nullable = false)
+    private Long delinquencyRangeId;
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private WorkingCapitalLoan loan;
@@ -50,8 +49,8 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleTagHistory extends Abstra
     @Version
     private Long version;
 
-    public WorkingCapitalLoanDelinquencyRangeScheduleTagHistory(DelinquencyRange delinquencyRange, WorkingCapitalLoan loan, WorkingCapitalLoanDelinquencyRangeSchedule rangeSchedule, LocalDate addedOnDate, LocalDate liftedOnDate, BigDecimal outstandingAmount) {
-        this.delinquencyRange = delinquencyRange;
+    public WorkingCapitalLoanDelinquencyRangeScheduleTagHistory(Long delinquencyRangeId, WorkingCapitalLoan loan, WorkingCapitalLoanDelinquencyRangeSchedule rangeSchedule, LocalDate addedOnDate, LocalDate liftedOnDate, BigDecimal outstandingAmount) {
+        this.delinquencyRangeId = delinquencyRangeId;
         this.loan = loan;
         this.rangeSchedule = rangeSchedule;
         this.addedOnDate = addedOnDate;
@@ -60,8 +59,8 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleTagHistory extends Abstra
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyRange getDelinquencyRange() {
-        return this.delinquencyRange;
+        public Long getDelinquencyRangeId() {
+        return this.delinquencyRangeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -95,8 +94,8 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleTagHistory extends Abstra
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
-        this.delinquencyRange = delinquencyRange;
+        public void setDelinquencyRangeId(final Long delinquencyRangeId) {
+        this.delinquencyRangeId = delinquencyRangeId;
     }
 
     @java.lang.SuppressWarnings("all")

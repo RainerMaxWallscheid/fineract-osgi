@@ -50,7 +50,7 @@ public class LoanPointInTimeData {
     private LoanArrearsData arrears;
 
 
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class, uses = {LoanStatusEnumData.Mapper.class, CurrencyMapper.class, LoanPrincipalData.Mapper.class, LoanInterestData.Mapper.class, LoanFeeData.Mapper.class, LoanPenaltyData.Mapper.class, LoanTotalAmountData.Mapper.class, org.apache.fineract.portfolio.loanaccount.mapper.LoanClientIdLookup.class})
+    @org.mapstruct.Mapper(config = MapstructMapperConfig.class, uses = {LoanStatusEnumDataMapper.class, CurrencyMapper.class, LoanPrincipalData.Mapper.class, LoanInterestData.Mapper.class, LoanFeeData.Mapper.class, LoanPenaltyData.Mapper.class, LoanTotalAmountData.Mapper.class, org.apache.fineract.portfolio.loanaccount.mapper.LoanClientIdLookup.class})
     public interface Mapper {
         @Mapping(source = "accountNumber", target = "accountNo")
         @Mapping(source = "source", target = "status")

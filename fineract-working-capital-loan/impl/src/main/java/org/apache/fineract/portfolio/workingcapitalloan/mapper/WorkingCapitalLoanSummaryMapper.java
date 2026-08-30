@@ -27,7 +27,7 @@ import org.apache.fineract.portfolio.accountdetails.data.WorkingCapitalLoanAccou
 import org.apache.fineract.portfolio.loanaccount.data.LoanApplicationTimelineData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanStatusEnumerations;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
 import org.mapstruct.Mapper;
@@ -60,7 +60,7 @@ public interface WorkingCapitalLoanSummaryMapper {
 
     @Named("loanStatusToEnumData")
     default LoanStatusEnumData loanStatusToEnumData(final LoanStatus loanStatus) {
-        return loanStatus != null ? LoanEnumerations.status(loanStatus) : null;
+        return loanStatus != null ? LoanStatusEnumerations.status(loanStatus) : null;
     }
 
     @Named("buildTimeline")

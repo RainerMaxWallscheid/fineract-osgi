@@ -23,11 +23,10 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.portfolio.delinquency.mapper.DelinquencyBucketMapper;
 import org.apache.fineract.portfolio.loanaccount.data.LoanApplicationTimelineData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
-import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanStatusEnumerations;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
@@ -39,7 +38,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(config = MapstructMapperConfig.class, uses = { DelinquencyBucketMapper.class, WorkingCapitalLoanProductMapper.class,
+@Mapper(config = MapstructMapperConfig.class, uses = { WorkingCapitalLoanProductMapper.class,
         WorkingCapitalLoanBalanceMapper.class, WorkingCapitalLoanDisbursementDetailMapper.class, WorkingCapitalLoanTransactionMapper.class,
         WorkingCapitalBreachMapper.class, WorkingCapitalNearBreachMapper.class, WorkingCapitalLoanSummaryDataMapper.class,
         WorkingCapitalLoanPaymentAllocationMapper.class, WorkingCapitalLoanClientIdLookup.class })
@@ -68,7 +67,7 @@ public interface WorkingCapitalLoanMapper {
     @Mapping(target = "approvedDiscountFee", source = "loanProductRelatedDetails.discountApproved")
     @Mapping(target = "breach", source = "loanProductRelatedDetails.breach")
     @Mapping(target = "nearBreach", source = "loanProductRelatedDetails.nearBreach")
-    @Mapping(target = "delinquencyBucket", source = "loanProductRelatedDetails.delinquencyBucket")
+    @Mapping(target = "delinquencyBucket", ignore = true)
     @Mapping(target = "balance", source = "balance")
     @Mapping(target = "paymentAllocation", source = "paymentAllocationRules", qualifiedByName = "paymentAllocationRulesToData")
     @Mapping(target = "timeline", source = "loan", qualifiedByName = "timelineData")
@@ -101,7 +100,7 @@ public interface WorkingCapitalLoanMapper {
 
     @Named("loanStatusData")
     default LoanStatusEnumData loanStatusData(final LoanStatus loanStatus) {
-        return LoanEnumerations.status(loanStatus);
+        return LoanStatusEnumerations.status(loanStatus);
     }
 
     @Named("monetaryCurrencyToCurrencyData")
@@ -129,7 +128,7 @@ public interface WorkingCapitalLoanMapper {
 
     @Named("installmentLevelDelinquencyEnabled")
     default Boolean installmentLevelDelinquencyEnabled(final WorkingCapitalLoanProductRelatedDetails detail) {
-        return detail != null && detail.getDelinquencyBucket() != null;
+        return detail != null && detail.getDelinquencyBucketId() != null;
     }
 
     @Named("timelineData")
