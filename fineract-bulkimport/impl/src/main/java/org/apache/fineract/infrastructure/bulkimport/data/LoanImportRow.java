@@ -58,7 +58,7 @@ public class LoanImportRow {
     private Integer graceOnInterestCharged;
     private LocalDate interestChargedFromDate;
     private LocalDate repaymentsStartingFromDate;
-    private Integer rowIndex;
+    private transient Integer rowIndex;
     private ExternalId externalId;
     private Long groupId;
     private Collection<LoanChargeData> charges;

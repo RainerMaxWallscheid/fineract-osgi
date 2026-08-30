@@ -39,8 +39,8 @@ public class GuarantorImportRow {
     private String zip;
     private Integer savingsId;
     private BigDecimal amount;
-    private Integer rowIndex;
-    private Long accountId;
+    private transient Integer rowIndex;
+    private transient Long accountId;
     private String locale;
     private String dateFormat;
     private boolean status;
