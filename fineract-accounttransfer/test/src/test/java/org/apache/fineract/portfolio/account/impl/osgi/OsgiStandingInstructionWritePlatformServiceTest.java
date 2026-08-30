@@ -30,5 +30,6 @@ class OsgiStandingInstructionWritePlatformServiceTest {
         assertNull(port.create(null).getResourceId());
         assertNull(port.update(1L, null).getResourceId());
         assertNull(port.delete(1L).getResourceId());
+        port.disableActiveForSavingsAccount(1L);
     }
 }

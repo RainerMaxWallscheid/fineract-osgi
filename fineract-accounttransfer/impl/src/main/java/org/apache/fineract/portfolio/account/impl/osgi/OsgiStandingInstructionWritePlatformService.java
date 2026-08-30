@@ -42,4 +42,7 @@ public final class OsgiStandingInstructionWritePlatformService implements Standi
     public CommandProcessingResult delete(final Long id) {
         return CommandProcessingResult.empty();
     }
+
+    @Override
+    public void disableActiveForSavingsAccount(final Long savingsAccountId) {}
 }

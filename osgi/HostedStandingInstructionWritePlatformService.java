@@ -40,4 +40,7 @@ final class HostedStandingInstructionWritePlatformService implements StandingIns
     public CommandProcessingResult delete(final Long standingInstructionId) {
         return CommandProcessingResult.resourceResult(HOSTED_ID);
     }
+
+    @Override
+    public void disableActiveForSavingsAccount(final Long savingsAccountId) {}
 }
