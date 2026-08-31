@@ -20,14 +20,11 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface CapitalizedIncomePlatformService {
 
-    @Transactional
     CommandProcessingResult addCapitalizedIncome(Long loanId, JsonCommand command);
 
-    @Transactional
     CommandProcessingResult capitalizedIncomeAdjustment(Long loanId, Long capitalizedIncomeTransactionId, JsonCommand command);
 
     void resetBalance(Long loanId);

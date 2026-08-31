@@ -119,6 +119,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         new CommandProcessingResultBuilder().withEntityId(capitalizedIncomeTransaction.getId()).withEntityExternalId(capitalizedIncomeTransaction.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withLoanId(loan.getId()).build();
     }
 
+    @Transactional
     @Override
     public CommandProcessingResult capitalizedIncomeAdjustment(final Long loanId, final Long capitalizedIncomeTransactionId, final JsonCommand command) {
         loanTransactionValidator.validateCapitalizedIncomeAdjustment(command, loanId, capitalizedIncomeTransactionId);
