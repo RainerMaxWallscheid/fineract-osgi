@@ -43,7 +43,7 @@ public abstract class LoanTransactionBusinessEvent extends AbstractBusinessEvent
     public Long getAggregateRootId() {
         final Object value = get();
         if (value instanceof LoanOwnedEventId id) {
-            return id.getLoanId();
+            return id.getId();
         }
         throw new IllegalStateException(
                 "Unsupported loan-transaction business event payload: " + (value == null ? "null" : value.getClass().getName()));
