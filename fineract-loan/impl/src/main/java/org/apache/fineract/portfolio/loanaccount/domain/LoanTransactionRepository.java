@@ -38,7 +38,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface LoanTransactionRepository extends JpaRepository<LoanTransaction, Long>, JpaSpecificationExecutor<LoanTransaction> {
 
-    Optional<LoanTransaction> findByIdAndLoanId(Long transactionId, Long loanId);
+    // Explicit JPQL: leftover LoanOwnedEventId.getLoanId() is not a mapped attribute, so a
+    // derived findByIdAndLoanId cannot resolve to loan.id.
+    @Query("""
+            SELECT lt FROM LoanTransaction lt
+            WHERE lt.id = :transactionId AND lt.loan.id = :loanId
+            """)
+    Optional<LoanTransaction> findByIdAndLoanId(@Param("transactionId") Long transactionId, @Param("loanId") Long loanId);
 
     @Query("""
             SELECT new org.apache.fineract.portfolio.loanaccount.data.LoanScheduleDelinquencyData(
