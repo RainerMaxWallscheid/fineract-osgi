@@ -41,6 +41,7 @@ jar {
                         + 'org.apache.fineract.portfolio.interestpauses.data,'
                         + 'org.apache.fineract.portfolio.interestpauses.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.api,'
+                        + 'org.apache.fineract.portfolio.loanaccount.api.request,'
                         + 'org.apache.fineract.portfolio.loanaccount.command,'
                         + 'org.apache.fineract.portfolio.loanaccount.data,'
                         + 'org.apache.fineract.portfolio.loanaccount.domain,'
@@ -90,6 +91,7 @@ jar {
                         + 'org.apache.fineract.portfolio.paymentdetail.data,'
                         + 'org.apache.fineract.portfolio.paymenttype.data,'
                         + 'org.apache.fineract.portfolio.savings.data,'
+                        + 'org.apache.fineract.validation.constraints,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.loan.api'
                 )

@@ -25,7 +25,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecalculationAdditionalDetailData;
 
 @Entity
 @Table(name = "m_loan_interest_recalculation_additional_details")
@@ -46,6 +49,21 @@ public class LoanInterestRecalcualtionAdditionalDetails extends AbstractPersista
             this.effectiveDate = effectiveDate;
         }
         this.amount = amount;
+    }
+
+    public static LoanInterestRecalcualtionAdditionalDetails from(final InterestRecalculationAdditionalDetailData data) {
+        return new LoanInterestRecalcualtionAdditionalDetails(data.getEffectiveDate(), data.getAmount());
+    }
+
+    public static Set<LoanInterestRecalcualtionAdditionalDetails> from(final Set<InterestRecalculationAdditionalDetailData> dataSet) {
+        if (dataSet == null) {
+            return null;
+        }
+        final Set<LoanInterestRecalcualtionAdditionalDetails> entities = new HashSet<>();
+        for (final InterestRecalculationAdditionalDetailData data : dataSet) {
+            entities.add(from(data));
+        }
+        return entities;
     }
 
     @java.lang.SuppressWarnings("all")

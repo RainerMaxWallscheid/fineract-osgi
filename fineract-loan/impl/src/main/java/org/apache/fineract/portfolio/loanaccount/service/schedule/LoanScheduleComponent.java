@@ -21,8 +21,8 @@ package org.apache.fineract.portfolio.loanaccount.service.schedule;
 import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanInterestRecalcualtionAdditionalDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
-import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecalculationAdditionalDetailData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModelPeriod;
 import org.apache.fineract.portfolio.loanaccount.service.LoanBalanceService;
@@ -38,7 +38,7 @@ public class LoanScheduleComponent {
             if (scheduledLoanInstallment.isRepaymentPeriod() || scheduledLoanInstallment.isDownPaymentPeriod()) {
                 LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(), scheduledLoanInstallment.periodNumber());
                 if (existingInstallment == null) {
-                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), InterestRecalculationAdditionalDetailData.toEntities(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
+                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), LoanInterestRecalcualtionAdditionalDetails.from(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
                     loan.addLoanRepaymentScheduleInstallment(installment);
                 } else {
                     existingInstallment.copyFrom(scheduledLoanInstallment);

@@ -2133,7 +2133,7 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
 
     private void addLoanRepaymentScheduleInstallment(final List<LoanRepaymentScheduleInstallment> installments, final LoanScheduleModelPeriod scheduledLoanInstallment) {
         if (scheduledLoanInstallment.isRepaymentPeriod() || scheduledLoanInstallment.isDownPaymentPeriod()) {
-            final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(null, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), InterestRecalculationAdditionalDetailData.toEntities(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
+            final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(null, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), LoanInterestRecalcualtionAdditionalDetails.from(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
             installments.add(installment);
         }
     }

@@ -20,9 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.loanschedule.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanInterestRecalcualtionAdditionalDetails;
 
 public final class InterestRecalculationAdditionalDetailData {
     private final LocalDate effectiveDate;
@@ -30,21 +27,6 @@ public final class InterestRecalculationAdditionalDetailData {
 
     public static InterestRecalculationAdditionalDetailData of(LocalDate effectiveDate, BigDecimal amount) {
         return new InterestRecalculationAdditionalDetailData(effectiveDate, amount);
-    }
-
-    public LoanInterestRecalcualtionAdditionalDetails toEntity() {
-        return new LoanInterestRecalcualtionAdditionalDetails(effectiveDate, amount);
-    }
-
-    public static Set<LoanInterestRecalcualtionAdditionalDetails> toEntities(Set<InterestRecalculationAdditionalDetailData> dataSet) {
-        if (dataSet == null) {
-            return null;
-        }
-        Set<LoanInterestRecalcualtionAdditionalDetails> entities = new HashSet<>();
-        for (InterestRecalculationAdditionalDetailData data : dataSet) {
-            entities.add(data.toEntity());
-        }
-        return entities;
     }
 
     @java.lang.SuppressWarnings("all")
