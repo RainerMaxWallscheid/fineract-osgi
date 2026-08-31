@@ -50,7 +50,7 @@ public class LoanCapitalizedIncomeAmortizationEventService {
     private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanCloseBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             final LoanStatus status = loan.getStatus();
             if (loan.getLoanProductRelatedDetail().isEnableIncomeCapitalization() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan closure on capitalized income amortization for loan {}", loan.getId());
@@ -63,7 +63,7 @@ public class LoanCapitalizedIncomeAmortizationEventService {
     private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanBalanceChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             final LoanStatus status = loan.getStatus();
             if (loan.getLoanProductRelatedDetail().isEnableIncomeCapitalization() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan balance change on capitalized income amortization for loan {}", loan.getId());
@@ -76,7 +76,7 @@ public class LoanCapitalizedIncomeAmortizationEventService {
     private final class LoanChargeOffEventListener implements BusinessEventListener<LoanChargeOffPostBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanChargeOffPostBusinessEvent event) {
-            final LoanTransaction loanTransaction = event.get();
+            final LoanTransaction loanTransaction = (LoanTransaction) event.get();
             final Loan loan = loanTransaction.getLoan();
             if (loan.getLoanProductRelatedDetail().isEnableIncomeCapitalization() && loan.isChargedOff() && loanTransaction.isChargeOff()) {
                 log.debug("Loan charge-off on capitalized income amortization for loan {}", loan.getId());
@@ -89,7 +89,7 @@ public class LoanCapitalizedIncomeAmortizationEventService {
     private final class LoanChargeOffPreEventListener implements BusinessEventListener<LoanChargeOffPreBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanChargeOffPreBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             if (loan.getLoanProductRelatedDetail().isEnableIncomeCapitalization()) {
                 log.debug("Loan pre charge-off capitalized income amortization for loan {}", loan.getId());
                 loanCapitalizedIncomeAmortizationProcessingService.processCapitalizedIncomeAmortizationTillDate(loan, DateUtils.getBusinessLocalDate(), true);
@@ -101,7 +101,7 @@ public class LoanCapitalizedIncomeAmortizationEventService {
     private final class LoanUndoChargeOffEventListener implements BusinessEventListener<LoanUndoChargeOffBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanUndoChargeOffBusinessEvent event) {
-            final LoanTransaction loanTransaction = event.get();
+            final LoanTransaction loanTransaction = (LoanTransaction) event.get();
             final Loan loan = loanTransaction.getLoan();
             final LoanStatus status = loan.getStatus();
             if (loan.getLoanProductRelatedDetail().isEnableIncomeCapitalization() && loanTransaction.getTypeOf().isChargeOff() && !(loan.isChargedOff() || status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {

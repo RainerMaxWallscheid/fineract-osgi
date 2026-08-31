@@ -49,6 +49,7 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.domain.reaging.LoanReAgeParameter;
 import org.apache.fineract.portfolio.loanaccount.domain.reamortization.LoanReAmortizationParameter;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanOwnedEventId;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 
 /**
@@ -57,7 +58,7 @@ import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
  */
 @Entity
 @Table(name = "m_loan_transaction", uniqueConstraints = {@UniqueConstraint(columnNames = {"external_id"}, name = "external_id_UNIQUE")})
-public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long> implements LoanOwnedEventId {
     @Version
     private Long version;
     @ManyToOne(optional = false)
@@ -906,6 +907,11 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
     @java.lang.SuppressWarnings("all")
         public Loan getLoan() {
         return this.loan;
+    }
+
+    @Override
+    public Long getLoanId() {
+        return this.loan == null ? null : this.loan.getId();
     }
 
     @java.lang.SuppressWarnings("all")

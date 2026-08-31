@@ -65,11 +65,11 @@ public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractB
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanDelinquencyRangeChangeBusinessEvent event = (LoanDelinquencyRangeChangeBusinessEvent) rawEvent;
-        LoanAccountData data = service.retrieveOne(event.get().getId());
+        LoanAccountData data = service.retrieveOne(event.getAggregateRootId());
         Long id = data.getId();
         String accountNumber = data.getAccountNo();
         String externalId = data.getExternalId().getValue();
-        MonetaryCurrency loanCurrency = event.get().getCurrency();
+        MonetaryCurrency loanCurrency = ((Loan) event.get()).getCurrency();
         CollectionData delinquentData = delinquencyReadPlatformService.calculateLoanCollectionData(id);
         String delinquentDate = dataTimeMapper.mapLocalDate(delinquentData.getDelinquentDate());
         List<LoanChargeDataRangeViewV1> charges = //
@@ -82,9 +82,9 @@ public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractB
         //
         //
         //
-        LoanAmountDataV1.newBuilder().setPrincipalAmount(calculateDataSummary(event.get(), (loan, installment) -> installment.getPrincipalOutstanding(loanCurrency).getAmount())).setFeeAmount(calculateDataSummary(event.get(), (loan, installment) -> installment.getFeeChargesOutstanding(loanCurrency).getAmount())).setInterestAmount(calculateDataSummary(event.get(), (loan, installment) -> installment.getInterestOutstanding(loanCurrency).getAmount())).setPenaltyAmount(calculateDataSummary(event.get(), (loan, installment) -> installment.getPenaltyChargesOutstanding(loanCurrency).getAmount())).setTotalAmount(calculateDataSummary(event.get(), (loan, installment) -> installment.getTotalOutstanding(loanCurrency).getAmount())).build();
+        LoanAmountDataV1.newBuilder().setPrincipalAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getPrincipalOutstanding(loanCurrency).getAmount())).setFeeAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getFeeChargesOutstanding(loanCurrency).getAmount())).setInterestAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getInterestOutstanding(loanCurrency).getAmount())).setPenaltyAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getPenaltyChargesOutstanding(loanCurrency).getAmount())).setTotalAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getTotalOutstanding(loanCurrency).getAmount())).build();
         DelinquencyRangeDataV1 delinquencyRange = mapper.map(data.getDelinquencyRange());
-        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData(event.get(), data.getCurrency());
+        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
         LoanAccountDelinquencyRangeDataV1.Builder builder = LoanAccountDelinquencyRangeDataV1.newBuilder();
         return //
         //

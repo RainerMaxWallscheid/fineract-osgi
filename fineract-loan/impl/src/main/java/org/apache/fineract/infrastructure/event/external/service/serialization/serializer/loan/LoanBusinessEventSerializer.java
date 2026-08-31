@@ -36,6 +36,7 @@ import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.CollectionData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummaryBalancesRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTermVariations;
 import org.apache.fineract.portfolio.loanaccount.service.LoanChargeReadPlatformService;
@@ -65,7 +66,7 @@ public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustom
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanBusinessEvent event = (LoanBusinessEvent) rawEvent;
-        Long loanId = event.get().getId();
+        Long loanId = event.getAggregateRootId();
         LoanAccountData data = service.retrieveOne(loanId);
         data = service.fetchRepaymentScheduleData(data);
         Collection<LoanChargeData> loanCharges = loanChargeReadPlatformService.retrieveLoanCharges(loanId);
@@ -76,16 +77,16 @@ public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustom
         data.setDelinquent(delinquentData);
         LoanSummaryDataProvider loanSummaryDataProvider = loanSummaryProviderDelegate.resolveLoanSummaryDataProvider(data.getTransactionProcessingStrategyCode());
         if (data.getSummary() != null) {
-            data.setSummary(loanSummaryDataProvider.withTransactionAmountsSummary(event.get(), data.getSummary(), data.getRepaymentSchedule(), loanSummaryBalancesRepository.retrieveLoanSummaryBalancesByTransactionType(loanId, LoanApiConstants.LOAN_SUMMARY_TRANSACTION_TYPES)));
+            data.setSummary(loanSummaryDataProvider.withTransactionAmountsSummary((Loan) event.get(), data.getSummary(), data.getRepaymentSchedule(), loanSummaryBalancesRepository.retrieveLoanSummaryBalancesByTransactionType(loanId, LoanApiConstants.LOAN_SUMMARY_TRANSACTION_TYPES)));
         } else {
             data.setSummary(loanSummaryDataProvider.withOnlyCurrencyData(data.getCurrency()));
         }
-        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData(event.get(), data.getCurrency());
-        List<LoanTermVariations> activeLoanTermVariations = event.get().getActiveLoanTermVariations();
+        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
+        List<LoanTermVariations> activeLoanTermVariations = ((Loan) event.get()).getActiveLoanTermVariations();
         if (!activeLoanTermVariations.isEmpty()) {
             data.setLoanTermVariations(activeLoanTermVariations.stream().map(LoanTermVariations::toData).toList());
         }
-        Integer actualNoTerms = Math.toIntExact(event.get().getRepaymentScheduleInstallments().stream().filter(i -> !i.isAdditional() && !i.isDownPayment()).count());
+        Integer actualNoTerms = Math.toIntExact(((Loan) event.get()).getRepaymentScheduleInstallments().stream().filter(i -> !i.isAdditional() && !i.isDownPayment()).count());
         data.setActualNoTerm(actualNoTerms);
         final LoanAccountDataV1 result = mapper.map(data);
         result.getDelinquent().setInstallmentDelinquencyBuckets(installmentsDelinquencyData);

@@ -49,11 +49,11 @@ public class LoanAdjustTransactionBusinessEventSerializer extends AbstractBusine
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanAdjustTransactionBusinessEvent event = (LoanAdjustTransactionBusinessEvent) rawEvent;
-        LoanTransaction transactionToAdjust = event.get().getTransactionToAdjust();
+        LoanTransaction transactionToAdjust = (LoanTransaction) event.get().getTransactionToAdjust();
         LoanTransactionData transactionToAdjustData = service.retrieveLoanTransaction(transactionToAdjust.getLoan().getId(), transactionToAdjust.getId());
         transactionToAdjustData.setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(transactionToAdjust.getId()));
         LoanTransactionDataV1 transactionToAdjustAvroDto = mapper.map(transactionToAdjustData);
-        LoanTransaction newTransactionDetail = event.get().getNewTransactionDetail();
+        LoanTransaction newTransactionDetail = (LoanTransaction) event.get().getNewTransactionDetail();
         LoanTransactionDataV1 newTransactionDetailAvroDto = null;
         if (newTransactionDetail != null) {
             LoanTransactionData newTransactionDetailData = service.retrieveLoanTransaction(newTransactionDetail.getLoan().getId(), newTransactionDetail.getId());

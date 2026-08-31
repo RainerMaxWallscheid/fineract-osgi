@@ -41,7 +41,7 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
     private static final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             log.debug("Loan Status change for loan {}", loan.getId());
             if (loan.isOpen()) {
                 loan.handleMaturityDateActivate();
@@ -53,7 +53,7 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
     private final class LoanAccrualActivityPostingLoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             if (loan.getLoanProductRelatedDetail().isEnableAccrualActivityPosting()) {
                 LoanStatus oldStatus = event.getOldStatus();
                 LoanStatus newStatus = loan.getStatus();

@@ -41,7 +41,7 @@ public class ProgressiveLoanStatusChangePlatformServiceImpl {
     private final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             log.debug("Loan Status change for loan {}", loan.getId());
             if (!event.getOldStatus().isSubmittedAndPendingApproval() && loan.isApproved()) {
                 capitalizedIncomeWritePlatformService.resetBalance(loan.getId());

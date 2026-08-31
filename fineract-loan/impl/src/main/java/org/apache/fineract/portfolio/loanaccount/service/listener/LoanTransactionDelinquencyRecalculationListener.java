@@ -52,7 +52,7 @@ public class LoanTransactionDelinquencyRecalculationListener implements Initiali
     @Override
     public void onBusinessEvent(LoanTransactionBusinessEvent event) {
         if (SUPPORTED_EVENT_TYPES.contains(event.getClass())) {
-            LoanTransaction tx = event.get();
+            LoanTransaction tx = (LoanTransaction) event.get();
             loanAccountDomainService.setLoanDelinquencyTag(tx.getLoan(), tx.getTransactionDate());
         }
     }

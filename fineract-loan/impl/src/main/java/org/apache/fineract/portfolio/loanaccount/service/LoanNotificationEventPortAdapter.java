@@ -44,34 +44,34 @@ public class LoanNotificationEventPortAdapter implements LoanNotificationEventPo
     @Override
     public void onLoanNotifications(final Consumer<LoanNotification> handler) {
         businessEventNotifierService.addPostBusinessEventListener(LoanCreatedBusinessEvent.class, event -> {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             handler.accept(new LoanNotification("APPROVE_LOAN", "loan", loan.getId(), "New loan created", "created", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, event -> {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             handler.accept(new LoanNotification("DISBURSE_LOAN", "loan", loan.getId(), "New loan approved", "approved", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanCloseBusinessEvent.class, event -> {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             handler.accept(new LoanNotification("READ_LOAN", "loan", loan.getId(), "Loan closed", "loanClosed", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanCloseAsRescheduleBusinessEvent.class, event -> {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             handler.accept(new LoanNotification("READ_Rescheduled Loans", "loan", loan.getId(), "Loan has been rescheduled",
                     "loanRescheduled", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanChargebackTransactionBusinessEvent.class, event -> {
-            final LoanTransaction transaction = event.get();
+            final LoanTransaction transaction = (LoanTransaction) event.get();
             handler.accept(new LoanNotification(LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_PERMISSION,
                     LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_OBJECT_TYPE, transaction.getId(),
                     LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_NOTIFICATION,
                     LoanChargebackTransactionBusinessEvent.LOAN_CHARGEBACK_TRANSACTION_EVENT_TYPE, transaction.getLoan().getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, event -> {
-            final Loan loan = event.get().getLoan();
+            final Loan loan = (Loan) ((LoanTransaction) event.get()).getLoan();
             handler.accept(new LoanNotification("READ_LOAN", "loan", loan.getId(), "Repayment made", "repaymentMade", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanProductCreateBusinessEvent.class, event -> handler.accept(
-                new LoanNotification("READ_LOANPRODUCT", "loanProduct", event.get().getId(), "New loan product created", "created", null)));
+                new LoanNotification("READ_LOANPRODUCT", "loanProduct", event.getAggregateRootId(), "New loan product created", "created", null)));
     }
 }

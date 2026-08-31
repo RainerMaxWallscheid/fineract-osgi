@@ -45,7 +45,7 @@ public class LoanProductBusinessEventSerializer extends AbstractBusinessEventWit
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanProductBusinessEvent event = (LoanProductBusinessEvent) rawEvent;
-        LoanProductData data = service.retrieveLoanProduct(event.get().getId());
+        LoanProductData data = service.retrieveLoanProduct(event.getAggregateRootId());
         final LoanProductDataV1 loanProductDataV1 = mapper.map(data);
         loanProductDataV1.setCustomData(collectCustomData(event));
         return loanProductDataV1;

@@ -465,7 +465,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class ValidateOnBusinessEvent implements BusinessEventListener<LoanApprovedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanApprovedBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             validateGuarantorBusinessRules(loan);
         }
     }
@@ -474,7 +474,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class HoldFundsOnBusinessEvent implements BusinessEventListener<LoanApprovedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanApprovedBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             holdGuarantorFunds(loan);
         }
     }
@@ -483,7 +483,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class ReleaseFundsOnBusinessEvent implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionMakeRepaymentPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             if (releaseLoanIds.containsKey(loanTransaction.getLoan().getId())) {
                 completeGuarantorFund(loanTransaction);
             } else {
@@ -496,7 +496,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class ReverseFundsOnBusinessEvent implements BusinessEventListener<LoanUndoWrittenOffBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanUndoWrittenOffBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             List<Long> reversedTransactions = new ArrayList<>();
             reversedTransactions.add(loanTransaction.getId());
             reverseTransaction(reversedTransactions);
@@ -508,11 +508,11 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
         @Override
         public void onBusinessEvent(LoanAdjustTransactionBusinessEvent event) {
             LoanAdjustTransactionBusinessEvent.Data eventData = event.get();
-            LoanTransaction loanTransaction = eventData.getTransactionToAdjust();
+            LoanTransaction loanTransaction = (LoanTransaction) eventData.getTransactionToAdjust();
             List<Long> reersedTransactions = new ArrayList<>(1);
             reersedTransactions.add(loanTransaction.getId());
             reverseTransaction(reersedTransactions);
-            LoanTransaction newTransaction = event.get().getNewTransactionDetail();
+            LoanTransaction newTransaction = (LoanTransaction) event.get().getNewTransactionDetail();
             if (newTransaction != null) {
                 releaseGuarantorFunds(newTransaction);
             }
@@ -523,7 +523,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class ReverseAllFundsOnBusinessEvent implements BusinessEventListener<LoanUndoDisbursalBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanUndoDisbursalBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             List<Long> reversedTransactions = new ArrayList<>(loanTransactionRepository.findTransactionIdsByLoan(loan));
             reverseTransaction(reversedTransactions);
         }
@@ -533,7 +533,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class UndoAllFundTransactions implements BusinessEventListener<LoanUndoApprovalBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanUndoApprovalBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             reverseAllFundTransaction(loan);
         }
     }
@@ -542,7 +542,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
     private final class ReleaseAllFunds implements BusinessEventListener<LoanWrittenOffPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanWrittenOffPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             releaseAllGuarantors(loanTransaction);
         }
     }

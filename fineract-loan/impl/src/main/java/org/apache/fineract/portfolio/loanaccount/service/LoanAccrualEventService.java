@@ -43,7 +43,7 @@ public class LoanAccrualEventService {
     private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanCloseBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             LoanStatus status = loan.getStatus();
             if (status.isClosedObligationsMet() || status.isOverpaid()) {
                 log.debug("Loan closure on accrual for loan {}", loan.getId());
@@ -57,7 +57,7 @@ public class LoanAccrualEventService {
     private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanBalanceChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             LoanStatus status = loan.getStatus();
             if (status.isClosedObligationsMet() || status.isOverpaid()) {
                 log.debug("Loan balance change on accrual for loan {}", loan.getId());

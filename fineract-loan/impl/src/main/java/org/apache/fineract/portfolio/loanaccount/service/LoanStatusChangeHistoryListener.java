@@ -77,7 +77,7 @@ public class LoanStatusChangeHistoryListener {
     protected final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
-            final Loan loan = event.get();
+            final Loan loan = (Loan) event.get();
             log.debug("Loan Status change for loan {} with status {}", loan.getId(), loan.getStatus());
             if (loanStatuses.contains(loan.getStatus())) {
                 LoanStatusChangeHistory loanStatusChangeHistory = new LoanStatusChangeHistory(loan, loan.getStatus(), DateUtils.getBusinessLocalDate());

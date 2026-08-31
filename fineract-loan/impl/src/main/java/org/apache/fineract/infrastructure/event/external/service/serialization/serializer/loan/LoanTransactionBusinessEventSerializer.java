@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.event.external.service.serialization.s
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.ExternalEventCustomDataSerializer;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.service.LoanChargePaidByReadService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -50,8 +51,8 @@ public class LoanTransactionBusinessEventSerializer extends AbstractBusinessEven
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanTransactionBusinessEvent event = (LoanTransactionBusinessEvent) rawEvent;
-        Long loanId = event.get().getLoan().getId();
-        Long loanTransactionId = event.get().getId();
+        Long loanId = ((LoanTransaction) event.get()).getLoanId();
+        Long loanTransactionId = event.getAggregateRootId();
         LoanTransactionData transactionData = service.retrieveLoanTransaction(loanId, loanTransactionId);
         transactionData.setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(loanTransactionId));
         final LoanTransactionDataV1 result = loanTransactionMapper.map(transactionData);

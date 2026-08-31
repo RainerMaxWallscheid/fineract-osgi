@@ -64,6 +64,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanCapitalizedIncomeStr
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCapitalizedIncomeType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeOffBehaviour;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleProcessingType;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanEventId;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductGeneralRuleException;
@@ -79,7 +80,7 @@ import org.apache.fineract.portfolio.rate.domain.Rate;
  */
 @Entity
 @Table(name = "m_product_loan", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "unq_name"), @UniqueConstraint(columnNames = {"external_id"}, name = "external_id_UNIQUE"), @UniqueConstraint(columnNames = {"short_name"}, name = "unq_short_name")})
-public class LoanProduct extends AbstractPersistableCustom<Long> {
+public class LoanProduct extends AbstractPersistableCustom<Long> implements LoanEventId {
     @ManyToOne
     @JoinColumn(name = "fund_id")
     private Fund fund;

@@ -43,7 +43,7 @@ public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSe
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanDeleteChargeBusinessEvent event = (LoanDeleteChargeBusinessEvent) rawEvent;
-        LoanCharge loanCharge = event.get();
+        LoanCharge loanCharge = (LoanCharge) event.get();
         Long id = loanCharge.getId();
         Long chargeId = loanCharge.getChargeId();
         return new LoanChargeDeletedV1(id, chargeId);

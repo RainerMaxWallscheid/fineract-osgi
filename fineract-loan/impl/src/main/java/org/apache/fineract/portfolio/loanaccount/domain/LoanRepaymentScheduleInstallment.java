@@ -40,12 +40,14 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModelPeriod;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanOwnedEventId;
 import org.apache.fineract.portfolio.loanproduct.domain.AllocationType;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 
 @Entity
 @Table(name = "m_loan_repayment_schedule")
-public class LoanRepaymentScheduleInstallment extends AbstractAuditableWithUTCDateTimeCustom<Long> implements Comparable<LoanRepaymentScheduleInstallment> {
+public class LoanRepaymentScheduleInstallment extends AbstractAuditableWithUTCDateTimeCustom<Long>
+        implements Comparable<LoanRepaymentScheduleInstallment>, LoanOwnedEventId {
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", referencedColumnName = "id")
     private Loan loan;
@@ -1187,6 +1189,11 @@ public class LoanRepaymentScheduleInstallment extends AbstractAuditableWithUTCDa
     @java.lang.SuppressWarnings("all")
         public Loan getLoan() {
         return this.loan;
+    }
+
+    @Override
+    public Long getLoanId() {
+        return this.loan == null ? null : this.loan.getId();
     }
 
     @java.lang.SuppressWarnings("all")

@@ -210,7 +210,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
         // then
         verify(loanDelinquencyTagRepository, times(1)).saveAllAndFlush(anyIterable());
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDeliquencyRangeChangeEvent.capture());
-        Loan loanPayloadForEvent = loanDeliquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDeliquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
     }
 
@@ -411,7 +411,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
 
         // verify range change event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyRangeChangeEvent.capture());
-        Loan loanPayloadForEvent = loanDelinquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
     }
 
@@ -497,7 +497,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
 
         // verify range change event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyRangeChangeEvent.capture());
-        Loan loanPayloadForEvent = loanDelinquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
 
     }
@@ -588,7 +588,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
 
         // verify range change event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyRangeChangeEvent.capture());
-        Loan loanPayloadForEvent = loanDelinquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
 
     }
@@ -620,7 +620,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
         verify(loanInstallmentDelinquencyTagRepository, times(1)).deleteAllLoanInstallmentsTags(anyLong());
         // verify range change event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyRangeChangeEvent.capture());
-        Loan loanPayloadForEvent = loanDelinquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
 
     }
@@ -668,7 +668,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
         // verify event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyPauseChangeEvent.capture());
 
-        Loan loanPayloadForEvent = loanDelinquencyPauseChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyPauseChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
 
         // verify no range change event for pause flag change as both start and end date are backdated
@@ -719,7 +719,7 @@ public class DelinquencyWritePlatformServiceRangeChangeEventTest {
         // verify event is raised
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanDelinquencyRangeChangeEvent.capture());
 
-        Loan loanPayloadForEvent = loanDelinquencyRangeChangeEvent.getValue().get();
+        Loan loanPayloadForEvent = (Loan) loanDelinquencyRangeChangeEvent.getValue().get();
         assertEquals(loanForProcessing, loanPayloadForEvent);
     }
 }

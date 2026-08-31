@@ -374,7 +374,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
         @SuppressWarnings("unused")
         @Override
         public void onBusinessEvent(LoanRefundPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -384,9 +384,9 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class AdjustTransactionBusinessEventEventListener implements BusinessEventListener<LoanAdjustTransactionBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanAdjustTransactionBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get().getTransactionToAdjust();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get().getTransactionToAdjust();
             if (loanTransaction == null) {
-                loanTransaction = event.get().getNewTransactionDetail();
+                loanTransaction = (LoanTransaction) event.get().getNewTransactionDetail();
             }
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
@@ -397,7 +397,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class MakeRepaymentEventListener implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionMakeRepaymentPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -407,7 +407,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class UndoWrittenOffEventListener implements BusinessEventListener<LoanUndoWrittenOffBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanUndoWrittenOffBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -417,7 +417,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class WaiveInterestEventListener implements BusinessEventListener<LoanWaiveInterestBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanWaiveInterestBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -427,7 +427,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class LoanForeClosureEventListener implements BusinessEventListener<LoanForeClosurePostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanForeClosurePostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -437,7 +437,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class LoanChargePaymentEventListener implements BusinessEventListener<LoanChargePaymentPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanChargePaymentPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -447,7 +447,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class AddChargeEventListener implements BusinessEventListener<LoanAddChargeBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanAddChargeBusinessEvent event) {
-            LoanCharge loanCharge = event.get();
+            LoanCharge loanCharge = (LoanCharge) event.get();
             Loan loan = loanCharge.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -457,7 +457,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class WaiveChargeEventListener implements BusinessEventListener<LoanWaiveChargeBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanWaiveChargeBusinessEvent event) {
-            LoanCharge loanCharge = event.get();
+            LoanCharge loanCharge = (LoanCharge) event.get();
             Loan loan = loanCharge.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -467,7 +467,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class ApplyOverdueChargeEventListener implements BusinessEventListener<LoanApplyOverdueChargeBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanApplyOverdueChargeBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             handleArrearsForLoan(loan);
         }
     }
@@ -477,7 +477,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
         @SuppressWarnings("unused")
         @Override
         public void onBusinessEvent(LoanDisbursalBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             updateLoanArrearsAgeingDetails(loan);
         }
     }
@@ -486,7 +486,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class GoodwillCreditEventListener implements BusinessEventListener<LoanTransactionGoodwillCreditPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionGoodwillCreditPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -496,7 +496,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class PaymentRefundEventListener implements BusinessEventListener<LoanTransactionPayoutRefundPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionPayoutRefundPostBusinessEvent event) {
-            LoanTransaction loanTransaction = event.get();
+            LoanTransaction loanTransaction = (LoanTransaction) event.get();
             Loan loan = loanTransaction.getLoan();
             handleArrearsForLoan(loan);
         }
@@ -506,7 +506,7 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService {
     private final class LoanBalanceChangedEventListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanBalanceChangedBusinessEvent event) {
-            Loan loan = event.get();
+            Loan loan = (Loan) event.get();
             handleArrearsForLoan(loan);
         }
     }

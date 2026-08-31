@@ -70,6 +70,8 @@ import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.LoanRepaymentScheduleTransactionProcessor;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanClosedOrOverpaid;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanEventId;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
@@ -82,7 +84,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "m_loan", uniqueConstraints = {@UniqueConstraint(columnNames = {"account_no"}, name = "loan_account_no_UNIQUE"), @UniqueConstraint(columnNames = {"external_id"}, name = "loan_externalid_UNIQUE")})
-public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implements LoanEventId, LoanClosedOrOverpaid {
     private static ClientActivePort clientActivePort;
     private static GroupActivePort groupActivePort;
 

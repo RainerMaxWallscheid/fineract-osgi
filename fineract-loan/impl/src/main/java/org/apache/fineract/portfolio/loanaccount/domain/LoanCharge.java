@@ -47,6 +47,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanOwnedEventId;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
@@ -55,7 +56,7 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanInstallmentChargeData;
 
 @Entity
 @Table(name = "m_loan_charge", uniqueConstraints = {@UniqueConstraint(columnNames = {"external_id"}, name = "external_id")})
-public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> implements LoanOwnedEventId {
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", referencedColumnName = "id", nullable = false)
     private Loan loan;
@@ -839,6 +840,11 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public Loan getLoan() {
         return this.loan;
+    }
+
+    @Override
+    public Long getLoanId() {
+        return this.loan == null ? null : this.loan.getId();
     }
 
     /**

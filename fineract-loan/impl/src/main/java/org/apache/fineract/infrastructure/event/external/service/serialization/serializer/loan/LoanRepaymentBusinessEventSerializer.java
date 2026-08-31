@@ -49,7 +49,7 @@ public class LoanRepaymentBusinessEventSerializer extends AbstractBusinessEventW
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanRepaymentBusinessEvent event = (LoanRepaymentBusinessEvent) rawEvent;
-        LoanRepaymentScheduleInstallment repaymentInstallment = event.get();
+        LoanRepaymentScheduleInstallment repaymentInstallment = (LoanRepaymentScheduleInstallment) event.get();
         Loan loan = repaymentInstallment.getLoan();
         Long id = loan.getId();
         String accountNo = loan.getAccountNumber();

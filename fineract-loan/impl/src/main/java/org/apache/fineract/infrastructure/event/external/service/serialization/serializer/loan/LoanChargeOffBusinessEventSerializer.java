@@ -28,6 +28,7 @@ import org.apache.fineract.infrastructure.event.external.service.serialization.m
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.loan.UnpaidChargeDataMapper;
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.ExternalEventCustomDataSerializer;
 import org.apache.fineract.portfolio.loanaccount.data.UnpaidChargeData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.service.LoanChargePaidByReadService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
@@ -60,7 +61,7 @@ public class LoanChargeOffBusinessEventSerializer extends LoanTransactionBusines
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanTransactionDataV1 transactionDataV1 = (LoanTransactionDataV1) super.toAvroDTO(rawEvent);
         LoanTransactionBusinessEvent event = (LoanTransactionBusinessEvent) rawEvent;
-        List<UnpaidChargeData> unpaidChargeDataList = loanTransactionRepository.fetchTotalUnpaidChargesForLoan(event.get().getLoan());
+        List<UnpaidChargeData> unpaidChargeDataList = loanTransactionRepository.fetchTotalUnpaidChargesForLoan(((LoanTransaction) event.get()).getLoan());
         transactionDataV1.setUnpaidCharges(unpaidChargeDataMapper.map(unpaidChargeDataList));
         return transactionDataV1;
     }
