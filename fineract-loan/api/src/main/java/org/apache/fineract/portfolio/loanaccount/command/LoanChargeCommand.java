@@ -22,10 +22,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 
 /**
- * Java object representation of {@link LoanCharge} API JSON.
+ * Java object representation of loan charge API JSON.
  */
 public class LoanChargeCommand implements Serializable {
     @Serial
