@@ -23,6 +23,7 @@ import java.math.MathContext;
 import java.time.LocalDate;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanRepaymentScheduleModelData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.ProgressiveLoanScheduleGenerator;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail;
@@ -31,9 +32,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoanScheduleGeneratorServiceImpl implements LoanScheduleGeneratorService {
     private final ProgressiveLoanScheduleGenerator scheduleGenerator;
+    private final LoanRepositoryWrapper loanRepositoryWrapper;
 
     @Override
-    public BigDecimal calculateInteresOnlyWithFirtDisbursement(final Loan loan) {
+    public BigDecimal calculateInteresOnlyWithFirtDisbursement(final Long loanId) {
+        final Loan loan = loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
         if (!loan.isMultiDisburmentLoan() || loan.getDisbursementDetails().isEmpty() || loan.getDisbursementDetails().size() == 1) {
             return loan.getTotalInterest();
         }
@@ -57,7 +60,9 @@ public class LoanScheduleGeneratorServiceImpl implements LoanScheduleGeneratorSe
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleGeneratorServiceImpl(final ProgressiveLoanScheduleGenerator scheduleGenerator) {
+        public LoanScheduleGeneratorServiceImpl(final ProgressiveLoanScheduleGenerator scheduleGenerator,
+            final LoanRepositoryWrapper loanRepositoryWrapper) {
         this.scheduleGenerator = scheduleGenerator;
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
     }
 }

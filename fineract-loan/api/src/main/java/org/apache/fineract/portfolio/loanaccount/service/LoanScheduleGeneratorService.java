@@ -19,9 +19,8 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 public interface LoanScheduleGeneratorService {
 
-    BigDecimal calculateInteresOnlyWithFirtDisbursement(Loan loan);
+    BigDecimal calculateInteresOnlyWithFirtDisbursement(Long loanId);
 }

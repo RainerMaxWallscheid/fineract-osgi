@@ -232,7 +232,7 @@ public class LoanChargeService {
         return switch (loanCharge.getChargeCalculation()) {
             case PERCENT_OF_AMOUNT -> getDerivedAmountForCharge(loan, loanCharge);
             case PERCENT_OF_AMOUNT_AND_INTEREST -> {
-                final BigDecimal totalInterestCharged = loan.isMultiDisburmentLoan() ? loanScheduleGeneratorService.calculateInteresOnlyWithFirtDisbursement(loan) : loan.getTotalInterest();
+                final BigDecimal totalInterestCharged = loan.isMultiDisburmentLoan() ? loanScheduleGeneratorService.calculateInteresOnlyWithFirtDisbursement(loan.getId()) : loan.getTotalInterest();
                 if (loan.isMultiDisburmentLoan() && loanCharge.isDisbursementCharge()) {
                     yield sumMultiDisbursementAmounts(loan, false).getAmount().add(totalInterestCharged);
                 } else if (loan.isMultiDisburmentLoan() && loanCharge.isTrancheDisbursementCharge()) {
@@ -243,7 +243,7 @@ public class LoanChargeService {
             }
             case PERCENT_OF_INTEREST -> {
                 if (loan.isMultiDisburmentLoan() && loanCharge.isDisbursementCharge()) {
-                    yield loanScheduleGeneratorService.calculateInteresOnlyWithFirtDisbursement(loan);
+                    yield loanScheduleGeneratorService.calculateInteresOnlyWithFirtDisbursement(loan.getId());
                 } else {
                     yield loan.getTotalInterest();
                 }
