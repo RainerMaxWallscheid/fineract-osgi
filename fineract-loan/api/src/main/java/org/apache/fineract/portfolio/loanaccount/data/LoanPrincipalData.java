@@ -19,30 +19,18 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
-import org.mapstruct.Mapping;
 
 public class LoanPrincipalData {
+
     private final BigDecimal principalDisbursed;
     private final BigDecimal principalAdjustments;
     private final BigDecimal principalPaid;
     private final BigDecimal principalWrittenOff;
     private final BigDecimal principalOutstanding;
 
-
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class)
-    public interface Mapper {
-        @Mapping(source = "totalPrincipalDisbursed", target = "principalDisbursed")
-        @Mapping(source = "totalPrincipalAdjustments", target = "principalAdjustments")
-        @Mapping(source = "totalPrincipalRepaid", target = "principalPaid")
-        @Mapping(source = "totalPrincipalWrittenOff", target = "principalWrittenOff")
-        @Mapping(source = "totalPrincipalOutstanding", target = "principalOutstanding")
-        LoanPrincipalData map(LoanSummary source);
-    }
-
     @java.lang.SuppressWarnings("all")
-        public LoanPrincipalData(final BigDecimal principalDisbursed, final BigDecimal principalAdjustments, final BigDecimal principalPaid, final BigDecimal principalWrittenOff, final BigDecimal principalOutstanding) {
+    public LoanPrincipalData(final BigDecimal principalDisbursed, final BigDecimal principalAdjustments, final BigDecimal principalPaid,
+            final BigDecimal principalWrittenOff, final BigDecimal principalOutstanding) {
         this.principalDisbursed = principalDisbursed;
         this.principalAdjustments = principalAdjustments;
         this.principalPaid = principalPaid;
@@ -51,63 +39,70 @@ public class LoanPrincipalData {
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipalDisbursed() {
+    public BigDecimal getPrincipalDisbursed() {
         return this.principalDisbursed;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipalAdjustments() {
+    public BigDecimal getPrincipalAdjustments() {
         return this.principalAdjustments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipalPaid() {
+    public BigDecimal getPrincipalPaid() {
         return this.principalPaid;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipalWrittenOff() {
+    public BigDecimal getPrincipalWrittenOff() {
         return this.principalWrittenOff;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipalOutstanding() {
+    public BigDecimal getPrincipalOutstanding() {
         return this.principalOutstanding;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
+    public boolean equals(final java.lang.Object o) {
         if (o == this) return true;
         if (!(o instanceof LoanPrincipalData)) return false;
         final LoanPrincipalData other = (LoanPrincipalData) o;
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$principalDisbursed = this.getPrincipalDisbursed();
         final java.lang.Object other$principalDisbursed = other.getPrincipalDisbursed();
-        if (this$principalDisbursed == null ? other$principalDisbursed != null : !this$principalDisbursed.equals(other$principalDisbursed)) return false;
+        if (this$principalDisbursed == null ? other$principalDisbursed != null : !this$principalDisbursed.equals(other$principalDisbursed))
+            return false;
         final java.lang.Object this$principalAdjustments = this.getPrincipalAdjustments();
         final java.lang.Object other$principalAdjustments = other.getPrincipalAdjustments();
-        if (this$principalAdjustments == null ? other$principalAdjustments != null : !this$principalAdjustments.equals(other$principalAdjustments)) return false;
+        if (this$principalAdjustments == null ? other$principalAdjustments != null
+                : !this$principalAdjustments.equals(other$principalAdjustments))
+            return false;
         final java.lang.Object this$principalPaid = this.getPrincipalPaid();
         final java.lang.Object other$principalPaid = other.getPrincipalPaid();
         if (this$principalPaid == null ? other$principalPaid != null : !this$principalPaid.equals(other$principalPaid)) return false;
         final java.lang.Object this$principalWrittenOff = this.getPrincipalWrittenOff();
         final java.lang.Object other$principalWrittenOff = other.getPrincipalWrittenOff();
-        if (this$principalWrittenOff == null ? other$principalWrittenOff != null : !this$principalWrittenOff.equals(other$principalWrittenOff)) return false;
+        if (this$principalWrittenOff == null ? other$principalWrittenOff != null
+                : !this$principalWrittenOff.equals(other$principalWrittenOff))
+            return false;
         final java.lang.Object this$principalOutstanding = this.getPrincipalOutstanding();
         final java.lang.Object other$principalOutstanding = other.getPrincipalOutstanding();
-        if (this$principalOutstanding == null ? other$principalOutstanding != null : !this$principalOutstanding.equals(other$principalOutstanding)) return false;
+        if (this$principalOutstanding == null ? other$principalOutstanding != null
+                : !this$principalOutstanding.equals(other$principalOutstanding))
+            return false;
         return true;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
+    protected boolean canEqual(final java.lang.Object other) {
         return other instanceof LoanPrincipalData;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public int hashCode() {
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final java.lang.Object $principalDisbursed = this.getPrincipalDisbursed();
@@ -125,7 +120,9 @@ public class LoanPrincipalData {
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-        return "LoanPrincipalData(principalDisbursed=" + this.getPrincipalDisbursed() + ", principalAdjustments=" + this.getPrincipalAdjustments() + ", principalPaid=" + this.getPrincipalPaid() + ", principalWrittenOff=" + this.getPrincipalWrittenOff() + ", principalOutstanding=" + this.getPrincipalOutstanding() + ")";
+    public java.lang.String toString() {
+        return "LoanPrincipalData(principalDisbursed=" + this.getPrincipalDisbursed() + ", principalAdjustments="
+                + this.getPrincipalAdjustments() + ", principalPaid=" + this.getPrincipalPaid() + ", principalWrittenOff="
+                + this.getPrincipalWrittenOff() + ", principalOutstanding=" + this.getPrincipalOutstanding() + ")";
     }
 }

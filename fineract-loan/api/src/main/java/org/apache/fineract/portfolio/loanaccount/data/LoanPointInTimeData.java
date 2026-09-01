@@ -18,14 +18,11 @@
  */
 package org.apache.fineract.portfolio.loanaccount.data;
 
-import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.arrears.LoanArrearsData;
-import org.mapstruct.Mapping;
 
 public class LoanPointInTimeData {
+
     // Loan attributes
     private Long id;
     private String accountNo;
@@ -49,214 +46,192 @@ public class LoanPointInTimeData {
     // Arrears data
     private LoanArrearsData arrears;
 
-
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class, uses = {LoanStatusEnumDataMapper.class, CurrencyMapper.class, LoanPrincipalData.Mapper.class, LoanInterestData.Mapper.class, LoanFeeData.Mapper.class, LoanPenaltyData.Mapper.class, LoanTotalAmountData.Mapper.class, org.apache.fineract.portfolio.loanaccount.mapper.LoanClientIdLookup.class})
-    public interface Mapper {
-        @Mapping(source = "accountNumber", target = "accountNo")
-        @Mapping(source = "source", target = "status")
-        @Mapping(source = "clientId", target = "clientId")
-        @Mapping(source = "clientId", target = "clientAccountNo", qualifiedByName = "clientAccountNumber")
-        @Mapping(source = "clientId", target = "clientExternalId", qualifiedByName = "clientExternalIdValue")
-        @Mapping(source = "clientId", target = "clientDisplayName", qualifiedByName = "clientDisplayName")
-        @Mapping(source = "officeId", target = "clientOfficeId")
-        @Mapping(source = "summary", target = "principal")
-        @Mapping(source = "summary", target = "interest")
-        @Mapping(source = "summary", target = "fee")
-        @Mapping(source = "summary", target = "penalty")
-        @Mapping(source = "summary", target = "total")
-        @Mapping(source = "loanProduct.id", target = "loanProductId")
-        @Mapping(source = "loanProduct.name", target = "loanProductName")
-        @Mapping(target = "arrears", ignore = true)
-        LoanPointInTimeData map(Loan source);
-    }
+    @java.lang.SuppressWarnings("all")
+    public LoanPointInTimeData() {}
 
     @java.lang.SuppressWarnings("all")
-        public LoanPointInTimeData() {
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Long getId() {
+    public Long getId() {
         return this.id;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getAccountNo() {
+    public String getAccountNo() {
         return this.accountNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanStatusEnumData getStatus() {
+    public LoanStatusEnumData getStatus() {
         return this.status;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getExternalId() {
+    public String getExternalId() {
         return this.externalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CurrencyData getCurrency() {
+    public CurrencyData getCurrency() {
         return this.currency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanPrincipalData getPrincipal() {
+    public LoanPrincipalData getPrincipal() {
         return this.principal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanInterestData getInterest() {
+    public LoanInterestData getInterest() {
         return this.interest;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanFeeData getFee() {
+    public LoanFeeData getFee() {
         return this.fee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanPenaltyData getPenalty() {
+    public LoanPenaltyData getPenalty() {
         return this.penalty;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTotalAmountData getTotal() {
+    public LoanTotalAmountData getTotal() {
         return this.total;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getClientId() {
+    public Long getClientId() {
         return this.clientId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getClientAccountNo() {
+    public String getClientAccountNo() {
         return this.clientAccountNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getClientExternalId() {
+    public String getClientExternalId() {
         return this.clientExternalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getClientDisplayName() {
+    public String getClientDisplayName() {
         return this.clientDisplayName;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getClientOfficeId() {
+    public Long getClientOfficeId() {
         return this.clientOfficeId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getLoanProductId() {
+    public Long getLoanProductId() {
         return this.loanProductId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getLoanProductName() {
+    public String getLoanProductName() {
         return this.loanProductName;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanArrearsData getArrears() {
+    public LoanArrearsData getArrears() {
         return this.arrears;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAccountNo(final String accountNo) {
+    public void setAccountNo(final String accountNo) {
         this.accountNo = accountNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setStatus(final LoanStatusEnumData status) {
+    public void setStatus(final LoanStatusEnumData status) {
         this.status = status;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setExternalId(final String externalId) {
+    public void setExternalId(final String externalId) {
         this.externalId = externalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCurrency(final CurrencyData currency) {
+    public void setCurrency(final CurrencyData currency) {
         this.currency = currency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPrincipal(final LoanPrincipalData principal) {
+    public void setPrincipal(final LoanPrincipalData principal) {
         this.principal = principal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterest(final LoanInterestData interest) {
+    public void setInterest(final LoanInterestData interest) {
         this.interest = interest;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFee(final LoanFeeData fee) {
+    public void setFee(final LoanFeeData fee) {
         this.fee = fee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPenalty(final LoanPenaltyData penalty) {
+    public void setPenalty(final LoanPenaltyData penalty) {
         this.penalty = penalty;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setTotal(final LoanTotalAmountData total) {
+    public void setTotal(final LoanTotalAmountData total) {
         this.total = total;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClientId(final Long clientId) {
+    public void setClientId(final Long clientId) {
         this.clientId = clientId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClientAccountNo(final String clientAccountNo) {
+    public void setClientAccountNo(final String clientAccountNo) {
         this.clientAccountNo = clientAccountNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClientExternalId(final String clientExternalId) {
+    public void setClientExternalId(final String clientExternalId) {
         this.clientExternalId = clientExternalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClientDisplayName(final String clientDisplayName) {
+    public void setClientDisplayName(final String clientDisplayName) {
         this.clientDisplayName = clientDisplayName;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClientOfficeId(final Long clientOfficeId) {
+    public void setClientOfficeId(final Long clientOfficeId) {
         this.clientOfficeId = clientOfficeId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanProductId(final Long loanProductId) {
+    public void setLoanProductId(final Long loanProductId) {
         this.loanProductId = loanProductId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanProductName(final String loanProductName) {
+    public void setLoanProductName(final String loanProductName) {
         this.loanProductName = loanProductName;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setArrears(final LoanArrearsData arrears) {
+    public void setArrears(final LoanArrearsData arrears) {
         this.arrears = arrears;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
+    public boolean equals(final java.lang.Object o) {
         if (o == this) return true;
         if (!(o instanceof LoanPointInTimeData)) return false;
         final LoanPointInTimeData other = (LoanPointInTimeData) o;
@@ -302,16 +277,20 @@ public class LoanPointInTimeData {
         if (this$total == null ? other$total != null : !this$total.equals(other$total)) return false;
         final java.lang.Object this$clientAccountNo = this.getClientAccountNo();
         final java.lang.Object other$clientAccountNo = other.getClientAccountNo();
-        if (this$clientAccountNo == null ? other$clientAccountNo != null : !this$clientAccountNo.equals(other$clientAccountNo)) return false;
+        if (this$clientAccountNo == null ? other$clientAccountNo != null : !this$clientAccountNo.equals(other$clientAccountNo))
+            return false;
         final java.lang.Object this$clientExternalId = this.getClientExternalId();
         final java.lang.Object other$clientExternalId = other.getClientExternalId();
-        if (this$clientExternalId == null ? other$clientExternalId != null : !this$clientExternalId.equals(other$clientExternalId)) return false;
+        if (this$clientExternalId == null ? other$clientExternalId != null : !this$clientExternalId.equals(other$clientExternalId))
+            return false;
         final java.lang.Object this$clientDisplayName = this.getClientDisplayName();
         final java.lang.Object other$clientDisplayName = other.getClientDisplayName();
-        if (this$clientDisplayName == null ? other$clientDisplayName != null : !this$clientDisplayName.equals(other$clientDisplayName)) return false;
+        if (this$clientDisplayName == null ? other$clientDisplayName != null : !this$clientDisplayName.equals(other$clientDisplayName))
+            return false;
         final java.lang.Object this$loanProductName = this.getLoanProductName();
         final java.lang.Object other$loanProductName = other.getLoanProductName();
-        if (this$loanProductName == null ? other$loanProductName != null : !this$loanProductName.equals(other$loanProductName)) return false;
+        if (this$loanProductName == null ? other$loanProductName != null : !this$loanProductName.equals(other$loanProductName))
+            return false;
         final java.lang.Object this$arrears = this.getArrears();
         final java.lang.Object other$arrears = other.getArrears();
         if (this$arrears == null ? other$arrears != null : !this$arrears.equals(other$arrears)) return false;
@@ -319,13 +298,13 @@ public class LoanPointInTimeData {
     }
 
     @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
+    protected boolean canEqual(final java.lang.Object other) {
         return other instanceof LoanPointInTimeData;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public int hashCode() {
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final java.lang.Object $id = this.getId();
@@ -369,7 +348,13 @@ public class LoanPointInTimeData {
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-        return "LoanPointInTimeData(id=" + this.getId() + ", accountNo=" + this.getAccountNo() + ", status=" + this.getStatus() + ", externalId=" + this.getExternalId() + ", currency=" + this.getCurrency() + ", principal=" + this.getPrincipal() + ", interest=" + this.getInterest() + ", fee=" + this.getFee() + ", penalty=" + this.getPenalty() + ", total=" + this.getTotal() + ", clientId=" + this.getClientId() + ", clientAccountNo=" + this.getClientAccountNo() + ", clientExternalId=" + this.getClientExternalId() + ", clientDisplayName=" + this.getClientDisplayName() + ", clientOfficeId=" + this.getClientOfficeId() + ", loanProductId=" + this.getLoanProductId() + ", loanProductName=" + this.getLoanProductName() + ", arrears=" + this.getArrears() + ")";
+    public java.lang.String toString() {
+        return "LoanPointInTimeData(id=" + this.getId() + ", accountNo=" + this.getAccountNo() + ", status=" + this.getStatus()
+                + ", externalId=" + this.getExternalId() + ", currency=" + this.getCurrency() + ", principal=" + this.getPrincipal()
+                + ", interest=" + this.getInterest() + ", fee=" + this.getFee() + ", penalty=" + this.getPenalty() + ", total="
+                + this.getTotal() + ", clientId=" + this.getClientId() + ", clientAccountNo=" + this.getClientAccountNo()
+                + ", clientExternalId=" + this.getClientExternalId() + ", clientDisplayName=" + this.getClientDisplayName()
+                + ", clientOfficeId=" + this.getClientOfficeId() + ", loanProductId=" + this.getLoanProductId() + ", loanProductName="
+                + this.getLoanProductName() + ", arrears=" + this.getArrears() + ")";
     }
 }

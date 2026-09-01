@@ -19,11 +19,9 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
-import org.mapstruct.Mapping;
 
 public class LoanFeeData {
+
     private final BigDecimal feeChargesCharged;
     private final BigDecimal feeAdjustments;
     private final BigDecimal feeChargesDueAtDisbursementCharged;
@@ -32,21 +30,10 @@ public class LoanFeeData {
     private final BigDecimal feeChargesWrittenOff;
     private final BigDecimal feeChargesOutstanding;
 
-
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class)
-    public interface Mapper {
-        @Mapping(source = "totalFeeChargesCharged", target = "feeChargesCharged")
-        @Mapping(source = "totalFeeChargesDueAtDisbursement", target = "feeChargesDueAtDisbursementCharged")
-        @Mapping(source = "totalFeeAdjustments", target = "feeAdjustments")
-        @Mapping(source = "totalFeeChargesRepaid", target = "feeChargesPaid")
-        @Mapping(source = "totalFeeChargesWaived", target = "feeChargesWaived")
-        @Mapping(source = "totalFeeChargesWrittenOff", target = "feeChargesWrittenOff")
-        @Mapping(source = "totalFeeChargesOutstanding", target = "feeChargesOutstanding")
-        LoanFeeData map(LoanSummary source);
-    }
-
     @java.lang.SuppressWarnings("all")
-        public LoanFeeData(final BigDecimal feeChargesCharged, final BigDecimal feeAdjustments, final BigDecimal feeChargesDueAtDisbursementCharged, final BigDecimal feeChargesPaid, final BigDecimal feeChargesWaived, final BigDecimal feeChargesWrittenOff, final BigDecimal feeChargesOutstanding) {
+    public LoanFeeData(final BigDecimal feeChargesCharged, final BigDecimal feeAdjustments,
+            final BigDecimal feeChargesDueAtDisbursementCharged, final BigDecimal feeChargesPaid, final BigDecimal feeChargesWaived,
+            final BigDecimal feeChargesWrittenOff, final BigDecimal feeChargesOutstanding) {
         this.feeChargesCharged = feeChargesCharged;
         this.feeAdjustments = feeAdjustments;
         this.feeChargesDueAtDisbursementCharged = feeChargesDueAtDisbursementCharged;
@@ -57,79 +44,87 @@ public class LoanFeeData {
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesCharged() {
+    public BigDecimal getFeeChargesCharged() {
         return this.feeChargesCharged;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeAdjustments() {
+    public BigDecimal getFeeAdjustments() {
         return this.feeAdjustments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesDueAtDisbursementCharged() {
+    public BigDecimal getFeeChargesDueAtDisbursementCharged() {
         return this.feeChargesDueAtDisbursementCharged;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesPaid() {
+    public BigDecimal getFeeChargesPaid() {
         return this.feeChargesPaid;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesWaived() {
+    public BigDecimal getFeeChargesWaived() {
         return this.feeChargesWaived;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesWrittenOff() {
+    public BigDecimal getFeeChargesWrittenOff() {
         return this.feeChargesWrittenOff;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getFeeChargesOutstanding() {
+    public BigDecimal getFeeChargesOutstanding() {
         return this.feeChargesOutstanding;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
+    public boolean equals(final java.lang.Object o) {
         if (o == this) return true;
         if (!(o instanceof LoanFeeData)) return false;
         final LoanFeeData other = (LoanFeeData) o;
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$feeChargesCharged = this.getFeeChargesCharged();
         final java.lang.Object other$feeChargesCharged = other.getFeeChargesCharged();
-        if (this$feeChargesCharged == null ? other$feeChargesCharged != null : !this$feeChargesCharged.equals(other$feeChargesCharged)) return false;
+        if (this$feeChargesCharged == null ? other$feeChargesCharged != null : !this$feeChargesCharged.equals(other$feeChargesCharged))
+            return false;
         final java.lang.Object this$feeAdjustments = this.getFeeAdjustments();
         final java.lang.Object other$feeAdjustments = other.getFeeAdjustments();
         if (this$feeAdjustments == null ? other$feeAdjustments != null : !this$feeAdjustments.equals(other$feeAdjustments)) return false;
         final java.lang.Object this$feeChargesDueAtDisbursementCharged = this.getFeeChargesDueAtDisbursementCharged();
         final java.lang.Object other$feeChargesDueAtDisbursementCharged = other.getFeeChargesDueAtDisbursementCharged();
-        if (this$feeChargesDueAtDisbursementCharged == null ? other$feeChargesDueAtDisbursementCharged != null : !this$feeChargesDueAtDisbursementCharged.equals(other$feeChargesDueAtDisbursementCharged)) return false;
+        if (this$feeChargesDueAtDisbursementCharged == null ? other$feeChargesDueAtDisbursementCharged != null
+                : !this$feeChargesDueAtDisbursementCharged.equals(other$feeChargesDueAtDisbursementCharged))
+            return false;
         final java.lang.Object this$feeChargesPaid = this.getFeeChargesPaid();
         final java.lang.Object other$feeChargesPaid = other.getFeeChargesPaid();
         if (this$feeChargesPaid == null ? other$feeChargesPaid != null : !this$feeChargesPaid.equals(other$feeChargesPaid)) return false;
         final java.lang.Object this$feeChargesWaived = this.getFeeChargesWaived();
         final java.lang.Object other$feeChargesWaived = other.getFeeChargesWaived();
-        if (this$feeChargesWaived == null ? other$feeChargesWaived != null : !this$feeChargesWaived.equals(other$feeChargesWaived)) return false;
+        if (this$feeChargesWaived == null ? other$feeChargesWaived != null : !this$feeChargesWaived.equals(other$feeChargesWaived))
+            return false;
         final java.lang.Object this$feeChargesWrittenOff = this.getFeeChargesWrittenOff();
         final java.lang.Object other$feeChargesWrittenOff = other.getFeeChargesWrittenOff();
-        if (this$feeChargesWrittenOff == null ? other$feeChargesWrittenOff != null : !this$feeChargesWrittenOff.equals(other$feeChargesWrittenOff)) return false;
+        if (this$feeChargesWrittenOff == null ? other$feeChargesWrittenOff != null
+                : !this$feeChargesWrittenOff.equals(other$feeChargesWrittenOff))
+            return false;
         final java.lang.Object this$feeChargesOutstanding = this.getFeeChargesOutstanding();
         final java.lang.Object other$feeChargesOutstanding = other.getFeeChargesOutstanding();
-        if (this$feeChargesOutstanding == null ? other$feeChargesOutstanding != null : !this$feeChargesOutstanding.equals(other$feeChargesOutstanding)) return false;
+        if (this$feeChargesOutstanding == null ? other$feeChargesOutstanding != null
+                : !this$feeChargesOutstanding.equals(other$feeChargesOutstanding))
+            return false;
         return true;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
+    protected boolean canEqual(final java.lang.Object other) {
         return other instanceof LoanFeeData;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public int hashCode() {
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final java.lang.Object $feeChargesCharged = this.getFeeChargesCharged();
@@ -151,7 +146,10 @@ public class LoanFeeData {
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-        return "LoanFeeData(feeChargesCharged=" + this.getFeeChargesCharged() + ", feeAdjustments=" + this.getFeeAdjustments() + ", feeChargesDueAtDisbursementCharged=" + this.getFeeChargesDueAtDisbursementCharged() + ", feeChargesPaid=" + this.getFeeChargesPaid() + ", feeChargesWaived=" + this.getFeeChargesWaived() + ", feeChargesWrittenOff=" + this.getFeeChargesWrittenOff() + ", feeChargesOutstanding=" + this.getFeeChargesOutstanding() + ")";
+    public java.lang.String toString() {
+        return "LoanFeeData(feeChargesCharged=" + this.getFeeChargesCharged() + ", feeAdjustments=" + this.getFeeAdjustments()
+                + ", feeChargesDueAtDisbursementCharged=" + this.getFeeChargesDueAtDisbursementCharged() + ", feeChargesPaid="
+                + this.getFeeChargesPaid() + ", feeChargesWaived=" + this.getFeeChargesWaived() + ", feeChargesWrittenOff="
+                + this.getFeeChargesWrittenOff() + ", feeChargesOutstanding=" + this.getFeeChargesOutstanding() + ")";
     }
 }

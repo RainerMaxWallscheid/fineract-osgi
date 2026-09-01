@@ -19,11 +19,9 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
-import org.mapstruct.Mapping;
 
 public class LoanTotalAmountData {
+
     private final BigDecimal totalExpectedRepayment;
     private final BigDecimal totalRepayment;
     private final BigDecimal totalExpectedCostOfLoan;
@@ -32,21 +30,10 @@ public class LoanTotalAmountData {
     private final BigDecimal totalWrittenOff;
     private final BigDecimal totalOutstanding;
 
-
-    @org.mapstruct.Mapper(config = MapstructMapperConfig.class)
-    public interface Mapper {
-        @Mapping(source = "totalExpectedRepayment", target = "totalExpectedRepayment")
-        @Mapping(source = "totalRepayment", target = "totalRepayment")
-        @Mapping(source = "totalExpectedCostOfLoan", target = "totalExpectedCostOfLoan")
-        @Mapping(source = "totalCostOfLoan", target = "totalCostOfLoan")
-        @Mapping(source = "totalWaived", target = "totalWaived")
-        @Mapping(source = "totalWrittenOff", target = "totalWrittenOff")
-        @Mapping(source = "totalOutstanding", target = "totalOutstanding")
-        LoanTotalAmountData map(LoanSummary source);
-    }
-
     @java.lang.SuppressWarnings("all")
-        public LoanTotalAmountData(final BigDecimal totalExpectedRepayment, final BigDecimal totalRepayment, final BigDecimal totalExpectedCostOfLoan, final BigDecimal totalCostOfLoan, final BigDecimal totalWaived, final BigDecimal totalWrittenOff, final BigDecimal totalOutstanding) {
+    public LoanTotalAmountData(final BigDecimal totalExpectedRepayment, final BigDecimal totalRepayment,
+            final BigDecimal totalExpectedCostOfLoan, final BigDecimal totalCostOfLoan, final BigDecimal totalWaived,
+            final BigDecimal totalWrittenOff, final BigDecimal totalOutstanding) {
         this.totalExpectedRepayment = totalExpectedRepayment;
         this.totalRepayment = totalRepayment;
         this.totalExpectedCostOfLoan = totalExpectedCostOfLoan;
@@ -57,79 +44,86 @@ public class LoanTotalAmountData {
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalExpectedRepayment() {
+    public BigDecimal getTotalExpectedRepayment() {
         return this.totalExpectedRepayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalRepayment() {
+    public BigDecimal getTotalRepayment() {
         return this.totalRepayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalExpectedCostOfLoan() {
+    public BigDecimal getTotalExpectedCostOfLoan() {
         return this.totalExpectedCostOfLoan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalCostOfLoan() {
+    public BigDecimal getTotalCostOfLoan() {
         return this.totalCostOfLoan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalWaived() {
+    public BigDecimal getTotalWaived() {
         return this.totalWaived;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalWrittenOff() {
+    public BigDecimal getTotalWrittenOff() {
         return this.totalWrittenOff;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTotalOutstanding() {
+    public BigDecimal getTotalOutstanding() {
         return this.totalOutstanding;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
+    public boolean equals(final java.lang.Object o) {
         if (o == this) return true;
         if (!(o instanceof LoanTotalAmountData)) return false;
         final LoanTotalAmountData other = (LoanTotalAmountData) o;
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$totalExpectedRepayment = this.getTotalExpectedRepayment();
         final java.lang.Object other$totalExpectedRepayment = other.getTotalExpectedRepayment();
-        if (this$totalExpectedRepayment == null ? other$totalExpectedRepayment != null : !this$totalExpectedRepayment.equals(other$totalExpectedRepayment)) return false;
+        if (this$totalExpectedRepayment == null ? other$totalExpectedRepayment != null
+                : !this$totalExpectedRepayment.equals(other$totalExpectedRepayment))
+            return false;
         final java.lang.Object this$totalRepayment = this.getTotalRepayment();
         final java.lang.Object other$totalRepayment = other.getTotalRepayment();
         if (this$totalRepayment == null ? other$totalRepayment != null : !this$totalRepayment.equals(other$totalRepayment)) return false;
         final java.lang.Object this$totalExpectedCostOfLoan = this.getTotalExpectedCostOfLoan();
         final java.lang.Object other$totalExpectedCostOfLoan = other.getTotalExpectedCostOfLoan();
-        if (this$totalExpectedCostOfLoan == null ? other$totalExpectedCostOfLoan != null : !this$totalExpectedCostOfLoan.equals(other$totalExpectedCostOfLoan)) return false;
+        if (this$totalExpectedCostOfLoan == null ? other$totalExpectedCostOfLoan != null
+                : !this$totalExpectedCostOfLoan.equals(other$totalExpectedCostOfLoan))
+            return false;
         final java.lang.Object this$totalCostOfLoan = this.getTotalCostOfLoan();
         final java.lang.Object other$totalCostOfLoan = other.getTotalCostOfLoan();
-        if (this$totalCostOfLoan == null ? other$totalCostOfLoan != null : !this$totalCostOfLoan.equals(other$totalCostOfLoan)) return false;
+        if (this$totalCostOfLoan == null ? other$totalCostOfLoan != null : !this$totalCostOfLoan.equals(other$totalCostOfLoan))
+            return false;
         final java.lang.Object this$totalWaived = this.getTotalWaived();
         final java.lang.Object other$totalWaived = other.getTotalWaived();
         if (this$totalWaived == null ? other$totalWaived != null : !this$totalWaived.equals(other$totalWaived)) return false;
         final java.lang.Object this$totalWrittenOff = this.getTotalWrittenOff();
         final java.lang.Object other$totalWrittenOff = other.getTotalWrittenOff();
-        if (this$totalWrittenOff == null ? other$totalWrittenOff != null : !this$totalWrittenOff.equals(other$totalWrittenOff)) return false;
+        if (this$totalWrittenOff == null ? other$totalWrittenOff != null : !this$totalWrittenOff.equals(other$totalWrittenOff))
+            return false;
         final java.lang.Object this$totalOutstanding = this.getTotalOutstanding();
         final java.lang.Object other$totalOutstanding = other.getTotalOutstanding();
-        if (this$totalOutstanding == null ? other$totalOutstanding != null : !this$totalOutstanding.equals(other$totalOutstanding)) return false;
+        if (this$totalOutstanding == null ? other$totalOutstanding != null : !this$totalOutstanding.equals(other$totalOutstanding))
+            return false;
         return true;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
+    protected boolean canEqual(final java.lang.Object other) {
         return other instanceof LoanTotalAmountData;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public int hashCode() {
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final java.lang.Object $totalExpectedRepayment = this.getTotalExpectedRepayment();
@@ -151,7 +145,10 @@ public class LoanTotalAmountData {
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-        return "LoanTotalAmountData(totalExpectedRepayment=" + this.getTotalExpectedRepayment() + ", totalRepayment=" + this.getTotalRepayment() + ", totalExpectedCostOfLoan=" + this.getTotalExpectedCostOfLoan() + ", totalCostOfLoan=" + this.getTotalCostOfLoan() + ", totalWaived=" + this.getTotalWaived() + ", totalWrittenOff=" + this.getTotalWrittenOff() + ", totalOutstanding=" + this.getTotalOutstanding() + ")";
+    public java.lang.String toString() {
+        return "LoanTotalAmountData(totalExpectedRepayment=" + this.getTotalExpectedRepayment() + ", totalRepayment="
+                + this.getTotalRepayment() + ", totalExpectedCostOfLoan=" + this.getTotalExpectedCostOfLoan() + ", totalCostOfLoan="
+                + this.getTotalCostOfLoan() + ", totalWaived=" + this.getTotalWaived() + ", totalWrittenOff=" + this.getTotalWrittenOff()
+                + ", totalOutstanding=" + this.getTotalOutstanding() + ")";
     }
 }

@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.data.LoanPointInTimeData;
+import org.apache.fineract.portfolio.loanaccount.data.LoanPointInTimeDataMapper;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -45,10 +46,11 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 @Service
 @Transactional
 public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
+
     private final LoanUtilService loanUtilService;
     private final LoanScheduleService loanScheduleService;
     private final LoanAssembler loanAssembler;
-    private final LoanPointInTimeData.Mapper dataMapper;
+    private final LoanPointInTimeDataMapper dataMapper;
     private final EntityManager entityManager;
     private final LoanArrearsAgingService arrearsAgingService;
 
@@ -173,12 +175,15 @@ public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
 
     private void throwExceptionIfValidationWarningsExist(List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                    dataValidationErrors);
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanPointInTimeServiceImpl(final LoanUtilService loanUtilService, final LoanScheduleService loanScheduleService, final LoanAssembler loanAssembler, final LoanPointInTimeData.Mapper dataMapper, final EntityManager entityManager, final LoanArrearsAgingService arrearsAgingService) {
+    public LoanPointInTimeServiceImpl(final LoanUtilService loanUtilService, final LoanScheduleService loanScheduleService,
+            final LoanAssembler loanAssembler, final LoanPointInTimeDataMapper dataMapper, final EntityManager entityManager,
+            final LoanArrearsAgingService arrearsAgingService) {
         this.loanUtilService = loanUtilService;
         this.loanScheduleService = loanScheduleService;
         this.loanAssembler = loanAssembler;
