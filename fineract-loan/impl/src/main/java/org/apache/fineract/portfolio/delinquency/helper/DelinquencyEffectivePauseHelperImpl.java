@@ -30,6 +30,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyAction;
 import org.apache.fineract.portfolio.delinquency.domain.LoanDelinquencyAction;
 import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionData;
+import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionDataFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,7 +46,7 @@ public class DelinquencyEffectivePauseHelperImpl implements DelinquencyEffective
         if (pauses != null && !pauses.isEmpty()) {
             for (LoanDelinquencyAction loanDelinquencyAction : pauses) {
                 Optional<LoanDelinquencyAction> resume = findMatchingResume(loanDelinquencyAction, partitioned.get(RESUME));
-                LoanDelinquencyActionData loanDelinquencyActionData = new LoanDelinquencyActionData(loanDelinquencyAction);
+                LoanDelinquencyActionData loanDelinquencyActionData = LoanDelinquencyActionDataFactory.from(loanDelinquencyAction);
                 resume.ifPresent(r -> loanDelinquencyActionData.setEndDate(r.getStartDate()));
                 effective.add(loanDelinquencyActionData);
             }

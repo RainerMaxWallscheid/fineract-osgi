@@ -43,6 +43,7 @@ import org.apache.fineract.portfolio.delinquency.mapper.DelinquencyBucketMapper;
 import org.apache.fineract.portfolio.delinquency.mapper.DelinquencyRangeMapper;
 import org.apache.fineract.portfolio.delinquency.mapper.LoanDelinquencyTagMapper;
 import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionData;
+import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionDataFactory;
 import org.apache.fineract.portfolio.loanaccount.data.CollectionData;
 import org.apache.fineract.portfolio.loanaccount.data.DelinquencyPausePeriod;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -117,11 +118,11 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
@@ -140,11 +141,11 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
@@ -162,11 +163,11 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 14))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
@@ -184,11 +185,11 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 13), LocalDate.of(2023, JANUARY, 14))),
-                new LoanDelinquencyActionData(
+                LoanDelinquencyActionDataFactory.from(
                         new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when

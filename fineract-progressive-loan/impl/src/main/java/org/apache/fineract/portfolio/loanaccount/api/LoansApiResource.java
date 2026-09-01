@@ -119,6 +119,7 @@ import org.apache.fineract.portfolio.delinquency.data.LoanDelinquencyTagHistoryD
 import org.apache.fineract.portfolio.delinquency.domain.LoanDelinquencyAction;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
 import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionData;
+import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionDataFactory;
 import org.apache.fineract.portfolio.floatingrates.data.InterestRatePeriodData;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
@@ -1033,7 +1034,7 @@ public class LoansApiResource {
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanId == null ? loanReadPlatformService.getResolvedLoanId(loanExternalId) : loanId;
         final Collection<LoanDelinquencyAction> delinquencyActions = this.delinquencyReadPlatformService.retrieveLoanDelinquencyActions(resolvedLoanId);
-        List<LoanDelinquencyActionData> result = delinquencyActions.stream().map(LoanDelinquencyActionData::new).toList();
+        List<LoanDelinquencyActionData> result = delinquencyActions.stream().map(LoanDelinquencyActionDataFactory::from).toList();
         return this.jsonSerializerTagHistory.serialize(result);
     }
 

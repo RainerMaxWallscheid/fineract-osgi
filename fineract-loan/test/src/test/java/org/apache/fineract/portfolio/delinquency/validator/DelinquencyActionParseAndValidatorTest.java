@@ -420,7 +420,7 @@ class DelinquencyActionParseAndValidatorTest {
     }
 
     private LoanDelinquencyActionData loanDelinquencyActionData(LoanDelinquencyAction loanDelinquencyAction) {
-        return new LoanDelinquencyActionData(loanDelinquencyAction);
+        return LoanDelinquencyActionDataFactory.from(loanDelinquencyAction);
     }
 
     private LoanDelinquencyAction loanDelinquencyAction(DelinquencyAction action, String startTime) {

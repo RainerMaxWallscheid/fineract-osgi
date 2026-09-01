@@ -61,6 +61,7 @@ import org.apache.fineract.portfolio.loanaccount.data.AccrualBalances;
 import org.apache.fineract.portfolio.loanaccount.data.AccrualChargeData;
 import org.apache.fineract.portfolio.loanaccount.data.AccrualPeriodData;
 import org.apache.fineract.portfolio.loanaccount.data.AccrualPeriodsData;
+import org.apache.fineract.portfolio.loanaccount.data.AccrualPeriodsDataFactory;
 import org.apache.fineract.portfolio.loanaccount.data.CumulativeIncomeFromIncomePosting;
 import org.apache.fineract.portfolio.loanaccount.data.TransactionPortionsForForeclosure;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -409,7 +410,7 @@ public class LoanAccrualsProcessingServiceImpl implements LoanAccrualsProcessing
         final int firstInstallmentNumber = fetchFirstNormalInstallmentNumber(loan.getRepaymentScheduleInstallments());
         final LocalDate interestCalculationTillDate = loan.isProgressiveSchedule() && loan.getLoanProductRelatedDetail().isInterestRecognitionOnDisbursementDate() ? tillDate.plusDays(1L) : tillDate;
         final List<LoanRepaymentScheduleInstallment> installments = isFinal ? loan.getRepaymentScheduleInstallments() : getInstallmentsToAccrue(loan, interestCalculationTillDate, periodic, chargeOnDueDate);
-        final AccrualPeriodsData accrualPeriods = AccrualPeriodsData.create(installments, firstInstallmentNumber, currency);
+        final AccrualPeriodsData accrualPeriods = AccrualPeriodsDataFactory.create(installments, firstInstallmentNumber, currency);
         for (LoanRepaymentScheduleInstallment installment : installments) {
             addInterestAccrual(loan, interestCalculationTillDate, scheduleGenerator, installment, accrualPeriods);
             addChargeAccrual(loan, tillDate, chargeOnDueDate, installment, accrualPeriods);

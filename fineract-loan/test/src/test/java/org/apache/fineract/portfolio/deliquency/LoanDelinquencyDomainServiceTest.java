@@ -48,6 +48,7 @@ import org.apache.fineract.portfolio.delinquency.helper.DelinquencyEffectivePaus
 import org.apache.fineract.portfolio.delinquency.helper.DelinquencyEffectivePauseHelperImpl;
 import org.apache.fineract.portfolio.delinquency.service.LoanDelinquencyDomainServiceImpl;
 import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionData;
+import org.apache.fineract.portfolio.delinquency.validator.LoanDelinquencyActionDataFactory;
 import org.apache.fineract.portfolio.loanaccount.data.CollectionData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanDelinquencyData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -349,7 +350,7 @@ public class LoanDelinquencyDomainServiceTest {
         LoanDelinquencyAction pauseAction = new LoanDelinquencyAction(null, DelinquencyAction.PAUSE, LocalDate.of(2022, 1, 20),
                 LocalDate.of(2022, 1, 30));
         pauseAction.setId(1L);
-        LoanDelinquencyActionData pauseData = new LoanDelinquencyActionData(pauseAction);
+        LoanDelinquencyActionData pauseData = LoanDelinquencyActionDataFactory.from(pauseAction);
         List<LoanDelinquencyActionData> effectiveDelinquencyList = List.of(pauseData);
 
         LoanDelinquencyDomainServiceImpl service = new LoanDelinquencyDomainServiceImpl(new DelinquencyEffectivePauseHelperImpl(),

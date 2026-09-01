@@ -20,9 +20,7 @@ package org.apache.fineract.portfolio.delinquency.validator;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyAction;
-import org.apache.fineract.portfolio.delinquency.domain.LoanDelinquencyAction;
 
 public class LoanDelinquencyActionData {
     private Long id;
@@ -34,16 +32,7 @@ public class LoanDelinquencyActionData {
     private Long updatedById;
     private OffsetDateTime lastModifiedOn;
 
-    public LoanDelinquencyActionData(LoanDelinquencyAction loanDelinquencyAction) {
-        this.id = loanDelinquencyAction.getId();
-        this.action = loanDelinquencyAction.getAction();
-        this.startDate = loanDelinquencyAction.getStartDate();
-        this.endDate = loanDelinquencyAction.getEndDate();
-        loanDelinquencyAction.getCreatedBy().ifPresent(this::setCreatedById);
-        loanDelinquencyAction.getLastModifiedBy().ifPresent(this::setUpdatedById);
-        this.createdOn = loanDelinquencyAction.getCreatedDate().orElse(DateUtils.getAuditOffsetDateTime());
-        this.lastModifiedOn = loanDelinquencyAction.getLastModifiedDate().orElse(DateUtils.getAuditOffsetDateTime());
-    }
+    public LoanDelinquencyActionData() {}
 
     @java.lang.SuppressWarnings("all")
         public Long getId() {

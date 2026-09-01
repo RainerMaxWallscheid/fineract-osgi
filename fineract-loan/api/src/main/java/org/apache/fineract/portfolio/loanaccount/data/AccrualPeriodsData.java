@@ -18,11 +18,9 @@
  */
 package org.apache.fineract.portfolio.loanaccount.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 
 public class AccrualPeriodsData {
     private final MonetaryCurrency currency;
@@ -31,16 +29,6 @@ public class AccrualPeriodsData {
     public AccrualPeriodsData addPeriod(AccrualPeriodData period) {
         periods.add(period);
         return this;
-    }
-
-    public static AccrualPeriodsData create(@NotNull List<LoanRepaymentScheduleInstallment> installments, Integer firstInstallmentNumber, MonetaryCurrency currency) {
-        AccrualPeriodsData accrualPeriods = new AccrualPeriodsData(currency);
-        for (LoanRepaymentScheduleInstallment installment : installments) {
-            Integer installmentNumber = installment.getInstallmentNumber();
-            boolean isFirst = installmentNumber.equals(firstInstallmentNumber);
-            accrualPeriods.addPeriod(new AccrualPeriodData(installmentNumber, isFirst, installment.getFromDate(), installment.getDueDate()));
-        }
-        return accrualPeriods;
     }
 
     public AccrualPeriodData getPeriodByInstallmentNumber(Integer installmentNumber) {
