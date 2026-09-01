@@ -83,8 +83,12 @@ jar {
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
                         + 'org.apache.fineract.portfolio.loanproduct.domain,'
                         + 'org.apache.fineract.portfolio.loanproduct.exception,'
+                        + 'org.apache.fineract.portfolio.loanproduct.productmix.command,'
+                        + 'org.apache.fineract.portfolio.loanproduct.productmix.data,'
+                        + 'org.apache.fineract.portfolio.loanproduct.productmix.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.service',
-                'Import-Package': 'org.apache.fineract.infrastructure.event.business.domain,'
+                'Import-Package': 'org.apache.fineract.command.core,'
+                        + 'org.apache.fineract.infrastructure.event.business.domain,'
                         + 'org.apache.fineract.accounting.common,'
                         + 'org.apache.fineract.accounting.journalentry.data,'
                         + 'org.apache.fineract.infrastructure.codes.data,'

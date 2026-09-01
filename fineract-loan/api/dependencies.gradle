@@ -20,6 +20,8 @@
 dependencies {
     // Shared kernel: LoanStatus, monetary, core DTOs, ExternalId, …
     api project(path: ':fineract-core')
+    // Command<T> on leftover product-mix write commands
+    api project(path: ':fineract-command-api')
     // ChargeData / charge catalog on pure loan charge DTOs
     api project(path: ':fineract-charge-api')
     // Accounting DTOs used by pure product/account bridge data
