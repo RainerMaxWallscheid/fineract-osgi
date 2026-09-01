@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.data;
 
-import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -163,7 +162,6 @@ public class LoanAccountData {
     private List<StringEnumOptionData> buyDownFeeCalculationTypeOptions;
     private List<StringEnumOptionData> buyDownFeeStrategyOptions;
     private List<StringEnumOptionData> buyDownFeeIncomeTypeOptions;
-    @Transient
     private BigDecimal feeChargesAtDisbursementCharged;
     private BigDecimal totalOverpaid;
     // loanCycle

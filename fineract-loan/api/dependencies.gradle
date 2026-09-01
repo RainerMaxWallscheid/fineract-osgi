@@ -40,6 +40,8 @@ dependencies {
     api project(path: ':fineract-tax-api')
     // Deposit on-hold DTO on guarantor funding transaction data
     api project(path: ':fineract-savings-api')
+    // NoteData on leftover loan account data
+    api project(path: ':fineract-note-api')
     // Re-age / re-amortize preview request constraints
     api project(path: ':fineract-validation')
 

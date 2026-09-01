@@ -113,6 +113,7 @@ jar {
                         + 'org.apache.fineract.portfolio.common.domain,'
                         + 'org.apache.fineract.portfolio.floatingrates.data,'
                         + 'org.apache.fineract.portfolio.fund.data,'
+                        + 'org.apache.fineract.portfolio.note.data,'
                         + 'org.apache.fineract.portfolio.rate.data,'
                         + 'org.apache.fineract.portfolio.paymentdetail.data,'
                         + 'org.apache.fineract.portfolio.paymenttype.data,'
