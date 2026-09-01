@@ -36,6 +36,12 @@ public interface LoanChargeRepository extends JpaRepository<LoanCharge, Long>, J
     @Query("""
             SELECT lc FROM LoanCharge lc
             WHERE lc.loan.id = :loanId
+            """)
+    List<LoanCharge> findByLoanId(@Param("loanId") Long loanId);
+
+    @Query("""
+            SELECT lc FROM LoanCharge lc
+            WHERE lc.loan.id = :loanId
             AND lc.dueDate >= :fromDate
             """)
     List<LoanCharge> findByLoanIdAndFromDueDate(@Param("loanId") Long loanId, @Param("fromDate") LocalDate fromDate);

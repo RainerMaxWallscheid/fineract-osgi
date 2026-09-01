@@ -38,7 +38,6 @@ import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargePaidByData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanInstallmentChargeData;
-import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
@@ -212,9 +211,9 @@ public class LoanChargeReadPlatformServiceImpl implements LoanChargeReadPlatform
     }
 
     @Override
-    public Collection<Integer> retrieveOverdueInstallmentChargeFrequencyNumber(final Loan loan, final Long chargeId, final Integer periodNumber) {
+    public Collection<Integer> retrieveOverdueInstallmentChargeFrequencyNumber(final Long loanId, final Long chargeId, final Integer periodNumber) {
         List<Integer> frequencyNumbers = new ArrayList<>();
-        for (LoanCharge loanCharge : loan.getLoanCharges()) {
+        for (LoanCharge loanCharge : loanChargeRepository.findByLoanId(loanId)) {
             if (loanCharge.isOverdueInstallmentCharge() && java.util.Objects.equals(chargeId, loanCharge.getChargeId()) && loanCharge.isActive() && periodNumber.equals(loanCharge.getOverdueInstallmentCharge().getInstallment().getInstallmentNumber())) {
                 frequencyNumbers.add(loanCharge.getOverdueInstallmentCharge().getFrequencyNumber());
             }
