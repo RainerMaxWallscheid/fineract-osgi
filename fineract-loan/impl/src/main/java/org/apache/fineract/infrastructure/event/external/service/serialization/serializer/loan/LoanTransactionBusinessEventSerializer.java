@@ -51,8 +51,9 @@ public class LoanTransactionBusinessEventSerializer extends AbstractBusinessEven
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanTransactionBusinessEvent event = (LoanTransactionBusinessEvent) rawEvent;
-        Long loanId = ((LoanTransaction) event.get()).getLoanId();
-        Long loanTransactionId = event.getAggregateRootId();
+        final LoanTransaction transaction = (LoanTransaction) event.get();
+        Long loanId = transaction.getLoanId();
+        Long loanTransactionId = transaction.getId();
         LoanTransactionData transactionData = service.retrieveLoanTransaction(loanId, loanTransactionId);
         transactionData.setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(loanTransactionId));
         final LoanTransactionDataV1 result = loanTransactionMapper.map(transactionData);

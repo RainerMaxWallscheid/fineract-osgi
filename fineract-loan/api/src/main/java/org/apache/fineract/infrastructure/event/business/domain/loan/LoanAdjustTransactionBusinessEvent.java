@@ -43,7 +43,7 @@ public class LoanAdjustTransactionBusinessEvent extends AbstractBusinessEvent<Lo
     public Long getAggregateRootId() {
         final Object transaction = get().getTransactionToAdjust();
         if (transaction instanceof LoanOwnedEventId id) {
-            return id.getId();
+            return id.getLoanId();
         }
         throw new IllegalStateException("Unsupported loan-adjust transaction payload: "
                 + (transaction == null ? "null" : transaction.getClass().getName()));

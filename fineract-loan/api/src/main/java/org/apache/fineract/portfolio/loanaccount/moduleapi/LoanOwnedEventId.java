@@ -20,8 +20,8 @@ package org.apache.fineract.portfolio.loanaccount.moduleapi;
 
 /**
  * Object-typed identity for leftover loan-transaction / charge / installment
- * business events (ADR-021). {@link #getId()} is the owned entity (aggregate
- * root for the event); {@link #getLoanId()} is the parent loan.
+ * business events (ADR-021). {@link #getId()} is the owned entity;
+ * {@link #getLoanId()} is the parent loan (event aggregate root).
  */
 public interface LoanOwnedEventId extends LoanEventId {
 
