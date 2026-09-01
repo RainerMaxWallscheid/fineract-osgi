@@ -255,7 +255,7 @@ public class LoanProductsApiResource {
     }
 
     private Long resolveProductId(ExternalId externalProductId) {
-        return loanProductReadPlatformService.retrieveLoanProductByExternalId(externalProductId).getId();
+        return loanProductReadPlatformService.retrieveLoanProductIdByExternalId(externalProductId);
     }
 
     private String getLoanProductDetails(Long productId, UriInfo uriInfo) {

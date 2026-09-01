@@ -24,7 +24,6 @@ import org.apache.fineract.portfolio.loanproduct.data.AdvancedPaymentData;
 import org.apache.fineract.portfolio.loanproduct.data.CreditAllocationData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBorrowerCycleVariationData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 
 public interface LoanProductReadPlatformService {
 
@@ -38,7 +37,7 @@ public interface LoanProductReadPlatformService {
 
     LoanProductData retrieveLoanProduct(Long productId);
 
-    LoanProduct retrieveLoanProductByExternalId(ExternalId externalId);
+    Long retrieveLoanProductIdByExternalId(ExternalId externalId);
 
     LoanProductData retrieveNewLoanProductDetails();
 
