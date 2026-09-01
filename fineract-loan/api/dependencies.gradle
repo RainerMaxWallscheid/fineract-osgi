@@ -30,6 +30,12 @@ dependencies {
     api project(path: ':fineract-loan-origination-api')
     // Floating rate DTOs on pure product data slices
     api project(path: ':fineract-rates-api')
+    // FundData on leftover loan product data
+    api project(path: ':fineract-fund-api')
+    // PaymentTypeData on leftover loan product data
+    api project(path: ':fineract-paymenttype-api')
+    // CodeValueData on leftover loan product data
+    api project(path: ':fineract-codes-api')
     // Tax identifiers on pure charge tax DTOs
     api project(path: ':fineract-tax-api')
     // Deposit on-hold DTO on guarantor funding transaction data

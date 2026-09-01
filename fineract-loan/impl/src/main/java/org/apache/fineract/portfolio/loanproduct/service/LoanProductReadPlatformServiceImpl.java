@@ -61,9 +61,9 @@ import org.apache.fineract.portfolio.loanproduct.data.CreditAllocationData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBorrowerCycleVariationData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductGuaranteeData;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductConfigurableAttributesData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductInterestRecalculationData;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableAttributes;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductParamType;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanSupportedInterestRefundTypes;
@@ -388,8 +388,9 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final boolean repaymentFrequency = rs.getBoolean("repaymentFrequencyBoolean");
             final boolean graceOnPrincipalAndInterest = rs.getBoolean("graceOnPrincipalAndInterestBoolean");
             final boolean graceOnArrearsAging = rs.getBoolean("graceOnArrearsAgingBoolean");
-            LoanProductConfigurableAttributes allowAttributeOverrides = null;
-            allowAttributeOverrides = new LoanProductConfigurableAttributes(amortization, interestMethod, transactionProcessingStrategy, interestCalcPeriod, arrearsTolerance, repaymentFrequency, graceOnPrincipalAndInterest, graceOnArrearsAging);
+            LoanProductConfigurableAttributesData allowAttributeOverrides = new LoanProductConfigurableAttributesData(amortization,
+                    interestMethod, transactionProcessingStrategy, interestCalcPeriod, arrearsTolerance, repaymentFrequency,
+                    graceOnPrincipalAndInterest, graceOnArrearsAging);
             final boolean holdGuaranteeFunds = rs.getBoolean("holdGuaranteeFunds");
             LoanProductGuaranteeData loanProductGuaranteeData = null;
             if (holdGuaranteeFunds) {
