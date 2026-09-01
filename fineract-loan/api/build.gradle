@@ -74,6 +74,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanaccount.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.data,'
+                        + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.exception,'
                         + 'org.apache.fineract.portfolio.loanaccount.rescheduleloan.service,'
                         + 'org.apache.fineract.portfolio.loanaccount.serialization,'
