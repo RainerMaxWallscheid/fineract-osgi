@@ -40,6 +40,9 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRateDefinitionData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
+import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
@@ -275,6 +278,46 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void taxLookupFacadeDelegatesToPublishedSpringPort() {
+        final TaxCatalogPort spring = new TaxCatalogPort() {
+
+            @Override
+            public Optional<TaxGroupDefinitionData> findTaxGroup(final Long taxGroupId) {
+                return taxGroupId != null && taxGroupId == 7L ? Optional.of(new TaxGroupDefinitionData(7L, "hosted")) : Optional.empty();
+            }
+
+            @Override
+            public TaxGroupDefinitionData getTaxGroup(final Long taxGroupId) {
+                return null;
+            }
+
+            @Override
+            public Optional<TaxComponentDefinitionData> findTaxComponent(final Long taxComponentId) {
+                return Optional.empty();
+            }
+
+            @Override
+            public TaxComponentDefinitionData getTaxComponent(final Long taxComponentId) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = taxBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final TaxCatalogPort facade = OsgiBackedPortFactory.of(lookup, TaxCatalogPort.class);
+
+        assertTrue(facade.findTaxGroup(7L).isEmpty());
+        lifecycle.start();
+        try {
+            assertTrue(facade.findTaxGroup(7L).isPresent());
+            assertTrue(facade.findTaxGroup(1L).isEmpty());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.findTaxGroup(7L).isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -344,6 +387,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringTaxPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final TaxCatalogPort tax = new StubTaxCatalogPort();
+        final SpringOsgiPortBridge bridge = taxBridge(tax);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean taxImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.tax.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    taxImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(taxImplActive);
+            final ServiceReference<TaxCatalogPort> selected = ctx.getServiceReference(TaxCatalogPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(tax, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -351,6 +424,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge ratesBridge(final FloatingRatePort rates) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FloatingRatePort.class, rates)));
+    }
+
+    private static SpringOsgiPortBridge taxBridge(final TaxCatalogPort tax) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TaxCatalogPort.class, tax)));
     }
 
     private static Path stagedCatalog() {
@@ -405,6 +482,29 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Collection<FloatingRatePeriodData> fetchInterestRates(final Long floatingRateId, final FloatingRateDTO floatingRateDTO) {
             return Collections.emptyList();
+        }
+    }
+
+    private static final class StubTaxCatalogPort implements TaxCatalogPort {
+
+        @Override
+        public Optional<TaxGroupDefinitionData> findTaxGroup(final Long taxGroupId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public TaxGroupDefinitionData getTaxGroup(final Long taxGroupId) {
+            return null;
+        }
+
+        @Override
+        public Optional<TaxComponentDefinitionData> findTaxComponent(final Long taxComponentId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public TaxComponentDefinitionData getTaxComponent(final Long taxComponentId) {
+            return null;
         }
     }
 }
