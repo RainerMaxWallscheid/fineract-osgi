@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
+import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
@@ -358,6 +360,28 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void cashierLookupFacadeDelegatesToPublishedSpringPort() {
+        final RecordingCashierTxnValidationPort spring = new RecordingCashierTxnValidationPort();
+        final SpringOsgiPortBridge bridge = cashierBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CashierTxnValidationPort facade = OsgiBackedPortFactory.of(lookup, CashierTxnValidationPort.class);
+
+        facade.validateOnLoanDisbursal(7L, "USD", BigDecimal.TEN);
+        assertEquals(null, spring.lastStaffId);
+        lifecycle.start();
+        try {
+            facade.validateOnLoanDisbursal(7L, "USD", BigDecimal.TEN);
+            assertEquals(7L, spring.lastStaffId);
+        } finally {
+            lifecycle.stop();
+        }
+        spring.lastStaffId = null;
+        facade.validateOnLoanDisbursal(7L, "USD", BigDecimal.TEN);
+        assertEquals(null, spring.lastStaffId);
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -487,6 +511,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCashierPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CashierTxnValidationPort cashier = new StubCashierTxnValidationPort();
+        final SpringOsgiPortBridge bridge = cashierBridge(cashier);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean branchImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.branch.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    branchImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(branchImplActive);
+            final ServiceReference<CashierTxnValidationPort> selected = ctx.getServiceReference(CashierTxnValidationPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(cashier, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -502,6 +556,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge contentBridge(final ContentStoreService content) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ContentStoreService.class, content)));
+    }
+
+    private static SpringOsgiPortBridge cashierBridge(final CashierTxnValidationPort cashier) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CashierTxnValidationPort.class, cashier)));
     }
 
     private static Path stagedCatalog() {
@@ -601,5 +659,21 @@ class EquinoxFrameworkLifecycleTest {
         public ContentStoreType getType() {
             return ContentStoreType.FILE_SYSTEM;
         }
+    }
+
+    private static final class RecordingCashierTxnValidationPort implements CashierTxnValidationPort {
+
+        Long lastStaffId;
+
+        @Override
+        public void validateOnLoanDisbursal(final Long staffId, final String currencyCode, final BigDecimal transactionAmount) {
+            lastStaffId = staffId;
+        }
+    }
+
+    private static final class StubCashierTxnValidationPort implements CashierTxnValidationPort {
+
+        @Override
+        public void validateOnLoanDisbursal(final Long staffId, final String currencyCode, final BigDecimal transactionAmount) {}
     }
 }
