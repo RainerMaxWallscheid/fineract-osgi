@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
 @Entity
 @Table(name = "m_loan_disbursement_detail")
 public class LoanDisbursementDetails extends AbstractPersistableCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
@@ -47,10 +48,10 @@ public class LoanDisbursementDetails extends AbstractPersistableCustom<Long> {
     @Column(name = "is_reversed", nullable = false)
     private boolean reversed;
 
-    protected LoanDisbursementDetails() {
-    }
+    protected LoanDisbursementDetails() {}
 
-    public LoanDisbursementDetails(final LocalDate expectedDisbursementDate, final LocalDate actualDisbursementDate, final BigDecimal principal, final BigDecimal netDisbursalAmount, final boolean reversed) {
+    public LoanDisbursementDetails(final LocalDate expectedDisbursementDate, final LocalDate actualDisbursementDate,
+            final BigDecimal principal, final BigDecimal netDisbursalAmount, final boolean reversed) {
         this.expectedDisbursementDate = expectedDisbursementDate;
         this.actualDisbursementDate = actualDisbursementDate;
         this.principal = principal;
@@ -67,7 +68,8 @@ public class LoanDisbursementDetails extends AbstractPersistableCustom<Long> {
         if (!(obj instanceof LoanDisbursementDetails loanDisbursementDetails)) {
             return false;
         }
-        return loanDisbursementDetails.principal.equals(this.principal) && DateUtils.isEqual(loanDisbursementDetails.expectedDisbursementDate, this.expectedDisbursementDate);
+        return loanDisbursementDetails.principal.equals(this.principal)
+                && DateUtils.isEqual(loanDisbursementDetails.expectedDisbursementDate, this.expectedDisbursementDate);
     }
 
     @Override
@@ -109,7 +111,8 @@ public class LoanDisbursementDetails extends AbstractPersistableCustom<Long> {
     public DisbursementData toData() {
         LocalDate expectedDisburseDate = expectedDisbursementDateAsLocalDate();
         BigDecimal waivedChargeAmount = null;
-        return new DisbursementData(getId(), loan.getId(), expectedDisburseDate, this.actualDisbursementDate, this.principal, this.netDisbursalAmount, null, null, waivedChargeAmount);
+        return new DisbursementData(getId(), loan.getId(), expectedDisburseDate, this.actualDisbursementDate, this.principal,
+                this.netDisbursalAmount, null, null, waivedChargeAmount);
     }
 
     public void updateActualDisbursementDate(LocalDate actualDisbursementDate) {
@@ -138,22 +141,22 @@ public class LoanDisbursementDetails extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getExpectedDisbursementDate() {
+    public LocalDate getExpectedDisbursementDate() {
         return this.expectedDisbursementDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getActualDisbursementDate() {
+    public LocalDate getActualDisbursementDate() {
         return this.actualDisbursementDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getPrincipal() {
+    public BigDecimal getPrincipal() {
         return this.principal;
     }
 }

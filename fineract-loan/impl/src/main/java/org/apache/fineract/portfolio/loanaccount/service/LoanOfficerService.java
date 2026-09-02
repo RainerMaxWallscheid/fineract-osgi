@@ -27,6 +27,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanOfficerAssignment
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanOfficerValidator;
 
 public class LoanOfficerService {
+
     private final LoanOfficerValidator loanOfficerValidator;
 
     public void reassignLoanOfficer(final Loan loan, final Staff newLoanOfficer, final LocalDate assignmentDate) {
@@ -45,7 +46,8 @@ public class LoanOfficerService {
             latestHistoryRecord.ifPresent(loanOfficerAssignmentHistory -> loanOfficerAssignmentHistory.updateEndDate(assignmentDate));
             loan.setLoanOfficer(newLoanOfficer);
             if (loan.isNotSubmittedAndPendingApproval()) {
-                final LoanOfficerAssignmentHistory loanOfficerAssignmentHistory = LoanOfficerAssignmentHistory.createNew(loan, loan.getLoanOfficer(), assignmentDate);
+                final LoanOfficerAssignmentHistory loanOfficerAssignmentHistory = LoanOfficerAssignmentHistory.createNew(loan,
+                        loan.getLoanOfficer(), assignmentDate);
                 loan.getLoanOfficerHistory().add(loanOfficerAssignmentHistory);
             }
         }
@@ -63,7 +65,7 @@ public class LoanOfficerService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanOfficerService(final LoanOfficerValidator loanOfficerValidator) {
+    public LoanOfficerService(final LoanOfficerValidator loanOfficerValidator) {
         this.loanOfficerValidator = loanOfficerValidator;
     }
 }

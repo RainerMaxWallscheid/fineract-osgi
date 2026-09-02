@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GUARANTOR", action = "DELETE")
 public class DeleteGuarantorCommandHandler implements NewCommandSourceHandler {
+
     private final GuarantorWritePlatformService guarantorWritePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class DeleteGuarantorCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public DeleteGuarantorCommandHandler(final GuarantorWritePlatformService guarantorWritePlatformService) {
+    public DeleteGuarantorCommandHandler(final GuarantorWritePlatformService guarantorWritePlatformService) {
         this.guarantorWritePlatformService = guarantorWritePlatformService;
     }
 }

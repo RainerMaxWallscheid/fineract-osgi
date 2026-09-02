@@ -26,8 +26,9 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.lang.NonNull;
 
 public class LoanItemReader extends AbstractLoanItemReader<Loan> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanItemReader.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanItemReader.class);
     private final BeforeStepLockingItemReaderHelper beforeStepLockingItemReaderHelper;
 
     public LoanItemReader(LoanRepository loanRepository, BeforeStepLockingItemReaderHelper beforeStepLockingItemReaderHelper) {

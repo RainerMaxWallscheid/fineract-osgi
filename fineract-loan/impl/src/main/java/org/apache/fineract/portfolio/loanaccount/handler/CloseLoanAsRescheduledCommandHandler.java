@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "CLOSEASRESCHEDULED")
 public class CloseLoanAsRescheduledCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class CloseLoanAsRescheduledCommandHandler implements NewCommandSourceHan
     }
 
     @java.lang.SuppressWarnings("all")
-        public CloseLoanAsRescheduledCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public CloseLoanAsRescheduledCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

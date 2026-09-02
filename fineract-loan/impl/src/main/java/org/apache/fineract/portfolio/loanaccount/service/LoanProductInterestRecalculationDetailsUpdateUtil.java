@@ -30,20 +30,27 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductInterestRecalculationDetailsUpdateUtil {
-    public void update(final LoanProductInterestRecalculationDetails loanProductInterestRecalculationDetails, final JsonCommand command, final Map<String, Object> actualChanges, final String localeAsInput) {
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName, loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod())) {
-            final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName);
+
+    public void update(final LoanProductInterestRecalculationDetails loanProductInterestRecalculationDetails, final JsonCommand command,
+            final Map<String, Object> actualChanges, final String localeAsInput) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName,
+                loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod())) {
+            final Integer newValue = command
+                    .integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName);
             actualChanges.put(LoanProductConstants.interestRecalculationCompoundingMethodParameterName, newValue);
             actualChanges.put("locale", localeAsInput);
-            loanProductInterestRecalculationDetails.setInterestRecalculationCompoundingMethod(InterestRecalculationCompoundingMethod.fromInt(newValue).getValue());
+            loanProductInterestRecalculationDetails
+                    .setInterestRecalculationCompoundingMethod(InterestRecalculationCompoundingMethod.fromInt(newValue).getValue());
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName, loanProductInterestRecalculationDetails.getRescheduleStrategyMethod())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName,
+                loanProductInterestRecalculationDetails.getRescheduleStrategyMethod())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName);
             actualChanges.put(LoanProductConstants.rescheduleStrategyMethodParameterName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductInterestRecalculationDetails.setRescheduleStrategyMethod(LoanRescheduleStrategyMethod.fromInt(newValue).getValue());
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyTypeParameterName, loanProductInterestRecalculationDetails.getRestFrequencyType().getValue())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyTypeParameterName,
+                loanProductInterestRecalculationDetails.getRestFrequencyType().getValue())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyTypeParameterName);
             actualChanges.put(LoanProductConstants.recalculationRestFrequencyTypeParameterName, newValue);
             actualChanges.put("locale", localeAsInput);
@@ -56,27 +63,32 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
             loanProductInterestRecalculationDetails.setRestFrequencyWeekday(null);
             loanProductInterestRecalculationDetails.setRestFrequencyOnDay(null);
         } else {
-            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName, loanProductInterestRecalculationDetails.getRestInterval())) {
-                Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName);
+            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName,
+                    loanProductInterestRecalculationDetails.getRestInterval())) {
+                Integer newValue = command
+                        .integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName);
                 actualChanges.put(LoanProductConstants.recalculationRestFrequencyIntervalParameterName, newValue);
                 actualChanges.put("locale", localeAsInput);
                 loanProductInterestRecalculationDetails.setRestInterval(newValue);
             }
-            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyNthDayParamName, loanProductInterestRecalculationDetails.getRestFrequencyNthDay())) {
+            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyNthDayParamName,
+                    loanProductInterestRecalculationDetails.getRestFrequencyNthDay())) {
                 Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyNthDayParamName);
                 actualChanges.put(LoanProductConstants.recalculationRestFrequencyNthDayParamName, newValue);
                 actualChanges.put("locale", localeAsInput);
                 loanProductInterestRecalculationDetails.setRestFrequencyNthDay(newValue);
                 loanProductInterestRecalculationDetails.setRestFrequencyOnDay(null);
             }
-            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyWeekdayParamName, loanProductInterestRecalculationDetails.getRestFrequencyWeekday())) {
+            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
+                    loanProductInterestRecalculationDetails.getRestFrequencyWeekday())) {
                 Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyWeekdayParamName);
                 actualChanges.put(LoanProductConstants.recalculationRestFrequencyWeekdayParamName, newValue);
                 actualChanges.put("locale", localeAsInput);
                 loanProductInterestRecalculationDetails.setRestFrequencyWeekday(newValue);
                 loanProductInterestRecalculationDetails.setRestFrequencyOnDay(null);
             }
-            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyOnDayParamName, loanProductInterestRecalculationDetails.getRestFrequencyOnDay())) {
+            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationRestFrequencyOnDayParamName,
+                    loanProductInterestRecalculationDetails.getRestFrequencyOnDay())) {
                 Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyOnDayParamName);
                 actualChanges.put(LoanProductConstants.recalculationRestFrequencyOnDayParamName, newValue);
                 actualChanges.put("locale", localeAsInput);
@@ -100,12 +112,15 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
                 loanProductInterestRecalculationDetails.setRestFrequencyOnDay(null);
             }
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName, loanProductInterestRecalculationDetails.getCompoundingFrequencyType().getValue())) {
-            final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName);
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName,
+                loanProductInterestRecalculationDetails.getCompoundingFrequencyType().getValue())) {
+            final Integer newValue = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName);
             actualChanges.put(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName, newValue);
             loanProductInterestRecalculationDetails.setCompoundingFrequencyType(RecalculationFrequencyType.fromInt(newValue).getValue());
         }
-        InterestRecalculationCompoundingMethod compoundingMethod = InterestRecalculationCompoundingMethod.fromInt(loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod());
+        InterestRecalculationCompoundingMethod compoundingMethod = InterestRecalculationCompoundingMethod
+                .fromInt(loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod());
         if (compoundingMethod.isCompoundingEnabled()) {
             RecalculationFrequencyType compoundingFrequencyType = loanProductInterestRecalculationDetails.getCompoundingFrequencyType();
             if (compoundingFrequencyType.isSameAsRepayment()) {
@@ -114,27 +129,35 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
                 loanProductInterestRecalculationDetails.setCompoundingFrequencyWeekday(null);
                 loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(null);
             } else {
-                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName, loanProductInterestRecalculationDetails.getCompoundingInterval())) {
-                    Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName);
+                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName,
+                        loanProductInterestRecalculationDetails.getCompoundingInterval())) {
+                    Integer newValue = command
+                            .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName);
                     actualChanges.put(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName, newValue);
                     loanProductInterestRecalculationDetails.setCompoundingInterval(newValue);
                 }
-                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName, loanProductInterestRecalculationDetails.getCompoundingFrequencyNthDay())) {
-                    Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName);
+                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName,
+                        loanProductInterestRecalculationDetails.getCompoundingFrequencyNthDay())) {
+                    Integer newValue = command
+                            .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName);
                     actualChanges.put(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName, newValue);
                     actualChanges.put("locale", localeAsInput);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyNthDay(newValue);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(null);
                 }
-                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName, loanProductInterestRecalculationDetails.getCompoundingFrequencyWeekday())) {
-                    Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName);
+                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName,
+                        loanProductInterestRecalculationDetails.getCompoundingFrequencyWeekday())) {
+                    Integer newValue = command
+                            .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName);
                     actualChanges.put(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName, newValue);
                     actualChanges.put("locale", localeAsInput);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyWeekday(newValue);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(null);
                 }
-                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName, loanProductInterestRecalculationDetails.getCompoundingFrequencyOnDay())) {
-                    Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName);
+                if (command.isChangeInIntegerParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName,
+                        loanProductInterestRecalculationDetails.getCompoundingFrequencyOnDay())) {
+                    Integer newValue = command
+                            .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName);
                     actualChanges.put(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName, newValue);
                     actualChanges.put("locale", localeAsInput);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(newValue);
@@ -145,7 +168,8 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyNthDay(null);
                     loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(null);
                 } else if (compoundingFrequencyType.isMonthly()) {
-                    if (command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName) != null) {
+                    if (command
+                            .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName) != null) {
                         loanProductInterestRecalculationDetails.setCompoundingFrequencyNthDay(null);
                         loanProductInterestRecalculationDetails.setCompoundingFrequencyWeekday(null);
                     } else {
@@ -158,7 +182,8 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
                 }
             }
             if (!compoundingFrequencyType.isDaily()) {
-                if (command.isChangeInBooleanParameterNamed(LoanProductConstants.allowCompoundingOnEodParamName, loanProductInterestRecalculationDetails.getAllowCompoundingOnEod())) {
+                if (command.isChangeInBooleanParameterNamed(LoanProductConstants.allowCompoundingOnEodParamName,
+                        loanProductInterestRecalculationDetails.getAllowCompoundingOnEod())) {
                     boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.allowCompoundingOnEodParamName);
                     actualChanges.put(LoanProductConstants.allowCompoundingOnEodParamName, newValue);
                     loanProductInterestRecalculationDetails.setAllowCompoundingOnEod(newValue);
@@ -173,12 +198,15 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
             loanProductInterestRecalculationDetails.setCompoundingFrequencyWeekday(null);
             loanProductInterestRecalculationDetails.setCompoundingFrequencyOnDay(null);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName, loanProductInterestRecalculationDetails.isArrearsBasedOnOriginalSchedule())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName,
+                loanProductInterestRecalculationDetails.isArrearsBasedOnOriginalSchedule())) {
+            final boolean newValue = command
+                    .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName);
             actualChanges.put(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName, newValue);
             loanProductInterestRecalculationDetails.setArrearsBasedOnOriginalSchedule(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.preClosureInterestCalculationStrategyParamName, loanProductInterestRecalculationDetails.getPreCloseInterestCalculationStrategy().getValue())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.preClosureInterestCalculationStrategyParamName,
+                loanProductInterestRecalculationDetails.getPreCloseInterestCalculationStrategy().getValue())) {
             Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.preClosureInterestCalculationStrategyParamName);
             if (newValue == null) {
                 newValue = LoanPreCloseInterestCalculationStrategy.TILL_PRE_CLOSURE_DATE.getValue();
@@ -186,19 +214,22 @@ public class LoanProductInterestRecalculationDetailsUpdateUtil {
             actualChanges.put(LoanProductConstants.preClosureInterestCalculationStrategyParamName, newValue);
             loanProductInterestRecalculationDetails.setPreCloseInterestCalculationStrategy(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, loanProductInterestRecalculationDetails.getIsCompoundingToBePostedAsTransaction())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName,
+                loanProductInterestRecalculationDetails.getIsCompoundingToBePostedAsTransaction())) {
+            final boolean newValue = command
+                    .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName);
             actualChanges.put(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, newValue);
             loanProductInterestRecalculationDetails.setIsCompoundingToBePostedAsTransaction(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName, loanProductInterestRecalculationDetails.getDisallowInterestCalculationOnPastDue())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName,
+                loanProductInterestRecalculationDetails.getDisallowInterestCalculationOnPastDue())) {
+            final boolean newValue = command
+                    .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName);
             actualChanges.put(LoanProductConstants.disallowInterestCalculationOnPastDueParamName, newValue);
             loanProductInterestRecalculationDetails.setDisallowInterestCalculationOnPastDue(newValue);
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductInterestRecalculationDetailsUpdateUtil() {
-    }
+    public LoanProductInterestRecalculationDetailsUpdateUtil() {}
 }

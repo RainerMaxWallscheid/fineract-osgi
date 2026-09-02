@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CreateLoanRescheduleRequestCommandStrategy implements CommandStrategy {
+
     private final RescheduleLoansApiResource rescheduleLoansApiResource;
 
     @Override
@@ -57,7 +58,7 @@ public class CreateLoanRescheduleRequestCommandStrategy implements CommandStrate
     }
 
     @java.lang.SuppressWarnings("all")
-        public CreateLoanRescheduleRequestCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
+    public CreateLoanRescheduleRequestCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
         this.rescheduleLoansApiResource = rescheduleLoansApiResource;
     }
 }

@@ -54,9 +54,8 @@ public class LoanOwnershipEventDataPortAdapter implements LoanOwnershipEventData
             if (existing == null) {
                 map.put(toAdd.getChargeId(), toAdd);
             } else {
-                map.put(existing.getChargeId(),
-                        new UnpaidChargeData(existing.getChargeId(), existing.getChargeName(),
-                                existing.getOutstandingAmount().add(toAdd.getOutstandingAmount())));
+                map.put(existing.getChargeId(), new UnpaidChargeData(existing.getChargeId(), existing.getChargeName(),
+                        existing.getOutstandingAmount().add(toAdd.getOutstandingAmount())));
             }
         }
     }

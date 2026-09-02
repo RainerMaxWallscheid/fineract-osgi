@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOANCHARGE", action = "CREATE")
 public class AddLoanChargeCommandHandler implements NewCommandSourceHandler {
+
     private final LoanChargeWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -47,7 +48,8 @@ public class AddLoanChargeCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddLoanChargeCommandHandler(final LoanChargeWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+    public AddLoanChargeCommandHandler(final LoanChargeWritePlatformService writePlatformService,
+            final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
         this.writePlatformService = writePlatformService;
         this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }

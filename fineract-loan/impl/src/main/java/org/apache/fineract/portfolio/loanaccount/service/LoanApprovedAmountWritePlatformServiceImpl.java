@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedAmountWritePlatformService {
+
     private static final String ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT = "must.be.different.from.current.approved.amount";
     private final LoanAssembler loanAssembler;
     private final LoanApprovedAmountValidator loanApprovedAmountValidator;
@@ -54,11 +55,12 @@ public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedA
         changes.put("oldApprovedAmount", loan.getApprovedPrincipal());
         BigDecimal newApprovedAmount = command.bigDecimalValueOfParameterNamed(LoanApiConstants.amountParameterName);
         validateNewApprovedAmountDiffersFromCurrent(loan, newApprovedAmount);
-        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount, loan.getApprovedPrincipal());
+        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount,
+                loan.getApprovedPrincipal());
         loan.setApprovedPrincipal(newApprovedAmount);
         loanApprovedAmountHistoryRepository.saveAndFlush(loanApprovedAmountHistory);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanApprovedAmountChangedBusinessEvent(loan));
-        return  //
+        return //
         //
         //
         //
@@ -66,7 +68,9 @@ public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedA
         //
         //
         //
-        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId()).withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).with(changes).build();
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId())
+                .withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId())
+                .withGroupId(loan.getGroupId()).with(changes).build();
     }
 
     @Override
@@ -78,17 +82,21 @@ public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedA
         changes.put("locale", command.locale());
         Loan loan = this.loanAssembler.assembleFrom(loanId);
         changes.put("oldApprovedAmount", loan.getApprovedPrincipal());
-        BigDecimal expectedDisbursementAmount = loan.getDisbursementDetails().stream().filter(t -> t.actualDisbursementDate() == null).map(LoanDisbursementDetails::getPrincipal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal oldAvailableDisbursement = loan.getApprovedPrincipal().subtract(loan.getSummary().getTotalPrincipal()).subtract(expectedDisbursementAmount);
+        BigDecimal expectedDisbursementAmount = loan.getDisbursementDetails().stream().filter(t -> t.actualDisbursementDate() == null)
+                .map(LoanDisbursementDetails::getPrincipal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal oldAvailableDisbursement = loan.getApprovedPrincipal().subtract(loan.getSummary().getTotalPrincipal())
+                .subtract(expectedDisbursementAmount);
         changes.put("oldAvailableDisbursementAmount", oldAvailableDisbursement);
         BigDecimal newAvailableDisbursementAmount = command.bigDecimalValueOfParameterNamed(LoanApiConstants.amountParameterName);
-        BigDecimal newApprovedAmount = loan.getSummary().getTotalPrincipal().add(expectedDisbursementAmount).add(newAvailableDisbursementAmount);
+        BigDecimal newApprovedAmount = loan.getSummary().getTotalPrincipal().add(expectedDisbursementAmount)
+                .add(newAvailableDisbursementAmount);
         changes.put("newApprovedAmount", newApprovedAmount);
-        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount, loan.getApprovedPrincipal());
+        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount,
+                loan.getApprovedPrincipal());
         loan.setApprovedPrincipal(newApprovedAmount);
         loanApprovedAmountHistoryRepository.saveAndFlush(loanApprovedAmountHistory);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanApprovedAmountChangedBusinessEvent(loan));
-        return  //
+        return //
         //
         //
         //
@@ -96,17 +104,24 @@ public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedA
         //
         //
         //
-        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId()).withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).with(changes).build();
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId())
+                .withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId())
+                .withGroupId(loan.getGroupId()).with(changes).build();
     }
 
     private static void validateNewApprovedAmountDiffersFromCurrent(final Loan loan, final BigDecimal newApprovedAmount) {
         if (newApprovedAmount.compareTo(loan.getApprovedPrincipal()) == 0) {
-            Validator.validateOrThrowDomainViolation("loan.approved.amount", baseDataValidator -> baseDataValidator.reset().parameter(LoanApiConstants.amountParameterName).value(newApprovedAmount).failWithCode(ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT));
+            Validator.validateOrThrowDomainViolation("loan.approved.amount",
+                    baseDataValidator -> baseDataValidator.reset().parameter(LoanApiConstants.amountParameterName).value(newApprovedAmount)
+                            .failWithCode(ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT));
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApprovedAmountWritePlatformServiceImpl(final LoanAssembler loanAssembler, final LoanApprovedAmountValidator loanApprovedAmountValidator, final LoanApprovedAmountHistoryRepository loanApprovedAmountHistoryRepository, final BusinessEventNotifierService businessEventNotifierService) {
+    public LoanApprovedAmountWritePlatformServiceImpl(final LoanAssembler loanAssembler,
+            final LoanApprovedAmountValidator loanApprovedAmountValidator,
+            final LoanApprovedAmountHistoryRepository loanApprovedAmountHistoryRepository,
+            final BusinessEventNotifierService businessEventNotifierService) {
         this.loanAssembler = loanAssembler;
         this.loanApprovedAmountValidator = loanApprovedAmountValidator;
         this.loanApprovedAmountHistoryRepository = loanApprovedAmountHistoryRepository;

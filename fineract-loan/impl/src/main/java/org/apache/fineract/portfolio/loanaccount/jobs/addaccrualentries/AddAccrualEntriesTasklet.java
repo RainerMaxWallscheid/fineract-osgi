@@ -32,8 +32,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AddAccrualEntriesTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddAccrualEntriesTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddAccrualEntriesTasklet.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -51,7 +52,7 @@ public class AddAccrualEntriesTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+    public AddAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

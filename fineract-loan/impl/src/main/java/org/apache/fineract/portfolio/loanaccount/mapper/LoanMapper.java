@@ -40,24 +40,32 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanMapper {
+
     private final LoanTermVariationsMapper loanTermVariationsMapper;
 
     public LoanScheduleModel regenerateScheduleModel(final ScheduleGeneratorDTO scheduleGeneratorDTO, final Loan loan) {
         final MathContext mc = MoneyHelper.getMathContext();
-        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO, loan);
+        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO,
+                loan);
         LoanScheduleGenerator loanScheduleGenerator;
         if (loanApplicationTerms.isEqualAmortization()) {
             if (loanApplicationTerms.getInterestMethod().isDecliningBalance()) {
-                final LoanScheduleGenerator decliningLoanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(), InterestMethod.DECLINING_BALANCE);
+                final LoanScheduleGenerator decliningLoanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory()
+                        .create(loanApplicationTerms.getLoanScheduleType(), InterestMethod.DECLINING_BALANCE);
                 Set<LoanCharge> loanCharges = loan.getActiveCharges();
-                LoanScheduleModel loanSchedule = decliningLoanScheduleGenerator.generate(mc, loanApplicationTerms, loanCharges, scheduleGeneratorDTO.getHolidayDetailDTO());
-                loanApplicationTerms.updateTotalInterestDue(Money.of(loanApplicationTerms.getCurrency(), loanSchedule.getTotalInterestCharged()));
+                LoanScheduleModel loanSchedule = decliningLoanScheduleGenerator.generate(mc, loanApplicationTerms, loanCharges,
+                        scheduleGeneratorDTO.getHolidayDetailDTO());
+                loanApplicationTerms
+                        .updateTotalInterestDue(Money.of(loanApplicationTerms.getCurrency(), loanSchedule.getTotalInterestCharged()));
             }
-            loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(), InterestMethod.FLAT);
+            loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(),
+                    InterestMethod.FLAT);
         } else {
-            loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(), loanApplicationTerms.getInterestMethod());
+            loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(),
+                    loanApplicationTerms.getInterestMethod());
         }
-        return loanScheduleGenerator.generate(mc, loanApplicationTerms, loan.getActiveCharges(), scheduleGeneratorDTO.getHolidayDetailDTO());
+        return loanScheduleGenerator.generate(mc, loanApplicationTerms, loan.getActiveCharges(),
+                scheduleGeneratorDTO.getHolidayDetailDTO());
     }
 
     public List<DisbursementData> getDisbursementData(final Loan loan) {
@@ -74,13 +82,15 @@ public class LoanMapper {
                 actualDisbursementDate = loanDisbursementDetails.actualDisbursementDate();
             }
             BigDecimal waivedChargeAmount = null;
-            disbursementData.add(new DisbursementData(loanDisbursementDetails.getId(), loan.getId(), expectedDisbursementDate, actualDisbursementDate, loanDisbursementDetails.getPrincipal(), loan.getNetDisbursalAmount(), null, null, waivedChargeAmount));
+            disbursementData.add(
+                    new DisbursementData(loanDisbursementDetails.getId(), loan.getId(), expectedDisbursementDate, actualDisbursementDate,
+                            loanDisbursementDetails.getPrincipal(), loan.getNetDisbursalAmount(), null, null, waivedChargeAmount));
         }
         return disbursementData;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanMapper(final LoanTermVariationsMapper loanTermVariationsMapper) {
+    public LoanMapper(final LoanTermVariationsMapper loanTermVariationsMapper) {
         this.loanTermVariationsMapper = loanTermVariationsMapper;
     }
 }

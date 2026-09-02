@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOANPRODUCT", action = "CREATE")
 public class CreateLoanProductCommandHandler implements NewCommandSourceHandler {
+
     private final LoanProductWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class CreateLoanProductCommandHandler implements NewCommandSourceHandler 
     }
 
     @java.lang.SuppressWarnings("all")
-        public CreateLoanProductCommandHandler(final LoanProductWritePlatformService writePlatformService) {
+    public CreateLoanProductCommandHandler(final LoanProductWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

@@ -122,7 +122,8 @@ public class CheckLoanRepaymentOverdueBusinessStepTest {
         Loan processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanRepaymentDueBusinessEventArgumentCaptor.capture());
-        LoanRepaymentScheduleInstallment loanPayloadForEvent = (LoanRepaymentScheduleInstallment) loanRepaymentDueBusinessEventArgumentCaptor.getValue().get();
+        LoanRepaymentScheduleInstallment loanPayloadForEvent = (LoanRepaymentScheduleInstallment) loanRepaymentDueBusinessEventArgumentCaptor
+                .getValue().get();
         assertEquals(repaymentInstallment, loanPayloadForEvent);
         assertEquals(processedLoan, loanForProcessing);
     }
@@ -207,7 +208,8 @@ public class CheckLoanRepaymentOverdueBusinessStepTest {
         Loan processedLoan = underTest.execute(loanForProcessing);
         // then
         verify(businessEventNotifierService, times(1)).notifyPostBusinessEvent(loanRepaymentDueBusinessEventArgumentCaptor.capture());
-        LoanRepaymentScheduleInstallment loanPayloadForEvent = (LoanRepaymentScheduleInstallment) loanRepaymentDueBusinessEventArgumentCaptor.getValue().get();
+        LoanRepaymentScheduleInstallment loanPayloadForEvent = (LoanRepaymentScheduleInstallment) loanRepaymentDueBusinessEventArgumentCaptor
+                .getValue().get();
         assertEquals(repaymentInstallment, loanPayloadForEvent);
         assertEquals(processedLoan, loanForProcessing);
     }

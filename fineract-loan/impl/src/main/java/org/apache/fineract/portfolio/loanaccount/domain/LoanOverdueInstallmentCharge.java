@@ -28,6 +28,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name = "m_loan_overdue_installment_charge")
 public class LoanOverdueInstallmentCharge extends AbstractPersistableCustom<Long> {
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_charge_id", referencedColumnName = "id", nullable = false)
     private LoanCharge loancharge;
@@ -37,10 +38,10 @@ public class LoanOverdueInstallmentCharge extends AbstractPersistableCustom<Long
     @Column(name = "frequency_number")
     private Integer frequencyNumber;
 
-    public LoanOverdueInstallmentCharge() {
-    }
+    public LoanOverdueInstallmentCharge() {}
 
-    public LoanOverdueInstallmentCharge(final LoanCharge loancharge, final LoanRepaymentScheduleInstallment installment, final Integer frequencyNumber) {
+    public LoanOverdueInstallmentCharge(final LoanCharge loancharge, final LoanRepaymentScheduleInstallment installment,
+            final Integer frequencyNumber) {
         this.loancharge = loancharge;
         this.installment = installment;
         this.frequencyNumber = frequencyNumber;
@@ -51,17 +52,17 @@ public class LoanOverdueInstallmentCharge extends AbstractPersistableCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCharge getLoancharge() {
+    public LoanCharge getLoancharge() {
         return this.loancharge;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentScheduleInstallment getInstallment() {
+    public LoanRepaymentScheduleInstallment getInstallment() {
         return this.installment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getFrequencyNumber() {
+    public Integer getFrequencyNumber() {
         return this.frequencyNumber;
     }
 }

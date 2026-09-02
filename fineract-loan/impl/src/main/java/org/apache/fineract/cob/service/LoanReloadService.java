@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanReloadService implements ReloadService<Loan> {
+
     private final LoanAssembler loanAssembler;
 
     @Override
@@ -38,7 +39,7 @@ public class LoanReloadService implements ReloadService<Loan> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReloadService(final LoanAssembler loanAssembler) {
+    public LoanReloadService(final LoanAssembler loanAssembler) {
         this.loanAssembler = loanAssembler;
     }
 }

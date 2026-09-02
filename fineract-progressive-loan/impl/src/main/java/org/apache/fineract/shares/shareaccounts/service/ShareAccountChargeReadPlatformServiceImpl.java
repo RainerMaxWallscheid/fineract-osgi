@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class ShareAccountChargeReadPlatformServiceImpl implements ShareAccountChargeReadPlatformService {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -45,15 +46,26 @@ public class ShareAccountChargeReadPlatformServiceImpl implements ShareAccountCh
             sqlBuilder.append(" and sc.is_active = false ");
         }
         sqlBuilder.append(" order by sc.charge_time_enum ASC");
-        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] {accountId});
+        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] { accountId });
     }
 
-
     private static final class ShareAccountChargeMapper implements RowMapper<ShareAccountChargeData> {
+
         private final String schema;
 
         ShareAccountChargeMapper() {
-            StringBuilder buff = new StringBuilder().append("sc.id as id, c.id as chargeId, sc.account_id as accountId, c.name as name, ").append("sc.amount as amountDue, sc.amount_paid_derived as amountPaid, ").append("sc.amount_waived_derived as amountWaived, sc.amount_writtenoff_derived as amountWrittenOff, ").append("sc.amount_outstanding_derived as amountOutstanding, sc.calculation_percentage as percentageOf, ").append("sc.calculation_on_amount as amountPercentageAppliedTo, sc.charge_time_enum as chargeTime, ").append("sc.charge_calculation_enum as chargeCalculation, c.is_active as isActive, ").append("c.currency_code as currencyCode, oc.name as currencyName, ").append("oc.decimal_places as currencyDecimalPlaces, oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, ").append("sc.charge_amount_or_percentage, ").append("oc.internationalized_name_code as currencyNameCode from m_charge c ").append("join m_organisation_currency oc on c.currency_code = oc.code ").append("join m_share_account_charge sc on sc.charge_id = c.id ");
+            StringBuilder buff = new StringBuilder().append("sc.id as id, c.id as chargeId, sc.account_id as accountId, c.name as name, ")
+                    .append("sc.amount as amountDue, sc.amount_paid_derived as amountPaid, ")
+                    .append("sc.amount_waived_derived as amountWaived, sc.amount_writtenoff_derived as amountWrittenOff, ")
+                    .append("sc.amount_outstanding_derived as amountOutstanding, sc.calculation_percentage as percentageOf, ")
+                    .append("sc.calculation_on_amount as amountPercentageAppliedTo, sc.charge_time_enum as chargeTime, ")
+                    .append("sc.charge_calculation_enum as chargeCalculation, c.is_active as isActive, ")
+                    .append("c.currency_code as currencyCode, oc.name as currencyName, ")
+                    .append("oc.decimal_places as currencyDecimalPlaces, oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, ")
+                    .append("sc.charge_amount_or_percentage, ")
+                    .append("oc.internationalized_name_code as currencyNameCode from m_charge c ")
+                    .append("join m_organisation_currency oc on c.currency_code = oc.code ")
+                    .append("join m_share_account_charge sc on sc.charge_id = c.id ");
             schema = buff.toString();
         }
 
@@ -76,7 +88,8 @@ public class ShareAccountChargeReadPlatformServiceImpl implements ShareAccountCh
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer currencyDecimalPlaces = JdbcSupport.getInteger(rs, "currencyDecimalPlaces");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDecimalPlaces, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDecimalPlaces, inMultiplesOf,
+                    currencyDisplaySymbol, currencyNameCode);
             final int chargeTime = rs.getInt("chargeTime");
             final EnumOptionData chargeTimeType = ChargeEnumerations.chargeTimeType(chargeTime);
             final int chargeCalculation = rs.getInt("chargeCalculation");
@@ -84,7 +97,9 @@ public class ShareAccountChargeReadPlatformServiceImpl implements ShareAccountCh
             final Boolean isActive = rs.getBoolean("isActive");
             final BigDecimal chargeamountorpercentage = rs.getBigDecimal("charge_amount_or_percentage");
             final Collection<ChargeData> chargeOptions = null;
-            return new ShareAccountChargeData(id, chargeId, accountId, name, currency, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, chargeTimeType, chargeCalculationType, percentageOf, amountPercentageAppliedTo, chargeOptions, isActive, chargeamountorpercentage);
+            return new ShareAccountChargeData(id, chargeId, accountId, name, currency, amount, amountPaid, amountWaived, amountWrittenOff,
+                    amountOutstanding, chargeTimeType, chargeCalculationType, percentageOf, amountPercentageAppliedTo, chargeOptions,
+                    isActive, chargeamountorpercentage);
         }
 
         public String schema() {
@@ -93,7 +108,7 @@ public class ShareAccountChargeReadPlatformServiceImpl implements ShareAccountCh
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountChargeReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+    public ShareAccountChargeReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 }

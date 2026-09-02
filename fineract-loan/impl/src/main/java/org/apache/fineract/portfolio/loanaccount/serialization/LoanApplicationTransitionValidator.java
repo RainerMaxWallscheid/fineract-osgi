@@ -37,12 +37,10 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
-import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
@@ -54,6 +52,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public final class LoanApplicationTransitionValidator {
+
     private ClientActivePort clientActivePort;
 
     @Autowired
@@ -73,7 +72,8 @@ public final class LoanApplicationTransitionValidator {
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                    dataValidationErrors);
         }
     }
 
@@ -81,21 +81,31 @@ public final class LoanApplicationTransitionValidator {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-        final Set<String> disbursementParameters = new HashSet<>(Arrays.asList(LoanApiConstants.loanIdTobeApproved, LoanApiConstants.approvedLoanAmountParameterName, LoanApiConstants.approvedOnDateParameterName, LoanApiConstants.disbursementNetDisbursalAmountParameterName, LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName, LoanApiConstants.disbursementDataParameterName, LoanApiConstants.expectedDisbursementDateParameterName));
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        final Set<String> disbursementParameters = new HashSet<>(
+                Arrays.asList(LoanApiConstants.loanIdTobeApproved, LoanApiConstants.approvedLoanAmountParameterName,
+                        LoanApiConstants.approvedOnDateParameterName, LoanApiConstants.disbursementNetDisbursalAmountParameterName,
+                        LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName,
+                        LoanApiConstants.disbursementDataParameterName, LoanApiConstants.expectedDisbursementDateParameterName));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, disbursementParameters);
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loanapplication");
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-        final BigDecimal principal = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed(LoanApiConstants.approvedLoanAmountParameterName, element);
-        baseDataValidator.reset().parameter(LoanApiConstants.approvedLoanAmountParameterName).value(principal).ignoreIfNull().positiveAmount();
-        final BigDecimal netDisbursalAmount = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed(LoanApiConstants.disbursementNetDisbursalAmountParameterName, element);
-        baseDataValidator.reset().parameter(LoanApiConstants.disbursementNetDisbursalAmountParameterName).value(netDisbursalAmount).ignoreIfNull().positiveAmount();
-        final LocalDate approvedOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.approvedOnDateParameterName, element);
+        final BigDecimal principal = this.fromApiJsonHelper
+                .extractBigDecimalWithLocaleNamed(LoanApiConstants.approvedLoanAmountParameterName, element);
+        baseDataValidator.reset().parameter(LoanApiConstants.approvedLoanAmountParameterName).value(principal).ignoreIfNull()
+                .positiveAmount();
+        final BigDecimal netDisbursalAmount = this.fromApiJsonHelper
+                .extractBigDecimalWithLocaleNamed(LoanApiConstants.disbursementNetDisbursalAmountParameterName, element);
+        baseDataValidator.reset().parameter(LoanApiConstants.disbursementNetDisbursalAmountParameterName).value(netDisbursalAmount)
+                .ignoreIfNull().positiveAmount();
+        final LocalDate approvedOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.approvedOnDateParameterName,
+                element);
         baseDataValidator.reset().parameter(LoanApiConstants.approvedOnDateParameterName).value(approvedOnDate).notNull();
-        final LocalDate expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, element);
-        baseDataValidator.reset().parameter(LoanApiConstants.expectedDisbursementDateParameterName).value(expectedDisbursementDate).ignoreIfNull();
+        final LocalDate expectedDisbursementDate = this.fromApiJsonHelper
+                .extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, element);
+        baseDataValidator.reset().parameter(LoanApiConstants.expectedDisbursementDateParameterName).value(expectedDisbursementDate)
+                .ignoreIfNull();
         final String note = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.noteParameterName, element);
         baseDataValidator.reset().parameter(LoanApiConstants.noteParameterName).value(note).notExceedingLengthOf(1000);
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
@@ -113,14 +123,15 @@ public final class LoanApplicationTransitionValidator {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-        final Set<String> disbursementParameters = new HashSet<>(Arrays.asList(LoanApiConstants.rejectedOnDateParameterName, LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName));
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        final Set<String> disbursementParameters = new HashSet<>(Arrays.asList(LoanApiConstants.rejectedOnDateParameterName,
+                LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, disbursementParameters);
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loanapplication");
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-        final LocalDate rejectedOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.rejectedOnDateParameterName, element);
+        final LocalDate rejectedOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.rejectedOnDateParameterName,
+                element);
         baseDataValidator.reset().parameter(LoanApiConstants.rejectedOnDateParameterName).value(rejectedOnDate).notNull();
         final String note = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.noteParameterName, element);
         baseDataValidator.reset().parameter(LoanApiConstants.noteParameterName).value(note).notExceedingLengthOf(1000);
@@ -137,8 +148,10 @@ public final class LoanApplicationTransitionValidator {
         if (!statusEnum.hasStateOf(loan.getLoanStatus())) {
             final LocalDate rejectedOn = command.localDateValueOfParameterNamed(Loan.REJECTED_ON_DATE);
             if (DateUtils.isBefore(rejectedOn, loan.getSubmittedOnDate())) {
-                final String errorMessage = "The date on which a loan is rejected cannot be before its submittal date: " + loan.getSubmittedOnDate().toString();
-                throw new InvalidLoanStateTransitionException("reject", "cannot.be.before.submittal.date", errorMessage, rejectedOn, loan.getSubmittedOnDate());
+                final String errorMessage = "The date on which a loan is rejected cannot be before its submittal date: "
+                        + loan.getSubmittedOnDate().toString();
+                throw new InvalidLoanStateTransitionException("reject", "cannot.be.before.submittal.date", errorMessage, rejectedOn,
+                        loan.getSubmittedOnDate());
             }
             validateActivityNotBeforeClientOrGroupTransferDate(loan, LoanEvent.LOAN_REJECTED, rejectedOn);
             if (DateUtils.isDateInTheFuture(rejectedOn)) {
@@ -163,14 +176,15 @@ public final class LoanApplicationTransitionValidator {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-        final Set<String> disbursementParameters = new HashSet<>(Arrays.asList(LoanApiConstants.withdrawnOnDateParameterName, LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName));
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        final Set<String> disbursementParameters = new HashSet<>(Arrays.asList(LoanApiConstants.withdrawnOnDateParameterName,
+                LoanApiConstants.noteParameterName, LoanApiConstants.localeParameterName, LoanApiConstants.dateFormatParameterName));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, disbursementParameters);
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loanapplication");
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-        final LocalDate withdrawnOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.withdrawnOnDateParameterName, element);
+        final LocalDate withdrawnOnDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.withdrawnOnDateParameterName,
+                element);
         baseDataValidator.reset().parameter(LoanApiConstants.withdrawnOnDateParameterName).value(withdrawnOnDate).notNull();
         final String note = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.noteParameterName, element);
         baseDataValidator.reset().parameter(LoanApiConstants.noteParameterName).value(note).notExceedingLengthOf(1000);
@@ -188,8 +202,10 @@ public final class LoanApplicationTransitionValidator {
                 withdrawnOn = command.localDateValueOfParameterNamed(Loan.EVENT_DATE);
             }
             if (DateUtils.isBefore(withdrawnOn, loan.getSubmittedOnDate())) {
-                final String errorMessage = "The date on which a loan is withdrawn cannot be before its submittal date: " + loan.getSubmittedOnDate().toString();
-                throw new InvalidLoanStateTransitionException("withdraw", "cannot.be.before.submittal.date", errorMessage, command, loan.getSubmittedOnDate());
+                final String errorMessage = "The date on which a loan is withdrawn cannot be before its submittal date: "
+                        + loan.getSubmittedOnDate().toString();
+                throw new InvalidLoanStateTransitionException("withdraw", "cannot.be.before.submittal.date", errorMessage, command,
+                        loan.getSubmittedOnDate());
             }
             validateActivityNotBeforeClientOrGroupTransferDate(loan, LoanEvent.LOAN_WITHDRAWN, withdrawnOn);
             if (DateUtils.isDateInTheFuture(withdrawnOn)) {
@@ -235,7 +251,8 @@ public final class LoanApplicationTransitionValidator {
             case LOAN_REJECTED -> {
                 if (!loan.isSubmittedAndPendingApproval()) {
                     final String defaultUserMessage = "Loan application cannot be rejected. Loan Account is not in Submitted and Pending approval state.";
-                    final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.reject.account.is.not.submitted.pending.approval.state", defaultUserMessage);
+                    final ApiParameterError error = ApiParameterError
+                            .generalError("error.msg.loan.reject.account.is.not.submitted.pending.approval.state", defaultUserMessage);
                     dataValidationErrors.add(error);
                 }
             }
@@ -259,7 +276,8 @@ public final class LoanApplicationTransitionValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationTransitionValidator(final FromJsonHelper fromApiJsonHelper, final LoanLifecycleStateMachine defaultLoanLifecycleStateMachine) {
+    public LoanApplicationTransitionValidator(final FromJsonHelper fromApiJsonHelper,
+            final LoanLifecycleStateMachine defaultLoanLifecycleStateMachine) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.defaultLoanLifecycleStateMachine = defaultLoanLifecycleStateMachine;
     }

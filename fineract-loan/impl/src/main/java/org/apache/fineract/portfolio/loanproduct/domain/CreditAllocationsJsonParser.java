@@ -31,9 +31,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CreditAllocationsJsonParser {
+
     public final CreditAllocationsValidator creditAllocationsValidator;
 
-    public List<LoanProductCreditAllocationRule> assembleLoanProductCreditAllocationRules(final JsonCommand command, String loanTransactionProcessingStrategyCode) {
+    public List<LoanProductCreditAllocationRule> assembleLoanProductCreditAllocationRules(final JsonCommand command,
+            String loanTransactionProcessingStrategyCode) {
         JsonArray creditAllocation = command.arrayOfParameterNamed("creditAllocation");
         List<LoanProductCreditAllocationRule> productCreditAllocationRules = null;
         if (creditAllocation != null) {
@@ -104,7 +106,7 @@ public class CreditAllocationsJsonParser {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CreditAllocationsJsonParser(final CreditAllocationsValidator creditAllocationsValidator) {
+    public CreditAllocationsJsonParser(final CreditAllocationsValidator creditAllocationsValidator) {
         this.creditAllocationsValidator = creditAllocationsValidator;
     }
 }

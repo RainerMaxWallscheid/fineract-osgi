@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSerializer {
+
     private final ByteBufferConverter byteBufferConverter;
 
     @Override
@@ -55,7 +56,7 @@ public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSe
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeDeletedBusinessEventSerializer(final ByteBufferConverter byteBufferConverter) {
+    public LoanChargeDeletedBusinessEventSerializer(final ByteBufferConverter byteBufferConverter) {
         this.byteBufferConverter = byteBufferConverter;
     }
 }

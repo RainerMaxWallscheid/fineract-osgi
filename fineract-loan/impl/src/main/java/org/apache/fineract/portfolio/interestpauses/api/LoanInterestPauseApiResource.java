@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Tag(name = "Loan Interest Pause", description = "APIs for managing interest pause periods on loans.")
 public class LoanInterestPauseApiResource {
+
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
     private static final String MODIFY_RESOURCE_NAME_FOR_PERMISSIONS = "UPDATE LOAN";
     private final PlatformSecurityContext context;
@@ -60,12 +61,13 @@ public class LoanInterestPauseApiResource {
 
     @POST
     @Path("/{loanId}/interest-pauses")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Create a new interest pause period for a loan", operationId = "createLoanInterestPause", description = "Allows users to define a period during which no interest will be accrued for a specific loan.")
     @AlternativeOperationId("createInterestPause")
     @ApiResponse(responseCode = "200", description = "Command successfully processed", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult createInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @RequestBody(required = true) final InterestPauseRequestDto request) {
+    public CommandProcessingResult createInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
+            @RequestBody(required = true) final InterestPauseRequestDto request) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createInterestPause(loanId).withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -73,35 +75,40 @@ public class LoanInterestPauseApiResource {
 
     @POST
     @Path("/external-id/{loanExternalId}/interest-pauses")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Create a new interest pause for a loan using external ID", operationId = "createLoanInterestPauseByExternalId", description = "Allows users to define a period during which no interest will be accrued for a specific loan using the external loan ID.")
     @AlternativeOperationId("createInterestPauseByExternalId")
     @ApiResponse(responseCode = "200", description = "Command successfully processed", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult createInterestPauseByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @RequestBody(required = true) final InterestPauseRequestDto request) {
+    public CommandProcessingResult createInterestPauseByExternalId(
+            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
+            @RequestBody(required = true) final InterestPauseRequestDto request) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createInterestPauseByExternalId(loanExternalId).withJson(request.toJson()).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createInterestPauseByExternalId(loanExternalId)
+                .withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("/{loanId}/interest-pauses")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve all interest pause periods for a loan", operationId = "retrieveAllLoanInterestPauses", description = "Fetches a list of all active interest pause periods for a specific loan.")
     @AlternativeOperationId("retrieveInterestPauses")
     @ApiResponse(responseCode = "200", description = "List of interest pause periods", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InterestPauseResponseDto.class))))
-    public List<InterestPauseResponseDto> retrieveInterestPauses(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    public List<InterestPauseResponseDto> retrieveInterestPauses(
+            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.interestPauseReadPlatformService.retrieveInterestPauses(loanId);
     }
 
     @GET
     @Path("/external-id/{loanExternalId}/interest-pauses")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve all interest pause periods for a loan using external ID", operationId = "retrieveAllLoanInterestPausesByExternalId", description = "Fetches a list of all active interest pause periods for a specific loan using the external loan ID.")
     @AlternativeOperationId("retrieveInterestPausesByExternalId")
     @ApiResponse(responseCode = "200", description = "List of interest pause periods", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InterestPauseResponseDto.class))))
-    public List<InterestPauseResponseDto> retrieveInterestPausesByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
+    public List<InterestPauseResponseDto> retrieveInterestPausesByExternalId(
+            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.interestPauseReadPlatformService.retrieveInterestPauses(loanExternalId);
     }
@@ -111,7 +118,8 @@ public class LoanInterestPauseApiResource {
     @Operation(summary = "Delete an interest pause period", operationId = "deleteLoanInterestPause", description = "Deletes a specific interest pause period by its variation ID.")
     @AlternativeOperationId("deleteInterestPause")
     @ApiResponse(responseCode = "204", description = "No Content")
-    public Response deleteInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
+    public Response deleteInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
+            @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteInterestPause(loanId, variationId).build();
         this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -123,7 +131,9 @@ public class LoanInterestPauseApiResource {
     @Operation(summary = "Delete an interest pause period by external id", operationId = "deleteLoanInterestPauseByExternalId", description = "Deletes a specific interest pause period by its variation ID.")
     @AlternativeOperationId("deleteInterestPauseByExternalId")
     @ApiResponse(responseCode = "204", description = "No Content")
-    public Response deleteInterestPauseByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
+    public Response deleteInterestPauseByExternalId(
+            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
+            @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteInterestPause(loanExternalId, variationId).build();
         this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -132,32 +142,41 @@ public class LoanInterestPauseApiResource {
 
     @PUT
     @Path("/{loanId}/interest-pauses/{variationId}")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Update an interest pause period", operationId = "updateLoanInterestPause", description = "Updates a specific interest pause period by its variation ID.")
     @AlternativeOperationId("updateInterestPause")
     @ApiResponse(responseCode = "200", description = "Command successfully processed", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult updateInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @PathParam("variationId") @Parameter(description = "variationId") final Long variationId, @RequestBody(required = true) final InterestPauseRequestDto request) {
+    public CommandProcessingResult updateInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
+            @PathParam("variationId") @Parameter(description = "variationId") final Long variationId,
+            @RequestBody(required = true) final InterestPauseRequestDto request) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInterestPause(loanId, variationId).withJson(request.toJson()).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInterestPause(loanId, variationId)
+                .withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("/external-id/{loanExternalId}/interest-pauses/{variationId}")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Update an interest pause period by external id", operationId = "updateLoanInterestPauseByExternalId", description = "Updates a specific interest pause period by its variation ID.")
     @AlternativeOperationId("updateInterestPauseByExternalId")
     @ApiResponse(responseCode = "200", description = "Command successfully processed", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult updateInterestPauseByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @PathParam("variationId") @Parameter(description = "variationId") final Long variationId, @RequestBody(required = true) final InterestPauseRequestDto request) {
+    public CommandProcessingResult updateInterestPauseByExternalId(
+            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
+            @PathParam("variationId") @Parameter(description = "variationId") final Long variationId,
+            @RequestBody(required = true) final InterestPauseRequestDto request) {
         this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInterestPause(loanExternalId, variationId).withJson(request.toJson()).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInterestPause(loanExternalId, variationId)
+                .withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanInterestPauseApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final InterestPauseReadPlatformService interestPauseReadPlatformService) {
+    public LoanInterestPauseApiResource(final PlatformSecurityContext context,
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+            final InterestPauseReadPlatformService interestPauseReadPlatformService) {
         this.context = context;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.interestPauseReadPlatformService = interestPauseReadPlatformService;

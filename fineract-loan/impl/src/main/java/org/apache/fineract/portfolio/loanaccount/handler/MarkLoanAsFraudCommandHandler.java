@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "SETFRAUD")
 public class MarkLoanAsFraudCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class MarkLoanAsFraudCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public MarkLoanAsFraudCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public MarkLoanAsFraudCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

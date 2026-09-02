@@ -40,39 +40,76 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanInstallmentLevelDelinquencyEventProducer {
+
     private final DelinquencyReadPlatformService delinquencyReadPlatformService;
     private final CurrencyDataMapper currencyMapper;
 
     public List<LoanInstallmentDelinquencyBucketDataV1> calculateInstallmentLevelDelinquencyData(Loan loan, CurrencyData currency) {
         List<LoanInstallmentDelinquencyBucketDataV1> loanInstallmentDelinquencyData = new ArrayList<>();
         if (loan.isEnableInstallmentLevelDelinquency()) {
-            Collection<LoanInstallmentDelinquencyTagData> installmentDelinquencyTags = delinquencyReadPlatformService.retrieveLoanInstallmentsCurrentDelinquencyTag(loan.getId());
+            Collection<LoanInstallmentDelinquencyTagData> installmentDelinquencyTags = delinquencyReadPlatformService
+                    .retrieveLoanInstallmentsCurrentDelinquencyTag(loan.getId());
             if (installmentDelinquencyTags != null && installmentDelinquencyTags.size() > 0) {
                 // group installments that are in same range
-                Map<Long, List<LoanInstallmentDelinquencyTagData>> installmentsInSameRange = installmentDelinquencyTags.stream().collect(Collectors.groupingBy(installmentDelnquencyTags -> installmentDelnquencyTags.getDelinquencyRange().getId()));
+                Map<Long, List<LoanInstallmentDelinquencyTagData>> installmentsInSameRange = installmentDelinquencyTags.stream().collect(
+                        Collectors.groupingBy(installmentDelnquencyTags -> installmentDelnquencyTags.getDelinquencyRange().getId()));
                 // for installments in each range, get details from loan repayment schedule installment, add amounts,
                 // list charges
-                for (Map.Entry<Long, List<LoanInstallmentDelinquencyTagData>> installmentDelinquencyTagData : installmentsInSameRange.entrySet()) {
+                for (Map.Entry<Long, List<LoanInstallmentDelinquencyTagData>> installmentDelinquencyTagData : installmentsInSameRange
+                        .entrySet()) {
                     // get installments details
-                    List<LoanRepaymentScheduleInstallment> delinquentInstallmentsInSameRange = loan.getRepaymentScheduleInstallments().stream().filter(installment -> installmentDelinquencyTagData.getValue().stream().anyMatch(installmentTag -> installmentTag.getId().equals(installment.getId()))).toList();
+                    List<LoanRepaymentScheduleInstallment> delinquentInstallmentsInSameRange = loan.getRepaymentScheduleInstallments()
+                            .stream().filter(installment -> installmentDelinquencyTagData.getValue().stream()
+                                    .anyMatch(installmentTag -> installmentTag.getId().equals(installment.getId())))
+                            .toList();
                     // add amounts
                     LoanAmountDataV1 amount = //
-                    //
-                    //
-                    //
-                    //
-                    //
-                    LoanAmountDataV1.newBuilder().setPrincipalAmount(delinquentInstallmentsInSameRange.stream().map(installment -> installment.getPrincipalOutstanding(loan.getCurrency()).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)).setFeeAmount(delinquentInstallmentsInSameRange.stream().map(installment -> installment.getFeeChargesOutstanding(loan.getCurrency()).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)).setInterestAmount(delinquentInstallmentsInSameRange.stream().map(installment -> installment.getInterestOutstanding(loan.getCurrency()).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)).setPenaltyAmount(delinquentInstallmentsInSameRange.stream().map(installment -> installment.getPenaltyChargesOutstanding(loan.getCurrency()).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)).setTotalAmount(delinquentInstallmentsInSameRange.stream().map(installment -> installment.getTotalOutstanding(loan.getCurrency()).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)).build();
+                            //
+                            //
+                            //
+                            //
+                            //
+                            LoanAmountDataV1.newBuilder()
+                                    .setPrincipalAmount(delinquentInstallmentsInSameRange.stream()
+                                            .map(installment -> installment.getPrincipalOutstanding(loan.getCurrency()).getAmount())
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .setFeeAmount(delinquentInstallmentsInSameRange.stream()
+                                            .map(installment -> installment.getFeeChargesOutstanding(loan.getCurrency()).getAmount())
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .setInterestAmount(delinquentInstallmentsInSameRange.stream()
+                                            .map(installment -> installment.getInterestOutstanding(loan.getCurrency()).getAmount())
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .setPenaltyAmount(delinquentInstallmentsInSameRange.stream()
+                                            .map(installment -> installment.getPenaltyChargesOutstanding(loan.getCurrency()).getAmount())
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .setTotalAmount(delinquentInstallmentsInSameRange.stream()
+                                            .map(installment -> installment.getTotalOutstanding(loan.getCurrency()).getAmount())
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .build();
                     // get list of charges for installments in same range
-                    List<LoanCharge> chargesForInstallmentsInSameRange = loan.getLoanCharges().stream().filter(loanCharge -> !loanCharge.isPaid() && delinquentInstallmentsInSameRange.stream().anyMatch(installmentForCharge -> (DateUtils.isAfter(loanCharge.getEffectiveDueDate(), installmentForCharge.getFromDate()) || DateUtils.isEqual(loanCharge.getEffectiveDueDate(), installmentForCharge.getFromDate())) && (DateUtils.isBefore(loanCharge.getEffectiveDueDate(), installmentForCharge.getDueDate()) || DateUtils.isEqual(loanCharge.getEffectiveDueDate(), installmentForCharge.getDueDate())))).toList();
+                    List<LoanCharge> chargesForInstallmentsInSameRange = loan.getLoanCharges().stream().filter(loanCharge -> !loanCharge
+                            .isPaid()
+                            && delinquentInstallmentsInSameRange.stream().anyMatch(installmentForCharge -> (DateUtils
+                                    .isAfter(loanCharge.getEffectiveDueDate(), installmentForCharge.getFromDate())
+                                    || DateUtils.isEqual(loanCharge.getEffectiveDueDate(), installmentForCharge.getFromDate()))
+                                    && (DateUtils.isBefore(loanCharge.getEffectiveDueDate(), installmentForCharge.getDueDate())
+                                            || DateUtils.isEqual(loanCharge.getEffectiveDueDate(), installmentForCharge.getDueDate()))))
+                            .toList();
                     List<LoanChargeDataRangeViewV1> charges = new ArrayList<>();
                     for (LoanCharge charge : chargesForInstallmentsInSameRange) {
-                        LoanChargeDataRangeViewV1 chargeData = LoanChargeDataRangeViewV1.newBuilder().setId(charge.getId()).setName(charge.name()).setAmount(charge.amountOutstanding()).setCurrency(currencyMapper.map(currency)).build();
+                        LoanChargeDataRangeViewV1 chargeData = LoanChargeDataRangeViewV1.newBuilder().setId(charge.getId())
+                                .setName(charge.name()).setAmount(charge.amountOutstanding()).setCurrency(currencyMapper.map(currency))
+                                .build();
                         charges.add(chargeData);
                     }
-                    LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange delinquencyRange = installmentDelinquencyTagData.getValue().get(0).getDelinquencyRange();
-                    DelinquencyRangeDataV1 delinquencyRangeDataV1 = DelinquencyRangeDataV1.newBuilder().setId(delinquencyRange.getId()).setClassification(delinquencyRange.getClassification()).setMinimumAgeDays(delinquencyRange.getMinimumAgeDays()).setMaximumAgeDays(delinquencyRange.getMaximumAgeDays()).build();
-                    LoanInstallmentDelinquencyBucketDataV1 installmentDelinquencyBucketDataV1 = LoanInstallmentDelinquencyBucketDataV1.newBuilder().setDelinquencyRange(delinquencyRangeDataV1).setAmount(amount).setCharges(charges).setCurrency(currencyMapper.map(currency)).build();
+                    LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange delinquencyRange = installmentDelinquencyTagData
+                            .getValue().get(0).getDelinquencyRange();
+                    DelinquencyRangeDataV1 delinquencyRangeDataV1 = DelinquencyRangeDataV1.newBuilder().setId(delinquencyRange.getId())
+                            .setClassification(delinquencyRange.getClassification()).setMinimumAgeDays(delinquencyRange.getMinimumAgeDays())
+                            .setMaximumAgeDays(delinquencyRange.getMaximumAgeDays()).build();
+                    LoanInstallmentDelinquencyBucketDataV1 installmentDelinquencyBucketDataV1 = LoanInstallmentDelinquencyBucketDataV1
+                            .newBuilder().setDelinquencyRange(delinquencyRangeDataV1).setAmount(amount).setCharges(charges)
+                            .setCurrency(currencyMapper.map(currency)).build();
                     loanInstallmentDelinquencyData.add(installmentDelinquencyBucketDataV1);
                 }
             }
@@ -81,7 +118,8 @@ public class LoanInstallmentLevelDelinquencyEventProducer {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanInstallmentLevelDelinquencyEventProducer(final DelinquencyReadPlatformService delinquencyReadPlatformService, final CurrencyDataMapper currencyMapper) {
+    public LoanInstallmentLevelDelinquencyEventProducer(final DelinquencyReadPlatformService delinquencyReadPlatformService,
+            final CurrencyDataMapper currencyMapper) {
         this.delinquencyReadPlatformService = delinquencyReadPlatformService;
         this.currencyMapper = currencyMapper;
     }

@@ -31,6 +31,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 @Entity
 @Table(name = "m_loan_delinquency_tag_history")
 public class LoanDelinquencyTagHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "delinquency_range_id", nullable = false)
     private DelinquencyRange delinquencyRange;
@@ -52,56 +53,55 @@ public class LoanDelinquencyTagHistory extends AbstractAuditableWithUTCDateTimeC
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyRange getDelinquencyRange() {
+    public DelinquencyRange getDelinquencyRange() {
         return this.delinquencyRange;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getAddedOnDate() {
+    public LocalDate getAddedOnDate() {
         return this.addedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getLiftedOnDate() {
+    public LocalDate getLiftedOnDate() {
         return this.liftedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getVersion() {
+    public Long getVersion() {
         return this.version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
+    public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
         this.delinquencyRange = delinquencyRange;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoan(final Loan loan) {
+    public void setLoan(final Loan loan) {
         this.loan = loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAddedOnDate(final LocalDate addedOnDate) {
+    public void setAddedOnDate(final LocalDate addedOnDate) {
         this.addedOnDate = addedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLiftedOnDate(final LocalDate liftedOnDate) {
+    public void setLiftedOnDate(final LocalDate liftedOnDate) {
         this.liftedOnDate = liftedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setVersion(final Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDelinquencyTagHistory() {
-    }
+    public LoanDelinquencyTagHistory() {}
 }

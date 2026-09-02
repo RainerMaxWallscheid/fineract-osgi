@@ -26,13 +26,15 @@ import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendStatu
 import org.springframework.transaction.annotation.Transactional;
 
 public class ShareAccountSchedularServiceImpl implements ShareAccountSchedularService {
+
     private final ShareAccountDividendRepository shareAccountDividendRepository;
     private final LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Override
     @Transactional
     public void postDividend(final Long dividendDetailId, final Long savingsId) {
-        ShareAccountDividendDetails shareAccountDividendDetails = this.shareAccountDividendRepository.findById(dividendDetailId).orElseThrow();
+        ShareAccountDividendDetails shareAccountDividendDetails = this.shareAccountDividendRepository.findById(dividendDetailId)
+                .orElseThrow();
         final Long transactionId = this.linkedSavingsAccountPort.handleDividendPayout(savingsId, DateUtils.getBusinessLocalDate(),
                 shareAccountDividendDetails.getAmount());
         shareAccountDividendDetails.update(ShareAccountDividendStatusType.POSTED.getValue(), transactionId);

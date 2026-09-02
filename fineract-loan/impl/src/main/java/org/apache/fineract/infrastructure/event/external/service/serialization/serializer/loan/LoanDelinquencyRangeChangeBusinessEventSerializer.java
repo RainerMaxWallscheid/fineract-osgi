@@ -51,7 +51,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
-public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent> {
+public class LoanDelinquencyRangeChangeBusinessEventSerializer
+        extends AbstractBusinessEventWithCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent> {
+
     private final LoanReadPlatformService service;
     private final LoanDelinquencyRangeDataMapper mapper;
     private final LoanChargeReadPlatformService loanChargeReadPlatformService;
@@ -73,18 +75,30 @@ public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractB
         CollectionData delinquentData = delinquencyReadPlatformService.calculateLoanCollectionData(id);
         String delinquentDate = dataTimeMapper.mapLocalDate(delinquentData.getDelinquentDate());
         List<LoanChargeDataRangeViewV1> charges = //
-        //
-        //
-        loanChargeReadPlatformService.retrieveLoanCharges(id).stream().map(chargeMapper::mapRangeView).toList();
+                //
+                //
+                loanChargeReadPlatformService.retrieveLoanCharges(id).stream().map(chargeMapper::mapRangeView).toList();
         LoanAmountDataV1 amount = //
-        //
-        //
-        //
-        //
-        //
-        LoanAmountDataV1.newBuilder().setPrincipalAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getPrincipalOutstanding(loanCurrency).getAmount())).setFeeAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getFeeChargesOutstanding(loanCurrency).getAmount())).setInterestAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getInterestOutstanding(loanCurrency).getAmount())).setPenaltyAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getPenaltyChargesOutstanding(loanCurrency).getAmount())).setTotalAmount(calculateDataSummary((Loan) event.get(), (loan, installment) -> installment.getTotalOutstanding(loanCurrency).getAmount())).build();
+                //
+                //
+                //
+                //
+                //
+                LoanAmountDataV1.newBuilder()
+                        .setPrincipalAmount(calculateDataSummary((Loan) event.get(),
+                                (loan, installment) -> installment.getPrincipalOutstanding(loanCurrency).getAmount()))
+                        .setFeeAmount(calculateDataSummary((Loan) event.get(),
+                                (loan, installment) -> installment.getFeeChargesOutstanding(loanCurrency).getAmount()))
+                        .setInterestAmount(calculateDataSummary((Loan) event.get(),
+                                (loan, installment) -> installment.getInterestOutstanding(loanCurrency).getAmount()))
+                        .setPenaltyAmount(calculateDataSummary((Loan) event.get(),
+                                (loan, installment) -> installment.getPenaltyChargesOutstanding(loanCurrency).getAmount()))
+                        .setTotalAmount(calculateDataSummary((Loan) event.get(),
+                                (loan, installment) -> installment.getTotalOutstanding(loanCurrency).getAmount()))
+                        .build();
         DelinquencyRangeDataV1 delinquencyRange = mapper.map(data.getDelinquencyRange());
-        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
+        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer
+                .calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
         LoanAccountDelinquencyRangeDataV1.Builder builder = LoanAccountDelinquencyRangeDataV1.newBuilder();
         return //
         //
@@ -96,11 +110,15 @@ public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractB
         //
         //
         //
-        builder.setLoanId(id).setLoanAccountNo(accountNumber).setLoanExternalId(externalId).setDelinquencyRange(delinquencyRange).setCharges(charges).setAmount(amount).setCurrency(currencyMapper.map(data.getCurrency())).setDelinquentDate(delinquentDate).setInstallmentDelinquencyBuckets(installmentsDelinquencyData).setCustomData(collectCustomData(event)).build();
+        builder.setLoanId(id).setLoanAccountNo(accountNumber).setLoanExternalId(externalId).setDelinquencyRange(delinquencyRange)
+                .setCharges(charges).setAmount(amount).setCurrency(currencyMapper.map(data.getCurrency())).setDelinquentDate(delinquentDate)
+                .setInstallmentDelinquencyBuckets(installmentsDelinquencyData).setCustomData(collectCustomData(event)).build();
     }
 
     private BigDecimal calculateDataSummary(Loan loan, BiFunction<Loan, LoanRepaymentScheduleInstallment, BigDecimal> mapper) {
-        return loan.getRepaymentScheduleInstallments().stream().filter(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate())).map(installment -> mapper.apply(loan, installment)).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return loan.getRepaymentScheduleInstallments().stream()
+                .filter(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate()))
+                .map(installment -> mapper.apply(loan, installment)).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
@@ -119,7 +137,12 @@ public class LoanDelinquencyRangeChangeBusinessEventSerializer extends AbstractB
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDelinquencyRangeChangeBusinessEventSerializer(final LoanReadPlatformService service, final LoanDelinquencyRangeDataMapper mapper, final LoanChargeReadPlatformService loanChargeReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanChargeDataMapper chargeMapper, final CurrencyDataMapper currencyMapper, final AvroDateTimeMapper dataTimeMapper, final LoanInstallmentLevelDelinquencyEventProducer installmentLevelDelinquencyEventProducer, final List<ExternalEventCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanDelinquencyRangeChangeBusinessEventSerializer(final LoanReadPlatformService service,
+            final LoanDelinquencyRangeDataMapper mapper, final LoanChargeReadPlatformService loanChargeReadPlatformService,
+            final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanChargeDataMapper chargeMapper,
+            final CurrencyDataMapper currencyMapper, final AvroDateTimeMapper dataTimeMapper,
+            final LoanInstallmentLevelDelinquencyEventProducer installmentLevelDelinquencyEventProducer,
+            final List<ExternalEventCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.mapper = mapper;
         this.loanChargeReadPlatformService = loanChargeReadPlatformService;

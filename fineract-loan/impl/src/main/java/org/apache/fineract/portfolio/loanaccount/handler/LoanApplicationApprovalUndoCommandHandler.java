@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "APPROVALUNDO")
 public class LoanApplicationApprovalUndoCommandHandler implements NewCommandSourceHandler {
+
     private final LoanApplicationWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class LoanApplicationApprovalUndoCommandHandler implements NewCommandSour
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationApprovalUndoCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
+    public LoanApplicationApprovalUndoCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

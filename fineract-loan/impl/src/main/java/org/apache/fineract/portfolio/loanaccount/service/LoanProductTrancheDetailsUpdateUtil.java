@@ -27,25 +27,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductTrancheDetailsUpdateUtil {
-    public void update(final LoanProductTrancheDetails loanProductTrancheDetails, final JsonCommand command, final Map<String, Object> actualChanges) {
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.MULTI_DISBURSE_LOAN_PARAMETER_NAME, loanProductTrancheDetails.isMultiDisburseLoan())) {
+
+    public void update(final LoanProductTrancheDetails loanProductTrancheDetails, final JsonCommand command,
+            final Map<String, Object> actualChanges) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.MULTI_DISBURSE_LOAN_PARAMETER_NAME,
+                loanProductTrancheDetails.isMultiDisburseLoan())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.MULTI_DISBURSE_LOAN_PARAMETER_NAME);
             actualChanges.put(LoanProductConstants.MULTI_DISBURSE_LOAN_PARAMETER_NAME, newValue);
             loanProductTrancheDetails.setMultiDisburseLoan(newValue);
         }
         if (loanProductTrancheDetails.isMultiDisburseLoan()) {
-            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.MAX_TRANCHE_COUNT_PARAMETER_NAME, loanProductTrancheDetails.getMaxTrancheCount())) {
+            if (command.isChangeInIntegerParameterNamed(LoanProductConstants.MAX_TRANCHE_COUNT_PARAMETER_NAME,
+                    loanProductTrancheDetails.getMaxTrancheCount())) {
                 final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.MAX_TRANCHE_COUNT_PARAMETER_NAME);
                 actualChanges.put(LoanProductConstants.MAX_TRANCHE_COUNT_PARAMETER_NAME, newValue);
                 loanProductTrancheDetails.setMaxTrancheCount(newValue);
             }
-            if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.OUTSTANDING_LOAN_BALANCE_PARAMETER_NAME, loanProductTrancheDetails.getOutstandingLoanBalance())) {
-                final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.OUTSTANDING_LOAN_BALANCE_PARAMETER_NAME);
+            if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.OUTSTANDING_LOAN_BALANCE_PARAMETER_NAME,
+                    loanProductTrancheDetails.getOutstandingLoanBalance())) {
+                final BigDecimal newValue = command
+                        .bigDecimalValueOfParameterNamed(LoanProductConstants.OUTSTANDING_LOAN_BALANCE_PARAMETER_NAME);
                 actualChanges.put(LoanProductConstants.OUTSTANDING_LOAN_BALANCE_PARAMETER_NAME, newValue);
                 loanProductTrancheDetails.setOutstandingLoanBalance(newValue);
             }
-            if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ALLOW_FULL_TERM_FOR_TRANCHE_PARAM_NAME, loanProductTrancheDetails.isAllowFullTermForTranche())) {
-                final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ALLOW_FULL_TERM_FOR_TRANCHE_PARAM_NAME);
+            if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ALLOW_FULL_TERM_FOR_TRANCHE_PARAM_NAME,
+                    loanProductTrancheDetails.isAllowFullTermForTranche())) {
+                final boolean newValue = command
+                        .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ALLOW_FULL_TERM_FOR_TRANCHE_PARAM_NAME);
                 actualChanges.put(LoanProductConstants.ALLOW_FULL_TERM_FOR_TRANCHE_PARAM_NAME, newValue);
                 loanProductTrancheDetails.setAllowFullTermForTranche(newValue);
             }
@@ -57,6 +65,5 @@ public class LoanProductTrancheDetailsUpdateUtil {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductTrancheDetailsUpdateUtil() {
-    }
+    public LoanProductTrancheDetailsUpdateUtil() {}
 }

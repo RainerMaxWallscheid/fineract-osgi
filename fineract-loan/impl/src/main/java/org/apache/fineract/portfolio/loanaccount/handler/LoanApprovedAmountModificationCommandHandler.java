@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "UPDATE_APPROVED_AMOUNT")
 public class LoanApprovedAmountModificationCommandHandler implements NewCommandSourceHandler {
+
     private final LoanApprovedAmountWritePlatformService loanApprovedAmountWritePlatformService;
 
     @Override
@@ -38,7 +39,8 @@ public class LoanApprovedAmountModificationCommandHandler implements NewCommandS
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApprovedAmountModificationCommandHandler(final LoanApprovedAmountWritePlatformService loanApprovedAmountWritePlatformService) {
+    public LoanApprovedAmountModificationCommandHandler(
+            final LoanApprovedAmountWritePlatformService loanApprovedAmountWritePlatformService) {
         this.loanApprovedAmountWritePlatformService = loanApprovedAmountWritePlatformService;
     }
 }

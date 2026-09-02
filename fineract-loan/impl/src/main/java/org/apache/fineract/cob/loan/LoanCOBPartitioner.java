@@ -32,12 +32,14 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.NonNull;
 
 public class LoanCOBPartitioner extends CommonPartitioner implements Partitioner {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanCOBPartitioner.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanCOBPartitioner.class);
     private final PropertyService propertyService;
     private final COBBusinessStepService cobBusinessStepService;
 
-    public LoanCOBPartitioner(PropertyService propertyService, COBBusinessStepService cobBusinessStepService, RetrieveIdService retrieveIdService, JobOperator jobOperator, StepExecution stepExecution, Long numberOfDaysBehind) {
+    public LoanCOBPartitioner(PropertyService propertyService, COBBusinessStepService cobBusinessStepService,
+            RetrieveIdService retrieveIdService, JobOperator jobOperator, StepExecution stepExecution, Long numberOfDaysBehind) {
         super(jobOperator, stepExecution, numberOfDaysBehind, retrieveIdService);
         this.propertyService = propertyService;
         this.cobBusinessStepService = cobBusinessStepService;
@@ -47,7 +49,8 @@ public class LoanCOBPartitioner extends CommonPartitioner implements Partitioner
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         int partitionSize = propertyService.getPartitionSize(LoanCOBConstant.JOB_NAME);
-        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(LoanCOBBusinessStep.class, LoanCOBConstant.LOAN_COB_JOB_NAME);
+        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(LoanCOBBusinessStep.class,
+                LoanCOBConstant.LOAN_COB_JOB_NAME);
         return getPartitions(partitionSize, cobBusinessSteps);
     }
 }

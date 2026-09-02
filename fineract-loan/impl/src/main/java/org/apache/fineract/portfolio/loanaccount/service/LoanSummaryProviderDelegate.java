@@ -23,14 +23,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanSummaryProviderDelegate {
+
     private final List<LoanSummaryDataProvider> loanSummaryDataProviders;
 
     public LoanSummaryDataProvider resolveLoanSummaryDataProvider(String loanProcessingStrategyCode) {
-        return loanSummaryDataProviders.stream().filter(provider -> provider.accept(loanProcessingStrategyCode)).findAny().orElseThrow(() -> new IllegalArgumentException("No provider found for :" + loanProcessingStrategyCode));
+        return loanSummaryDataProviders.stream().filter(provider -> provider.accept(loanProcessingStrategyCode)).findAny()
+                .orElseThrow(() -> new IllegalArgumentException("No provider found for :" + loanProcessingStrategyCode));
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanSummaryProviderDelegate(final List<LoanSummaryDataProvider> loanSummaryDataProviders) {
+    public LoanSummaryProviderDelegate(final List<LoanSummaryDataProvider> loanSummaryDataProviders) {
         this.loanSummaryDataProviders = loanSummaryDataProviders;
     }
 }

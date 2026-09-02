@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecal
 @Entity
 @Table(name = "m_loan_interest_recalculation_additional_details")
 public class LoanInterestRecalcualtionAdditionalDetails extends AbstractPersistableCustom<Long> {
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_repayment_schedule_id", nullable = false)
     private LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment;
@@ -41,8 +42,7 @@ public class LoanInterestRecalcualtionAdditionalDetails extends AbstractPersista
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
-    protected LoanInterestRecalcualtionAdditionalDetails() {
-    }
+    protected LoanInterestRecalcualtionAdditionalDetails() {}
 
     public LoanInterestRecalcualtionAdditionalDetails(final LocalDate effectiveDate, final BigDecimal amount) {
         if (effectiveDate != null) {
@@ -67,22 +67,22 @@ public class LoanInterestRecalcualtionAdditionalDetails extends AbstractPersista
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentScheduleInstallment getLoanRepaymentScheduleInstallment() {
+    public LoanRepaymentScheduleInstallment getLoanRepaymentScheduleInstallment() {
         return this.loanRepaymentScheduleInstallment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getEffectiveDate() {
+    public LocalDate getEffectiveDate() {
         return this.effectiveDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanRepaymentScheduleInstallment(final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
+    public void setLoanRepaymentScheduleInstallment(final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
         this.loanRepaymentScheduleInstallment = loanRepaymentScheduleInstallment;
     }
 }

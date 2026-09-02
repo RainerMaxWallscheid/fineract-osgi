@@ -39,6 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccountDividendReadPlatformService {
+
     private final JdbcTemplate jdbcTemplate;
     private final ColumnValidator columnValidator;
     private final PaginationHelper paginationHelper;
@@ -54,7 +55,8 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
         sb.append(" inner join m_share_product_dividend_pay_out spdpo on spdpo.id = sadd.dividend_pay_out_id ");
         sb.append(" inner join m_share_account sa on sa.id = sadd.account_id ");
         sb.append(" where spdpo.status = ? and sadd.status = ?");
-        return this.jdbcTemplate.queryForList(sb.toString(), ShareProductDividendStatusType.APPROVED.getValue(), ShareAccountDividendStatusType.INITIATED.getValue());
+        return this.jdbcTemplate.queryForList(sb.toString(), ShareProductDividendStatusType.APPROVED.getValue(),
+                ShareAccountDividendStatusType.INITIATED.getValue());
     }
 
     @Override
@@ -90,8 +92,8 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), paramsObj, shareAccountDividendMapper);
     }
 
-
     private static final class ShareAccountDividendMapper implements RowMapper<ShareAccountDividendData> {
+
         private final String sql;
 
         ShareAccountDividendMapper() {
@@ -127,7 +129,8 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountDividendReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
+    public ShareAccountDividendReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator,
+            final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.columnValidator = columnValidator;
         this.paginationHelper = paginationHelper;

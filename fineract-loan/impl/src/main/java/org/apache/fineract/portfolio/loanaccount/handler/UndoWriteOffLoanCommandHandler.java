@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "UNDOWRITEOFF")
 public class UndoWriteOffLoanCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UndoWriteOffLoanCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoWriteOffLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public UndoWriteOffLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

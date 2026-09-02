@@ -28,6 +28,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.Tra
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanRefundValidator;
 
 public class LoanRefundService {
+
     private final LoanRefundValidator loanRefundValidator;
     private final LoanTransactionProcessingService loadTransactionProcessingService;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
@@ -68,12 +69,16 @@ public class LoanRefundService {
         final LocalDate loanTransactionDate = extractTransactionDate(loan, loanTransaction);
         loanRefundValidator.validateTransactionDateNotInFuture(loanTransactionDate);
         loanRefundValidator.validateTransactionAmountThreshold(loan, null);
-        loadTransactionProcessingService.processLatestTransaction(loan.getTransactionProcessingStrategyCode(), loanTransaction, new TransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), null, loan.getActiveLoanTermVariations()));
+        loadTransactionProcessingService.processLatestTransaction(loan.getTransactionProcessingStrategyCode(), loanTransaction,
+                new TransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(),
+                        new MoneyHolder(loan.getTotalOverpaidAsMoney()), null, loan.getActiveLoanTermVariations()));
         loanLifecycleStateMachine.determineAndTransition(loan, loanTransaction.getTransactionDate());
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRefundService(final LoanRefundValidator loanRefundValidator, final LoanTransactionProcessingService loadTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine) {
+    public LoanRefundService(final LoanRefundValidator loanRefundValidator,
+            final LoanTransactionProcessingService loadTransactionProcessingService,
+            final LoanLifecycleStateMachine loanLifecycleStateMachine) {
         this.loanRefundValidator = loanRefundValidator;
         this.loadTransactionProcessingService = loadTransactionProcessingService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;

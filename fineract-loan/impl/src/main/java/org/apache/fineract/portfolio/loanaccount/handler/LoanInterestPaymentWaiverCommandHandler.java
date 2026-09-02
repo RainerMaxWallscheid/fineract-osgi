@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "INTERESTPAYMENTWAIVER")
 public class LoanInterestPaymentWaiverCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -40,7 +41,8 @@ public class LoanInterestPaymentWaiverCommandHandler implements NewCommandSource
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanInterestPaymentWaiverCommandHandler(final LoanWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+    public LoanInterestPaymentWaiverCommandHandler(final LoanWritePlatformService writePlatformService,
+            final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
         this.writePlatformService = writePlatformService;
         this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }

@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
+
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
     private final LoanPointInTimeService loanPointInTimeService;
     private final LoanReadPlatformService loanReadPlatformService;
@@ -47,7 +48,8 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
     }
 
     @Override
-    public LoanPointInTimeData retrieveLoanPointInTimeByExternalId(String loanExternalIdStr, DateParam dateParam, String dateFormat, String locale) {
+    public LoanPointInTimeData retrieveLoanPointInTimeByExternalId(String loanExternalIdStr, DateParam dateParam, String dateFormat,
+            String locale) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanReadPlatformService.getResolvedLoanId(loanExternalId);
@@ -94,7 +96,8 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoansPointInTimeApiDelegate(final LoanPointInTimeService loanPointInTimeService, final LoanReadPlatformService loanReadPlatformService, final PlatformSecurityContext context) {
+    public LoansPointInTimeApiDelegate(final LoanPointInTimeService loanPointInTimeService,
+            final LoanReadPlatformService loanReadPlatformService, final PlatformSecurityContext context) {
         this.loanPointInTimeService = loanPointInTimeService;
         this.loanReadPlatformService = loanReadPlatformService;
         this.context = context;

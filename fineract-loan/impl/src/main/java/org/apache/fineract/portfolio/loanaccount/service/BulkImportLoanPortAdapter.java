@@ -38,7 +38,8 @@ public class BulkImportLoanPortAdapter implements BulkImportLoanPort {
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
 
-    public BulkImportLoanPortAdapter(final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
+    public BulkImportLoanPortAdapter(
+            final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
             final LoanReadPlatformService loanReadPlatformService, final LoanProductReadPlatformService loanProductReadPlatformService) {
         this.loanRepaymentScheduleTransactionProcessorFactory = loanRepaymentScheduleTransactionProcessorFactory;
         this.loanReadPlatformService = loanReadPlatformService;

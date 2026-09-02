@@ -31,8 +31,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class AddPeriodicAccrualEntriesForLoansTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesForLoansTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesForLoansTasklet.class);
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
@@ -57,7 +58,8 @@ public class AddPeriodicAccrualEntriesForLoansTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddPeriodicAccrualEntriesForLoansTasklet(final LoanReadPlatformService loanReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+    public AddPeriodicAccrualEntriesForLoansTasklet(final LoanReadPlatformService loanReadPlatformService,
+            final LoanAccrualsProcessingService loanAccrualsProcessingService) {
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }

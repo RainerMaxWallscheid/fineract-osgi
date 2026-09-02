@@ -50,6 +50,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
 public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements RepaymentWithPostDatedChecksWritePlatformService {
+
     public static final String NAME = "name";
     public static final String AMOUNT = "amount";
     public static final String ACCOUNT_NO = "accountNo";
@@ -61,7 +62,8 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
      * The parameters supported for this command.
      */
     private static final Set<String> SUPPORTED_PARAMETERS_FOR_UPDATE = new HashSet<>(Arrays.asList(NAME, AMOUNT, ACCOUNT_NO, LOCALE));
-    private static final Set<String> SUPPORTED_PARAMETERS_FOR_BOUNCE = new HashSet<>(Arrays.asList(NAME, AMOUNT, ACCOUNT_NO, CHECK_NO, LOCALE, INSTALLMENT_ID));
+    private static final Set<String> SUPPORTED_PARAMETERS_FOR_BOUNCE = new HashSet<>(
+            Arrays.asList(NAME, AMOUNT, ACCOUNT_NO, CHECK_NO, LOCALE, INSTALLMENT_ID));
     private final PostDatedChecksRepository postDatedChecksRepository;
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanRepository loanRepository;
@@ -70,10 +72,11 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
     @Override
     public CommandProcessingResult updatePostDatedChecks(JsonCommand command) {
         validateForUpdate(command);
-        final PostDatedChecks postDatedChecks = this.postDatedChecksRepository.findById(command.entityId()).orElseThrow(() -> new PostDatedCheckNotFoundException(command.entityId()));
+        final PostDatedChecks postDatedChecks = this.postDatedChecksRepository.findById(command.entityId())
+                .orElseThrow(() -> new PostDatedCheckNotFoundException(command.entityId()));
         Map<String, Object> changes = postDatedChecks.updatePostDatedChecks(command);
         this.postDatedChecksRepository.saveAndFlush(postDatedChecks);
-        return  //
+        return //
         //
         //
         //
@@ -84,9 +87,11 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
     @Override
     public CommandProcessingResult bouncePostDatedChecks(JsonCommand command) {
         validateForBounce(command);
-        final PostDatedChecks postDatedCheck = this.postDatedChecksRepository.findById(command.entityId()).orElseThrow(() -> new PostDatedCheckNotFoundException(command.entityId()));
+        final PostDatedChecks postDatedCheck = this.postDatedChecksRepository.findById(command.entityId())
+                .orElseThrow(() -> new PostDatedCheckNotFoundException(command.entityId()));
         postDatedCheck.setStatus(PostDatedChecksStatus.POST_DATED_CHECKS_BOUNCED);
-        final Loan loan = this.loanRepository.findById(command.getLoanId()).orElseThrow(() -> new LoanNotFoundException(command.getLoanId()));
+        final Loan loan = this.loanRepository.findById(command.getLoanId())
+                .orElseThrow(() -> new LoanNotFoundException(command.getLoanId()));
         final JsonElement jsonElement = this.fromApiJsonHelper.parse(command.json());
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(jsonObject);
@@ -96,7 +101,8 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
         final Long accountNo = this.fromApiJsonHelper.extractLongNamed(ACCOUNT_NO, jsonObject);
         final Long checkNo = this.fromApiJsonHelper.extractLongNamed(CHECK_NO, jsonObject);
         final List<LoanRepaymentScheduleInstallment> loanRepaymentScheduleInstallments = loan.getRepaymentScheduleInstallments();
-        final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream().filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).toList();
+        final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream()
+                .filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).toList();
         final PostDatedChecks postDatedChecks = PostDatedChecks.instanceOf(accountNo, name, amount, installmentList.get(0), loan, checkNo);
         try {
             this.postDatedChecksRepository.saveAndFlush(postDatedChecks);
@@ -108,23 +114,25 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
                 baseDataValidator.reset().parameter(CHECK_NO).failWithCode("value.must.be.unique");
             }
             if (!dataValidationErrors.isEmpty()) {
-                throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors, e);
+                throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                        dataValidationErrors, e);
             }
         }
-        return  //
+        return //
         //
         //
         //
-        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(Integer.toUnsignedLong(installmentId)).withLoanId(postDatedChecks.getLoan().getId()).build();
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(Integer.toUnsignedLong(installmentId))
+                .withLoanId(postDatedChecks.getLoan().getId()).build();
     }
 
     private void validateForBounce(JsonCommand command) {
         final JsonElement jsonElement = this.fromApiJsonHelper.parse(command.json());
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, command.json(), SUPPORTED_PARAMETERS_FOR_BOUNCE);
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(REPAYMENT_WITH_POST_DATED_CHECKS);
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
+                .resource(REPAYMENT_WITH_POST_DATED_CHECKS);
         if (!command.parameterExists(LOCALE)) {
             baseDataValidator.reset().parameter(LOCALE).notNull().failWithCode("locale.not.exists");
         } else {
@@ -155,10 +163,10 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
     private void validateForUpdate(JsonCommand command) {
         final JsonElement jsonElement = this.fromApiJsonHelper.parse(command.json());
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, command.json(), SUPPORTED_PARAMETERS_FOR_UPDATE);
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(REPAYMENT_WITH_POST_DATED_CHECKS);
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
+                .resource(REPAYMENT_WITH_POST_DATED_CHECKS);
         if (!command.parameterExists(LOCALE)) {
             baseDataValidator.reset().parameter(LOCALE).notNull().failWithCode("locale.not.exists");
         } else {
@@ -186,15 +194,17 @@ public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements Rep
     @Override
     public CommandProcessingResult deletePostDatedChecks(final JsonCommand command) {
         this.postDatedChecksRepository.deleteById(command.entityId());
-        return  //
+        return //
         //
         //
         //
-        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withLoanId(command.getLoanId()).withEntityId(command.entityId()).build();
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withLoanId(command.getLoanId())
+                .withEntityId(command.entityId()).build();
     }
 
     @java.lang.SuppressWarnings("all")
-        public RepaymentWithPostDatedChecksWritePlatformServiceImpl(final PostDatedChecksRepository postDatedChecksRepository, final FromJsonHelper fromApiJsonHelper, final LoanRepository loanRepository) {
+    public RepaymentWithPostDatedChecksWritePlatformServiceImpl(final PostDatedChecksRepository postDatedChecksRepository,
+            final FromJsonHelper fromApiJsonHelper, final LoanRepository loanRepository) {
         this.postDatedChecksRepository = postDatedChecksRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanRepository = loanRepository;

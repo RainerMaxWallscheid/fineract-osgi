@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "WAIVEINTERESTPORTION")
 public class WaiveInterestPortionOnLoanCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class WaiveInterestPortionOnLoanCommandHandler implements NewCommandSourc
     }
 
     @java.lang.SuppressWarnings("all")
-        public WaiveInterestPortionOnLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public WaiveInterestPortionOnLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

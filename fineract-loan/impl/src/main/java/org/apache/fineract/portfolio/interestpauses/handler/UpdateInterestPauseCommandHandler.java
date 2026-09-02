@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 @Component("updateInterestPauseCommandHandler")
 public class UpdateInterestPauseCommandHandler implements NewCommandSourceHandler {
+
     private final InterestPauseWritePlatformService interestPauseService;
 
     @Override
@@ -44,12 +45,13 @@ public class UpdateInterestPauseCommandHandler implements NewCommandSourceHandle
         } else if (loanExternalId != null) {
             return interestPauseService.updateInterestPause(loanExternalId, termVariationId, startDate, endDate, dateFormat, locale);
         } else {
-            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id", "Either loanId or loanExternalId must be provided.", "loanId");
+            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id",
+                    "Either loanId or loanExternalId must be provided.", "loanId");
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateInterestPauseCommandHandler(final InterestPauseWritePlatformService interestPauseService) {
+    public UpdateInterestPauseCommandHandler(final InterestPauseWritePlatformService interestPauseService) {
         this.interestPauseService = interestPauseService;
     }
 }

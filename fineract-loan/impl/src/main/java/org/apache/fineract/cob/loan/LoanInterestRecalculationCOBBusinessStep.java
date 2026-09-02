@@ -27,16 +27,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanInterestRecalculationCOBBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanInterestRecalculationCOBBusinessStep.class);
     private final LoanWritePlatformService loanWritePlatformService;
 
     @Override
     public Loan execute(Loan loan) {
         try {
             ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
-            if (!loan.getStatus().isActive() || loan.isNpa() || loan.isChargedOff() || !loan.isInterestBearingAndInterestRecalculationEnabled() || loan.getLoanInterestRecalculationDetails().disallowInterestCalculationOnPastDue() || !hasOverdueInstallment(loan)) {
-                log.debug("Skip processing loan interest recalculation [{}] - Possible reasons: Loan is not an interest bearing loan, Loan is not active, Interest recalculation on past due is disabled on this loan", loan.getId());
+            if (!loan.getStatus().isActive() || loan.isNpa() || loan.isChargedOff()
+                    || !loan.isInterestBearingAndInterestRecalculationEnabled()
+                    || loan.getLoanInterestRecalculationDetails().disallowInterestCalculationOnPastDue() || !hasOverdueInstallment(loan)) {
+                log.debug(
+                        "Skip processing loan interest recalculation [{}] - Possible reasons: Loan is not an interest bearing loan, Loan is not active, Interest recalculation on past due is disabled on this loan",
+                        loan.getId());
                 return loan;
             }
             log.debug("Start processing loan interest recalculation [{}]", loan.getId());
@@ -49,7 +54,8 @@ public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusiness
     }
 
     private boolean hasOverdueInstallment(Loan loan) {
-        return loan.getRepaymentScheduleInstallments().stream().anyMatch(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate()) && !installment.isObligationsMet());
+        return loan.getRepaymentScheduleInstallments().stream()
+                .anyMatch(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate()) && !installment.isObligationsMet());
     }
 
     @Override
@@ -63,7 +69,7 @@ public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusiness
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanInterestRecalculationCOBBusinessStep(final LoanWritePlatformService loanWritePlatformService) {
+    public LoanInterestRecalculationCOBBusinessStep(final LoanWritePlatformService loanWritePlatformService) {
         this.loanWritePlatformService = loanWritePlatformService;
     }
 }

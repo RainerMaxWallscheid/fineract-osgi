@@ -47,8 +47,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class RecalculateInterestForLoanTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecalculateInterestForLoanTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecalculateInterestForLoanTasklet.class);
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanWritePlatformService loanWritePlatformService;
     private final ApplicationContext applicationContext;
@@ -96,13 +97,15 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
         taskExecutor.setMaxPoolSize(threadPoolSize);
         Long maxLoanIdInList = 0L;
         final String officeHierarchy = office.getHierarchy() + "%";
-        List<Long> loanIds = Collections.synchronizedList(this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
+        List<Long> loanIds = Collections.synchronizedList(
+                this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
         do {
             int totalFilteredRecords = loanIds.size();
             log.debug("Starting accrual - total filtered records - {}", totalFilteredRecords);
             recalculateInterest(loanIds, threadPoolSize);
             maxLoanIdInList += pageSize + 1;
-            loanIds = Collections.synchronizedList(this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
+            loanIds = Collections.synchronizedList(
+                    this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
         } while (!CollectionUtils.isEmpty(loanIds));
     }
 
@@ -111,12 +114,13 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
             return;
         }
         int actualBatchSize = (int) Math.ceil(loanIds.size() / (double) threadPoolSize);
-        List<Future<Void>> responses = ListUtils.partition(loanIds, actualBatchSize).stream().filter(subList -> !subList.isEmpty()).map(subList -> {
-            RecalculateInterestPoster recalculateInterestPoster = applicationContext.getBean(RecalculateInterestPoster.class);
-            recalculateInterestPoster.setLoanIds(subList);
-            recalculateInterestPoster.setFineractContext(ThreadLocalContextUtil.getContext());
-            return (Callable<Void>) recalculateInterestPoster;
-        }).map(taskExecutor::submit).toList();
+        List<Future<Void>> responses = ListUtils.partition(loanIds, actualBatchSize).stream().filter(subList -> !subList.isEmpty())
+                .map(subList -> {
+                    RecalculateInterestPoster recalculateInterestPoster = applicationContext.getBean(RecalculateInterestPoster.class);
+                    recalculateInterestPoster.setLoanIds(subList);
+                    recalculateInterestPoster.setFineractContext(ThreadLocalContextUtil.getContext());
+                    return (Callable<Void>) recalculateInterestPoster;
+                }).map(taskExecutor::submit).toList();
         checkCompletion(responses);
     }
 
@@ -144,7 +148,10 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public RecalculateInterestForLoanTasklet(final LoanReadPlatformService loanReadPlatformService, final LoanWritePlatformService loanWritePlatformService, final ApplicationContext applicationContext, final OfficeReadPlatformService officeReadPlatformService, @Qualifier(TaskExecutorConstant.CONFIGURABLE_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
+    public RecalculateInterestForLoanTasklet(final LoanReadPlatformService loanReadPlatformService,
+            final LoanWritePlatformService loanWritePlatformService, final ApplicationContext applicationContext,
+            final OfficeReadPlatformService officeReadPlatformService,
+            @Qualifier(TaskExecutorConstant.CONFIGURABLE_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanWritePlatformService = loanWritePlatformService;
         this.applicationContext = applicationContext;

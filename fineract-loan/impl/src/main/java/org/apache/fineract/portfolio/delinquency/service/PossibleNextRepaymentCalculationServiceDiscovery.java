@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PossibleNextRepaymentCalculationServiceDiscovery {
+
     private final List<PossibleNextRepaymentCalculationService> services;
 
     public PossibleNextRepaymentCalculationService getService(final Loan loan) {
@@ -31,7 +32,7 @@ public class PossibleNextRepaymentCalculationServiceDiscovery {
     }
 
     @java.lang.SuppressWarnings("all")
-        public PossibleNextRepaymentCalculationServiceDiscovery(final List<PossibleNextRepaymentCalculationService> services) {
+    public PossibleNextRepaymentCalculationServiceDiscovery(final List<PossibleNextRepaymentCalculationService> services) {
         this.services = services;
     }
 }

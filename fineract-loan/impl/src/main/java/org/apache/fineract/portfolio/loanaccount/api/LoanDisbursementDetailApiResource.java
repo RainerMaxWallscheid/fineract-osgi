@@ -51,7 +51,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Tag(name = "Loan Disbursement Details", description = "")
 public class LoanDisbursementDetailApiResource {
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "expectedDisbursementDate", "actualDisbursementDate", "principal", "approvedPrincipal"));
+
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
+            Arrays.asList("id", "expectedDisbursementDate", "actualDisbursementDate", "principal", "approvedPrincipal"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
     private final DefaultToApiJsonSerializer<DisbursementData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -61,27 +63,32 @@ public class LoanDisbursementDetailApiResource {
 
     @PUT
     @Path("{disbursementId}")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
-    public CommandProcessingResult updateDisbursementDate(@PathParam("loanId") final Long loanId, @PathParam("disbursementId") final Long disbursementId, final String apiRequestBodyAsJson) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDisbusementDate(loanId, disbursementId).withJson(apiRequestBodyAsJson).build();
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CommandProcessingResult updateDisbursementDate(@PathParam("loanId") final Long loanId,
+            @PathParam("disbursementId") final Long disbursementId, final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDisbusementDate(loanId, disbursementId)
+                .withJson(apiRequestBodyAsJson).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("editDisbursements")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = LoanDisbursementDetailApiResourceSwagger.PostAddAndDeleteDisbursementDetailRequest.class)))
-    public CommandProcessingResult addAndDeleteDisbursementDetail(@PathParam("loanId") final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandRequest = new CommandWrapperBuilder().addAndDeleteDisbursementDetails(loanId).withJson(apiRequestBodyAsJson).build();
+    public CommandProcessingResult addAndDeleteDisbursementDetail(@PathParam("loanId") final Long loanId,
+            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        CommandWrapper commandRequest = new CommandWrapperBuilder().addAndDeleteDisbursementDetails(loanId).withJson(apiRequestBodyAsJson)
+                .build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("{disbursementId}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public String retriveDetail(@PathParam("loanId") final Long loanId, @PathParam("disbursementId") final Long disbursementId, @Context final UriInfo uriInfo) {
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retriveDetail(@PathParam("loanId") final Long loanId, @PathParam("disbursementId") final Long disbursementId,
+            @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final DisbursementData disbursementData = this.loanReadPlatformService.retrieveLoanDisbursementDetail(loanId, disbursementId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -89,7 +96,9 @@ public class LoanDisbursementDetailApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDisbursementDetailApiResource(final DefaultToApiJsonSerializer<DisbursementData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context, final ApiRequestParameterHelper apiRequestParameterHelper, final LoanReadPlatformService loanReadPlatformService) {
+    public LoanDisbursementDetailApiResource(final DefaultToApiJsonSerializer<DisbursementData> toApiJsonSerializer,
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context,
+            final ApiRequestParameterHelper apiRequestParameterHelper, final LoanReadPlatformService loanReadPlatformService) {
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.context = context;

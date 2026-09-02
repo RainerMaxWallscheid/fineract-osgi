@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 @Entity
 @Table(name = "m_loan_reamortization_parameter")
 public class LoanReAmortizationParameter extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @OneToOne
     @JoinColumn(name = "loan_transaction_id", nullable = false)
     private LoanTransaction loanTransaction;
@@ -44,32 +45,32 @@ public class LoanReAmortizationParameter extends AbstractAuditableWithUTCDateTim
     private CodeValue reamortizationReason;
 
     // for JPA, don't use
-    protected LoanReAmortizationParameter() {
-    }
+    protected LoanReAmortizationParameter() {}
 
     public LoanReAmortizationParameter getCopy(LoanTransaction loanTransaction) {
         return new LoanReAmortizationParameter(loanTransaction, interestHandlingType, reamortizationReason);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReAmortizationParameter(final LoanTransaction loanTransaction, final LoanReAmortizationInterestHandlingType interestHandlingType, final CodeValue reamortizationReason) {
+    public LoanReAmortizationParameter(final LoanTransaction loanTransaction,
+            final LoanReAmortizationInterestHandlingType interestHandlingType, final CodeValue reamortizationReason) {
         this.loanTransaction = loanTransaction;
         this.interestHandlingType = interestHandlingType;
         this.reamortizationReason = reamortizationReason;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransaction getLoanTransaction() {
+    public LoanTransaction getLoanTransaction() {
         return this.loanTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReAmortizationInterestHandlingType getInterestHandlingType() {
+    public LoanReAmortizationInterestHandlingType getInterestHandlingType() {
         return this.interestHandlingType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getReamortizationReason() {
+    public CodeValue getReamortizationReason() {
         return this.reamortizationReason;
     }
 }

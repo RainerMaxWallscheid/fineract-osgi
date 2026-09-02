@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.loanaccount.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.apache.fineract.portfolio.loanaccount.api.request.ReAgePreviewRequest;
@@ -33,15 +34,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
-@ContextConfiguration(classes = {ReAgePreviewRequestValidationTest.TestConfig.class})
+@ContextConfiguration(classes = { ReAgePreviewRequestValidationTest.TestConfig.class })
 class ReAgePreviewRequestValidationTest {
-    @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReAgePreviewRequestValidationTest.class);
 
+    @java.lang.SuppressWarnings("all")
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReAgePreviewRequestValidationTest.class);
 
     @Configuration
-    @Import({MessageSourceAutoConfiguration.class})
+    @Import({ MessageSourceAutoConfiguration.class })
     static class TestConfig {
+
         @Bean
         public Validator validator() {
             return Validation.byProvider(HibernateValidator.class).configure().buildValidatorFactory().getValidator();
@@ -130,7 +132,8 @@ class ReAgePreviewRequestValidationTest {
         var errors = validator.validate(params);
         assertThat(errors).hasSize(1);
         assertThat(errors).anyMatch(e -> e.getPropertyPath().toString().equals("frequencyType"));
-        assertThat(errors).anyMatch(e -> e.getMessage().equals("The parameter \'frequencyType\' must be valid PeriodFrequencyType value. Provided value: \'NOT_A_VALID_ENUM\'."));
+        assertThat(errors).anyMatch(e -> e.getMessage()
+                .equals("The parameter \'frequencyType\' must be valid PeriodFrequencyType value. Provided value: \'NOT_A_VALID_ENUM\'."));
     }
 
     @Test
@@ -300,6 +303,7 @@ class ReAgePreviewRequestValidationTest {
     }
 
     private ReAgePreviewRequest validParams() {
-        return ReAgePreviewRequest.builder().frequencyNumber(1).frequencyType("MONTHS").startDate("12-05-2025").numberOfInstallments(6).dateFormat("dd-MM-yyyy").locale("en").build();
+        return ReAgePreviewRequest.builder().frequencyNumber(1).frequencyType("MONTHS").startDate("12-05-2025").numberOfInstallments(6)
+                .dateFormat("dd-MM-yyyy").locale("en").build();
     }
 }

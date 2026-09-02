@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "DISBURSETOSAVINGS")
 public class DisburseLoanToSavingsCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class DisburseLoanToSavingsCommandHandler implements NewCommandSourceHand
     }
 
     @java.lang.SuppressWarnings("all")
-        public DisburseLoanToSavingsCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public DisburseLoanToSavingsCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

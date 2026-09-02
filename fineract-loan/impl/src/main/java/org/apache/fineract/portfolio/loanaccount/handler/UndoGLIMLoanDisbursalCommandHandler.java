@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GLIMLOAN", action = "UNDODISBURSAL")
 public class UndoGLIMLoanDisbursalCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UndoGLIMLoanDisbursalCommandHandler implements NewCommandSourceHand
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoGLIMLoanDisbursalCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public UndoGLIMLoanDisbursalCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AdjustChargeByChargeExternalIdCommandStrategy implements CommandStrategy {
+
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -64,7 +66,8 @@ public class AdjustChargeByChargeExternalIdCommandStrategy implements CommandStr
             // This would only occur if the CommandStrategyProvider is incorrectly configured.
             response.setRequestId(request.getRequestId());
             response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
-            response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
+            response.setBody(
+                    "Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
         final String commandQueryParam = commandMatcher.group(0);
@@ -87,10 +90,11 @@ public class AdjustChargeByChargeExternalIdCommandStrategy implements CommandStr
     /**
      * Creates a new {@code AdjustChargeByChargeExternalIdCommandStrategy} instance.
      *
-     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     * @param loanChargesApiResource
+     *            Loan charges api resource {@link LoanChargesApiResource}.
      */
     @java.lang.SuppressWarnings("all")
-        public AdjustChargeByChargeExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+    public AdjustChargeByChargeExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
         this.loanChargesApiResource = loanChargesApiResource;
     }
 }

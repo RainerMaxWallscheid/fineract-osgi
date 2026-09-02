@@ -31,13 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class LoanAccountDomainServiceJpaHelper {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountDomainServiceJpaHelper.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountDomainServiceJpaHelper.class);
     private final LoanAssembler loanAssembler;
     private final LoanTransactionProcessingService loanTransactionProcessingService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    public LocalDate calculateRecalculateTillDate(Loan loan, LocalDate transactionDate, ScheduleGeneratorDTO scheduleGeneratorDTOForPrepay, Money repaymentAmount) {
+    public LocalDate calculateRecalculateTillDate(Loan loan, LocalDate transactionDate, ScheduleGeneratorDTO scheduleGeneratorDTOForPrepay,
+            Money repaymentAmount) {
         LocalDate recalculateTill = null;
         try {
             if (FineractRequestContextHolder.isBatchRequest() && BatchRequestContextHolder.isEnclosingTransaction()) {
@@ -59,8 +61,10 @@ public class LoanAccountDomainServiceJpaHelper {
                 return null;
             }
             loan = loanAssembler.assembleFrom(loan.getId());
-            if (loan.isInterestBearingAndInterestRecalculationEnabled() && loan.getLoanProduct().getProductInterestRecalculationDetails().getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled()) {
-                Money outstanding = loanTransactionProcessingService.fetchPrepaymentDetail(scheduleGeneratorDTOForPrepay, transactionDate, loan).getTotalOutstanding();
+            if (loan.isInterestBearingAndInterestRecalculationEnabled() && loan.getLoanProduct().getProductInterestRecalculationDetails()
+                    .getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled()) {
+                Money outstanding = loanTransactionProcessingService
+                        .fetchPrepaymentDetail(scheduleGeneratorDTOForPrepay, transactionDate, loan).getTotalOutstanding();
                 if (repaymentAmount.isGreaterThanOrEqualTo(outstanding)) {
                     recalculateTill = transactionDate;
                 }
@@ -76,7 +80,8 @@ public class LoanAccountDomainServiceJpaHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccountDomainServiceJpaHelper(final LoanAssembler loanAssembler, final LoanTransactionProcessingService loanTransactionProcessingService) {
+    public LoanAccountDomainServiceJpaHelper(final LoanAssembler loanAssembler,
+            final LoanTransactionProcessingService loanTransactionProcessingService) {
         this.loanAssembler = loanAssembler;
         this.loanTransactionProcessingService = loanTransactionProcessingService;
     }

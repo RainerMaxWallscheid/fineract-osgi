@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanRepaymentBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanRepaymentBusinessEvent> {
+
     private final AvroDateTimeMapper dataTimeMapper;
     private final LoanRepaymentPastDueDataMapper pastDueDataMapper;
     private final LoanCalculateRepaymentPastDueService pastDueService;
@@ -55,11 +56,13 @@ public class LoanRepaymentBusinessEventSerializer extends AbstractBusinessEventW
         String accountNo = loan.getAccountNumber();
         String externalId = loan.getExternalId().getValue();
         MonetaryCurrency loanCurrency = loan.getCurrency();
-        CurrencyDataV1 currency = CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode()).setDecimalPlaces(loanCurrency.getDigitsAfterDecimal()).setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
+        CurrencyDataV1 currency = CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode())
+                .setDecimalPlaces(loanCurrency.getDigitsAfterDecimal()).setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
         RepaymentDueDataV1 repaymentDue = getRepaymentDueData(repaymentInstallment, loanCurrency);
         LoanRepaymentPastDueData pastDueData = pastDueService.retrieveLoanRepaymentPastDueAmountTillDate(loan);
         RepaymentPastDueDataV1 pastDue = pastDueDataMapper.map(pastDueData);
-        LoanRepaymentDueDataV1 loanRepaymentDueDataV1 = LoanRepaymentDueDataV1.newBuilder().setLoanId(id).setLoanAccountNo(accountNo).setLoanExternalId(externalId).setCurrency(currency).setInstallment(repaymentDue).setPastDueAmount(pastDue).build();
+        LoanRepaymentDueDataV1 loanRepaymentDueDataV1 = LoanRepaymentDueDataV1.newBuilder().setLoanId(id).setLoanAccountNo(accountNo)
+                .setLoanExternalId(externalId).setCurrency(currency).setInstallment(repaymentDue).setPastDueAmount(pastDue).build();
         loanRepaymentDueDataV1.setCustomData(collectCustomData(event));
         return loanRepaymentDueDataV1;
     }
@@ -72,7 +75,8 @@ public class LoanRepaymentBusinessEventSerializer extends AbstractBusinessEventW
         BigDecimal feeChargeAmountDue = repaymentInstallment.getFeeChargesOutstanding(loanCurrency).getAmount();
         BigDecimal penaltyChargeAmountDue = repaymentInstallment.getPenaltyChargesOutstanding(loanCurrency).getAmount();
         BigDecimal totalAmountDue = repaymentInstallment.getTotalOutstanding(loanCurrency).getAmount();
-        RepaymentDueDataV1 repaymentDue = new RepaymentDueDataV1(installmentNumber, dueDate, principalAmountDue, interestAmountDue, feeChargeAmountDue, penaltyChargeAmountDue, totalAmountDue);
+        RepaymentDueDataV1 repaymentDue = new RepaymentDueDataV1(installmentNumber, dueDate, principalAmountDue, interestAmountDue,
+                feeChargeAmountDue, penaltyChargeAmountDue, totalAmountDue);
         return repaymentDue;
     }
 
@@ -92,7 +96,9 @@ public class LoanRepaymentBusinessEventSerializer extends AbstractBusinessEventW
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentBusinessEventSerializer(final AvroDateTimeMapper dataTimeMapper, final LoanRepaymentPastDueDataMapper pastDueDataMapper, final LoanCalculateRepaymentPastDueService pastDueService, final List<ExternalEventCustomDataSerializer<LoanRepaymentBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanRepaymentBusinessEventSerializer(final AvroDateTimeMapper dataTimeMapper,
+            final LoanRepaymentPastDueDataMapper pastDueDataMapper, final LoanCalculateRepaymentPastDueService pastDueService,
+            final List<ExternalEventCustomDataSerializer<LoanRepaymentBusinessEvent>> externalEventCustomDataSerializers) {
         this.dataTimeMapper = dataTimeMapper;
         this.pastDueDataMapper = pastDueDataMapper;
         this.pastDueService = pastDueService;

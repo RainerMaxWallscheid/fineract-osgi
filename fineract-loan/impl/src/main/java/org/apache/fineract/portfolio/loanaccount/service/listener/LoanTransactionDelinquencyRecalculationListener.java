@@ -32,14 +32,16 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoanTransactionDelinquencyRecalculationListener implements InitializingBean, BusinessEventListener<LoanTransactionBusinessEvent> {
+public class LoanTransactionDelinquencyRecalculationListener
+        implements InitializingBean, BusinessEventListener<LoanTransactionBusinessEvent> {
+
     // Extend this list to support more event types so the hardcoded delinquency recalculation can be removed from the
     // use-cases
     private static final List<Class<? extends LoanTransactionBusinessEvent>> SUPPORTED_EVENT_TYPES = List.of(//
-    LoanReAgeTransactionBusinessEvent.class,  //
-    LoanUndoReAgeTransactionBusinessEvent.class,  //
-    LoanReAmortizeTransactionBusinessEvent.class,  //
-    LoanUndoReAmortizeTransactionBusinessEvent.class //
+            LoanReAgeTransactionBusinessEvent.class, //
+            LoanUndoReAgeTransactionBusinessEvent.class, //
+            LoanReAmortizeTransactionBusinessEvent.class, //
+            LoanUndoReAmortizeTransactionBusinessEvent.class //
     );//
     private final LoanAccountDomainService loanAccountDomainService;
     private final BusinessEventNotifierService businessEventNotifierService;
@@ -58,7 +60,8 @@ public class LoanTransactionDelinquencyRecalculationListener implements Initiali
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionDelinquencyRecalculationListener(final LoanAccountDomainService loanAccountDomainService, final BusinessEventNotifierService businessEventNotifierService) {
+    public LoanTransactionDelinquencyRecalculationListener(final LoanAccountDomainService loanAccountDomainService,
+            final BusinessEventNotifierService businessEventNotifierService) {
         this.loanAccountDomainService = loanAccountDomainService;
         this.businessEventNotifierService = businessEventNotifierService;
     }

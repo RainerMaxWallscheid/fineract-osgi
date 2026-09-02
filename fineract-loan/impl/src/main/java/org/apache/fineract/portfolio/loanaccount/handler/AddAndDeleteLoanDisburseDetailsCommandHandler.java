@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AddAndDeleteLoanDisburseDetailsCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -36,7 +37,7 @@ public class AddAndDeleteLoanDisburseDetailsCommandHandler implements NewCommand
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddAndDeleteLoanDisburseDetailsCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public AddAndDeleteLoanDisburseDetailsCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

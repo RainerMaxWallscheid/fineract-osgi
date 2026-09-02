@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 
 @Embeddable
 public class LoanProductTrancheDetails {
+
     @Column(name = "allow_multiple_disbursals")
     private boolean multiDisburseLoan;
     @Column(name = "max_disbursals")
@@ -37,7 +38,8 @@ public class LoanProductTrancheDetails {
         // TODO Auto-generated constructor stub
     }
 
-    public LoanProductTrancheDetails(final boolean multiDisburseLoan, final Integer maxTrancheCount, final BigDecimal outstandingLoanBalance, final boolean allowFullTermForTranche) {
+    public LoanProductTrancheDetails(final boolean multiDisburseLoan, final Integer maxTrancheCount,
+            final BigDecimal outstandingLoanBalance, final boolean allowFullTermForTranche) {
         this.multiDisburseLoan = multiDisburseLoan;
         this.maxTrancheCount = maxTrancheCount;
         this.outstandingLoanBalance = outstandingLoanBalance;
@@ -45,42 +47,42 @@ public class LoanProductTrancheDetails {
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isMultiDisburseLoan() {
+    public boolean isMultiDisburseLoan() {
         return this.multiDisburseLoan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getMaxTrancheCount() {
+    public Integer getMaxTrancheCount() {
         return this.maxTrancheCount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getOutstandingLoanBalance() {
+    public BigDecimal getOutstandingLoanBalance() {
         return this.outstandingLoanBalance;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isAllowFullTermForTranche() {
+    public boolean isAllowFullTermForTranche() {
         return this.allowFullTermForTranche;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMultiDisburseLoan(final boolean multiDisburseLoan) {
+    public void setMultiDisburseLoan(final boolean multiDisburseLoan) {
         this.multiDisburseLoan = multiDisburseLoan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMaxTrancheCount(final Integer maxTrancheCount) {
+    public void setMaxTrancheCount(final Integer maxTrancheCount) {
         this.maxTrancheCount = maxTrancheCount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOutstandingLoanBalance(final BigDecimal outstandingLoanBalance) {
+    public void setOutstandingLoanBalance(final BigDecimal outstandingLoanBalance) {
         this.outstandingLoanBalance = outstandingLoanBalance;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAllowFullTermForTranche(final boolean allowFullTermForTranche) {
+    public void setAllowFullTermForTranche(final boolean allowFullTermForTranche) {
         this.allowFullTermForTranche = allowFullTermForTranche;
     }
 }

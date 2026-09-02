@@ -24,6 +24,7 @@ apply plugin: 'eclipse'
 compileJava {
     dependsOn ':fineract-avro-schemas:buildJavaSdk'
     dependsOn ':fineract-loan-api:jar'
+    dependsOn ':fineract-progressive-loan-api:jar'
 }
 
 configurations {

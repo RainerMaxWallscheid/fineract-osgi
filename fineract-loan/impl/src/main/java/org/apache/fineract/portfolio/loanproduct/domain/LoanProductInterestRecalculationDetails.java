@@ -33,6 +33,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name = "m_product_loan_recalculation_details")
 public class LoanProductInterestRecalculationDetails extends AbstractPersistableCustom<Long> {
+
     @OneToOne
     @JoinColumn(name = "product_id", nullable = false)
     private LoanProduct loanProduct;
@@ -81,7 +82,14 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
         //
     }
 
-    public LoanProductInterestRecalculationDetails(final Integer interestRecalculationCompoundingMethod, final Integer rescheduleStrategyMethod, final Integer restFrequencyType, final Integer restInterval, final Integer restFrequencyNthDay, final Integer restFrequencyOnDay, final Integer restFrequencyWeekday, Integer compoundingFrequencyType, Integer compoundingInterval, final Integer compoundingFrequencyNthDay, final Integer compoundingFrequencyOnDay, final Integer compoundingFrequencyWeekday, final boolean isArrearsBasedOnOriginalSchedule, final Integer preCloseInterestCalculationStrategy, final boolean isCompoundingToBePostedAsTransaction, final boolean allowCompoundingOnEod, final boolean disallowInterestCalculationOnPastDue) {
+    public LoanProductInterestRecalculationDetails(final Integer interestRecalculationCompoundingMethod,
+            final Integer rescheduleStrategyMethod, final Integer restFrequencyType, final Integer restInterval,
+            final Integer restFrequencyNthDay, final Integer restFrequencyOnDay, final Integer restFrequencyWeekday,
+            Integer compoundingFrequencyType, Integer compoundingInterval, final Integer compoundingFrequencyNthDay,
+            final Integer compoundingFrequencyOnDay, final Integer compoundingFrequencyWeekday,
+            final boolean isArrearsBasedOnOriginalSchedule, final Integer preCloseInterestCalculationStrategy,
+            final boolean isCompoundingToBePostedAsTransaction, final boolean allowCompoundingOnEod,
+            final boolean disallowInterestCalculationOnPastDue) {
         this.interestRecalculationCompoundingMethod = interestRecalculationCompoundingMethod;
         this.rescheduleStrategyMethod = rescheduleStrategyMethod;
         this.restFrequencyType = restFrequencyType;
@@ -118,7 +126,7 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProduct getLoanProduct() {
+    public LoanProduct getLoanProduct() {
         return this.loanProduct;
     }
 
@@ -126,7 +134,7 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
      * {@link InterestRecalculationCompoundingMethod}
      */
     @java.lang.SuppressWarnings("all")
-        public Integer getInterestRecalculationCompoundingMethod() {
+    public Integer getInterestRecalculationCompoundingMethod() {
         return this.interestRecalculationCompoundingMethod;
     }
 
@@ -134,72 +142,72 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
      * {@link LoanRescheduleStrategyMethod}
      */
     @java.lang.SuppressWarnings("all")
-        public Integer getRescheduleStrategyMethod() {
+    public Integer getRescheduleStrategyMethod() {
         return this.rescheduleStrategyMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRestInterval() {
+    public Integer getRestInterval() {
         return this.restInterval;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRestFrequencyNthDay() {
+    public Integer getRestFrequencyNthDay() {
         return this.restFrequencyNthDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRestFrequencyWeekday() {
+    public Integer getRestFrequencyWeekday() {
         return this.restFrequencyWeekday;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRestFrequencyOnDay() {
+    public Integer getRestFrequencyOnDay() {
         return this.restFrequencyOnDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getCompoundingInterval() {
+    public Integer getCompoundingInterval() {
         return this.compoundingInterval;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getCompoundingFrequencyNthDay() {
+    public Integer getCompoundingFrequencyNthDay() {
         return this.compoundingFrequencyNthDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getCompoundingFrequencyWeekday() {
+    public Integer getCompoundingFrequencyWeekday() {
         return this.compoundingFrequencyWeekday;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getCompoundingFrequencyOnDay() {
+    public Integer getCompoundingFrequencyOnDay() {
         return this.compoundingFrequencyOnDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isArrearsBasedOnOriginalSchedule() {
+    public boolean isArrearsBasedOnOriginalSchedule() {
         return this.isArrearsBasedOnOriginalSchedule;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Boolean getIsCompoundingToBePostedAsTransaction() {
+    public Boolean getIsCompoundingToBePostedAsTransaction() {
         return this.isCompoundingToBePostedAsTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Boolean getAllowCompoundingOnEod() {
+    public Boolean getAllowCompoundingOnEod() {
         return this.allowCompoundingOnEod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Boolean getDisallowInterestCalculationOnPastDue() {
+    public Boolean getDisallowInterestCalculationOnPastDue() {
         return this.disallowInterestCalculationOnPastDue;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanProduct(final LoanProduct loanProduct) {
+    public void setLoanProduct(final LoanProduct loanProduct) {
         this.loanProduct = loanProduct;
     }
 
@@ -207,7 +215,7 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
      * {@link InterestRecalculationCompoundingMethod}
      */
     @java.lang.SuppressWarnings("all")
-        public void setInterestRecalculationCompoundingMethod(final Integer interestRecalculationCompoundingMethod) {
+    public void setInterestRecalculationCompoundingMethod(final Integer interestRecalculationCompoundingMethod) {
         this.interestRecalculationCompoundingMethod = interestRecalculationCompoundingMethod;
     }
 
@@ -215,82 +223,82 @@ public class LoanProductInterestRecalculationDetails extends AbstractPersistable
      * {@link LoanRescheduleStrategyMethod}
      */
     @java.lang.SuppressWarnings("all")
-        public void setRescheduleStrategyMethod(final Integer rescheduleStrategyMethod) {
+    public void setRescheduleStrategyMethod(final Integer rescheduleStrategyMethod) {
         this.rescheduleStrategyMethod = rescheduleStrategyMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRestFrequencyType(final Integer restFrequencyType) {
+    public void setRestFrequencyType(final Integer restFrequencyType) {
         this.restFrequencyType = restFrequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRestInterval(final Integer restInterval) {
+    public void setRestInterval(final Integer restInterval) {
         this.restInterval = restInterval;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRestFrequencyNthDay(final Integer restFrequencyNthDay) {
+    public void setRestFrequencyNthDay(final Integer restFrequencyNthDay) {
         this.restFrequencyNthDay = restFrequencyNthDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRestFrequencyWeekday(final Integer restFrequencyWeekday) {
+    public void setRestFrequencyWeekday(final Integer restFrequencyWeekday) {
         this.restFrequencyWeekday = restFrequencyWeekday;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRestFrequencyOnDay(final Integer restFrequencyOnDay) {
+    public void setRestFrequencyOnDay(final Integer restFrequencyOnDay) {
         this.restFrequencyOnDay = restFrequencyOnDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCompoundingFrequencyType(final Integer compoundingFrequencyType) {
+    public void setCompoundingFrequencyType(final Integer compoundingFrequencyType) {
         this.compoundingFrequencyType = compoundingFrequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCompoundingInterval(final Integer compoundingInterval) {
+    public void setCompoundingInterval(final Integer compoundingInterval) {
         this.compoundingInterval = compoundingInterval;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCompoundingFrequencyNthDay(final Integer compoundingFrequencyNthDay) {
+    public void setCompoundingFrequencyNthDay(final Integer compoundingFrequencyNthDay) {
         this.compoundingFrequencyNthDay = compoundingFrequencyNthDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCompoundingFrequencyWeekday(final Integer compoundingFrequencyWeekday) {
+    public void setCompoundingFrequencyWeekday(final Integer compoundingFrequencyWeekday) {
         this.compoundingFrequencyWeekday = compoundingFrequencyWeekday;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCompoundingFrequencyOnDay(final Integer compoundingFrequencyOnDay) {
+    public void setCompoundingFrequencyOnDay(final Integer compoundingFrequencyOnDay) {
         this.compoundingFrequencyOnDay = compoundingFrequencyOnDay;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setArrearsBasedOnOriginalSchedule(final boolean isArrearsBasedOnOriginalSchedule) {
+    public void setArrearsBasedOnOriginalSchedule(final boolean isArrearsBasedOnOriginalSchedule) {
         this.isArrearsBasedOnOriginalSchedule = isArrearsBasedOnOriginalSchedule;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPreCloseInterestCalculationStrategy(final Integer preCloseInterestCalculationStrategy) {
+    public void setPreCloseInterestCalculationStrategy(final Integer preCloseInterestCalculationStrategy) {
         this.preCloseInterestCalculationStrategy = preCloseInterestCalculationStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setIsCompoundingToBePostedAsTransaction(final Boolean isCompoundingToBePostedAsTransaction) {
+    public void setIsCompoundingToBePostedAsTransaction(final Boolean isCompoundingToBePostedAsTransaction) {
         this.isCompoundingToBePostedAsTransaction = isCompoundingToBePostedAsTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAllowCompoundingOnEod(final Boolean allowCompoundingOnEod) {
+    public void setAllowCompoundingOnEod(final Boolean allowCompoundingOnEod) {
         this.allowCompoundingOnEod = allowCompoundingOnEod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDisallowInterestCalculationOnPastDue(final Boolean disallowInterestCalculationOnPastDue) {
+    public void setDisallowInterestCalculationOnPastDue(final Boolean disallowInterestCalculationOnPastDue) {
         this.disallowInterestCalculationOnPastDue = disallowInterestCalculationOnPastDue;
     }
 }

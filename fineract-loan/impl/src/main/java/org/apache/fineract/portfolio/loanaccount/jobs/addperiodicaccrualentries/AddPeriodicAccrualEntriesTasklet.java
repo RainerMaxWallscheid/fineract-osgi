@@ -29,8 +29,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class AddPeriodicAccrualEntriesTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesTasklet.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -48,7 +49,7 @@ public class AddPeriodicAccrualEntriesTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddPeriodicAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+    public AddPeriodicAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

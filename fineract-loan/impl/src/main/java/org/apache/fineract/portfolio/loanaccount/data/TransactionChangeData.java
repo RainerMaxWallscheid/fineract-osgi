@@ -24,31 +24,32 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
  * Represents a transaction change, storing both the old reversed transaction (if any) and the new transaction.
  */
 public class TransactionChangeData {
+
     private LoanTransaction oldTransaction;
     private LoanTransaction newTransaction;
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransaction getOldTransaction() {
+    public LoanTransaction getOldTransaction() {
         return this.oldTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransaction getNewTransaction() {
+    public LoanTransaction getNewTransaction() {
         return this.newTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOldTransaction(final LoanTransaction oldTransaction) {
+    public void setOldTransaction(final LoanTransaction oldTransaction) {
         this.oldTransaction = oldTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setNewTransaction(final LoanTransaction newTransaction) {
+    public void setNewTransaction(final LoanTransaction newTransaction) {
         this.newTransaction = newTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public TransactionChangeData(final LoanTransaction oldTransaction, final LoanTransaction newTransaction) {
+    public TransactionChangeData(final LoanTransaction oldTransaction, final LoanTransaction newTransaction) {
         this.oldTransaction = oldTransaction;
         this.newTransaction = newTransaction;
     }

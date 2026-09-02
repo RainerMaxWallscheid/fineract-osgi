@@ -33,7 +33,8 @@ public final class AccrualPeriodsDataFactory {
         for (LoanRepaymentScheduleInstallment installment : installments) {
             Integer installmentNumber = installment.getInstallmentNumber();
             boolean isFirst = installmentNumber.equals(firstInstallmentNumber);
-            accrualPeriods.addPeriod(new AccrualPeriodData(installmentNumber, isFirst, installment.getFromDate(), installment.getDueDate()));
+            accrualPeriods
+                    .addPeriod(new AccrualPeriodData(installmentNumber, isFirst, installment.getFromDate(), installment.getDueDate()));
         }
         return accrualPeriods;
     }

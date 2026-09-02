@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GetChargeByChargeExternalIdCommandStrategy implements CommandStrategy {
+
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -82,10 +84,11 @@ public class GetChargeByChargeExternalIdCommandStrategy implements CommandStrate
     /**
      * Creates a new {@code GetChargeByChargeExternalIdCommandStrategy} instance.
      *
-     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     * @param loanChargesApiResource
+     *            Loan charges api resource {@link LoanChargesApiResource}.
      */
     @java.lang.SuppressWarnings("all")
-        public GetChargeByChargeExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+    public GetChargeByChargeExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
         this.loanChargesApiResource = loanChargesApiResource;
     }
 }

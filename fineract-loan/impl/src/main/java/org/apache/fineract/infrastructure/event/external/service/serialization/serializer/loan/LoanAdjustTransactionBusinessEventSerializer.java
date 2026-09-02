@@ -35,7 +35,9 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoanAdjustTransactionBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanAdjustTransactionBusinessEvent> {
+public class LoanAdjustTransactionBusinessEventSerializer
+        extends AbstractBusinessEventWithCustomDataSerializer<LoanAdjustTransactionBusinessEvent> {
+
     private final LoanReadPlatformService service;
     private final LoanTransactionDataMapper mapper;
     private final LoanChargePaidByReadService loanChargePaidByReadService;
@@ -50,14 +52,18 @@ public class LoanAdjustTransactionBusinessEventSerializer extends AbstractBusine
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanAdjustTransactionBusinessEvent event = (LoanAdjustTransactionBusinessEvent) rawEvent;
         LoanTransaction transactionToAdjust = (LoanTransaction) event.get().getTransactionToAdjust();
-        LoanTransactionData transactionToAdjustData = service.retrieveLoanTransaction(transactionToAdjust.getLoan().getId(), transactionToAdjust.getId());
-        transactionToAdjustData.setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(transactionToAdjust.getId()));
+        LoanTransactionData transactionToAdjustData = service.retrieveLoanTransaction(transactionToAdjust.getLoan().getId(),
+                transactionToAdjust.getId());
+        transactionToAdjustData
+                .setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(transactionToAdjust.getId()));
         LoanTransactionDataV1 transactionToAdjustAvroDto = mapper.map(transactionToAdjustData);
         LoanTransaction newTransactionDetail = (LoanTransaction) event.get().getNewTransactionDetail();
         LoanTransactionDataV1 newTransactionDetailAvroDto = null;
         if (newTransactionDetail != null) {
-            LoanTransactionData newTransactionDetailData = service.retrieveLoanTransaction(newTransactionDetail.getLoan().getId(), newTransactionDetail.getId());
-            newTransactionDetailData.setLoanChargePaidByList(loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(newTransactionDetail.getId()));
+            LoanTransactionData newTransactionDetailData = service.retrieveLoanTransaction(newTransactionDetail.getLoan().getId(),
+                    newTransactionDetail.getId());
+            newTransactionDetailData.setLoanChargePaidByList(
+                    loanChargePaidByReadService.fetchLoanChargesPaidByDataTransactionId(newTransactionDetail.getId()));
             newTransactionDetailAvroDto = mapper.map(newTransactionDetailData);
         }
         return new LoanTransactionAdjustmentDataV1(transactionToAdjustAvroDto, newTransactionDetailAvroDto, collectCustomData(event));
@@ -74,7 +80,9 @@ public class LoanAdjustTransactionBusinessEventSerializer extends AbstractBusine
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAdjustTransactionBusinessEventSerializer(final LoanReadPlatformService service, final LoanTransactionDataMapper mapper, final LoanChargePaidByReadService loanChargePaidByReadService, final List<ExternalEventCustomDataSerializer<LoanAdjustTransactionBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanAdjustTransactionBusinessEventSerializer(final LoanReadPlatformService service, final LoanTransactionDataMapper mapper,
+            final LoanChargePaidByReadService loanChargePaidByReadService,
+            final List<ExternalEventCustomDataSerializer<LoanAdjustTransactionBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.mapper = mapper;
         this.loanChargePaidByReadService = loanChargePaidByReadService;

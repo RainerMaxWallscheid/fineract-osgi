@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @CommandType(entity = "LOAN", action = "DELETESCHEDULEEXCEPTIONS")
 public class LoanScheduleDeleteVariationCommandHandler implements NewCommandSourceHandler {
+
     private final LoanScheduleWritePlatformService loanScheduleWritePlatformService;
 
     @Override
@@ -36,7 +37,7 @@ public class LoanScheduleDeleteVariationCommandHandler implements NewCommandSour
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleDeleteVariationCommandHandler(final LoanScheduleWritePlatformService loanScheduleWritePlatformService) {
+    public LoanScheduleDeleteVariationCommandHandler(final LoanScheduleWritePlatformService loanScheduleWritePlatformService) {
         this.loanScheduleWritePlatformService = loanScheduleWritePlatformService;
     }
 }

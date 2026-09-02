@@ -36,8 +36,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AccrualActivityPostingTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingTasklet.class);
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
     private final LoanAccrualActivityRepository loanAccrualActivityRepository;
 
@@ -45,7 +46,8 @@ public class AccrualActivityPostingTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final LocalDate yesterday = DateUtils.getBusinessLocalDate().minusDays(1);
         List<Throwable> errors = new ArrayList<>();
-        Set<Long> loanAccounts = loanAccrualActivityRepository.fetchLoanIdsForAccrualActivityPosting(yesterday, LoanTransactionType.ACCRUAL_ACTIVITY, LoanStatus.ACTIVE);
+        Set<Long> loanAccounts = loanAccrualActivityRepository.fetchLoanIdsForAccrualActivityPosting(yesterday,
+                LoanTransactionType.ACCRUAL_ACTIVITY, LoanStatus.ACTIVE);
         for (Long accountId : loanAccounts) {
             try {
                 loanAccrualActivityProcessingService.makeAccrualActivityTransaction(accountId, yesterday);
@@ -61,7 +63,8 @@ public class AccrualActivityPostingTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccrualActivityPostingTasklet(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService, final LoanAccrualActivityRepository loanAccrualActivityRepository) {
+    public AccrualActivityPostingTasklet(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService,
+            final LoanAccrualActivityRepository loanAccrualActivityRepository) {
         this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
         this.loanAccrualActivityRepository = loanAccrualActivityRepository;
     }

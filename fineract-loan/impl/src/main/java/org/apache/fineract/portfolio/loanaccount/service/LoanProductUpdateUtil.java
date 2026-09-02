@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductUpdateUtil {
+
     private final LoanProductRelatedDetailUpdateUtil detailUpdateUtil;
     private final LoanProductMinMaxConstraintsUpdateUtil minMaxConstraintsUpdateUtil;
     private final LoanProductFloatingRatesUpdateUtil floatingRatesUpdateUtil;
@@ -51,8 +52,10 @@ public class LoanProductUpdateUtil {
     private final LoanProductGuaranteeDetailsAssembler guaranteeDetailsAssembler;
     private final LoanProductGuaranteeDetailsUpdateUtil guaranteeDetailsUpdateUtil;
 
-    public Map<String, Object> update(final LoanProduct loanProduct, final JsonCommand command, final AprCalculator aprCalculator, Long floatingRateId) {
-        final Map<String, Object> actualChanges = detailUpdateUtil.updateLoanRepaymentSchedule(loanProduct.getLoanProductRelatedDetail(), command, aprCalculator);
+    public Map<String, Object> update(final LoanProduct loanProduct, final JsonCommand command, final AprCalculator aprCalculator,
+            Long floatingRateId) {
+        final Map<String, Object> actualChanges = detailUpdateUtil.updateLoanRepaymentSchedule(loanProduct.getLoanProductRelatedDetail(),
+                command, aprCalculator);
         actualChanges.putAll(minMaxConstraintsUpdateUtil.update(loanProduct.loanProductMinMaxConstraints(), command));
         final String isLinkedToFloatingInterestRates = "isLinkedToFloatingInterestRates";
         if (command.isChangeInBooleanParameterNamed(isLinkedToFloatingInterestRates, loanProduct.isLinkedToFloatingInterestRate())) {
@@ -60,7 +63,8 @@ public class LoanProductUpdateUtil {
             actualChanges.put(isLinkedToFloatingInterestRates, newValue);
             loanProduct.setLinkedToFloatingInterestRate(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_ACCRUAL_ACTIVITY_POSTING, loanProduct.getLoanProductRelatedDetail().isEnableAccrualActivityPosting())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_ACCRUAL_ACTIVITY_POSTING,
+                loanProduct.getLoanProductRelatedDetail().isEnableAccrualActivityPosting())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ENABLE_ACCRUAL_ACTIVITY_POSTING);
             actualChanges.put(LoanProductConstants.ENABLE_ACCRUAL_ACTIVITY_POSTING, newValue);
             loanProduct.getLoanProductRelatedDetail().setEnableAccrualActivityPosting(newValue);
@@ -72,7 +76,8 @@ public class LoanProductUpdateUtil {
         } else {
             loanProduct.setFloatingRates(null);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.allowVariableInstallmentsParamName, loanProduct.isAllowVariabeInstallments())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.allowVariableInstallmentsParamName,
+                loanProduct.isAllowVariabeInstallments())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.allowVariableInstallmentsParamName);
             actualChanges.put(LoanProductConstants.allowVariableInstallmentsParamName, newValue);
             loanProduct.setAllowVariabeInstallments(newValue);
@@ -117,7 +122,8 @@ public class LoanProductUpdateUtil {
             actualChanges.put(fundIdParamName, newValue);
         }
         final String transactionProcessingStrategyCodeParamName = "transactionProcessingStrategyCode";
-        if (command.isChangeInStringParameterNamed(transactionProcessingStrategyCodeParamName, loanProduct.getTransactionProcessingStrategyCode())) {
+        if (command.isChangeInStringParameterNamed(transactionProcessingStrategyCodeParamName,
+                loanProduct.getTransactionProcessingStrategyCode())) {
             final String newValue = command.stringValueOfParameterNamed(transactionProcessingStrategyCodeParamName);
             actualChanges.put(transactionProcessingStrategyCodeParamName, newValue);
         }
@@ -148,7 +154,8 @@ public class LoanProductUpdateUtil {
             actualChanges.put(includeInBorrowerCycleParamName, newValue);
             loanProduct.setIncludeInBorrowerCycle(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.USE_BORROWER_CYCLE_PARAMETER_NAME, loanProduct.isUseBorrowerCycle())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.USE_BORROWER_CYCLE_PARAMETER_NAME,
+                loanProduct.isUseBorrowerCycle())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.USE_BORROWER_CYCLE_PARAMETER_NAME);
             actualChanges.put(LoanProductConstants.USE_BORROWER_CYCLE_PARAMETER_NAME, newValue);
             loanProduct.setUseBorrowerCycle(newValue);
@@ -185,14 +192,17 @@ public class LoanProductUpdateUtil {
             loanProduct.setExternalId(newValue);
         }
         trancheDetailsUpdateUtil.update(loanProduct.getLoanProductTrancheDetails(), command, actualChanges);
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.OVERDUE_DAYS_FOR_NPA_PARAMETER_NAME, loanProduct.getOverdueDaysForNPA())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.OVERDUE_DAYS_FOR_NPA_PARAMETER_NAME,
+                loanProduct.getOverdueDaysForNPA())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.OVERDUE_DAYS_FOR_NPA_PARAMETER_NAME);
             actualChanges.put(LoanProductConstants.OVERDUE_DAYS_FOR_NPA_PARAMETER_NAME, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProduct.setOverdueDaysForNPA(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.MINIMUM_DAYS_BETWEEN_DISBURSAL_AND_FIRST_REPAYMENT, loanProduct.getMinimumDaysBetweenDisbursalAndFirstRepayment())) {
-            final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.MINIMUM_DAYS_BETWEEN_DISBURSAL_AND_FIRST_REPAYMENT);
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.MINIMUM_DAYS_BETWEEN_DISBURSAL_AND_FIRST_REPAYMENT,
+                loanProduct.getMinimumDaysBetweenDisbursalAndFirstRepayment())) {
+            final Integer newValue = command
+                    .integerValueOfParameterNamed(LoanProductConstants.MINIMUM_DAYS_BETWEEN_DISBURSAL_AND_FIRST_REPAYMENT);
             actualChanges.put(LoanProductConstants.MINIMUM_DAYS_BETWEEN_DISBURSAL_AND_FIRST_REPAYMENT, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProduct.setMinimumDaysBetweenDisbursalAndFirstRepayment(newValue);
@@ -211,19 +221,23 @@ public class LoanProductUpdateUtil {
             actualChanges.put(LoanProductConstants.DELINQUENCY_BUCKET_PARAM_NAME, newValue);
         }
         // Update interest recalculation settings
-        final boolean isInterestRecalculationEnabledChanged = actualChanges.containsKey(LoanProductConstants.IS_INTEREST_RECALCULATION_ENABLED_PARAMETER_NAME);
+        final boolean isInterestRecalculationEnabledChanged = actualChanges
+                .containsKey(LoanProductConstants.IS_INTEREST_RECALCULATION_ENABLED_PARAMETER_NAME);
         if (isInterestRecalculationEnabledChanged) {
             if (loanProduct.isInterestRecalculationEnabled()) {
                 loanProduct.setProductInterestRecalculationDetails(interestRecalculationDetailsAssembler.createFrom(command));
                 loanProduct.getProductInterestRecalculationDetails().updateProduct(loanProduct);
-                actualChanges.put(LoanProductConstants.interestRecalculationCompoundingMethodParameterName, command.integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName));
-                actualChanges.put(LoanProductConstants.rescheduleStrategyMethodParameterName, command.integerValueOfParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName));
+                actualChanges.put(LoanProductConstants.interestRecalculationCompoundingMethodParameterName,
+                        command.integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName));
+                actualChanges.put(LoanProductConstants.rescheduleStrategyMethodParameterName,
+                        command.integerValueOfParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName));
             } else {
                 loanProduct.setProductInterestRecalculationDetails(null);
             }
         }
         if (!isInterestRecalculationEnabledChanged && loanProduct.isInterestRecalculationEnabled()) {
-            interestRecalculationDetailsUpdateUtil.update(loanProduct.getProductInterestRecalculationDetails(), command, actualChanges, localeAsInput);
+            interestRecalculationDetailsUpdateUtil.update(loanProduct.getProductInterestRecalculationDetails(), command, actualChanges,
+                    localeAsInput);
         }
         if (command.isChangeInBooleanParameterNamed(LoanProductConstants.holdGuaranteeFundsParamName, loanProduct.isHoldGuaranteeFunds())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.holdGuaranteeFundsParamName);
@@ -232,31 +246,72 @@ public class LoanProductUpdateUtil {
         }
         final String configurableAttributesChanges = LoanProductConstants.allowAttributeOverridesParamName;
         if (command.hasParameter(configurableAttributesChanges)) {
-            if (!command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).isJsonNull()) {
+            if (!command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                    .isJsonNull()) {
                 actualChanges.put(configurableAttributesChanges, command.jsonFragment(configurableAttributesChanges));
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.amortizationTypeParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getAmortizationBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setAmortizationType(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.amortizationTypeParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.amortizationTypeParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getAmortizationBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setAmortizationType(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.amortizationTypeParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.interestTypeParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getInterestMethodBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setInterestType(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.interestTypeParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.interestTypeParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getInterestMethodBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setInterestType(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.interestTypeParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.transactionProcessingStrategyCodeParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getTransactionProcessingStrategyBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setTransactionProcessingStrategyCode(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.transactionProcessingStrategyCodeParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.transactionProcessingStrategyCodeParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getTransactionProcessingStrategyBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setTransactionProcessingStrategyCode(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.transactionProcessingStrategyCodeParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.interestCalculationPeriodTypeParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getInterestCalcPeriodBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setInterestCalculationPeriodType(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.interestCalculationPeriodTypeParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.interestCalculationPeriodTypeParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getInterestCalcPeriodBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setInterestCalculationPeriodType(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.interestCalculationPeriodTypeParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.inArrearsToleranceParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getArrearsToleranceBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setInArrearsTolerance(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.inArrearsToleranceParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.inArrearsToleranceParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getArrearsToleranceBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setInArrearsTolerance(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.inArrearsToleranceParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.repaymentEveryParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getRepaymentEveryBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setRepaymentEvery(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.repaymentEveryParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.repaymentEveryParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getRepaymentEveryBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setRepaymentEvery(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.repaymentEveryParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.graceOnPrincipalAndInterestPaymentParamName).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getGraceOnPrincipalAndInterestPaymentBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setGraceOnPrincipalAndInterestPayment(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.graceOnPrincipalAndInterestPaymentParamName).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.graceOnPrincipalAndInterestPaymentParamName)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getGraceOnPrincipalAndInterestPaymentBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setGraceOnPrincipalAndInterestPayment(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.graceOnPrincipalAndInterestPaymentParamName).getAsBoolean());
                 }
-                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.GRACE_ON_ARREARS_AGEING_PARAMETER_NAME).getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getGraceOnArrearsAgingBoolean()) {
-                    loanProduct.getLoanConfigurableAttributes().setGraceOnArrearsAgeing(command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName).getAsJsonPrimitive(LoanProductConstants.GRACE_ON_ARREARS_AGEING_PARAMETER_NAME).getAsBoolean());
+                if (command.parsedJson().getAsJsonObject().getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                        .getAsJsonPrimitive(LoanProductConstants.GRACE_ON_ARREARS_AGEING_PARAMETER_NAME)
+                        .getAsBoolean() != loanProduct.getLoanConfigurableAttributes().getGraceOnArrearsAgingBoolean()) {
+                    loanProduct.getLoanConfigurableAttributes()
+                            .setGraceOnArrearsAgeing(command.parsedJson().getAsJsonObject()
+                                    .getAsJsonObject(LoanProductConstants.allowAttributeOverridesParamName)
+                                    .getAsJsonPrimitive(LoanProductConstants.GRACE_ON_ARREARS_AGEING_PARAMETER_NAME).getAsBoolean());
                 }
             } else {
                 loanProduct.setLoanConfigurableAttributes(LoanProductConfigurableAttributes.populateDefaultsForConfigurableAttributes());
@@ -267,31 +322,40 @@ public class LoanProductUpdateUtil {
             if (loanProduct.isHoldGuaranteeFunds()) {
                 loanProduct.setLoanProductGuaranteeDetails(guaranteeDetailsAssembler.createFrom(command));
                 loanProduct.getLoanProductGuaranteeDetails().updateProduct(loanProduct);
-                actualChanges.put(LoanProductConstants.mandatoryGuaranteeParamName, loanProduct.getLoanProductGuaranteeDetails().getMandatoryGuarantee());
-                actualChanges.put(LoanProductConstants.minimumGuaranteeFromGuarantorParamName, loanProduct.getLoanProductGuaranteeDetails().getMinimumGuaranteeFromGuarantor());
-                actualChanges.put(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName, loanProduct.getLoanProductGuaranteeDetails().getMinimumGuaranteeFromOwnFunds());
+                actualChanges.put(LoanProductConstants.mandatoryGuaranteeParamName,
+                        loanProduct.getLoanProductGuaranteeDetails().getMandatoryGuarantee());
+                actualChanges.put(LoanProductConstants.minimumGuaranteeFromGuarantorParamName,
+                        loanProduct.getLoanProductGuaranteeDetails().getMinimumGuaranteeFromGuarantor());
+                actualChanges.put(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName,
+                        loanProduct.getLoanProductGuaranteeDetails().getMinimumGuaranteeFromOwnFunds());
             } else {
                 loanProduct.setLoanProductRelatedDetail(null);
             }
         } else if (loanProduct.isHoldGuaranteeFunds()) {
             guaranteeDetailsUpdateUtil.update(loanProduct.getLoanProductGuaranteeDetails(), command, actualChanges);
         }
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.principalThresholdForLastInstallmentParamName, loanProduct.getPrincipalThresholdForLastInstallment())) {
-            BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.principalThresholdForLastInstallmentParamName);
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.principalThresholdForLastInstallmentParamName,
+                loanProduct.getPrincipalThresholdForLastInstallment())) {
+            BigDecimal newValue = command
+                    .bigDecimalValueOfParameterNamed(LoanProductConstants.principalThresholdForLastInstallmentParamName);
             actualChanges.put(LoanProductConstants.principalThresholdForLastInstallmentParamName, newValue);
             loanProduct.setPrincipalThresholdForLastInstallment(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ACCOUNT_MOVES_OUT_OF_NPA_ONLY_ON_ARREARS_COMPLETION_PARAM_NAME, loanProduct.isAccountMovesOutOfNPAOnlyOnArrearsCompletion())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ACCOUNT_MOVES_OUT_OF_NPA_ONLY_ON_ARREARS_COMPLETION_PARAM_NAME);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ACCOUNT_MOVES_OUT_OF_NPA_ONLY_ON_ARREARS_COMPLETION_PARAM_NAME,
+                loanProduct.isAccountMovesOutOfNPAOnlyOnArrearsCompletion())) {
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(
+                    LoanProductConstants.ACCOUNT_MOVES_OUT_OF_NPA_ONLY_ON_ARREARS_COMPLETION_PARAM_NAME);
             actualChanges.put(LoanProductConstants.ACCOUNT_MOVES_OUT_OF_NPA_ONLY_ON_ARREARS_COMPLETION_PARAM_NAME, newValue);
             loanProduct.setAccountMovesOutOfNPAOnlyOnArrearsCompletion(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.canDefineEmiAmountParamName, loanProduct.isCanDefineInstallmentAmount())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.canDefineEmiAmountParamName,
+                loanProduct.isCanDefineInstallmentAmount())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.canDefineEmiAmountParamName);
             actualChanges.put(LoanProductConstants.canDefineEmiAmountParamName, newValue);
             loanProduct.setCanDefineInstallmentAmount(newValue);
         }
-        if (command.isChangeInIntegerParameterNamedWithNullCheck(LoanProductConstants.installmentAmountInMultiplesOfParamName, loanProduct.getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf())) {
+        if (command.isChangeInIntegerParameterNamedWithNullCheck(LoanProductConstants.installmentAmountInMultiplesOfParamName,
+                loanProduct.getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.installmentAmountInMultiplesOfParamName);
             actualChanges.put(LoanProductConstants.installmentAmountInMultiplesOfParamName, newValue);
             actualChanges.put("locale", localeAsInput);
@@ -308,22 +372,28 @@ public class LoanProductUpdateUtil {
                 actualChanges.put(LoanProductConstants.RATES_PARAM_NAME, command.jsonFragment(LoanProductConstants.RATES_PARAM_NAME));
             }
         }
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.fixedPrincipalPercentagePerInstallmentParamName, loanProduct.getFixedPrincipalPercentagePerInstallment())) {
-            BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.fixedPrincipalPercentagePerInstallmentParamName);
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.fixedPrincipalPercentagePerInstallmentParamName,
+                loanProduct.getFixedPrincipalPercentagePerInstallment())) {
+            BigDecimal newValue = command
+                    .bigDecimalValueOfParameterNamed(LoanProductConstants.fixedPrincipalPercentagePerInstallmentParamName);
             actualChanges.put(LoanProductConstants.fixedPrincipalPercentagePerInstallmentParamName, newValue);
             loanProduct.setFixedPrincipalPercentagePerInstallment(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.DISALLOW_EXPECTED_DISBURSEMENTS, loanProduct.isDisallowExpectedDisbursements())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.DISALLOW_EXPECTED_DISBURSEMENTS,
+                loanProduct.isDisallowExpectedDisbursements())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.DISALLOW_EXPECTED_DISBURSEMENTS);
             actualChanges.put(LoanProductConstants.DISALLOW_EXPECTED_DISBURSEMENTS, newValue);
             loanProduct.setDisallowExpectedDisbursements(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ALLOW_APPROVED_DISBURSED_AMOUNTS_OVER_APPLIED, loanProduct.isAllowApprovedDisbursedAmountsOverApplied())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ALLOW_APPROVED_DISBURSED_AMOUNTS_OVER_APPLIED);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ALLOW_APPROVED_DISBURSED_AMOUNTS_OVER_APPLIED,
+                loanProduct.isAllowApprovedDisbursedAmountsOverApplied())) {
+            final boolean newValue = command
+                    .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ALLOW_APPROVED_DISBURSED_AMOUNTS_OVER_APPLIED);
             actualChanges.put(LoanProductConstants.ALLOW_APPROVED_DISBURSED_AMOUNTS_OVER_APPLIED, newValue);
             loanProduct.setAllowApprovedDisbursedAmountsOverApplied(newValue);
         }
-        if (command.isChangeInStringParameterNamed(LoanProductConstants.OVER_APPLIED_CALCULATION_TYPE, loanProduct.getOverAppliedCalculationType())) {
+        if (command.isChangeInStringParameterNamed(LoanProductConstants.OVER_APPLIED_CALCULATION_TYPE,
+                loanProduct.getOverAppliedCalculationType())) {
             final String newValue = command.stringValueOfParameterNamed(LoanProductConstants.OVER_APPLIED_CALCULATION_TYPE);
             actualChanges.put(LoanProductConstants.OVER_APPLIED_CALCULATION_TYPE, newValue);
             loanProduct.setOverAppliedCalculationType(newValue);
@@ -334,44 +404,53 @@ public class LoanProductUpdateUtil {
             actualChanges.put("locale", localeAsInput);
             loanProduct.setOverAppliedNumber(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.DUE_DAYS_FOR_REPAYMENT_EVENT, loanProduct.getDueDaysForRepaymentEvent())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.DUE_DAYS_FOR_REPAYMENT_EVENT,
+                loanProduct.getDueDaysForRepaymentEvent())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.DUE_DAYS_FOR_REPAYMENT_EVENT);
             actualChanges.put(LoanProductConstants.DUE_DAYS_FOR_REPAYMENT_EVENT, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProduct.setDueDaysForRepaymentEvent(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.OVER_DUE_DAYS_FOR_REPAYMENT_EVENT, loanProduct.getOverDueDaysForRepaymentEvent())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.OVER_DUE_DAYS_FOR_REPAYMENT_EVENT,
+                loanProduct.getOverDueDaysForRepaymentEvent())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.OVER_DUE_DAYS_FOR_REPAYMENT_EVENT);
             actualChanges.put(LoanProductConstants.OVER_DUE_DAYS_FOR_REPAYMENT_EVENT, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProduct.setOverDueDaysForRepaymentEvent(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_DOWN_PAYMENT, loanProduct.getLoanProductRelatedDetail().isEnableDownPayment())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_DOWN_PAYMENT,
+                loanProduct.getLoanProductRelatedDetail().isEnableDownPayment())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ENABLE_DOWN_PAYMENT);
             actualChanges.put(LoanProductConstants.ENABLE_DOWN_PAYMENT, newValue);
             loanProduct.getLoanProductRelatedDetail().setEnableDownPayment(newValue);
         }
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.DISBURSED_AMOUNT_PERCENTAGE_DOWN_PAYMENT, loanProduct.getLoanProductRelatedDetail().getDisbursedAmountPercentageForDownPayment())) {
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.DISBURSED_AMOUNT_PERCENTAGE_DOWN_PAYMENT,
+                loanProduct.getLoanProductRelatedDetail().getDisbursedAmountPercentageForDownPayment())) {
             BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.DISBURSED_AMOUNT_PERCENTAGE_DOWN_PAYMENT);
             actualChanges.put(LoanProductConstants.DISBURSED_AMOUNT_PERCENTAGE_DOWN_PAYMENT, newValue);
             loanProduct.getLoanProductRelatedDetail().setDisbursedAmountPercentageForDownPayment(newValue);
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_AUTO_REPAYMENT_DOWN_PAYMENT, loanProduct.getLoanProductRelatedDetail().isEnableAutoRepaymentForDownPayment())) {
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_AUTO_REPAYMENT_DOWN_PAYMENT,
+                loanProduct.getLoanProductRelatedDetail().isEnableAutoRepaymentForDownPayment())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ENABLE_AUTO_REPAYMENT_DOWN_PAYMENT);
             actualChanges.put(LoanProductConstants.ENABLE_AUTO_REPAYMENT_DOWN_PAYMENT, newValue);
             loanProduct.getLoanProductRelatedDetail().setEnableAutoRepaymentForDownPayment(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.REPAYMENT_START_DATE_TYPE, loanProduct.getRepaymentStartDateType().getValue())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.REPAYMENT_START_DATE_TYPE,
+                loanProduct.getRepaymentStartDateType().getValue())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.REPAYMENT_START_DATE_TYPE);
             actualChanges.put(LoanProductConstants.REPAYMENT_START_DATE_TYPE, newValue);
             loanProduct.setRepaymentStartDateType(RepaymentStartDateType.fromInt(newValue));
         }
-        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_INSTALLMENT_LEVEL_DELINQUENCY, loanProduct.isEnableInstallmentLevelDelinquency())) {
-            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ENABLE_INSTALLMENT_LEVEL_DELINQUENCY);
+        if (command.isChangeInBooleanParameterNamed(LoanProductConstants.ENABLE_INSTALLMENT_LEVEL_DELINQUENCY,
+                loanProduct.isEnableInstallmentLevelDelinquency())) {
+            final boolean newValue = command
+                    .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.ENABLE_INSTALLMENT_LEVEL_DELINQUENCY);
             actualChanges.put(LoanProductConstants.ENABLE_INSTALLMENT_LEVEL_DELINQUENCY, newValue);
             loanProduct.updateEnableInstallmentLevelDelinquency(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.FIXED_LENGTH, loanProduct.getLoanProductRelatedDetail().getFixedLength())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.FIXED_LENGTH,
+                loanProduct.getLoanProductRelatedDetail().getFixedLength())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.FIXED_LENGTH);
             actualChanges.put(LoanProductConstants.FIXED_LENGTH, newValue);
             loanProduct.getLoanProductRelatedDetail().setFixedLength(newValue);
@@ -382,9 +461,12 @@ public class LoanProductUpdateUtil {
     private Map<String, Object> updateBorrowerCycleVariations(final LoanProduct loanProduct, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(20);
         List<Long> variationIds = fetchAllVariationIds(loanProduct);
-        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.PRINCIPAL.getValue(), LoanProductConstants.PRINCIPAL_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
-        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.INTERESTRATE.getValue(), LoanProductConstants.INTEREST_RATE_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
-        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.REPAYMENT.getValue(), LoanProductConstants.NUMBER_OF_REPAYMENT_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
+        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.PRINCIPAL.getValue(),
+                LoanProductConstants.PRINCIPAL_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
+        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.INTERESTRATE.getValue(),
+                LoanProductConstants.INTEREST_RATE_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
+        updateBorrowerCycleVariations(loanProduct, command, LoanProductParamType.REPAYMENT.getValue(),
+                LoanProductConstants.NUMBER_OF_REPAYMENT_VARIATIONS_FOR_BORROWER_CYCLE_PARAMETER_NAME, actualChanges, variationIds);
         for (Long id : variationIds) {
             loanProduct.getBorrowerCycleVariations().remove(fetchLoanProductBorrowerCycleVariationById(loanProduct, id));
         }
@@ -410,7 +492,8 @@ public class LoanProductUpdateUtil {
         return list;
     }
 
-    private void updateBorrowerCycleVariations(final LoanProduct loanProduct, final JsonCommand command, Integer paramType, String variationParameterName, final Map<String, Object> actualChanges, List<Long> variationIds) {
+    private void updateBorrowerCycleVariations(final LoanProduct loanProduct, final JsonCommand command, Integer paramType,
+            String variationParameterName, final Map<String, Object> actualChanges, List<Long> variationIds) {
         if (command.parameterExists(variationParameterName)) {
             final JsonArray variationArray = command.arrayOfParameterNamed(variationParameterName);
             if (variationArray != null && variationArray.size() > 0) {
@@ -423,32 +506,44 @@ public class LoanProductUpdateUtil {
                     Integer cycleNumber = null;
                     Integer valueUsageCondition = null;
                     Long id = null;
-                    if (jsonObject.has(LoanProductConstants.DEFAULT_VALUE_PARAMETER_NAME) && jsonObject.get(LoanProductConstants.DEFAULT_VALUE_PARAMETER_NAME).isJsonPrimitive()) {
+                    if (jsonObject.has(LoanProductConstants.DEFAULT_VALUE_PARAMETER_NAME)
+                            && jsonObject.get(LoanProductConstants.DEFAULT_VALUE_PARAMETER_NAME).isJsonPrimitive()) {
                         defaultValue = jsonObject.getAsJsonPrimitive(LoanProductConstants.DEFAULT_VALUE_PARAMETER_NAME).getAsBigDecimal();
                     }
-                    if (jsonObject.has(LoanProductConstants.MIN_VALUE_PARAMETER_NAME) && jsonObject.get(LoanProductConstants.MIN_VALUE_PARAMETER_NAME).isJsonPrimitive() && StringUtils.isNotBlank(jsonObject.get(LoanProductConstants.MIN_VALUE_PARAMETER_NAME).getAsString())) {
+                    if (jsonObject.has(LoanProductConstants.MIN_VALUE_PARAMETER_NAME)
+                            && jsonObject.get(LoanProductConstants.MIN_VALUE_PARAMETER_NAME).isJsonPrimitive()
+                            && StringUtils.isNotBlank(jsonObject.get(LoanProductConstants.MIN_VALUE_PARAMETER_NAME).getAsString())) {
                         minValue = jsonObject.getAsJsonPrimitive(LoanProductConstants.MIN_VALUE_PARAMETER_NAME).getAsBigDecimal();
                     }
-                    if (jsonObject.has(LoanProductConstants.MAX_VALUE_PARAMETER_NAME) && jsonObject.get(LoanProductConstants.MAX_VALUE_PARAMETER_NAME).isJsonPrimitive() && StringUtils.isNotBlank(jsonObject.get(LoanProductConstants.MAX_VALUE_PARAMETER_NAME).getAsString())) {
+                    if (jsonObject.has(LoanProductConstants.MAX_VALUE_PARAMETER_NAME)
+                            && jsonObject.get(LoanProductConstants.MAX_VALUE_PARAMETER_NAME).isJsonPrimitive()
+                            && StringUtils.isNotBlank(jsonObject.get(LoanProductConstants.MAX_VALUE_PARAMETER_NAME).getAsString())) {
                         maxValue = jsonObject.getAsJsonPrimitive(LoanProductConstants.MAX_VALUE_PARAMETER_NAME).getAsBigDecimal();
                     }
-                    if (jsonObject.has(LoanProductConstants.BORROWER_CYCLE_NUMBER_PARAM_NAME) && jsonObject.get(LoanProductConstants.BORROWER_CYCLE_NUMBER_PARAM_NAME).isJsonPrimitive()) {
+                    if (jsonObject.has(LoanProductConstants.BORROWER_CYCLE_NUMBER_PARAM_NAME)
+                            && jsonObject.get(LoanProductConstants.BORROWER_CYCLE_NUMBER_PARAM_NAME).isJsonPrimitive()) {
                         cycleNumber = jsonObject.getAsJsonPrimitive(LoanProductConstants.BORROWER_CYCLE_NUMBER_PARAM_NAME).getAsInt();
                     }
-                    if (jsonObject.has(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME) && jsonObject.get(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME).isJsonPrimitive()) {
-                        valueUsageCondition = jsonObject.getAsJsonPrimitive(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME).getAsInt();
+                    if (jsonObject.has(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME)
+                            && jsonObject.get(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME).isJsonPrimitive()) {
+                        valueUsageCondition = jsonObject.getAsJsonPrimitive(LoanProductConstants.VALUE_CONDITION_TYPE_PARAM_NAME)
+                                .getAsInt();
                     }
-                    if (jsonObject.has(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME) && jsonObject.get(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME).isJsonPrimitive() && StringUtils.isNotBlank(jsonObject.get(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME).getAsString())) {
+                    if (jsonObject.has(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME)
+                            && jsonObject.get(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME).isJsonPrimitive() && StringUtils
+                                    .isNotBlank(jsonObject.get(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME).getAsString())) {
                         id = jsonObject.getAsJsonPrimitive(LoanProductConstants.BORROWER_CYCLE_ID_PARAMETER_NAME).getAsLong();
                     }
-                    LoanProductBorrowerCycleVariations borrowerCycleVariations = new LoanProductBorrowerCycleVariations(cycleNumber, paramType, valueUsageCondition, minValue, maxValue, defaultValue);
+                    LoanProductBorrowerCycleVariations borrowerCycleVariations = new LoanProductBorrowerCycleVariations(cycleNumber,
+                            paramType, valueUsageCondition, minValue, maxValue, defaultValue);
                     if (id == null) {
                         borrowerCycleVariations.updateLoanProduct(loanProduct);
                         loanProduct.getBorrowerCycleVariations().add(borrowerCycleVariations);
                         actualChanges.put("borrowerCycleParamType", paramType);
                     } else {
                         variationIds.remove(id);
-                        LoanProductBorrowerCycleVariations existingCycleVariation = fetchLoanProductBorrowerCycleVariationById(loanProduct, id);
+                        LoanProductBorrowerCycleVariations existingCycleVariation = fetchLoanProductBorrowerCycleVariationById(loanProduct,
+                                id);
                         if (!existingCycleVariation.equals(borrowerCycleVariations)) {
                             existingCycleVariation.copy(borrowerCycleVariations);
                             actualChanges.put("borrowerCycleId", id);
@@ -465,7 +560,15 @@ public class LoanProductUpdateUtil {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductUpdateUtil(final LoanProductRelatedDetailUpdateUtil detailUpdateUtil, final LoanProductMinMaxConstraintsUpdateUtil minMaxConstraintsUpdateUtil, final LoanProductFloatingRatesUpdateUtil floatingRatesUpdateUtil, final LoanProductVariableInstallmentConfigUpdateUtil variableInstallmentConfigUpdateUtil, final LoanProductTrancheDetailsUpdateUtil trancheDetailsUpdateUtil, final LoanProductInterestRecalculationDetailsAssembler interestRecalculationDetailsAssembler, final LoanProductInterestRecalculationDetailsUpdateUtil interestRecalculationDetailsUpdateUtil, final LoanProductGuaranteeDetailsAssembler guaranteeDetailsAssembler, final LoanProductGuaranteeDetailsUpdateUtil guaranteeDetailsUpdateUtil) {
+    public LoanProductUpdateUtil(final LoanProductRelatedDetailUpdateUtil detailUpdateUtil,
+            final LoanProductMinMaxConstraintsUpdateUtil minMaxConstraintsUpdateUtil,
+            final LoanProductFloatingRatesUpdateUtil floatingRatesUpdateUtil,
+            final LoanProductVariableInstallmentConfigUpdateUtil variableInstallmentConfigUpdateUtil,
+            final LoanProductTrancheDetailsUpdateUtil trancheDetailsUpdateUtil,
+            final LoanProductInterestRecalculationDetailsAssembler interestRecalculationDetailsAssembler,
+            final LoanProductInterestRecalculationDetailsUpdateUtil interestRecalculationDetailsUpdateUtil,
+            final LoanProductGuaranteeDetailsAssembler guaranteeDetailsAssembler,
+            final LoanProductGuaranteeDetailsUpdateUtil guaranteeDetailsUpdateUtil) {
         this.detailUpdateUtil = detailUpdateUtil;
         this.minMaxConstraintsUpdateUtil = minMaxConstraintsUpdateUtil;
         this.floatingRatesUpdateUtil = floatingRatesUpdateUtil;

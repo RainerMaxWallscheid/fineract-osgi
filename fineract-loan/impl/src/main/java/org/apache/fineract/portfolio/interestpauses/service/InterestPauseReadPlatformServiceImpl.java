@@ -30,26 +30,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 public class InterestPauseReadPlatformServiceImpl implements InterestPauseReadPlatformService {
+
     private final LoanTermVariationsRepository loanTermVariationsRepository;
 
     @Override
     public List<InterestPauseResponseDto> retrieveInterestPauses(Long loanId) {
-        List<LoanTermVariationsData> variations = this.loanTermVariationsRepository.findLoanTermVariationsByLoanIdAndTermType(loanId, LoanTermVariationType.INTEREST_PAUSE.getValue());
+        List<LoanTermVariationsData> variations = this.loanTermVariationsRepository.findLoanTermVariationsByLoanIdAndTermType(loanId,
+                LoanTermVariationType.INTEREST_PAUSE.getValue());
         return mapToInterestPauseResponse(variations);
     }
 
     @Override
     public List<InterestPauseResponseDto> retrieveInterestPauses(String loanExternalId) {
-        List<LoanTermVariationsData> variations = this.loanTermVariationsRepository.findLoanTermVariationsByExternalLoanIdAndTermType(new ExternalId(loanExternalId), LoanTermVariationType.INTEREST_PAUSE.getValue());
+        List<LoanTermVariationsData> variations = this.loanTermVariationsRepository.findLoanTermVariationsByExternalLoanIdAndTermType(
+                new ExternalId(loanExternalId), LoanTermVariationType.INTEREST_PAUSE.getValue());
         return mapToInterestPauseResponse(variations);
     }
 
     private List<InterestPauseResponseDto> mapToInterestPauseResponse(List<LoanTermVariationsData> variations) {
-        return variations.stream().map(variation -> new InterestPauseResponseDto(variation.getId(), variation.getTermVariationApplicableFrom(), variation.getDateValue(), DateUtils.DEFAULT_DATE_FORMAT, Locale.getDefault().toString())).toList();
+        return variations.stream()
+                .map(variation -> new InterestPauseResponseDto(variation.getId(), variation.getTermVariationApplicableFrom(),
+                        variation.getDateValue(), DateUtils.DEFAULT_DATE_FORMAT, Locale.getDefault().toString()))
+                .toList();
     }
 
     @java.lang.SuppressWarnings("all")
-        public InterestPauseReadPlatformServiceImpl(final LoanTermVariationsRepository loanTermVariationsRepository) {
+    public InterestPauseReadPlatformServiceImpl(final LoanTermVariationsRepository loanTermVariationsRepository) {
         this.loanTermVariationsRepository = loanTermVariationsRepository;
     }
 }

@@ -49,7 +49,8 @@ public class LoanNotificationEventPortAdapter implements LoanNotificationEventPo
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, event -> {
             final Loan loan = (Loan) event.get();
-            handler.accept(new LoanNotification("DISBURSE_LOAN", "loan", loan.getId(), "New loan approved", "approved", loan.getOfficeId()));
+            handler.accept(
+                    new LoanNotification("DISBURSE_LOAN", "loan", loan.getId(), "New loan approved", "approved", loan.getOfficeId()));
         });
         businessEventNotifierService.addPostBusinessEventListener(LoanCloseBusinessEvent.class, event -> {
             final Loan loan = (Loan) event.get();
@@ -71,7 +72,8 @@ public class LoanNotificationEventPortAdapter implements LoanNotificationEventPo
             final Loan loan = (Loan) ((LoanTransaction) event.get()).getLoan();
             handler.accept(new LoanNotification("READ_LOAN", "loan", loan.getId(), "Repayment made", "repaymentMade", loan.getOfficeId()));
         });
-        businessEventNotifierService.addPostBusinessEventListener(LoanProductCreateBusinessEvent.class, event -> handler.accept(
-                new LoanNotification("READ_LOANPRODUCT", "loanProduct", event.getAggregateRootId(), "New loan product created", "created", null)));
+        businessEventNotifierService.addPostBusinessEventListener(LoanProductCreateBusinessEvent.class,
+                event -> handler.accept(new LoanNotification("READ_LOANPRODUCT", "loanProduct", event.getAggregateRootId(),
+                        "New loan product created", "created", null)));
     }
 }

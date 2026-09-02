@@ -32,6 +32,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 @Entity
 @Table(name = "m_loan_delinquency_action")
 public class LoanDelinquencyAction extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
@@ -51,46 +52,45 @@ public class LoanDelinquencyAction extends AbstractAuditableWithUTCDateTimeCusto
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyAction getAction() {
+    public DelinquencyAction getAction() {
         return this.action;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getStartDate() {
+    public LocalDate getStartDate() {
         return this.startDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getEndDate() {
+    public LocalDate getEndDate() {
         return this.endDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoan(final Loan loan) {
+    public void setLoan(final Loan loan) {
         this.loan = loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAction(final DelinquencyAction action) {
+    public void setAction(final DelinquencyAction action) {
         this.action = action;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setStartDate(final LocalDate startDate) {
+    public void setStartDate(final LocalDate startDate) {
         this.startDate = startDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEndDate(final LocalDate endDate) {
+    public void setEndDate(final LocalDate endDate) {
         this.endDate = endDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDelinquencyAction() {
-    }
+    public LoanDelinquencyAction() {}
 }

@@ -31,10 +31,12 @@ import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+
 // TODO FINERACT-1932-Fineract modularization: Move to fineract-progressive-loan module after refactor of Loan and LoanTransaction classes
 @Entity
 @Table(name = "m_loan_reage_parameter")
 public class LoanReAgeParameter extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @OneToOne
     @JoinColumn(name = "loan_transaction_id", nullable = false)
     private LoanTransaction loanTransaction;
@@ -55,15 +57,17 @@ public class LoanReAgeParameter extends AbstractAuditableWithUTCDateTimeCustom<L
     private CodeValue reageReason;
 
     // for JPA, don't use
-    protected LoanReAgeParameter() {
-    }
+    protected LoanReAgeParameter() {}
 
     public LoanReAgeParameter getCopy(LoanTransaction loanTransaction) {
-        return new LoanReAgeParameter(loanTransaction, frequencyType, frequencyNumber, startDate, numberOfInstallments, interestHandlingType, reageReason);
+        return new LoanReAgeParameter(loanTransaction, frequencyType, frequencyNumber, startDate, numberOfInstallments,
+                interestHandlingType, reageReason);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReAgeParameter(final LoanTransaction loanTransaction, final PeriodFrequencyType frequencyType, final Integer frequencyNumber, final LocalDate startDate, final Integer numberOfInstallments, final LoanReAgeInterestHandlingType interestHandlingType, final CodeValue reageReason) {
+    public LoanReAgeParameter(final LoanTransaction loanTransaction, final PeriodFrequencyType frequencyType, final Integer frequencyNumber,
+            final LocalDate startDate, final Integer numberOfInstallments, final LoanReAgeInterestHandlingType interestHandlingType,
+            final CodeValue reageReason) {
         this.loanTransaction = loanTransaction;
         this.frequencyType = frequencyType;
         this.frequencyNumber = frequencyNumber;
@@ -74,37 +78,37 @@ public class LoanReAgeParameter extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransaction getLoanTransaction() {
+    public LoanTransaction getLoanTransaction() {
         return this.loanTransaction;
     }
 
     @java.lang.SuppressWarnings("all")
-        public PeriodFrequencyType getFrequencyType() {
+    public PeriodFrequencyType getFrequencyType() {
         return this.frequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getFrequencyNumber() {
+    public Integer getFrequencyNumber() {
         return this.frequencyNumber;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getStartDate() {
+    public LocalDate getStartDate() {
         return this.startDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getNumberOfInstallments() {
+    public Integer getNumberOfInstallments() {
         return this.numberOfInstallments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanReAgeInterestHandlingType getInterestHandlingType() {
+    public LoanReAgeInterestHandlingType getInterestHandlingType() {
         return this.interestHandlingType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getReageReason() {
+    public CodeValue getReageReason() {
         return this.reageReason;
     }
 }

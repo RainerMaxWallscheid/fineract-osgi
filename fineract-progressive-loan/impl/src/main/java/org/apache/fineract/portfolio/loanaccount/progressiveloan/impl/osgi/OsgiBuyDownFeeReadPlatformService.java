@@ -23,8 +23,8 @@ import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFee
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 
 /**
- * Empty buy-down fee catalog for Equinox without Spring/JPA.
- * Published by {@code OSGI-INF/progressive-loan.xml} (ADR-022 B6).
+ * Empty buy-down fee catalog for Equinox without Spring/JPA. Published by {@code OSGI-INF/progressive-loan.xml}
+ * (ADR-022 B6).
  */
 public final class OsgiBuyDownFeeReadPlatformService implements BuyDownFeeReadPlatformService {
 

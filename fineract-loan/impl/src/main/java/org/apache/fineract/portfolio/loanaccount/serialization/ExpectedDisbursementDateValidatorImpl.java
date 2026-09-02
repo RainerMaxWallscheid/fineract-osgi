@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ExpectedDisbursementDateValidatorImpl implements ExpectedDisbursementDateValidator {
+
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final HolidayRepositoryWrapper holidayRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -70,7 +71,8 @@ public class ExpectedDisbursementDateValidatorImpl implements ExpectedDisburseme
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExpectedDisbursementDateValidatorImpl(final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepositoryWrapper holidayRepository, final ConfigurationDomainService configurationDomainService) {
+    public ExpectedDisbursementDateValidatorImpl(final WorkingDaysRepositoryWrapper workingDaysRepository,
+            final HolidayRepositoryWrapper holidayRepository, final ConfigurationDomainService configurationDomainService) {
         this.workingDaysRepository = workingDaysRepository;
         this.holidayRepository = holidayRepository;
         this.configurationDomainService = configurationDomainService;

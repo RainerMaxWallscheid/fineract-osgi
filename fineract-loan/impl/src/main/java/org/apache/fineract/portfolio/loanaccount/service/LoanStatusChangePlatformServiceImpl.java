@@ -26,19 +26,21 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
 public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlatformService {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangePlatformServiceImpl.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangePlatformServiceImpl.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
 
     @PostConstruct
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanStatusChangedListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanAccrualActivityPostingLoanStatusChangedListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class,
+                new LoanAccrualActivityPostingLoanStatusChangedListener());
     }
 
-
     private static final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
+
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = (Loan) event.get();
@@ -49,8 +51,9 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
         }
     }
 
+    private final class LoanAccrualActivityPostingLoanStatusChangedListener
+            implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
 
-    private final class LoanAccrualActivityPostingLoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = (Loan) event.get();
@@ -65,7 +68,8 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanStatusChangePlatformServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+    public LoanStatusChangePlatformServiceImpl(final BusinessEventNotifierService businessEventNotifierService,
+            final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
     }

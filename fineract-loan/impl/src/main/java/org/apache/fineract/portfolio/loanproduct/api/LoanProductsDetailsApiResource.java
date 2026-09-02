@@ -38,13 +38,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Tag(name = "Loan Products Details", description = "Loan product basic details to be listed")
 public class LoanProductsDetailsApiResource {
+
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOANPRODUCT";
     private final PlatformSecurityContext context;
     private final List<LoanProductReadBasicDetailsService> loanProductReadBasicDetailsServices;
 
     @GET
     @Path("basic-details")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "List Loan Products with basic details", operationId = "retrieveAllLoanProductsDetails", description = "Lists Loan Products with basic details to be listed")
     public Collection<LoanProductBasicDetailsData> fetchProducts(@Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
@@ -54,7 +55,8 @@ public class LoanProductsDetailsApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductsDetailsApiResource(final PlatformSecurityContext context, final List<LoanProductReadBasicDetailsService> loanProductReadBasicDetailsServices) {
+    public LoanProductsDetailsApiResource(final PlatformSecurityContext context,
+            final List<LoanProductReadBasicDetailsService> loanProductReadBasicDetailsServices) {
         this.context = context;
         this.loanProductReadBasicDetailsServices = loanProductReadBasicDetailsServices;
     }

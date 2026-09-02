@@ -39,8 +39,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanStatusChangeHistoryListener {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangeHistoryListener.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangeHistoryListener.class);
     private final Set<LoanStatus> loanStatuses = new HashSet<>();
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanStatusChangeHistoryRepository loanStatusChangeHistoryRepository;
@@ -50,7 +51,8 @@ public class LoanStatusChangeHistoryListener {
     public void addListeners() {
         loanStatuses.addAll(getLoanStatuses(fineractProperties.getLoan().getStatusChangeHistoryStatuses()));
         if (!loanStatuses.isEmpty()) {
-            businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanStatusChangedListener());
+            businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class,
+                    new LoanStatusChangedListener());
         }
     }
 
@@ -73,21 +75,23 @@ public class LoanStatusChangeHistoryListener {
         return result;
     }
 
-
     protected final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
+
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = (Loan) event.get();
             log.debug("Loan Status change for loan {} with status {}", loan.getId(), loan.getStatus());
             if (loanStatuses.contains(loan.getStatus())) {
-                LoanStatusChangeHistory loanStatusChangeHistory = new LoanStatusChangeHistory(loan, loan.getStatus(), DateUtils.getBusinessLocalDate());
+                LoanStatusChangeHistory loanStatusChangeHistory = new LoanStatusChangeHistory(loan, loan.getStatus(),
+                        DateUtils.getBusinessLocalDate());
                 loanStatusChangeHistoryRepository.saveAndFlush(loanStatusChangeHistory);
             }
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanStatusChangeHistoryListener(final BusinessEventNotifierService businessEventNotifierService, final LoanStatusChangeHistoryRepository loanStatusChangeHistoryRepository, final FineractProperties fineractProperties) {
+    public LoanStatusChangeHistoryListener(final BusinessEventNotifierService businessEventNotifierService,
+            final LoanStatusChangeHistoryRepository loanStatusChangeHistoryRepository, final FineractProperties fineractProperties) {
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanStatusChangeHistoryRepository = loanStatusChangeHistoryRepository;
         this.fineractProperties = fineractProperties;

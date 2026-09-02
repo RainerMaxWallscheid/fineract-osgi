@@ -45,7 +45,6 @@ dependencies {
     implementation(project(path: ':fineract-accounting-api'))
     implementation(project(path: ':fineract-charge-api'))
     implementation(project(path: ':fineract-loan-api'))
-    implementation(project(path: ':fineract-loan-impl'))
     // Leftover loan-read residual: FundReadPlatformService + floating-rate periods
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-rates-api'))

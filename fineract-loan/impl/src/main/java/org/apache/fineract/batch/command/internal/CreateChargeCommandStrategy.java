@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CreateChargeCommandStrategy implements CommandStrategy {
+
     private final LoanChargesApiResource loanChargesApiResource;
 
     @Override
@@ -66,7 +68,7 @@ public class CreateChargeCommandStrategy implements CommandStrategy {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CreateChargeCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+    public CreateChargeCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
         this.loanChargesApiResource = loanChargesApiResource;
     }
 }

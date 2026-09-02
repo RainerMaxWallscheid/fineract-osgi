@@ -27,6 +27,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 @Entity
 @Table(name = "m_loan_approved_amount_history")
 public class LoanApprovedAmountHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
     @Column(name = "new_approved_amount", scale = 6, precision = 19, nullable = false)
@@ -35,41 +36,40 @@ public class LoanApprovedAmountHistory extends AbstractAuditableWithUTCDateTimeC
     private BigDecimal oldApprovedAmount;
 
     @java.lang.SuppressWarnings("all")
-        public Long getLoanId() {
+    public Long getLoanId() {
         return this.loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getNewApprovedAmount() {
+    public BigDecimal getNewApprovedAmount() {
         return this.newApprovedAmount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getOldApprovedAmount() {
+    public BigDecimal getOldApprovedAmount() {
         return this.oldApprovedAmount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanId(final Long loanId) {
+    public void setLoanId(final Long loanId) {
         this.loanId = loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setNewApprovedAmount(final BigDecimal newApprovedAmount) {
+    public void setNewApprovedAmount(final BigDecimal newApprovedAmount) {
         this.newApprovedAmount = newApprovedAmount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOldApprovedAmount(final BigDecimal oldApprovedAmount) {
+    public void setOldApprovedAmount(final BigDecimal oldApprovedAmount) {
         this.oldApprovedAmount = oldApprovedAmount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApprovedAmountHistory() {
-    }
+    public LoanApprovedAmountHistory() {}
 
     @java.lang.SuppressWarnings("all")
-        public LoanApprovedAmountHistory(final Long loanId, final BigDecimal newApprovedAmount, final BigDecimal oldApprovedAmount) {
+    public LoanApprovedAmountHistory(final Long loanId, final BigDecimal newApprovedAmount, final BigDecimal oldApprovedAmount) {
         this.loanId = loanId;
         this.newApprovedAmount = newApprovedAmount;
         this.oldApprovedAmount = oldApprovedAmount;

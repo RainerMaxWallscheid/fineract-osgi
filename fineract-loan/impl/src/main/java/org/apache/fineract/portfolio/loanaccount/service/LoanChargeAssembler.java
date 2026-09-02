@@ -36,10 +36,10 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -53,6 +53,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 
 public class LoanChargeAssembler {
+
     private final FromJsonHelper fromApiJsonHelper;
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final LoanChargeRepository loanChargeRepository;
@@ -85,7 +86,8 @@ public class LoanChargeAssembler {
         final BigDecimal principal = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed("principal", element);
         final Integer numberOfRepayments = this.fromApiJsonHelper.extractIntegerWithLocaleNamed("numberOfRepayments", element);
         final Long productId = this.fromApiJsonHelper.extractLongNamed("productId", element);
-        final LoanProduct loanProduct = this.loanProductRepository.findById(productId).orElseThrow(() -> new LoanProductNotFoundException(productId));
+        final LoanProduct loanProduct = this.loanProductRepository.findById(productId)
+                .orElseThrow(() -> new LoanProductNotFoundException(productId));
         final boolean isMultiDisbursal = loanProduct.isMultiDisburseLoan();
         LocalDate expectedDisbursementDate = null;
         if (element.isJsonObject()) {
@@ -100,9 +102,12 @@ public class LoanChargeAssembler {
                     final Long chargeId = this.fromApiJsonHelper.extractLongNamed("chargeId", loanChargeElement);
                     final BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalNamed("amount", loanChargeElement, locale);
                     final Integer chargeTimeType = this.fromApiJsonHelper.extractIntegerNamed("chargeTimeType", loanChargeElement, locale);
-                    final Integer chargeCalculationType = this.fromApiJsonHelper.extractIntegerNamed("chargeCalculationType", loanChargeElement, locale);
-                    final LocalDate dueDate = this.fromApiJsonHelper.extractLocalDateNamed("dueDate", loanChargeElement, dateFormat, locale);
-                    final Integer chargePaymentMode = this.fromApiJsonHelper.extractIntegerNamed("chargePaymentMode", loanChargeElement, locale);
+                    final Integer chargeCalculationType = this.fromApiJsonHelper.extractIntegerNamed("chargeCalculationType",
+                            loanChargeElement, locale);
+                    final LocalDate dueDate = this.fromApiJsonHelper.extractLocalDateNamed("dueDate", loanChargeElement, dateFormat,
+                            locale);
+                    final Integer chargePaymentMode = this.fromApiJsonHelper.extractIntegerNamed("chargePaymentMode", loanChargeElement,
+                            locale);
                     final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", loanChargeElement);
                     final ExternalId externalId = externalIdFactory.create(externalIdStr);
                     if (loanChargeId == null) {
@@ -120,41 +125,53 @@ public class LoanChargeAssembler {
                             chargePaymentModeEnum = ChargePaymentMode.fromInt(chargePaymentMode);
                         }
                         if (!isMultiDisbursal) {
-                            final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
+                            final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime,
+                                    chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
                             loanCharges.add(loanCharge);
                         } else {
                             if (topLevelJsonElement.has("disbursementData") && topLevelJsonElement.get("disbursementData").isJsonArray()) {
                                 final JsonArray disbursementArray = topLevelJsonElement.get("disbursementData").getAsJsonArray();
                                 if (!disbursementArray.isEmpty()) {
                                     JsonObject disbursementDataElement = disbursementArray.get(0).getAsJsonObject();
-                                    expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, disbursementDataElement, dateFormat, locale);
+                                    expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(
+                                            LoanApiConstants.expectedDisbursementDateParameterName, disbursementDataElement, dateFormat,
+                                            locale);
                                 } else {
-                                    expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, element);
+                                    expectedDisbursementDate = this.fromApiJsonHelper
+                                            .extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, element);
                                 }
                             }
                             if (ChargeTimeType.DISBURSEMENT.getValue().equals(chargeDefinition.getChargeTimeType())) {
                                 if (CollectionUtils.isEmpty(disbursementDetails)) {
                                     // non-tranche
-                                    final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
+                                    final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime,
+                                            chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
                                     loanCharges.add(loanCharge);
                                 } else {
                                     // tranche
                                     for (LoanDisbursementDetails disbursementDetail : disbursementDetails) {
                                         LoanTrancheDisbursementCharge loanTrancheDisbursementCharge = null;
-                                        if (isPercentageOfApprovedAmount(chargeDefinition)
-                                                && disbursementDetail.expectedDisbursementDateAsLocalDate().equals(expectedDisbursementDate)) {
-                                            final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
+                                        if (isPercentageOfApprovedAmount(chargeDefinition) && disbursementDetail
+                                                .expectedDisbursementDateAsLocalDate().equals(expectedDisbursementDate)) {
+                                            final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount,
+                                                    chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments,
+                                                    externalId);
                                             loanCharges.add(loanCharge);
                                             if (loanCharge.isTrancheDisbursementCharge()) {
-                                                loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge, disbursementDetail);
+                                                loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge,
+                                                        disbursementDetail);
                                                 loanCharge.updateLoanTrancheDisbursementCharge(loanTrancheDisbursementCharge);
                                             }
                                         } else {
                                             if (disbursementDetail.expectedDisbursementDateAsLocalDate().equals(expectedDisbursementDate)) {
-                                                final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, disbursementDetail.getPrincipal(), amount, chargeTime, chargeCalculation, disbursementDetail.expectedDisbursementDateAsLocalDate(), chargePaymentModeEnum, numberOfRepayments, externalId);
+                                                final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition,
+                                                        disbursementDetail.getPrincipal(), amount, chargeTime, chargeCalculation,
+                                                        disbursementDetail.expectedDisbursementDateAsLocalDate(), chargePaymentModeEnum,
+                                                        numberOfRepayments, externalId);
                                                 loanCharges.add(loanCharge);
                                                 if (loanCharge.isTrancheDisbursementCharge()) {
-                                                    loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge, disbursementDetail);
+                                                    loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge,
+                                                            disbursementDetail);
                                                     loanCharge.updateLoanTrancheDisbursementCharge(loanTrancheDisbursementCharge);
                                                 }
                                             }
@@ -165,19 +182,24 @@ public class LoanChargeAssembler {
                                 LoanTrancheDisbursementCharge loanTrancheDisbursementCharge = null;
                                 for (LoanDisbursementDetails disbursementDetail : disbursementDetails) {
                                     if (ChargeTimeType.TRANCHE_DISBURSEMENT.getValue().equals(chargeDefinition.getChargeTimeType())) {
-                                        final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, disbursementDetail.getPrincipal(), amount, chargeTime, chargeCalculation, disbursementDetail.expectedDisbursementDateAsLocalDate(), chargePaymentModeEnum, numberOfRepayments, externalId);
+                                        final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition,
+                                                disbursementDetail.getPrincipal(), amount, chargeTime, chargeCalculation,
+                                                disbursementDetail.expectedDisbursementDateAsLocalDate(), chargePaymentModeEnum,
+                                                numberOfRepayments, externalId);
                                         loanCharges.add(loanCharge);
                                         loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge, disbursementDetail);
                                         loanCharge.updateLoanTrancheDisbursementCharge(loanTrancheDisbursementCharge);
                                     }
                                 }
                             } else {
-                                final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
+                                final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime,
+                                        chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
                                 loanCharges.add(loanCharge);
                             }
                         }
                     } else {
-                        final LoanCharge loanCharge = this.loanChargeRepository.findById(loanChargeId).orElseThrow(() -> new LoanChargeNotFoundException(loanChargeId));
+                        final LoanCharge loanCharge = this.loanChargeRepository.findById(loanChargeId)
+                                .orElseThrow(() -> new LoanChargeNotFoundException(loanChargeId));
                         if (!loanCharge.isTrancheDisbursementCharge() || disbursementChargeIds.contains(loanChargeId)) {
                             loanChargeService.update(loanCharge, amount, dueDate, numberOfRepayments);
                             loanCharges.add(loanCharge);
@@ -215,12 +237,14 @@ public class LoanChargeAssembler {
         final LocalDate dueDate = command.localDateValueOfParameterNamed("dueDate");
         if (ChargeTimeType.SPECIFIED_DUE_DATE.getValue().equals(chargeDefinition.getChargeTimeType()) && dueDate == null) {
             final String defaultUserMessage = "Loan charge is missing due date.";
-            throw new LoanChargeWithoutMandatoryFieldException("loanCharge", "dueDate", defaultUserMessage, chargeDefinition.getId(), chargeDefinition.getName());
+            throw new LoanChargeWithoutMandatoryFieldException("loanCharge", "dueDate", defaultUserMessage, chargeDefinition.getId(),
+                    chargeDefinition.getName());
         }
         return createNewFromJson(loan, chargeDefinition, command, dueDate);
     }
 
-    public LoanCharge createNewFromJson(final Loan loan, final ChargeDefinitionData chargeDefinition, final JsonCommand command, final LocalDate dueDate) {
+    public LoanCharge createNewFromJson(final Loan loan, final ChargeDefinitionData chargeDefinition, final JsonCommand command,
+            final LocalDate dueDate) {
         final Locale locale = command.extractLocale();
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount", locale);
         final ChargeTimeType chargeTime = null;
@@ -228,28 +252,29 @@ public class LoanChargeAssembler {
         final ChargePaymentMode chargePaymentMode = null;
         BigDecimal amountPercentageAppliedTo = BigDecimal.ZERO;
         switch (ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType())) {
-        case PERCENT_OF_AMOUNT:
-            if (command.hasParameter("principal")) {
-                amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal");
-            } else {
-                amountPercentageAppliedTo = loan.getPrincipal().getAmount();
-            }
+            case PERCENT_OF_AMOUNT:
+                if (command.hasParameter("principal")) {
+                    amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal");
+                } else {
+                    amountPercentageAppliedTo = loan.getPrincipal().getAmount();
+                }
             break;
-        case PERCENT_OF_AMOUNT_AND_INTEREST:
-            if (command.hasParameter("principal") && command.hasParameter("interest")) {
-                amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal").add(command.bigDecimalValueOfParameterNamed("interest"));
-            } else {
-                amountPercentageAppliedTo = loan.getPrincipal().getAmount().add(loan.getTotalInterest());
-            }
+            case PERCENT_OF_AMOUNT_AND_INTEREST:
+                if (command.hasParameter("principal") && command.hasParameter("interest")) {
+                    amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal")
+                            .add(command.bigDecimalValueOfParameterNamed("interest"));
+                } else {
+                    amountPercentageAppliedTo = loan.getPrincipal().getAmount().add(loan.getTotalInterest());
+                }
             break;
-        case PERCENT_OF_INTEREST:
-            if (command.hasParameter("interest")) {
-                amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("interest");
-            } else {
-                amountPercentageAppliedTo = loan.getTotalInterest();
-            }
+            case PERCENT_OF_INTEREST:
+                if (command.hasParameter("interest")) {
+                    amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("interest");
+                } else {
+                    amountPercentageAppliedTo = loan.getTotalInterest();
+                }
             break;
-        default:
+            default:
             break;
         }
         BigDecimal loanCharge = BigDecimal.ZERO;
@@ -258,7 +283,8 @@ public class LoanChargeAssembler {
             if (percentage == null) {
                 percentage = chargeDefinition.getAmount();
             }
-            loanCharge = loanChargeService.calculatePerInstallmentChargeAmount(loan, ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType()), percentage);
+            loanCharge = loanChargeService.calculatePerInstallmentChargeAmount(loan,
+                    ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType()), percentage);
         }
         // If charge type is specified due date and loan is multi disburment
         // loan.
@@ -273,14 +299,19 @@ public class LoanChargeAssembler {
             }
         }
         ExternalId externalId = externalIdFactory.createFromCommand(command, "externalId");
-        return loanChargeService.create(loan, chargeDefinition, amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, null, loanCharge, externalId);
+        return loanChargeService.create(loan, chargeDefinition, amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate,
+                chargePaymentMode, null, loanCharge, externalId);
     }
 
     /*
      * loanPrincipal is required for charges that are percentage based
      */
-    public LoanCharge createNewWithoutLoan(final ChargeDefinitionData chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final ExternalId externalId) {
-        return loanChargeService.create(null, chargeDefinition, loanPrincipal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
+    public LoanCharge createNewWithoutLoan(final ChargeDefinitionData chargeDefinition, final BigDecimal loanPrincipal,
+            final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation,
+            final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments,
+            final ExternalId externalId) {
+        return loanChargeService.create(null, chargeDefinition, loanPrincipal, amount, chargeTime, chargeCalculation, dueDate,
+                chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
     }
 
     private static boolean isPercentageOfApprovedAmount(final ChargeDefinitionData chargeDefinition) {
@@ -288,7 +319,9 @@ public class LoanChargeAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-    public LoanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final LoanChargeRepository loanChargeRepository, final LoanProductRepository loanProductRepository, final ExternalIdFactory externalIdFactory, final LoanChargeService loanChargeService) {
+    public LoanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
+            final LoanChargeRepository loanChargeRepository, final LoanProductRepository loanProductRepository,
+            final ExternalIdFactory externalIdFactory, final LoanChargeService loanChargeService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.loanChargeRepository = loanChargeRepository;

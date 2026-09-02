@@ -30,21 +30,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class PurchasedSharesReadPlatformServiceImpl implements PurchasedSharesReadPlatformService {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Collection<ShareAccountTransactionData> retrievePurchasedShares(Long accountId) {
         PurchasedSharesDataRowMapper mapper = new PurchasedSharesDataRowMapper();
         final String sql = "select " + mapper.schema() + " where saps.account_id=? and saps.is_active = true";
-        return this.jdbcTemplate.query(sql, mapper, new Object[] {accountId}); // NOSONAR
+        return this.jdbcTemplate.query(sql, mapper, new Object[] { accountId }); // NOSONAR
     }
 
-
     private static final class PurchasedSharesDataRowMapper implements RowMapper<ShareAccountTransactionData> {
+
         private final String schema;
 
         PurchasedSharesDataRowMapper() {
-            StringBuilder buff = new StringBuilder().append("saps.id, saps.account_id, saps.transaction_date, saps.total_shares, saps.unit_price, ").append("saps.status_enum, saps.type_enum, saps.amount, saps.charge_amount as chargeamount, ").append("saps.amount_paid as amountPaid").append(" from m_share_account_transactions saps ");
+            StringBuilder buff = new StringBuilder()
+                    .append("saps.id, saps.account_id, saps.transaction_date, saps.total_shares, saps.unit_price, ")
+                    .append("saps.status_enum, saps.type_enum, saps.amount, saps.charge_amount as chargeamount, ")
+                    .append("saps.amount_paid as amountPaid").append(" from m_share_account_transactions saps ");
             schema = buff.toString();
         }
 
@@ -62,7 +66,8 @@ public class PurchasedSharesReadPlatformServiceImpl implements PurchasedSharesRe
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "amount");
             final BigDecimal chargeAmount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "chargeamount");
             final BigDecimal amountPaid = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "amountPaid");
-            return new ShareAccountTransactionData(id, accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid);
+            return new ShareAccountTransactionData(id, accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum,
+                    amount, chargeAmount, amountPaid);
         }
 
         public String schema() {
@@ -71,7 +76,7 @@ public class PurchasedSharesReadPlatformServiceImpl implements PurchasedSharesRe
     }
 
     @java.lang.SuppressWarnings("all")
-        public PurchasedSharesReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+    public PurchasedSharesReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 }

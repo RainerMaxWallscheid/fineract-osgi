@@ -118,12 +118,12 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
         underTest.enrichWithDelinquencyPausePeriodInfo(collectionData, delinquencyActions, LocalDate.of(2023, JANUARY, 12));
@@ -141,12 +141,12 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 13))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
         underTest.enrichWithDelinquencyPausePeriodInfo(collectionData, delinquencyActions, LocalDate.of(2023, JANUARY, 13));
@@ -163,12 +163,12 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 14))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 12), LocalDate.of(2023, JANUARY, 14))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
         underTest.enrichWithDelinquencyPausePeriodInfo(collectionData, delinquencyActions, LocalDate.of(2023, JANUARY, 13));
@@ -185,12 +185,12 @@ class DelinquencyReadPlatformServiceImplTest {
         // given
         CollectionData collectionData = CollectionData.template();
         Collection<LoanDelinquencyActionData> delinquencyActions = List.of(
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 13), LocalDate.of(2023, JANUARY, 14))),
-                LoanDelinquencyActionDataFactory.from(
-                        new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 10), LocalDate.of(2023, JANUARY, 11))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 13), LocalDate.of(2023, JANUARY, 14))),
+                LoanDelinquencyActionDataFactory
+                        .from(new LoanDelinquencyAction(null, PAUSE, LocalDate.of(2023, JANUARY, 15), LocalDate.of(2023, JANUARY, 20))));
 
         // when
         underTest.enrichWithDelinquencyPausePeriodInfo(collectionData, delinquencyActions, LocalDate.of(2023, JANUARY, 12));

@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name = "m_product_loan_guarantee_details")
 public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long> {
+
     @OneToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
@@ -48,7 +49,8 @@ public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long>
         //
     }
 
-    public LoanProductGuaranteeDetails(final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds, final BigDecimal minimumGuaranteeFromGuarantor) {
+    public LoanProductGuaranteeDetails(final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds,
+            final BigDecimal minimumGuaranteeFromGuarantor) {
         this.mandatoryGuarantee = mandatoryGuarantee;
         this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
         this.minimumGuaranteeFromOwnFunds = minimumGuaranteeFromOwnFunds;
@@ -59,42 +61,42 @@ public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long>
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProduct getLoanProduct() {
+    public LoanProduct getLoanProduct() {
         return this.loanProduct;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMandatoryGuarantee() {
+    public BigDecimal getMandatoryGuarantee() {
         return this.mandatoryGuarantee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMinimumGuaranteeFromOwnFunds() {
+    public BigDecimal getMinimumGuaranteeFromOwnFunds() {
         return this.minimumGuaranteeFromOwnFunds;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMinimumGuaranteeFromGuarantor() {
+    public BigDecimal getMinimumGuaranteeFromGuarantor() {
         return this.minimumGuaranteeFromGuarantor;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanProduct(final LoanProduct loanProduct) {
+    public void setLoanProduct(final LoanProduct loanProduct) {
         this.loanProduct = loanProduct;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMandatoryGuarantee(final BigDecimal mandatoryGuarantee) {
+    public void setMandatoryGuarantee(final BigDecimal mandatoryGuarantee) {
         this.mandatoryGuarantee = mandatoryGuarantee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinimumGuaranteeFromOwnFunds(final BigDecimal minimumGuaranteeFromOwnFunds) {
+    public void setMinimumGuaranteeFromOwnFunds(final BigDecimal minimumGuaranteeFromOwnFunds) {
         this.minimumGuaranteeFromOwnFunds = minimumGuaranteeFromOwnFunds;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinimumGuaranteeFromGuarantor(final BigDecimal minimumGuaranteeFromGuarantor) {
+    public void setMinimumGuaranteeFromGuarantor(final BigDecimal minimumGuaranteeFromGuarantor) {
         this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
     }
 }

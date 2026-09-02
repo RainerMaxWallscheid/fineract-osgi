@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DelinquencyRangeParseAndValidator extends ParseAndValidator {
+
     private final FromJsonHelper jsonHelper;
 
     public DelinquencyRangeData validateAndParseUpdate(@NotNull final JsonCommand command) {
@@ -43,11 +44,14 @@ public class DelinquencyRangeParseAndValidator extends ParseAndValidator {
         return result;
     }
 
-    private DelinquencyRangeData validateAndParseUpdate(final DataValidatorBuilder dataValidator, JsonObject element, FromJsonHelper jsonHelper) {
+    private DelinquencyRangeData validateAndParseUpdate(final DataValidatorBuilder dataValidator, JsonObject element,
+            FromJsonHelper jsonHelper) {
         if (element == null) {
             return null;
         }
-        jsonHelper.checkForUnsupportedParameters(element, List.of(DelinquencyApiConstants.CLASSIFICATION_PARAM_NAME, DelinquencyApiConstants.MINIMUMAGEDAYS_PARAM_NAME, DelinquencyApiConstants.MAXIMUMAGEDAYS_PARAM_NAME, DelinquencyApiConstants.LOCALE_PARAM_NAME));
+        jsonHelper.checkForUnsupportedParameters(element,
+                List.of(DelinquencyApiConstants.CLASSIFICATION_PARAM_NAME, DelinquencyApiConstants.MINIMUMAGEDAYS_PARAM_NAME,
+                        DelinquencyApiConstants.MAXIMUMAGEDAYS_PARAM_NAME, DelinquencyApiConstants.LOCALE_PARAM_NAME));
         final String localeValue = jsonHelper.extractStringNamed(DelinquencyApiConstants.LOCALE_PARAM_NAME, element);
         dataValidator.reset().parameter(DelinquencyApiConstants.LOCALE_PARAM_NAME).value(localeValue).notBlank();
         final Locale locale = jsonHelper.extractLocaleParameter(element);
@@ -55,13 +59,15 @@ public class DelinquencyRangeParseAndValidator extends ParseAndValidator {
         final Integer minimumAge = jsonHelper.extractIntegerNamed(DelinquencyApiConstants.MINIMUMAGEDAYS_PARAM_NAME, element, locale);
         final Integer maximumAge = jsonHelper.extractIntegerNamed(DelinquencyApiConstants.MAXIMUMAGEDAYS_PARAM_NAME, element, locale);
         dataValidator.reset().parameter(DelinquencyApiConstants.CLASSIFICATION_PARAM_NAME).value(classification).notBlank();
-        dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUMAGEDAYS_PARAM_NAME).value(minimumAge).notBlank().integerGreaterThanNumber(0);
-        dataValidator.reset().parameter(DelinquencyApiConstants.MAXIMUMAGEDAYS_PARAM_NAME).value(maximumAge).ignoreIfNull().integerGreaterThanNumber(0);
+        dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUMAGEDAYS_PARAM_NAME).value(minimumAge).notBlank()
+                .integerGreaterThanNumber(0);
+        dataValidator.reset().parameter(DelinquencyApiConstants.MAXIMUMAGEDAYS_PARAM_NAME).value(maximumAge).ignoreIfNull()
+                .integerGreaterThanNumber(0);
         return dataValidator.hasError() ? null : DelinquencyRangeData.instance(classification, minimumAge, maximumAge);
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyRangeParseAndValidator(final FromJsonHelper jsonHelper) {
+    public DelinquencyRangeParseAndValidator(final FromJsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 }

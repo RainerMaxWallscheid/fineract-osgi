@@ -68,8 +68,7 @@ class DelinquencyActionParseAndValidatorTest {
 
         JsonCommand command = delinquencyAction("pause", "20220909", "20220919");
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, List.of(),
-                localDate("20220909"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, List.of(), localDate("20220909"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220909"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220919"), parsedDelinquencyAction.getEndDate());
@@ -85,8 +84,7 @@ class DelinquencyActionParseAndValidatorTest {
         List<LoanDelinquencyActionData> effectiveList = List.of(loanDelinquencyActionData(existing.get(0)));
         Mockito.when(delinquencyEffectivePauseHelper.calculateEffectiveDelinquencyList(existing)).thenReturn(effectiveList);
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220909"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220909"));
         Assertions.assertEquals(RESUME, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220909"), parsedDelinquencyAction.getStartDate());
         Assertions.assertNull(parsedDelinquencyAction.getEndDate());
@@ -167,8 +165,7 @@ class DelinquencyActionParseAndValidatorTest {
                 loanDelinquencyAction(RESUME, "20220917") //
         );
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220918"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220918"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220918"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220920"), parsedDelinquencyAction.getEndDate());
@@ -245,8 +242,7 @@ class DelinquencyActionParseAndValidatorTest {
         List<LoanDelinquencyActionData> effectiveList = List.of(loanDelinquencyActionData(existing.get(0)));
         Mockito.when(delinquencyEffectivePauseHelper.calculateEffectiveDelinquencyList(existing)).thenReturn(effectiveList);
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220909"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220909"));
         Assertions.assertEquals(RESUME, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220909"), parsedDelinquencyAction.getStartDate());
         Assertions.assertNull(parsedDelinquencyAction.getEndDate());
@@ -292,14 +288,12 @@ class DelinquencyActionParseAndValidatorTest {
         Mockito.when(loan.getStatus()).thenReturn(LoanStatus.ACTIVE);
 
         assertPlatformValidationException("The parameter `startDate` is mandatory.",
-                "validation.msg.loanDelinquencyAction.startDate.cannot.be.blank",
-                () -> underTest.validateAndParseUpdate(delinquencyAction("pause", null, "20220909"), loan, List.of(),
-                        localDate("20220909")));
+                "validation.msg.loanDelinquencyAction.startDate.cannot.be.blank", () -> underTest
+                        .validateAndParseUpdate(delinquencyAction("pause", null, "20220909"), loan, List.of(), localDate("20220909")));
 
         assertPlatformValidationException("The parameter `endDate` is mandatory.",
-                "validation.msg.loanDelinquencyAction.endDate.cannot.be.blank",
-                () -> underTest.validateAndParseUpdate(delinquencyAction("pause", "20220909", null), loan, List.of(),
-                        localDate("20220909")));
+                "validation.msg.loanDelinquencyAction.endDate.cannot.be.blank", () -> underTest
+                        .validateAndParseUpdate(delinquencyAction("pause", "20220909", null), loan, List.of(), localDate("20220909")));
     }
 
     @Test
@@ -308,8 +302,8 @@ class DelinquencyActionParseAndValidatorTest {
         Mockito.when(loan.getStatus()).thenReturn(LoanStatus.ACTIVE);
 
         assertPlatformValidationException("The parameter `startDate` is mandatory.",
-                "validation.msg.loanDelinquencyAction.startDate.cannot.be.blank", () -> underTest
-                        .validateAndParseUpdate(delinquencyAction("resume", null, null), loan, List.of(), localDate("20220909")));
+                "validation.msg.loanDelinquencyAction.startDate.cannot.be.blank",
+                () -> underTest.validateAndParseUpdate(delinquencyAction("resume", null, null), loan, List.of(), localDate("20220909")));
     }
 
     @Test
@@ -322,8 +316,7 @@ class DelinquencyActionParseAndValidatorTest {
 
         List<LoanDelinquencyAction> existing = List.of(loanDelinquencyAction(PAUSE, "20220915", "20220918"));
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220918"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220918"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220918"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220920"), parsedDelinquencyAction.getEndDate());
@@ -339,8 +332,7 @@ class DelinquencyActionParseAndValidatorTest {
 
         List<LoanDelinquencyAction> existing = List.of(loanDelinquencyAction(PAUSE, "20220920", "20220925"));
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220918"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220918"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220918"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220920"), parsedDelinquencyAction.getEndDate());
@@ -359,8 +351,7 @@ class DelinquencyActionParseAndValidatorTest {
                 loanDelinquencyAction(RESUME, "20220918") //
         );
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing,
-                localDate("20220918"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, existing, localDate("20220918"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220918"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220920"), parsedDelinquencyAction.getEndDate());
@@ -374,8 +365,7 @@ class DelinquencyActionParseAndValidatorTest {
 
         JsonCommand command = delinquencyAction("pause", "20220908", "20220919");
 
-        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, List.of(),
-                localDate("20220909"));
+        LoanDelinquencyAction parsedDelinquencyAction = underTest.validateAndParseUpdate(command, loan, List.of(), localDate("20220909"));
         Assertions.assertEquals(PAUSE, parsedDelinquencyAction.getAction());
         Assertions.assertEquals(localDate("20220908"), parsedDelinquencyAction.getStartDate());
         Assertions.assertEquals(localDate("20220919"), parsedDelinquencyAction.getEndDate());

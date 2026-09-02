@@ -107,8 +107,7 @@ class LoanChargeServiceTaxTest {
     @Test
     void populateDerivedFields_populatesTaxDetails_forEachTaxComponent() {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
-        when(taxService.computeTax(any(), any(), any(), anyInt()))
-                .thenReturn(List.of(share(11L, "10.000000"), share(12L, "5.000000")));
+        when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(List.of(share(11L, "10.000000"), share(12L, "5.000000")));
 
         LoanChargeService service = buildService(taxService);
         LoanCharge loanCharge = loanCharge(7L, new BigDecimal("100.00"), null);
@@ -176,8 +175,8 @@ class LoanChargeServiceTaxTest {
     @Test
     void populateDerivedFields_clearsPreviousTaxDetails_onReapplication() {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
-        when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(
-                List.of(share(11L, "10.000000"), share(12L, "5.000000")), List.of(share(11L, "20.000000")));
+        when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(List.of(share(11L, "10.000000"), share(12L, "5.000000")),
+                List.of(share(11L, "20.000000")));
 
         LoanChargeService service = buildService(taxService);
         LoanCharge loanCharge = loanCharge(7L, new BigDecimal("100.00"), null);

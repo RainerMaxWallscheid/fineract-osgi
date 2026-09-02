@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name = "m_product_loan_floating_rates")
 public class LoanProductFloatingRates extends AbstractPersistableCustom<Long> {
+
     @OneToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
@@ -49,8 +50,7 @@ public class LoanProductFloatingRates extends AbstractPersistableCustom<Long> {
     @Column(name = "is_floating_interest_rate_calculation_allowed", nullable = false)
     private boolean isFloatingInterestRateCalculationAllowed;
 
-    public LoanProductFloatingRates() {
-    }
+    public LoanProductFloatingRates() {}
 
     public LoanProductFloatingRates(Long floatingRateId, LoanProduct loanProduct, BigDecimal interestRateDifferential,
             BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate,

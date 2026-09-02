@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @CommandType(entity = "LOAN", action = "FORECLOSURE")
 public class ForeClosureCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Override
@@ -36,7 +37,7 @@ public class ForeClosureCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ForeClosureCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public ForeClosureCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

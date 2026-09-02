@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GetLoanInterestPausesByLoanIdCommandStrategy implements CommandStrategy {
+
     private final LoanInterestPauseApiResource loanInterestPauseApiResource;
     private final DefaultToApiJsonSerializer<List<InterestPauseResponseDto>> toApiJsonSerializer;
 
@@ -57,7 +59,8 @@ public class GetLoanInterestPausesByLoanIdCommandStrategy implements CommandStra
     }
 
     @java.lang.SuppressWarnings("all")
-        public GetLoanInterestPausesByLoanIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource, final DefaultToApiJsonSerializer<List<InterestPauseResponseDto>> toApiJsonSerializer) {
+    public GetLoanInterestPausesByLoanIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource,
+            final DefaultToApiJsonSerializer<List<InterestPauseResponseDto>> toApiJsonSerializer) {
         this.loanInterestPauseApiResource = loanInterestPauseApiResource;
         this.toApiJsonSerializer = toApiJsonSerializer;
     }

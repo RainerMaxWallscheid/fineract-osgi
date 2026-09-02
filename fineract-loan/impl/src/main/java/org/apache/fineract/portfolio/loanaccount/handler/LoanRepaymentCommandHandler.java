@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "REPAYMENT")
 public class LoanRepaymentCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -41,7 +42,8 @@ public class LoanRepaymentCommandHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(final JsonCommand command) {
         try {
             boolean isRecoveryRepayment = false;
-            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.REPAYMENT, command.getLoanId(), command, isRecoveryRepayment);
+            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.REPAYMENT, command.getLoanId(), command,
+                    isRecoveryRepayment);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.repayment", "Repayment");
             return CommandProcessingResult.empty();
@@ -49,7 +51,8 @@ public class LoanRepaymentCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentCommandHandler(final LoanWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+    public LoanRepaymentCommandHandler(final LoanWritePlatformService writePlatformService,
+            final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
         this.writePlatformService = writePlatformService;
         this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }

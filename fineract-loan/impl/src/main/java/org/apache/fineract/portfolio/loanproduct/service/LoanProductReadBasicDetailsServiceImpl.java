@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class LoanProductReadBasicDetailsServiceImpl implements LoanProductReadBasicDetailsService {
+
     private final LoanProductBasicDetailsMapper loanProductBasicDetailsMapper;
     private final LoanProductRepository loanProductRepository;
 
@@ -38,7 +39,8 @@ public class LoanProductReadBasicDetailsServiceImpl implements LoanProductReadBa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductReadBasicDetailsServiceImpl(final LoanProductBasicDetailsMapper loanProductBasicDetailsMapper, final LoanProductRepository loanProductRepository) {
+    public LoanProductReadBasicDetailsServiceImpl(final LoanProductBasicDetailsMapper loanProductBasicDetailsMapper,
+            final LoanProductRepository loanProductRepository) {
         this.loanProductBasicDetailsMapper = loanProductBasicDetailsMapper;
         this.loanProductRepository = loanProductRepository;
     }

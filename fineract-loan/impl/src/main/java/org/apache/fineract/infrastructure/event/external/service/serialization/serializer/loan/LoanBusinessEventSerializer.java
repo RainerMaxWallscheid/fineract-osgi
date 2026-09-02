@@ -47,7 +47,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanBusinessEvent> implements BusinessEventSerializer {
+public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanBusinessEvent>
+        implements BusinessEventSerializer {
+
     private final LoanReadPlatformService service;
     private final LoanAccountDataMapper mapper;
     private final LoanChargeReadPlatformService loanChargeReadPlatformService;
@@ -75,18 +77,23 @@ public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustom
         }
         CollectionData delinquentData = delinquencyReadPlatformService.calculateLoanCollectionData(loanId);
         data.setDelinquent(delinquentData);
-        LoanSummaryDataProvider loanSummaryDataProvider = loanSummaryProviderDelegate.resolveLoanSummaryDataProvider(data.getTransactionProcessingStrategyCode());
+        LoanSummaryDataProvider loanSummaryDataProvider = loanSummaryProviderDelegate
+                .resolveLoanSummaryDataProvider(data.getTransactionProcessingStrategyCode());
         if (data.getSummary() != null) {
-            data.setSummary(loanSummaryDataProvider.withTransactionAmountsSummary((Loan) event.get(), data.getSummary(), data.getRepaymentSchedule(), loanSummaryBalancesRepository.retrieveLoanSummaryBalancesByTransactionType(loanId, LoanApiConstants.LOAN_SUMMARY_TRANSACTION_TYPES)));
+            data.setSummary(loanSummaryDataProvider.withTransactionAmountsSummary((Loan) event.get(), data.getSummary(),
+                    data.getRepaymentSchedule(), loanSummaryBalancesRepository.retrieveLoanSummaryBalancesByTransactionType(loanId,
+                            LoanApiConstants.LOAN_SUMMARY_TRANSACTION_TYPES)));
         } else {
             data.setSummary(loanSummaryDataProvider.withOnlyCurrencyData(data.getCurrency()));
         }
-        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer.calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
+        List<LoanInstallmentDelinquencyBucketDataV1> installmentsDelinquencyData = installmentLevelDelinquencyEventProducer
+                .calculateInstallmentLevelDelinquencyData((Loan) event.get(), data.getCurrency());
         List<LoanTermVariations> activeLoanTermVariations = ((Loan) event.get()).getActiveLoanTermVariations();
         if (!activeLoanTermVariations.isEmpty()) {
             data.setLoanTermVariations(activeLoanTermVariations.stream().map(LoanTermVariations::toData).toList());
         }
-        Integer actualNoTerms = Math.toIntExact(((Loan) event.get()).getRepaymentScheduleInstallments().stream().filter(i -> !i.isAdditional() && !i.isDownPayment()).count());
+        Integer actualNoTerms = Math.toIntExact(((Loan) event.get()).getRepaymentScheduleInstallments().stream()
+                .filter(i -> !i.isAdditional() && !i.isDownPayment()).count());
         data.setActualNoTerm(actualNoTerms);
         final LoanAccountDataV1 result = mapper.map(data);
         result.getDelinquent().setInstallmentDelinquencyBuckets(installmentsDelinquencyData);
@@ -105,7 +112,13 @@ public class LoanBusinessEventSerializer extends AbstractBusinessEventWithCustom
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanBusinessEventSerializer(final LoanReadPlatformService service, final LoanAccountDataMapper mapper, final LoanChargeReadPlatformService loanChargeReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final LoanInstallmentLevelDelinquencyEventProducer installmentLevelDelinquencyEventProducer, final LoanSummaryBalancesRepository loanSummaryBalancesRepository, final LoanSummaryProviderDelegate loanSummaryProviderDelegate, final List<ExternalEventCustomDataSerializer<LoanBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanBusinessEventSerializer(final LoanReadPlatformService service, final LoanAccountDataMapper mapper,
+            final LoanChargeReadPlatformService loanChargeReadPlatformService,
+            final DelinquencyReadPlatformService delinquencyReadPlatformService,
+            final LoanInstallmentLevelDelinquencyEventProducer installmentLevelDelinquencyEventProducer,
+            final LoanSummaryBalancesRepository loanSummaryBalancesRepository,
+            final LoanSummaryProviderDelegate loanSummaryProviderDelegate,
+            final List<ExternalEventCustomDataSerializer<LoanBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.mapper = mapper;
         this.loanChargeReadPlatformService = loanChargeReadPlatformService;

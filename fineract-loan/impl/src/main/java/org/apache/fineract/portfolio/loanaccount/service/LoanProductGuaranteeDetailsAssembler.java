@@ -26,14 +26,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductGuaranteeDetailsAssembler {
+
     public LoanProductGuaranteeDetails createFrom(final JsonCommand command) {
         final BigDecimal mandatoryGuarantee = command.bigDecimalValueOfParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName);
-        final BigDecimal minimumGuaranteeFromGuarantor = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
-        final BigDecimal minimumGuaranteeFromOwnFunds = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
+        final BigDecimal minimumGuaranteeFromGuarantor = command
+                .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
+        final BigDecimal minimumGuaranteeFromOwnFunds = command
+                .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
         return new LoanProductGuaranteeDetails(mandatoryGuarantee, minimumGuaranteeFromOwnFunds, minimumGuaranteeFromGuarantor);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductGuaranteeDetailsAssembler() {
-    }
+    public LoanProductGuaranteeDetailsAssembler() {}
 }

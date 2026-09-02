@@ -50,6 +50,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
  */
 @Embeddable
 public class LoanProductRelatedDetail {
+
     @Embedded
     private MonetaryCurrency currency;
     @Column(name = "principal_amount", scale = 6, precision = 19)
@@ -163,16 +164,63 @@ public class LoanProductRelatedDetail {
     @Column(name = "installment_amount_in_multiples_of")
     private Integer installmentAmountInMultiplesOf;
 
-    public static LoanProductRelatedDetail createFrom(final CurrencyData currencyData, final BigDecimal principal, final BigDecimal nominalInterestRatePerPeriod, final PeriodFrequencyType interestRatePeriodFrequencyType, final BigDecimal nominalAnnualInterestRate, final InterestMethod interestMethod, final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean allowPartialPeriodInterestCalculation, final Integer repaymentEvery, final PeriodFrequencyType repaymentPeriodFrequencyType, final Integer numberOfRepayments, final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods, final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod, final BigDecimal inArrearsTolerance, final Integer graceOnArrearsAgeing, final Integer daysInMonthType, final Integer daysInYearType, final boolean isInterestRecalculationEnabled, final boolean isEqualAmortization, final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment, final boolean enableAutoRepaymentForDownPayment, final LoanScheduleType loanScheduleType, final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength, final boolean enableAccrualActivityPosting, final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes, final LoanChargeOffBehaviour chargeOffBehaviour, final boolean interestRecognitionOnDisbursementDate, final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization, final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType, final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType, final Integer installmentAmountInMultiplesOf, final boolean enableBuyDownFee, final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy, final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee) {
+    public static LoanProductRelatedDetail createFrom(final CurrencyData currencyData, final BigDecimal principal,
+            final BigDecimal nominalInterestRatePerPeriod, final PeriodFrequencyType interestRatePeriodFrequencyType,
+            final BigDecimal nominalAnnualInterestRate, final InterestMethod interestMethod,
+            final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean allowPartialPeriodInterestCalculation,
+            final Integer repaymentEvery, final PeriodFrequencyType repaymentPeriodFrequencyType, final Integer numberOfRepayments,
+            final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods,
+            final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod,
+            final BigDecimal inArrearsTolerance, final Integer graceOnArrearsAgeing, final Integer daysInMonthType,
+            final Integer daysInYearType, final boolean isInterestRecalculationEnabled, final boolean isEqualAmortization,
+            final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment,
+            final boolean enableAutoRepaymentForDownPayment, final LoanScheduleType loanScheduleType,
+            final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength,
+            final boolean enableAccrualActivityPosting, final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes,
+            final LoanChargeOffBehaviour chargeOffBehaviour, final boolean interestRecognitionOnDisbursementDate,
+            final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization,
+            final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType,
+            final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType,
+            final Integer installmentAmountInMultiplesOf, final boolean enableBuyDownFee,
+            final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy,
+            final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee) {
         final MonetaryCurrency currency = MonetaryCurrency.fromCurrencyData(currencyData);
-        return new LoanProductRelatedDetail(currency, principal, nominalInterestRatePerPeriod, interestRatePeriodFrequencyType, nominalAnnualInterestRate, interestMethod, interestCalculationPeriodMethod, allowPartialPeriodInterestCalculation, repaymentEvery, repaymentPeriodFrequencyType, numberOfRepayments, graceOnPrincipalPayment, recurringMoratoriumOnPrincipalPeriods, graceOnInterestPayment, graceOnInterestCharged, amortizationMethod, inArrearsTolerance, graceOnArrearsAgeing, daysInMonthType, daysInYearType, isInterestRecalculationEnabled, isEqualAmortization, enableDownPayment, disbursedAmountPercentageForDownPayment, enableAutoRepaymentForDownPayment, loanScheduleType, loanScheduleProcessingType, fixedLength, enableAccrualActivityPosting, supportedInterestRefundTypes, chargeOffBehaviour, interestRecognitionOnDisbursementDate, daysInYearCustomStrategy, enableIncomeCapitalization, capitalizedIncomeCalculationType, capitalizedIncomeStrategy, capitalizedIncomeType, installmentAmountInMultiplesOf, enableBuyDownFee, buyDownFeeCalculationType, buyDownFeeStrategy, buyDownFeeIncomeType, merchantBuyDownFee);
+        return new LoanProductRelatedDetail(currency, principal, nominalInterestRatePerPeriod, interestRatePeriodFrequencyType,
+                nominalAnnualInterestRate, interestMethod, interestCalculationPeriodMethod, allowPartialPeriodInterestCalculation,
+                repaymentEvery, repaymentPeriodFrequencyType, numberOfRepayments, graceOnPrincipalPayment,
+                recurringMoratoriumOnPrincipalPeriods, graceOnInterestPayment, graceOnInterestCharged, amortizationMethod,
+                inArrearsTolerance, graceOnArrearsAgeing, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
+                isEqualAmortization, enableDownPayment, disbursedAmountPercentageForDownPayment, enableAutoRepaymentForDownPayment,
+                loanScheduleType, loanScheduleProcessingType, fixedLength, enableAccrualActivityPosting, supportedInterestRefundTypes,
+                chargeOffBehaviour, interestRecognitionOnDisbursementDate, daysInYearCustomStrategy, enableIncomeCapitalization,
+                capitalizedIncomeCalculationType, capitalizedIncomeStrategy, capitalizedIncomeType, installmentAmountInMultiplesOf,
+                enableBuyDownFee, buyDownFeeCalculationType, buyDownFeeStrategy, buyDownFeeIncomeType, merchantBuyDownFee);
     }
 
     protected LoanProductRelatedDetail() {
         //
     }
 
-    public LoanProductRelatedDetail(final MonetaryCurrency currency, final BigDecimal defaultPrincipal, final BigDecimal defaultNominalInterestRatePerPeriod, final PeriodFrequencyType interestPeriodFrequencyType, final BigDecimal defaultAnnualNominalInterestRate, final InterestMethod interestMethod, final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean allowPartialPeriodInterestCalculation, final Integer repayEvery, final PeriodFrequencyType repaymentFrequencyType, final Integer defaultNumberOfRepayments, final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods, final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod, final BigDecimal inArrearsTolerance, final Integer graceOnArrearsAgeing, final Integer daysInMonthType, final Integer daysInYearType, final boolean isInterestRecalculationEnabled, final boolean isEqualAmortization, final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment, final boolean enableAutoRepaymentForDownPayment, final LoanScheduleType loanScheduleType, final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength, final boolean enableAccrualActivityPosting, List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes, final LoanChargeOffBehaviour chargeOffBehaviour, final boolean interestRecognitionOnDisbursementDate, final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization, final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType, final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType, final Integer installmentAmountInMultiplesOf, final boolean enableBuyDownFee, final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy, final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee) {
+    public LoanProductRelatedDetail(final MonetaryCurrency currency, final BigDecimal defaultPrincipal,
+            final BigDecimal defaultNominalInterestRatePerPeriod, final PeriodFrequencyType interestPeriodFrequencyType,
+            final BigDecimal defaultAnnualNominalInterestRate, final InterestMethod interestMethod,
+            final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean allowPartialPeriodInterestCalculation,
+            final Integer repayEvery, final PeriodFrequencyType repaymentFrequencyType, final Integer defaultNumberOfRepayments,
+            final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods,
+            final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod,
+            final BigDecimal inArrearsTolerance, final Integer graceOnArrearsAgeing, final Integer daysInMonthType,
+            final Integer daysInYearType, final boolean isInterestRecalculationEnabled, final boolean isEqualAmortization,
+            final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment,
+            final boolean enableAutoRepaymentForDownPayment, final LoanScheduleType loanScheduleType,
+            final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength,
+            final boolean enableAccrualActivityPosting, List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes,
+            final LoanChargeOffBehaviour chargeOffBehaviour, final boolean interestRecognitionOnDisbursementDate,
+            final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization,
+            final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType,
+            final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType,
+            final Integer installmentAmountInMultiplesOf, final boolean enableBuyDownFee,
+            final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy,
+            final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee) {
         this.currency = currency;
         this.principal = defaultPrincipal;
         this.nominalInterestRatePerPeriod = defaultNominalInterestRatePerPeriod;
@@ -247,7 +295,8 @@ public class LoanProductRelatedDetail {
     }
 
     public BigDecimal getNominalInterestRatePerPeriod() {
-        return this.nominalInterestRatePerPeriod == null ? null : BigDecimal.valueOf(Double.parseDouble(this.nominalInterestRatePerPeriod.stripTrailingZeros().toString()));
+        return this.nominalInterestRatePerPeriod == null ? null
+                : BigDecimal.valueOf(Double.parseDouble(this.nominalInterestRatePerPeriod.stripTrailingZeros().toString()));
     }
 
     public PeriodFrequencyType getInterestPeriodFrequencyType() {
@@ -255,7 +304,8 @@ public class LoanProductRelatedDetail {
     }
 
     public BigDecimal getAnnualNominalInterestRate() {
-        return this.annualNominalInterestRate == null ? null : BigDecimal.valueOf(Double.parseDouble(this.annualNominalInterestRate.stripTrailingZeros().toString()));
+        return this.annualNominalInterestRate == null ? null
+                : BigDecimal.valueOf(Double.parseDouble(this.annualNominalInterestRate.stripTrailingZeros().toString()));
     }
 
     public DaysInYearCustomStrategyType getDaysInYearCustomStrategy() {
@@ -285,397 +335,397 @@ public class LoanProductRelatedDetail {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InterestMethod getInterestMethod() {
+    public InterestMethod getInterestMethod() {
         return this.interestMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public InterestCalculationPeriodMethod getInterestCalculationPeriodMethod() {
+    public InterestCalculationPeriodMethod getInterestCalculationPeriodMethod() {
         return this.interestCalculationPeriodMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isAllowPartialPeriodInterestCalculation() {
+    public boolean isAllowPartialPeriodInterestCalculation() {
         return this.allowPartialPeriodInterestCalculation;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRepayEvery() {
+    public Integer getRepayEvery() {
         return this.repayEvery;
     }
 
     @java.lang.SuppressWarnings("all")
-        public PeriodFrequencyType getRepaymentPeriodFrequencyType() {
+    public PeriodFrequencyType getRepaymentPeriodFrequencyType() {
         return this.repaymentPeriodFrequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getFixedLength() {
+    public Integer getFixedLength() {
         return this.fixedLength;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getNumberOfRepayments() {
+    public Integer getNumberOfRepayments() {
         return this.numberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getGraceOnPrincipalPayment() {
+    public Integer getGraceOnPrincipalPayment() {
         return this.graceOnPrincipalPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRecurringMoratoriumOnPrincipalPeriods() {
+    public Integer getRecurringMoratoriumOnPrincipalPeriods() {
         return this.recurringMoratoriumOnPrincipalPeriods;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getGraceOnInterestPayment() {
+    public Integer getGraceOnInterestPayment() {
         return this.graceOnInterestPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getGraceOnInterestCharged() {
+    public Integer getGraceOnInterestCharged() {
         return this.graceOnInterestCharged;
     }
 
     @java.lang.SuppressWarnings("all")
-        public AmortizationMethod getAmortizationMethod() {
+    public AmortizationMethod getAmortizationMethod() {
         return this.amortizationMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getGraceOnArrearsAgeing() {
+    public Integer getGraceOnArrearsAgeing() {
         return this.graceOnArrearsAgeing;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getDaysInMonthType() {
+    public Integer getDaysInMonthType() {
         return this.daysInMonthType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getDaysInYearType() {
+    public Integer getDaysInYearType() {
         return this.daysInYearType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isInterestRecalculationEnabled() {
+    public boolean isInterestRecalculationEnabled() {
         return this.isInterestRecalculationEnabled;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEqualAmortization() {
+    public boolean isEqualAmortization() {
         return this.isEqualAmortization;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEnableDownPayment() {
+    public boolean isEnableDownPayment() {
         return this.enableDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getDisbursedAmountPercentageForDownPayment() {
+    public BigDecimal getDisbursedAmountPercentageForDownPayment() {
         return this.disbursedAmountPercentageForDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEnableAutoRepaymentForDownPayment() {
+    public boolean isEnableAutoRepaymentForDownPayment() {
         return this.enableAutoRepaymentForDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleType getLoanScheduleType() {
+    public LoanScheduleType getLoanScheduleType() {
         return this.loanScheduleType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleProcessingType getLoanScheduleProcessingType() {
+    public LoanScheduleProcessingType getLoanScheduleProcessingType() {
         return this.loanScheduleProcessingType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEnableAccrualActivityPosting() {
+    public boolean isEnableAccrualActivityPosting() {
         return this.enableAccrualActivityPosting;
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<LoanSupportedInterestRefundTypes> getSupportedInterestRefundTypes() {
+    public List<LoanSupportedInterestRefundTypes> getSupportedInterestRefundTypes() {
         return this.supportedInterestRefundTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeOffBehaviour getChargeOffBehaviour() {
+    public LoanChargeOffBehaviour getChargeOffBehaviour() {
         return this.chargeOffBehaviour;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isInterestRecognitionOnDisbursementDate() {
+    public boolean isInterestRecognitionOnDisbursementDate() {
         return this.interestRecognitionOnDisbursementDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEnableIncomeCapitalization() {
+    public boolean isEnableIncomeCapitalization() {
         return this.enableIncomeCapitalization;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCapitalizedIncomeCalculationType getCapitalizedIncomeCalculationType() {
+    public LoanCapitalizedIncomeCalculationType getCapitalizedIncomeCalculationType() {
         return this.capitalizedIncomeCalculationType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCapitalizedIncomeStrategy getCapitalizedIncomeStrategy() {
+    public LoanCapitalizedIncomeStrategy getCapitalizedIncomeStrategy() {
         return this.capitalizedIncomeStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCapitalizedIncomeType getCapitalizedIncomeType() {
+    public LoanCapitalizedIncomeType getCapitalizedIncomeType() {
         return this.capitalizedIncomeType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isEnableBuyDownFee() {
+    public boolean isEnableBuyDownFee() {
         return this.enableBuyDownFee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanBuyDownFeeCalculationType getBuyDownFeeCalculationType() {
+    public LoanBuyDownFeeCalculationType getBuyDownFeeCalculationType() {
         return this.buyDownFeeCalculationType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanBuyDownFeeStrategy getBuyDownFeeStrategy() {
+    public LoanBuyDownFeeStrategy getBuyDownFeeStrategy() {
         return this.buyDownFeeStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanBuyDownFeeIncomeType getBuyDownFeeIncomeType() {
+    public LoanBuyDownFeeIncomeType getBuyDownFeeIncomeType() {
         return this.buyDownFeeIncomeType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isMerchantBuyDownFee() {
+    public boolean isMerchantBuyDownFee() {
         return this.merchantBuyDownFee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getInstallmentAmountInMultiplesOf() {
+    public Integer getInstallmentAmountInMultiplesOf() {
         return this.installmentAmountInMultiplesOf;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCurrency(final MonetaryCurrency currency) {
+    public void setCurrency(final MonetaryCurrency currency) {
         this.currency = currency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPrincipal(final BigDecimal principal) {
+    public void setPrincipal(final BigDecimal principal) {
         this.principal = principal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setNominalInterestRatePerPeriod(final BigDecimal nominalInterestRatePerPeriod) {
+    public void setNominalInterestRatePerPeriod(final BigDecimal nominalInterestRatePerPeriod) {
         this.nominalInterestRatePerPeriod = nominalInterestRatePerPeriod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterestPeriodFrequencyType(final PeriodFrequencyType interestPeriodFrequencyType) {
+    public void setInterestPeriodFrequencyType(final PeriodFrequencyType interestPeriodFrequencyType) {
         this.interestPeriodFrequencyType = interestPeriodFrequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAnnualNominalInterestRate(final BigDecimal annualNominalInterestRate) {
+    public void setAnnualNominalInterestRate(final BigDecimal annualNominalInterestRate) {
         this.annualNominalInterestRate = annualNominalInterestRate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterestMethod(final InterestMethod interestMethod) {
+    public void setInterestMethod(final InterestMethod interestMethod) {
         this.interestMethod = interestMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterestCalculationPeriodMethod(final InterestCalculationPeriodMethod interestCalculationPeriodMethod) {
+    public void setInterestCalculationPeriodMethod(final InterestCalculationPeriodMethod interestCalculationPeriodMethod) {
         this.interestCalculationPeriodMethod = interestCalculationPeriodMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAllowPartialPeriodInterestCalculation(final boolean allowPartialPeriodInterestCalculation) {
+    public void setAllowPartialPeriodInterestCalculation(final boolean allowPartialPeriodInterestCalculation) {
         this.allowPartialPeriodInterestCalculation = allowPartialPeriodInterestCalculation;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRepayEvery(final Integer repayEvery) {
+    public void setRepayEvery(final Integer repayEvery) {
         this.repayEvery = repayEvery;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRepaymentPeriodFrequencyType(final PeriodFrequencyType repaymentPeriodFrequencyType) {
+    public void setRepaymentPeriodFrequencyType(final PeriodFrequencyType repaymentPeriodFrequencyType) {
         this.repaymentPeriodFrequencyType = repaymentPeriodFrequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFixedLength(final Integer fixedLength) {
+    public void setFixedLength(final Integer fixedLength) {
         this.fixedLength = fixedLength;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setNumberOfRepayments(final Integer numberOfRepayments) {
+    public void setNumberOfRepayments(final Integer numberOfRepayments) {
         this.numberOfRepayments = numberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setGraceOnPrincipalPayment(final Integer graceOnPrincipalPayment) {
+    public void setGraceOnPrincipalPayment(final Integer graceOnPrincipalPayment) {
         this.graceOnPrincipalPayment = graceOnPrincipalPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRecurringMoratoriumOnPrincipalPeriods(final Integer recurringMoratoriumOnPrincipalPeriods) {
+    public void setRecurringMoratoriumOnPrincipalPeriods(final Integer recurringMoratoriumOnPrincipalPeriods) {
         this.recurringMoratoriumOnPrincipalPeriods = recurringMoratoriumOnPrincipalPeriods;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setGraceOnInterestPayment(final Integer graceOnInterestPayment) {
+    public void setGraceOnInterestPayment(final Integer graceOnInterestPayment) {
         this.graceOnInterestPayment = graceOnInterestPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setGraceOnInterestCharged(final Integer graceOnInterestCharged) {
+    public void setGraceOnInterestCharged(final Integer graceOnInterestCharged) {
         this.graceOnInterestCharged = graceOnInterestCharged;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAmortizationMethod(final AmortizationMethod amortizationMethod) {
+    public void setAmortizationMethod(final AmortizationMethod amortizationMethod) {
         this.amortizationMethod = amortizationMethod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInArrearsTolerance(final BigDecimal inArrearsTolerance) {
+    public void setInArrearsTolerance(final BigDecimal inArrearsTolerance) {
         this.inArrearsTolerance = inArrearsTolerance;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setGraceOnArrearsAgeing(final Integer graceOnArrearsAgeing) {
+    public void setGraceOnArrearsAgeing(final Integer graceOnArrearsAgeing) {
         this.graceOnArrearsAgeing = graceOnArrearsAgeing;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDaysInMonthType(final Integer daysInMonthType) {
+    public void setDaysInMonthType(final Integer daysInMonthType) {
         this.daysInMonthType = daysInMonthType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDaysInYearType(final Integer daysInYearType) {
+    public void setDaysInYearType(final Integer daysInYearType) {
         this.daysInYearType = daysInYearType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterestRecalculationEnabled(final boolean isInterestRecalculationEnabled) {
+    public void setInterestRecalculationEnabled(final boolean isInterestRecalculationEnabled) {
         this.isInterestRecalculationEnabled = isInterestRecalculationEnabled;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEqualAmortization(final boolean isEqualAmortization) {
+    public void setEqualAmortization(final boolean isEqualAmortization) {
         this.isEqualAmortization = isEqualAmortization;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEnableDownPayment(final boolean enableDownPayment) {
+    public void setEnableDownPayment(final boolean enableDownPayment) {
         this.enableDownPayment = enableDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDisbursedAmountPercentageForDownPayment(final BigDecimal disbursedAmountPercentageForDownPayment) {
+    public void setDisbursedAmountPercentageForDownPayment(final BigDecimal disbursedAmountPercentageForDownPayment) {
         this.disbursedAmountPercentageForDownPayment = disbursedAmountPercentageForDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEnableAutoRepaymentForDownPayment(final boolean enableAutoRepaymentForDownPayment) {
+    public void setEnableAutoRepaymentForDownPayment(final boolean enableAutoRepaymentForDownPayment) {
         this.enableAutoRepaymentForDownPayment = enableAutoRepaymentForDownPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanScheduleType(final LoanScheduleType loanScheduleType) {
+    public void setLoanScheduleType(final LoanScheduleType loanScheduleType) {
         this.loanScheduleType = loanScheduleType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanScheduleProcessingType(final LoanScheduleProcessingType loanScheduleProcessingType) {
+    public void setLoanScheduleProcessingType(final LoanScheduleProcessingType loanScheduleProcessingType) {
         this.loanScheduleProcessingType = loanScheduleProcessingType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEnableAccrualActivityPosting(final boolean enableAccrualActivityPosting) {
+    public void setEnableAccrualActivityPosting(final boolean enableAccrualActivityPosting) {
         this.enableAccrualActivityPosting = enableAccrualActivityPosting;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setSupportedInterestRefundTypes(final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes) {
+    public void setSupportedInterestRefundTypes(final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes) {
         this.supportedInterestRefundTypes = supportedInterestRefundTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setChargeOffBehaviour(final LoanChargeOffBehaviour chargeOffBehaviour) {
+    public void setChargeOffBehaviour(final LoanChargeOffBehaviour chargeOffBehaviour) {
         this.chargeOffBehaviour = chargeOffBehaviour;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInterestRecognitionOnDisbursementDate(final boolean interestRecognitionOnDisbursementDate) {
+    public void setInterestRecognitionOnDisbursementDate(final boolean interestRecognitionOnDisbursementDate) {
         this.interestRecognitionOnDisbursementDate = interestRecognitionOnDisbursementDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDaysInYearCustomStrategy(final DaysInYearCustomStrategyType daysInYearCustomStrategy) {
+    public void setDaysInYearCustomStrategy(final DaysInYearCustomStrategyType daysInYearCustomStrategy) {
         this.daysInYearCustomStrategy = daysInYearCustomStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEnableIncomeCapitalization(final boolean enableIncomeCapitalization) {
+    public void setEnableIncomeCapitalization(final boolean enableIncomeCapitalization) {
         this.enableIncomeCapitalization = enableIncomeCapitalization;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCapitalizedIncomeCalculationType(final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType) {
+    public void setCapitalizedIncomeCalculationType(final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType) {
         this.capitalizedIncomeCalculationType = capitalizedIncomeCalculationType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCapitalizedIncomeStrategy(final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy) {
+    public void setCapitalizedIncomeStrategy(final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy) {
         this.capitalizedIncomeStrategy = capitalizedIncomeStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCapitalizedIncomeType(final LoanCapitalizedIncomeType capitalizedIncomeType) {
+    public void setCapitalizedIncomeType(final LoanCapitalizedIncomeType capitalizedIncomeType) {
         this.capitalizedIncomeType = capitalizedIncomeType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setEnableBuyDownFee(final boolean enableBuyDownFee) {
+    public void setEnableBuyDownFee(final boolean enableBuyDownFee) {
         this.enableBuyDownFee = enableBuyDownFee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setBuyDownFeeCalculationType(final LoanBuyDownFeeCalculationType buyDownFeeCalculationType) {
+    public void setBuyDownFeeCalculationType(final LoanBuyDownFeeCalculationType buyDownFeeCalculationType) {
         this.buyDownFeeCalculationType = buyDownFeeCalculationType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setBuyDownFeeStrategy(final LoanBuyDownFeeStrategy buyDownFeeStrategy) {
+    public void setBuyDownFeeStrategy(final LoanBuyDownFeeStrategy buyDownFeeStrategy) {
         this.buyDownFeeStrategy = buyDownFeeStrategy;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setBuyDownFeeIncomeType(final LoanBuyDownFeeIncomeType buyDownFeeIncomeType) {
+    public void setBuyDownFeeIncomeType(final LoanBuyDownFeeIncomeType buyDownFeeIncomeType) {
         this.buyDownFeeIncomeType = buyDownFeeIncomeType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMerchantBuyDownFee(final boolean merchantBuyDownFee) {
+    public void setMerchantBuyDownFee(final boolean merchantBuyDownFee) {
         this.merchantBuyDownFee = merchantBuyDownFee;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInstallmentAmountInMultiplesOf(final Integer installmentAmountInMultiplesOf) {
+    public void setInstallmentAmountInMultiplesOf(final Integer installmentAmountInMultiplesOf) {
         this.installmentAmountInMultiplesOf = installmentAmountInMultiplesOf;
     }
 }

@@ -42,8 +42,8 @@ import org.apache.fineract.portfolio.address.service.AddressReadPlatformService;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.data.ClientFamilyMembersData;
-import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.client.domain.LegalForm;
+import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,7 @@ import org.springframework.util.CollectionUtils;
 
 @Service
 public class ClientTemplateReadPlatformServiceImpl implements ClientTemplateReadPlatformService {
+
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final StaffReadService staffReadPlatformService;
@@ -79,19 +80,29 @@ public class ClientTemplateReadPlatformServiceImpl implements ClientTemplateRead
         if (staffInSelectedOfficeOnly) {
             staffOptions = this.staffReadPlatformService.retrieveAllStaffForDropdown(defaultOfficeId);
         } else {
-            staffOptions = this.staffReadPlatformService.retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(defaultOfficeId, loanOfficersOnly);
+            staffOptions = this.staffReadPlatformService.retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(defaultOfficeId,
+                    loanOfficersOnly);
         }
         if (CollectionUtils.isEmpty(staffOptions)) {
             staffOptions = null;
         }
-        final List<CodeValueData> genderOptions = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
-        final List<CodeValueData> clientTypeOptions = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
-        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
-        final List<CodeValueData> clientNonPersonConstitutionOptions = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION));
-        final List<CodeValueData> clientNonPersonMainBusinessLineOptions = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE));
+        final List<CodeValueData> genderOptions = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
+        final List<CodeValueData> clientTypeOptions = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
+        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
+        final List<CodeValueData> clientNonPersonConstitutionOptions = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION));
+        final List<CodeValueData> clientNonPersonMainBusinessLineOptions = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE));
         final List<EnumOptionData> clientLegalFormOptions = ClientEnumerations.legalForm(LegalForm.values());
-        final List<DatatableData> datatableTemplates = this.entityDatatableChecksReadService.retrieveTemplates(StatusEnum.CREATE.getValue(), EntityTables.CLIENT.getName(), null);
-        return ClientData.template(defaultOfficeId, LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), offices, staffOptions, null, genderOptions, savingsProductDatas, clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions, familyMemberOptions, new ArrayList<AddressData>(Arrays.asList(address)), isAddressEnabled, datatableTemplates);
+        final List<DatatableData> datatableTemplates = this.entityDatatableChecksReadService.retrieveTemplates(StatusEnum.CREATE.getValue(),
+                EntityTables.CLIENT.getName(), null);
+        return ClientData.template(defaultOfficeId, LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), offices, staffOptions, null,
+                genderOptions, savingsProductDatas, clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions,
+                clientNonPersonMainBusinessLineOptions, clientLegalFormOptions, familyMemberOptions,
+                new ArrayList<AddressData>(Arrays.asList(address)), isAddressEnabled, datatableTemplates);
     }
 
     private Long defaultToUsersOfficeIfNull(final Long officeId) {
@@ -103,7 +114,14 @@ public class ClientTemplateReadPlatformServiceImpl implements ClientTemplateRead
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientTemplateReadPlatformServiceImpl(final PlatformSecurityContext context, final OfficeReadPlatformService officeReadPlatformService, final StaffReadService staffReadPlatformService, final CodeValueReadPlatformService codeValueReadPlatformService, final SavingsProductReadPlatformService savingsProductReadPlatformService, final EntityDatatableChecksReadService entityDatatableChecksReadService, final AddressReadPlatformService addressReadPlatformService, final ClientFamilyMembersReadPlatformService clientFamilyMembersReadPlatformService, final ConfigurationDomainService configurationDomainService) {
+    public ClientTemplateReadPlatformServiceImpl(final PlatformSecurityContext context,
+            final OfficeReadPlatformService officeReadPlatformService, final StaffReadService staffReadPlatformService,
+            final CodeValueReadPlatformService codeValueReadPlatformService,
+            final SavingsProductReadPlatformService savingsProductReadPlatformService,
+            final EntityDatatableChecksReadService entityDatatableChecksReadService,
+            final AddressReadPlatformService addressReadPlatformService,
+            final ClientFamilyMembersReadPlatformService clientFamilyMembersReadPlatformService,
+            final ConfigurationDomainService configurationDomainService) {
         this.context = context;
         this.officeReadPlatformService = officeReadPlatformService;
         this.staffReadPlatformService = staffReadPlatformService;

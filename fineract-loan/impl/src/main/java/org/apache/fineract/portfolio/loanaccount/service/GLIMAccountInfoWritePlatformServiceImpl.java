@@ -23,11 +23,14 @@ import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepositor
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 
 public class GLIMAccountInfoWritePlatformServiceImpl implements GLIMAccountInfoWritePlatformService {
+
     private final GLIMAccountInfoRepository glimAccountRepository;
 
     @Override
-    public GroupLoanIndividualMonitoringAccount createGLIMAccount(String accountNumber, Object group, BigDecimal principalAmount, Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
-        GroupLoanIndividualMonitoringAccount glimAccountInfo = GroupLoanIndividualMonitoringAccount.getInstance(accountNumber, group, principalAmount, childAccountsCount, isAcceptingChild, loanStatus, applicationId);
+    public GroupLoanIndividualMonitoringAccount createGLIMAccount(String accountNumber, Object group, BigDecimal principalAmount,
+            Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
+        GroupLoanIndividualMonitoringAccount glimAccountInfo = GroupLoanIndividualMonitoringAccount.getInstance(accountNumber, group,
+                principalAmount, childAccountsCount, isAcceptingChild, loanStatus, applicationId);
         return this.glimAccountRepository.save(glimAccountInfo);
     }
 
@@ -51,7 +54,7 @@ public class GLIMAccountInfoWritePlatformServiceImpl implements GLIMAccountInfoW
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLIMAccountInfoWritePlatformServiceImpl(final GLIMAccountInfoRepository glimAccountRepository) {
+    public GLIMAccountInfoWritePlatformServiceImpl(final GLIMAccountInfoRepository glimAccountRepository) {
         this.glimAccountRepository = glimAccountRepository;
     }
 }

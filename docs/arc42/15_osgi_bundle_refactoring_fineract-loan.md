@@ -71,3 +71,4 @@ fineract-loan/
 - Leftover LoanChargeAssembler and reschedule preview/write impls closed into loan-impl.
 - Leftover loan-charge batch strategy tests closed into loan-test.
 - Leftover AccountSummaryCollectionData, AccountDetailsReadPlatformService, and LoansApiResourceSwagger closed into loan-impl.
+- Leftover progressive loan write/processor residual hosted next to leftover Loan (B4: progressive-loan-impl is loan-api only).

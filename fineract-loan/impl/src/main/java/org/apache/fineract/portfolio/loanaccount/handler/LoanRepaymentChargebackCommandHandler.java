@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "CHARGEBACK")
 public class LoanRepaymentChargebackCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class LoanRepaymentChargebackCommandHandler implements NewCommandSourceHa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentChargebackCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public LoanRepaymentChargebackCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

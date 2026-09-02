@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InterestRefundServiceDelegate {
+
     @Lazy
     private final List<InterestRefundService> interestRefundService;
 
@@ -33,7 +34,7 @@ public class InterestRefundServiceDelegate {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InterestRefundServiceDelegate(final List<InterestRefundService> interestRefundService) {
+    public InterestRefundServiceDelegate(final List<InterestRefundService> interestRefundService) {
         this.interestRefundService = interestRefundService;
     }
 }

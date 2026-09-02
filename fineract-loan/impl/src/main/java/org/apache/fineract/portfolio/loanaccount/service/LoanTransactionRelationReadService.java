@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional(readOnly = true)
 public class LoanTransactionRelationReadService {
+
     @PersistenceContext
     private EntityManager entityManager;
     private final LoanTransactionRelationMapper loanTransactionRelationMapper;
@@ -68,7 +69,7 @@ public class LoanTransactionRelationReadService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionRelationReadService(final LoanTransactionRelationMapper loanTransactionRelationMapper) {
+    public LoanTransactionRelationReadService(final LoanTransactionRelationMapper loanTransactionRelationMapper) {
         this.loanTransactionRelationMapper = loanTransactionRelationMapper;
     }
 }

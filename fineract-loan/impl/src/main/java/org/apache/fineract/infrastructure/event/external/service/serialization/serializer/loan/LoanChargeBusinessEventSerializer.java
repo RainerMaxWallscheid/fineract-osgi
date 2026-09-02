@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanChargeBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanChargeBusinessEvent> {
+
     private final LoanChargeReadPlatformService service;
     private final LoanChargeDataMapper mapper;
     private final List<ExternalEventCustomDataSerializer<LoanChargeBusinessEvent>> externalEventCustomDataSerializers;
@@ -46,8 +47,7 @@ public class LoanChargeBusinessEventSerializer extends AbstractBusinessEventWith
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         LoanChargeBusinessEvent event = (LoanChargeBusinessEvent) rawEvent;
-        LoanChargeData data = service.retrieveLoanChargeDetails(((LoanCharge) event.get()).getId(),
-                ((LoanCharge) event.get()).getLoanId());
+        LoanChargeData data = service.retrieveLoanChargeDetails(((LoanCharge) event.get()).getId(), ((LoanCharge) event.get()).getLoanId());
         final LoanChargeDataV1 loanChargeDataV1 = mapper.map(data);
         loanChargeDataV1.setCustomData(collectCustomData(event));
         return loanChargeDataV1;
@@ -64,7 +64,8 @@ public class LoanChargeBusinessEventSerializer extends AbstractBusinessEventWith
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeBusinessEventSerializer(final LoanChargeReadPlatformService service, final LoanChargeDataMapper mapper, final List<ExternalEventCustomDataSerializer<LoanChargeBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanChargeBusinessEventSerializer(final LoanChargeReadPlatformService service, final LoanChargeDataMapper mapper,
+            final List<ExternalEventCustomDataSerializer<LoanChargeBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.mapper = mapper;
         this.externalEventCustomDataSerializers = externalEventCustomDataSerializers;

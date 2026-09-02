@@ -37,7 +37,9 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoanTransactionBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanTransactionBusinessEvent> implements BusinessEventSerializer {
+public class LoanTransactionBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanTransactionBusinessEvent>
+        implements BusinessEventSerializer {
+
     private final LoanReadPlatformService service;
     private final LoanTransactionDataMapper loanTransactionMapper;
     private final LoanChargePaidByReadService loanChargePaidByReadService;
@@ -76,7 +78,9 @@ public class LoanTransactionBusinessEventSerializer extends AbstractBusinessEven
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionBusinessEventSerializer(final LoanReadPlatformService service, final LoanTransactionDataMapper loanTransactionMapper, final LoanChargePaidByReadService loanChargePaidByReadService, final List<ExternalEventCustomDataSerializer<LoanTransactionBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanTransactionBusinessEventSerializer(final LoanReadPlatformService service,
+            final LoanTransactionDataMapper loanTransactionMapper, final LoanChargePaidByReadService loanChargePaidByReadService,
+            final List<ExternalEventCustomDataSerializer<LoanTransactionBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.loanTransactionMapper = loanTransactionMapper;
         this.loanChargePaidByReadService = loanChargePaidByReadService;

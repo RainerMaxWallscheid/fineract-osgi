@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UpdateLoanInterestPauseByLoanIdCommandStrategy implements CommandStrategy {
+
     private final LoanInterestPauseApiResource loanInterestPauseApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
@@ -53,14 +55,16 @@ public class UpdateLoanInterestPauseByLoanIdCommandStrategy implements CommandSt
         final Long loanId = Long.parseLong(pathParameters.get(1));
         final Long variationId = Long.parseLong(pathParameters.get(3));
         final InterestPauseRequestDto interestPauseRequestDto = InterestPauseRequestDto.fromJson(request.getBody());
-        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.updateInterestPause(loanId, variationId, interestPauseRequestDto);
+        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.updateInterestPause(loanId, variationId,
+                interestPauseRequestDto);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
         return response;
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateLoanInterestPauseByLoanIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+    public UpdateLoanInterestPauseByLoanIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource,
+            final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
         this.loanInterestPauseApiResource = loanInterestPauseApiResource;
         this.toApiJsonSerializer = toApiJsonSerializer;
     }

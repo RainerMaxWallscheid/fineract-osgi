@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.mapper.LoanMapper;
 import org.apache.fineract.portfolio.loanaccount.service.schedule.LoanScheduleComponent;
 
 public class LoanScheduleService {
+
     private final LoanChargeService loanChargeService;
     private final ReprocessLoanTransactionsService reprocessLoanTransactionsService;
     private final LoanMapper loanMapper;
@@ -67,11 +68,13 @@ public class LoanScheduleService {
         reprocessLoanTransactionsService.reprocessTransactions(loan);
     }
 
-    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO, final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds) {
+    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO,
+            final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds) {
         recalculateScheduleFromLastTransaction(loan, generatorDTO, existingTransactionIds, existingReversedTransactionIds, false);
     }
 
-    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO, final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds, boolean skipTransactionIdCollecting) {
+    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO,
+            final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds, boolean skipTransactionIdCollecting) {
         if (!skipTransactionIdCollecting) {
             existingTransactionIds.addAll(loanTransactionRepository.findTransactionIdsByLoan(loan));
             existingReversedTransactionIds.addAll(loanTransactionRepository.findReversedTransactionIdsByLoan(loan));
@@ -106,8 +109,10 @@ public class LoanScheduleService {
         for (final LoanCharge loanCharge : charges) {
             if (!loanCharge.isDueAtDisbursement()) {
                 loanChargeService.updateOverdueScheduleInstallment(loan, loanCharge);
-                if (loanCharge.getDueLocalDate() == null || (!DateUtils.isBefore(lastRepaymentDate, loanCharge.getDueLocalDate()) || loan.getLoanProductRelatedDetail().getLoanScheduleType().equals(LoanScheduleType.PROGRESSIVE))) {
-                    if ((loanCharge.isInstalmentFee() || !loanCharge.isWaived()) && (loanCharge.getDueLocalDate() == null || !DateUtils.isAfter(lastTransactionDate, loanCharge.getDueLocalDate()))) {
+                if (loanCharge.getDueLocalDate() == null || (!DateUtils.isBefore(lastRepaymentDate, loanCharge.getDueLocalDate())
+                        || loan.getLoanProductRelatedDetail().getLoanScheduleType().equals(LoanScheduleType.PROGRESSIVE))) {
+                    if ((loanCharge.isInstalmentFee() || !loanCharge.isWaived()) && (loanCharge.getDueLocalDate() == null
+                            || !DateUtils.isAfter(lastTransactionDate, loanCharge.getDueLocalDate()))) {
                         loanChargeService.recalculateLoanCharge(loan, loanCharge, generatorDTO.getPenaltyWaitPeriod());
                         loanCharge.updateWaivedAmount(loan.getCurrency());
                     }
@@ -134,7 +139,10 @@ public class LoanScheduleService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleService(final LoanChargeService loanChargeService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanMapper loanMapper, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanScheduleComponent loanSchedule, final LoanTransactionRepository loanTransactionRepository, final ILoanUtilService loanUtilService) {
+    public LoanScheduleService(final LoanChargeService loanChargeService,
+            final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanMapper loanMapper,
+            final LoanTransactionProcessingService loanTransactionProcessingService, final LoanScheduleComponent loanSchedule,
+            final LoanTransactionRepository loanTransactionRepository, final ILoanUtilService loanUtilService) {
         this.loanChargeService = loanChargeService;
         this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
         this.loanMapper = loanMapper;

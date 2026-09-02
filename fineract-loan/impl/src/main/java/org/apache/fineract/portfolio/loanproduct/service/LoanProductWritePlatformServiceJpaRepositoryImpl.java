@@ -74,8 +74,9 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
 public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanProductWritePlatformService {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanProductWritePlatformServiceJpaRepositoryImpl.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanProductWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final LoanProductDataValidator fromApiJsonDeserializer;
     private final LoanProductRepository loanProductRepository;
@@ -109,18 +110,24 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
             final List<Long> charges = assembleListOfProductChargeIds(command, currencyCode);
             final List<Rate> rates = assembleListOfProductRates(command);
-            final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser.assembleLoanProductPaymentAllocationRules(command, loanTransactionProcessingStrategyCode);
-            final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser.assembleLoanProductCreditAllocationRules(command, loanTransactionProcessingStrategyCode);
+            final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser
+                    .assembleLoanProductPaymentAllocationRules(command, loanTransactionProcessingStrategyCode);
+            final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser
+                    .assembleLoanProductCreditAllocationRules(command, loanTransactionProcessingStrategyCode);
             Long floatingRateId = null;
             if (command.parameterExists("floatingRatesId")) {
                 floatingRateId = command.longValueOfParameterNamed("floatingRatesId");
                 this.floatingRatePort.getFloatingRate(floatingRateId); // not-found if missing
             }
-            final LoanProduct loanProduct = loanProductAssembler.assembleFromJson(fund, loanTransactionProcessingStrategyCode, charges, command, this.aprCalculator, floatingRateId, rates, loanProductPaymentAllocationRules, loanProductCreditAllocationRules);
+            final LoanProduct loanProduct = loanProductAssembler.assembleFromJson(fund, loanTransactionProcessingStrategyCode, charges,
+                    command, this.aprCalculator, floatingRateId, rates, loanProductPaymentAllocationRules,
+                    loanProductCreditAllocationRules);
             loanProduct.updateLoanProductInRelatedClasses();
-            loanProduct.setTransactionProcessingStrategyName(loanRepaymentScheduleTransactionProcessorFactory.determineProcessor(loanTransactionProcessingStrategyCode).getName());
+            loanProduct.setTransactionProcessingStrategyName(
+                    loanRepaymentScheduleTransactionProcessorFactory.determineProcessor(loanTransactionProcessingStrategyCode).getName());
             if (command.parameterExists("delinquencyBucketId")) {
-                loanProduct.setDelinquencyBucket(findDelinquencyBucketIdIfProvided(command.longValueOfParameterNamed("delinquencyBucketId")));
+                loanProduct
+                        .setDelinquencyBucket(findDelinquencyBucketIdIfProvided(command.longValueOfParameterNamed("delinquencyBucketId")));
             }
             this.loanProductRepository.saveAndFlush(loanProduct);
             // save accounting mappings
@@ -128,9 +135,10 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             // check if the office specific products are enabled. If yes, then
             // save this savings product against a specific office
             // i.e. this savings product is specific for this office.
-            fineractEntityAccessUtil.checkConfigurationAndAddProductResrictionsForUserOffice(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS, loanProduct.getId());
+            fineractEntityAccessUtil.checkConfigurationAndAddProductResrictionsForUserOffice(
+                    FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS, loanProduct.getId());
             businessEventNotifierService.notifyPostBusinessEvent(new LoanProductCreateBusinessEvent(loanProduct));
-            return  //
+            return //
             //
             //
             new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loanProduct.getId()).build();
@@ -155,7 +163,8 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private DelinquencyBucket findDelinquencyBucketIdIfProvided(final Long delinquencyBucketId) {
         DelinquencyBucket delinquencyBucket = null;
         if (delinquencyBucketId != null) {
-            delinquencyBucket = delinquencyBucketRepository.findById(delinquencyBucketId).orElseThrow(() -> DelinquencyBucketNotFoundException.notFound(delinquencyBucketId));
+            delinquencyBucket = delinquencyBucketRepository.findById(delinquencyBucketId)
+                    .orElseThrow(() -> DelinquencyBucketNotFoundException.notFound(delinquencyBucketId));
         }
         return delinquencyBucket;
     }
@@ -165,10 +174,12 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     public CommandProcessingResult updateLoanProduct(final Long loanProductId, final JsonCommand command) {
         try {
             this.context.authenticatedUser();
-            final LoanProduct product = this.loanProductRepository.findById(loanProductId).orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
+            final LoanProduct product = this.loanProductRepository.findById(loanProductId)
+                    .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
             this.fromApiJsonDeserializer.validateForUpdate(command, product);
             validateInputDates(command);
-            if (anyChangeInCriticalFloatingRateLinkedParams(command, product) && this.loanRepositoryWrapper.doNonClosedLoanAccountsExistForProduct(product.getId())) {
+            if (anyChangeInCriticalFloatingRateLinkedParams(command, product)
+                    && this.loanRepositoryWrapper.doNonClosedLoanAccountsExistForProduct(product.getId())) {
                 throw new LoanProductCannotBeModifiedDueToNonClosedLoansException(product.getId());
             }
             Long floatingRateId = null;
@@ -187,7 +198,8 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             }
             if (changes.containsKey("transactionProcessingStrategyCode")) {
                 final String transactionProcessingStrategyCode = (String) changes.get("transactionProcessingStrategyCode");
-                final String transactionProcessingStrategyName = loanRepaymentScheduleTransactionProcessorFactory.determineProcessor(transactionProcessingStrategyCode).getName();
+                final String transactionProcessingStrategyName = loanRepaymentScheduleTransactionProcessorFactory
+                        .determineProcessor(transactionProcessingStrategyCode).getName();
                 product.setTransactionProcessingStrategyCode(transactionProcessingStrategyCode);
                 product.setTransactionProcessingStrategyName(transactionProcessingStrategyName);
             }
@@ -199,17 +211,21 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                 }
             }
             if (changes.containsKey("paymentAllocation")) {
-                final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser.assembleLoanProductPaymentAllocationRules(command, product.getTransactionProcessingStrategyCode());
+                final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser
+                        .assembleLoanProductPaymentAllocationRules(command, product.getTransactionProcessingStrategyCode());
                 loanProductPaymentAllocationRules.forEach(lppar -> lppar.setLoanProduct(product));
-                final boolean updated = loanProductPaymentAllocationRuleMerger.updateProductPaymentAllocationRules(product, loanProductPaymentAllocationRules);
+                final boolean updated = loanProductPaymentAllocationRuleMerger.updateProductPaymentAllocationRules(product,
+                        loanProductPaymentAllocationRules);
                 if (!updated) {
                     changes.remove("paymentAllocation");
                 }
             }
             if (changes.containsKey("creditAllocation")) {
-                final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser.assembleLoanProductCreditAllocationRules(command, product.getTransactionProcessingStrategyCode());
+                final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser
+                        .assembleLoanProductCreditAllocationRules(command, product.getTransactionProcessingStrategyCode());
                 loanProductCreditAllocationRules.forEach(lpcar -> lpcar.setLoanProduct(product));
-                final boolean updated = loanProductCreditAllocationRuleMerger.updateCreditAllocationRules(product, loanProductCreditAllocationRules);
+                final boolean updated = loanProductCreditAllocationRuleMerger.updateCreditAllocationRules(product,
+                        loanProductCreditAllocationRules);
                 if (!updated) {
                     changes.remove("creditAllocation");
                 }
@@ -225,7 +241,9 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             }
             // accounting related changes
             final boolean accountingTypeChanged = changes.containsKey("accountingRule");
-            final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService.updateLoanProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingRule(), enableIncomeCapitalization, enableBuyDownFee, merchantBuyDownFee);
+            final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService
+                    .updateLoanProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingRule(),
+                            enableIncomeCapitalization, enableBuyDownFee, merchantBuyDownFee);
             changes.putAll(accountingMappingChanges);
             if (changes.containsKey(LoanProductConstants.RATES_PARAM_NAME)) {
                 final List<Rate> productRates = assembleListOfProductRates(command);
@@ -235,7 +253,8 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                 }
             }
             if (command.parameterExists(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES)) {
-                JsonArray supportedTransactionsForInterestRefund = command.arrayOfParameterNamed(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES);
+                JsonArray supportedTransactionsForInterestRefund = command
+                        .arrayOfParameterNamed(LoanProductConstants.SUPPORTED_INTEREST_REFUND_TYPES);
                 List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes = new ArrayList<>();
                 supportedTransactionsForInterestRefund.iterator().forEachRemaining(value -> {
                     supportedInterestRefundTypes.add(LoanSupportedInterestRefundTypes.valueOf(value.getAsString()));
@@ -243,13 +262,14 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                 product.getLoanProductRelatedDetail().setSupportedInterestRefundTypes(supportedInterestRefundTypes);
             }
             if (command.parameterExists(LoanProductConstants.CHARGE_OFF_BEHAVIOUR)) {
-                product.getLoanProductRelatedDetail().setChargeOffBehaviour(command.enumValueOfParameterNamed(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, LoanChargeOffBehaviour.class));
+                product.getLoanProductRelatedDetail().setChargeOffBehaviour(
+                        command.enumValueOfParameterNamed(LoanProductConstants.CHARGE_OFF_BEHAVIOUR, LoanChargeOffBehaviour.class));
             }
             if (!changes.isEmpty()) {
                 product.validateLoanProductPreSave();
                 this.loanProductRepository.saveAndFlush(product);
             }
-            return  //
+            return //
             //
             //
             //
@@ -265,8 +285,12 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     }
 
     private boolean anyChangeInCriticalFloatingRateLinkedParams(JsonCommand command, LoanProduct product) {
-        final boolean isChangeFromFloatingToFlatOrViceVersa = command.isChangeInBooleanParameterNamed("isLinkedToFloatingInterestRates", product.isLinkedToFloatingInterestRate());
-        final boolean isChangeInCriticalFloatingRateParams = product.getFloatingRates() != null && (command.isChangeInLongParameterNamed("floatingRatesId", product.getFloatingRates().getFloatingRateId()) || command.isChangeInBigDecimalParameterNamed("interestRateDifferential", product.getFloatingRates().getInterestRateDifferential()));
+        final boolean isChangeFromFloatingToFlatOrViceVersa = command.isChangeInBooleanParameterNamed("isLinkedToFloatingInterestRates",
+                product.isLinkedToFloatingInterestRate());
+        final boolean isChangeInCriticalFloatingRateParams = product.getFloatingRates() != null
+                && (command.isChangeInLongParameterNamed("floatingRatesId", product.getFloatingRates().getFloatingRateId())
+                        || command.isChangeInBigDecimalParameterNamed("interestRateDifferential",
+                                product.getFloatingRates().getInterestRateDifferential()));
         return isChangeFromFloatingToFlatOrViceVersa || isChangeInCriticalFloatingRateParams;
     }
 
@@ -321,18 +345,24 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("\'external_id\'")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
-            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.externalId", "Loan Product with externalId `" + externalId + "` already exists", "externalId", externalId, realCause);
+            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.externalId",
+                    "Loan Product with externalId `" + externalId + "` already exists", "externalId", externalId, realCause);
         } else if (realCause.getMessage().contains("\'unq_name\'")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.name", "Loan product with name `" + name + "` already exists", "name", name, realCause);
-        } else if (realCause.getMessage().contains("\'unq_short_name\'") || containsDuplicateShortnameErrorForPostgreSQL(realCause) || containsDuplicateShortnameErrorForMySQL(realCause)) {
+            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.name",
+                    "Loan product with name `" + name + "` already exists", "name", name, realCause);
+        } else if (realCause.getMessage().contains("\'unq_short_name\'") || containsDuplicateShortnameErrorForPostgreSQL(realCause)
+                || containsDuplicateShortnameErrorForMySQL(realCause)) {
             final String shortName = command.stringValueOfParameterNamed("shortName");
-            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.short.name", "Loan product with short name `" + shortName + "` already exists", "shortName", shortName, realCause);
+            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.short.name",
+                    "Loan product with short name `" + shortName + "` already exists", "shortName", shortName, realCause);
         } else if (realCause.getMessage().contains("Duplicate entry")) {
-            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.charge", "Loan product may only have one charge of each type.`", "charges", realCause);
+            throw new PlatformDataIntegrityException("error.msg.product.loan.duplicate.charge",
+                    "Loan product may only have one charge of each type.`", "charges", realCause);
         }
         logAsErrorUnexpectedDataIntegrityException(dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.product.loan.unknown.data.integrity.issue", "Unknown data integrity issue with resource.", null, realCause);
+        throw ErrorHandler.getMappable(dve, "error.msg.product.loan.unknown.data.integrity.issue",
+                "Unknown data integrity issue with resource.", null, realCause);
     }
 
     private static boolean containsDuplicateShortnameErrorForPostgreSQL(Throwable realCause) {
@@ -356,7 +386,18 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final OfficeProductRestrictionService fineractEntityAccessUtil, final FloatingRatePort floatingRatePort, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
+    public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
+            final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository,
+            final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort,
+            final RateRepositoryWrapper rateRepository,
+            final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
+            final OfficeProductRestrictionService fineractEntityAccessUtil, final FloatingRatePort floatingRatePort,
+            final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService,
+            final DelinquencyBucketRepository delinquencyBucketRepository,
+            final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
+            final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser,
+            final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler,
+            final LoanProductUpdateUtil loanProductUpdateUtil) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;

@@ -37,6 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class SetLoanDelinquencyTagsConfig {
+
     @Autowired
     private JobRepository jobRepository;
     @Autowired
@@ -51,21 +52,29 @@ public class SetLoanDelinquencyTagsConfig {
 
     @Bean
     public Step setLoanDelinquencyTagsStep() {
-        return new StepBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).tasklet(setLoanDelinquencyTagsTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository)
+                .tasklet(setLoanDelinquencyTagsTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job setLoanDelinquencyTagsJob() {
-        return new JobBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).start(setLoanDelinquencyTagsStep()).incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).start(setLoanDelinquencyTagsStep())
+                .incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public SetLoanDelinquencyTagsTasklet setLoanDelinquencyTagsTasklet() {
-        return new SetLoanDelinquencyTagsTasklet(delinquencyWritePlatformService, loanRepaymentScheduleInstallmentRepository, loanTransactionRepository, delinquencyEffectivePauseHelper, delinquencyReadPlatformService);
+        return new SetLoanDelinquencyTagsTasklet(delinquencyWritePlatformService, loanRepaymentScheduleInstallmentRepository,
+                loanTransactionRepository, delinquencyEffectivePauseHelper, delinquencyReadPlatformService);
     }
 
     @java.lang.SuppressWarnings("all")
-        public SetLoanDelinquencyTagsConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanTransactionRepository loanTransactionRepository) {
+    public SetLoanDelinquencyTagsConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager,
+            final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper,
+            final DelinquencyReadPlatformService delinquencyReadPlatformService,
+            final DelinquencyWritePlatformService delinquencyWritePlatformService,
+            final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository,
+            final LoanTransactionRepository loanTransactionRepository) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.delinquencyEffectivePauseHelper = delinquencyEffectivePauseHelper;

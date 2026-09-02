@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GLIMLOAN", action = "REJECT")
 public class GLIMApplicationRejectionCommandHandler implements NewCommandSourceHandler {
+
     private final LoanApplicationWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class GLIMApplicationRejectionCommandHandler implements NewCommandSourceH
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLIMApplicationRejectionCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
+    public GLIMApplicationRejectionCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

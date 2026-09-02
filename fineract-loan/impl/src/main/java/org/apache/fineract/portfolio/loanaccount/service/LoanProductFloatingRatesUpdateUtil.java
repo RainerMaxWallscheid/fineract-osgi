@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductFloatingRatesUpdateUtil {
+
     public Map<? extends String, ?> update(LoanProductFloatingRates loanProductFloatingRates, JsonCommand command, Long floatingRateId) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(20);
         if (floatingRateId != null) {
@@ -45,25 +46,29 @@ public class LoanProductFloatingRatesUpdateUtil {
             loanProductFloatingRates.setInterestRateDifferential(newValue);
         }
         final String minDifferentialLendingRate = "minDifferentialLendingRate";
-        if (command.isChangeInBigDecimalParameterNamed(minDifferentialLendingRate, loanProductFloatingRates.getMinDifferentialLendingRate())) {
+        if (command.isChangeInBigDecimalParameterNamed(minDifferentialLendingRate,
+                loanProductFloatingRates.getMinDifferentialLendingRate())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(minDifferentialLendingRate);
             actualChanges.put(minDifferentialLendingRate, newValue);
             loanProductFloatingRates.setMinDifferentialLendingRate(newValue);
         }
         final String defaultDifferentialLendingRate = "defaultDifferentialLendingRate";
-        if (command.isChangeInBigDecimalParameterNamed(defaultDifferentialLendingRate, loanProductFloatingRates.getDefaultDifferentialLendingRate())) {
+        if (command.isChangeInBigDecimalParameterNamed(defaultDifferentialLendingRate,
+                loanProductFloatingRates.getDefaultDifferentialLendingRate())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(defaultDifferentialLendingRate);
             actualChanges.put(defaultDifferentialLendingRate, newValue);
             loanProductFloatingRates.setDefaultDifferentialLendingRate(newValue);
         }
         final String maxDifferentialLendingRate = "maxDifferentialLendingRate";
-        if (command.isChangeInBigDecimalParameterNamed(maxDifferentialLendingRate, loanProductFloatingRates.getMaxDifferentialLendingRate())) {
+        if (command.isChangeInBigDecimalParameterNamed(maxDifferentialLendingRate,
+                loanProductFloatingRates.getMaxDifferentialLendingRate())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(maxDifferentialLendingRate);
             actualChanges.put(maxDifferentialLendingRate, newValue);
             loanProductFloatingRates.setMaxDifferentialLendingRate(newValue);
         }
         final String isFloatingInterestRateCalculationAllowed = "isFloatingInterestRateCalculationAllowed";
-        if (command.isChangeInBooleanParameterNamed(isFloatingInterestRateCalculationAllowed, loanProductFloatingRates.isFloatingInterestRateCalculationAllowed())) {
+        if (command.isChangeInBooleanParameterNamed(isFloatingInterestRateCalculationAllowed,
+                loanProductFloatingRates.isFloatingInterestRateCalculationAllowed())) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(isFloatingInterestRateCalculationAllowed);
             actualChanges.put(isFloatingInterestRateCalculationAllowed, newValue);
             loanProductFloatingRates.setFloatingInterestRateCalculationAllowed(newValue);

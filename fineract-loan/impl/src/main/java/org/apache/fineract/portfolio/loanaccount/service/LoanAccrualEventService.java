@@ -27,8 +27,9 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
 public class LoanAccrualEventService {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccrualEventService.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccrualEventService.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
@@ -39,8 +40,8 @@ public class LoanAccrualEventService {
         businessEventNotifierService.addPostBusinessEventListener(LoanBalanceChangedBusinessEvent.class, new LoanBalanceChangedListener());
     }
 
-
     private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
+
         @Override
         public void onBusinessEvent(LoanCloseBusinessEvent event) {
             final Loan loan = (Loan) event.get();
@@ -53,8 +54,8 @@ public class LoanAccrualEventService {
         }
     }
 
-
     private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
+
         @Override
         public void onBusinessEvent(LoanBalanceChangedBusinessEvent event) {
             final Loan loan = (Loan) event.get();
@@ -68,7 +69,9 @@ public class LoanAccrualEventService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAccrualEventService(final BusinessEventNotifierService businessEventNotifierService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+    public LoanAccrualEventService(final BusinessEventNotifierService businessEventNotifierService,
+            final LoanAccrualsProcessingService loanAccrualsProcessingService,
+            final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
         this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;

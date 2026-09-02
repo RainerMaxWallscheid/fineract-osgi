@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UpdateLoanArrearsAgingBusinessStep implements LoanCOBBusinessStep {
+
     private final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler;
 
     @Override
@@ -45,7 +46,7 @@ public class UpdateLoanArrearsAgingBusinessStep implements LoanCOBBusinessStep {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateLoanArrearsAgingBusinessStep(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
+    public UpdateLoanArrearsAgingBusinessStep(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
         this.loanArrearsAgeingUpdateHandler = loanArrearsAgeingUpdateHandler;
     }
 }

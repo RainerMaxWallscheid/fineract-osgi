@@ -55,8 +55,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/v1/internal/cob")
 @Tag(name = "Internal COB", description = "Internal COB api for testing purpose")
 public class InternalCOBApiResource implements InitializingBean {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalCOBApiResource.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalCOBApiResource.class);
     private static final String DATETIME_PATTERN = "yyyyMMdd";
     private final RetrieveLoanIdService retrieveIdService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -78,7 +79,7 @@ public class InternalCOBApiResource implements InitializingBean {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Path("partitions/{partitionSize}")
     public List<COBPartition> getCobPartitions(@Context final UriInfo uriInfo, @PathParam("partitionSize") int partitionSize) {
         LocalDate businessDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE);
@@ -87,7 +88,7 @@ public class InternalCOBApiResource implements InitializingBean {
     }
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
     @Path("fast-forward-cob-date-of-loan/{loanId}")
     public void updateLoanCobLastDate(@Context final UriInfo uriInfo, @PathParam("loanId") long loanId, String jsonBody) {
         JsonElement root = JsonParser.parseString(jsonBody);
@@ -102,7 +103,7 @@ public class InternalCOBApiResource implements InitializingBean {
     }
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
     @Path("loan-reprocess/{loanId}")
     @Transactional
     public void loanReprocess(@Context final UriInfo uriInfo, @PathParam("loanId") long loanId) {
@@ -110,7 +111,9 @@ public class InternalCOBApiResource implements InitializingBean {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InternalCOBApiResource(final RetrieveLoanIdService retrieveIdService, final ApiRequestParameterHelper apiRequestParameterHelper, final ToApiJsonSerializer<List> toApiJsonSerializerForList, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanScheduleService loanScheduleService) {
+    public InternalCOBApiResource(final RetrieveLoanIdService retrieveIdService, final ApiRequestParameterHelper apiRequestParameterHelper,
+            final ToApiJsonSerializer<List> toApiJsonSerializerForList, final LoanRepositoryWrapper loanRepositoryWrapper,
+            final LoanScheduleService loanScheduleService) {
         this.retrieveIdService = retrieveIdService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.toApiJsonSerializerForList = toApiJsonSerializerForList;

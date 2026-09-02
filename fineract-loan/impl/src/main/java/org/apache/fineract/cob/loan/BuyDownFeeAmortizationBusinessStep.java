@@ -27,8 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class BuyDownFeeAmortizationBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BuyDownFeeAmortizationBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BuyDownFeeAmortizationBusinessStep.class);
     private final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService;
 
     @Transactional
@@ -53,7 +54,8 @@ public class BuyDownFeeAmortizationBusinessStep implements LoanCOBBusinessStep {
     }
 
     @java.lang.SuppressWarnings("all")
-        public BuyDownFeeAmortizationBusinessStep(final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService) {
+    public BuyDownFeeAmortizationBusinessStep(
+            final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService) {
         this.loanBuyDownFeeAmortizationProcessingService = loanBuyDownFeeAmortizationProcessingService;
     }
 }

@@ -29,20 +29,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductInterestRecalculationDetailsAssembler {
+
     public LoanProductInterestRecalculationDetails createFrom(final JsonCommand command) {
-        final Integer interestRecalculationCompoundingMethod = InterestRecalculationCompoundingMethod.fromInt(command.integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName)).getValue();
-        final Integer loanRescheduleStrategyMethod = LoanRescheduleStrategyMethod.fromInt(command.integerValueOfParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName)).getValue();
-        final Integer recurrenceFrequency = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyTypeParameterName);
-        final Integer recurrenceOnNthDay = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyNthDayParamName);
+        final Integer interestRecalculationCompoundingMethod = InterestRecalculationCompoundingMethod
+                .fromInt(command.integerValueOfParameterNamed(LoanProductConstants.interestRecalculationCompoundingMethodParameterName))
+                .getValue();
+        final Integer loanRescheduleStrategyMethod = LoanRescheduleStrategyMethod
+                .fromInt(command.integerValueOfParameterNamed(LoanProductConstants.rescheduleStrategyMethodParameterName)).getValue();
+        final Integer recurrenceFrequency = command
+                .integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyTypeParameterName);
+        final Integer recurrenceOnNthDay = command
+                .integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyNthDayParamName);
         final Integer recurrenceOnDay = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyOnDayParamName);
-        final Integer recurrenceOnWeekday = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyWeekdayParamName);
-        Integer recurrenceInterval = command.integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName);
-        final boolean isArrearsBasedOnOriginalSchedule = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName);
+        final Integer recurrenceOnWeekday = command
+                .integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyWeekdayParamName);
+        Integer recurrenceInterval = command
+                .integerValueOfParameterNamed(LoanProductConstants.recalculationRestFrequencyIntervalParameterName);
+        final boolean isArrearsBasedOnOriginalSchedule = command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isArrearsBasedOnOriginalScheduleParamName);
         RecalculationFrequencyType frequencyType = RecalculationFrequencyType.fromInt(recurrenceFrequency);
         if (frequencyType.isSameAsRepayment()) {
             recurrenceInterval = 0;
         }
-        InterestRecalculationCompoundingMethod compoundingMethod = InterestRecalculationCompoundingMethod.fromInt(interestRecalculationCompoundingMethod);
+        InterestRecalculationCompoundingMethod compoundingMethod = InterestRecalculationCompoundingMethod
+                .fromInt(interestRecalculationCompoundingMethod);
         Integer compoundingRecurrenceFrequency = null;
         Integer compoundingInterval = null;
         Integer compoundingRecurrenceOnNthDay = null;
@@ -50,29 +60,40 @@ public class LoanProductInterestRecalculationDetailsAssembler {
         Integer compoundingRecurrenceOnWeekday = null;
         boolean allowCompoundingOnEod = false;
         if (compoundingMethod.isCompoundingEnabled()) {
-            compoundingRecurrenceFrequency = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName);
-            compoundingInterval = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName);
+            compoundingRecurrenceFrequency = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyTypeParameterName);
+            compoundingInterval = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyIntervalParameterName);
             RecalculationFrequencyType compoundingFrequencyType = RecalculationFrequencyType.fromInt(compoundingRecurrenceFrequency);
             if (compoundingFrequencyType.isSameAsRepayment()) {
                 recurrenceInterval = 0;
             }
-            compoundingRecurrenceOnNthDay = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName);
-            compoundingRecurrenceOnDay = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName);
-            compoundingRecurrenceOnWeekday = command.integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName);
+            compoundingRecurrenceOnNthDay = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyNthDayParamName);
+            compoundingRecurrenceOnDay = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyOnDayParamName);
+            compoundingRecurrenceOnWeekday = command
+                    .integerValueOfParameterNamed(LoanProductConstants.recalculationCompoundingFrequencyWeekdayParamName);
             if (!compoundingFrequencyType.isDaily()) {
                 allowCompoundingOnEod = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.allowCompoundingOnEodParamName);
             }
         }
-        Integer preCloseInterestCalculationStrategy = command.integerValueOfParameterNamed(LoanProductConstants.preClosureInterestCalculationStrategyParamName);
+        Integer preCloseInterestCalculationStrategy = command
+                .integerValueOfParameterNamed(LoanProductConstants.preClosureInterestCalculationStrategyParamName);
         if (preCloseInterestCalculationStrategy == null) {
             preCloseInterestCalculationStrategy = LoanPreCloseInterestCalculationStrategy.TILL_PRE_CLOSURE_DATE.getValue();
         }
-        final boolean isCompoundingToBePostedAsTransaction = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName);
-        final boolean disallowInterestCalculationOnPastDue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName);
-        return new LoanProductInterestRecalculationDetails(interestRecalculationCompoundingMethod, loanRescheduleStrategyMethod, recurrenceFrequency, recurrenceInterval, recurrenceOnNthDay, recurrenceOnDay, recurrenceOnWeekday, compoundingRecurrenceFrequency, compoundingInterval, compoundingRecurrenceOnNthDay, compoundingRecurrenceOnDay, compoundingRecurrenceOnWeekday, isArrearsBasedOnOriginalSchedule, preCloseInterestCalculationStrategy, isCompoundingToBePostedAsTransaction, allowCompoundingOnEod, disallowInterestCalculationOnPastDue);
+        final boolean isCompoundingToBePostedAsTransaction = command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCompoundingToBePostedAsTransactionParamName);
+        final boolean disallowInterestCalculationOnPastDue = command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.disallowInterestCalculationOnPastDueParamName);
+        return new LoanProductInterestRecalculationDetails(interestRecalculationCompoundingMethod, loanRescheduleStrategyMethod,
+                recurrenceFrequency, recurrenceInterval, recurrenceOnNthDay, recurrenceOnDay, recurrenceOnWeekday,
+                compoundingRecurrenceFrequency, compoundingInterval, compoundingRecurrenceOnNthDay, compoundingRecurrenceOnDay,
+                compoundingRecurrenceOnWeekday, isArrearsBasedOnOriginalSchedule, preCloseInterestCalculationStrategy,
+                isCompoundingToBePostedAsTransaction, allowCompoundingOnEod, disallowInterestCalculationOnPastDue);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductInterestRecalculationDetailsAssembler() {
-    }
+    public LoanProductInterestRecalculationDetailsAssembler() {}
 }

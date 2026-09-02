@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 @Entity
 @Table(name = "m_loan_amortization_allocation_mapping")
 public class LoanAmortizationAllocationMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
     @Column(name = "base_loan_transaction_id", nullable = false)
@@ -53,22 +54,22 @@ public class LoanAmortizationAllocationMapping extends AbstractAuditableWithUTCD
     private BigDecimal amount;
 
     @java.lang.SuppressWarnings("all")
-        public Long getLoanId() {
+    public Long getLoanId() {
         return this.loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getBaseLoanTransactionId() {
+    public Long getBaseLoanTransactionId() {
         return this.baseLoanTransactionId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getDate() {
+    public LocalDate getDate() {
         return this.date;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getAmortizationLoanTransactionId() {
+    public Long getAmortizationLoanTransactionId() {
         return this.amortizationLoanTransactionId;
     }
 
@@ -76,18 +77,17 @@ public class LoanAmortizationAllocationMapping extends AbstractAuditableWithUTCD
      * Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
      */
     @java.lang.SuppressWarnings("all")
-        public AmortizationType getAmortizationType() {
+    public AmortizationType getAmortizationType() {
         return this.amortizationType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanAmortizationAllocationMapping() {
-    }
+    public LoanAmortizationAllocationMapping() {}
 
     /**
      * Creates a new {@code LoanAmortizationAllocationMapping} instance.
@@ -96,11 +96,13 @@ public class LoanAmortizationAllocationMapping extends AbstractAuditableWithUTCD
      * @param baseLoanTransactionId
      * @param date
      * @param amortizationLoanTransactionId
-     * @param amortizationType Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
+     * @param amortizationType
+     *            Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
      * @param amount
      */
     @java.lang.SuppressWarnings("all")
-        public LoanAmortizationAllocationMapping(final Long loanId, final Long baseLoanTransactionId, final LocalDate date, final Long amortizationLoanTransactionId, final AmortizationType amortizationType, final BigDecimal amount) {
+    public LoanAmortizationAllocationMapping(final Long loanId, final Long baseLoanTransactionId, final LocalDate date,
+            final Long amortizationLoanTransactionId, final AmortizationType amortizationType, final BigDecimal amount) {
         this.loanId = loanId;
         this.baseLoanTransactionId = baseLoanTransactionId;
         this.date = date;

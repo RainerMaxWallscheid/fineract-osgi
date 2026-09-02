@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DelinquencyBucketParseAndValidator extends ParseAndValidator {
+
     private final FromJsonHelper jsonHelper;
 
     public DelinquencyBucketData validateAndParseUpdate(@NotNull final JsonCommand command) {
@@ -49,19 +50,25 @@ public class DelinquencyBucketParseAndValidator extends ParseAndValidator {
         return result;
     }
 
-    private DelinquencyBucketData validateAndParseUpdate(final DataValidatorBuilder dataValidator, JsonObject element, FromJsonHelper jsonHelper) {
+    private DelinquencyBucketData validateAndParseUpdate(final DataValidatorBuilder dataValidator, JsonObject element,
+            FromJsonHelper jsonHelper) {
         if (element == null) {
             return null;
         }
-        jsonHelper.checkForUnsupportedParameters(element, List.of(DelinquencyApiConstants.NAME_PARAM_NAME, DelinquencyApiConstants.RANGES_PARAM_NAME, DelinquencyApiConstants.BUCKET_TYPE_PARAM_NAME, DelinquencyApiConstants.MINIMUM_PAYMENT_PERIOD_AND_RULE_PARAM_NAME));
+        jsonHelper.checkForUnsupportedParameters(element,
+                List.of(DelinquencyApiConstants.NAME_PARAM_NAME, DelinquencyApiConstants.RANGES_PARAM_NAME,
+                        DelinquencyApiConstants.BUCKET_TYPE_PARAM_NAME,
+                        DelinquencyApiConstants.MINIMUM_PAYMENT_PERIOD_AND_RULE_PARAM_NAME));
         final String name = jsonHelper.extractStringNamed(DelinquencyApiConstants.NAME_PARAM_NAME, element);
         dataValidator.reset().parameter(DelinquencyApiConstants.NAME_PARAM_NAME).value(name).notBlank();
         final String bucketTypeParam = jsonHelper.extractStringNamed(DelinquencyApiConstants.BUCKET_TYPE_PARAM_NAME, element);
-        dataValidator.reset().parameter(DelinquencyApiConstants.BUCKET_TYPE_PARAM_NAME).value(bucketTypeParam).ignoreIfNull().isOneOfEnumValues(DelinquencyBucketType.class);
+        dataValidator.reset().parameter(DelinquencyApiConstants.BUCKET_TYPE_PARAM_NAME).value(bucketTypeParam).ignoreIfNull()
+                .isOneOfEnumValues(DelinquencyBucketType.class);
         if (dataValidator.hasError()) {
             return null;
         }
-        DelinquencyBucketType bucketType = bucketTypeParam == null ? DelinquencyBucketType.REGULAR : DelinquencyBucketType.valueOf(bucketTypeParam);
+        DelinquencyBucketType bucketType = bucketTypeParam == null ? DelinquencyBucketType.REGULAR
+                : DelinquencyBucketType.valueOf(bucketTypeParam);
         ArrayList<DelinquencyRangeData> ranges = new ArrayList<>();
         final String[] rangeIds = jsonHelper.extractArrayNamed(DelinquencyApiConstants.RANGES_PARAM_NAME, element);
         dataValidator.reset().parameter(DelinquencyApiConstants.RANGES_PARAM_NAME).value(rangeIds).notNull().arrayNotEmpty();
@@ -72,39 +79,48 @@ public class DelinquencyBucketParseAndValidator extends ParseAndValidator {
         }
         DelinquencyMinimumPaymentPeriodAndRuleData minimumPaymentPeriodAndRule = null;
         if (DelinquencyBucketType.WORKING_CAPITAL.equals(bucketType)) {
-            JsonObject minimumPaymentPeriodAndRuleElement = jsonHelper.extractJsonObjectNamed(DelinquencyApiConstants.MINIMUM_PAYMENT_PERIOD_AND_RULE_PARAM_NAME, element);
-            minimumPaymentPeriodAndRule = validateAndParseUpdateMinimumPaymentPeriodAndRule(dataValidator, minimumPaymentPeriodAndRuleElement, jsonHelper);
+            JsonObject minimumPaymentPeriodAndRuleElement = jsonHelper
+                    .extractJsonObjectNamed(DelinquencyApiConstants.MINIMUM_PAYMENT_PERIOD_AND_RULE_PARAM_NAME, element);
+            minimumPaymentPeriodAndRule = validateAndParseUpdateMinimumPaymentPeriodAndRule(dataValidator,
+                    minimumPaymentPeriodAndRuleElement, jsonHelper);
         }
         return dataValidator.hasError() ? null : new DelinquencyBucketData(null, name, ranges, bucketType, minimumPaymentPeriodAndRule);
     }
 
-    private DelinquencyMinimumPaymentPeriodAndRuleData validateAndParseUpdateMinimumPaymentPeriodAndRule(DataValidatorBuilder dataValidator, JsonObject element, FromJsonHelper jsonHelper) {
+    private DelinquencyMinimumPaymentPeriodAndRuleData validateAndParseUpdateMinimumPaymentPeriodAndRule(DataValidatorBuilder dataValidator,
+            JsonObject element, FromJsonHelper jsonHelper) {
         dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUM_PAYMENT_PERIOD_AND_RULE_PARAM_NAME).value(element).notNull();
         if (element != null) {
             Locale locale = jsonHelper.extractLocaleParameter(element);
             Integer frequency = jsonHelper.extractIntegerNamed(DelinquencyApiConstants.FREQUENCY_PARAM_NAME, element);
             dataValidator.reset().parameter(DelinquencyApiConstants.FREQUENCY_PARAM_NAME).value(frequency).notNull();
             String frequencyType = jsonHelper.extractStringNamed(DelinquencyApiConstants.FREQUENCY_TYPE_PARAM_NAME, element);
-            dataValidator.reset().parameter(DelinquencyApiConstants.FREQUENCY_TYPE_PARAM_NAME).value(frequencyType).notNull().isOneOfEnumValues(DelinquencyFrequencyType.class);
+            dataValidator.reset().parameter(DelinquencyApiConstants.FREQUENCY_TYPE_PARAM_NAME).value(frequencyType).notNull()
+                    .isOneOfEnumValues(DelinquencyFrequencyType.class);
             if (dataValidator.hasError()) {
                 return null;
             }
             final DelinquencyFrequencyType delinquencyFrequencyType = DelinquencyFrequencyType.valueOf(frequencyType);
-            BigDecimal minimumPayment = jsonHelper.extractBigDecimalNamed(DelinquencyApiConstants.MINIMUM_PAYMENT_PARAM_NAME, element, locale);
-            dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUM_PAYMENT_PARAM_NAME).value(minimumPayment).notNull().positiveAmount();
+            BigDecimal minimumPayment = jsonHelper.extractBigDecimalNamed(DelinquencyApiConstants.MINIMUM_PAYMENT_PARAM_NAME, element,
+                    locale);
+            dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUM_PAYMENT_PARAM_NAME).value(minimumPayment).notNull()
+                    .positiveAmount();
             String minimumPaymentType = jsonHelper.extractStringNamed(DelinquencyApiConstants.MINIMUM_PAYMENT_TYPE_PARAM_NAME, element);
-            dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUM_PAYMENT_TYPE_PARAM_NAME).value(minimumPaymentType).notNull().isOneOfEnumValues(DelinquencyMinimumPaymentType.class);
+            dataValidator.reset().parameter(DelinquencyApiConstants.MINIMUM_PAYMENT_TYPE_PARAM_NAME).value(minimumPaymentType).notNull()
+                    .isOneOfEnumValues(DelinquencyMinimumPaymentType.class);
             if (dataValidator.hasError()) {
                 return null;
             }
             final DelinquencyMinimumPaymentType delinquencyMinimumPayment = DelinquencyMinimumPaymentType.valueOf(minimumPaymentType);
-            return dataValidator.hasError() ? null : new DelinquencyMinimumPaymentPeriodAndRuleData(frequency, delinquencyFrequencyType, minimumPayment, delinquencyMinimumPayment);
+            return dataValidator.hasError() ? null
+                    : new DelinquencyMinimumPaymentPeriodAndRuleData(frequency, delinquencyFrequencyType, minimumPayment,
+                            delinquencyMinimumPayment);
         }
         return null;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucketParseAndValidator(final FromJsonHelper jsonHelper) {
+    public DelinquencyBucketParseAndValidator(final FromJsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 }

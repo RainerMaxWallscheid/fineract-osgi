@@ -27,8 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class CapitalizedIncomeAmortizationBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CapitalizedIncomeAmortizationBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CapitalizedIncomeAmortizationBusinessStep.class);
     private final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService;
 
     @Transactional
@@ -50,7 +51,8 @@ public class CapitalizedIncomeAmortizationBusinessStep implements LoanCOBBusines
     }
 
     @java.lang.SuppressWarnings("all")
-        public CapitalizedIncomeAmortizationBusinessStep(final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService) {
+    public CapitalizedIncomeAmortizationBusinessStep(
+            final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService) {
         this.loanCapitalizedIncomeAmortizationProcessingService = loanCapitalizedIncomeAmortizationProcessingService;
     }
 }

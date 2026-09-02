@@ -55,28 +55,32 @@ import org.springframework.stereotype.Component;
 @Component
 @Tag(name = "Product Mix")
 public class ProductMixApiResource {
+
     private final ProductMixReadPlatformService productMixReadPlatformService;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
     private final CommandDispatcher commandDispatcher;
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve Product Mix Template", operationId = "retrieveTemplateProductMix")
     @AlternativeOperationId("retrieveTemplate_12")
     public ProductMixData retrieveTemplate(@PathParam("productId") final Long productId, @Context final UriInfo uriInfo) {
         var productMixData = productMixReadPlatformService.retrieveLoanProductMixDetails(productId);
         if (uriInfo.getQueryParameters().containsKey("template")) {
             final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAvailableLoanProductsForMix();
-            productMixData = ProductMixData.builder().productId(productMixData.getProductId()).productName(productMixData.getProductName()).restrictedProducts(productMixData.getRestrictedProducts()).allowedProducts(productMixData.getAllowedProducts()).productOptions(productOptions).build();
+            productMixData = ProductMixData.builder().productId(productMixData.getProductId()).productName(productMixData.getProductName())
+                    .restrictedProducts(productMixData.getRestrictedProducts()).allowedProducts(productMixData.getAllowedProducts())
+                    .productOptions(productOptions).build();
         }
         return productMixData;
     }
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Create Product Mix", operationId = "createProductMix")
-    public ProductMixCreateResponse createProductMix(@PathParam("productId") final Long productId, @Valid final ProductMixCreateRequest request) {
+    public ProductMixCreateResponse createProductMix(@PathParam("productId") final Long productId,
+            @Valid final ProductMixCreateRequest request) {
         request.setProductId(productId);
         final var command = new ProductMixCreateCommand();
         command.setPayload(request);
@@ -85,10 +89,11 @@ public class ProductMixApiResource {
     }
 
     @PUT
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Update Product Mix", operationId = "updateProductMix")
-    public ProductMixUpdateResponse updateProductMix(@PathParam("productId") final Long productId, @Valid final ProductMixUpdateRequest request) {
+    public ProductMixUpdateResponse updateProductMix(@PathParam("productId") final Long productId,
+            @Valid final ProductMixUpdateRequest request) {
         request.setProductId(productId);
         final var command = new ProductMixUpdateCommand();
         command.setPayload(request);
@@ -97,7 +102,7 @@ public class ProductMixApiResource {
     }
 
     @DELETE
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Delete Product Mix", operationId = "deleteProductMix")
     public ProductMixDeleteResponse deleteProductMix(@PathParam("productId") final Long productId) {
         final var command = new ProductMixDeleteCommand();
@@ -107,7 +112,8 @@ public class ProductMixApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductMixApiResource(final ProductMixReadPlatformService productMixReadPlatformService, final LoanProductReadPlatformService loanProductReadPlatformService, final CommandDispatcher commandDispatcher) {
+    public ProductMixApiResource(final ProductMixReadPlatformService productMixReadPlatformService,
+            final LoanProductReadPlatformService loanProductReadPlatformService, final CommandDispatcher commandDispatcher) {
         this.productMixReadPlatformService = productMixReadPlatformService;
         this.loanProductReadPlatformService = loanProductReadPlatformService;
         this.commandDispatcher = commandDispatcher;

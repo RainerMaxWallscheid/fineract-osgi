@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.loanaccount.jobs.applyholidaystoloans;
 
 import static org.apache.fineract.infrastructure.core.service.DateUtils.isDateWithinRange;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +50,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApplyHolidaysToLoansTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyHolidaysToLoansTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyHolidaysToLoansTasklet.class);
     private final ConfigurationDomainService configurationDomainService;
     private final HolidayRepositoryWrapper holidayRepository;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
@@ -64,7 +66,8 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
         if (!isHolidayEnabled) {
             return RepeatStatus.FINISHED;
         }
-        final Collection<LoanStatus> loanStatuses = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE));
+        final Collection<LoanStatus> loanStatuses = new ArrayList<>(
+                Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE));
         final List<Holiday> holidays = holidayRepository.findUnprocessed();
         for (final Holiday holiday : holidays) {
             final Set<Office> offices = holiday.getOffices();
@@ -111,7 +114,8 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
     private void adjustRepaymentSchedules(Loan loan, Holiday holiday, LocalDate adjustedRescheduleToDate) {
         final DefaultScheduledDateGenerator scheduledDateGenerator = new DefaultScheduledDateGenerator();
         ScheduleGeneratorDTO scheduleGeneratorDTO = loanUtilService.buildScheduleGeneratorDTO(loan, holiday.getFromDate());
-        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO, loan);
+        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO,
+                loan);
         // first repayment's from date is same as disbursement date.
         LocalDate tmpFromDate = loan.getDisbursementDate();
         // Loop through all loanRepayments
@@ -127,7 +131,8 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
                 // FIXME: AA do we need to apply non-working days.
                 // Assuming holiday's repayment reschedule to date cannot be
                 // created on a non-working day.
-                adjustedRescheduleToDate = scheduledDateGenerator.generateNextRepaymentDateWhenHolidayApply(adjustedRescheduleToDate, loanApplicationTerms);
+                adjustedRescheduleToDate = scheduledDateGenerator.generateNextRepaymentDateWhenHolidayApply(adjustedRescheduleToDate,
+                        loanApplicationTerms);
                 loanRepaymentScheduleInstallment.updateDueDate(adjustedRescheduleToDate);
             }
             tmpFromDate = loanRepaymentScheduleInstallment.getDueDate();
@@ -137,7 +142,8 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
     private void adjustAllRepaymentSchedules(Loan loan, Holiday holiday, LocalDate adjustedRescheduleToDate) {
         final DefaultScheduledDateGenerator scheduledDateGenerator = new DefaultScheduledDateGenerator();
         ScheduleGeneratorDTO scheduleGeneratorDTO = loanUtilService.buildScheduleGeneratorDTO(loan, holiday.getFromDate());
-        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO, loan);
+        final LoanApplicationTerms loanApplicationTerms = loanTermVariationsMapper.constructLoanApplicationTerms(scheduleGeneratorDTO,
+                loan);
         // first repayment's from date is same as disbursement date.
         LocalDate tmpFromDate = loan.getDisbursementDate();
         // Loop through all loanRepayments
@@ -153,7 +159,8 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
                 // FIXME: AA do we need to apply non-working days.
                 // Assuming holiday's repayment reschedule to date cannot be
                 // created on a non-working day.
-                adjustedRescheduleToDate = scheduledDateGenerator.generateNextRepaymentDate(adjustedRescheduleToDate, loanApplicationTerms, false);
+                adjustedRescheduleToDate = scheduledDateGenerator.generateNextRepaymentDate(adjustedRescheduleToDate, loanApplicationTerms,
+                        false);
                 loanRepaymentScheduleInstallment.updateDueDate(adjustedRescheduleToDate);
             }
             tmpFromDate = loanRepaymentScheduleInstallment.getDueDate();
@@ -168,13 +175,15 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
                 adjustedRescheduleToDate = rescheduleToDate;
                 break;
             } else {
-                adjustedRescheduleToDate = doStandardMonthlyCheck(adjustedRescheduleToDate, rescheduleToDate, loanRepaymentScheduleInstallment);
+                adjustedRescheduleToDate = doStandardMonthlyCheck(adjustedRescheduleToDate, rescheduleToDate,
+                        loanRepaymentScheduleInstallment);
             }
         }
         return adjustedRescheduleToDate;
     }
 
-    private LocalDate doStandardMonthlyCheck(LocalDate adjustedRescheduleToDate, LocalDate rescheduleToDate, LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
+    private LocalDate doStandardMonthlyCheck(LocalDate adjustedRescheduleToDate, LocalDate rescheduleToDate,
+            LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
         // Standard Monthly Loan Holiday check
         LocalDate dueDate = loanRepaymentScheduleInstallment.getDueDate();
         if (DateUtils.isAfter(rescheduleToDate, dueDate) && DateUtils.isBefore(rescheduleToDate, dueDate.plusDays(30))) {
@@ -184,7 +193,10 @@ public class ApplyHolidaysToLoansTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ApplyHolidaysToLoansTasklet(final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanUtilService loanUtilService, final BusinessEventNotifierService businessEventNotifierService, final LoanTermVariationsMapper loanTermVariationsMapper) {
+    public ApplyHolidaysToLoansTasklet(final ConfigurationDomainService configurationDomainService,
+            final HolidayRepositoryWrapper holidayRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
+            final LoanUtilService loanUtilService, final BusinessEventNotifierService businessEventNotifierService,
+            final LoanTermVariationsMapper loanTermVariationsMapper) {
         this.configurationDomainService = configurationDomainService;
         this.holidayRepository = holidayRepository;
         this.loanRepositoryWrapper = loanRepositoryWrapper;

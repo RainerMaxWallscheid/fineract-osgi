@@ -42,6 +42,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class TransferFeeChargeForLoansTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TransferFeeChargeForLoansTasklet.class);
     private final LoanChargeReadPlatformService loanChargeReadPlatformService;

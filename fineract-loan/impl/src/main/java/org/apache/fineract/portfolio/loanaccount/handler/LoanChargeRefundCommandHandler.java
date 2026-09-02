@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "CHARGEREFUND")
 public class LoanChargeRefundCommandHandler implements NewCommandSourceHandler {
+
     private final LoanChargeWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -41,13 +42,15 @@ public class LoanChargeRefundCommandHandler implements NewCommandSourceHandler {
         try {
             return this.writePlatformService.loanChargeRefund(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loancharge.refund", "Loancharge Refund");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loancharge.refund",
+                    "Loancharge Refund");
             return CommandProcessingResult.empty();
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeRefundCommandHandler(final LoanChargeWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+    public LoanChargeRefundCommandHandler(final LoanChargeWritePlatformService writePlatformService,
+            final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
         this.writePlatformService = writePlatformService;
         this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }

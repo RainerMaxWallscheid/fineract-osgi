@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "DISBURSALLASTUNDO")
 public class UndoLastDisbursalLoanCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UndoLastDisbursalLoanCommandHandler implements NewCommandSourceHand
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoLastDisbursalLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public UndoLastDisbursalLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

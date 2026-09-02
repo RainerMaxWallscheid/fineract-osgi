@@ -33,8 +33,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CheckLoanRepaymentDueBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CheckLoanRepaymentDueBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CheckLoanRepaymentDueBusinessStep.class);
     private final ConfigurationDomainService configurationDomainService;
     private final BusinessEventNotifierService businessEventNotifierService;
 
@@ -51,8 +52,10 @@ public class CheckLoanRepaymentDueBusinessStep implements LoanCOBBusinessStep {
         final List<LoanRepaymentScheduleInstallment> loanRepaymentScheduleInstallments = loan.getRepaymentScheduleInstallments();
         for (LoanRepaymentScheduleInstallment repaymentSchedule : loanRepaymentScheduleInstallments) {
             LocalDate repaymentDate = repaymentSchedule.getDueDate();
-            List<LoanStatus> nonDisbursedStatuses = Arrays.asList(LoanStatus.INVALID, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED);
-            if (isDueEventNeededToBeSent(loan, numberOfDaysBeforeDueDateToRaiseEvent, currentDate, repaymentSchedule, repaymentDate, nonDisbursedStatuses)) {
+            List<LoanStatus> nonDisbursedStatuses = Arrays.asList(LoanStatus.INVALID, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL,
+                    LoanStatus.APPROVED);
+            if (isDueEventNeededToBeSent(loan, numberOfDaysBeforeDueDateToRaiseEvent, currentDate, repaymentSchedule, repaymentDate,
+                    nonDisbursedStatuses)) {
                 businessEventNotifierService.notifyPostBusinessEvent(new LoanRepaymentDueBusinessEvent(repaymentSchedule));
                 break;
             }
@@ -71,12 +74,17 @@ public class CheckLoanRepaymentDueBusinessStep implements LoanCOBBusinessStep {
         return "Check loan repayment due";
     }
 
-    private static boolean isDueEventNeededToBeSent(Loan loan, Long numberOfDaysBeforeDueDateToRaiseEvent, LocalDate currentDate, LoanRepaymentScheduleInstallment repaymentScheduleInstallment, LocalDate repaymentDate, List<LoanStatus> nonDisbursedStatuses) {
-        return repaymentDate.minusDays(numberOfDaysBeforeDueDateToRaiseEvent).equals(currentDate) && !nonDisbursedStatuses.contains(loan.getStatus()) && loan.getSummary().getTotalOutstanding().compareTo(BigDecimal.ZERO) > 0 && repaymentScheduleInstallment.getTotalOutstanding(loan.getCurrency()).isGreaterThanZero();
+    private static boolean isDueEventNeededToBeSent(Loan loan, Long numberOfDaysBeforeDueDateToRaiseEvent, LocalDate currentDate,
+            LoanRepaymentScheduleInstallment repaymentScheduleInstallment, LocalDate repaymentDate, List<LoanStatus> nonDisbursedStatuses) {
+        return repaymentDate.minusDays(numberOfDaysBeforeDueDateToRaiseEvent).equals(currentDate)
+                && !nonDisbursedStatuses.contains(loan.getStatus())
+                && loan.getSummary().getTotalOutstanding().compareTo(BigDecimal.ZERO) > 0
+                && repaymentScheduleInstallment.getTotalOutstanding(loan.getCurrency()).isGreaterThanZero();
     }
 
     @java.lang.SuppressWarnings("all")
-        public CheckLoanRepaymentDueBusinessStep(final ConfigurationDomainService configurationDomainService, final BusinessEventNotifierService businessEventNotifierService) {
+    public CheckLoanRepaymentDueBusinessStep(final ConfigurationDomainService configurationDomainService,
+            final BusinessEventNotifierService businessEventNotifierService) {
         this.configurationDomainService = configurationDomainService;
         this.businessEventNotifierService = businessEventNotifierService;
     }

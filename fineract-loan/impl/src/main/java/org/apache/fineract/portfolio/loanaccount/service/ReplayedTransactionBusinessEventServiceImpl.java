@@ -26,6 +26,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 
 public class ReplayedTransactionBusinessEventServiceImpl implements ReplayedTransactionBusinessEventService {
+
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanTransactionRepository loanTransactionRepository;
 
@@ -56,7 +57,8 @@ public class ReplayedTransactionBusinessEventServiceImpl implements ReplayedTran
     }
 
     @java.lang.SuppressWarnings("all")
-        public ReplayedTransactionBusinessEventServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository) {
+    public ReplayedTransactionBusinessEventServiceImpl(final BusinessEventNotifierService businessEventNotifierService,
+            final LoanTransactionRepository loanTransactionRepository) {
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanTransactionRepository = loanTransactionRepository;
     }

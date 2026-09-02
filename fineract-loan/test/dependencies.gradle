@@ -19,6 +19,27 @@
 
 dependencies {
     testImplementation(project(path: ':fineract-loan-impl'))
+    testImplementation(project(path: ':fineract-progressive-loan-api'))
+    testImplementation(project(path: ':fineract-paymentdetail-api'))
+    testImplementation(project(path: ':fineract-clients-api'))
+    testImplementation(project(path: ':fineract-bulkimport-api'))
+    testImplementation(project(path: ':fineract-working-capital-loan-api'))
+    testImplementation(project(path: ':fineract-working-capital-loan-impl'))
+    testImplementation(project(path: ':fineract-group-api'))
+    testImplementation(project(path: ':fineract-collateralmanagement-api'))
+    testImplementation(project(path: ':fineract-branch-api'))
+    testImplementation(project(path: ':fineract-accounttransfer-api'))
+    testImplementation(project(path: ':fineract-savings-api'))
+    testImplementation(project(path: ':fineract-savings-impl'))
+    testImplementation(project(path: ':fineract-note-api'))
+    testImplementation(project(path: ':fineract-dataqueries-api'))
+    testImplementation(project(path: ':fineract-dataqueries-impl'))
+    testImplementation(project(path: ':fineract-calendar-api'))
+    testImplementation(project(path: ':fineract-collateralmanagement-impl'))
+    testImplementation(project(path: ':fineract-fund-api'))
+    testImplementation(project(path: ':fineract-organisation-api'))
+    testImplementation 'org.springframework.security:spring-security-core'
+    testCompileOnly 'com.github.spotbugs:spotbugs-annotations'
     testImplementation(project(path: ':fineract-cob-api'))
     testImplementation(project(path: ':fineract-cob-impl'))
     testImplementation(project(path: ':fineract-core'))

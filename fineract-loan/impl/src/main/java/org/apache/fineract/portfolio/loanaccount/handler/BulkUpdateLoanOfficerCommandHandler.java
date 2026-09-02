@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "BULKREASSIGN")
 public class BulkUpdateLoanOfficerCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class BulkUpdateLoanOfficerCommandHandler implements NewCommandSourceHand
     }
 
     @java.lang.SuppressWarnings("all")
-        public BulkUpdateLoanOfficerCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public BulkUpdateLoanOfficerCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

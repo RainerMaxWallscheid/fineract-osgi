@@ -38,7 +38,8 @@ import org.springframework.stereotype.Component;
 /**
  * Spring ↔ OSGi bridge for primary pure loan ports (ADR-022 / loan plan).
  *
- * <p>Entity-typed account services remain composition-root residual on impl.
+ * <p>
+ * Entity-typed account services remain composition-root residual on impl.
  */
 @Component
 public class LoanOsgiServiceRegistrar implements InitializingBean, DisposableBean {

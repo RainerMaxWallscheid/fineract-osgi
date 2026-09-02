@@ -23,13 +23,14 @@ import java.time.LocalDate;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
 public class LoanScheduleDelinquencyData implements Serializable {
+
     private Long loanId;
     private LocalDate overdueSinceDate;
     private Long overdueDays;
     private Loan loan;
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleDelinquencyData(final Long loanId, final LocalDate overdueSinceDate, final Long overdueDays, final Loan loan) {
+    public LoanScheduleDelinquencyData(final Long loanId, final LocalDate overdueSinceDate, final Long overdueDays, final Loan loan) {
         this.loanId = loanId;
         this.overdueSinceDate = overdueSinceDate;
         this.overdueDays = overdueDays;
@@ -37,46 +38,45 @@ public class LoanScheduleDelinquencyData implements Serializable {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleDelinquencyData() {
-    }
+    public LoanScheduleDelinquencyData() {}
 
     @java.lang.SuppressWarnings("all")
-        public Long getLoanId() {
+    public Long getLoanId() {
         return this.loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getOverdueSinceDate() {
+    public LocalDate getOverdueSinceDate() {
         return this.overdueSinceDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getOverdueDays() {
+    public Long getOverdueDays() {
         return this.overdueDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanId(final Long loanId) {
+    public void setLoanId(final Long loanId) {
         this.loanId = loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOverdueSinceDate(final LocalDate overdueSinceDate) {
+    public void setOverdueSinceDate(final LocalDate overdueSinceDate) {
         this.overdueSinceDate = overdueSinceDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOverdueDays(final Long overdueDays) {
+    public void setOverdueDays(final Long overdueDays) {
         this.overdueDays = overdueDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoan(final Loan loan) {
+    public void setLoan(final Loan loan) {
         this.loan = loan;
     }
 }

@@ -28,8 +28,9 @@ import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.lang.NonNull;
 
 public abstract class AbstractLoanItemWriter extends RepositoryItemWriter<Loan> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractLoanItemWriter.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractLoanItemWriter.class);
     private final LockingService loanLockingService;
 
     @Override
@@ -44,7 +45,7 @@ public abstract class AbstractLoanItemWriter extends RepositoryItemWriter<Loan> 
     protected abstract LockOwner getLockOwner();
 
     @java.lang.SuppressWarnings("all")
-        public AbstractLoanItemWriter(final LockingService loanLockingService) {
+    public AbstractLoanItemWriter(final LockingService loanLockingService) {
         this.loanLockingService = loanLockingService;
     }
 }

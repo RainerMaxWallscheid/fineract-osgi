@@ -26,13 +26,15 @@ import org.apache.fineract.portfolio.loanproduct.data.TransactionProcessingStrat
 import org.springframework.beans.factory.annotation.Value;
 
 public class LoanRepaymentScheduleTransactionProcessorFactory {
+
     private final LoanRepaymentScheduleTransactionProcessor defaultLoanRepaymentScheduleTransactionProcessor;
     private final List<LoanRepaymentScheduleTransactionProcessor> processors;
     @Value("${fineract.loan.transactionprocessor.error-not-found-fail}")
     private Boolean errorNotFoundFail;
 
     public LoanRepaymentScheduleTransactionProcessor determineProcessor(final String transactionProcessingStrategy) {
-        Optional<LoanRepaymentScheduleTransactionProcessor> processor = processors.stream().filter(p -> p.accept(transactionProcessingStrategy)).findFirst();
+        Optional<LoanRepaymentScheduleTransactionProcessor> processor = processors.stream()
+                .filter(p -> p.accept(transactionProcessingStrategy)).findFirst();
         if (processor.isEmpty() && Boolean.TRUE.equals(errorNotFoundFail)) {
             throw new LoanTransactionProcessingStrategyNotFoundException(transactionProcessingStrategy);
         } else {
@@ -45,7 +47,9 @@ public class LoanRepaymentScheduleTransactionProcessorFactory {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentScheduleTransactionProcessorFactory(final LoanRepaymentScheduleTransactionProcessor defaultLoanRepaymentScheduleTransactionProcessor, final List<LoanRepaymentScheduleTransactionProcessor> processors) {
+    public LoanRepaymentScheduleTransactionProcessorFactory(
+            final LoanRepaymentScheduleTransactionProcessor defaultLoanRepaymentScheduleTransactionProcessor,
+            final List<LoanRepaymentScheduleTransactionProcessor> processors) {
         this.defaultLoanRepaymentScheduleTransactionProcessor = defaultLoanRepaymentScheduleTransactionProcessor;
         this.processors = processors;
     }

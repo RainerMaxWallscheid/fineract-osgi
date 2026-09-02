@@ -49,12 +49,12 @@ import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.data.ClientNonPersonData;
 import org.apache.fineract.portfolio.client.data.ClientTimelineData;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
-import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.client.mapper.ClientMapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
+import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -67,6 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ClientReadPlatformServiceImpl implements ClientReadPlatformService {
+
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
@@ -85,10 +86,12 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
     @Override
     public Page<ClientData> retrieveAll(final SearchParameters searchParameters) {
-        if (searchParameters != null && searchParameters.getStatus() != null && ClientStatus.fromString(searchParameters.getStatus()) == ClientStatus.INVALID) {
+        if (searchParameters != null && searchParameters.getStatus() != null
+                && ClientStatus.fromString(searchParameters.getStatus()) == ClientStatus.INVALID) {
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final String defaultUserMessage = "The Status value \'" + searchParameters.getStatus() + "\' is not supported.";
-            final ApiParameterError error = ApiParameterError.parameterError("validation.msg.client.status.value.is.not.supported", defaultUserMessage, "status", searchParameters.getStatus());
+            final ApiParameterError error = ApiParameterError.parameterError("validation.msg.client.status.value.is.not.supported",
+                    defaultUserMessage, "status", searchParameters.getStatus());
             dataValidationErrors.add(error);
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
@@ -200,8 +203,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
                         summary.pctToBase(), summary.basePrice(), summary.total(), summary.totalCollateral()));
             }
             final String clientGroupsSql = "select " + this.clientGroupsMapper.parentGroupsSchema();
-            final Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper,  // NOSONAR
-            clientId);
+            final Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper, // NOSONAR
+                    clientId);
             return ClientData.setParentGroups(clientData, parentGroups, clientCollateralManagementDataSet);
         } catch (final EmptyResultDataAccessException e) {
             throw new ClientNotFoundException(clientId, e);
@@ -238,19 +241,22 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final AppUser currentUser = this.context.authenticatedUser();
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
-        final String sql = "select " + this.membersOfGroupMapper.schema() + " where o.hierarchy like ? and pgc.group_id = ? and c.status_enum = ? ";
-        return this.jdbcTemplate.query(sql, this.membersOfGroupMapper,  // NOSONAR
-        hierarchySearchString, groupId, ClientStatus.ACTIVE.getValue());
+        final String sql = "select " + this.membersOfGroupMapper.schema()
+                + " where o.hierarchy like ? and pgc.group_id = ? and c.status_enum = ? ";
+        return this.jdbcTemplate.query(sql, this.membersOfGroupMapper, // NOSONAR
+                hierarchySearchString, groupId, ClientStatus.ACTIVE.getValue());
     }
 
-
     private static final class ClientMembersOfGroupMapper implements RowMapper<ClientData> {
+
         private final String schema;
 
         ClientMembersOfGroupMapper() {
             final StringBuilder sqlBuilder = new StringBuilder(200);
-            sqlBuilder.append("c.id as id, c.account_no as accountNo, c.external_id as externalId, c.status_enum as statusEnum,c.sub_status as subStatus, ");
-            sqlBuilder.append("cvSubStatus.code_value as subStatusValue,cvSubStatus.code_description as subStatusDesc,c.office_id as officeId, o.name as officeName, ");
+            sqlBuilder.append(
+                    "c.id as id, c.account_no as accountNo, c.external_id as externalId, c.status_enum as statusEnum,c.sub_status as subStatus, ");
+            sqlBuilder.append(
+                    "cvSubStatus.code_value as subStatusValue,cvSubStatus.code_description as subStatusDesc,c.office_id as officeId, o.name as officeName, ");
             sqlBuilder.append("c.transfer_to_office_id as transferToOfficeId, transferToOffice.name as transferToOfficeName, ");
             sqlBuilder.append("c.firstname as firstname, c.middlename as middlename, c.lastname as lastname, ");
             sqlBuilder.append("c.fullname as fullname, c.display_name as displayName, ");
@@ -376,9 +382,15 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String mainBusinessLineValue = rs.getString("mainBusinessLineValue");
             final CodeValueData mainBusinessLine = CodeValueData.instance(mainBusinessLineId, mainBusinessLineValue);
             final String remarks = rs.getString("remarks");
-            final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
-            final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname, activationDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername, closedByFirstname, closedByLastname);
-            return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate, imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype, classification, legalForm, clientNonPerson, isStaff);
+            final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill,
+                    mainBusinessLine, remarks);
+            final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
+                    submittedByLastname, activationDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate,
+                    closedByUsername, closedByFirstname, closedByLastname);
+            return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
+                    firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender,
+                    activationDate, imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId,
+                    clienttype, classification, legalForm, clientNonPerson, isStaff);
         }
     }
 
@@ -387,15 +399,17 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final AppUser currentUser = this.context.authenticatedUser();
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
-        final String sql = "select " + this.membersOfGroupMapper.schema() + " left join m_group g on pgc.group_id=g.id where o.hierarchy like ? and g.parent_id = ? and c.status_enum = ? group by c.id";
-        return this.jdbcTemplate.query(sql, this.membersOfGroupMapper,  // NOSONAR
-        hierarchySearchString, centerId, ClientStatus.ACTIVE.getValue());
+        final String sql = "select " + this.membersOfGroupMapper.schema()
+                + " left join m_group g on pgc.group_id=g.id where o.hierarchy like ? and g.parent_id = ? and c.status_enum = ? group by c.id";
+        return this.jdbcTemplate.query(sql, this.membersOfGroupMapper, // NOSONAR
+                hierarchySearchString, centerId, ClientStatus.ACTIVE.getValue());
     }
 
-
     private static final class ParentGroupsMapper implements RowMapper<GroupGeneralData> {
+
         public String parentGroupsSchema() {
-            return "gp.id As groupId , gp.account_no as accountNo, gp.display_name As groupName from m_client cl JOIN m_group_client gc ON cl.id = gc.client_id " + "JOIN m_group gp ON gp.id = gc.group_id WHERE cl.id  = ?";
+            return "gp.id As groupId , gp.account_no as accountNo, gp.display_name As groupName from m_client cl JOIN m_group_client gc ON cl.id = gc.client_id "
+                    + "JOIN m_group gp ON gp.id = gc.group_id WHERE cl.id  = ?";
         }
 
         @Override
@@ -407,8 +421,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         }
     }
 
-
     private static final class ClientLookupMapper implements RowMapper<ClientData> {
+
         private final String schema;
 
         ClientLookupMapper() {
@@ -445,10 +459,13 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         }
     }
 
-
     private static final class ClientIdentifierMapper implements RowMapper<ClientData> {
+
         public String clientLookupByIdentifierSchema() {
-            return "c.id as id, c.account_no as accountNo, c.firstname as firstname, c.middlename as middlename, c.lastname as lastname, " + "c.fullname as fullname, c.display_name as displayName," + "c.office_id as officeId, o.name as officeName " + " from m_client c, m_office o, m_client_identifier ci " + "where o.id = c.office_id and c.id=ci.client_id " + "and ci.document_type_id= ? and ci.document_key like ?";
+            return "c.id as id, c.account_no as accountNo, c.firstname as firstname, c.middlename as middlename, c.lastname as lastname, "
+                    + "c.fullname as fullname, c.display_name as displayName," + "c.office_id as officeId, o.name as officeName "
+                    + " from m_client c, m_office o, m_client_identifier ci " + "where o.id = c.office_id and c.id=ci.client_id "
+                    + "and ci.document_type_id= ? and ci.document_key like ?";
         }
 
         @Override
@@ -471,14 +488,16 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         return clientRepositoryWrapper.findIdByExternalId(externalId);
     }
 
-
     private static final class ClientToDataMapper implements RowMapper<ClientData> {
+
         private final String schema;
 
         ClientToDataMapper() {
             final StringBuilder builder = new StringBuilder(400);
-            builder.append("c.id as id, c.account_no as accountNo, c.external_id as externalId, c.status_enum as statusEnum,c.sub_status as subStatus, ");
-            builder.append("cvSubStatus.code_value as subStatusValue,cvSubStatus.code_description as subStatusDesc,c.office_id as officeId, o.name as officeName, ");
+            builder.append(
+                    "c.id as id, c.account_no as accountNo, c.external_id as externalId, c.status_enum as statusEnum,c.sub_status as subStatus, ");
+            builder.append(
+                    "cvSubStatus.code_value as subStatusValue,cvSubStatus.code_description as subStatusDesc,c.office_id as officeId, o.name as officeName, ");
             builder.append("c.transfer_to_office_id as transferToOfficeId, transferToOffice.name as transferToOfficeName, ");
             builder.append("c.firstname as firstname, c.middlename as middlename, c.lastname as lastname, ");
             builder.append("c.fullname as fullname, c.display_name as displayName, ");
@@ -604,21 +623,29 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String mainBusinessLineValue = rs.getString("mainBusinessLineValue");
             final CodeValueData mainBusinessLine = CodeValueData.instance(mainBusinessLineId, mainBusinessLineValue);
             final String remarks = rs.getString("remarks");
-            final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
-            final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname, activationDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername, closedByFirstname, closedByLastname);
-            return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate, imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype, classification, legalForm, clientNonPerson, isStaff);
+            final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill,
+                    mainBusinessLine, remarks);
+            final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
+                    submittedByLastname, activationDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate,
+                    closedByUsername, closedByFirstname, closedByLastname);
+            return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
+                    firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender,
+                    activationDate, imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId,
+                    clienttype, classification, legalForm, clientNonPerson, isStaff);
         }
     }
 
     @Override
     public ClientData retrieveAllNarrations(final String clientNarrations) {
-        final List<CodeValueData> narrations = new ArrayList<>(this.codeValueReadPlatformService.retrieveCodeValuesByCode(clientNarrations));
+        final List<CodeValueData> narrations = new ArrayList<>(
+                this.codeValueReadPlatformService.retrieveCodeValuesByCode(clientNarrations));
         final Collection<CodeValueData> clientTypeOptions = null;
         final Collection<CodeValueData> clientClassificationOptions = null;
         final Collection<CodeValueData> clientNonPersonConstitutionOptions = null;
         final Collection<CodeValueData> clientNonPersonMainBusinessLineOptions = null;
         final List<EnumOptionData> clientLegalFormOptions = null;
-        return ClientData.template(null, null, null, null, narrations, null, null, clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions, null, null, null, null);
+        return ClientData.template(null, null, null, null, narrations, null, null, clientTypeOptions, clientClassificationOptions,
+                clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions, null, null, null, null);
     }
 
     @Override
@@ -632,7 +659,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final CodeValueReadPlatformService codeValueReadPlatformService, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator, final LoanCollateralPort loanCollateralPort, final ClientRepositoryWrapper clientRepositoryWrapper, final ClientMapper clientMapper, final InputValidator inputValidator) {
+    public ClientReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context,
+            final CodeValueReadPlatformService codeValueReadPlatformService, final PaginationHelper paginationHelper,
+            final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator,
+            final LoanCollateralPort loanCollateralPort, final ClientRepositoryWrapper clientRepositoryWrapper,
+            final ClientMapper clientMapper, final InputValidator inputValidator) {
         this.jdbcTemplate = jdbcTemplate;
         this.context = context;
         this.codeValueReadPlatformService = codeValueReadPlatformService;

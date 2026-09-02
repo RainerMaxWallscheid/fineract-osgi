@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 @Entity
 @Table(name = "m_loan_status_change_history")
 public class LoanStatusChangeHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
@@ -41,33 +42,32 @@ public class LoanStatusChangeHistory extends AbstractAuditableWithUTCDateTimeCus
     private LocalDate businessDate;
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanStatus getStatus() {
+    public LoanStatus getStatus() {
         return this.status;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getBusinessDate() {
+    public LocalDate getBusinessDate() {
         return this.businessDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanStatusChangeHistory(final Loan loan, final LoanStatus status, final LocalDate businessDate) {
+    public LoanStatusChangeHistory(final Loan loan, final LoanStatus status, final LocalDate businessDate) {
         this.loan = loan;
         this.status = status;
         this.businessDate = businessDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected LoanStatusChangeHistory() {
-    }
+    protected LoanStatusChangeHistory() {}
 
     @java.lang.SuppressWarnings("all")
-        public void setStatus(final LoanStatus status) {
+    public void setStatus(final LoanStatus status) {
         this.status = status;
     }
 }

@@ -37,6 +37,7 @@ import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePla
 import org.springframework.lang.NonNull;
 
 public class LoanTransactionAssembler {
+
     private final ExternalIdFactory externalIdFactory;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
 
@@ -59,20 +60,26 @@ public class LoanTransactionAssembler {
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
         final Money repaymentAmount = Money.of(loan.getCurrency(), transactionAmount);
-        return LoanTransaction.repaymentType(repaymentTransactionType, loan.getOffice(), repaymentAmount, paymentDetail, transactionDate, txnExternalId, null);
+        return LoanTransaction.repaymentType(repaymentTransactionType, loan.getOffice(), repaymentAmount, paymentDetail, transactionDate,
+                txnExternalId, null);
     }
 
-    public LoanTransaction assembleAccrualActivityTransaction(@NonNull Loan loan, @NonNull LoanRepaymentScheduleInstallment installment, @NonNull LocalDate transactionDate) {
+    public LoanTransaction assembleAccrualActivityTransaction(@NonNull Loan loan, @NonNull LoanRepaymentScheduleInstallment installment,
+            @NonNull LocalDate transactionDate) {
         ExternalId externalId = externalIdFactory.create();
         BigDecimal interestPortion = installment.getInterestCharged();
         BigDecimal feeChargesPortion = installment.getFeeChargesCharged();
         BigDecimal penaltyChargesPortion = installment.getPenaltyCharges();
         BigDecimal transactionAmount = MathUtil.add(interestPortion, feeChargesPortion, penaltyChargesPortion);
-        return MathUtil.isGreaterThanZero(transactionAmount) ? new LoanTransaction(loan, loan.getOffice(), LoanTransactionType.ACCRUAL_ACTIVITY, transactionDate, transactionAmount, null, interestPortion, feeChargesPortion, penaltyChargesPortion, null, false, null, externalId) : null;
+        return MathUtil.isGreaterThanZero(transactionAmount)
+                ? new LoanTransaction(loan, loan.getOffice(), LoanTransactionType.ACCRUAL_ACTIVITY, transactionDate, transactionAmount,
+                        null, interestPortion, feeChargesPortion, penaltyChargesPortion, null, false, null, externalId)
+                : null;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionAssembler(final ExternalIdFactory externalIdFactory, final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
+    public LoanTransactionAssembler(final ExternalIdFactory externalIdFactory,
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
         this.externalIdFactory = externalIdFactory;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
     }

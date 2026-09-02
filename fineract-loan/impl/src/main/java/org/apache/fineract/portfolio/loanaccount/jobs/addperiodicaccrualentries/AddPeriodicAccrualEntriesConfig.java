@@ -32,18 +32,21 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class AddPeriodicAccrualEntriesConfig {
+
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Bean
     protected Step addPeriodicAccrualEntriesStep() {
-        return new StepBuilder(JobName.ADD_PERIODIC_ACCRUAL_ENTRIES.name(), jobRepository).tasklet(addPeriodicAccrualEntriesTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.ADD_PERIODIC_ACCRUAL_ENTRIES.name(), jobRepository)
+                .tasklet(addPeriodicAccrualEntriesTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job addPeriodicAccrualEntriesJob() {
-        return new JobBuilder(JobName.ADD_PERIODIC_ACCRUAL_ENTRIES.name(), jobRepository).start(addPeriodicAccrualEntriesStep()).incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.ADD_PERIODIC_ACCRUAL_ENTRIES.name(), jobRepository).start(addPeriodicAccrualEntriesStep())
+                .incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
@@ -52,7 +55,8 @@ public class AddPeriodicAccrualEntriesConfig {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddPeriodicAccrualEntriesConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+    public AddPeriodicAccrualEntriesConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager,
+            final LoanAccrualsProcessingService loanAccrualsProcessingService) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;

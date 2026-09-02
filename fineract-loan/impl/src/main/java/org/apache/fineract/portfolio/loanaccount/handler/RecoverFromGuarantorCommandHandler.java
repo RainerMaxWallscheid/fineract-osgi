@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @CommandType(entity = "LOAN", action = "RECOVERGUARANTEES")
 public class RecoverFromGuarantorCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Override
@@ -36,7 +37,7 @@ public class RecoverFromGuarantorCommandHandler implements NewCommandSourceHandl
     }
 
     @java.lang.SuppressWarnings("all")
-        public RecoverFromGuarantorCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public RecoverFromGuarantorCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

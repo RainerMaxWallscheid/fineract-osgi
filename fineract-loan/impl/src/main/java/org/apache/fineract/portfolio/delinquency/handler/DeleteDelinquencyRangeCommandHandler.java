@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "DELINQUENCY_RANGE", action = "DELETE")
 public class DeleteDelinquencyRangeCommandHandler implements NewCommandSourceHandler {
+
     private final DelinquencyWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class DeleteDelinquencyRangeCommandHandler implements NewCommandSourceHan
     }
 
     @java.lang.SuppressWarnings("all")
-        public DeleteDelinquencyRangeCommandHandler(final DelinquencyWritePlatformService writePlatformService) {
+    public DeleteDelinquencyRangeCommandHandler(final DelinquencyWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanJournalEntryPosterImpl implements LoanJournalEntryPoster {
+
     private final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort;
     @Autowired
     private LoanJournalPort loanJournalPort;
@@ -35,7 +36,8 @@ public class LoanJournalEntryPosterImpl implements LoanJournalEntryPoster {
     private LoanAccountingBridgeMapper loanAccountingBridgeMapper;
 
     @Override
-    public void postJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer, final boolean isLoanToLoanTransfer) {
+    public void postJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer,
+            final boolean isLoanToLoanTransfer) {
         final Loan loan = loanTransaction.getLoan();
         if (!loan.isCashBasedAccountingEnabledOnLoanProduct() && !loan.isUpfrontAccrualAccountingEnabledOnLoanProduct()
                 && !loan.isPeriodicAccrualAccountingEnabledOnLoanProduct()) {
@@ -49,12 +51,13 @@ public class LoanJournalEntryPosterImpl implements LoanJournalEntryPoster {
     }
 
     @Override
-    public void postJournalEntriesForExternalOwnerTransfer(final Loan loan, final Object externalAssetOwnerTransfer, final Object previousOwner) {
+    public void postJournalEntriesForExternalOwnerTransfer(final Loan loan, final Object externalAssetOwnerTransfer,
+            final Object previousOwner) {
         this.externalOwnerTransferJournalPort.postTransfer(loan, externalAssetOwnerTransfer, previousOwner);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanJournalEntryPosterImpl(final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort) {
+    public LoanJournalEntryPosterImpl(final ExternalOwnerTransferJournalPort externalOwnerTransferJournalPort) {
         this.externalOwnerTransferJournalPort = externalOwnerTransferJournalPort;
     }
 }

@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 
 public class RepaymentWithPostDatedChecksAssembler {
+
     private final FromJsonHelper fromApiJsonHelper;
 
     public Set<PostDatedChecks> fromParsedJson(final String json, final Loan loan) {
@@ -51,7 +52,8 @@ public class RepaymentWithPostDatedChecksAssembler {
                 final String name = this.fromApiJsonHelper.extractStringNamed("name", postDatedCheck);
                 final BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalNamed("amount", postDatedCheck, locale);
                 final Integer installmentId = this.fromApiJsonHelper.extractIntegerNamed("installmentId", postDatedCheck, locale);
-                final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream().filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).collect(Collectors.toList());
+                final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream()
+                        .filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).collect(Collectors.toList());
                 final Long accountNo = this.fromApiJsonHelper.extractLongNamed("accountNo", postDatedCheck);
                 final Long checkNo = this.fromApiJsonHelper.extractLongNamed("checkNo", postDatedCheck);
                 postDatedChecks.add(PostDatedChecks.instanceOf(accountNo, name, amount, installmentList.get(0), loan, checkNo));
@@ -61,7 +63,7 @@ public class RepaymentWithPostDatedChecksAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public RepaymentWithPostDatedChecksAssembler(final FromJsonHelper fromApiJsonHelper) {
+    public RepaymentWithPostDatedChecksAssembler(final FromJsonHelper fromApiJsonHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

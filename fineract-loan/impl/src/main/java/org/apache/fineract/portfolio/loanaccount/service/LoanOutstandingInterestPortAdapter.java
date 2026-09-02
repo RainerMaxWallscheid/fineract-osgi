@@ -52,8 +52,7 @@ public class LoanOutstandingInterestPortAdapter implements LoanOutstandingIntere
         if (!loan.isOpen()) {
             return BigDecimal.ZERO;
         }
-        final String outstandingInterestCalculationStrategy = configurationDomainService
-                .getAssetOwnerTransferOustandingInterestStrategy();
+        final String outstandingInterestCalculationStrategy = configurationDomainService.getAssetOwnerTransferOustandingInterestStrategy();
         return switch (outstandingInterestCalculationStrategy) {
             case "TOTAL_OUTSTANDING_INTEREST" -> loan.getSummary().getTotalInterestOutstanding();
             case "PAYABLE_OUTSTANDING_INTEREST" -> {

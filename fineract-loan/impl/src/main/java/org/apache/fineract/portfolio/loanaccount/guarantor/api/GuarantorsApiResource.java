@@ -72,6 +72,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Tag(name = "Guarantors", description = "")
 public class GuarantorsApiResource {
+
     private static final String RESOURCE_NAME_FOR_PERMISSION = "GUARANTOR";
     private final GuarantorReadPlatformService guarantorReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
@@ -86,17 +87,18 @@ public class GuarantorsApiResource {
 
     @GET
     @Path("template")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
-        final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService.retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
+        final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService
+                .retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
         final Collection<PortfolioAccountData> accountLinkingOptions = null;
         return GuarantorData.template(guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     public List<GuarantorData> retrieveGuarantorDetails(@PathParam("loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         return this.guarantorReadPlatformService.retrieveGuarantorsForValidLoan(loanId);
@@ -104,48 +106,55 @@ public class GuarantorsApiResource {
 
     @GET
     @Path("{guarantorId}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public GuarantorData retrieveGuarantorDetails(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId) {
+    @Produces({ MediaType.APPLICATION_JSON })
+    public GuarantorData retrieveGuarantorDetails(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId,
+            @PathParam("guarantorId") final Long guarantorId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         GuarantorData guarantorData = this.guarantorReadPlatformService.retrieveGuarantor(loanId, guarantorId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
-            final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService.retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
+            final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService
+                    .retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
             final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
             final Collection<PortfolioAccountData> accountLinkingOptions = null;
-            guarantorData = GuarantorData.templateOnTop(guarantorData, guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
+            guarantorData = GuarantorData.templateOnTop(guarantorData, guarantorTypeOptions, allowedClientRelationshipTypes,
+                    accountLinkingOptions);
         }
         return guarantorData;
     }
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest guarantorsRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId).withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
+                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{guarantorId}")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
-    public CommandProcessingResult updateGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId, final GuarantorsRequest guarantorsRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId).withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CommandProcessingResult updateGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
+            final GuarantorsRequest guarantorsRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
+                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{guarantorId}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public CommandProcessingResult deleteGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId, @QueryParam("guarantorFundingId") final Long guarantorFundingId) {
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CommandProcessingResult deleteGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
+            @QueryParam("guarantorFundingId") final Long guarantorFundingId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId, guarantorFundingId).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("accounts/template")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     public GuarantorData accountsTemplate(@QueryParam("clientId") final Long clientId, @PathParam("loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         PortfolioAccountDTO portfolioAccountDTO = new PortfolioAccountDTO(PortfolioAccountType.SAVINGS.getValue(), clientId, null);
@@ -159,21 +168,33 @@ public class GuarantorsApiResource {
     @GET
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
-    public Response getGuarantorTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat, @PathParam("loanId") final Long loanId) {
+    public Response getGuarantorTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat,
+            @PathParam("loanId") final Long loanId) {
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GUARANTORS.toString(), officeId, null, dateFormat);
     }
 
     @POST
     @Path("uploadtemplate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @RequestBody(description = "Upload guarantor template", content = {@Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadRequest.class))})
-    public String postGuarantorTemplate(@FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat, @PathParam("loanId") final Long loanId) {
-        final Long importDocumentId = this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.GUARANTORS.toString(), uploadedInputStream, fileDetail, locale, dateFormat);
+    @RequestBody(description = "Upload guarantor template", content = {
+            @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadRequest.class)) })
+    public String postGuarantorTemplate(@FormDataParam("file") InputStream uploadedInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale,
+            @FormDataParam("dateFormat") final String dateFormat, @PathParam("loanId") final Long loanId) {
+        final Long importDocumentId = this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.GUARANTORS.toString(),
+                uploadedInputStream, fileDetail, locale, dateFormat);
         return this.apiJsonSerializerService.serialize(importDocumentId);
     }
 
     @java.lang.SuppressWarnings("all")
-        public GuarantorsApiResource(final GuarantorReadPlatformService guarantorReadPlatformService, final CodeValueReadPlatformService codeValueReadPlatformService, final DefaultToApiJsonSerializer<GuarantorData> apiJsonSerializerService, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context, final PortfolioAccountReadPlatformService portfolioAccountReadPlatformService, final LoanReadPlatformService loanReadPlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService) {
+    public GuarantorsApiResource(final GuarantorReadPlatformService guarantorReadPlatformService,
+            final CodeValueReadPlatformService codeValueReadPlatformService,
+            final DefaultToApiJsonSerializer<GuarantorData> apiJsonSerializerService,
+            final ApiRequestParameterHelper apiRequestParameterHelper,
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context,
+            final PortfolioAccountReadPlatformService portfolioAccountReadPlatformService,
+            final LoanReadPlatformService loanReadPlatformService, final BulkImportWorkbookService bulkImportWorkbookService,
+            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService) {
         this.guarantorReadPlatformService = guarantorReadPlatformService;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
         this.apiJsonSerializerService = apiJsonSerializerService;

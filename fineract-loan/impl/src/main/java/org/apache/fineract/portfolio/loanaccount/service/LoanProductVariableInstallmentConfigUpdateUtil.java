@@ -27,14 +27,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductVariableInstallmentConfigUpdateUtil {
+
     public Map<? extends String, ?> update(LoanProductVariableInstallmentConfig loanProductVariableInstallmentConfig, JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(3);
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.minimumGapBetweenInstallments, loanProductVariableInstallmentConfig.getMinimumGap())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.minimumGapBetweenInstallments,
+                loanProductVariableInstallmentConfig.getMinimumGap())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.minimumGapBetweenInstallments);
             actualChanges.put(LoanProductConstants.minimumGapBetweenInstallments, newValue);
             loanProductVariableInstallmentConfig.setMinimumGap(newValue);
         }
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.maximumGapBetweenInstallments, loanProductVariableInstallmentConfig.getMaximumGap())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.maximumGapBetweenInstallments,
+                loanProductVariableInstallmentConfig.getMaximumGap())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.maximumGapBetweenInstallments);
             actualChanges.put(LoanProductConstants.maximumGapBetweenInstallments, newValue);
             loanProductVariableInstallmentConfig.setMaximumGap(newValue);
@@ -43,6 +46,5 @@ public class LoanProductVariableInstallmentConfigUpdateUtil {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductVariableInstallmentConfigUpdateUtil() {
-    }
+    public LoanProductVariableInstallmentConfigUpdateUtil() {}
 }

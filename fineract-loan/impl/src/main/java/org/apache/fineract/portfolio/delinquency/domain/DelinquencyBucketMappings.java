@@ -27,8 +27,10 @@ import jakarta.persistence.Version;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
-@Table(name = "m_delinquency_bucket_mappings", uniqueConstraints = {@UniqueConstraint(name = "uq_delinquency_bucket_mapping", columnNames = {"delinquencyBucket", "delinquencyRange"})})
+@Table(name = "m_delinquency_bucket_mappings", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_delinquency_bucket_mapping", columnNames = { "delinquencyBucket", "delinquencyRange" }) })
 public class DelinquencyBucketMappings extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "delinquency_bucket_id", nullable = false)
     private DelinquencyBucket delinquencyBucket;
@@ -48,36 +50,35 @@ public class DelinquencyBucketMappings extends AbstractAuditableWithUTCDateTimeC
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucket getDelinquencyBucket() {
+    public DelinquencyBucket getDelinquencyBucket() {
         return this.delinquencyBucket;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyRange getDelinquencyRange() {
+    public DelinquencyRange getDelinquencyRange() {
         return this.delinquencyRange;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getVersion() {
+    public Long getVersion() {
         return this.version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyBucket(final DelinquencyBucket delinquencyBucket) {
+    public void setDelinquencyBucket(final DelinquencyBucket delinquencyBucket) {
         this.delinquencyBucket = delinquencyBucket;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
+    public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
         this.delinquencyRange = delinquencyRange;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setVersion(final Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucketMappings() {
-    }
+    public DelinquencyBucketMappings() {}
 }

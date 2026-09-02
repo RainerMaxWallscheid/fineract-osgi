@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOAN", action = "DELETE")
 public class LoanApplicationDeletionCommandHandler implements NewCommandSourceHandler {
+
     private final LoanApplicationWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class LoanApplicationDeletionCommandHandler implements NewCommandSourceHa
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationDeletionCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
+    public LoanApplicationDeletionCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

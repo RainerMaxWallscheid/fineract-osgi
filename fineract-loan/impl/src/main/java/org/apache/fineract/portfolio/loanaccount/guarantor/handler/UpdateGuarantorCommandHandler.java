@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GUARANTOR", action = "UPDATE")
 public class UpdateGuarantorCommandHandler implements NewCommandSourceHandler {
+
     private final GuarantorWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UpdateGuarantorCommandHandler implements NewCommandSourceHandler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateGuarantorCommandHandler(final GuarantorWritePlatformService writePlatformService) {
+    public UpdateGuarantorCommandHandler(final GuarantorWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

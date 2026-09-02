@@ -24,8 +24,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class UpdateLoanArrearsAgeingTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateLoanArrearsAgeingTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateLoanArrearsAgeingTasklet.class);
     private final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler;
 
     @Override
@@ -35,7 +36,7 @@ public class UpdateLoanArrearsAgeingTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateLoanArrearsAgeingTasklet(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
+    public UpdateLoanArrearsAgeingTasklet(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
         this.loanArrearsAgeingUpdateHandler = loanArrearsAgeingUpdateHandler;
     }
 }

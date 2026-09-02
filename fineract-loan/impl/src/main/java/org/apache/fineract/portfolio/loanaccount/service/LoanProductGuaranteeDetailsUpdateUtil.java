@@ -27,18 +27,24 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductGuaranteeDetailsUpdateUtil {
-    public void update(final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final JsonCommand command, final Map<String, Object> actualChanges) {
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName, loanProductGuaranteeDetails.getMandatoryGuarantee())) {
+
+    public void update(final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final JsonCommand command,
+            final Map<String, Object> actualChanges) {
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName,
+                loanProductGuaranteeDetails.getMandatoryGuarantee())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName);
             actualChanges.put(LoanProductConstants.mandatoryGuaranteeParamName, newValue);
             loanProductGuaranteeDetails.setMandatoryGuarantee(newValue);
         }
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName, loanProductGuaranteeDetails.getMinimumGuaranteeFromGuarantor())) {
-            final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName,
+                loanProductGuaranteeDetails.getMinimumGuaranteeFromGuarantor())) {
+            final BigDecimal newValue = command
+                    .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
             actualChanges.put(LoanProductConstants.minimumGuaranteeFromGuarantorParamName, newValue);
             loanProductGuaranteeDetails.setMinimumGuaranteeFromGuarantor(newValue);
         }
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName, loanProductGuaranteeDetails.getMinimumGuaranteeFromOwnFunds())) {
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName,
+                loanProductGuaranteeDetails.getMinimumGuaranteeFromOwnFunds())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
             actualChanges.put(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName, newValue);
             loanProductGuaranteeDetails.setMinimumGuaranteeFromOwnFunds(newValue);
@@ -46,6 +52,5 @@ public class LoanProductGuaranteeDetailsUpdateUtil {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductGuaranteeDetailsUpdateUtil() {
-    }
+    public LoanProductGuaranteeDetailsUpdateUtil() {}
 }

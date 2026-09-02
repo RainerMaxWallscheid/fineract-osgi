@@ -41,8 +41,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class SetLoanDelinquencyTagsTasklet implements Tasklet {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SetLoanDelinquencyTagsTasklet.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SetLoanDelinquencyTagsTasklet.class);
     private final DelinquencyWritePlatformService delinquencyWritePlatformService;
     private final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository;
     private final LoanTransactionRepository loanTransactionRepository;
@@ -56,14 +57,18 @@ public class SetLoanDelinquencyTagsTasklet implements Tasklet {
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
         log.debug("Run job for date {}", businessDate);
         // Read Loan Ids with Loan Transaction Charge back
-        Collection<LoanScheduleDelinquencyData> loanScheduleDelinquencyData = this.loanTransactionRepository.fetchLoanTransactionsByTypeAndLessOrEqualDate(LoanTransactionType.CHARGEBACK, businessDate);
+        Collection<LoanScheduleDelinquencyData> loanScheduleDelinquencyData = this.loanTransactionRepository
+                .fetchLoanTransactionsByTypeAndLessOrEqualDate(LoanTransactionType.CHARGEBACK, businessDate);
         List<Long> processedLoans = applyDelinquencyTagToLoans(loanScheduleDelinquencyData);
-        log.debug("{}: Records affected by setLoanDelinquencyTags: {}", ThreadLocalContextUtil.getTenant().getName(), processedLoans.size());
+        log.debug("{}: Records affected by setLoanDelinquencyTags: {}", ThreadLocalContextUtil.getTenant().getName(),
+                processedLoans.size());
         // Read Loan Ids with overdue installments
         if (processedLoans.isEmpty()) {
-            loanScheduleDelinquencyData = this.loanRepaymentScheduleInstallmentRepository.fetchLoanScheduleDataByDueDateAndObligationsMet(LoanStatus.ACTIVE, businessDate, false);
+            loanScheduleDelinquencyData = this.loanRepaymentScheduleInstallmentRepository
+                    .fetchLoanScheduleDataByDueDateAndObligationsMet(LoanStatus.ACTIVE, businessDate, false);
         } else {
-            loanScheduleDelinquencyData = this.loanRepaymentScheduleInstallmentRepository.fetchLoanScheduleDataByDueDateAndObligationsMet(LoanStatus.ACTIVE, businessDate, false, processedLoans);
+            loanScheduleDelinquencyData = this.loanRepaymentScheduleInstallmentRepository
+                    .fetchLoanScheduleDataByDueDateAndObligationsMet(LoanStatus.ACTIVE, businessDate, false, processedLoans);
         }
         applyDelinquencyTagToLoans(loanScheduleDelinquencyData);
         return RepeatStatus.FINISHED;
@@ -74,10 +79,14 @@ public class SetLoanDelinquencyTagsTasklet implements Tasklet {
         log.debug("Were found {} items", loanScheduleDelinquencyData.size());
         for (LoanScheduleDelinquencyData loanDelinquencyData : loanScheduleDelinquencyData) {
             // Set the data used by Delinquency Classification method
-            List<LoanDelinquencyAction> savedDelinquencyList = delinquencyReadPlatformService.retrieveLoanDelinquencyActions(loanDelinquencyData.getLoanId());
-            List<LoanDelinquencyActionData> effectiveDelinquencyList = delinquencyEffectivePauseHelper.calculateEffectiveDelinquencyList(savedDelinquencyList);
-            loanDelinquencyData = this.delinquencyWritePlatformService.calculateDelinquencyData(loanDelinquencyData, effectiveDelinquencyList);
-            log.debug("Processing Loan {} with {} overdue days since date {}", loanDelinquencyData.getLoanId(), loanDelinquencyData.getOverdueDays(), loanDelinquencyData.getOverdueSinceDate());
+            List<LoanDelinquencyAction> savedDelinquencyList = delinquencyReadPlatformService
+                    .retrieveLoanDelinquencyActions(loanDelinquencyData.getLoanId());
+            List<LoanDelinquencyActionData> effectiveDelinquencyList = delinquencyEffectivePauseHelper
+                    .calculateEffectiveDelinquencyList(savedDelinquencyList);
+            loanDelinquencyData = this.delinquencyWritePlatformService.calculateDelinquencyData(loanDelinquencyData,
+                    effectiveDelinquencyList);
+            log.debug("Processing Loan {} with {} overdue days since date {}", loanDelinquencyData.getLoanId(),
+                    loanDelinquencyData.getOverdueDays(), loanDelinquencyData.getOverdueSinceDate());
             // Set or Unset the Delinquency Classification Tag
             if (loanDelinquencyData.getOverdueDays() > 0) {
                 this.delinquencyWritePlatformService.applyDelinquencyTagToLoan(loanDelinquencyData, effectiveDelinquencyList);
@@ -90,7 +99,11 @@ public class SetLoanDelinquencyTagsTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SetLoanDelinquencyTagsTasklet(final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanTransactionRepository loanTransactionRepository, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService) {
+    public SetLoanDelinquencyTagsTasklet(final DelinquencyWritePlatformService delinquencyWritePlatformService,
+            final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository,
+            final LoanTransactionRepository loanTransactionRepository,
+            final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper,
+            final DelinquencyReadPlatformService delinquencyReadPlatformService) {
         this.delinquencyWritePlatformService = delinquencyWritePlatformService;
         this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
         this.loanTransactionRepository = loanTransactionRepository;

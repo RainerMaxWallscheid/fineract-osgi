@@ -35,6 +35,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 @Entity
 @Table(name = "m_repayment_with_post_dated_checks")
 public class PostDatedChecks extends AbstractPersistableCustom<Long> {
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", referencedColumnName = "id", nullable = false)
     private Loan loan;
@@ -54,10 +55,11 @@ public class PostDatedChecks extends AbstractPersistableCustom<Long> {
     @Column(name = "check_no", nullable = false, unique = true)
     private Long checkNo;
 
-    public PostDatedChecks() {
-    }
+    public PostDatedChecks() {}
 
-    private PostDatedChecks(final Long accountNo, final String bankName, final BigDecimal amount, final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final LocalDate date, final Loan loan, final Long checkNo) {
+    private PostDatedChecks(final Long accountNo, final String bankName, final BigDecimal amount,
+            final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final LocalDate date, final Loan loan,
+            final Long checkNo) {
         this.bankName = bankName;
         this.accountNo = accountNo;
         this.amount = amount;
@@ -67,8 +69,10 @@ public class PostDatedChecks extends AbstractPersistableCustom<Long> {
         this.checkNo = checkNo;
     }
 
-    public static PostDatedChecks instanceOf(final Long accountNo, final String bankName, final BigDecimal amount, final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final Loan loan, final Long checkNo) {
-        return new PostDatedChecks(accountNo, bankName, amount, loanRepaymentScheduleInstallment, loanRepaymentScheduleInstallment.getDueDate(), loan, checkNo);
+    public static PostDatedChecks instanceOf(final Long accountNo, final String bankName, final BigDecimal amount,
+            final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final Loan loan, final Long checkNo) {
+        return new PostDatedChecks(accountNo, bankName, amount, loanRepaymentScheduleInstallment,
+                loanRepaymentScheduleInstallment.getDueDate(), loan, checkNo);
     }
 
     public Map<String, Object> updatePostDatedChecks(JsonCommand command) {
@@ -97,57 +101,57 @@ public class PostDatedChecks extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentScheduleInstallment getLoanRepaymentScheduleInstallment() {
+    public LoanRepaymentScheduleInstallment getLoanRepaymentScheduleInstallment() {
         return this.loanRepaymentScheduleInstallment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getAccountNo() {
+    public Long getAccountNo() {
         return this.accountNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getBankName() {
+    public String getBankName() {
         return this.bankName;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getRepaymentDate() {
+    public LocalDate getRepaymentDate() {
         return this.repaymentDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getStatus() {
+    public Integer getStatus() {
         return this.status;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getCheckNo() {
+    public Long getCheckNo() {
         return this.checkNo;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoan(final Loan loan) {
+    public void setLoan(final Loan loan) {
         this.loan = loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanRepaymentScheduleInstallment(final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
+    public void setLoanRepaymentScheduleInstallment(final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
         this.loanRepaymentScheduleInstallment = loanRepaymentScheduleInstallment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setStatus(final Integer status) {
+    public void setStatus(final Integer status) {
         this.status = status;
     }
 }

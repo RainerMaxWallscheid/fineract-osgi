@@ -27,6 +27,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTermVariations;
 
 public class TransactionCtx {
+
     private final MonetaryCurrency currency;
     private final List<LoanRepaymentScheduleInstallment> installments;
     private final Set<LoanCharge> charges;
@@ -35,38 +36,38 @@ public class TransactionCtx {
     private final List<LoanTermVariations> activeLoanTermVariations;
 
     @java.lang.SuppressWarnings("all")
-        public MonetaryCurrency getCurrency() {
+    public MonetaryCurrency getCurrency() {
         return this.currency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<LoanRepaymentScheduleInstallment> getInstallments() {
+    public List<LoanRepaymentScheduleInstallment> getInstallments() {
         return this.installments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Set<LoanCharge> getCharges() {
+    public Set<LoanCharge> getCharges() {
         return this.charges;
     }
 
     @java.lang.SuppressWarnings("all")
-        public MoneyHolder getOverpaymentHolder() {
+    public MoneyHolder getOverpaymentHolder() {
         return this.overpaymentHolder;
     }
 
     @java.lang.SuppressWarnings("all")
-        public ChangedTransactionDetail getChangedTransactionDetail() {
+    public ChangedTransactionDetail getChangedTransactionDetail() {
         return this.changedTransactionDetail;
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<LoanTermVariations> getActiveLoanTermVariations() {
+    public List<LoanTermVariations> getActiveLoanTermVariations() {
         return this.activeLoanTermVariations;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
+    public boolean equals(final java.lang.Object o) {
         if (o == this) return true;
         if (!(o instanceof TransactionCtx)) return false;
         final TransactionCtx other = (TransactionCtx) o;
@@ -82,24 +83,29 @@ public class TransactionCtx {
         if (this$charges == null ? other$charges != null : !this$charges.equals(other$charges)) return false;
         final java.lang.Object this$overpaymentHolder = this.getOverpaymentHolder();
         final java.lang.Object other$overpaymentHolder = other.getOverpaymentHolder();
-        if (this$overpaymentHolder == null ? other$overpaymentHolder != null : !this$overpaymentHolder.equals(other$overpaymentHolder)) return false;
+        if (this$overpaymentHolder == null ? other$overpaymentHolder != null : !this$overpaymentHolder.equals(other$overpaymentHolder))
+            return false;
         final java.lang.Object this$changedTransactionDetail = this.getChangedTransactionDetail();
         final java.lang.Object other$changedTransactionDetail = other.getChangedTransactionDetail();
-        if (this$changedTransactionDetail == null ? other$changedTransactionDetail != null : !this$changedTransactionDetail.equals(other$changedTransactionDetail)) return false;
+        if (this$changedTransactionDetail == null ? other$changedTransactionDetail != null
+                : !this$changedTransactionDetail.equals(other$changedTransactionDetail))
+            return false;
         final java.lang.Object this$activeLoanTermVariations = this.getActiveLoanTermVariations();
         final java.lang.Object other$activeLoanTermVariations = other.getActiveLoanTermVariations();
-        if (this$activeLoanTermVariations == null ? other$activeLoanTermVariations != null : !this$activeLoanTermVariations.equals(other$activeLoanTermVariations)) return false;
+        if (this$activeLoanTermVariations == null ? other$activeLoanTermVariations != null
+                : !this$activeLoanTermVariations.equals(other$activeLoanTermVariations))
+            return false;
         return true;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
+    protected boolean canEqual(final java.lang.Object other) {
         return other instanceof TransactionCtx;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public int hashCode() {
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final java.lang.Object $currency = this.getCurrency();
@@ -119,12 +125,16 @@ public class TransactionCtx {
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-        return "TransactionCtx(currency=" + this.getCurrency() + ", installments=" + this.getInstallments() + ", charges=" + this.getCharges() + ", overpaymentHolder=" + this.getOverpaymentHolder() + ", changedTransactionDetail=" + this.getChangedTransactionDetail() + ", activeLoanTermVariations=" + this.getActiveLoanTermVariations() + ")";
+    public java.lang.String toString() {
+        return "TransactionCtx(currency=" + this.getCurrency() + ", installments=" + this.getInstallments() + ", charges="
+                + this.getCharges() + ", overpaymentHolder=" + this.getOverpaymentHolder() + ", changedTransactionDetail="
+                + this.getChangedTransactionDetail() + ", activeLoanTermVariations=" + this.getActiveLoanTermVariations() + ")";
     }
 
     @java.lang.SuppressWarnings("all")
-        public TransactionCtx(final MonetaryCurrency currency, final List<LoanRepaymentScheduleInstallment> installments, final Set<LoanCharge> charges, final MoneyHolder overpaymentHolder, final ChangedTransactionDetail changedTransactionDetail, final List<LoanTermVariations> activeLoanTermVariations) {
+    public TransactionCtx(final MonetaryCurrency currency, final List<LoanRepaymentScheduleInstallment> installments,
+            final Set<LoanCharge> charges, final MoneyHolder overpaymentHolder, final ChangedTransactionDetail changedTransactionDetail,
+            final List<LoanTermVariations> activeLoanTermVariations) {
         this.currency = currency;
         this.installments = installments;
         this.charges = charges;

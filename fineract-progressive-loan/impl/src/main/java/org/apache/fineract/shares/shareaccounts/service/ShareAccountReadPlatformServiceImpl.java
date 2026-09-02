@@ -36,9 +36,6 @@ import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.accountdetails.data.ShareAccountSummaryData;
-import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
-import org.apache.fineract.shares.accounts.data.AccountData;
-import org.apache.fineract.shares.accounts.exceptions.ShareAccountNotFoundException;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.charge.util.ConvertChargeDataToSpecificChargeData;
@@ -50,6 +47,9 @@ import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformSe
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.shares.accounts.data.AccountData;
+import org.apache.fineract.shares.accounts.exceptions.ShareAccountNotFoundException;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountApplicationTimelineData;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountChargeData;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountData;
@@ -67,6 +67,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlatformService {
+
     private final ApplicationContext applicationContext;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final ShareProductDropdownReadPlatformService shareProductDropdownReadPlatformService;
@@ -90,10 +91,15 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final BigDecimal marketPrice = deriveMarketPrice(productData);
             final Collection<ChargeData> productCharges = this.chargeReadPlatformService.retrieveShareProductCharges(productId);
             final Collection<ShareAccountChargeData> charges = convertChargesToShareAccountCharges(productCharges);
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveLockinPeriodFrequencyTypeOptions();
-            final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveMinimumActivePeriodFrequencyTypeOptions();
-            final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService.retrieveActiveForLookup(clientId, DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().getCode());
-            toReturn = new ShareAccountData(client.getId(), client.getDisplayName(), productData.getCurrency(), charges, marketPrice, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, clientSavingsAccounts, productData.getNominalShares());
+            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
+                    .retrieveLockinPeriodFrequencyTypeOptions();
+            final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
+                    .retrieveMinimumActivePeriodFrequencyTypeOptions();
+            final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService
+                    .retrieveActiveForLookup(clientId, DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().getCode());
+            toReturn = new ShareAccountData(client.getId(), client.getDisplayName(), productData.getCurrency(), charges, marketPrice,
+                    minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, clientSavingsAccounts,
+                    productData.getNominalShares());
         } else {
             Collection<ProductData> productOptions = service.retrieveAllForLookup();
             final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
@@ -134,12 +140,15 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             data.setDividends(dividends);
         }
         if (includeTemplate) {
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveLockinPeriodFrequencyTypeOptions();
+            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
+                    .retrieveLockinPeriodFrequencyTypeOptions();
             final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = lockinPeriodFrequencyTypeOptions;
-            final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService.retrieveActiveForLookup(data.getClientId(), DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().getCode());
+            final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService
+                    .retrieveActiveForLookup(data.getClientId(), DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().getCode());
             Collection<ProductData> productOptions = service.retrieveAllForLookup();
             final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
-            data = ShareAccountData.template(data, productOptions, chargeOptions, clientSavingsAccounts, lockinPeriodFrequencyTypeOptions, minimumActivePeriodFrequencyTypeOptions);
+            data = ShareAccountData.template(data, productOptions, chargeOptions, clientSavingsAccounts, lockinPeriodFrequencyTypeOptions,
+                    minimumActivePeriodFrequencyTypeOptions);
         }
         return data;
     }
@@ -165,7 +174,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         if (offSet != null) {
             sqlBuilder.append(" offset ").append(offSet);
         }
-        Object[] whereClauseItemsitems = new Object[] {ShareAccountStatusType.ACTIVE.getValue()};
+        Object[] whereClauseItemsitems = new Object[] { ShareAccountStatusType.ACTIVE.getValue() };
         return this.shareAccountDataPaginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), whereClauseItemsitems, mapper);
     }
 
@@ -175,7 +184,8 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
     }
 
     @Override
-    public Collection<ShareAccountData> retrieveAllShareAccountDataForDividends(final Long id, final boolean fetchInActiveAccounts, final LocalDate startDate) {
+    public Collection<ShareAccountData> retrieveAllShareAccountDataForDividends(final Long id, final boolean fetchInActiveAccounts,
+            final LocalDate startDate) {
         ShareAccountMapperForDividents mapper = new ShareAccountMapperForDividents();
         StringBuilder sb = new StringBuilder("select ");
         sb.append(mapper.schema);
@@ -196,7 +206,8 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         params.add(PurchasedSharesStatusType.APPROVED.getValue());
         Object[] whereClauseItems = params.toArray();
         return this.jdbcTemplate.query(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(sb.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement preparedStatement = con.prepareStatement(sb.toString(), ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             for (int i = 0; i < whereClauseItems.length; i++) {
                 preparedStatement.setObject(i + 1, whereClauseItems[i]);
             }
@@ -213,42 +224,43 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         return savingsCharges;
     }
 
-
     private static final class ShareAccountMapper implements RowMapper<AccountData> {
+
         private final Collection<ShareAccountChargeData> charges;
         private final Collection<ShareAccountTransactionData> purchasedShares;
         private static final String SHARE_ACCOUNT_SCHEMA = """
-            sa.id as id, sa.external_id as externalId, sa.status_enum as statusEnum,
-            sa.savings_account_id, msa.account_no as savingsAccNo,
-            c.id as clientId, c.display_name as clientName,
-            sa.account_no as accountNo, sa.total_approved_shares as approvedShares, sa.total_pending_shares as pendingShares,
-            sa.savings_account_id as savingsAccountNo, sa.minimum_active_period_frequency as minimumactivePeriod,
-            sa.minimum_active_period_frequency_enum as minimumactivePeriodEnum,
-            sa.lockin_period_frequency as lockinPeriod, sa.lockin_period_frequency_enum as lockinPeriodEnum,
-            sa.allow_dividends_inactive_clients as allowdividendsforinactiveclients,
-            sa.submitted_date as submittedDate, sbu.username as submittedByUsername,
-            sbu.firstname as submittedByFirstname, sbu.lastname as submittedByLastname,
-            sa.rejected_date as rejectedDate, rbu.username as rejectedByUsername,
-            rbu.firstname as rejectedByFirstname, rbu.lastname as rejectedByLastname,
-            sa.approved_date as approvedDate, abu.username as approvedByUsername,
-            abu.firstname as approvedByFirstname, abu.lastname as approvedByLastname,
-            sa.activated_date as activatedDate, avbu.username as activatedByUsername,
-            avbu.firstname as activatedByFirstname, avbu.lastname as activatedByLastname,
-            sa.closed_date as closedDate, cbu.username as closedByUsername,
-            cbu.firstname as closedByFirstname, cbu.lastname as closedByLastname,
-            sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf,
-            curr.name as currencyName, curr.internationalized_name_code as currencyNameCode,
-            curr.display_symbol as currencyDisplaySymbol, sa.product_id as productId, p.name as productName, p.short_name as shortProductName
-            from m_share_account sa join m_share_product as p on p.id = sa.product_id
-            join m_currency curr on curr.code = sa.currency_code left join m_client c ON c.id = sa.client_id
-            left join m_appuser sbu on sbu.id = sa.submitted_userid
-            left join m_appuser rbu on rbu.id = sa.rejected_userid
-            left join m_appuser abu on abu.id = sa.approved_userid
-            left join m_appuser avbu on avbu.id = sa.activated_userid
-            left join m_appuser cbu on cbu.id = sa.closed_userid
-            left join m_savings_account msa on sa.savings_account_id = msa.id """;
+                sa.id as id, sa.external_id as externalId, sa.status_enum as statusEnum,
+                sa.savings_account_id, msa.account_no as savingsAccNo,
+                c.id as clientId, c.display_name as clientName,
+                sa.account_no as accountNo, sa.total_approved_shares as approvedShares, sa.total_pending_shares as pendingShares,
+                sa.savings_account_id as savingsAccountNo, sa.minimum_active_period_frequency as minimumactivePeriod,
+                sa.minimum_active_period_frequency_enum as minimumactivePeriodEnum,
+                sa.lockin_period_frequency as lockinPeriod, sa.lockin_period_frequency_enum as lockinPeriodEnum,
+                sa.allow_dividends_inactive_clients as allowdividendsforinactiveclients,
+                sa.submitted_date as submittedDate, sbu.username as submittedByUsername,
+                sbu.firstname as submittedByFirstname, sbu.lastname as submittedByLastname,
+                sa.rejected_date as rejectedDate, rbu.username as rejectedByUsername,
+                rbu.firstname as rejectedByFirstname, rbu.lastname as rejectedByLastname,
+                sa.approved_date as approvedDate, abu.username as approvedByUsername,
+                abu.firstname as approvedByFirstname, abu.lastname as approvedByLastname,
+                sa.activated_date as activatedDate, avbu.username as activatedByUsername,
+                avbu.firstname as activatedByFirstname, avbu.lastname as activatedByLastname,
+                sa.closed_date as closedDate, cbu.username as closedByUsername,
+                cbu.firstname as closedByFirstname, cbu.lastname as closedByLastname,
+                sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf,
+                curr.name as currencyName, curr.internationalized_name_code as currencyNameCode,
+                curr.display_symbol as currencyDisplaySymbol, sa.product_id as productId, p.name as productName, p.short_name as shortProductName
+                from m_share_account sa join m_share_product as p on p.id = sa.product_id
+                join m_currency curr on curr.code = sa.currency_code left join m_client c ON c.id = sa.client_id
+                left join m_appuser sbu on sbu.id = sa.submitted_userid
+                left join m_appuser rbu on rbu.id = sa.rejected_userid
+                left join m_appuser abu on abu.id = sa.approved_userid
+                left join m_appuser avbu on avbu.id = sa.activated_userid
+                left join m_appuser cbu on cbu.id = sa.closed_userid
+                left join m_savings_account msa on sa.savings_account_id = msa.id """;
 
-        ShareAccountMapper(final Collection<ShareAccountChargeData> charges, final Collection<ShareAccountTransactionData> purchasedShares) {
+        ShareAccountMapper(final Collection<ShareAccountChargeData> charges,
+                final Collection<ShareAccountTransactionData> purchasedShares) {
             this.charges = charges;
             this.purchasedShares = purchasedShares;
         }
@@ -289,14 +301,19 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final String closedByUsername = rs.getString("closedByUsername");
             final String closedByFirstname = rs.getString("closedByFirstname");
             final String closedByLastname = rs.getString("closedByLastname");
-            final ShareAccountApplicationTimelineData timeline = new ShareAccountApplicationTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname, activatedOnDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername, closedByFirstname, closedByLastname);
+            final ShareAccountApplicationTimelineData timeline = new ShareAccountApplicationTimelineData(submittedOnDate,
+                    submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername, rejectedByFirstname,
+                    rejectedByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname, activatedOnDate,
+                    activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername, closedByFirstname,
+                    closedByLastname);
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
             final String currencyNameCode = rs.getString("currencyNameCode");
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
+                    currencyNameCode);
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockinPeriod");
             EnumOptionData lockinPeriodFrequencyType = null;
             final Integer lockinPeriodFrequencyTypeValue = JdbcSupport.getInteger(rs, "lockinPeriodEnum");
@@ -310,8 +327,11 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
                 minimumActivePeriodType = SharesEnumerations.minimumActivePeriodFrequencyType(minimumActivePeriodTypeValue);
             }
             final String shortProductName = null;
-            final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName, shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
-            return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName, productId, productName, status, timeline, currency, summary, charges, purchasedShares, lockinPeriodFrequency, lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, allowdividendsforinactiveclients);
+            final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+            return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName, productId,
+                    productName, status, timeline, currency, summary, charges, purchasedShares, lockinPeriodFrequency,
+                    lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, allowdividendsforinactiveclients);
         }
 
         public String schema() {
@@ -319,8 +339,8 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         }
     }
 
-
     private static final class ShareAccountMapperForDividents implements RowMapper<ShareAccountData> {
+
         private final String schema;
         final PurchasedSharesDataRowMapper purchasedSharesDataRowMapper = new PurchasedSharesDataRowMapper();
 
@@ -328,12 +348,11 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             // Explicit spaces around concatenations: text blocks strip trailing whitespace, which
             // previously produced "amountPaidfrom m_share_account" and broke dividend creation.
             schema = """
-                sa.id as id, sa.status_enum as statusEnum,
-                c.id as clientId, c.display_name as clientName,
-                sa.account_no as accountNo,
-                sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, """
-                    + purchasedSharesDataRowMapper.schema() + " from m_share_account sa "
-                    + "join m_client c ON c.id = sa.client_id "
+                    sa.id as id, sa.status_enum as statusEnum,
+                    c.id as clientId, c.display_name as clientName,
+                    sa.account_no as accountNo,
+                    sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, """
+                    + purchasedSharesDataRowMapper.schema() + " from m_share_account sa " + "join m_client c ON c.id = sa.client_id "
                     + "join m_share_account_transactions saps ON saps.account_id = sa.id ";
         }
 
@@ -369,20 +388,22 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
                     break;
                 }
             }
-            final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName, shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
-            return new ShareAccountData(id, accountNo, externalId, clientId, clientName, productId, shortProductName, productId, shortProductName, status, timeline, currency, summary, charges, purchasedSharesData, lockinPeriod, lockPeriodTypeEnum, minimumActivePeriod, minimumActivePeriodTypeEnum, allowdividendsforinactiveclients);
+            final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+            return new ShareAccountData(id, accountNo, externalId, clientId, clientName, productId, shortProductName, productId,
+                    shortProductName, status, timeline, currency, summary, charges, purchasedSharesData, lockinPeriod, lockPeriodTypeEnum,
+                    minimumActivePeriod, minimumActivePeriodTypeEnum, allowdividendsforinactiveclients);
         }
     }
 
-
     private static final class PurchasedSharesDataRowMapper implements RowMapper<ShareAccountTransactionData> {
-        private static final String PURCHASED_SHARES_SCHEMA = """
-            saps.id as purchasedId, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice,
-            saps.status_enum as purchaseStatus, saps.type_enum as purchaseType, saps.amount as amount, saps.charge_amount as chargeamount,
-            saps.amount_paid as amountPaid""";
 
-        PurchasedSharesDataRowMapper() {
-        }
+        private static final String PURCHASED_SHARES_SCHEMA = """
+                saps.id as purchasedId, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice,
+                saps.status_enum as purchaseStatus, saps.type_enum as purchaseType, saps.amount as amount, saps.charge_amount as chargeamount,
+                saps.amount_paid as amountPaid""";
+
+        PurchasedSharesDataRowMapper() {}
 
         @Override
         public ShareAccountTransactionData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
@@ -398,7 +419,8 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amount");
             final BigDecimal chargeAmount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "chargeamount");
             final BigDecimal amountPaid = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amountPaid");
-            return new ShareAccountTransactionData(id, accountId, transactionDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid);
+            return new ShareAccountTransactionData(id, accountId, transactionDate, numberOfShares, purchasedPrice, statusEnum, typeEnum,
+                    amount, chargeAmount, amountPaid);
         }
 
         public String schema() {
@@ -406,15 +428,14 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         }
     }
 
-
     private static final class ShareAccountDividendRowMapper implements RowMapper<ShareAccountDividendData> {
-        private static final String SHARE_ACCOUNT_DIVIDEND_SCHEMA = """
-            spdp.created_date, sadd.id, sadd.amount, sadd.savings_transaction_id, sadd.status
-             from m_share_account_dividend_details sadd
-            JOIN m_share_product_dividend_pay_out spdp ON spdp.id = sadd.dividend_pay_out_id """;
 
-        ShareAccountDividendRowMapper() {
-        }
+        private static final String SHARE_ACCOUNT_DIVIDEND_SCHEMA = """
+                spdp.created_date, sadd.id, sadd.amount, sadd.savings_transaction_id, sadd.status
+                 from m_share_account_dividend_details sadd
+                JOIN m_share_product_dividend_pay_out spdp ON spdp.id = sadd.dividend_pay_out_id """;
+
+        ShareAccountDividendRowMapper() {}
 
         @SuppressWarnings("unused")
         @Override
@@ -445,7 +466,14 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountReadPlatformServiceImpl(final ApplicationContext applicationContext, final ChargeReadPlatformService chargeReadPlatformService, final ShareProductDropdownReadPlatformService shareProductDropdownReadPlatformService, final SavingsAccountReadPlatformService savingsAccountReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final ShareAccountChargeReadPlatformService shareAccountChargeReadPlatformService, final PurchasedSharesReadPlatformService purchasedSharesReadPlatformService, final JdbcTemplate jdbcTemplate, final PaginationHelper shareAccountDataPaginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
+    public ShareAccountReadPlatformServiceImpl(final ApplicationContext applicationContext,
+            final ChargeReadPlatformService chargeReadPlatformService,
+            final ShareProductDropdownReadPlatformService shareProductDropdownReadPlatformService,
+            final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
+            final ClientReadPlatformService clientReadPlatformService,
+            final ShareAccountChargeReadPlatformService shareAccountChargeReadPlatformService,
+            final PurchasedSharesReadPlatformService purchasedSharesReadPlatformService, final JdbcTemplate jdbcTemplate,
+            final PaginationHelper shareAccountDataPaginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
         this.applicationContext = applicationContext;
         this.chargeReadPlatformService = chargeReadPlatformService;
         this.shareProductDropdownReadPlatformService = shareProductDropdownReadPlatformService;

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UpdateLoanDisburseDateCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -36,7 +37,7 @@ public class UpdateLoanDisburseDateCommandHandler implements NewCommandSourceHan
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateLoanDisburseDateCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public UpdateLoanDisburseDateCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

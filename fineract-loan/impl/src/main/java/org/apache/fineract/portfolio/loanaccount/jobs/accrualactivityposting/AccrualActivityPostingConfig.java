@@ -31,21 +31,24 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class AccrualActivityPostingConfig {
+
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
     @Bean
     protected Step accrualActivityPostingStep(AccrualActivityPostingTasklet accrualActivityPostingTasklet) {
-        return new StepBuilder(JobName.ACCRUAL_ACTIVITY_POSTING.name(), jobRepository).tasklet(accrualActivityPostingTasklet, transactionManager).build();
+        return new StepBuilder(JobName.ACCRUAL_ACTIVITY_POSTING.name(), jobRepository)
+                .tasklet(accrualActivityPostingTasklet, transactionManager).build();
     }
 
     @Bean
     public Job accrualActivityPostingJob(AccrualActivityPostingTasklet accrualActivityPosting) {
-        return new JobBuilder(JobName.ACCRUAL_ACTIVITY_POSTING.name(), jobRepository).start(accrualActivityPostingStep(accrualActivityPosting)).incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.ACCRUAL_ACTIVITY_POSTING.name(), jobRepository)
+                .start(accrualActivityPostingStep(accrualActivityPosting)).incrementer(new RunIdIncrementer()).build();
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccrualActivityPostingConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager) {
+    public AccrualActivityPostingConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
     }

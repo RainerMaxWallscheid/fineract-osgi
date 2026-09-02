@@ -24,8 +24,9 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class ChunkProcessingLoanItemListener extends AbstractLoanItemListener<Loan> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChunkProcessingLoanItemListener.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChunkProcessingLoanItemListener.class);
 
     public ChunkProcessingLoanItemListener(LockingService lockingService, TransactionTemplate requiresNewTransactionJdbcTemplate) {
         super(lockingService, requiresNewTransactionJdbcTemplate);

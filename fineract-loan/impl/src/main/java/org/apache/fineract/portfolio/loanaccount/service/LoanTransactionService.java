@@ -32,23 +32,29 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanTransactionService {
+
     private final LoanTransactionRepository loanTransactionRepository;
 
     public List<LoanTransaction> retrieveListOfTransactionsForReprocessing(final Loan loan) {
-        return loan.getLoanTransactions().stream().filter(loanTransactionForReprocessingPredicate()).sorted(LoanTransactionComparator.INSTANCE).collect(Collectors.toList());
+        return loan.getLoanTransactions().stream().filter(loanTransactionForReprocessingPredicate())
+                .sorted(LoanTransactionComparator.INSTANCE).collect(Collectors.toList());
     }
 
     public boolean isChronologicallyLatestRepaymentOrWaiver(final Loan loan, final LoanTransaction loanTransaction) {
-        final Optional<LocalDate> lastTransactionDateForReprocessing = loanTransactionRepository.findLastTransactionDateForReprocessing(loan);
-        return lastTransactionDateForReprocessing.isEmpty() || !DateUtils.isAfter(lastTransactionDateForReprocessing.get(), loanTransaction.getTransactionDate());
+        final Optional<LocalDate> lastTransactionDateForReprocessing = loanTransactionRepository
+                .findLastTransactionDateForReprocessing(loan);
+        return lastTransactionDateForReprocessing.isEmpty()
+                || !DateUtils.isAfter(lastTransactionDateForReprocessing.get(), loanTransaction.getTransactionDate());
     }
 
     private Predicate<LoanTransaction> loanTransactionForReprocessingPredicate() {
-        return transaction -> transaction.isNotReversed() && (transaction.isChargeOff() || transaction.isReAge() || transaction.isAccrualActivity() || transaction.isReAmortize() || !transaction.isNonMonetaryTransaction() || transaction.isContractTermination());
+        return transaction -> transaction.isNotReversed()
+                && (transaction.isChargeOff() || transaction.isReAge() || transaction.isAccrualActivity() || transaction.isReAmortize()
+                        || !transaction.isNonMonetaryTransaction() || transaction.isContractTermination());
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanTransactionService(final LoanTransactionRepository loanTransactionRepository) {
+    public LoanTransactionService(final LoanTransactionRepository loanTransactionRepository) {
         this.loanTransactionRepository = loanTransactionRepository;
     }
 }

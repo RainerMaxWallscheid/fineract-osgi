@@ -62,7 +62,8 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
 
         totalChargeback = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.CHARGEBACK);
 
-        totalCreditBalanceRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.CREDIT_BALANCE_REFUND);
+        totalCreditBalanceRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances,
+                LoanTransactionType.CREDIT_BALANCE_REFUND);
         totalCreditBalanceRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.CREDIT_BALANCE_REFUND);
 
@@ -80,7 +81,8 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
                 LoanTransactionType.MERCHANT_ISSUED_REFUND);
 
         totalPayoutRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
-        totalPayoutRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
+        totalPayoutRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
+                LoanTransactionType.PAYOUT_REFUND);
 
         totalRepaymentTransaction = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.REPAYMENT)
                 .add(fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.DOWN_PAYMENT));
@@ -139,8 +141,8 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
                 .totalUnpaidPayableNotDueInterest(totalUnpaidPayableNotDueInterest).totalInterestRefund(totalInterestRefund).build();
     }
 
-    private static BigDecimal fetchLoanTransactionBalanceViewByType(final Collection<? extends LoanTransactionBalanceView> loanTransactionBalances,
-            final LoanTransactionType transactionType) {
+    private static BigDecimal fetchLoanTransactionBalanceViewByType(
+            final Collection<? extends LoanTransactionBalanceView> loanTransactionBalances, final LoanTransactionType transactionType) {
         final Optional<? extends LoanTransactionBalanceView> optLoanTransactionBalanceView = loanTransactionBalances.stream()
                 .filter(balance -> balance.getTransactionType().equals(transactionType) && !balance.isReversed()).findFirst();
         return optLoanTransactionBalanceView.isPresent() ? optLoanTransactionBalanceView.get().getAmount() : BigDecimal.ZERO;

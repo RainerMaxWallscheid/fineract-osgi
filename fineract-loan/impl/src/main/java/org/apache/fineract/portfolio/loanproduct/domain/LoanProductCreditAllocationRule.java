@@ -32,8 +32,10 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
-@Table(name = "m_loan_product_credit_allocation_rule", uniqueConstraints = {@UniqueConstraint(columnNames = {"loan_product_id", "transaction_type"}, name = "uq_m_loan_product_credit_allocation_rule")})
+@Table(name = "m_loan_product_credit_allocation_rule", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "loan_product_id", "transaction_type" }, name = "uq_m_loan_product_credit_allocation_rule") })
 public class LoanProductCreditAllocationRule extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
@@ -45,43 +47,43 @@ public class LoanProductCreditAllocationRule extends AbstractAuditableWithUTCDat
     private List<AllocationType> allocationTypes;
 
     @java.lang.SuppressWarnings("all")
-        public LoanProduct getLoanProduct() {
+    public LoanProduct getLoanProduct() {
         return this.loanProduct;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CreditAllocationTransactionType getTransactionType() {
+    public CreditAllocationTransactionType getTransactionType() {
         return this.transactionType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<AllocationType> getAllocationTypes() {
+    public List<AllocationType> getAllocationTypes() {
         return this.allocationTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoanProduct(final LoanProduct loanProduct) {
+    public void setLoanProduct(final LoanProduct loanProduct) {
         this.loanProduct = loanProduct;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setTransactionType(final CreditAllocationTransactionType transactionType) {
+    public void setTransactionType(final CreditAllocationTransactionType transactionType) {
         this.transactionType = transactionType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAllocationTypes(final List<AllocationType> allocationTypes) {
+    public void setAllocationTypes(final List<AllocationType> allocationTypes) {
         this.allocationTypes = allocationTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductCreditAllocationRule(final LoanProduct loanProduct, final CreditAllocationTransactionType transactionType, final List<AllocationType> allocationTypes) {
+    public LoanProductCreditAllocationRule(final LoanProduct loanProduct, final CreditAllocationTransactionType transactionType,
+            final List<AllocationType> allocationTypes) {
         this.loanProduct = loanProduct;
         this.transactionType = transactionType;
         this.allocationTypes = allocationTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        protected LoanProductCreditAllocationRule() {
-    }
+    protected LoanProductCreditAllocationRule() {}
 }

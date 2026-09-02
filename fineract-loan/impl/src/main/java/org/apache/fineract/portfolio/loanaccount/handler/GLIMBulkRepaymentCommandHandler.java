@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GLIMLOAN", action = "REPAYMENT")
 public class GLIMBulkRepaymentCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class GLIMBulkRepaymentCommandHandler implements NewCommandSourceHandler 
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLIMBulkRepaymentCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public GLIMBulkRepaymentCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

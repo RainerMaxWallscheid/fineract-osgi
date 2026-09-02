@@ -26,12 +26,14 @@ import org.apache.fineract.shares.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 
 public class ShareAccountCommandsServiceImpl implements AccountsCommandsService {
+
     private final FromJsonHelper fromApiJsonHelper;
 
     @Override
     public Object handleCommand(Long accountId, String command, String jsonBody) {
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonBody);
-        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null);
         if (ShareAccountApiConstants.APPROVE_COMMAND.equals(command)) {
             return approveShareAccount(accountId, jsonCommand);
         }
@@ -68,7 +70,7 @@ public class ShareAccountCommandsServiceImpl implements AccountsCommandsService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ShareAccountCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper) {
+    public ShareAccountCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

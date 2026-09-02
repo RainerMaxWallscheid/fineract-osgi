@@ -27,8 +27,10 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
-@Table(name = "m_delinquency_range", uniqueConstraints = {@UniqueConstraint(name = "uq_delinquency_range_classification", columnNames = {"classification"})})
+@Table(name = "m_delinquency_range", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_delinquency_range_classification", columnNames = { "classification" }) })
 public class DelinquencyRange extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @Column(name = "classification", nullable = false)
     private String classification;
     @Column(name = "min_age_days", nullable = false)
@@ -49,46 +51,45 @@ public class DelinquencyRange extends AbstractAuditableWithUTCDateTimeCustom<Lon
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getClassification() {
+    public String getClassification() {
         return this.classification;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getMinimumAgeDays() {
+    public Integer getMinimumAgeDays() {
         return this.minimumAgeDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getMaximumAgeDays() {
+    public Integer getMaximumAgeDays() {
         return this.maximumAgeDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Long getVersion() {
+    public Long getVersion() {
         return this.version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClassification(final String classification) {
+    public void setClassification(final String classification) {
         this.classification = classification;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinimumAgeDays(final Integer minimumAgeDays) {
+    public void setMinimumAgeDays(final Integer minimumAgeDays) {
         this.minimumAgeDays = minimumAgeDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMaximumAgeDays(final Integer maximumAgeDays) {
+    public void setMaximumAgeDays(final Integer maximumAgeDays) {
         this.maximumAgeDays = maximumAgeDays;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setVersion(final Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyRange() {
-    }
+    public DelinquencyRange() {}
 }

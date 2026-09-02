@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApproveLoanRescheduleCommandStrategy implements CommandStrategy {
+
     private final RescheduleLoansApiResource rescheduleLoansApiResource;
 
     @Override
@@ -53,7 +55,7 @@ public class ApproveLoanRescheduleCommandStrategy implements CommandStrategy {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ApproveLoanRescheduleCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
+    public ApproveLoanRescheduleCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
         this.rescheduleLoansApiResource = rescheduleLoansApiResource;
     }
 }

@@ -39,7 +39,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 public class RetrieveAllNonClosedIdServiceImpl implements RetrieveLoanIdService {
-    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE, LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD));
+
+    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = new ArrayList<>(
+            Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE,
+                    LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD));
     private final LoanRepository loanRepository;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -85,11 +88,18 @@ public class RetrieveAllNonClosedIdServiceImpl implements RetrieveLoanIdService 
     }
 
     @Override
-    public List<Long> retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(COBParameter loanCOBParameter, boolean isCatchUp) {
+    public List<Long> retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(COBParameter loanCOBParameter,
+            boolean isCatchUp) {
         if (isCatchUp) {
-            return loanRepository.findAllLoansByLastClosedBusinessDateNotNullAndMinAndMaxLoanIdAndStatuses(loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(LoanCOBConstant.NUMBER_OF_DAYS_BEHIND), NON_CLOSED_LOAN_STATUSES);
+            return loanRepository.findAllLoansByLastClosedBusinessDateNotNullAndMinAndMaxLoanIdAndStatuses(
+                    loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil
+                            .getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(LoanCOBConstant.NUMBER_OF_DAYS_BEHIND),
+                    NON_CLOSED_LOAN_STATUSES);
         } else {
-            return loanRepository.findAllLoansByLastClosedBusinessDateAndMinAndMaxLoanIdAndStatuses(loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(LoanCOBConstant.NUMBER_OF_DAYS_BEHIND), NON_CLOSED_LOAN_STATUSES);
+            return loanRepository.findAllLoansByLastClosedBusinessDateAndMinAndMaxLoanIdAndStatuses(
+                    loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil
+                            .getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(LoanCOBConstant.NUMBER_OF_DAYS_BEHIND),
+                    NON_CLOSED_LOAN_STATUSES);
         }
     }
 
@@ -99,7 +109,8 @@ public class RetrieveAllNonClosedIdServiceImpl implements RetrieveLoanIdService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public RetrieveAllNonClosedIdServiceImpl(final LoanRepository loanRepository, final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public RetrieveAllNonClosedIdServiceImpl(final LoanRepository loanRepository,
+            final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.loanRepository = loanRepository;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }

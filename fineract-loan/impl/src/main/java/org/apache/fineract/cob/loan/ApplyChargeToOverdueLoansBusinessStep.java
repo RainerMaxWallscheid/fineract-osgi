@@ -27,12 +27,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApplyChargeToOverdueLoansBusinessStep implements LoanCOBBusinessStep {
+
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanChargeWritePlatformService loanChargeWritePlatformService;
 
     @Override
     public Loan execute(Loan loan) {
-        final Collection<OverdueLoanScheduleData> overdueLoanScheduleDataList = loanReadPlatformService.retrieveAllOverdueInstallmentsForLoan(loan);
+        final Collection<OverdueLoanScheduleData> overdueLoanScheduleDataList = loanReadPlatformService
+                .retrieveAllOverdueInstallmentsForLoan(loan);
         if (!overdueLoanScheduleDataList.isEmpty()) {
             loanChargeWritePlatformService.applyOverdueChargesForLoan(loan.getId(), overdueLoanScheduleDataList);
         }
@@ -50,7 +52,8 @@ public class ApplyChargeToOverdueLoansBusinessStep implements LoanCOBBusinessSte
     }
 
     @java.lang.SuppressWarnings("all")
-        public ApplyChargeToOverdueLoansBusinessStep(final LoanReadPlatformService loanReadPlatformService, final LoanChargeWritePlatformService loanChargeWritePlatformService) {
+    public ApplyChargeToOverdueLoansBusinessStep(final LoanReadPlatformService loanReadPlatformService,
+            final LoanChargeWritePlatformService loanChargeWritePlatformService) {
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanChargeWritePlatformService = loanChargeWritePlatformService;
     }

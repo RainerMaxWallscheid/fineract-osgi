@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 @Service
 @CommandType(entity = "LOAN", action = "RECOVERYPAYMENT")
 public class LoanRecoveryPaymentCommandHandler implements NewCommandSourceHandler {
+
     private final LoanWritePlatformService writePlatformService;
 
     @Override
@@ -38,7 +39,7 @@ public class LoanRecoveryPaymentCommandHandler implements NewCommandSourceHandle
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRecoveryPaymentCommandHandler(final LoanWritePlatformService writePlatformService) {
+    public LoanRecoveryPaymentCommandHandler(final LoanWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

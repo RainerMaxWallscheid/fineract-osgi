@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 @Entity
 @Table(name = "m_wc_delinquency_configuration")
 public class DelinquencyMinimumPaymentPeriodAndRule extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @Serial
     private static final long serialVersionUID = -9204385885041120403L;
     @OneToOne
@@ -49,56 +50,55 @@ public class DelinquencyMinimumPaymentPeriodAndRule extends AbstractAuditableWit
     private DelinquencyMinimumPaymentType minimumPaymentType;
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyBucket getBucket() {
+    public DelinquencyBucket getBucket() {
         return this.bucket;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getFrequency() {
+    public Integer getFrequency() {
         return this.frequency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyFrequencyType getFrequencyType() {
+    public DelinquencyFrequencyType getFrequencyType() {
         return this.frequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMinimumPayment() {
+    public BigDecimal getMinimumPayment() {
         return this.minimumPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyMinimumPaymentType getMinimumPaymentType() {
+    public DelinquencyMinimumPaymentType getMinimumPaymentType() {
         return this.minimumPaymentType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setBucket(final DelinquencyBucket bucket) {
+    public void setBucket(final DelinquencyBucket bucket) {
         this.bucket = bucket;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFrequency(final Integer frequency) {
+    public void setFrequency(final Integer frequency) {
         this.frequency = frequency;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFrequencyType(final DelinquencyFrequencyType frequencyType) {
+    public void setFrequencyType(final DelinquencyFrequencyType frequencyType) {
         this.frequencyType = frequencyType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinimumPayment(final BigDecimal minimumPayment) {
+    public void setMinimumPayment(final BigDecimal minimumPayment) {
         this.minimumPayment = minimumPayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinimumPaymentType(final DelinquencyMinimumPaymentType minimumPaymentType) {
+    public void setMinimumPaymentType(final DelinquencyMinimumPaymentType minimumPaymentType) {
         this.minimumPaymentType = minimumPaymentType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public DelinquencyMinimumPaymentPeriodAndRule() {
-    }
+    public DelinquencyMinimumPaymentPeriodAndRule() {}
 }

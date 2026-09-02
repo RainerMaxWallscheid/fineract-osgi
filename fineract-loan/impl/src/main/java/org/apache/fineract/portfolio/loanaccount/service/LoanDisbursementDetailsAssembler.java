@@ -30,6 +30,7 @@ import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanDisbursementDetails;
 
 public class LoanDisbursementDetailsAssembler {
+
     private final FromJsonHelper fromApiJsonHelper;
 
     public List<LoanDisbursementDetails> fetchDisbursementData(final JsonObject command) {
@@ -39,18 +40,23 @@ public class LoanDisbursementDetailsAssembler {
         JsonArray disbursementDataArray = command.getAsJsonArray(LoanApiConstants.disbursementDataParameterName);
         if (disbursementDataArray != null && !disbursementDataArray.isEmpty()) {
             disbursementDataArray.forEach(jsonElement -> {
-                LocalDate expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, jsonElement, dateFormat, locale);
-                BigDecimal principal = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.disbursementPrincipalParameterName, jsonElement, locale);
-                BigDecimal netDisbursalAmount = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.disbursementNetDisbursalAmountParameterName, jsonElement, locale);
-                boolean isReversed = Boolean.TRUE.equals(this.fromApiJsonHelper.extractBooleanNamed(LoanApiConstants.disbursementReversedParameterName, jsonElement));
-                disbursementDatas.add(new LoanDisbursementDetails(expectedDisbursementDate, null, principal, netDisbursalAmount, isReversed));
+                LocalDate expectedDisbursementDate = this.fromApiJsonHelper
+                        .extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, jsonElement, dateFormat, locale);
+                BigDecimal principal = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.disbursementPrincipalParameterName,
+                        jsonElement, locale);
+                BigDecimal netDisbursalAmount = this.fromApiJsonHelper
+                        .extractBigDecimalNamed(LoanApiConstants.disbursementNetDisbursalAmountParameterName, jsonElement, locale);
+                boolean isReversed = Boolean.TRUE.equals(
+                        this.fromApiJsonHelper.extractBooleanNamed(LoanApiConstants.disbursementReversedParameterName, jsonElement));
+                disbursementDatas
+                        .add(new LoanDisbursementDetails(expectedDisbursementDate, null, principal, netDisbursalAmount, isReversed));
             });
         }
         return disbursementDatas;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDisbursementDetailsAssembler(final FromJsonHelper fromApiJsonHelper) {
+    public LoanDisbursementDetailsAssembler(final FromJsonHelper fromApiJsonHelper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

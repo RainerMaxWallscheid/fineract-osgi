@@ -29,8 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ProductMixCreateCommandHandler implements CommandHandler<ProductMixCreateRequest, ProductMixCreateResponse> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductMixCreateCommandHandler.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductMixCreateCommandHandler.class);
     private final ProductMixWritePlatformService writePlatformService;
 
     @Retry(name = "commandProductMixCreate", fallbackMethod = "fallback")
@@ -46,7 +47,7 @@ public class ProductMixCreateCommandHandler implements CommandHandler<ProductMix
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductMixCreateCommandHandler(final ProductMixWritePlatformService writePlatformService) {
+    public ProductMixCreateCommandHandler(final ProductMixWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "LOANCHARGE", action = "DEACTIVATEOVERDUE")
 public class LoanChargeDeactivateOverdueCommandHandler implements NewCommandSourceHandler {
+
     private final LoanChargeWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class LoanChargeDeactivateOverdueCommandHandler implements NewCommandSour
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeDeactivateOverdueCommandHandler(final LoanChargeWritePlatformService writePlatformService) {
+    public LoanChargeDeactivateOverdueCommandHandler(final LoanChargeWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanInstallmentChargeData;
 @Entity
 @Table(name = "m_loan_installment_charge")
 public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> implements Comparable<LoanInstallmentCharge> {
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_charge_id", referencedColumnName = "id", nullable = false)
     private LoanCharge loancharge;
@@ -288,71 +289,72 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
     }
 
     public LoanInstallmentChargeData toData() {
-        return LoanInstallmentChargeData.builder().installmentNumber(installment.getInstallmentNumber()).dueDate(installment.getDueDate()).amount(amount).amountOutstanding(amountOutstanding).amountWaived(amountWaived).paid(paid).waived(waived).build();
+        return LoanInstallmentChargeData.builder().installmentNumber(installment.getInstallmentNumber()).dueDate(installment.getDueDate())
+                .amount(amount).amountOutstanding(amountOutstanding).amountWaived(amountWaived).paid(paid).waived(waived).build();
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanRepaymentScheduleInstallment getInstallment() {
+    public LoanRepaymentScheduleInstallment getInstallment() {
         return this.installment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmountPaid() {
+    public BigDecimal getAmountPaid() {
         return this.amountPaid;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmountWaived() {
+    public BigDecimal getAmountWaived() {
         return this.amountWaived;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmountWrittenOff() {
+    public BigDecimal getAmountWrittenOff() {
         return this.amountWrittenOff;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmountOutstanding() {
+    public BigDecimal getAmountOutstanding() {
         return this.amountOutstanding;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmountThroughChargePayment() {
+    public BigDecimal getAmountThroughChargePayment() {
         return this.amountThroughChargePayment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isPaid() {
+    public boolean isPaid() {
         return this.paid;
     }
 
     @java.lang.SuppressWarnings("all")
-        public boolean isWaived() {
+    public boolean isWaived() {
         return this.waived;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setInstallment(final LoanRepaymentScheduleInstallment installment) {
+    public void setInstallment(final LoanRepaymentScheduleInstallment installment) {
         this.installment = installment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAmountWaived(final BigDecimal amountWaived) {
+    public void setAmountWaived(final BigDecimal amountWaived) {
         this.amountWaived = amountWaived;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPaid(final boolean paid) {
+    public void setPaid(final boolean paid) {
         this.paid = paid;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setWaived(final boolean waived) {
+    public void setWaived(final boolean waived) {
         this.waived = waived;
     }
 }

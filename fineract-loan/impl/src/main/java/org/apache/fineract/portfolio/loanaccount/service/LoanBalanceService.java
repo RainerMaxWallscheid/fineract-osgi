@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanBalanceService {
+
     private final CapitalizedIncomeBalanceService capitalizedIncomeBalanceService;
     private final FlushModeHandler flushModeHandler;
     private final LoanTransactionRepository loanTransactionRepository;
@@ -55,7 +56,9 @@ public class LoanBalanceService {
         Money cumulativeTotalWaivedOnInstallments = Money.zero(currency);
         List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
         for (final LoanRepaymentScheduleInstallment scheduledRepayment : installments) {
-            cumulativeTotalPaidOnInstallments = cumulativeTotalPaidOnInstallments.plus(scheduledRepayment.getPrincipalCompleted(currency).plus(scheduledRepayment.getInterestPaid(currency))).plus(scheduledRepayment.getFeeChargesPaid(currency)).plus(scheduledRepayment.getPenaltyChargesPaid(currency));
+            cumulativeTotalPaidOnInstallments = cumulativeTotalPaidOnInstallments
+                    .plus(scheduledRepayment.getPrincipalCompleted(currency).plus(scheduledRepayment.getInterestPaid(currency)))
+                    .plus(scheduledRepayment.getFeeChargesPaid(currency)).plus(scheduledRepayment.getPenaltyChargesPaid(currency));
             cumulativeTotalWaivedOnInstallments = cumulativeTotalWaivedOnInstallments.plus(scheduledRepayment.getInterestWaived(currency));
         }
         for (final LoanTransaction loanTransaction : loan.getLoanTransactions()) {
@@ -69,10 +72,12 @@ public class LoanBalanceService {
                     totalPaidInRepayments = totalPaidInRepayments.minus(loanTransaction.getOverPaymentPortion(currency));
                 }
             } else if (loanTransaction.isChargeback()) {
-                if (loanTransaction.getPrincipalPortion(currency).isZero() &&  //
+                if (loanTransaction.getPrincipalPortion(currency).isZero() && //
                 //
                 //
-                loan.getCreditAllocationRules().stream().filter(car -> car.getTransactionType().equals(CreditAllocationTransactionType.CHARGEBACK)).findAny().isEmpty()) {
+                        loan.getCreditAllocationRules().stream()
+                                .filter(car -> car.getTransactionType().equals(CreditAllocationTransactionType.CHARGEBACK)).findAny()
+                                .isEmpty()) {
                     totalPaidInRepayments = totalPaidInRepayments.minus(loanTransaction.getOverPaymentPortion(currency));
                 }
             }
@@ -110,7 +115,8 @@ public class LoanBalanceService {
         final Money principal = loan.getLoanRepaymentScheduleDetail().getPrincipal();
         final Money capitalizedIncome = capitalizedIncomeBalanceService.calculateCapitalizedIncome(loan);
         final Money capitalizedIncomeAdjustment = capitalizedIncomeBalanceService.calculateCapitalizedIncomeAdjustment(loan);
-        loan.getSummary().updateSummary(loan.getCurrency(), principal, loan.getRepaymentScheduleInstallments(), loan.getLoanCharges(), capitalizedIncome, capitalizedIncomeAdjustment);
+        loan.getSummary().updateSummary(loan.getCurrency(), principal, loan.getRepaymentScheduleInstallments(), loan.getLoanCharges(),
+                capitalizedIncome, capitalizedIncomeAdjustment);
         reconcileChargeStatusWithSummary(loan);
         updateLoanOutstandingBalances(loan);
     }
@@ -123,14 +129,16 @@ public class LoanBalanceService {
         }
         if (MathUtil.isZero(summary.getTotalFeeChargesOutstanding())) {
             for (final LoanCharge charge : charges) {
-                if (charge.isActive() && charge.isFeeCharge() && !charge.isPaid() && !charge.isWaived() && MathUtil.isGreaterThanZero(charge.getAmount())) {
+                if (charge.isActive() && charge.isFeeCharge() && !charge.isPaid() && !charge.isWaived()
+                        && MathUtil.isGreaterThanZero(charge.getAmount())) {
                     charge.reconcileFullyPaid();
                 }
             }
         }
         if (MathUtil.isZero(summary.getTotalPenaltyChargesOutstanding())) {
             for (final LoanCharge charge : charges) {
-                if (charge.isActive() && charge.isPenaltyCharge() && !charge.isPaid() && !charge.isWaived() && MathUtil.isGreaterThanZero(charge.getAmount())) {
+                if (charge.isActive() && charge.isPenaltyCharge() && !charge.isPaid() && !charge.isWaived()
+                        && MathUtil.isGreaterThanZero(charge.getAmount())) {
                     charge.reconcileFullyPaid();
                 }
             }
@@ -154,20 +162,24 @@ public class LoanBalanceService {
         loanTransactions.sort(LoanTransactionComparator.INSTANCE);
         for (LoanTransaction loanTransaction : loanTransactions) {
             if (loanTransaction.isDisbursement() || loanTransaction.isIncomePosting() || loanTransaction.isCapitalizedIncome()) {
-                outstanding = outstanding.plus(loanTransaction.getAmount(loan.getCurrency())).minus(loanTransaction.getOverPaymentPortion(loan.getCurrency()));
+                outstanding = outstanding.plus(loanTransaction.getAmount(loan.getCurrency()))
+                        .minus(loanTransaction.getOverPaymentPortion(loan.getCurrency()));
                 loanTransaction.updateOutstandingLoanBalance(MathUtil.negativeToZero(outstanding.getAmount()));
             } else if (loanTransaction.isChargeback() || loanTransaction.isCreditBalanceRefund()) {
                 Money transactionOutstanding = loanTransaction.getPrincipalPortion(loan.getCurrency());
                 if (loanTransaction.isOverPaid()) {
                     // in case of advanced payment strategy and creditAllocations the full amount is recognized first
                     if (loan.getCreditAllocationRules() != null && !loan.getCreditAllocationRules().isEmpty()) {
-                        Money payedPrincipal =  //
-                        //
-                        loanTransaction.getLoanTransactionToRepaymentScheduleMappings().stream().map(mapping -> mapping.getPrincipalPortion(loan.getCurrency())).reduce(Money.zero(loan.getCurrency()), Money::plus);
+                        Money payedPrincipal = //
+                                //
+                                loanTransaction.getLoanTransactionToRepaymentScheduleMappings().stream()
+                                        .map(mapping -> mapping.getPrincipalPortion(loan.getCurrency()))
+                                        .reduce(Money.zero(loan.getCurrency()), Money::plus);
                         transactionOutstanding = loanTransaction.getPrincipalPortion(loan.getCurrency()).minus(payedPrincipal);
                     } else {
                         // in case legacy payment strategy
-                        transactionOutstanding = loanTransaction.getAmount(loan.getCurrency()).minus(loanTransaction.getOverPaymentPortion(loan.getCurrency()));
+                        transactionOutstanding = loanTransaction.getAmount(loan.getCurrency())
+                                .minus(loanTransaction.getOverPaymentPortion(loan.getCurrency()));
                     }
                     if (transactionOutstanding.isLessThanZero()) {
                         transactionOutstanding = Money.zero(loan.getCurrency());
@@ -176,7 +188,9 @@ public class LoanBalanceService {
                 outstanding = outstanding.plus(transactionOutstanding);
                 loanTransaction.updateOutstandingLoanBalance(MathUtil.negativeToZero(outstanding.getAmount()));
             } else if (!loanTransaction.isAccrualActivity()) {
-                if (loan.getLoanInterestRecalculationDetails() != null && loan.getLoanInterestRecalculationDetails().isCompoundingToBePostedAsTransaction() && !loanTransaction.isRepaymentAtDisbursement()) {
+                if (loan.getLoanInterestRecalculationDetails() != null
+                        && loan.getLoanInterestRecalculationDetails().isCompoundingToBePostedAsTransaction()
+                        && !loanTransaction.isRepaymentAtDisbursement()) {
                     outstanding = outstanding.minus(loanTransaction.getAmount(loan.getCurrency()));
                 } else {
                     outstanding = outstanding.minus(loanTransaction.getPrincipalPortion(loan.getCurrency()));
@@ -190,7 +204,8 @@ public class LoanBalanceService {
         for (final LoanCharge charge : loan.getActiveCharges()) {
             if (charge.isOverdueInstallmentCharge()) {
                 charge.setActive(false);
-            } else if (charge.isTrancheDisbursementCharge() && disbursementDetail.getDisbursementDate().equals(charge.getTrancheDisbursementCharge().getloanDisbursementDetails().actualDisbursementDate())) {
+            } else if (charge.isTrancheDisbursementCharge() && disbursementDetail.getDisbursementDate()
+                    .equals(charge.getTrancheDisbursementCharge().getloanDisbursementDetails().actualDisbursementDate())) {
                 charge.resetToOriginal(loan.getCurrency());
             }
         }
@@ -203,7 +218,8 @@ public class LoanBalanceService {
     public Money getReceivableInterest(final Loan loan, final LocalDate tillDate) {
         Money receivableInterest = Money.zero(loan.getCurrency());
         for (final LoanTransaction transaction : loan.getLoanTransactions()) {
-            if (transaction.isNotReversed() && !transaction.isRepaymentAtDisbursement() && !transaction.isDisbursement() && !DateUtils.isAfter(transaction.getTransactionDate(), tillDate)) {
+            if (transaction.isNotReversed() && !transaction.isRepaymentAtDisbursement() && !transaction.isDisbursement()
+                    && !DateUtils.isAfter(transaction.getTransactionDate(), tillDate)) {
                 if (transaction.isAccrual()) {
                     receivableInterest = receivableInterest.plus(transaction.getInterestPortion(loan.getCurrency()));
                 } else if (transaction.isRepaymentLikeType() || transaction.isInterestWaiver() || transaction.isAccrualAdjustment()) {
@@ -222,14 +238,16 @@ public class LoanBalanceService {
         Money totalPrincipal = Money.of(loan.getCurrency(), loan.getSummary().getTotalPrincipalOutstanding());
         totalPrincipal = totalPrincipal.minus(receivables[3]);
         final LocalDate currentDate = DateUtils.getBusinessLocalDate();
-        return new LoanRepaymentScheduleInstallment(null, 0, currentDate, currentDate, totalPrincipal.getAmount(), receivables[0].getAmount(), receivables[1].getAmount(), receivables[2].getAmount(), false, null);
+        return new LoanRepaymentScheduleInstallment(null, 0, currentDate, currentDate, totalPrincipal.getAmount(),
+                receivables[0].getAmount(), receivables[1].getAmount(), receivables[2].getAmount(), false, null);
     }
 
     public Money[] retrieveIncomeForOverlappingPeriod(final Loan loan, final LocalDate paymentDate) {
         Money[] balances = new Money[3];
         final MonetaryCurrency currency = loan.getCurrency();
         balances[0] = balances[1] = balances[2] = Money.zero(currency);
-        int firstNormalInstallmentNumber = LoanRepaymentScheduleProcessingWrapper.fetchFirstNormalInstallmentNumber(loan.getRepaymentScheduleInstallments());
+        int firstNormalInstallmentNumber = LoanRepaymentScheduleProcessingWrapper
+                .fetchFirstNormalInstallmentNumber(loan.getRepaymentScheduleInstallments());
         for (final LoanRepaymentScheduleInstallment installment : loan.getRepaymentScheduleInstallments()) {
             boolean isFirstNormalInstallment = installment.getInstallmentNumber().equals(firstNormalInstallmentNumber);
             if (DateUtils.isEqual(paymentDate, installment.getDueDate())) {
@@ -255,7 +273,8 @@ public class LoanBalanceService {
         Money paidFromFutureInstallments = Money.zero(currency);
         Money fee = Money.zero(currency);
         Money penalty = Money.zero(currency);
-        int firstNormalInstallmentNumber = LoanRepaymentScheduleProcessingWrapper.fetchFirstNormalInstallmentNumber(loan.getRepaymentScheduleInstallments());
+        int firstNormalInstallmentNumber = LoanRepaymentScheduleProcessingWrapper
+                .fetchFirstNormalInstallmentNumber(loan.getRepaymentScheduleInstallments());
         for (final LoanRepaymentScheduleInstallment installment : loan.getRepaymentScheduleInstallments()) {
             boolean isFirstNormalInstallment = installment.getInstallmentNumber().equals(firstNormalInstallmentNumber);
             if (!DateUtils.isBefore(paymentDate, installment.getDueDate())) {
@@ -263,24 +282,29 @@ public class LoanBalanceService {
                 penalty = penalty.plus(installment.getPenaltyChargesOutstanding(currency));
                 fee = fee.plus(installment.getFeeChargesOutstanding(currency));
             } else if (DateUtils.isAfter(paymentDate, installment.getFromDate())) {
-                Money[] balancesForCurrentPeriod = fetchInterestFeeAndPenaltyTillDate(loan, paymentDate, currency, installment, isFirstNormalInstallment);
+                Money[] balancesForCurrentPeriod = fetchInterestFeeAndPenaltyTillDate(loan, paymentDate, currency, installment,
+                        isFirstNormalInstallment);
                 if (balancesForCurrentPeriod[0].isGreaterThan(balancesForCurrentPeriod[5])) {
                     interest = interest.plus(balancesForCurrentPeriod[0]).minus(balancesForCurrentPeriod[5]);
                 } else {
-                    paidFromFutureInstallments = paidFromFutureInstallments.plus(balancesForCurrentPeriod[5]).minus(balancesForCurrentPeriod[0]);
+                    paidFromFutureInstallments = paidFromFutureInstallments.plus(balancesForCurrentPeriod[5])
+                            .minus(balancesForCurrentPeriod[0]);
                 }
                 if (balancesForCurrentPeriod[1].isGreaterThan(balancesForCurrentPeriod[3])) {
                     fee = fee.plus(balancesForCurrentPeriod[1].minus(balancesForCurrentPeriod[3]));
                 } else {
-                    paidFromFutureInstallments = paidFromFutureInstallments.plus(balancesForCurrentPeriod[3].minus(balancesForCurrentPeriod[1]));
+                    paidFromFutureInstallments = paidFromFutureInstallments
+                            .plus(balancesForCurrentPeriod[3].minus(balancesForCurrentPeriod[1]));
                 }
                 if (balancesForCurrentPeriod[2].isGreaterThan(balancesForCurrentPeriod[4])) {
                     penalty = penalty.plus(balancesForCurrentPeriod[2].minus(balancesForCurrentPeriod[4]));
                 } else {
-                    paidFromFutureInstallments = paidFromFutureInstallments.plus(balancesForCurrentPeriod[4]).minus(balancesForCurrentPeriod[2]);
+                    paidFromFutureInstallments = paidFromFutureInstallments.plus(balancesForCurrentPeriod[4])
+                            .minus(balancesForCurrentPeriod[2]);
                 }
             } else {
-                paidFromFutureInstallments = paidFromFutureInstallments.plus(installment.getInterestPaid(currency)).plus(installment.getPenaltyChargesPaid(currency)).plus(installment.getFeeChargesPaid(currency));
+                paidFromFutureInstallments = paidFromFutureInstallments.plus(installment.getInterestPaid(currency))
+                        .plus(installment.getPenaltyChargesPaid(currency)).plus(installment.getFeeChargesPaid(currency));
             }
         }
         balances[0] = interest;
@@ -290,30 +314,36 @@ public class LoanBalanceService {
         return balances;
     }
 
-    private Money[] fetchInterestFeeAndPenaltyTillDate(final Loan loan, final LocalDate paymentDate, final MonetaryCurrency currency, final LoanRepaymentScheduleInstallment installment, final boolean isFirstNormalInstallment) {
+    private Money[] fetchInterestFeeAndPenaltyTillDate(final Loan loan, final LocalDate paymentDate, final MonetaryCurrency currency,
+            final LoanRepaymentScheduleInstallment installment, final boolean isFirstNormalInstallment) {
         Money penaltyForCurrentPeriod = Money.zero(loan.getCurrency());
         Money penaltyAccoutedForCurrentPeriod = Money.zero(loan.getCurrency());
         Money feeForCurrentPeriod = Money.zero(loan.getCurrency());
         Money feeAccountedForCurrentPeriod = Money.zero(loan.getCurrency());
         int totalPeriodDays = DateUtils.getExactDifferenceInDays(installment.getFromDate(), installment.getDueDate());
         int tillDays = DateUtils.getExactDifferenceInDays(installment.getFromDate(), paymentDate);
-        Money interestForCurrentPeriod = Money.of(loan.getCurrency(), BigDecimal.valueOf(calculateInterestForDays(totalPeriodDays, installment.getInterestCharged(loan.getCurrency()).getAmount(), tillDays)));
-        Money interestAccountedForCurrentPeriod = installment.getInterestWaived(loan.getCurrency()).plus(installment.getInterestPaid(loan.getCurrency()));
+        Money interestForCurrentPeriod = Money.of(loan.getCurrency(), BigDecimal.valueOf(
+                calculateInterestForDays(totalPeriodDays, installment.getInterestCharged(loan.getCurrency()).getAmount(), tillDays)));
+        Money interestAccountedForCurrentPeriod = installment.getInterestWaived(loan.getCurrency())
+                .plus(installment.getInterestPaid(loan.getCurrency()));
         for (LoanCharge loanCharge : loan.getLoanCharges()) {
             if (loanCharge.isActive() && !loanCharge.isDueAtDisbursement()) {
                 boolean isDue = loanCharge.isDueInPeriod(installment.getFromDate(), paymentDate, isFirstNormalInstallment);
                 if (isDue) {
                     if (loanCharge.isPenaltyCharge()) {
                         penaltyForCurrentPeriod = penaltyForCurrentPeriod.plus(loanCharge.getAmount(loan.getCurrency()));
-                        penaltyAccoutedForCurrentPeriod = penaltyAccoutedForCurrentPeriod.plus(loanCharge.getAmountWaived(loan.getCurrency()).plus(loanCharge.getAmountPaid(loan.getCurrency())));
+                        penaltyAccoutedForCurrentPeriod = penaltyAccoutedForCurrentPeriod
+                                .plus(loanCharge.getAmountWaived(loan.getCurrency()).plus(loanCharge.getAmountPaid(loan.getCurrency())));
                     } else {
                         feeForCurrentPeriod = feeForCurrentPeriod.plus(loanCharge.getAmount(currency));
-                        feeAccountedForCurrentPeriod = feeAccountedForCurrentPeriod.plus(loanCharge.getAmountWaived(loan.getCurrency()).plus(loanCharge.getAmountPaid(loan.getCurrency())));
+                        feeAccountedForCurrentPeriod = feeAccountedForCurrentPeriod
+                                .plus(loanCharge.getAmountWaived(loan.getCurrency()).plus(loanCharge.getAmountPaid(loan.getCurrency())));
                     }
                 } else if (loanCharge.isInstalmentFee()) {
                     LoanInstallmentCharge loanInstallmentCharge = loanCharge.getInstallmentLoanCharge(installment.getInstallmentNumber());
                     if (loanCharge.isPenaltyCharge()) {
-                        penaltyAccoutedForCurrentPeriod = penaltyAccoutedForCurrentPeriod.plus(loanInstallmentCharge.getAmountPaid(currency));
+                        penaltyAccoutedForCurrentPeriod = penaltyAccoutedForCurrentPeriod
+                                .plus(loanInstallmentCharge.getAmountPaid(currency));
                     } else {
                         feeAccountedForCurrentPeriod = feeAccountedForCurrentPeriod.plus(loanInstallmentCharge.getAmountPaid(currency));
                     }
@@ -338,7 +368,8 @@ public class LoanBalanceService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanBalanceService(final CapitalizedIncomeBalanceService capitalizedIncomeBalanceService, final FlushModeHandler flushModeHandler, final LoanTransactionRepository loanTransactionRepository) {
+    public LoanBalanceService(final CapitalizedIncomeBalanceService capitalizedIncomeBalanceService,
+            final FlushModeHandler flushModeHandler, final LoanTransactionRepository loanTransactionRepository) {
         this.capitalizedIncomeBalanceService = capitalizedIncomeBalanceService;
         this.flushModeHandler = flushModeHandler;
         this.loanTransactionRepository = loanTransactionRepository;

@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "WAIVECHARGE", action = "UNDO")
 public class UndoLoanChargeWaiveCommandHandler implements NewCommandSourceHandler {
+
     final LoanChargeWritePlatformService loanWritePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UndoLoanChargeWaiveCommandHandler implements NewCommandSourceHandle
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoLoanChargeWaiveCommandHandler(final LoanChargeWritePlatformService loanWritePlatformService) {
+    public UndoLoanChargeWaiveCommandHandler(final LoanChargeWritePlatformService loanWritePlatformService) {
         this.loanWritePlatformService = loanWritePlatformService;
     }
 }

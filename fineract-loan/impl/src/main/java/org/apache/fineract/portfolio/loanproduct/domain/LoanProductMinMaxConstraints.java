@@ -30,6 +30,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
  */
 @Embeddable
 public class LoanProductMinMaxConstraints {
+
     @Column(name = "min_principal_amount", scale = 6, precision = 19)
     private BigDecimal minPrincipal;
     @Column(name = "max_principal_amount", scale = 6, precision = 19)
@@ -75,14 +76,16 @@ public class LoanProductMinMaxConstraints {
             this.maxNumberOfRepayments = newValue;
         }
         final String minInterestRatePerPeriodParamName = "minInterestRatePerPeriod";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minInterestRatePerPeriodParamName, this.minNominalInterestRatePerPeriod)) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minInterestRatePerPeriodParamName,
+                this.minNominalInterestRatePerPeriod)) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(minInterestRatePerPeriodParamName);
             actualChanges.put(minInterestRatePerPeriodParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             this.minNominalInterestRatePerPeriod = newValue;
         }
         final String maxInterestRatePerPeriodParamName = "maxInterestRatePerPeriod";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxInterestRatePerPeriodParamName, this.maxNominalInterestRatePerPeriod)) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxInterestRatePerPeriodParamName,
+                this.maxNominalInterestRatePerPeriod)) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(maxInterestRatePerPeriodParamName);
             actualChanges.put(maxInterestRatePerPeriodParamName, newValue);
             actualChanges.put("locale", localeAsInput);
@@ -92,11 +95,13 @@ public class LoanProductMinMaxConstraints {
     }
 
     public BigDecimal getMinNominalInterestRatePerPeriod() {
-        return this.minNominalInterestRatePerPeriod == null ? null : BigDecimal.valueOf(Double.parseDouble(this.minNominalInterestRatePerPeriod.stripTrailingZeros().toString()));
+        return this.minNominalInterestRatePerPeriod == null ? null
+                : BigDecimal.valueOf(Double.parseDouble(this.minNominalInterestRatePerPeriod.stripTrailingZeros().toString()));
     }
 
     public BigDecimal getMaxNominalInterestRatePerPeriod() {
-        return this.maxNominalInterestRatePerPeriod == null ? null : BigDecimal.valueOf(Double.parseDouble(this.maxNominalInterestRatePerPeriod.stripTrailingZeros().toString()));
+        return this.maxNominalInterestRatePerPeriod == null ? null
+                : BigDecimal.valueOf(Double.parseDouble(this.maxNominalInterestRatePerPeriod.stripTrailingZeros().toString()));
     }
 
     public void updateForFloatingInterestRates() {
@@ -105,61 +110,62 @@ public class LoanProductMinMaxConstraints {
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMinPrincipal() {
+    public BigDecimal getMinPrincipal() {
         return this.minPrincipal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getMaxPrincipal() {
+    public BigDecimal getMaxPrincipal() {
         return this.maxPrincipal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getMinNumberOfRepayments() {
+    public Integer getMinNumberOfRepayments() {
         return this.minNumberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getMaxNumberOfRepayments() {
+    public Integer getMaxNumberOfRepayments() {
         return this.maxNumberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinPrincipal(final BigDecimal minPrincipal) {
+    public void setMinPrincipal(final BigDecimal minPrincipal) {
         this.minPrincipal = minPrincipal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMaxPrincipal(final BigDecimal maxPrincipal) {
+    public void setMaxPrincipal(final BigDecimal maxPrincipal) {
         this.maxPrincipal = maxPrincipal;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinNominalInterestRatePerPeriod(final BigDecimal minNominalInterestRatePerPeriod) {
+    public void setMinNominalInterestRatePerPeriod(final BigDecimal minNominalInterestRatePerPeriod) {
         this.minNominalInterestRatePerPeriod = minNominalInterestRatePerPeriod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMaxNominalInterestRatePerPeriod(final BigDecimal maxNominalInterestRatePerPeriod) {
+    public void setMaxNominalInterestRatePerPeriod(final BigDecimal maxNominalInterestRatePerPeriod) {
         this.maxNominalInterestRatePerPeriod = maxNominalInterestRatePerPeriod;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMinNumberOfRepayments(final Integer minNumberOfRepayments) {
+    public void setMinNumberOfRepayments(final Integer minNumberOfRepayments) {
         this.minNumberOfRepayments = minNumberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setMaxNumberOfRepayments(final Integer maxNumberOfRepayments) {
+    public void setMaxNumberOfRepayments(final Integer maxNumberOfRepayments) {
         this.maxNumberOfRepayments = maxNumberOfRepayments;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductMinMaxConstraints() {
-    }
+    public LoanProductMinMaxConstraints() {}
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductMinMaxConstraints(final BigDecimal minPrincipal, final BigDecimal maxPrincipal, final BigDecimal minNominalInterestRatePerPeriod, final BigDecimal maxNominalInterestRatePerPeriod, final Integer minNumberOfRepayments, final Integer maxNumberOfRepayments) {
+    public LoanProductMinMaxConstraints(final BigDecimal minPrincipal, final BigDecimal maxPrincipal,
+            final BigDecimal minNominalInterestRatePerPeriod, final BigDecimal maxNominalInterestRatePerPeriod,
+            final Integer minNumberOfRepayments, final Integer maxNumberOfRepayments) {
         this.minPrincipal = minPrincipal;
         this.maxPrincipal = maxPrincipal;
         this.minNominalInterestRatePerPeriod = minNominalInterestRatePerPeriod;

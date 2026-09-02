@@ -26,8 +26,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AccrualActivityPostingBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingBusinessStep.class);
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
 
     @Override
@@ -51,7 +52,7 @@ public class AccrualActivityPostingBusinessStep implements LoanCOBBusinessStep {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccrualActivityPostingBusinessStep(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+    public AccrualActivityPostingBusinessStep(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
         this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
     }
 }

@@ -30,15 +30,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanScheduleComponent {
+
     private final LoanBalanceService loanBalanceService;
 
     public void updateLoanSchedule(Loan loan, final LoanScheduleModel modifiedLoanSchedule) {
         final List<LoanScheduleModelPeriod> periods = modifiedLoanSchedule.getPeriods();
         for (final LoanScheduleModelPeriod scheduledLoanInstallment : modifiedLoanSchedule.getPeriods()) {
             if (scheduledLoanInstallment.isRepaymentPeriod() || scheduledLoanInstallment.isDownPaymentPeriod()) {
-                LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(), scheduledLoanInstallment.periodNumber());
+                LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(),
+                        scheduledLoanInstallment.periodNumber());
                 if (existingInstallment == null) {
-                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), LoanInterestRecalcualtionAdditionalDetails.from(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
+                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan,
+                            scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(),
+                            scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(),
+                            scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(),
+                            scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(),
+                            LoanInterestRecalcualtionAdditionalDetails.from(scheduledLoanInstallment.getLoanCompoundingDetails()),
+                            scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
                     loan.addLoanRepaymentScheduleInstallment(installment);
                 } else {
                     existingInstallment.copyFrom(scheduledLoanInstallment);
@@ -53,7 +61,8 @@ public class LoanScheduleComponent {
 
     public void updateLoanSchedule(Loan loan, final List<LoanRepaymentScheduleInstallment> installments) {
         for (final LoanRepaymentScheduleInstallment installment : installments) {
-            LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(), installment.getInstallmentNumber());
+            LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(),
+                    installment.getInstallmentNumber());
             if (existingInstallment != null) {
                 existingInstallment.copyFrom(installment);
             } else {
@@ -66,7 +75,8 @@ public class LoanScheduleComponent {
         loanBalanceService.updateLoanSummaryDerivedFields(loan);
     }
 
-    private LoanRepaymentScheduleInstallment findByInstallmentNumber(final Collection<LoanRepaymentScheduleInstallment> installments, final Integer installmentNumber) {
+    private LoanRepaymentScheduleInstallment findByInstallmentNumber(final Collection<LoanRepaymentScheduleInstallment> installments,
+            final Integer installmentNumber) {
         return installments.stream().filter(i -> installmentNumber.compareTo(i.getInstallmentNumber()) == 0).findFirst().orElse(null);
     }
 
@@ -79,7 +89,7 @@ public class LoanScheduleComponent {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanScheduleComponent(final LoanBalanceService loanBalanceService) {
+    public LoanScheduleComponent(final LoanBalanceService loanBalanceService) {
         this.loanBalanceService = loanBalanceService;
     }
 }

@@ -18,19 +18,16 @@
  */
 package org.apache.fineract.shares.shareaccounts.start;
 
-import org.apache.fineract.accounting.moduleapi.SharesJournalPort;
-import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
-import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
-import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
-import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.shares.accounts.constants.AccountsApiConstants;
+import org.apache.fineract.shares.accounts.service.AccountsCommandsService;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountDividendRepository;
 import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformService;
 import org.apache.fineract.shares.shareaccounts.service.PurchasedSharesReadPlatformServiceImpl;
@@ -43,7 +40,6 @@ import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatform
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountReadPlatformServiceImpl;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularService;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountSchedularServiceImpl;
-import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
 import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;

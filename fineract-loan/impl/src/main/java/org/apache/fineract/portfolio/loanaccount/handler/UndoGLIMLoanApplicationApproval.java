@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "GLIMLOAN", action = "UNDOAPPROVAL")
 public class UndoGLIMLoanApplicationApproval implements NewCommandSourceHandler {
+
     private final LoanApplicationWritePlatformService writePlatformService;
 
     @Transactional
@@ -38,7 +39,7 @@ public class UndoGLIMLoanApplicationApproval implements NewCommandSourceHandler 
     }
 
     @java.lang.SuppressWarnings("all")
-        public UndoGLIMLoanApplicationApproval(final LoanApplicationWritePlatformService writePlatformService) {
+    public UndoGLIMLoanApplicationApproval(final LoanApplicationWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 }

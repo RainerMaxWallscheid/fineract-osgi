@@ -27,46 +27,53 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoanProductMinMaxConstraintsUpdateUtil {
+
     public Map<String, Object> update(final LoanProductMinMaxConstraints loanProductMinMaxConstraints, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(20);
         final String localeAsInput = command.locale();
         final String minPrincipalParamName = "minPrincipal";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minPrincipalParamName, loanProductMinMaxConstraints.getMinPrincipal())) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minPrincipalParamName,
+                loanProductMinMaxConstraints.getMinPrincipal())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(minPrincipalParamName);
             actualChanges.put(minPrincipalParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductMinMaxConstraints.setMinPrincipal(newValue);
         }
         final String maxPrincipalParamName = "maxPrincipal";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxPrincipalParamName, loanProductMinMaxConstraints.getMaxPrincipal())) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxPrincipalParamName,
+                loanProductMinMaxConstraints.getMaxPrincipal())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(maxPrincipalParamName);
             actualChanges.put(maxPrincipalParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductMinMaxConstraints.setMaxPrincipal(newValue);
         }
         final String minNumberOfRepaymentsParamName = "minNumberOfRepayments";
-        if (command.isChangeInIntegerParameterNamed(minNumberOfRepaymentsParamName, loanProductMinMaxConstraints.getMinNumberOfRepayments())) {
+        if (command.isChangeInIntegerParameterNamed(minNumberOfRepaymentsParamName,
+                loanProductMinMaxConstraints.getMinNumberOfRepayments())) {
             final Integer newValue = command.integerValueOfParameterNamed(minNumberOfRepaymentsParamName);
             actualChanges.put(minNumberOfRepaymentsParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductMinMaxConstraints.setMinNumberOfRepayments(newValue);
         }
         final String maxNumberOfRepaymentsParamName = "maxNumberOfRepayments";
-        if (command.isChangeInIntegerParameterNamed(maxNumberOfRepaymentsParamName, loanProductMinMaxConstraints.getMaxNumberOfRepayments())) {
+        if (command.isChangeInIntegerParameterNamed(maxNumberOfRepaymentsParamName,
+                loanProductMinMaxConstraints.getMaxNumberOfRepayments())) {
             final Integer newValue = command.integerValueOfParameterNamed(maxNumberOfRepaymentsParamName);
             actualChanges.put(maxNumberOfRepaymentsParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductMinMaxConstraints.setMaxNumberOfRepayments(newValue);
         }
         final String minInterestRatePerPeriodParamName = "minInterestRatePerPeriod";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minInterestRatePerPeriodParamName, loanProductMinMaxConstraints.getMinNominalInterestRatePerPeriod())) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(minInterestRatePerPeriodParamName,
+                loanProductMinMaxConstraints.getMinNominalInterestRatePerPeriod())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(minInterestRatePerPeriodParamName);
             actualChanges.put(minInterestRatePerPeriodParamName, newValue);
             actualChanges.put("locale", localeAsInput);
             loanProductMinMaxConstraints.setMinNominalInterestRatePerPeriod(newValue);
         }
         final String maxInterestRatePerPeriodParamName = "maxInterestRatePerPeriod";
-        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxInterestRatePerPeriodParamName, loanProductMinMaxConstraints.getMaxNominalInterestRatePerPeriod())) {
+        if (command.isChangeInBigDecimalParameterNamedWithNullCheck(maxInterestRatePerPeriodParamName,
+                loanProductMinMaxConstraints.getMaxNominalInterestRatePerPeriod())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(maxInterestRatePerPeriodParamName);
             actualChanges.put(maxInterestRatePerPeriodParamName, newValue);
             actualChanges.put("locale", localeAsInput);
@@ -76,6 +83,5 @@ public class LoanProductMinMaxConstraintsUpdateUtil {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductMinMaxConstraintsUpdateUtil() {
-    }
+    public LoanProductMinMaxConstraintsUpdateUtil() {}
 }

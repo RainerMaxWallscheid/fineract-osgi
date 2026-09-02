@@ -31,13 +31,16 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 public class LoanIdsHardLockedExceptionMapper implements FineractExceptionMapper, ExceptionMapper<LoanIdsHardLockedException> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanIdsHardLockedExceptionMapper.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanIdsHardLockedExceptionMapper.class);
 
     @Override
     public Response toResponse(LoanIdsHardLockedException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        return Response.status(HttpStatus.SC_CONFLICT).entity(ApiGlobalErrorResponse.loanIsLocked(exception.getLoanIdFromRequest()).toJson()).type(MediaType.APPLICATION_JSON).build();
+        return Response.status(HttpStatus.SC_CONFLICT)
+                .entity(ApiGlobalErrorResponse.loanIsLocked(exception.getLoanIdFromRequest()).toJson()).type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     @Override

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanProductBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanProductBusinessEvent> {
+
     private final LoanProductReadPlatformService service;
     private final LoanProductDataMapper mapper;
     private final List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> externalEventCustomDataSerializers;
@@ -62,7 +63,8 @@ public class LoanProductBusinessEventSerializer extends AbstractBusinessEventWit
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductBusinessEventSerializer(final LoanProductReadPlatformService service, final LoanProductDataMapper mapper, final List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> externalEventCustomDataSerializers) {
+    public LoanProductBusinessEventSerializer(final LoanProductReadPlatformService service, final LoanProductDataMapper mapper,
+            final List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> externalEventCustomDataSerializers) {
         this.service = service;
         this.mapper = mapper;
         this.externalEventCustomDataSerializers = externalEventCustomDataSerializers;

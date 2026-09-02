@@ -41,6 +41,7 @@ import org.apache.fineract.useradministration.domain.AppUser;
 @Entity
 @Table(name = "m_loan_reschedule_request")
 public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
@@ -78,13 +79,15 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     /**
      * LoanRescheduleRequest constructor
      */
-    protected LoanRescheduleRequest() {
-    }
+    protected LoanRescheduleRequest() {}
 
     /**
      * LoanRescheduleRequest constructor
      */
-    private LoanRescheduleRequest(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment, final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue, final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser, final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
+    private LoanRescheduleRequest(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
+            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
+            final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser,
+            final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
         this.loan = loan;
         this.statusEnum = statusEnum;
         this.rescheduleFromInstallment = rescheduleFromInstallment;
@@ -103,8 +106,13 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     /**
      * @return a new instance of the LoanRescheduleRequest class
      */
-    public static LoanRescheduleRequest instance(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment, final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue, final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser, final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
-        return new LoanRescheduleRequest(loan, statusEnum, rescheduleFromInstallment, rescheduleFromDate, recalculateInterest, rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate, submittedByUser, approvedOnDate, approvedByUser, rejectedOnDate, rejectedByUser);
+    public static LoanRescheduleRequest instance(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
+            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
+            final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser,
+            final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
+        return new LoanRescheduleRequest(loan, statusEnum, rescheduleFromInstallment, rescheduleFromDate, recalculateInterest,
+                rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate, submittedByUser, approvedOnDate, approvedByUser,
+                rejectedOnDate, rejectedByUser);
     }
 
     /**
@@ -157,75 +165,79 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     }
 
     public LoanTermVariations getInterestRateFromInstallmentTermVariationIfExists() {
-        return this.loanRescheduleRequestToTermVariationMappings.stream().map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations).filter(loanTermVariations -> loanTermVariations.getTermType().isInterestRateFromInstallment()).findFirst().orElse(null);
+        return this.loanRescheduleRequestToTermVariationMappings.stream()
+                .map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations)
+                .filter(loanTermVariations -> loanTermVariations.getTermType().isInterestRateFromInstallment()).findFirst().orElse(null);
     }
 
     public LoanTermVariations getDueDateTermVariationIfExists() {
-        return this.loanRescheduleRequestToTermVariationMappings.stream().map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations).filter(loanTermVariations -> loanTermVariations.getTermType().isDueDateVariation()).findFirst().orElse(null);
+        return this.loanRescheduleRequestToTermVariationMappings.stream()
+                .map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations)
+                .filter(loanTermVariations -> loanTermVariations.getTermType().isDueDateVariation()).findFirst().orElse(null);
     }
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getStatusEnum() {
+    public Integer getStatusEnum() {
         return this.statusEnum;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Integer getRescheduleFromInstallment() {
+    public Integer getRescheduleFromInstallment() {
         return this.rescheduleFromInstallment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getRescheduleFromDate() {
+    public LocalDate getRescheduleFromDate() {
         return this.rescheduleFromDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getRescheduleReasonCodeValue() {
+    public CodeValue getRescheduleReasonCodeValue() {
         return this.rescheduleReasonCodeValue;
     }
 
     @java.lang.SuppressWarnings("all")
-        public String getRescheduleReasonComment() {
+    public String getRescheduleReasonComment() {
         return this.rescheduleReasonComment;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getSubmittedOnDate() {
+    public LocalDate getSubmittedOnDate() {
         return this.submittedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getSubmittedByUser() {
+    public AppUser getSubmittedByUser() {
         return this.submittedByUser;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getApprovedOnDate() {
+    public LocalDate getApprovedOnDate() {
         return this.approvedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getApprovedByUser() {
+    public AppUser getApprovedByUser() {
         return this.approvedByUser;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getRejectedOnDate() {
+    public LocalDate getRejectedOnDate() {
         return this.rejectedOnDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getRejectedByUser() {
+    public AppUser getRejectedByUser() {
         return this.rejectedByUser;
     }
 
     @java.lang.SuppressWarnings("all")
-        public Set<LoanRescheduleRequestToTermVariationMapping> getLoanRescheduleRequestToTermVariationMappings() {
+    public Set<LoanRescheduleRequestToTermVariationMapping> getLoanRescheduleRequestToTermVariationMappings() {
         return this.loanRescheduleRequestToTermVariationMappings;
     }
 }

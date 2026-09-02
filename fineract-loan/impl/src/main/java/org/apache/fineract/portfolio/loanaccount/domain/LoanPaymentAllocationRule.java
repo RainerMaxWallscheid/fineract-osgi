@@ -36,8 +36,10 @@ import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationType;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTypeListConverter;
 
 @Entity
-@Table(name = "m_loan_payment_allocation_rule", uniqueConstraints = {@UniqueConstraint(columnNames = {"loan_id", "transaction_type"}, name = "uq_m_loan_payment_allocation_rule")})
+@Table(name = "m_loan_payment_allocation_rule", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "loan_id", "transaction_type" }, name = "uq_m_loan_payment_allocation_rule") })
 public class LoanPaymentAllocationRule extends AbstractAuditableWithUTCDateTimeCustom<Long> {
+
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
@@ -52,47 +54,48 @@ public class LoanPaymentAllocationRule extends AbstractAuditableWithUTCDateTimeC
     private FutureInstallmentAllocationRule futureInstallmentAllocationRule;
 
     @java.lang.SuppressWarnings("all")
-        public Loan getLoan() {
+    public Loan getLoan() {
         return this.loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public PaymentAllocationTransactionType getTransactionType() {
+    public PaymentAllocationTransactionType getTransactionType() {
         return this.transactionType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<PaymentAllocationType> getAllocationTypes() {
+    public List<PaymentAllocationType> getAllocationTypes() {
         return this.allocationTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public FutureInstallmentAllocationRule getFutureInstallmentAllocationRule() {
+    public FutureInstallmentAllocationRule getFutureInstallmentAllocationRule() {
         return this.futureInstallmentAllocationRule;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setLoan(final Loan loan) {
+    public void setLoan(final Loan loan) {
         this.loan = loan;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setTransactionType(final PaymentAllocationTransactionType transactionType) {
+    public void setTransactionType(final PaymentAllocationTransactionType transactionType) {
         this.transactionType = transactionType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setAllocationTypes(final List<PaymentAllocationType> allocationTypes) {
+    public void setAllocationTypes(final List<PaymentAllocationType> allocationTypes) {
         this.allocationTypes = allocationTypes;
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFutureInstallmentAllocationRule(final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
+    public void setFutureInstallmentAllocationRule(final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
         this.futureInstallmentAllocationRule = futureInstallmentAllocationRule;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanPaymentAllocationRule(final Loan loan, final PaymentAllocationTransactionType transactionType, final List<PaymentAllocationType> allocationTypes, final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
+    public LoanPaymentAllocationRule(final Loan loan, final PaymentAllocationTransactionType transactionType,
+            final List<PaymentAllocationType> allocationTypes, final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
         this.loan = loan;
         this.transactionType = transactionType;
         this.allocationTypes = allocationTypes;
@@ -100,6 +103,5 @@ public class LoanPaymentAllocationRule extends AbstractAuditableWithUTCDateTimeC
     }
 
     @java.lang.SuppressWarnings("all")
-        protected LoanPaymentAllocationRule() {
-    }
+    protected LoanPaymentAllocationRule() {}
 }

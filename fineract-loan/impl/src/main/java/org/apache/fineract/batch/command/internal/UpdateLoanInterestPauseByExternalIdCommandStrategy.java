@@ -19,6 +19,7 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
+
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UpdateLoanInterestPauseByExternalIdCommandStrategy implements CommandStrategy {
+
     private final LoanInterestPauseApiResource loanInterestPauseApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
@@ -53,14 +55,16 @@ public class UpdateLoanInterestPauseByExternalIdCommandStrategy implements Comma
         final String loanExternalId = pathParameters.get(2);
         final Long variationId = Long.parseLong(pathParameters.get(4));
         final InterestPauseRequestDto interestPauseRequestDto = InterestPauseRequestDto.fromJson(request.getBody());
-        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.updateInterestPauseByExternalId(loanExternalId, variationId, interestPauseRequestDto);
+        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.updateInterestPauseByExternalId(loanExternalId,
+                variationId, interestPauseRequestDto);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
         return response;
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateLoanInterestPauseByExternalIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+    public UpdateLoanInterestPauseByExternalIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource,
+            final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
         this.loanInterestPauseApiResource = loanInterestPauseApiResource;
         this.toApiJsonSerializer = toApiJsonSerializer;
     }

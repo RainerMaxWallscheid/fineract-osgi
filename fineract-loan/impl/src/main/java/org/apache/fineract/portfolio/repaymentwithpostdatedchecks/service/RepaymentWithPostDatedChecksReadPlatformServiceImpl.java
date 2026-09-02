@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 public class RepaymentWithPostDatedChecksReadPlatformServiceImpl implements RepaymentWithPostDatedChecksReadPlatformService {
+
     private final PostDatedChecksRepository postDatedChecksRepository;
     private final LoanRepository loanRepository;
     private final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository;
@@ -46,7 +47,11 @@ public class RepaymentWithPostDatedChecksReadPlatformServiceImpl implements Repa
         for (PostDatedChecks postDatedCheckObject : postDatedChecks) {
             // Avoid bounced checks
             if (!PostDatedChecksStatus.POST_DATED_CHECKS_BOUNCED.equals(postDatedCheckObject.getStatus())) {
-                postDatedChecksDataList.add(PostDatedChecksData.from(postDatedCheckObject.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedCheckObject.getId(), postDatedCheckObject.getLoanRepaymentScheduleInstallment().getInstallmentNumber(), postDatedCheckObject.getAccountNo(), postDatedCheckObject.getAmount(), postDatedCheckObject.getBankName(), postDatedCheckObject.getCheckNo(), postDatedCheckObject.getStatus()));
+                postDatedChecksDataList.add(PostDatedChecksData.from(
+                        postDatedCheckObject.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedCheckObject.getId(),
+                        postDatedCheckObject.getLoanRepaymentScheduleInstallment().getInstallmentNumber(),
+                        postDatedCheckObject.getAccountNo(), postDatedCheckObject.getAmount(), postDatedCheckObject.getBankName(),
+                        postDatedCheckObject.getCheckNo(), postDatedCheckObject.getStatus()));
             }
         }
         return postDatedChecksDataList;
@@ -54,8 +59,11 @@ public class RepaymentWithPostDatedChecksReadPlatformServiceImpl implements Repa
 
     @Override
     public PostDatedChecksData getPostDatedCheck(final Long id) {
-        final PostDatedChecks postDatedChecks = this.postDatedChecksRepository.findById(id).orElseThrow(() -> new PostDatedCheckNotFoundException(id));
-        return PostDatedChecksData.from(postDatedChecks.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedChecks.getId(), postDatedChecks.getLoanRepaymentScheduleInstallment().getInstallmentNumber(), postDatedChecks.getAccountNo(), postDatedChecks.getAmount(), postDatedChecks.getBankName(), postDatedChecks.getCheckNo(), postDatedChecks.getStatus());
+        final PostDatedChecks postDatedChecks = this.postDatedChecksRepository.findById(id)
+                .orElseThrow(() -> new PostDatedCheckNotFoundException(id));
+        return PostDatedChecksData.from(postDatedChecks.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedChecks.getId(),
+                postDatedChecks.getLoanRepaymentScheduleInstallment().getInstallmentNumber(), postDatedChecks.getAccountNo(),
+                postDatedChecks.getAmount(), postDatedChecks.getBankName(), postDatedChecks.getCheckNo(), postDatedChecks.getStatus());
     }
 
     @Override
@@ -65,12 +73,20 @@ public class RepaymentWithPostDatedChecksReadPlatformServiceImpl implements Repa
         if (postDatedChecks == null || postDatedChecks.size() == 0) {
             throw new PostDatedCheckNotFoundException(loanId, id);
         }
-        final PostDatedChecks postDatedChecksData = postDatedChecks.stream().filter(postDatedCheck -> postDatedCheck.getLoanRepaymentScheduleInstallment().getInstallmentNumber().equals(id) && !PostDatedChecksStatus.POST_DATED_CHECKS_BOUNCED.equals(postDatedCheck.getStatus())).collect(Collectors.toList()).get(0);
-        return PostDatedChecksData.from(postDatedChecksData.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedChecksData.getId(), postDatedChecksData.getLoanRepaymentScheduleInstallment().getInstallmentNumber(), postDatedChecksData.getAccountNo(), postDatedChecksData.getAmount(), postDatedChecksData.getBankName(), postDatedChecksData.getCheckNo(), postDatedChecksData.getStatus());
+        final PostDatedChecks postDatedChecksData = postDatedChecks.stream()
+                .filter(postDatedCheck -> postDatedCheck.getLoanRepaymentScheduleInstallment().getInstallmentNumber().equals(id)
+                        && !PostDatedChecksStatus.POST_DATED_CHECKS_BOUNCED.equals(postDatedCheck.getStatus()))
+                .collect(Collectors.toList()).get(0);
+        return PostDatedChecksData.from(postDatedChecksData.getLoanRepaymentScheduleInstallment().getDueDate(), postDatedChecksData.getId(),
+                postDatedChecksData.getLoanRepaymentScheduleInstallment().getInstallmentNumber(), postDatedChecksData.getAccountNo(),
+                postDatedChecksData.getAmount(), postDatedChecksData.getBankName(), postDatedChecksData.getCheckNo(),
+                postDatedChecksData.getStatus());
     }
 
     @java.lang.SuppressWarnings("all")
-        public RepaymentWithPostDatedChecksReadPlatformServiceImpl(final PostDatedChecksRepository postDatedChecksRepository, final LoanRepository loanRepository, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository) {
+    public RepaymentWithPostDatedChecksReadPlatformServiceImpl(final PostDatedChecksRepository postDatedChecksRepository,
+            final LoanRepository loanRepository,
+            final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository) {
         this.postDatedChecksRepository = postDatedChecksRepository;
         this.loanRepository = loanRepository;
         this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;

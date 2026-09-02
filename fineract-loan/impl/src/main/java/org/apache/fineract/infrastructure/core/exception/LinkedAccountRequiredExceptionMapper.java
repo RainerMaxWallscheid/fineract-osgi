@@ -30,13 +30,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 public class LinkedAccountRequiredExceptionMapper implements FineractExceptionMapper, ExceptionMapper<LinkedAccountRequiredException> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LinkedAccountRequiredExceptionMapper.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LinkedAccountRequiredExceptionMapper.class);
 
     @Override
     public Response toResponse(LinkedAccountRequiredException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
+        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(
+                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
         // request understood but not carried out due to it violating some
         // domain/business logic
         return Response.status(Response.Status.FORBIDDEN).entity(notFoundErrorResponse).type(MediaType.APPLICATION_JSON).build();

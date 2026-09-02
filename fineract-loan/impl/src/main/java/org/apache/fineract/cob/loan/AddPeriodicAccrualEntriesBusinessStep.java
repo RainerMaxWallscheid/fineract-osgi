@@ -27,8 +27,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AddPeriodicAccrualEntriesBusinessStep implements LoanCOBBusinessStep {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesBusinessStep.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesBusinessStep.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -54,7 +55,7 @@ public class AddPeriodicAccrualEntriesBusinessStep implements LoanCOBBusinessSte
     }
 
     @java.lang.SuppressWarnings("all")
-        public AddPeriodicAccrualEntriesBusinessStep(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+    public AddPeriodicAccrualEntriesBusinessStep(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
         this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

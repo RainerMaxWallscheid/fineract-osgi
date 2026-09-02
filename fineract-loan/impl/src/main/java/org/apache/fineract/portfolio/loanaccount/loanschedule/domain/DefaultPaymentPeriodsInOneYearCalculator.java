@@ -28,49 +28,55 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultPaymentPeriodsInOneYearCalculator implements PaymentPeriodsInOneYearCalculator {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultPaymentPeriodsInOneYearCalculator.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultPaymentPeriodsInOneYearCalculator.class);
 
     @Override
     public Integer calculate(final PeriodFrequencyType repaymentFrequencyType) {
         Integer paymentPeriodsInOneYear = 0;
         switch (repaymentFrequencyType) {
-        case DAYS: 
-            paymentPeriodsInOneYear = 365;
+            case DAYS:
+                paymentPeriodsInOneYear = 365;
             break;
-        case WEEKS: 
-            paymentPeriodsInOneYear = 52;
+            case WEEKS:
+                paymentPeriodsInOneYear = 52;
             break;
-        case MONTHS: 
-            paymentPeriodsInOneYear = 12;
+            case MONTHS:
+                paymentPeriodsInOneYear = 12;
             break;
-        case YEARS: 
-            paymentPeriodsInOneYear = 1;
+            case YEARS:
+                paymentPeriodsInOneYear = 1;
             break;
-        case INVALID: 
-            paymentPeriodsInOneYear = 0;
+            case INVALID:
+                paymentPeriodsInOneYear = 0;
             break;
-        case WHOLE_TERM: 
-            log.error("TODO Implement repaymentFrequencyType for WHOLE_TERM");
+            case WHOLE_TERM:
+                log.error("TODO Implement repaymentFrequencyType for WHOLE_TERM");
             break;
         }
         return paymentPeriodsInOneYear;
     }
 
     @Override
-    public BigDecimal calculatePortionOfRepaymentPeriodInterestChargingGrace(final LocalDate repaymentPeriodStartDate, final LocalDate scheduledDueDate, final LocalDate interestChargedFromLocalDate, final PeriodFrequencyType repaymentPeriodFrequencyType, final int repaidEvery, MathContext mc) {
+    public BigDecimal calculatePortionOfRepaymentPeriodInterestChargingGrace(final LocalDate repaymentPeriodStartDate,
+            final LocalDate scheduledDueDate, final LocalDate interestChargedFromLocalDate,
+            final PeriodFrequencyType repaymentPeriodFrequencyType, final int repaidEvery, MathContext mc) {
         BigDecimal periodFraction = BigDecimal.ZERO;
         final LocalDateInterval repaymentPeriod = new LocalDateInterval(repaymentPeriodStartDate, scheduledDueDate);
         if (interestChargedFromLocalDate != null && repaymentPeriod.fallsBefore(interestChargedFromLocalDate.plusDays(1))) {
             periodFraction = BigDecimal.ONE;
         } else if (interestChargedFromLocalDate != null && repaymentPeriod.contains(interestChargedFromLocalDate)) {
-            final int numberOfDaysInterestCalculationGraceInPeriod = DateUtils.getExactDifferenceInDays(repaymentPeriodStartDate, interestChargedFromLocalDate);
-            periodFraction = calculateRepaymentPeriodFraction(repaymentPeriodFrequencyType, repaidEvery, numberOfDaysInterestCalculationGraceInPeriod, mc);
+            final int numberOfDaysInterestCalculationGraceInPeriod = DateUtils.getExactDifferenceInDays(repaymentPeriodStartDate,
+                    interestChargedFromLocalDate);
+            periodFraction = calculateRepaymentPeriodFraction(repaymentPeriodFrequencyType, repaidEvery,
+                    numberOfDaysInterestCalculationGraceInPeriod, mc);
         }
         return periodFraction;
     }
 
-    private BigDecimal calculateRepaymentPeriodFraction(final PeriodFrequencyType repaymentPeriodFrequencyType, final int repaidEvery, final int numberOfDaysInterestCalculationGrace, final MathContext mc) {
+    private BigDecimal calculateRepaymentPeriodFraction(final PeriodFrequencyType repaymentPeriodFrequencyType, final int repaidEvery,
+            final int numberOfDaysInterestCalculationGrace, final MathContext mc) {
         BigDecimal repayEveryBD = BigDecimal.valueOf(repaidEvery);
         BigDecimal noDaysInterestCalculationGrace = BigDecimal.valueOf(numberOfDaysInterestCalculationGrace);
         return switch (repaymentPeriodFrequencyType) {

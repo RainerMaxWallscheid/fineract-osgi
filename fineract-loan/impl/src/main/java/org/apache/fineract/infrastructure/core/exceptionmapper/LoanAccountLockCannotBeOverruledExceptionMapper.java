@@ -30,8 +30,9 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 public class LoanAccountLockCannotBeOverruledExceptionMapper implements ExceptionMapper<AccountLockCannotBeOverruledException> {
+
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountLockCannotBeOverruledExceptionMapper.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountLockCannotBeOverruledExceptionMapper.class);
 
     @Override
     public Response toResponse(AccountLockCannotBeOverruledException exception) {

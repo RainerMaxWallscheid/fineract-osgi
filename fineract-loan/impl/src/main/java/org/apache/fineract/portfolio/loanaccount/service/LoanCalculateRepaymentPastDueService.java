@@ -29,6 +29,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 
 public class LoanCalculateRepaymentPastDueService {
+
     public LoanRepaymentPastDueData retrieveLoanRepaymentPastDueAmountTillDate(Loan loan) {
         List<LoanRepaymentScheduleInstallment> pastDueRepayments = getPastDueRepayments(loan);
         MonetaryCurrency loanCurrency = loan.getCurrency();
@@ -36,18 +37,24 @@ public class LoanCalculateRepaymentPastDueService {
         return pastDueData;
     }
 
-    private LoanRepaymentPastDueData calculatePastDueAmountsForRepayments(List<LoanRepaymentScheduleInstallment> pastDueRepayments, MonetaryCurrency currency) {
+    private LoanRepaymentPastDueData calculatePastDueAmountsForRepayments(List<LoanRepaymentScheduleInstallment> pastDueRepayments,
+            MonetaryCurrency currency) {
         BigDecimal totalAmount = BigDecimal.ZERO;
         BigDecimal principalAmount = BigDecimal.ZERO;
         BigDecimal interestAmount = BigDecimal.ZERO;
         BigDecimal feeAmount = BigDecimal.ZERO;
         BigDecimal penaltyAmount = BigDecimal.ZERO;
         if (!pastDueRepayments.isEmpty()) {
-            totalAmount = pastDueRepayments.stream().map(repayment -> repayment.getTotalOutstanding(currency).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            principalAmount = pastDueRepayments.stream().map(repayment -> repayment.getPrincipalOutstanding(currency).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            interestAmount = pastDueRepayments.stream().map(repayment -> repayment.getInterestOutstanding(currency).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            feeAmount = pastDueRepayments.stream().map(repayment -> repayment.getFeeChargesOutstanding(currency).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            penaltyAmount = pastDueRepayments.stream().map(repayment -> repayment.getPenaltyChargesOutstanding(currency).getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalAmount = pastDueRepayments.stream().map(repayment -> repayment.getTotalOutstanding(currency).getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            principalAmount = pastDueRepayments.stream().map(repayment -> repayment.getPrincipalOutstanding(currency).getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            interestAmount = pastDueRepayments.stream().map(repayment -> repayment.getInterestOutstanding(currency).getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            feeAmount = pastDueRepayments.stream().map(repayment -> repayment.getFeeChargesOutstanding(currency).getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            penaltyAmount = pastDueRepayments.stream().map(repayment -> repayment.getPenaltyChargesOutstanding(currency).getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
         return new LoanRepaymentPastDueData(totalAmount, principalAmount, interestAmount, feeAmount, penaltyAmount);
     }
@@ -55,10 +62,11 @@ public class LoanCalculateRepaymentPastDueService {
     private List<LoanRepaymentScheduleInstallment> getPastDueRepayments(Loan loan) {
         List<LoanRepaymentScheduleInstallment> loanRepayments = loan.getRepaymentScheduleInstallments();
         LocalDate currentBusinessDate = DateUtils.getBusinessLocalDate();
-        return loanRepayments.stream().filter(repayment -> (!repayment.isObligationsMet() && !DateUtils.isAfter(repayment.getDueDate(), currentBusinessDate))).collect(Collectors.toList());
+        return loanRepayments.stream()
+                .filter(repayment -> (!repayment.isObligationsMet() && !DateUtils.isAfter(repayment.getDueDate(), currentBusinessDate)))
+                .collect(Collectors.toList());
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCalculateRepaymentPastDueService() {
-    }
+    public LoanCalculateRepaymentPastDueService() {}
 }
