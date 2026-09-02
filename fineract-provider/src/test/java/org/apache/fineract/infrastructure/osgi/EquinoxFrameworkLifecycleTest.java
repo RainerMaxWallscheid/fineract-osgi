@@ -25,12 +25,15 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
+import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
@@ -318,6 +321,43 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void contentStoreLookupFacadeDelegatesToPublishedSpringPort() {
+        final ContentStoreService spring = new ContentStoreService() {
+
+            @Override
+            public InputStream download(final String path) {
+                return null;
+            }
+
+            @Override
+            public String upload(final String path, final InputStream is, final String mimeType) {
+                return path;
+            }
+
+            @Override
+            public void delete(final String path) {}
+
+            @Override
+            public ContentStoreType getType() {
+                return ContentStoreType.S3;
+            }
+        };
+        final SpringOsgiPortBridge bridge = contentBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ContentStoreService facade = OsgiBackedPortFactory.of(lookup, ContentStoreService.class);
+
+        assertEquals(null, facade.getType());
+        lifecycle.start();
+        try {
+            assertEquals(ContentStoreType.S3, facade.getType());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.getType());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -417,6 +457,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringContentStoreStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ContentStoreService content = new StubContentStoreService();
+        final SpringOsgiPortBridge bridge = contentBridge(content);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean documentImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.document.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    documentImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(documentImplActive);
+            final ServiceReference<ContentStoreService> selected = ctx.getServiceReference(ContentStoreService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(content, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -428,6 +498,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge taxBridge(final TaxCatalogPort tax) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TaxCatalogPort.class, tax)));
+    }
+
+    private static SpringOsgiPortBridge contentBridge(final ContentStoreService content) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ContentStoreService.class, content)));
     }
 
     private static Path stagedCatalog() {
@@ -505,6 +579,27 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public TaxComponentDefinitionData getTaxComponent(final Long taxComponentId) {
             return null;
+        }
+    }
+
+    private static final class StubContentStoreService implements ContentStoreService {
+
+        @Override
+        public InputStream download(final String path) {
+            return null;
+        }
+
+        @Override
+        public String upload(final String path, final InputStream is, final String mimeType) {
+            return path;
+        }
+
+        @Override
+        public void delete(final String path) {}
+
+        @Override
+        public ContentStoreType getType() {
+            return ContentStoreType.FILE_SYSTEM;
         }
     }
 }
