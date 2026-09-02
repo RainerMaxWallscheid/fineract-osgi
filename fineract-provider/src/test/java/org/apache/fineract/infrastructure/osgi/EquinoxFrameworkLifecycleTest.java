@@ -45,6 +45,9 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRateDefinitionData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
+import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplateData;
+import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
@@ -382,6 +385,55 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void originatorLookupFacadeDelegatesToPublishedSpringPort() {
+        final LoanOriginatorReadPlatformService spring = new LoanOriginatorReadPlatformService() {
+
+            @Override
+            public List<LoanOriginatorData> retrieveAll() {
+                return List.of();
+            }
+
+            @Override
+            public LoanOriginatorData retrieveById(final Long id) {
+                return id != null && id == 7L ? LoanOriginatorData.builder().id(7L).build() : null;
+            }
+
+            @Override
+            public LoanOriginatorData retrieveByExternalId(final String externalId) {
+                return null;
+            }
+
+            @Override
+            public Long resolveIdByExternalId(final String externalId) {
+                return null;
+            }
+
+            @Override
+            public List<LoanOriginatorData> retrieveByLoanId(final Long loanId) {
+                return List.of();
+            }
+
+            @Override
+            public LoanOriginatorTemplateData retrieveTemplate() {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = originatorBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final LoanOriginatorReadPlatformService facade = OsgiBackedPortFactory.of(lookup, LoanOriginatorReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveById(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveById(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveById(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -541,6 +593,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringOriginatorPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final LoanOriginatorReadPlatformService originator = new StubLoanOriginatorReadPlatformService();
+        final SpringOsgiPortBridge bridge = originatorBridge(originator);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean originatorImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.loanorigination.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    originatorImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(originatorImplActive);
+            final ServiceReference<LoanOriginatorReadPlatformService> selected = ctx
+                    .getServiceReference(LoanOriginatorReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(originator, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -560,6 +643,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge cashierBridge(final CashierTxnValidationPort cashier) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CashierTxnValidationPort.class, cashier)));
+    }
+
+    private static SpringOsgiPortBridge originatorBridge(final LoanOriginatorReadPlatformService originator) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(LoanOriginatorReadPlatformService.class, originator)));
     }
 
     private static Path stagedCatalog() {
@@ -675,5 +762,38 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public void validateOnLoanDisbursal(final Long staffId, final String currencyCode, final BigDecimal transactionAmount) {}
+    }
+
+    private static final class StubLoanOriginatorReadPlatformService implements LoanOriginatorReadPlatformService {
+
+        @Override
+        public List<LoanOriginatorData> retrieveAll() {
+            return List.of();
+        }
+
+        @Override
+        public LoanOriginatorData retrieveById(final Long id) {
+            return null;
+        }
+
+        @Override
+        public LoanOriginatorData retrieveByExternalId(final String externalId) {
+            return null;
+        }
+
+        @Override
+        public Long resolveIdByExternalId(final String externalId) {
+            return null;
+        }
+
+        @Override
+        public List<LoanOriginatorData> retrieveByLoanId(final Long loanId) {
+            return List.of();
+        }
+
+        @Override
+        public LoanOriginatorTemplateData retrieveTemplate() {
+            return null;
+        }
     }
 }
