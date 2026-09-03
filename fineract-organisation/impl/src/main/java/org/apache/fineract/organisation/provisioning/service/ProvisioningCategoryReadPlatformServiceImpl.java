@@ -25,7 +25,9 @@ import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ProvisioningCategoryReadPlatformServiceImpl implements ProvisioningCategoryReadPlatformService {
     private final JdbcTemplate jdbcTemplate;
     private final ProvisioningCategoryRowMapper provisionCategoryRowMapper = new ProvisioningCategoryRowMapper();
