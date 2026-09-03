@@ -82,8 +82,8 @@ import org.springframework.context.annotation.Primary;
 /**
  * OSGi→Spring port beans (ADR-022 B4 / playbook §15.5). {@code ChargeDefinitionPort}, {@code FloatingRatePort},
  * {@code TaxCatalogPort}, {@code ContentStoreService}, {@code CashierTxnValidationPort},
- * {@code LoanOriginatorReadPlatformService}, {@code MixTaxonomyReadService}, and
- * {@code DelayedSettlementAttributeService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
+ * {@code LoanOriginatorReadPlatformService}, {@code MixTaxonomyReadService}, {@code DelayedSettlementAttributeService},
+ * and {@code GLClosureReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
  * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
  * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
  * stay empty-catalog only.
@@ -145,7 +145,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(GLClosureReadPlatformService.class)
+    @Primary
     public GLClosureReadPlatformService osgiGLClosureReadPlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, GLClosureReadPlatformService.class);
     }

@@ -33,6 +33,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.apache.fineract.accounting.closure.data.GLClosureData;
+import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -484,6 +486,36 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void glClosureLookupFacadeDelegatesToPublishedSpringPort() {
+        final GLClosureReadPlatformService spring = new GLClosureReadPlatformService() {
+
+            @Override
+            public List<GLClosureData> retrieveAllGLClosures(final Long officeId) {
+                return List.of();
+            }
+
+            @Override
+            public GLClosureData retrieveGLClosureById(final long glClosureId) {
+                return glClosureId == 7L ? new GLClosureData(7L, 7L, "hosted", null, false, null, null, null, null, null, null, null)
+                        : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = glClosureBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final GLClosureReadPlatformService facade = OsgiBackedPortFactory.of(lookup, GLClosureReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveGLClosureById(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveGLClosureById(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveGLClosureById(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -735,6 +767,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringGLClosurePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final GLClosureReadPlatformService closures = new StubGLClosureReadPlatformService();
+        final SpringOsgiPortBridge bridge = glClosureBridge(closures);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean accountingImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.accounting.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    accountingImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(accountingImplActive);
+            final ServiceReference<GLClosureReadPlatformService> selected = ctx.getServiceReference(GLClosureReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(closures, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -766,6 +828,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge delayedBridge(final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
+    }
+
+    private static SpringOsgiPortBridge glClosureBridge(final GLClosureReadPlatformService closures) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(GLClosureReadPlatformService.class, closures)));
     }
 
     private static Path stagedCatalog() {
@@ -934,6 +1000,19 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public boolean isEnabled(final Long loanProductId) {
             return false;
+        }
+    }
+
+    private static final class StubGLClosureReadPlatformService implements GLClosureReadPlatformService {
+
+        @Override
+        public List<GLClosureData> retrieveAllGLClosures(final Long officeId) {
+            return List.of();
+        }
+
+        @Override
+        public GLClosureData retrieveGLClosureById(final long glClosureId) {
+            return null;
         }
     }
 }
