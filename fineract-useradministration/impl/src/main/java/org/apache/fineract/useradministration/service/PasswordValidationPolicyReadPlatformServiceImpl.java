@@ -28,7 +28,9 @@ import org.apache.fineract.useradministration.exception.PasswordValidationPolicy
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PasswordValidationPolicyReadPlatformServiceImpl implements PasswordValidationPolicyReadPlatformService {
 
     private final JdbcTemplate jdbcTemplate;

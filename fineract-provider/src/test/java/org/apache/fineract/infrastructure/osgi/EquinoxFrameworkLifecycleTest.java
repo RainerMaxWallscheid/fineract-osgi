@@ -81,6 +81,8 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.useradministration.data.PasswordValidationPolicyData;
+import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -851,6 +853,37 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void passwordValidationPolicyLookupFacadeDelegatesToPublishedSpringPort() {
+        final PasswordValidationPolicyData hosted = new PasswordValidationPolicyData(7L, true, "hosted", "hosted");
+        final PasswordValidationPolicyReadPlatformService spring = new PasswordValidationPolicyReadPlatformService() {
+
+            @Override
+            public Collection<PasswordValidationPolicyData> retrieveAll() {
+                return List.of(hosted);
+            }
+
+            @Override
+            public PasswordValidationPolicyData retrieveActiveValidationPolicy() {
+                return hosted;
+            }
+        };
+        final SpringOsgiPortBridge bridge = passwordValidationPolicyBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final PasswordValidationPolicyReadPlatformService facade = OsgiBackedPortFactory.of(lookup,
+                PasswordValidationPolicyReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveActiveValidationPolicy());
+        lifecycle.start();
+        try {
+            assertSame(hosted, facade.retrieveActiveValidationPolicy());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveActiveValidationPolicy());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1436,6 +1469,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringPasswordValidationPolicyPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final PasswordValidationPolicyReadPlatformService policies = new StubPasswordValidationPolicyReadPlatformService();
+        final SpringOsgiPortBridge bridge = passwordValidationPolicyBridge(policies);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean userAdminImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.useradministration.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    userAdminImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(userAdminImplActive);
+            final ServiceReference<PasswordValidationPolicyReadPlatformService> selected = ctx
+                    .getServiceReference(PasswordValidationPolicyReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(policies, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1512,6 +1576,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge currencyWriteBridge(final CurrencyWritePlatformService currencies) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CurrencyWritePlatformService.class, currencies)));
+    }
+
+    private static SpringOsgiPortBridge passwordValidationPolicyBridge(final PasswordValidationPolicyReadPlatformService policies) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PasswordValidationPolicyReadPlatformService.class, policies)));
     }
 
     private static Path stagedCatalog() {
@@ -1853,6 +1921,19 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public CurrencyUpdateResponse updateAllowedCurrencies(final CurrencyUpdateRequest request) {
+            return null;
+        }
+    }
+
+    private static final class StubPasswordValidationPolicyReadPlatformService implements PasswordValidationPolicyReadPlatformService {
+
+        @Override
+        public Collection<PasswordValidationPolicyData> retrieveAll() {
+            return List.of();
+        }
+
+        @Override
+        public PasswordValidationPolicyData retrieveActiveValidationPolicy() {
             return null;
         }
     }
