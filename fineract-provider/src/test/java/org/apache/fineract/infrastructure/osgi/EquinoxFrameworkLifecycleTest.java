@@ -58,6 +58,8 @@ import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
+import org.apache.fineract.notification.data.NotificationData;
+import org.apache.fineract.notification.service.UserNotificationService;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateResponse;
 import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService;
@@ -952,6 +954,41 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void userNotificationLookupFacadeDelegatesToPublishedSpringPort() {
+        final UserNotificationService spring = new UserNotificationService() {
+
+            @Override
+            public void notifyUsers(final String permission, final String objectType, final Long objectIdentifier,
+                    final String notificationContent, final String eventType, final Long appUserId, final Long officeId) {
+                // hosted unread flag only
+            }
+
+            @Override
+            public boolean hasUnreadUserNotifications(final Long appUserId) {
+                return appUserId != null && appUserId == 7L;
+            }
+
+            @Override
+            public void notifyUsers(final NotificationData notificationData) {
+                // hosted unread flag only
+            }
+        };
+        final SpringOsgiPortBridge bridge = userNotificationBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final UserNotificationService facade = OsgiBackedPortFactory.of(lookup, UserNotificationService.class);
+
+        assertFalse(facade.hasUnreadUserNotifications(7L));
+        lifecycle.start();
+        try {
+            assertTrue(facade.hasUnreadUserNotifications(7L));
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(facade.hasUnreadUserNotifications(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1628,6 +1665,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringUserNotificationPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final UserNotificationService notifications = new StubUserNotificationService();
+        final SpringOsgiPortBridge bridge = userNotificationBridge(notifications);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean notificationImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.notification.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    notificationImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(notificationImplActive);
+            final ServiceReference<UserNotificationService> selected = ctx.getServiceReference(UserNotificationService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(notifications, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1716,6 +1783,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge templateMergeBridge(final TemplateMergeService templates) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TemplateMergeService.class, templates)));
+    }
+
+    private static SpringOsgiPortBridge userNotificationBridge(final UserNotificationService notifications) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(UserNotificationService.class, notifications)));
     }
 
     private static Path stagedCatalog() {
@@ -2102,6 +2173,25 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public String compile(final TemplateData template, final Map<String, Object> scopes) {
             return "";
+        }
+    }
+
+    private static final class StubUserNotificationService implements UserNotificationService {
+
+        @Override
+        public void notifyUsers(final String permission, final String objectType, final Long objectIdentifier,
+                final String notificationContent, final String eventType, final Long appUserId, final Long officeId) {
+            // no-op
+        }
+
+        @Override
+        public boolean hasUnreadUserNotifications(final Long appUserId) {
+            return false;
+        }
+
+        @Override
+        public void notifyUsers(final NotificationData notificationData) {
+            // no-op
         }
     }
 }

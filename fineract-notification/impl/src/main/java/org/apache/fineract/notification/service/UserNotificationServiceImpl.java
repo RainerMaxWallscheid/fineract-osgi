@@ -30,7 +30,9 @@ import org.apache.fineract.notification.data.NotificationData;
 import org.apache.fineract.notification.eventandlistener.NotificationEventPublisher;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserNotificationServiceImpl implements UserNotificationService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserNotificationServiceImpl.class);
