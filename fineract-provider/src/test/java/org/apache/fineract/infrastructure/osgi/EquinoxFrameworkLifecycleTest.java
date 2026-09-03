@@ -1129,6 +1129,55 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void transferWriteLookupFacadeDelegatesToPublishedSpringPort() {
+        final TransferWritePlatformService spring = new TransferWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult transferClientsBetweenGroups(final Long sourceGroupId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult proposeClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult withdrawClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult acceptClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult rejectClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult proposeAndAcceptClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = transferWriteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final TransferWritePlatformService facade = OsgiBackedPortFactory.of(lookup, TransferWritePlatformService.class);
+
+        assertEquals(null, facade.proposeClientTransfer(7L, null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.proposeClientTransfer(7L, null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.proposeClientTransfer(7L, null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1956,6 +2005,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringTransferWritePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final TransferWritePlatformService transfers = new StubTransferWritePlatformService();
+        final SpringOsgiPortBridge bridge = transferWriteBridge(transfers);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean transferImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.transfer.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    transferImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(transferImplActive);
+            final ServiceReference<TransferWritePlatformService> selected = ctx.getServiceReference(TransferWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(transfers, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2064,6 +2143,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge readLikelihoodBridge(final ReadLikelihoodService likelihood) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ReadLikelihoodService.class, likelihood)));
+    }
+
+    private static SpringOsgiPortBridge transferWriteBridge(final TransferWritePlatformService transfers) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TransferWritePlatformService.class, transfers)));
     }
 
     private static Path stagedCatalog() {
@@ -2531,6 +2614,39 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public LikelihoodData retrieve(final Long likelihoodId) {
             return null;
+        }
+    }
+
+    private static final class StubTransferWritePlatformService implements TransferWritePlatformService {
+
+        @Override
+        public CommandProcessingResult transferClientsBetweenGroups(final Long sourceGroupId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult proposeClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult withdrawClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult acceptClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult rejectClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult proposeAndAcceptClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
+            return CommandProcessingResult.empty();
         }
     }
 }
