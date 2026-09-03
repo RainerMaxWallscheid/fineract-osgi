@@ -28,7 +28,9 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFeeAmortizationDetails;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.repository.LoanBuyDownFeeBalanceRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class BuyDownFeeReadPlatformServiceImpl implements BuyDownFeeReadPlatformService {
 
     private final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository;
