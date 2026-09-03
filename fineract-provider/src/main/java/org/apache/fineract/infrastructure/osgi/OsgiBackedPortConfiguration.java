@@ -87,10 +87,11 @@ import org.springframework.context.annotation.Primary;
  * {@code BuyDownFeeReadPlatformService}, {@code WorkingCapitalLoanPeriodPaymentRateChangeReadService},
  * {@code ConfigJobParameterService}, {@code AccessTokenGenerationService}, {@code BusinessDateReadPlatformService},
  * {@code CodeReadPlatformService}, {@code ProvisioningCategoryReadPlatformService},
- * {@code CurrencyWritePlatformService}, {@code PasswordValidationPolicyReadPlatformService}, and
- * {@code AdHocReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve them
- * from the Service Registry. Other ports are created only when Boot has no bean of that type. {@code CommandDispatcher}
- * stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService} stay empty-catalog only.
+ * {@code CurrencyWritePlatformService}, {@code PasswordValidationPolicyReadPlatformService},
+ * {@code AdHocReadPlatformService}, and {@code TemplateMergeService} are {@code @Primary} lookup façades when Equinox
+ * is on — Boot consumers resolve them from the Service Registry. Other ports are created only when Boot has no bean of
+ * that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -228,7 +229,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(TemplateMergeService.class)
+    @Primary
     public TemplateMergeService osgiTemplateMergeService(final OsgiServiceLookup lookup) {
         return backed(lookup, TemplateMergeService.class);
     }

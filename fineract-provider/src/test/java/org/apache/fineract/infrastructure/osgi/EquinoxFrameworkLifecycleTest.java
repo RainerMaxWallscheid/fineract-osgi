@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
@@ -83,6 +84,8 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.template.data.TemplateData;
+import org.apache.fineract.template.service.TemplateMergeService;
 import org.apache.fineract.useradministration.data.PasswordValidationPolicyData;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.junit.jupiter.api.Test;
@@ -925,6 +928,30 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void templateMergeLookupFacadeDelegatesToPublishedSpringPort() {
+        final TemplateMergeService spring = new TemplateMergeService() {
+
+            @Override
+            public String compile(final TemplateData template, final Map<String, Object> scopes) {
+                return "hosted";
+            }
+        };
+        final SpringOsgiPortBridge bridge = templateMergeBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final TemplateMergeService facade = OsgiBackedPortFactory.of(lookup, TemplateMergeService.class);
+
+        assertEquals("", facade.compile(null, null));
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.compile(null, null));
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals("", facade.compile(null, null));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1571,6 +1598,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringTemplateMergePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final TemplateMergeService templates = new StubTemplateMergeService();
+        final SpringOsgiPortBridge bridge = templateMergeBridge(templates);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean templateImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.template.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    templateImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(templateImplActive);
+            final ServiceReference<TemplateMergeService> selected = ctx.getServiceReference(TemplateMergeService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(templates, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1655,6 +1712,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge adHocBridge(final AdHocReadPlatformService adhoc) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AdHocReadPlatformService.class, adhoc)));
+    }
+
+    private static SpringOsgiPortBridge templateMergeBridge(final TemplateMergeService templates) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TemplateMergeService.class, templates)));
     }
 
     private static Path stagedCatalog() {
@@ -2033,6 +2094,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public AdHocData retrieveNewAdHocDetails() {
             return null;
+        }
+    }
+
+    private static final class StubTemplateMergeService implements TemplateMergeService {
+
+        @Override
+        public String compile(final TemplateData template, final Map<String, Object> scopes) {
+            return "";
         }
     }
 }

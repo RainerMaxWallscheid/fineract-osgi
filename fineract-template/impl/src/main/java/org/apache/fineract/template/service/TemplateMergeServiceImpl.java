@@ -46,12 +46,10 @@ import org.apache.fineract.template.data.TemplateData;
 import org.apache.fineract.template.data.TemplateMapperData;
 import org.apache.fineract.template.domain.TemplateFunctions;
 import org.apache.fineract.template.exception.TemplateForbiddenException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(value = TemplateMergeService.class, ignored = TemplateMergeServiceImpl.class)
 public class TemplateMergeServiceImpl implements TemplateMergeService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TemplateMergeServiceImpl.class);
