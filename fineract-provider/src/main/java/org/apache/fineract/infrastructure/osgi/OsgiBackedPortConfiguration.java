@@ -90,8 +90,8 @@ import org.springframework.context.annotation.Primary;
  * {@code CurrencyWritePlatformService}, {@code PasswordValidationPolicyReadPlatformService},
  * {@code AdHocReadPlatformService}, {@code TemplateMergeService}, {@code UserNotificationService},
  * {@code ScorecardReadPlatformService}, {@code FundReadPlatformService},
- * {@code AccountNumberFormatReadPlatformService}, {@code ReadLikelihoodService}, and
- * {@code TransferWritePlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve
+ * {@code AccountNumberFormatReadPlatformService}, {@code ReadLikelihoodService}, {@code TransferWritePlatformService},
+ * and {@code PaymentTypeReadService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve
  * them from the Service Registry. Other ports are created only when Boot has no bean of that type.
  * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
  * stay empty-catalog only.
@@ -274,7 +274,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(PaymentTypeReadService.class)
+    @Primary
     public PaymentTypeReadService osgiPaymentTypeReadService(final OsgiServiceLookup lookup) {
         return backed(lookup, PaymentTypeReadService.class);
     }

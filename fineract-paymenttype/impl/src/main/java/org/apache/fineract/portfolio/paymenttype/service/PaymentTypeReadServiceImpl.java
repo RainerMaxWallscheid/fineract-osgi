@@ -24,7 +24,9 @@ import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
 import org.apache.fineract.portfolio.paymenttype.mapper.PaymentTypeMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PaymentTypeReadServiceImpl implements PaymentTypeReadService {
     private final PaymentTypeRepository repository;
     private final PaymentTypeMapper paymentTypeMapper;

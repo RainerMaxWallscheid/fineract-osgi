@@ -86,6 +86,8 @@ import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplate
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
+import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
@@ -1178,6 +1180,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void paymentTypeLookupFacadeDelegatesToPublishedSpringPort() {
+        final PaymentTypeReadService spring = new PaymentTypeReadService() {
+
+            @Override
+            public List<PaymentTypeData> retrieveAllPaymentTypes() {
+                return List.of();
+            }
+
+            @Override
+            public List<PaymentTypeData> retrieveAllPaymentTypesWithCode() {
+                return List.of();
+            }
+
+            @Override
+            public PaymentTypeData retrieveOne(final Long paymentTypeId) {
+                return paymentTypeId != null && paymentTypeId == 7L ? PaymentTypeData.builder().id(7L).name("hosted").build() : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = paymentTypeBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final PaymentTypeReadService facade = OsgiBackedPortFactory.of(lookup, PaymentTypeReadService.class);
+
+        assertEquals(null, facade.retrieveOne(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveOne(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveOne(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2035,6 +2071,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringPaymentTypePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final PaymentTypeReadService paymentTypes = new StubPaymentTypeReadService();
+        final SpringOsgiPortBridge bridge = paymentTypeBridge(paymentTypes);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean paymentTypeImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.paymenttype.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    paymentTypeImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(paymentTypeImplActive);
+            final ServiceReference<PaymentTypeReadService> selected = ctx.getServiceReference(PaymentTypeReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(paymentTypes, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2147,6 +2213,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge transferWriteBridge(final TransferWritePlatformService transfers) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(TransferWritePlatformService.class, transfers)));
+    }
+
+    private static SpringOsgiPortBridge paymentTypeBridge(final PaymentTypeReadService paymentTypes) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PaymentTypeReadService.class, paymentTypes)));
     }
 
     private static Path stagedCatalog() {
@@ -2647,6 +2717,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public CommandProcessingResult proposeAndAcceptClientTransfer(final Long clientId, final JsonCommand jsonCommand) {
             return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubPaymentTypeReadService implements PaymentTypeReadService {
+
+        @Override
+        public List<PaymentTypeData> retrieveAllPaymentTypes() {
+            return List.of();
+        }
+
+        @Override
+        public List<PaymentTypeData> retrieveAllPaymentTypesWithCode() {
+            return List.of();
+        }
+
+        @Override
+        public PaymentTypeData retrieveOne(final Long paymentTypeId) {
+            return null;
         }
     }
 }
