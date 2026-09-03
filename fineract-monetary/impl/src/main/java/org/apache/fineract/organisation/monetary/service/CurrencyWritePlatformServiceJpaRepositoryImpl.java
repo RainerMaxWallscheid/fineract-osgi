@@ -32,8 +32,10 @@ import org.apache.fineract.organisation.monetary.exception.CurrencyInUseExceptio
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWritePlatformService {
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
     private final OrganisationCurrencyRepository organisationCurrencyRepository;

@@ -55,6 +55,9 @@ import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
+import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
+import org.apache.fineract.organisation.monetary.data.CurrencyUpdateResponse;
+import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService;
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryData;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
@@ -824,6 +827,30 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void currencyWriteLookupFacadeDelegatesToPublishedSpringPort() {
+        final CurrencyWritePlatformService spring = new CurrencyWritePlatformService() {
+
+            @Override
+            public CurrencyUpdateResponse updateAllowedCurrencies(final CurrencyUpdateRequest request) {
+                return new CurrencyUpdateResponse(List.of("hosted"));
+            }
+        };
+        final SpringOsgiPortBridge bridge = currencyWriteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CurrencyWritePlatformService facade = OsgiBackedPortFactory.of(lookup, CurrencyWritePlatformService.class);
+
+        assertEquals(null, facade.updateAllowedCurrencies(null));
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.updateAllowedCurrencies(null).getCurrencies().get(0));
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.updateAllowedCurrencies(null));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1379,6 +1406,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCurrencyWritePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CurrencyWritePlatformService currencies = new StubCurrencyWritePlatformService();
+        final SpringOsgiPortBridge bridge = currencyWriteBridge(currencies);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean monetaryImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.monetary.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    monetaryImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(monetaryImplActive);
+            final ServiceReference<CurrencyWritePlatformService> selected = ctx.getServiceReference(CurrencyWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(currencies, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1451,6 +1508,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge provisioningCategoryBridge(final ProvisioningCategoryReadPlatformService categories) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ProvisioningCategoryReadPlatformService.class, categories)));
+    }
+
+    private static SpringOsgiPortBridge currencyWriteBridge(final CurrencyWritePlatformService currencies) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CurrencyWritePlatformService.class, currencies)));
     }
 
     private static Path stagedCatalog() {
@@ -1785,6 +1846,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public List<ProvisioningCategoryData> retrieveAllProvisionCategories() {
             return List.of();
+        }
+    }
+
+    private static final class StubCurrencyWritePlatformService implements CurrencyWritePlatformService {
+
+        @Override
+        public CurrencyUpdateResponse updateAllowedCurrencies(final CurrencyUpdateRequest request) {
+            return null;
         }
     }
 }
