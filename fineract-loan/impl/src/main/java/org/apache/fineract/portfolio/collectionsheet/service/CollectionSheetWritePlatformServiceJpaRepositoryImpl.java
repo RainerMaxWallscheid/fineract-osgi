@@ -34,11 +34,9 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformServic
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(value = CollectionSheetWritePlatformService.class, ignored = CollectionSheetWritePlatformServiceJpaRepositoryImpl.class)
 public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements CollectionSheetWritePlatformService {
 
     @java.lang.SuppressWarnings("all")

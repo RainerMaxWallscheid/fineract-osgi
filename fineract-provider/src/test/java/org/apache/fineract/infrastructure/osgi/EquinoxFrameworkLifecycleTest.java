@@ -73,6 +73,7 @@ import org.apache.fineract.organisation.provisioning.service.ProvisioningCategor
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRateDefinitionData;
@@ -1254,6 +1255,35 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void collectionSheetLookupFacadeDelegatesToPublishedSpringPort() {
+        final CollectionSheetWritePlatformService spring = new CollectionSheetWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult updateCollectionSheet(final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult saveIndividualCollectionSheet(final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = collectionSheetBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CollectionSheetWritePlatformService facade = OsgiBackedPortFactory.of(lookup, CollectionSheetWritePlatformService.class);
+
+        assertEquals(null, facade.updateCollectionSheet(null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.updateCollectionSheet(null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.updateCollectionSheet(null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2171,6 +2201,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCollectionSheetPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CollectionSheetWritePlatformService sheets = new StubCollectionSheetWritePlatformService();
+        final SpringOsgiPortBridge bridge = collectionSheetBridge(sheets);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean collectionSheetImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.collectionsheet.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    collectionSheetImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(collectionSheetImplActive);
+            final ServiceReference<CollectionSheetWritePlatformService> selected = ctx
+                    .getServiceReference(CollectionSheetWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(sheets, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2291,6 +2352,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge searchBridge(final SearchReadService search) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SearchReadService.class, search)));
+    }
+
+    private static SpringOsgiPortBridge collectionSheetBridge(final CollectionSheetWritePlatformService sheets) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollectionSheetWritePlatformService.class, sheets)));
     }
 
     private static Path stagedCatalog() {
@@ -2827,6 +2892,19 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public List<AdHocSearchQueryData> retrieveAdHocQueryMatchingData(final AdHocQuerySearchRequest request) {
             return List.of();
+        }
+    }
+
+    private static final class StubCollectionSheetWritePlatformService implements CollectionSheetWritePlatformService {
+
+        @Override
+        public CommandProcessingResult updateCollectionSheet(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult saveIndividualCollectionSheet(final JsonCommand command) {
+            return CommandProcessingResult.empty();
         }
     }
 }
