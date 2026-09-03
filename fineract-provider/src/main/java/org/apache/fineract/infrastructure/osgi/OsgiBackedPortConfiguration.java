@@ -84,10 +84,10 @@ import org.springframework.context.annotation.Primary;
  * {@code TaxCatalogPort}, {@code ContentStoreService}, {@code CashierTxnValidationPort},
  * {@code LoanOriginatorReadPlatformService}, {@code MixTaxonomyReadService}, {@code DelayedSettlementAttributeService},
  * {@code GLClosureReadPlatformService}, {@code SavingsDropdownReadPlatformService}, {@code LoanProductLookupReadPort},
- * and {@code BuyDownFeeReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code BuyDownFeeReadPlatformService}, and {@code WorkingCapitalLoanPeriodPaymentRateChangeReadService} are
+ * {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other
+ * ports are created only when Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only.
+ * {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -170,7 +170,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class)
+    @Primary
     public WorkingCapitalLoanPeriodPaymentRateChangeReadService osgiWorkingCapitalLoanPeriodPaymentRateChangeReadService(
             final OsgiServiceLookup lookup) {
         return backed(lookup, WorkingCapitalLoanPeriodPaymentRateChangeReadService.class);

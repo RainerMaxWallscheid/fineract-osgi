@@ -62,6 +62,8 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
+import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
+import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -635,6 +637,27 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void wcRateChangeLookupFacadeDelegatesToPublishedSpringPort() {
+        final WorkingCapitalLoanPeriodPaymentRateChangeReadService spring = loanId -> loanId != null && loanId == 7L
+                ? List.of(new WorkingCapitalLoanPeriodPaymentRateChangeData(7L, 7L, null, null, null, false, null, null))
+                : List.of();
+        final SpringOsgiPortBridge bridge = wcRateChangeBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final WorkingCapitalLoanPeriodPaymentRateChangeReadService facade = OsgiBackedPortFactory.of(lookup,
+                WorkingCapitalLoanPeriodPaymentRateChangeReadService.class);
+
+        assertTrue(facade.retrieveRateChangeHistory(7L).isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveRateChangeHistory(7L).get(0).id());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveRateChangeHistory(7L).isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1007,6 +1030,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringWcRateChangePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final WorkingCapitalLoanPeriodPaymentRateChangeReadService rateChange = new StubWorkingCapitalLoanPeriodPaymentRateChangeReadService();
+        final SpringOsgiPortBridge bridge = wcRateChangeBridge(rateChange);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean wcImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.workingcapitalloan.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    wcImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(wcImplActive);
+            final ServiceReference<WorkingCapitalLoanPeriodPaymentRateChangeReadService> selected = ctx
+                    .getServiceReference(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(rateChange, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1054,6 +1108,11 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge buyDownFeeBridge(final BuyDownFeeReadPlatformService buyDown) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BuyDownFeeReadPlatformService.class, buyDown)));
+    }
+
+    private static SpringOsgiPortBridge wcRateChangeBridge(final WorkingCapitalLoanPeriodPaymentRateChangeReadService rateChange) {
+        return new SpringOsgiPortBridge(
+                List.of(SpringOsgiPortBridge.bind(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class, rateChange)));
     }
 
     private static Path stagedCatalog() {
@@ -1303,6 +1362,15 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<BuyDownFeeAmortizationDetails> retrieveLoanBuyDownFeeAmortizationDetails(final Long loanId) {
+            return List.of();
+        }
+    }
+
+    private static final class StubWorkingCapitalLoanPeriodPaymentRateChangeReadService
+            implements WorkingCapitalLoanPeriodPaymentRateChangeReadService {
+
+        @Override
+        public List<WorkingCapitalLoanPeriodPaymentRateChangeData> retrieveRateChangeHistory(final Long loanId) {
             return List.of();
         }
     }
