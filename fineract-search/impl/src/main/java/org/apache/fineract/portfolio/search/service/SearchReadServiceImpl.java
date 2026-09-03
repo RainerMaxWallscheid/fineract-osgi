@@ -49,7 +49,9 @@ import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SearchReadServiceImpl implements SearchReadService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final LoanProductLookupReadPort loanProductLookupReadPort;

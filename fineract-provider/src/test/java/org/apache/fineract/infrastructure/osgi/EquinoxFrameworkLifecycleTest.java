@@ -89,6 +89,11 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPo
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
+import org.apache.fineract.portfolio.search.data.AdHocQuerySearchRequest;
+import org.apache.fineract.portfolio.search.data.AdHocSearchQueryData;
+import org.apache.fineract.portfolio.search.data.SearchConditions;
+import org.apache.fineract.portfolio.search.data.SearchData;
+import org.apache.fineract.portfolio.search.service.SearchReadService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
@@ -1214,6 +1219,41 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void searchLookupFacadeDelegatesToPublishedSpringPort() {
+        final SearchReadService spring = new SearchReadService() {
+
+            @Override
+            public List<SearchData> retriveMatchingData(final SearchConditions searchConditions) {
+                return List.of(new SearchData(7L, "hosted", "hosted", "hosted", "client", null, null, null, null,
+                        new EnumOptionData(7L, "hosted", "hosted"), null));
+            }
+
+            @Override
+            public AdHocSearchQueryData retrieveAdHocQueryTemplate() {
+                return null;
+            }
+
+            @Override
+            public List<AdHocSearchQueryData> retrieveAdHocQueryMatchingData(final AdHocQuerySearchRequest request) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = searchBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final SearchReadService facade = OsgiBackedPortFactory.of(lookup, SearchReadService.class);
+
+        assertTrue(facade.retriveMatchingData(null).isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retriveMatchingData(null).get(0).getEntityId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retriveMatchingData(null).isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2101,6 +2141,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringSearchPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final SearchReadService search = new StubSearchReadService();
+        final SpringOsgiPortBridge bridge = searchBridge(search);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean searchImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.search.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    searchImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(searchImplActive);
+            final ServiceReference<SearchReadService> selected = ctx.getServiceReference(SearchReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(search, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2217,6 +2287,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge paymentTypeBridge(final PaymentTypeReadService paymentTypes) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PaymentTypeReadService.class, paymentTypes)));
+    }
+
+    private static SpringOsgiPortBridge searchBridge(final SearchReadService search) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SearchReadService.class, search)));
     }
 
     private static Path stagedCatalog() {
@@ -2735,6 +2809,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public PaymentTypeData retrieveOne(final Long paymentTypeId) {
             return null;
+        }
+    }
+
+    private static final class StubSearchReadService implements SearchReadService {
+
+        @Override
+        public List<SearchData> retriveMatchingData(final SearchConditions searchConditions) {
+            return List.of();
+        }
+
+        @Override
+        public AdHocSearchQueryData retrieveAdHocQueryTemplate() {
+            return null;
+        }
+
+        @Override
+        public List<AdHocSearchQueryData> retrieveAdHocQueryMatchingData(final AdHocQuerySearchRequest request) {
+            return List.of();
         }
     }
 }

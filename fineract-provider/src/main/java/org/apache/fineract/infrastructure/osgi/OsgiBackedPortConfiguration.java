@@ -91,10 +91,10 @@ import org.springframework.context.annotation.Primary;
  * {@code AdHocReadPlatformService}, {@code TemplateMergeService}, {@code UserNotificationService},
  * {@code ScorecardReadPlatformService}, {@code FundReadPlatformService},
  * {@code AccountNumberFormatReadPlatformService}, {@code ReadLikelihoodService}, {@code TransferWritePlatformService},
- * and {@code PaymentTypeReadService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve
- * them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code PaymentTypeReadService}, and {@code SearchReadService} are {@code @Primary} lookup façades when Equinox is on
+ * — Boot consumers resolve them from the Service Registry. Other ports are created only when Boot has no bean of that
+ * type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -280,7 +280,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SearchReadService.class)
+    @Primary
     public SearchReadService osgiSearchReadService(final OsgiServiceLookup lookup) {
         return backed(lookup, SearchReadService.class);
     }
