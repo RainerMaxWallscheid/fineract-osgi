@@ -102,6 +102,7 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.shares.shareproducts.service.ShareProductDropdownReadPlatformService;
 import org.apache.fineract.spm.data.ScorecardData;
 import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 import org.apache.fineract.template.data.TemplateData;
@@ -1323,6 +1324,36 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void shareProductDropdownLookupFacadeDelegatesToPublishedSpringPort() {
+        final ShareProductDropdownReadPlatformService spring = new ShareProductDropdownReadPlatformService() {
+
+            @Override
+            public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {
+                return List.of(new EnumOptionData(7L, "hosted", "hosted"));
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveMinimumActivePeriodFrequencyTypeOptions() {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = shareProductDropdownBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ShareProductDropdownReadPlatformService facade = OsgiBackedPortFactory.of(lookup,
+                ShareProductDropdownReadPlatformService.class);
+
+        assertTrue(facade.retrieveLockinPeriodFrequencyTypeOptions().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveLockinPeriodFrequencyTypeOptions().iterator().next().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveLockinPeriodFrequencyTypeOptions().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2302,6 +2333,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringShareProductDropdownPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ShareProductDropdownReadPlatformService shareProducts = new StubShareProductDropdownReadPlatformService();
+        final SpringOsgiPortBridge bridge = shareProductDropdownBridge(shareProducts);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean sharesImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.shares.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    sharesImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(sharesImplActive);
+            final ServiceReference<ShareProductDropdownReadPlatformService> selected = ctx
+                    .getServiceReference(ShareProductDropdownReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(shareProducts, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2431,6 +2493,10 @@ class EquinoxFrameworkLifecycleTest {
     private static SpringOsgiPortBridge standingInstructionBridge(final StandingInstructionWritePlatformService standingInstructions) {
         return new SpringOsgiPortBridge(
                 List.of(SpringOsgiPortBridge.bind(StandingInstructionWritePlatformService.class, standingInstructions)));
+    }
+
+    private static SpringOsgiPortBridge shareProductDropdownBridge(final ShareProductDropdownReadPlatformService shareProducts) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ShareProductDropdownReadPlatformService.class, shareProducts)));
     }
 
     private static Path stagedCatalog() {
@@ -3002,5 +3068,18 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public void disableActiveForSavingsAccount(final Long savingsAccountId) {}
+    }
+
+    private static final class StubShareProductDropdownReadPlatformService implements ShareProductDropdownReadPlatformService {
+
+        @Override
+        public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveMinimumActivePeriodFrequencyTypeOptions() {
+            return List.of();
+        }
     }
 }

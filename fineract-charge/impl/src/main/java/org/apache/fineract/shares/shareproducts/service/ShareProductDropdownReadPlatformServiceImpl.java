@@ -24,7 +24,9 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.shares.shareaccounts.service.SharesEnumerations;
 import org.apache.fineract.shares.shareproducts.SharePeriodFrequencyType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ShareProductDropdownReadPlatformServiceImpl implements ShareProductDropdownReadPlatformService {
     @Override
     public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {
