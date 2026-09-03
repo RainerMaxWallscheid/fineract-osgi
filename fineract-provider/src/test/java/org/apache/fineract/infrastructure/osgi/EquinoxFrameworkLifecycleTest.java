@@ -71,6 +71,7 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryData;
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
+import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
@@ -1284,6 +1285,44 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void standingInstructionLookupFacadeDelegatesToPublishedSpringPort() {
+        final StandingInstructionWritePlatformService spring = new StandingInstructionWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult create(final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult update(final Long id, final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult delete(final Long id) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public void disableActiveForSavingsAccount(final Long savingsAccountId) {}
+        };
+        final SpringOsgiPortBridge bridge = standingInstructionBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final StandingInstructionWritePlatformService facade = OsgiBackedPortFactory.of(lookup,
+                StandingInstructionWritePlatformService.class);
+
+        assertEquals(null, facade.create(null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.create(null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.create(null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2232,6 +2271,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringStandingInstructionPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final StandingInstructionWritePlatformService standingInstructions = new StubStandingInstructionWritePlatformService();
+        final SpringOsgiPortBridge bridge = standingInstructionBridge(standingInstructions);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean accountTransferImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.accounttransfer.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    accountTransferImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(accountTransferImplActive);
+            final ServiceReference<StandingInstructionWritePlatformService> selected = ctx
+                    .getServiceReference(StandingInstructionWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(standingInstructions, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2356,6 +2426,11 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge collectionSheetBridge(final CollectionSheetWritePlatformService sheets) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollectionSheetWritePlatformService.class, sheets)));
+    }
+
+    private static SpringOsgiPortBridge standingInstructionBridge(final StandingInstructionWritePlatformService standingInstructions) {
+        return new SpringOsgiPortBridge(
+                List.of(SpringOsgiPortBridge.bind(StandingInstructionWritePlatformService.class, standingInstructions)));
     }
 
     private static Path stagedCatalog() {
@@ -2906,5 +2981,26 @@ class EquinoxFrameworkLifecycleTest {
         public CommandProcessingResult saveIndividualCollectionSheet(final JsonCommand command) {
             return CommandProcessingResult.empty();
         }
+    }
+
+    private static final class StubStandingInstructionWritePlatformService implements StandingInstructionWritePlatformService {
+
+        @Override
+        public CommandProcessingResult create(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult update(final Long id, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult delete(final Long id) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public void disableActiveForSavingsAccount(final Long savingsAccountId) {}
     }
 }
