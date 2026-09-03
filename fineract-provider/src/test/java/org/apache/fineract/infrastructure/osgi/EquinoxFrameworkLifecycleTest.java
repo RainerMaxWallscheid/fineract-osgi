@@ -72,6 +72,8 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRateDefinitionData;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
+import org.apache.fineract.portfolio.fund.data.FundData;
+import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFeeAmortizationDetails;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
@@ -1025,6 +1027,35 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void fundLookupFacadeDelegatesToPublishedSpringPort() {
+        final FundReadPlatformService spring = new FundReadPlatformService() {
+
+            @Override
+            public List<FundData> retrieveAllFunds() {
+                return List.of();
+            }
+
+            @Override
+            public FundData retrieveFund(final Long fundId) {
+                return fundId != null && fundId == 7L ? FundData.instance(7L, "hosted", "hosted") : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = fundBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final FundReadPlatformService facade = OsgiBackedPortFactory.of(lookup, FundReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveFund(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveFund(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveFund(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1761,6 +1792,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringFundPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final FundReadPlatformService funds = new StubFundReadPlatformService();
+        final SpringOsgiPortBridge bridge = fundBridge(funds);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean fundImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.fund.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    fundImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(fundImplActive);
+            final ServiceReference<FundReadPlatformService> selected = ctx.getServiceReference(FundReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(funds, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1857,6 +1918,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge scorecardBridge(final ScorecardReadPlatformService scorecards) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ScorecardReadPlatformService.class, scorecards)));
+    }
+
+    private static SpringOsgiPortBridge fundBridge(final FundReadPlatformService funds) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FundReadPlatformService.class, funds)));
     }
 
     private static Path stagedCatalog() {
@@ -2280,6 +2345,19 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Collection<ScorecardData> retrieveScorecardBySurvey(final Long surveyId) {
             return List.of();
+        }
+    }
+
+    private static final class StubFundReadPlatformService implements FundReadPlatformService {
+
+        @Override
+        public List<FundData> retrieveAllFunds() {
+            return List.of();
+        }
+
+        @Override
+        public FundData retrieveFund(final Long fundId) {
+            return null;
         }
     }
 }
