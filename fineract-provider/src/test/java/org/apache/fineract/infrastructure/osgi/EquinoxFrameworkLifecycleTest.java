@@ -38,6 +38,7 @@ import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformServi
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -52,6 +53,7 @@ import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplateData;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
@@ -516,6 +518,55 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void savingsDropdownLookupFacadeDelegatesToPublishedSpringPort() {
+        final SavingsDropdownReadPlatformService spring = new SavingsDropdownReadPlatformService() {
+
+            @Override
+            public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {
+                return List.of(new EnumOptionData(7L, "hosted", "hosted"));
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveCompoundingInterestPeriodTypeOptions() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveInterestPostingPeriodTypeOptions() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveInterestCalculationTypeOptions() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveInterestCalculationDaysInYearTypeOptions() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrievewithdrawalFeeTypeOptions() {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = savingsDropdownBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final SavingsDropdownReadPlatformService facade = OsgiBackedPortFactory.of(lookup, SavingsDropdownReadPlatformService.class);
+
+        assertTrue(facade.retrieveLockinPeriodFrequencyTypeOptions().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveLockinPeriodFrequencyTypeOptions().iterator().next().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveLockinPeriodFrequencyTypeOptions().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -797,6 +848,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringSavingsDropdownPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final SavingsDropdownReadPlatformService savings = new StubSavingsDropdownReadPlatformService();
+        final SpringOsgiPortBridge bridge = savingsDropdownBridge(savings);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean savingsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.savings.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    savingsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(savingsImplActive);
+            final ServiceReference<SavingsDropdownReadPlatformService> selected = ctx
+                    .getServiceReference(SavingsDropdownReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(savings, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -832,6 +914,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge glClosureBridge(final GLClosureReadPlatformService closures) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(GLClosureReadPlatformService.class, closures)));
+    }
+
+    private static SpringOsgiPortBridge savingsDropdownBridge(final SavingsDropdownReadPlatformService savings) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SavingsDropdownReadPlatformService.class, savings)));
     }
 
     private static Path stagedCatalog() {
@@ -1013,6 +1099,39 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public GLClosureData retrieveGLClosureById(final long glClosureId) {
             return null;
+        }
+    }
+
+    private static final class StubSavingsDropdownReadPlatformService implements SavingsDropdownReadPlatformService {
+
+        @Override
+        public Collection<EnumOptionData> retrieveLockinPeriodFrequencyTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveCompoundingInterestPeriodTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveInterestPostingPeriodTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveInterestCalculationTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveInterestCalculationDaysInYearTypeOptions() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrievewithdrawalFeeTypeOptions() {
+            return List.of();
         }
     }
 }

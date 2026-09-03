@@ -28,7 +28,9 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.SavingsWithdrawalFeesType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SavingsDropdownReadPlatformServiceImpl implements SavingsDropdownReadPlatformService {
     @Override
     public Collection<EnumOptionData> retrievewithdrawalFeeTypeOptions() {

@@ -83,10 +83,10 @@ import org.springframework.context.annotation.Primary;
  * OSGi→Spring port beans (ADR-022 B4 / playbook §15.5). {@code ChargeDefinitionPort}, {@code FloatingRatePort},
  * {@code TaxCatalogPort}, {@code ContentStoreService}, {@code CashierTxnValidationPort},
  * {@code LoanOriginatorReadPlatformService}, {@code MixTaxonomyReadService}, {@code DelayedSettlementAttributeService},
- * and {@code GLClosureReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code GLClosureReadPlatformService}, and {@code SavingsDropdownReadPlatformService} are {@code @Primary} lookup
+ * façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created only when
+ * Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -151,7 +151,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SavingsDropdownReadPlatformService.class)
+    @Primary
     public SavingsDropdownReadPlatformService osgiSavingsDropdownReadPlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, SavingsDropdownReadPlatformService.class);
     }
