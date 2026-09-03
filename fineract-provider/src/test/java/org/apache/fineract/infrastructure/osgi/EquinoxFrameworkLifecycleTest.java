@@ -35,8 +35,12 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
+import org.apache.fineract.cob.data.JobBusinessStepConfigData;
+import org.apache.fineract.cob.data.JobBusinessStepDetail;
+import org.apache.fineract.cob.service.ConfigJobParameterService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
@@ -658,6 +662,45 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void configJobLookupFacadeDelegatesToPublishedSpringPort() {
+        final ConfigJobParameterService spring = new ConfigJobParameterService() {
+
+            @Override
+            public JobBusinessStepConfigData getBusinessStepConfigByJobName(final String jobName) {
+                return null;
+            }
+
+            @Override
+            public CommandProcessingResult updateStepConfigByJobName(final JsonCommand command, final String jobName) {
+                return null;
+            }
+
+            @Override
+            public JobBusinessStepDetail getAvailableBusinessStepsByJobName(final String jobName) {
+                return null;
+            }
+
+            @Override
+            public List<String> getAllConfiguredJobNames() {
+                return List.of("hosted");
+            }
+        };
+        final SpringOsgiPortBridge bridge = configJobBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ConfigJobParameterService facade = OsgiBackedPortFactory.of(lookup, ConfigJobParameterService.class);
+
+        assertTrue(facade.getAllConfiguredJobNames().isEmpty());
+        lifecycle.start();
+        try {
+            assertTrue(facade.getAllConfiguredJobNames().contains("hosted"));
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.getAllConfiguredJobNames().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1061,6 +1104,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringConfigJobPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ConfigJobParameterService cobJobs = new StubConfigJobParameterService();
+        final SpringOsgiPortBridge bridge = configJobBridge(cobJobs);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean cobImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.cob.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    cobImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(cobImplActive);
+            final ServiceReference<ConfigJobParameterService> selected = ctx.getServiceReference(ConfigJobParameterService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(cobJobs, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1113,6 +1186,10 @@ class EquinoxFrameworkLifecycleTest {
     private static SpringOsgiPortBridge wcRateChangeBridge(final WorkingCapitalLoanPeriodPaymentRateChangeReadService rateChange) {
         return new SpringOsgiPortBridge(
                 List.of(SpringOsgiPortBridge.bind(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class, rateChange)));
+    }
+
+    private static SpringOsgiPortBridge configJobBridge(final ConfigJobParameterService cobJobs) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ConfigJobParameterService.class, cobJobs)));
     }
 
     private static Path stagedCatalog() {
@@ -1371,6 +1448,29 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<WorkingCapitalLoanPeriodPaymentRateChangeData> retrieveRateChangeHistory(final Long loanId) {
+            return List.of();
+        }
+    }
+
+    private static final class StubConfigJobParameterService implements ConfigJobParameterService {
+
+        @Override
+        public JobBusinessStepConfigData getBusinessStepConfigByJobName(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public CommandProcessingResult updateStepConfigByJobName(final JsonCommand command, final String jobName) {
+            return null;
+        }
+
+        @Override
+        public JobBusinessStepDetail getAvailableBusinessStepsByJobName(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public List<String> getAllConfiguredJobNames() {
             return List.of();
         }
     }
