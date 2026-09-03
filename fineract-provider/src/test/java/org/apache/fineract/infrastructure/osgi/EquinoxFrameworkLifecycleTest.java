@@ -465,6 +465,25 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void delayedSettlementLookupFacadeDelegatesToPublishedSpringPort() {
+        final DelayedSettlementAttributeService spring = id -> id != null && id == 7L;
+        final SpringOsgiPortBridge bridge = delayedBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final DelayedSettlementAttributeService facade = OsgiBackedPortFactory.of(lookup, DelayedSettlementAttributeService.class);
+
+        assertFalse(facade.isEnabled(7L));
+        lifecycle.start();
+        try {
+            assertTrue(facade.isEnabled(7L));
+            assertFalse(facade.isEnabled(1L));
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(facade.isEnabled(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -685,6 +704,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringDelayedSettlementPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final DelayedSettlementAttributeService delayed = new StubDelayedSettlementAttributeService();
+        final SpringOsgiPortBridge bridge = delayedBridge(delayed);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean investorImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.investor.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    investorImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(investorImplActive);
+            final ServiceReference<DelayedSettlementAttributeService> selected = ctx
+                    .getServiceReference(DelayedSettlementAttributeService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(delayed, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -712,6 +762,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge mixBridge(final MixTaxonomyReadService mix) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(MixTaxonomyReadService.class, mix)));
+    }
+
+    private static SpringOsgiPortBridge delayedBridge(final DelayedSettlementAttributeService delayed) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
     }
 
     private static Path stagedCatalog() {
@@ -872,6 +926,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public MixTaxonomyData retrieveOne(final Long id) {
             return null;
+        }
+    }
+
+    private static final class StubDelayedSettlementAttributeService implements DelayedSettlementAttributeService {
+
+        @Override
+        public boolean isEnabled(final Long loanProductId) {
+            return false;
         }
     }
 }
