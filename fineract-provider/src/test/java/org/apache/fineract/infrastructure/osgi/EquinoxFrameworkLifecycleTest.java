@@ -81,6 +81,8 @@ import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRateDefinit
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
+import org.apache.fineract.portfolio.group.data.GroupLevelData;
+import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFeeAmortizationDetails;
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
@@ -1354,6 +1356,30 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void groupLevelLookupFacadeDelegatesToPublishedSpringPort() {
+        final GroupLevelReadPlatformService spring = new GroupLevelReadPlatformService() {
+
+            @Override
+            public List<GroupLevelData> retrieveAllLevels() {
+                return List.of(new GroupLevelData(7L, "hosted", null, null, null, null, true, false, false));
+            }
+        };
+        final SpringOsgiPortBridge bridge = groupLevelBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final GroupLevelReadPlatformService facade = OsgiBackedPortFactory.of(lookup, GroupLevelReadPlatformService.class);
+
+        assertTrue(facade.retrieveAllLevels().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveAllLevels().get(0).getLevelId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveAllLevels().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2364,6 +2390,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringGroupLevelPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final GroupLevelReadPlatformService groupLevels = new StubGroupLevelReadPlatformService();
+        final SpringOsgiPortBridge bridge = groupLevelBridge(groupLevels);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean groupImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.group.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    groupImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(groupImplActive);
+            final ServiceReference<GroupLevelReadPlatformService> selected = ctx.getServiceReference(GroupLevelReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(groupLevels, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2497,6 +2553,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge shareProductDropdownBridge(final ShareProductDropdownReadPlatformService shareProducts) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ShareProductDropdownReadPlatformService.class, shareProducts)));
+    }
+
+    private static SpringOsgiPortBridge groupLevelBridge(final GroupLevelReadPlatformService groupLevels) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(GroupLevelReadPlatformService.class, groupLevels)));
     }
 
     private static Path stagedCatalog() {
@@ -3079,6 +3139,14 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public Collection<EnumOptionData> retrieveMinimumActivePeriodFrequencyTypeOptions() {
+            return List.of();
+        }
+    }
+
+    private static final class StubGroupLevelReadPlatformService implements GroupLevelReadPlatformService {
+
+        @Override
+        public List<GroupLevelData> retrieveAllLevels() {
             return List.of();
         }
     }

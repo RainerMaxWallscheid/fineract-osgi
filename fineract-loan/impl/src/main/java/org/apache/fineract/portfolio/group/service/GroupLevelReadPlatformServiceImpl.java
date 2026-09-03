@@ -26,7 +26,9 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.group.data.GroupLevelData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class GroupLevelReadPlatformServiceImpl implements GroupLevelReadPlatformService {
 
     private final PlatformSecurityContext context;
