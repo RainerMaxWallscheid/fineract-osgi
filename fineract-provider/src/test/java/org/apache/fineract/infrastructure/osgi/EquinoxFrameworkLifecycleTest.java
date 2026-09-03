@@ -43,6 +43,8 @@ import org.apache.fineract.cob.service.ConfigJobParameterService;
 import org.apache.fineract.infrastructure.businessdate.data.service.BusinessDateDTO;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
+import org.apache.fineract.infrastructure.codes.data.CodeData;
+import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -761,6 +763,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void codeLookupFacadeDelegatesToPublishedSpringPort() {
+        final CodeReadPlatformService spring = new CodeReadPlatformService() {
+
+            @Override
+            public Collection<CodeData> retrieveAllCodes() {
+                return List.of();
+            }
+
+            @Override
+            public CodeData retrieveCode(final Long codeId) {
+                return codeId != null && codeId == 7L ? CodeData.instance(7L, "hosted", false) : null;
+            }
+
+            @Override
+            public CodeData retrieveCode(final String codeName) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = codeBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CodeReadPlatformService facade = OsgiBackedPortFactory.of(lookup, CodeReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveCode(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveCode(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveCode(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1255,6 +1291,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCodePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CodeReadPlatformService codes = new StubCodeReadPlatformService();
+        final SpringOsgiPortBridge bridge = codeBridge(codes);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean codesImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.codes.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    codesImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(codesImplActive);
+            final ServiceReference<CodeReadPlatformService> selected = ctx.getServiceReference(CodeReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(codes, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1319,6 +1385,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge businessDateBridge(final BusinessDateReadPlatformService businessDates) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BusinessDateReadPlatformService.class, businessDates)));
+    }
+
+    private static SpringOsgiPortBridge codeBridge(final CodeReadPlatformService codes) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CodeReadPlatformService.class, codes)));
     }
 
     private static Path stagedCatalog() {
@@ -1627,6 +1697,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public HashMap<BusinessDateType, LocalDate> getBusinessDates() {
             return new HashMap<>();
+        }
+    }
+
+    private static final class StubCodeReadPlatformService implements CodeReadPlatformService {
+
+        @Override
+        public Collection<CodeData> retrieveAllCodes() {
+            return List.of();
+        }
+
+        @Override
+        public CodeData retrieveCode(final Long codeId) {
+            return null;
+        }
+
+        @Override
+        public CodeData retrieveCode(final String codeName) {
+            return null;
         }
     }
 }
