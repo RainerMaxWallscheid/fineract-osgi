@@ -43,6 +43,7 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -701,6 +702,24 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void accessTokenLookupFacadeDelegatesToPublishedSpringPort() {
+        final AccessTokenGenerationService spring = () -> "hosted";
+        final SpringOsgiPortBridge bridge = accessTokenBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final AccessTokenGenerationService facade = OsgiBackedPortFactory.of(lookup, AccessTokenGenerationService.class);
+
+        assertEquals("", facade.generateRandomToken());
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.generateRandomToken());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals("", facade.generateRandomToken());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1134,6 +1153,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringAccessTokenPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final AccessTokenGenerationService accessToken = new StubAccessTokenGenerationService();
+        final SpringOsgiPortBridge bridge = accessTokenBridge(accessToken);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean securityImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.security.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    securityImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(securityImplActive);
+            final ServiceReference<AccessTokenGenerationService> selected = ctx.getServiceReference(AccessTokenGenerationService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(accessToken, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1190,6 +1239,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge configJobBridge(final ConfigJobParameterService cobJobs) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ConfigJobParameterService.class, cobJobs)));
+    }
+
+    private static SpringOsgiPortBridge accessTokenBridge(final AccessTokenGenerationService accessToken) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AccessTokenGenerationService.class, accessToken)));
     }
 
     private static Path stagedCatalog() {
@@ -1472,6 +1525,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public List<String> getAllConfiguredJobNames() {
             return List.of();
+        }
+    }
+
+    private static final class StubAccessTokenGenerationService implements AccessTokenGenerationService {
+
+        @Override
+        public String generateRandomToken() {
+            return "";
         }
     }
 }
