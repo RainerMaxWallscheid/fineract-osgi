@@ -43,6 +43,9 @@ import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.data.JobBusinessStepConfigData;
 import org.apache.fineract.cob.data.JobBusinessStepDetail;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData;
+import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
+import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.data.service.BusinessDateDTO;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
@@ -1056,6 +1059,44 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void accountNumberFormatLookupFacadeDelegatesToPublishedSpringPort() {
+        final AccountNumberFormatReadPlatformService spring = new AccountNumberFormatReadPlatformService() {
+
+            @Override
+            public List<AccountNumberFormatData> getAllAccountNumberFormats() {
+                return List.of();
+            }
+
+            @Override
+            public AccountNumberFormatData getAccountNumberFormat(final Long id) {
+                return id != null && id == 7L
+                        ? new AccountNumberFormatData(7L, new EnumOptionData(7L, "hosted", "hosted"),
+                                new EnumOptionData(7L, "hosted", "hosted"), "hosted")
+                        : null;
+            }
+
+            @Override
+            public AccountNumberFormatData retrieveTemplate(final EntityAccountType entityAccountTypeForTemplate) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = accountNumberFormatBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final AccountNumberFormatReadPlatformService facade = OsgiBackedPortFactory.of(lookup,
+                AccountNumberFormatReadPlatformService.class);
+
+        assertEquals(null, facade.getAccountNumberFormat(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.getAccountNumberFormat(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.getAccountNumberFormat(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1822,6 +1863,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringAccountNumberFormatPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final AccountNumberFormatReadPlatformService formats = new StubAccountNumberFormatReadPlatformService();
+        final SpringOsgiPortBridge bridge = accountNumberFormatBridge(formats);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean accountNumberFormatImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.accountnumberformat.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    accountNumberFormatImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(accountNumberFormatImplActive);
+            final ServiceReference<AccountNumberFormatReadPlatformService> selected = ctx
+                    .getServiceReference(AccountNumberFormatReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(formats, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1922,6 +1994,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge fundBridge(final FundReadPlatformService funds) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FundReadPlatformService.class, funds)));
+    }
+
+    private static SpringOsgiPortBridge accountNumberFormatBridge(final AccountNumberFormatReadPlatformService formats) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AccountNumberFormatReadPlatformService.class, formats)));
     }
 
     private static Path stagedCatalog() {
@@ -2357,6 +2433,24 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public FundData retrieveFund(final Long fundId) {
+            return null;
+        }
+    }
+
+    private static final class StubAccountNumberFormatReadPlatformService implements AccountNumberFormatReadPlatformService {
+
+        @Override
+        public List<AccountNumberFormatData> getAllAccountNumberFormats() {
+            return List.of();
+        }
+
+        @Override
+        public AccountNumberFormatData getAccountNumberFormat(final Long id) {
+            return null;
+        }
+
+        @Override
+        public AccountNumberFormatData retrieveTemplate(final EntityAccountType entityAccountTypeForTemplate) {
             return null;
         }
     }
