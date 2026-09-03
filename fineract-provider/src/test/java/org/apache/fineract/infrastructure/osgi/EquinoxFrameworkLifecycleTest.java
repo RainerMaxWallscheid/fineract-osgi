@@ -38,6 +38,8 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
+import org.apache.fineract.mix.data.MixTaxonomyData;
+import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -434,6 +436,35 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void mixLookupFacadeDelegatesToPublishedSpringPort() {
+        final MixTaxonomyReadService spring = new MixTaxonomyReadService() {
+
+            @Override
+            public List<MixTaxonomyData> retrieveAll() {
+                return List.of();
+            }
+
+            @Override
+            public MixTaxonomyData retrieveOne(final Long id) {
+                return id != null && id == 7L ? MixTaxonomyData.builder().id(7L).build() : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = mixBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final MixTaxonomyReadService facade = OsgiBackedPortFactory.of(lookup, MixTaxonomyReadService.class);
+
+        assertEquals(null, facade.retrieveOne(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveOne(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveOne(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -624,6 +655,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringMixPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final MixTaxonomyReadService mix = new StubMixTaxonomyReadService();
+        final SpringOsgiPortBridge bridge = mixBridge(mix);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean mixImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.mix.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    mixImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(mixImplActive);
+            final ServiceReference<MixTaxonomyReadService> selected = ctx.getServiceReference(MixTaxonomyReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(mix, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -647,6 +708,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge originatorBridge(final LoanOriginatorReadPlatformService originator) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(LoanOriginatorReadPlatformService.class, originator)));
+    }
+
+    private static SpringOsgiPortBridge mixBridge(final MixTaxonomyReadService mix) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(MixTaxonomyReadService.class, mix)));
     }
 
     private static Path stagedCatalog() {
@@ -793,6 +858,19 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public LoanOriginatorTemplateData retrieveTemplate() {
+            return null;
+        }
+    }
+
+    private static final class StubMixTaxonomyReadService implements MixTaxonomyReadService {
+
+        @Override
+        public List<MixTaxonomyData> retrieveAll() {
+            return List.of();
+        }
+
+        @Override
+        public MixTaxonomyData retrieveOne(final Long id) {
             return null;
         }
     }
