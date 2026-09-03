@@ -53,6 +53,8 @@ import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplateData;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentDefinitionData;
@@ -567,6 +569,50 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void loanProductLookupFacadeDelegatesToPublishedSpringPort() {
+        final LoanProductLookupReadPort spring = new LoanProductLookupReadPort() {
+
+            @Override
+            public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
+                return retrieveAllLoanProductsForLookup(false);
+            }
+
+            @Override
+            public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
+                return List.of(LoanProductLookupData.lookup(7L, "hosted", false));
+            }
+
+            @Override
+            public String nameById(final Long loanProductId) {
+                return null;
+            }
+
+            @Override
+            public String loanEnumerationValue(final String typeName, final int id) {
+                return null;
+            }
+
+            @Override
+            public Collection<LoanProductLookupData> findAllByNameIgnoreCase(final Collection<String> names) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = loanProductLookupBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final LoanProductLookupReadPort facade = OsgiBackedPortFactory.of(lookup, LoanProductLookupReadPort.class);
+
+        assertTrue(facade.retrieveAllLoanProductsForLookup().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveAllLoanProductsForLookup().iterator().next().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveAllLoanProductsForLookup().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -879,6 +925,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringLoanProductLookupPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final LoanProductLookupReadPort loanProducts = new StubLoanProductLookupReadPort();
+        final SpringOsgiPortBridge bridge = loanProductLookupBridge(loanProducts);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean loanImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.loan.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    loanImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(loanImplActive);
+            final ServiceReference<LoanProductLookupReadPort> selected = ctx.getServiceReference(LoanProductLookupReadPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(loanProducts, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -918,6 +994,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge savingsDropdownBridge(final SavingsDropdownReadPlatformService savings) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SavingsDropdownReadPlatformService.class, savings)));
+    }
+
+    private static SpringOsgiPortBridge loanProductLookupBridge(final LoanProductLookupReadPort loanProducts) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(LoanProductLookupReadPort.class, loanProducts)));
     }
 
     private static Path stagedCatalog() {
@@ -1131,6 +1211,34 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public Collection<EnumOptionData> retrievewithdrawalFeeTypeOptions() {
+            return List.of();
+        }
+    }
+
+    private static final class StubLoanProductLookupReadPort implements LoanProductLookupReadPort {
+
+        @Override
+        public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<LoanProductLookupData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
+            return List.of();
+        }
+
+        @Override
+        public String nameById(final Long loanProductId) {
+            return null;
+        }
+
+        @Override
+        public String loanEnumerationValue(final String typeName, final int id) {
+            return null;
+        }
+
+        @Override
+        public Collection<LoanProductLookupData> findAllByNameIgnoreCase(final Collection<String> names) {
             return List.of();
         }
     }
