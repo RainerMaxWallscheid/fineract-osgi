@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
+import org.apache.fineract.adhocquery.data.AdHocData;
+import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.data.JobBusinessStepConfigData;
 import org.apache.fineract.cob.data.JobBusinessStepDetail;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
@@ -884,6 +886,45 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void adHocLookupFacadeDelegatesToPublishedSpringPort() {
+        final AdHocReadPlatformService spring = new AdHocReadPlatformService() {
+
+            @Override
+            public List<AdHocData> retrieveAllAdHocQuery() {
+                return List.of();
+            }
+
+            @Override
+            public List<AdHocData> retrieveAllActiveAdHocQuery() {
+                return List.of();
+            }
+
+            @Override
+            public AdHocData retrieveOne(final Long adHocId) {
+                return adHocId != null && adHocId == 7L ? new AdHocData().setId(7L).setName("hosted") : null;
+            }
+
+            @Override
+            public AdHocData retrieveNewAdHocDetails() {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = adHocBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final AdHocReadPlatformService facade = OsgiBackedPortFactory.of(lookup, AdHocReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveOne(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveOne(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveOne(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1500,6 +1541,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringAdHocPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final AdHocReadPlatformService adhoc = new StubAdHocReadPlatformService();
+        final SpringOsgiPortBridge bridge = adHocBridge(adhoc);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean adhocImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.adhocquery.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    adhocImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(adhocImplActive);
+            final ServiceReference<AdHocReadPlatformService> selected = ctx.getServiceReference(AdHocReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(adhoc, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1580,6 +1651,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge passwordValidationPolicyBridge(final PasswordValidationPolicyReadPlatformService policies) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PasswordValidationPolicyReadPlatformService.class, policies)));
+    }
+
+    private static SpringOsgiPortBridge adHocBridge(final AdHocReadPlatformService adhoc) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AdHocReadPlatformService.class, adhoc)));
     }
 
     private static Path stagedCatalog() {
@@ -1934,6 +2009,29 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public PasswordValidationPolicyData retrieveActiveValidationPolicy() {
+            return null;
+        }
+    }
+
+    private static final class StubAdHocReadPlatformService implements AdHocReadPlatformService {
+
+        @Override
+        public List<AdHocData> retrieveAllAdHocQuery() {
+            return List.of();
+        }
+
+        @Override
+        public List<AdHocData> retrieveAllActiveAdHocQuery() {
+            return List.of();
+        }
+
+        @Override
+        public AdHocData retrieveOne(final Long adHocId) {
+            return null;
+        }
+
+        @Override
+        public AdHocData retrieveNewAdHocDetails() {
             return null;
         }
     }

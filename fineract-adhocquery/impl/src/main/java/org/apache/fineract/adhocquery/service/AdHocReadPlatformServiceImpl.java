@@ -29,7 +29,9 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AdHocReadPlatformServiceImpl implements AdHocReadPlatformService {
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
