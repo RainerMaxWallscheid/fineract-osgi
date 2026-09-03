@@ -86,6 +86,8 @@ import org.apache.fineract.portfolio.tax.moduleapi.TaxGroupDefinitionData;
 import org.apache.fineract.portfolio.transfer.service.TransferWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanPeriodPaymentRateChangeReadService;
+import org.apache.fineract.spm.data.ScorecardData;
+import org.apache.fineract.spm.service.ScorecardReadPlatformService;
 import org.apache.fineract.template.data.TemplateData;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.apache.fineract.useradministration.data.PasswordValidationPolicyData;
@@ -989,6 +991,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void scorecardLookupFacadeDelegatesToPublishedSpringPort() {
+        final ScorecardReadPlatformService spring = new ScorecardReadPlatformService() {
+
+            @Override
+            public Collection<ScorecardData> retrieveScorecardByClient(final Long clientId) {
+                return clientId != null && clientId == 7L ? List.of(ScorecardData.instance(7L, 7L, "hosted", 7L, "hosted", 7L)) : List.of();
+            }
+
+            @Override
+            public Collection<ScorecardData> retrieveScorecardBySurveyAndClient(final Long surveyId, final Long clientId) {
+                return List.of();
+            }
+
+            @Override
+            public Collection<ScorecardData> retrieveScorecardBySurvey(final Long surveyId) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = scorecardBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ScorecardReadPlatformService facade = OsgiBackedPortFactory.of(lookup, ScorecardReadPlatformService.class);
+
+        assertTrue(facade.retrieveScorecardByClient(7L).isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveScorecardByClient(7L).iterator().next().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveScorecardByClient(7L).isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1695,6 +1731,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringScorecardPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ScorecardReadPlatformService scorecards = new StubScorecardReadPlatformService();
+        final SpringOsgiPortBridge bridge = scorecardBridge(scorecards);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean spmImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.spm.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    spmImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(spmImplActive);
+            final ServiceReference<ScorecardReadPlatformService> selected = ctx.getServiceReference(ScorecardReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(scorecards, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1787,6 +1853,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge userNotificationBridge(final UserNotificationService notifications) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(UserNotificationService.class, notifications)));
+    }
+
+    private static SpringOsgiPortBridge scorecardBridge(final ScorecardReadPlatformService scorecards) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ScorecardReadPlatformService.class, scorecards)));
     }
 
     private static Path stagedCatalog() {
@@ -2192,6 +2262,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public void notifyUsers(final NotificationData notificationData) {
             // no-op
+        }
+    }
+
+    private static final class StubScorecardReadPlatformService implements ScorecardReadPlatformService {
+
+        @Override
+        public Collection<ScorecardData> retrieveScorecardByClient(final Long clientId) {
+            return List.of();
+        }
+
+        @Override
+        public Collection<ScorecardData> retrieveScorecardBySurveyAndClient(final Long surveyId, final Long clientId) {
+            return List.of();
+        }
+
+        @Override
+        public Collection<ScorecardData> retrieveScorecardBySurvey(final Long surveyId) {
+            return List.of();
         }
     }
 }
