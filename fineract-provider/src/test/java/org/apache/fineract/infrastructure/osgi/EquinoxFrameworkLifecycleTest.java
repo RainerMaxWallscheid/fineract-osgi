@@ -58,6 +58,8 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
+import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
+import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
@@ -1097,6 +1099,36 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void readLikelihoodLookupFacadeDelegatesToPublishedSpringPort() {
+        final ReadLikelihoodService spring = new ReadLikelihoodService() {
+
+            @Override
+            public List<LikelihoodData> retrieveAll(final String ppiName) {
+                return List.of();
+            }
+
+            @Override
+            public LikelihoodData retrieve(final Long likelihoodId) {
+                return likelihoodId != null && likelihoodId == 7L ? new LikelihoodData().setResourceId(7L).setLikeliHoodName("hosted")
+                        : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = readLikelihoodBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ReadLikelihoodService facade = OsgiBackedPortFactory.of(lookup, ReadLikelihoodService.class);
+
+        assertEquals(null, facade.retrieve(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieve(7L).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieve(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1894,6 +1926,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringReadLikelihoodPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ReadLikelihoodService likelihood = new StubReadLikelihoodService();
+        final SpringOsgiPortBridge bridge = readLikelihoodBridge(likelihood);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean surveyImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.survey.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    surveyImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(surveyImplActive);
+            final ServiceReference<ReadLikelihoodService> selected = ctx.getServiceReference(ReadLikelihoodService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(likelihood, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1998,6 +2060,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge accountNumberFormatBridge(final AccountNumberFormatReadPlatformService formats) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AccountNumberFormatReadPlatformService.class, formats)));
+    }
+
+    private static SpringOsgiPortBridge readLikelihoodBridge(final ReadLikelihoodService likelihood) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ReadLikelihoodService.class, likelihood)));
     }
 
     private static Path stagedCatalog() {
@@ -2451,6 +2517,19 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public AccountNumberFormatData retrieveTemplate(final EntityAccountType entityAccountTypeForTemplate) {
+            return null;
+        }
+    }
+
+    private static final class StubReadLikelihoodService implements ReadLikelihoodService {
+
+        @Override
+        public List<LikelihoodData> retrieveAll(final String ppiName) {
+            return List.of();
+        }
+
+        @Override
+        public LikelihoodData retrieve(final Long likelihoodId) {
             return null;
         }
     }
