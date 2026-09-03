@@ -29,8 +29,10 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
@@ -38,6 +40,9 @@ import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformServi
 import org.apache.fineract.cob.data.JobBusinessStepConfigData;
 import org.apache.fineract.cob.data.JobBusinessStepDetail;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.infrastructure.businessdate.data.service.BusinessDateDTO;
+import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
+import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -720,6 +725,42 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void businessDateLookupFacadeDelegatesToPublishedSpringPort() {
+        final BusinessDateReadPlatformService spring = new BusinessDateReadPlatformService() {
+
+            @Override
+            public List<BusinessDateDTO> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public BusinessDateDTO findByType(final String type) {
+                return BusinessDateType.BUSINESS_DATE.name().equals(type)
+                        ? BusinessDateDTO.builder().type(BusinessDateType.BUSINESS_DATE).build()
+                        : null;
+            }
+
+            @Override
+            public HashMap<BusinessDateType, LocalDate> getBusinessDates() {
+                return new HashMap<>();
+            }
+        };
+        final SpringOsgiPortBridge bridge = businessDateBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final BusinessDateReadPlatformService facade = OsgiBackedPortFactory.of(lookup, BusinessDateReadPlatformService.class);
+
+        assertEquals(null, facade.findByType(BusinessDateType.BUSINESS_DATE.name()));
+        lifecycle.start();
+        try {
+            assertEquals(BusinessDateType.BUSINESS_DATE, facade.findByType(BusinessDateType.BUSINESS_DATE.name()).getType());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.findByType(BusinessDateType.BUSINESS_DATE.name()));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -1183,6 +1224,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringBusinessDatePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final BusinessDateReadPlatformService businessDates = new StubBusinessDateReadPlatformService();
+        final SpringOsgiPortBridge bridge = businessDateBridge(businessDates);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean businessDateImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.businessdate.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    businessDateImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(businessDateImplActive);
+            final ServiceReference<BusinessDateReadPlatformService> selected = ctx
+                    .getServiceReference(BusinessDateReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(businessDates, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -1243,6 +1315,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge accessTokenBridge(final AccessTokenGenerationService accessToken) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(AccessTokenGenerationService.class, accessToken)));
+    }
+
+    private static SpringOsgiPortBridge businessDateBridge(final BusinessDateReadPlatformService businessDates) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BusinessDateReadPlatformService.class, businessDates)));
     }
 
     private static Path stagedCatalog() {
@@ -1533,6 +1609,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public String generateRandomToken() {
             return "";
+        }
+    }
+
+    private static final class StubBusinessDateReadPlatformService implements BusinessDateReadPlatformService {
+
+        @Override
+        public List<BusinessDateDTO> findAll() {
+            return List.of();
+        }
+
+        @Override
+        public BusinessDateDTO findByType(final String type) {
+            return null;
+        }
+
+        @Override
+        public HashMap<BusinessDateType, LocalDate> getBusinessDates() {
+            return new HashMap<>();
         }
     }
 }
