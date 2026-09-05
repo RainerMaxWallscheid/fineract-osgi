@@ -87,6 +87,8 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
 import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformService;
+import org.apache.fineract.portfolio.collateralmanagement.data.CollateralManagementData;
+import org.apache.fineract.portfolio.collateralmanagement.service.CollateralManagementReadService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
@@ -1720,6 +1722,37 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void collateralManagementLookupFacadeDelegatesToPublishedSpringPort() {
+        final CollateralManagementReadService spring = new CollateralManagementReadService() {
+
+            @Override
+            public CollateralManagementData getCollateralProduct(final Long collateralId) {
+                return collateralId != null && collateralId == 7L
+                        ? CollateralManagementData.createNew("hosted", BigDecimal.ONE, "hosted", BigDecimal.ONE, "USD", "hosted", 7L)
+                        : null;
+            }
+
+            @Override
+            public List<CollateralManagementData> getAllCollateralProducts() {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = collateralManagementBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CollateralManagementReadService facade = OsgiBackedPortFactory.of(lookup, CollateralManagementReadService.class);
+
+        assertEquals(null, facade.getCollateralProduct(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.getCollateralProduct(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.getCollateralProduct(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3067,6 +3100,38 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCollateralManagementPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CollateralManagementReadService collateralManagement = new StubCollateralManagementReadService();
+        final SpringOsgiPortBridge bridge = collateralManagementBridge(collateralManagement);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean collateralManagementImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.collateralmanagement.impl".equals(bundle.getSymbolicName())
+                        && bundle.getState() == Bundle.ACTIVE) {
+                    collateralManagementImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(collateralManagementImplActive);
+            final ServiceReference<CollateralManagementReadService> selected = ctx
+                    .getServiceReference(CollateralManagementReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(collateralManagement, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3246,6 +3311,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge collateralWriteBridge(final CollateralWritePlatformService collateral) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollateralWritePlatformService.class, collateral)));
+    }
+
+    private static SpringOsgiPortBridge collateralManagementBridge(final CollateralManagementReadService collateralManagement) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollateralManagementReadService.class, collateralManagement)));
     }
 
     private static Path stagedCatalog() {
@@ -4022,6 +4091,19 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public CommandProcessingResult deleteCollateral(final Long loanId, final Long collateralId, final Long commandId) {
             return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubCollateralManagementReadService implements CollateralManagementReadService {
+
+        @Override
+        public CollateralManagementData getCollateralProduct(final Long collateralId) {
+            return null;
+        }
+
+        @Override
+        public List<CollateralManagementData> getAllCollateralProducts() {
+            return List.of();
         }
     }
 }

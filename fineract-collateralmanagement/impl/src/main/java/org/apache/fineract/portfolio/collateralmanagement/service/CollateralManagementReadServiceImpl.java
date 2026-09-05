@@ -23,7 +23,9 @@ import java.util.List;
 import org.apache.fineract.portfolio.collateralmanagement.data.CollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementRepositoryWrapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CollateralManagementReadServiceImpl implements CollateralManagementReadService {
     private final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper;
 
