@@ -58,6 +58,8 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.creditbureau.data.CreditBureauData;
+import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelationData;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
@@ -1664,6 +1666,25 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void creditBureauLookupFacadeDelegatesToPublishedSpringPort() {
+        final CreditBureauReadPlatformService spring = () -> List
+                .of(CreditBureauData.instance(7L, "hosted", "hosted", "hosted", "hosted", 7L));
+        final SpringOsgiPortBridge bridge = creditBureauBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CreditBureauReadPlatformService facade = OsgiBackedPortFactory.of(lookup, CreditBureauReadPlatformService.class);
+
+        assertTrue(facade.retrieveCreditBureau().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveCreditBureau().iterator().next().getCreditBureauId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveCreditBureau().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2950,6 +2971,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCreditBureauPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CreditBureauReadPlatformService creditBureaus = new StubCreditBureauReadPlatformService();
+        final SpringOsgiPortBridge bridge = creditBureauBridge(creditBureaus);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean creditBureauImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.creditbureau.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    creditBureauImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(creditBureauImplActive);
+            final ServiceReference<CreditBureauReadPlatformService> selected = ctx
+                    .getServiceReference(CreditBureauReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(creditBureaus, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3121,6 +3173,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge fieldConfigurationBridge(final FieldConfigurationReadPlatformService fields) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FieldConfigurationReadPlatformService.class, fields)));
+    }
+
+    private static SpringOsgiPortBridge creditBureauBridge(final CreditBureauReadPlatformService creditBureaus) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CreditBureauReadPlatformService.class, creditBureaus)));
     }
 
     private static Path stagedCatalog() {
@@ -3870,6 +3926,14 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<FieldConfigurationData> retrieveFieldConfigurationList(final String entity) {
+            return List.of();
+        }
+    }
+
+    private static final class StubCreditBureauReadPlatformService implements CreditBureauReadPlatformService {
+
+        @Override
+        public Collection<CreditBureauData> retrieveCreditBureau() {
             return List.of();
         }
     }
