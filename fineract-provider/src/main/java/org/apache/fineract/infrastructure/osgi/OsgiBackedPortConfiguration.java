@@ -97,10 +97,11 @@ import org.springframework.context.annotation.Primary;
  * {@code RepaymentWithPostDatedChecksWritePlatformService}, {@code ProductCommandsService},
  * {@code CacheWritePlatformService}, {@code FineractEntityAccessReadService},
  * {@code CalendarDropdownReadPlatformService}, {@code MeetingAttendanceDropdownReadService},
- * {@code FieldConfigurationReadPlatformService}, and {@code CreditBureauReadPlatformService} are {@code @Primary}
- * lookup façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created
- * only when Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
- * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
+ * {@code FieldConfigurationReadPlatformService}, {@code CreditBureauReadPlatformService}, and
+ * {@code CollateralWritePlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
+ * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
+ * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
+ * stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -371,7 +372,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(CollateralWritePlatformService.class)
+    @Primary
     public CollateralWritePlatformService osgiCollateralWritePlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, CollateralWritePlatformService.class);
     }

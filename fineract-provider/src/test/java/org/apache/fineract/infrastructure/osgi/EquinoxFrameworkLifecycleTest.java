@@ -86,6 +86,7 @@ import org.apache.fineract.portfolio.calendar.service.CalendarDropdownReadPlatfo
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
+import org.apache.fineract.portfolio.collateral.service.CollateralWritePlatformService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
@@ -1685,6 +1686,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void collateralWriteLookupFacadeDelegatesToPublishedSpringPort() {
+        final CollateralWritePlatformService spring = new CollateralWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult addCollateral(final Long loanId, final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult updateCollateral(final Long loanId, final Long collateralId, final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult deleteCollateral(final Long loanId, final Long collateralId, final Long commandId) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = collateralWriteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CollateralWritePlatformService facade = OsgiBackedPortFactory.of(lookup, CollateralWritePlatformService.class);
+
+        assertEquals(null, facade.addCollateral(7L, null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.addCollateral(7L, null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.addCollateral(7L, null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3002,6 +3037,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCollateralWritePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CollateralWritePlatformService collateral = new StubCollateralWritePlatformService();
+        final SpringOsgiPortBridge bridge = collateralWriteBridge(collateral);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean collateralImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.collateral.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    collateralImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(collateralImplActive);
+            final ServiceReference<CollateralWritePlatformService> selected = ctx.getServiceReference(CollateralWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(collateral, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3177,6 +3242,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge creditBureauBridge(final CreditBureauReadPlatformService creditBureaus) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CreditBureauReadPlatformService.class, creditBureaus)));
+    }
+
+    private static SpringOsgiPortBridge collateralWriteBridge(final CollateralWritePlatformService collateral) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollateralWritePlatformService.class, collateral)));
     }
 
     private static Path stagedCatalog() {
@@ -3935,6 +4004,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Collection<CreditBureauData> retrieveCreditBureau() {
             return List.of();
+        }
+    }
+
+    private static final class StubCollateralWritePlatformService implements CollateralWritePlatformService {
+
+        @Override
+        public CommandProcessingResult addCollateral(final Long loanId, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult updateCollateral(final Long loanId, final Long collateralId, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult deleteCollateral(final Long loanId, final Long collateralId, final Long commandId) {
+            return CommandProcessingResult.empty();
         }
     }
 }
