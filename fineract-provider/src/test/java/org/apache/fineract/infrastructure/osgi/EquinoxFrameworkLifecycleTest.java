@@ -49,6 +49,8 @@ import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNum
 import org.apache.fineract.infrastructure.businessdate.data.service.BusinessDateDTO;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
+import org.apache.fineract.infrastructure.cache.domain.CacheType;
+import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
 import org.apache.fineract.infrastructure.codes.data.CodeData;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
@@ -1472,6 +1474,24 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void cacheLookupFacadeDelegatesToPublishedSpringPort() {
+        final CacheWritePlatformService spring = cacheType -> Map.of("cacheType", 7);
+        final SpringOsgiPortBridge bridge = cacheBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CacheWritePlatformService facade = OsgiBackedPortFactory.of(lookup, CacheWritePlatformService.class);
+
+        assertTrue(facade.switchToCache(CacheType.NO_CACHE).isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7, facade.switchToCache(CacheType.NO_CACHE).get("cacheType"));
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.switchToCache(CacheType.NO_CACHE).isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2604,6 +2624,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCachePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CacheWritePlatformService cache = new StubCacheWritePlatformService();
+        final SpringOsgiPortBridge bridge = cacheBridge(cache);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean cacheImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.cache.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    cacheImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(cacheImplActive);
+            final ServiceReference<CacheWritePlatformService> selected = ctx.getServiceReference(CacheWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(cache, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2755,6 +2805,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge productCommandsBridge(final ProductCommandsService productCommands) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ProductCommandsService.class, productCommands)));
+    }
+
+    private static SpringOsgiPortBridge cacheBridge(final CacheWritePlatformService cache) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CacheWritePlatformService.class, cache)));
     }
 
     private static Path stagedCatalog() {
@@ -3392,6 +3446,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Object handleCommand(final Long productId, final String command, final String jsonBody) {
             return null;
+        }
+    }
+
+    private static final class StubCacheWritePlatformService implements CacheWritePlatformService {
+
+        @Override
+        public Map<String, Object> switchToCache(final CacheType cacheType) {
+            return Map.of();
         }
     }
 }
