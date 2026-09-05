@@ -58,6 +58,10 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelationData;
+import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
+import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
+import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
@@ -1492,6 +1496,74 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void entityAccessLookupFacadeDelegatesToPublishedSpringPort() {
+        final FineractEntityAccessReadService spring = new FineractEntityAccessReadService() {
+
+            @Override
+            public Collection<FineractEntityToEntityMappingData> retrieveEntityAccessFor(final FineractEntityType firstEntityType,
+                    final Long relId, final Long fromEntityId, final boolean includeAllSubOffices) {
+                return List.of();
+            }
+
+            @Override
+            public String getSQLQueryInClause_WithListOfIDsForEntityAccess(final FineractEntityType firstEntityType, final Long relId,
+                    final Long fromEntityId, final boolean includeAllOffices) {
+                return "";
+            }
+
+            @Override
+            public String getSQLQueryInClauseIDList_ForLoanProductsForOffice(final Long loanProductId, final boolean includeAllOffices) {
+                return "";
+            }
+
+            @Override
+            public String getSQLQueryInClauseIDList_ForSavingsProductsForOffice(final Long savingsProductId,
+                    final boolean includeAllOffices) {
+                return "";
+            }
+
+            @Override
+            public String getSQLQueryInClauseIDList_ForChargesForOffice(final Long officeId, final boolean includeAllOffices) {
+                return "(7)";
+            }
+
+            @Override
+            public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(final FineractEntityType fineractEntityType) {
+                return "";
+            }
+
+            @Override
+            public Collection<FineractEntityRelationData> retrieveAllSupportedMappingTypes() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<FineractEntityToEntityMappingData> retrieveOneMapping(final Long mapId) {
+                return List.of();
+            }
+
+            @Override
+            public Collection<FineractEntityToEntityMappingData> retrieveEntityToEntityMappings(final Long mapId, final Long fromoId,
+                    final Long toId) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = entityAccessBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final FineractEntityAccessReadService facade = OsgiBackedPortFactory.of(lookup, FineractEntityAccessReadService.class);
+
+        assertEquals("", facade.getSQLQueryInClauseIDList_ForChargesForOffice(7L, false));
+        lifecycle.start();
+        try {
+            assertEquals("(7)", facade.getSQLQueryInClauseIDList_ForChargesForOffice(7L, false));
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals("", facade.getSQLQueryInClauseIDList_ForChargesForOffice(7L, false));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2654,6 +2726,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringEntityAccessPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final FineractEntityAccessReadService entityAccess = new StubFineractEntityAccessReadService();
+        final SpringOsgiPortBridge bridge = entityAccessBridge(entityAccess);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean entityAccessImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.entityaccess.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    entityAccessImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(entityAccessImplActive);
+            final ServiceReference<FineractEntityAccessReadService> selected = ctx
+                    .getServiceReference(FineractEntityAccessReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(entityAccess, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2809,6 +2912,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge cacheBridge(final CacheWritePlatformService cache) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CacheWritePlatformService.class, cache)));
+    }
+
+    private static SpringOsgiPortBridge entityAccessBridge(final FineractEntityAccessReadService entityAccess) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FineractEntityAccessReadService.class, entityAccess)));
     }
 
     private static Path stagedCatalog() {
@@ -3454,6 +3561,57 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Map<String, Object> switchToCache(final CacheType cacheType) {
             return Map.of();
+        }
+    }
+
+    private static final class StubFineractEntityAccessReadService implements FineractEntityAccessReadService {
+
+        @Override
+        public Collection<FineractEntityToEntityMappingData> retrieveEntityAccessFor(final FineractEntityType firstEntityType,
+                final Long relId, final Long fromEntityId, final boolean includeAllSubOffices) {
+            return List.of();
+        }
+
+        @Override
+        public String getSQLQueryInClause_WithListOfIDsForEntityAccess(final FineractEntityType firstEntityType, final Long relId,
+                final Long fromEntityId, final boolean includeAllOffices) {
+            return "";
+        }
+
+        @Override
+        public String getSQLQueryInClauseIDList_ForLoanProductsForOffice(final Long loanProductId, final boolean includeAllOffices) {
+            return "";
+        }
+
+        @Override
+        public String getSQLQueryInClauseIDList_ForSavingsProductsForOffice(final Long savingsProductId, final boolean includeAllOffices) {
+            return "";
+        }
+
+        @Override
+        public String getSQLQueryInClauseIDList_ForChargesForOffice(final Long officeId, final boolean includeAllOffices) {
+            return "";
+        }
+
+        @Override
+        public String getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(final FineractEntityType fineractEntityType) {
+            return "";
+        }
+
+        @Override
+        public Collection<FineractEntityRelationData> retrieveAllSupportedMappingTypes() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<FineractEntityToEntityMappingData> retrieveOneMapping(final Long mapId) {
+            return List.of();
+        }
+
+        @Override
+        public Collection<FineractEntityToEntityMappingData> retrieveEntityToEntityMappings(final Long mapId, final Long fromoId,
+                final Long toId) {
+            return List.of();
         }
     }
 }
