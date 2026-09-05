@@ -78,6 +78,8 @@ import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryDa
 import org.apache.fineract.organisation.provisioning.service.ProvisioningCategoryReadPlatformService;
 import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPort;
 import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
+import org.apache.fineract.portfolio.address.data.FieldConfigurationData;
+import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatformService;
 import org.apache.fineract.portfolio.calendar.service.CalendarDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -1633,6 +1635,35 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void fieldConfigurationLookupFacadeDelegatesToPublishedSpringPort() {
+        final FieldConfigurationReadPlatformService spring = new FieldConfigurationReadPlatformService() {
+
+            @Override
+            public List<FieldConfigurationData> retrieveFieldConfiguration(final String entity) {
+                return List.of(new FieldConfigurationData(7L, "hosted", "hosted", "hosted", true, false, "hosted"));
+            }
+
+            @Override
+            public List<FieldConfigurationData> retrieveFieldConfigurationList(final String entity) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = fieldConfigurationBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final FieldConfigurationReadPlatformService facade = OsgiBackedPortFactory.of(lookup, FieldConfigurationReadPlatformService.class);
+
+        assertTrue(facade.retrieveFieldConfiguration("hosted").isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveFieldConfiguration("hosted").get(0).fieldConfigurationId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveFieldConfiguration("hosted").isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2888,6 +2919,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringFieldConfigurationPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final FieldConfigurationReadPlatformService fields = new StubFieldConfigurationReadPlatformService();
+        final SpringOsgiPortBridge bridge = fieldConfigurationBridge(fields);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean addressImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.address.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    addressImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(addressImplActive);
+            final ServiceReference<FieldConfigurationReadPlatformService> selected = ctx
+                    .getServiceReference(FieldConfigurationReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(fields, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3055,6 +3117,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge meetingAttendanceBridge(final MeetingAttendanceDropdownReadService meetings) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(MeetingAttendanceDropdownReadService.class, meetings)));
+    }
+
+    private static SpringOsgiPortBridge fieldConfigurationBridge(final FieldConfigurationReadPlatformService fields) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(FieldConfigurationReadPlatformService.class, fields)));
     }
 
     private static Path stagedCatalog() {
@@ -3791,6 +3857,19 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<EnumOptionData> retrieveAttendanceTypeOptions() {
+            return List.of();
+        }
+    }
+
+    private static final class StubFieldConfigurationReadPlatformService implements FieldConfigurationReadPlatformService {
+
+        @Override
+        public List<FieldConfigurationData> retrieveFieldConfiguration(final String entity) {
+            return List.of();
+        }
+
+        @Override
+        public List<FieldConfigurationData> retrieveFieldConfigurationList(final String entity) {
             return List.of();
         }
     }
