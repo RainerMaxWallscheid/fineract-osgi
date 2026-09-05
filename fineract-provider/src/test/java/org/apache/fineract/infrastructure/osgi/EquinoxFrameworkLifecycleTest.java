@@ -106,6 +106,8 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
+import org.apache.fineract.portfolio.note.data.NoteData;
+import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
@@ -1753,6 +1755,35 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void noteLookupFacadeDelegatesToPublishedSpringPort() {
+        final NoteReadPlatformService spring = new NoteReadPlatformService() {
+
+            @Override
+            public NoteData retrieveNote(final Long noteId, final Long resourceId, final Integer noteTypeId) {
+                return noteId != null && noteId == 7L ? NoteData.builder().id(7L).note("hosted").build() : null;
+            }
+
+            @Override
+            public List<NoteData> retrieveNotesByResource(final Long resourceId, final Integer noteTypeId) {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = noteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final NoteReadPlatformService facade = OsgiBackedPortFactory.of(lookup, NoteReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveNote(7L, 7L, 1));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveNote(7L, 7L, 1).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveNote(7L, 7L, 1));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3132,6 +3163,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringNotePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final NoteReadPlatformService notes = new StubNoteReadPlatformService();
+        final SpringOsgiPortBridge bridge = noteBridge(notes);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean noteImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.note.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    noteImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(noteImplActive);
+            final ServiceReference<NoteReadPlatformService> selected = ctx.getServiceReference(NoteReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(notes, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3315,6 +3376,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge collateralManagementBridge(final CollateralManagementReadService collateralManagement) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CollateralManagementReadService.class, collateralManagement)));
+    }
+
+    private static SpringOsgiPortBridge noteBridge(final NoteReadPlatformService notes) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(NoteReadPlatformService.class, notes)));
     }
 
     private static Path stagedCatalog() {
@@ -4103,6 +4168,19 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<CollateralManagementData> getAllCollateralProducts() {
+            return List.of();
+        }
+    }
+
+    private static final class StubNoteReadPlatformService implements NoteReadPlatformService {
+
+        @Override
+        public NoteData retrieveNote(final Long noteId, final Long resourceId, final Integer noteTypeId) {
+            return null;
+        }
+
+        @Override
+        public List<NoteData> retrieveNotesByResource(final Long resourceId, final Integer noteTypeId) {
             return List.of();
         }
     }
