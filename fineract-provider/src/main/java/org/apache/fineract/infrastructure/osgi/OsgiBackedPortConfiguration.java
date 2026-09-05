@@ -93,9 +93,10 @@ import org.springframework.context.annotation.Primary;
  * {@code AccountNumberFormatReadPlatformService}, {@code ReadLikelihoodService}, {@code TransferWritePlatformService},
  * {@code PaymentTypeReadService}, {@code SearchReadService}, {@code CollectionSheetWritePlatformService},
  * {@code StandingInstructionWritePlatformService}, {@code ShareProductDropdownReadPlatformService},
- * {@code GroupLevelReadPlatformService}, and {@code ClientIdentifierWritePlatformService} are {@code @Primary} lookup
- * façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created only when
- * Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code GroupLevelReadPlatformService}, {@code ClientIdentifierWritePlatformService}, and
+ * {@code RepaymentWithPostDatedChecksWritePlatformService} are {@code @Primary} lookup façades when Equinox is on —
+ * Boot consumers resolve them from the Service Registry. Other ports are created only when Boot has no bean of that
+ * type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
  * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
@@ -318,7 +319,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RepaymentWithPostDatedChecksWritePlatformService.class)
+    @Primary
     public RepaymentWithPostDatedChecksWritePlatformService osgiRepaymentWithPostDatedChecksWritePlatformService(
             final OsgiServiceLookup lookup) {
         return backed(lookup, RepaymentWithPostDatedChecksWritePlatformService.class);

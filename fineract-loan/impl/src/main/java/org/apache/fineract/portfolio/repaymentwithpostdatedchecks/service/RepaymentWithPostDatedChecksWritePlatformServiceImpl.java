@@ -47,8 +47,10 @@ import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDat
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.exception.PostDatedCheckNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class RepaymentWithPostDatedChecksWritePlatformServiceImpl implements RepaymentWithPostDatedChecksWritePlatformService {
 
     public static final String NAME = "name";

@@ -93,6 +93,7 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
+import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.search.data.AdHocQuerySearchRequest;
 import org.apache.fineract.portfolio.search.data.AdHocSearchQueryData;
@@ -1417,6 +1418,41 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void repaymentWithPostDatedChecksLookupFacadeDelegatesToPublishedSpringPort() {
+        final RepaymentWithPostDatedChecksWritePlatformService spring = new RepaymentWithPostDatedChecksWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult deletePostDatedChecks(final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult updatePostDatedChecks(final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult bouncePostDatedChecks(final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = repaymentWithPostDatedChecksBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final RepaymentWithPostDatedChecksWritePlatformService facade = OsgiBackedPortFactory.of(lookup,
+                RepaymentWithPostDatedChecksWritePlatformService.class);
+
+        assertEquals(null, facade.updatePostDatedChecks(null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.updatePostDatedChecks(null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.updatePostDatedChecks(null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2488,6 +2524,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringRepaymentWithPostDatedChecksPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final RepaymentWithPostDatedChecksWritePlatformService postDatedChecks = new StubRepaymentWithPostDatedChecksWritePlatformService();
+        final SpringOsgiPortBridge bridge = repaymentWithPostDatedChecksBridge(postDatedChecks);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean postDatedChecksImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.postdatedchecks.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    postDatedChecksImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(postDatedChecksImplActive);
+            final ServiceReference<RepaymentWithPostDatedChecksWritePlatformService> selected = ctx
+                    .getServiceReference(RepaymentWithPostDatedChecksWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(postDatedChecks, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2629,6 +2696,12 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge clientIdentifierBridge(final ClientIdentifierWritePlatformService clientIdentifiers) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ClientIdentifierWritePlatformService.class, clientIdentifiers)));
+    }
+
+    private static SpringOsgiPortBridge repaymentWithPostDatedChecksBridge(
+            final RepaymentWithPostDatedChecksWritePlatformService postDatedChecks) {
+        return new SpringOsgiPortBridge(
+                List.of(SpringOsgiPortBridge.bind(RepaymentWithPostDatedChecksWritePlatformService.class, postDatedChecks)));
     }
 
     private static Path stagedCatalog() {
@@ -3238,6 +3311,25 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public CommandProcessingResult deleteClientIdentifier(final Long clientId, final Long clientIdentifierId, final Long commandId) {
+            return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubRepaymentWithPostDatedChecksWritePlatformService
+            implements RepaymentWithPostDatedChecksWritePlatformService {
+
+        @Override
+        public CommandProcessingResult deletePostDatedChecks(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult updatePostDatedChecks(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult bouncePostDatedChecks(final JsonCommand command) {
             return CommandProcessingResult.empty();
         }
     }
