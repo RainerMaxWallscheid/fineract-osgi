@@ -74,6 +74,7 @@ import org.apache.fineract.organisation.teller.moduleapi.CashierTxnValidationPor
 import org.apache.fineract.portfolio.account.service.StandingInstructionWritePlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.client.service.ClientIdentifierWritePlatformService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
@@ -1380,6 +1381,42 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void clientIdentifierLookupFacadeDelegatesToPublishedSpringPort() {
+        final ClientIdentifierWritePlatformService spring = new ClientIdentifierWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult addClientIdentifier(final Long clientId, final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult updateClientIdentifier(final Long clientId, final Long clientIdentifierId,
+                    final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult deleteClientIdentifier(final Long clientId, final Long clientIdentifierId,
+                    final Long commandId) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = clientIdentifierBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ClientIdentifierWritePlatformService facade = OsgiBackedPortFactory.of(lookup, ClientIdentifierWritePlatformService.class);
+
+        assertEquals(null, facade.addClientIdentifier(7L, null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.addClientIdentifier(7L, null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.addClientIdentifier(7L, null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2420,6 +2457,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringClientIdentifierPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ClientIdentifierWritePlatformService clientIdentifiers = new StubClientIdentifierWritePlatformService();
+        final SpringOsgiPortBridge bridge = clientIdentifierBridge(clientIdentifiers);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean clientsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.clients.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    clientsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(clientsImplActive);
+            final ServiceReference<ClientIdentifierWritePlatformService> selected = ctx
+                    .getServiceReference(ClientIdentifierWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(clientIdentifiers, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2557,6 +2625,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge groupLevelBridge(final GroupLevelReadPlatformService groupLevels) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(GroupLevelReadPlatformService.class, groupLevels)));
+    }
+
+    private static SpringOsgiPortBridge clientIdentifierBridge(final ClientIdentifierWritePlatformService clientIdentifiers) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ClientIdentifierWritePlatformService.class, clientIdentifiers)));
     }
 
     private static Path stagedCatalog() {
@@ -3148,6 +3220,25 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public List<GroupLevelData> retrieveAllLevels() {
             return List.of();
+        }
+    }
+
+    private static final class StubClientIdentifierWritePlatformService implements ClientIdentifierWritePlatformService {
+
+        @Override
+        public CommandProcessingResult addClientIdentifier(final Long clientId, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult updateClientIdentifier(final Long clientId, final Long clientIdentifierId,
+                final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult deleteClientIdentifier(final Long clientId, final Long clientIdentifierId, final Long commandId) {
+            return CommandProcessingResult.empty();
         }
     }
 }
