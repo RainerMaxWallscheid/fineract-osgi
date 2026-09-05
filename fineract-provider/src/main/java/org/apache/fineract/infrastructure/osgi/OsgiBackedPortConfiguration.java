@@ -95,11 +95,11 @@ import org.springframework.context.annotation.Primary;
  * {@code StandingInstructionWritePlatformService}, {@code ShareProductDropdownReadPlatformService},
  * {@code GroupLevelReadPlatformService}, {@code ClientIdentifierWritePlatformService},
  * {@code RepaymentWithPostDatedChecksWritePlatformService}, {@code ProductCommandsService},
- * {@code CacheWritePlatformService}, {@code FineractEntityAccessReadService}, and
- * {@code CalendarDropdownReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code CacheWritePlatformService}, {@code FineractEntityAccessReadService},
+ * {@code CalendarDropdownReadPlatformService}, and {@code MeetingAttendanceDropdownReadService} are {@code @Primary}
+ * lookup façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created
+ * only when Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -352,7 +352,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(MeetingAttendanceDropdownReadService.class)
+    @Primary
     public MeetingAttendanceDropdownReadService osgiMeetingAttendanceDropdownReadService(final OsgiServiceLookup lookup) {
         return backed(lookup, MeetingAttendanceDropdownReadService.class);
     }

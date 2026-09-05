@@ -98,6 +98,7 @@ import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplate
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
+import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
@@ -1614,6 +1615,24 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void meetingAttendanceLookupFacadeDelegatesToPublishedSpringPort() {
+        final MeetingAttendanceDropdownReadService spring = () -> List.of(new EnumOptionData(7L, "hosted", "hosted"));
+        final SpringOsgiPortBridge bridge = meetingAttendanceBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final MeetingAttendanceDropdownReadService facade = OsgiBackedPortFactory.of(lookup, MeetingAttendanceDropdownReadService.class);
+
+        assertTrue(facade.retrieveAttendanceTypeOptions().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveAttendanceTypeOptions().get(0).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveAttendanceTypeOptions().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2838,6 +2857,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringMeetingAttendancePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final MeetingAttendanceDropdownReadService meetings = new StubMeetingAttendanceDropdownReadService();
+        final SpringOsgiPortBridge bridge = meetingAttendanceBridge(meetings);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean meetingImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.meeting.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    meetingImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(meetingImplActive);
+            final ServiceReference<MeetingAttendanceDropdownReadService> selected = ctx
+                    .getServiceReference(MeetingAttendanceDropdownReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(meetings, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3001,6 +3051,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge calendarDropdownBridge(final CalendarDropdownReadPlatformService calendars) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CalendarDropdownReadPlatformService.class, calendars)));
+    }
+
+    private static SpringOsgiPortBridge meetingAttendanceBridge(final MeetingAttendanceDropdownReadService meetings) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(MeetingAttendanceDropdownReadService.class, meetings)));
     }
 
     private static Path stagedCatalog() {
@@ -3729,6 +3783,14 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public List<EnumOptionData> retrieveCalendarFrequencyNthDayTypeOptions() {
+            return List.of();
+        }
+    }
+
+    private static final class StubMeetingAttendanceDropdownReadService implements MeetingAttendanceDropdownReadService {
+
+        @Override
+        public List<EnumOptionData> retrieveAttendanceTypeOptions() {
             return List.of();
         }
     }

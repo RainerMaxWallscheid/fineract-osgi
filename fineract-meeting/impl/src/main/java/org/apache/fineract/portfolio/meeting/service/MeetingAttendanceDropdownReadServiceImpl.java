@@ -23,11 +23,9 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceEnumerations;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceType;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(value = MeetingAttendanceDropdownReadService.class, ignored = MeetingAttendanceDropdownReadServiceImpl.class)
 public class MeetingAttendanceDropdownReadServiceImpl implements MeetingAttendanceDropdownReadService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingAttendanceDropdownReadServiceImpl.class);
