@@ -64,6 +64,9 @@ import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelati
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.hooks.data.HookData;
+import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
+import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
@@ -1784,6 +1787,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void hookLookupFacadeDelegatesToPublishedSpringPort() {
+        final HookReadPlatformService spring = new HookReadPlatformService() {
+
+            @Override
+            public Collection<HookData> retrieveAllHooks() {
+                return List.of();
+            }
+
+            @Override
+            public HookData retrieveHook(final Long hookId) {
+                return hookId != null && hookId == 7L ? HookData.builder().id(7L).name("hosted").displayName("hosted").build() : null;
+            }
+
+            @Override
+            public HookDetailsData retrieveNewHookDetails(final String templateName) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = hookBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final HookReadPlatformService facade = OsgiBackedPortFactory.of(lookup, HookReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveHook(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveHook(7L).getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveHook(7L));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3193,6 +3230,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringHookPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final HookReadPlatformService hooks = new StubHookReadPlatformService();
+        final SpringOsgiPortBridge bridge = hookBridge(hooks);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean hookImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.hooks.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    hookImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(hookImplActive);
+            final ServiceReference<HookReadPlatformService> selected = ctx.getServiceReference(HookReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(hooks, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3380,6 +3447,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge noteBridge(final NoteReadPlatformService notes) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(NoteReadPlatformService.class, notes)));
+    }
+
+    private static SpringOsgiPortBridge hookBridge(final HookReadPlatformService hooks) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(HookReadPlatformService.class, hooks)));
     }
 
     private static Path stagedCatalog() {
@@ -4182,6 +4253,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public List<NoteData> retrieveNotesByResource(final Long resourceId, final Integer noteTypeId) {
             return List.of();
+        }
+    }
+
+    private static final class StubHookReadPlatformService implements HookReadPlatformService {
+
+        @Override
+        public Collection<HookData> retrieveAllHooks() {
+            return List.of();
+        }
+
+        @Override
+        public HookData retrieveHook(final Long hookId) {
+            return null;
+        }
+
+        @Override
+        public HookDetailsData retrieveNewHookDetails(final String templateName) {
+            return null;
         }
     }
 }

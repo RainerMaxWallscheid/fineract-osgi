@@ -34,7 +34,6 @@ import org.apache.fineract.infrastructure.hooks.domain.Hook;
 import org.apache.fineract.infrastructure.hooks.domain.HookEventResultSetExtractor;
 import org.apache.fineract.infrastructure.hooks.domain.HookRepository;
 import org.apache.fineract.infrastructure.hooks.exception.HookNotFoundException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,7 +41,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(value = HookReadPlatformService.class, ignored = HookReadPlatformServiceImpl.class)
 public class HookReadPlatformServiceImpl implements HookReadPlatformService, HookEventQueryService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HookReadPlatformServiceImpl.class);
