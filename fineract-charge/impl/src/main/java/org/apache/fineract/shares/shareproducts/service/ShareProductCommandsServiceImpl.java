@@ -24,7 +24,9 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.shares.shareproducts.constants.ShareProductApiConstants;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ShareProductCommandsServiceImpl implements ProductCommandsService {
     private final FromJsonHelper fromApiJsonHelper;
 

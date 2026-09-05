@@ -93,6 +93,7 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductLookupData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
+import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.search.data.AdHocQuerySearchRequest;
@@ -1453,6 +1454,24 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void productCommandsLookupFacadeDelegatesToPublishedSpringPort() {
+        final ProductCommandsService spring = (productId, command, jsonBody) -> CommandProcessingResult.resourceResult(7L);
+        final SpringOsgiPortBridge bridge = productCommandsBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ProductCommandsService facade = OsgiBackedPortFactory.of(lookup, ProductCommandsService.class);
+
+        assertEquals(null, facade.handleCommand(7L, "hosted", "{}"));
+        lifecycle.start();
+        try {
+            assertEquals(7L, ((CommandProcessingResult) facade.handleCommand(7L, "hosted", "{}")).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.handleCommand(7L, "hosted", "{}"));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2555,6 +2574,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringProductCommandsPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ProductCommandsService productCommands = new StubProductCommandsService();
+        final SpringOsgiPortBridge bridge = productCommandsBridge(productCommands);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean productsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.products.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    productsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(productsImplActive);
+            final ServiceReference<ProductCommandsService> selected = ctx.getServiceReference(ProductCommandsService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(productCommands, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -2702,6 +2751,10 @@ class EquinoxFrameworkLifecycleTest {
             final RepaymentWithPostDatedChecksWritePlatformService postDatedChecks) {
         return new SpringOsgiPortBridge(
                 List.of(SpringOsgiPortBridge.bind(RepaymentWithPostDatedChecksWritePlatformService.class, postDatedChecks)));
+    }
+
+    private static SpringOsgiPortBridge productCommandsBridge(final ProductCommandsService productCommands) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ProductCommandsService.class, productCommands)));
     }
 
     private static Path stagedCatalog() {
@@ -3331,6 +3384,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public CommandProcessingResult bouncePostDatedChecks(final JsonCommand command) {
             return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubProductCommandsService implements ProductCommandsService {
+
+        @Override
+        public Object handleCommand(final Long productId, final String command, final String jsonBody) {
+            return null;
         }
     }
 }
