@@ -33,6 +33,8 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
@@ -105,7 +107,8 @@ import org.springframework.context.annotation.Primary;
  * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService},
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
- * {@code PaymentDetailWritePlatformService}, and {@code CommandDispatcher} are {@code @Primary} lookup façades when
+ * {@code PaymentDetailWritePlatformService}, {@code CommandDispatcher}, {@code PortfolioNotificationEventPort},
+ * and {@code SmsCampaignTriggerEventPort} are {@code @Primary} lookup façades when
  * Equinox is on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
@@ -465,5 +468,17 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public CommandDispatcher osgiCommandDispatcher(final OsgiServiceLookup lookup) {
         return backed(lookup, CommandDispatcher.class);
+    }
+
+    @Bean
+    @Primary
+    public PortfolioNotificationEventPort osgiPortfolioNotificationEventPort(final OsgiServiceLookup lookup) {
+        return backed(lookup, PortfolioNotificationEventPort.class);
+    }
+
+    @Bean
+    @Primary
+    public SmsCampaignTriggerEventPort osgiSmsCampaignTriggerEventPort(final OsgiServiceLookup lookup) {
+        return backed(lookup, SmsCampaignTriggerEventPort.class);
     }
 }

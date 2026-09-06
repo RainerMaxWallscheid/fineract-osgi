@@ -47,6 +47,8 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
@@ -345,7 +347,9 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(PropertyService.class, s -> s instanceof PropertyService p
                         && HostedPropertyService.HOSTED_SIZE == p.getPartitionSize("hosted")),
                 probeOf(PaymentDetailWritePlatformService.class, s -> s instanceof PaymentDetailWritePlatformService p
-                        && HostedPaymentDetailWritePlatformService.HOSTED_ID == p.id(p.createAndPersistPaymentDetail(null, null))));
+                        && HostedPaymentDetailWritePlatformService.HOSTED_ID == p.id(p.createAndPersistPaymentDetail(null, null))),
+                probeOf(PortfolioNotificationEventPort.class, EquinoxSpringBridgeSmoke::notificationWins),
+                probeOf(SmsCampaignTriggerEventPort.class, EquinoxSpringBridgeSmoke::smsCampaignTriggerWins));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {
@@ -380,6 +384,24 @@ public final class EquinoxSpringBridgeSmoke {
         }
         port.validateOnLoanDisbursal(HostedCashierTxnValidationPort.HOSTED_STAFF_ID, "USD", BigDecimal.TEN);
         return HostedCashierTxnValidationPort.HOSTED_STAFF_ID == port.lastStaffId();
+    }
+
+    private static boolean notificationWins(final Object service) {
+        if (!(service instanceof PortfolioNotificationEventPort port)) {
+            return false;
+        }
+        final PortfolioNotificationEventPort.Notification[] seen = new PortfolioNotificationEventPort.Notification[1];
+        port.onNotifications(n -> seen[0] = n);
+        return seen[0] != null && HostedPortfolioNotificationEventPort.HOSTED.equals(seen[0].permission());
+    }
+
+    private static boolean smsCampaignTriggerWins(final Object service) {
+        if (!(service instanceof SmsCampaignTriggerEventPort port)) {
+            return false;
+        }
+        final Object[] seen = new Object[1];
+        port.onClientActivated(v -> seen[0] = v);
+        return HostedSmsCampaignTriggerEventPort.HOSTED.equals(seen[0]);
     }
 
     private static boolean commandWins(final Object service) {

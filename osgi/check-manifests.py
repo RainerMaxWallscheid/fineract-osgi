@@ -69,7 +69,6 @@ ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset()
 NO_PORT_STEMS: frozenset[str] = frozenset(
     {
         "bulkimport",
-        "event",
         "instancemode",
         "interoperation",
         "openapi",

@@ -35,12 +35,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
@@ -78,6 +80,8 @@ import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelati
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.domain.NotificationConfigurationData;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.data.HookData;
@@ -2219,6 +2223,75 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void notificationLookupFacadeDelegatesToPublishedSpringPort() {
+        final PortfolioNotificationEventPort.Notification hosted = new PortfolioNotificationEventPort.Notification("hosted", "hosted", 1L,
+                "hosted", "hosted", 1L);
+        final PortfolioNotificationEventPort spring = handler -> handler.accept(hosted);
+        final SpringOsgiPortBridge bridge = notificationBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final PortfolioNotificationEventPort facade = OsgiBackedPortFactory.of(lookup, PortfolioNotificationEventPort.class);
+
+        final List<PortfolioNotificationEventPort.Notification> seen = new ArrayList<>();
+        facade.onNotifications(seen::add);
+        assertTrue(seen.isEmpty());
+        lifecycle.start();
+        try {
+            facade.onNotifications(seen::add);
+            assertSame(hosted, seen.get(0));
+        } finally {
+            lifecycle.stop();
+        }
+        seen.clear();
+        facade.onNotifications(seen::add);
+        assertTrue(seen.isEmpty());
+    }
+
+    @Test
+    void smsCampaignTriggerLookupFacadeDelegatesToPublishedSpringPort() {
+        final SmsCampaignTriggerEventPort spring = new SmsCampaignTriggerEventPort() {
+
+            @Override
+            public void onClientActivated(final Consumer<Object> handler) {
+                handler.accept("hosted");
+            }
+
+            @Override
+            public void onClientRejected(final Consumer<Object> handler) {}
+
+            @Override
+            public void onSavingsActivated(final Consumer<Object> handler) {}
+
+            @Override
+            public void onSavingsRejected(final Consumer<Object> handler) {}
+
+            @Override
+            public void onSavingsDeposit(final Consumer<Object> handler) {}
+
+            @Override
+            public void onSavingsWithdrawal(final Consumer<Object> handler) {}
+        };
+        final SpringOsgiPortBridge bridge = smsCampaignTriggerBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final SmsCampaignTriggerEventPort facade = OsgiBackedPortFactory.of(lookup, SmsCampaignTriggerEventPort.class);
+
+        final List<Object> seen = new ArrayList<>();
+        facade.onClientActivated(seen::add);
+        assertTrue(seen.isEmpty());
+        lifecycle.start();
+        try {
+            facade.onClientActivated(seen::add);
+            assertEquals("hosted", seen.get(0));
+        } finally {
+            lifecycle.stop();
+        }
+        seen.clear();
+        facade.onClientActivated(seen::add);
+        assertTrue(seen.isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2230,6 +2303,12 @@ class EquinoxFrameworkLifecycleTest {
         assertEquals(0L, OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).id(null));
         assertNull(OsgiBackedPortFactory.empty(ContentStreamPort.class).pipe(output -> {}));
         assertNull(OsgiBackedPortFactory.empty(CommandDispatcher.class).dispatch(new Command<>()));
+        final List<PortfolioNotificationEventPort.Notification> notifications = new ArrayList<>();
+        OsgiBackedPortFactory.empty(PortfolioNotificationEventPort.class).onNotifications(notifications::add);
+        assertTrue(notifications.isEmpty());
+        final List<Object> smsCampaigns = new ArrayList<>();
+        OsgiBackedPortFactory.empty(SmsCampaignTriggerEventPort.class).onClientActivated(smsCampaigns::add);
+        assertTrue(smsCampaigns.isEmpty());
     }
 
     @Test
@@ -3997,6 +4076,66 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringPortfolioNotificationEventPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final PortfolioNotificationEventPort notifications = new StubPortfolioNotificationEventPort();
+        final SpringOsgiPortBridge bridge = notificationBridge(notifications);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean eventImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.event.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    eventImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(eventImplActive);
+            final ServiceReference<PortfolioNotificationEventPort> selected = ctx.getServiceReference(PortfolioNotificationEventPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(notifications, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
+    @Test
+    void stagedCatalogStartsAndSpringSmsCampaignTriggerEventPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final SmsCampaignTriggerEventPort smsCampaigns = new StubSmsCampaignTriggerEventPort();
+        final SpringOsgiPortBridge bridge = smsCampaignTriggerBridge(smsCampaigns);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean eventImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.event.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    eventImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(eventImplActive);
+            final ServiceReference<SmsCampaignTriggerEventPort> selected = ctx.getServiceReference(SmsCampaignTriggerEventPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(smsCampaigns, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4234,6 +4373,14 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge commandBridge(final CommandDispatcher commands) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CommandDispatcher.class, commands)));
+    }
+
+    private static SpringOsgiPortBridge notificationBridge(final PortfolioNotificationEventPort notifications) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PortfolioNotificationEventPort.class, notifications)));
+    }
+
+    private static SpringOsgiPortBridge smsCampaignTriggerBridge(final SmsCampaignTriggerEventPort smsCampaigns) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsCampaignTriggerEventPort.class, smsCampaigns)));
     }
 
     private static Path stagedCatalog() {
@@ -5266,5 +5413,32 @@ class EquinoxFrameworkLifecycleTest {
         public <REQ, RES> Supplier<RES> dispatch(final Command<REQ> command) {
             return null;
         }
+    }
+
+    private static final class StubPortfolioNotificationEventPort implements PortfolioNotificationEventPort {
+
+        @Override
+        public void onNotifications(final Consumer<Notification> handler) {}
+    }
+
+    private static final class StubSmsCampaignTriggerEventPort implements SmsCampaignTriggerEventPort {
+
+        @Override
+        public void onClientActivated(final Consumer<Object> handler) {}
+
+        @Override
+        public void onClientRejected(final Consumer<Object> handler) {}
+
+        @Override
+        public void onSavingsActivated(final Consumer<Object> handler) {}
+
+        @Override
+        public void onSavingsRejected(final Consumer<Object> handler) {}
+
+        @Override
+        public void onSavingsDeposit(final Consumer<Object> handler) {}
+
+        @Override
+        public void onSavingsWithdrawal(final Consumer<Object> handler) {}
     }
 }

@@ -35,6 +35,8 @@ import org.apache.fineract.infrastructure.contentstore.service.ContentStoreServi
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
@@ -160,6 +162,8 @@ public final class CompositionRootOsgiBridge {
         register(StuckJobExecutorService.class, new HostedStuckJobExecutorService());
         register(PropertyService.class, new HostedPropertyService());
         register(PaymentDetailWritePlatformService.class, new HostedPaymentDetailWritePlatformService());
+        register(PortfolioNotificationEventPort.class, new HostedPortfolioNotificationEventPort());
+        register(SmsCampaignTriggerEventPort.class, new HostedSmsCampaignTriggerEventPort());
     }
 
     private <T> void register(final Class<T> type, final T service) {

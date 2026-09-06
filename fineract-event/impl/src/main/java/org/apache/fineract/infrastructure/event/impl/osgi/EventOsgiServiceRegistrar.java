@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.event.external.producer.ExternalEventProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +45,16 @@ public class EventOsgiServiceRegistrar implements InitializingBean, DisposableBe
     private static final Logger LOG = LoggerFactory.getLogger(EventOsgiServiceRegistrar.class);
 
     private final ObjectProvider<ExternalEventProducer> producer;
+    private final ObjectProvider<PortfolioNotificationEventPort> notifications;
+    private final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaigns;
     private final List<Object> registrations = new ArrayList<>();
 
-    public EventOsgiServiceRegistrar(final ObjectProvider<ExternalEventProducer> producer) {
+    public EventOsgiServiceRegistrar(final ObjectProvider<ExternalEventProducer> producer,
+            final ObjectProvider<PortfolioNotificationEventPort> notifications,
+            final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaigns) {
         this.producer = producer;
+        this.notifications = notifications;
+        this.smsCampaigns = smsCampaigns;
     }
 
     @Override
@@ -64,6 +72,8 @@ public class EventOsgiServiceRegistrar implements InitializingBean, DisposableBe
             }
             // Prefer the active producer bean when present (JMS/Kafka); noop lives in core.
             register(context, ExternalEventProducer.class, producer.getIfAvailable());
+            register(context, PortfolioNotificationEventPort.class, notifications.getIfAvailable());
+            register(context, SmsCampaignTriggerEventPort.class, smsCampaigns.getIfAvailable());
             LOG.info("Registered {} event OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only event wiring");
