@@ -693,9 +693,9 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         }
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonObject()) {
             final JsonCommand paymentDetailsCommand = JsonCommand.fromExistingCommand(command, paymentDetailsElement);
-            return (PaymentDetail) paymentDetailService.createPaymentDetail(paymentDetailsCommand, changes);
+            return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(paymentDetailsCommand, changes);
         }
-        return (PaymentDetail) paymentDetailService.createPaymentDetail(command, changes);
+        return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(command, changes);
     }
 
     private void updateBalanceOnDisburse(final WorkingCapitalLoan loan, final BigDecimal disbursedAmount) {

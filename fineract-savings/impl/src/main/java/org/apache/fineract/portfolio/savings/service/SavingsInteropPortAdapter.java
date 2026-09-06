@@ -75,6 +75,7 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
@@ -112,6 +113,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     private final SavingsAccountDomainService savingsAccountService;
     private final ConfigurationDomainService configurationDomainService;
     private final ChargeTaxApplicationService chargeTaxApplicationService;
+    private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
     private ClientActivePort clientActivePort;
     private GroupActivePort groupActivePort;
 
@@ -121,7 +123,8 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             final InteropIdentifierRepository identifierRepository, final SavingsHelper savingsHelper,
             final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService,
-            final ChargeTaxApplicationService chargeTaxApplicationService) {
+            final ChargeTaxApplicationService chargeTaxApplicationService,
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.currencyRepository = currencyRepository;
@@ -132,6 +135,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         this.savingsAccountService = savingsAccountService;
         this.configurationDomainService = configurationDomainService;
         this.chargeTaxApplicationService = chargeTaxApplicationService;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
     }
 
     @Autowired
@@ -271,8 +275,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             if (findTransaction(savingsAccount, transferCode, AMOUNT_HOLD.getValue()) != null) {
                 throw new InteropTransferAlreadyOnHoldException(savingsAccount.getExternalId().getValue(), transferCode);
             }
-            final PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null,
-                    getRoutingCode(), transferCode, null);
+            final PaymentDetail paymentDetail = createAndPersistInteropPaymentDetail(savingsAccount, transferCode);
             final SavingsAccountTransaction holdTransaction = SavingsAccountTransaction.holdAmount(savingsAccount, savingsAccount.office(),
                     paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false);
             final MonetaryCurrency accountCurrency = savingsAccount.getCurrency().copy();
@@ -325,12 +328,10 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             }
             final SavingsTransactionBooleanValues transactionValues = new SavingsTransactionBooleanValues(false, true, true, false, false);
             transaction = savingsAccountService.handleWithdrawal(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
-                    instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    transactionValues, backdatedTxnsAllowedTill);
+                    createAndPersistInteropPaymentDetail(savingsAccount, transferCode), transactionValues, backdatedTxnsAllowedTill);
         } else {
             transaction = savingsAccountService.handleDeposit(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
-                    instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    false, true, backdatedTxnsAllowedTill);
+                    createAndPersistInteropPaymentDetail(savingsAccount, transferCode), false, true, backdatedTxnsAllowedTill);
         }
         return new CommitTransferResult(InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(),
                 InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getTransferCode(),
@@ -436,6 +437,12 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             }
         }
         return null;
+    }
+
+    private PaymentDetail createAndPersistInteropPaymentDetail(final SavingsAccount savingsAccount, final String transferCode) {
+        final PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(),
+                transferCode, null);
+        return (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
     }
 
     private SavingsAccountTransaction findTransaction(final SavingsAccount savingsAccount, final String transactionCode,
