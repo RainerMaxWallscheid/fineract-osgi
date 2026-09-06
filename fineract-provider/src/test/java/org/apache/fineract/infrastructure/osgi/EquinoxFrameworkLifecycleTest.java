@@ -2041,6 +2041,60 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void propertyLookupFacadeDelegatesToPublishedSpringPort() {
+        final PropertyService spring = new PropertyService() {
+
+            @Override
+            public Integer getPartitionSize(final String jobName) {
+                return 7;
+            }
+
+            @Override
+            public Integer getChunkSize(final String jobName) {
+                return 0;
+            }
+
+            @Override
+            public Integer getRetryLimit(final String jobName) {
+                return 0;
+            }
+
+            @Override
+            public Integer getThreadPoolCorePoolSize(final String jobName) {
+                return 0;
+            }
+
+            @Override
+            public Integer getThreadPoolMaxPoolSize(final String jobName) {
+                return 0;
+            }
+
+            @Override
+            public Integer getThreadPoolQueueCapacity(final String jobName) {
+                return 0;
+            }
+
+            @Override
+            public Integer getPollInterval(final String jobName) {
+                return 0;
+            }
+        };
+        final SpringOsgiPortBridge bridge = propertyBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final PropertyService facade = OsgiBackedPortFactory.of(lookup, PropertyService.class);
+
+        assertEquals(0, facade.getPartitionSize("hosted"));
+        lifecycle.start();
+        try {
+            assertEquals(7, facade.getPartitionSize("hosted"));
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(0, facade.getPartitionSize("hosted"));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3694,6 +3748,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringPropertyPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final PropertyService properties = new StubPropertyService();
+        final SpringOsgiPortBridge bridge = propertyBridge(properties);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean springbatchImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.springbatch.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    springbatchImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(springbatchImplActive);
+            final ServiceReference<PropertyService> selected = ctx.getServiceReference(PropertyService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(properties, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3915,6 +3999,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge stuckJobBridge(final StuckJobExecutorService stuckJobs) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(StuckJobExecutorService.class, stuckJobs)));
+    }
+
+    private static SpringOsgiPortBridge propertyBridge(final PropertyService properties) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PropertyService.class, properties)));
     }
 
     private static Path stagedCatalog() {
@@ -4851,5 +4939,43 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public void resumeStuckJob(final String jobName) {}
+    }
+
+    private static final class StubPropertyService implements PropertyService {
+
+        @Override
+        public Integer getPartitionSize(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getChunkSize(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getRetryLimit(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getThreadPoolCorePoolSize(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getThreadPoolMaxPoolSize(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getThreadPoolQueueCapacity(final String jobName) {
+            return null;
+        }
+
+        @Override
+        public Integer getPollInterval(final String jobName) {
+            return null;
+        }
     }
 }
