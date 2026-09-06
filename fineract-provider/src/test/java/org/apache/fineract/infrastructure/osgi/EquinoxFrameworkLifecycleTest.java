@@ -74,6 +74,7 @@ import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationR
 import org.apache.fineract.infrastructure.hooks.data.HookData;
 import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
+import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobConfigurationData;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
@@ -2018,6 +2019,28 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void stuckJobLookupFacadeDelegatesToPublishedSpringPort() {
+        final RecordingStuckJobExecutorService spring = new RecordingStuckJobExecutorService();
+        final SpringOsgiPortBridge bridge = stuckJobBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final StuckJobExecutorService facade = OsgiBackedPortFactory.of(lookup, StuckJobExecutorService.class);
+
+        facade.resumeStuckJob("hosted");
+        assertEquals(null, spring.lastJobName);
+        lifecycle.start();
+        try {
+            facade.resumeStuckJob("hosted");
+            assertEquals("hosted", spring.lastJobName);
+        } finally {
+            lifecycle.stop();
+        }
+        spring.lastJobName = null;
+        facade.resumeStuckJob("hosted");
+        assertEquals(null, spring.lastJobName);
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3641,6 +3664,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringStuckJobPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final StuckJobExecutorService stuckJobs = new StubStuckJobExecutorService();
+        final SpringOsgiPortBridge bridge = stuckJobBridge(stuckJobs);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean jobsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.jobs.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    jobsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(jobsImplActive);
+            final ServiceReference<StuckJobExecutorService> selected = ctx.getServiceReference(StuckJobExecutorService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(stuckJobs, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3858,6 +3911,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge externalServicesBridge(final ExternalServicesReadPlatformService externalServices) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ExternalServicesReadPlatformService.class, externalServices)));
+    }
+
+    private static SpringOsgiPortBridge stuckJobBridge(final StuckJobExecutorService stuckJobs) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(StuckJobExecutorService.class, stuckJobs)));
     }
 
     private static Path stagedCatalog() {
@@ -4778,5 +4835,21 @@ class EquinoxFrameworkLifecycleTest {
         public ExternalServicesData getExternalServiceDetailsByServiceName(final String serviceName) {
             return null;
         }
+    }
+
+    private static final class RecordingStuckJobExecutorService implements StuckJobExecutorService {
+
+        String lastJobName;
+
+        @Override
+        public void resumeStuckJob(final String jobName) {
+            lastJobName = jobName;
+        }
+    }
+
+    private static final class StubStuckJobExecutorService implements StuckJobExecutorService {
+
+        @Override
+        public void resumeStuckJob(final String jobName) {}
     }
 }

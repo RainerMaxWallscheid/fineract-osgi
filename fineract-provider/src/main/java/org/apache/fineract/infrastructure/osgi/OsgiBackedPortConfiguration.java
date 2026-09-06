@@ -101,11 +101,11 @@ import org.springframework.context.annotation.Primary;
  * {@code CollateralWritePlatformService}, {@code CollateralManagementReadService}, {@code NoteReadPlatformService},
  * {@code HookReadPlatformService}, {@code SmsWritePlatformService},
  * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService},
- * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService}, and
- * {@code ExternalServicesReadPlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
+ * {@code ExternalServicesReadPlatformService}, and {@code StuckJobExecutorService} are {@code @Primary} lookup façades
+ * when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created only when Boot
+ * has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -437,7 +437,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(StuckJobExecutorService.class)
+    @Primary
     public StuckJobExecutorService osgiStuckJobExecutorService(final OsgiServiceLookup lookup) {
         return backed(lookup, StuckJobExecutorService.class);
     }
