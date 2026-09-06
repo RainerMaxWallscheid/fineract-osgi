@@ -62,6 +62,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.creditbureau.data.CreditBureauData;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
+import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelationData;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
@@ -1961,6 +1962,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void reportWriteLookupFacadeDelegatesToPublishedSpringPort() {
+        final ReportWritePlatformService spring = new ReportWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult createReport(final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult updateReport(final Long reportId, final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult deleteReport(final Long reportId) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = reportWriteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ReportWritePlatformService facade = OsgiBackedPortFactory.of(lookup, ReportWritePlatformService.class);
+
+        assertEquals(null, facade.createReport(null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.createReport(null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.createReport(null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3523,6 +3558,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringReportWritePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ReportWritePlatformService reports = new StubReportWritePlatformService();
+        final SpringOsgiPortBridge bridge = reportWriteBridge(reports);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean dataqueriesImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.dataqueries.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    dataqueriesImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(dataqueriesImplActive);
+            final ServiceReference<ReportWritePlatformService> selected = ctx.getServiceReference(ReportWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(reports, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3732,6 +3797,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge notificationConfigurationBridge(final NotificationConfigurationReadService gcmConfig) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(NotificationConfigurationReadService.class, gcmConfig)));
+    }
+
+    private static SpringOsgiPortBridge reportWriteBridge(final ReportWritePlatformService reports) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ReportWritePlatformService.class, reports)));
     }
 
     private static Path stagedCatalog() {
@@ -4625,6 +4694,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public NotificationConfigurationData getNotificationConfiguration() {
             return null;
+        }
+    }
+
+    private static final class StubReportWritePlatformService implements ReportWritePlatformService {
+
+        @Override
+        public CommandProcessingResult createReport(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult updateReport(final Long reportId, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult deleteReport(final Long reportId) {
+            return CommandProcessingResult.empty();
         }
     }
 }

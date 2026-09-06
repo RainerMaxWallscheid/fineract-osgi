@@ -100,11 +100,11 @@ import org.springframework.context.annotation.Primary;
  * {@code FieldConfigurationReadPlatformService}, {@code CreditBureauReadPlatformService},
  * {@code CollateralWritePlatformService}, {@code CollateralManagementReadService}, {@code NoteReadPlatformService},
  * {@code HookReadPlatformService}, {@code SmsWritePlatformService},
- * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService}, and
- * {@code NotificationConfigurationReadService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. Other ports are created only when Boot has no bean of that type.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService},
+ * {@code NotificationConfigurationReadService}, and {@code ReportWritePlatformService} are {@code @Primary} lookup
+ * façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other ports are created only when
+ * Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
+ * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -424,7 +424,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(ReportWritePlatformService.class)
+    @Primary
     public ReportWritePlatformService osgiReportWritePlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, ReportWritePlatformService.class);
     }
