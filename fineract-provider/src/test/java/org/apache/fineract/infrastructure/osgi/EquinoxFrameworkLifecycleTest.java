@@ -51,6 +51,8 @@ import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.cache.domain.CacheType;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
+import org.apache.fineract.infrastructure.campaigns.sms.data.SmsProviderData;
+import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.data.CodeData;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
@@ -1888,6 +1890,56 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void smsCampaignDropdownLookupFacadeDelegatesToPublishedSpringPort() {
+        final SmsCampaignDropdownReadPlatformService spring = new SmsCampaignDropdownReadPlatformService() {
+
+            @Override
+            public Collection<EnumOptionData> retrieveCampaignTriggerTypes() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<SmsProviderData> retrieveSmsProviders() {
+                return List.of(new SmsProviderData(7L, "hosted", "hosted", "hosted", "hosted", "hosted"));
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveCampaignTypes() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveWeeks() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrieveMonths() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<EnumOptionData> retrivePeriodFrequencyTypes() {
+                return List.of();
+            }
+        };
+        final SpringOsgiPortBridge bridge = smsCampaignDropdownBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final SmsCampaignDropdownReadPlatformService facade = OsgiBackedPortFactory.of(lookup,
+                SmsCampaignDropdownReadPlatformService.class);
+
+        assertTrue(facade.retrieveSmsProviders().isEmpty());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.retrieveSmsProviders().iterator().next().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertTrue(facade.retrieveSmsProviders().isEmpty());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3388,6 +3440,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringSmsCampaignDropdownPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final SmsCampaignDropdownReadPlatformService smsCampaigns = new StubSmsCampaignDropdownReadPlatformService();
+        final SpringOsgiPortBridge bridge = smsCampaignDropdownBridge(smsCampaigns);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean campaignsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.campaigns.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    campaignsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(campaignsImplActive);
+            final ServiceReference<SmsCampaignDropdownReadPlatformService> selected = ctx
+                    .getServiceReference(SmsCampaignDropdownReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(smsCampaigns, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3589,6 +3672,10 @@ class EquinoxFrameworkLifecycleTest {
             final ReportMailingJobConfigurationReadPlatformService reportMailing) {
         return new SpringOsgiPortBridge(
                 List.of(SpringOsgiPortBridge.bind(ReportMailingJobConfigurationReadPlatformService.class, reportMailing)));
+    }
+
+    private static SpringOsgiPortBridge smsCampaignDropdownBridge(final SmsCampaignDropdownReadPlatformService smsCampaigns) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsCampaignDropdownReadPlatformService.class, smsCampaigns)));
     }
 
     private static Path stagedCatalog() {
@@ -4441,6 +4528,39 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public ReportMailingJobConfigurationData retrieveReportMailingJobConfiguration(final String name) {
             return null;
+        }
+    }
+
+    private static final class StubSmsCampaignDropdownReadPlatformService implements SmsCampaignDropdownReadPlatformService {
+
+        @Override
+        public Collection<EnumOptionData> retrieveCampaignTriggerTypes() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<SmsProviderData> retrieveSmsProviders() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveCampaignTypes() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveWeeks() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrieveMonths() {
+            return List.of();
+        }
+
+        @Override
+        public Collection<EnumOptionData> retrivePeriodFrequencyTypes() {
+            return List.of();
         }
     }
 }

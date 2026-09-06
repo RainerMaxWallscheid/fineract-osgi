@@ -99,11 +99,11 @@ import org.springframework.context.annotation.Primary;
  * {@code CalendarDropdownReadPlatformService}, {@code MeetingAttendanceDropdownReadService},
  * {@code FieldConfigurationReadPlatformService}, {@code CreditBureauReadPlatformService},
  * {@code CollateralWritePlatformService}, {@code CollateralManagementReadService}, {@code NoteReadPlatformService},
- * {@code HookReadPlatformService}, {@code SmsWritePlatformService}, and
- * {@code ReportMailingJobConfigurationReadPlatformService} are {@code @Primary} lookup façades when Equinox is on —
- * Boot consumers resolve them from the Service Registry. Other ports are created only when Boot has no bean of that
- * type. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and
- * {@code PaymentDetailWritePlatformService} stay empty-catalog only.
+ * {@code HookReadPlatformService}, {@code SmsWritePlatformService},
+ * {@code ReportMailingJobConfigurationReadPlatformService}, and {@code SmsCampaignDropdownReadPlatformService} are
+ * {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve them from the Service Registry. Other
+ * ports are created only when Boot has no bean of that type. {@code CommandDispatcher} stays hosted-only.
+ * {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService} stay empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -411,7 +411,7 @@ public class OsgiBackedPortConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SmsCampaignDropdownReadPlatformService.class)
+    @Primary
     public SmsCampaignDropdownReadPlatformService osgiSmsCampaignDropdownReadPlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, SmsCampaignDropdownReadPlatformService.class);
     }
