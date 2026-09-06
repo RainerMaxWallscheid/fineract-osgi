@@ -59,6 +59,7 @@ import org.apache.fineract.interoperation.data.InteropTransferResponseData;
 import org.apache.fineract.interoperation.data.MoneyData;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 import org.apache.fineract.interoperation.domain.InteropIdentifier;
+import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.interoperation.domain.InteropIdentifierRepository;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 import org.apache.fineract.interoperation.exception.InteropAccountNotFoundException;
@@ -241,7 +242,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     @Transactional
     public InteropQuoteResponseData createQuote(@NonNull final JsonCommand command, @NonNull final InteropQuoteRequestData request) {
         final SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
-        final SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
+        final SavingsAccountTransactionType transactionType = leftoverTransactionType(request.getTransactionRole());
         final BigDecimal fee;
         if (transactionType.isDebit()) {
             fee = savingsAccount.calculateWithdrawalFee(request.getAmount().getAmount());
@@ -264,7 +265,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             @NonNull final InteropTransferRequestData request) {
         final String transferCode = request.getTransferCode();
         final LocalDate transactionDate = DateUtils.getBusinessLocalDate();
-        final SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
+        final SavingsAccountTransactionType transactionType = leftoverTransactionType(request.getTransactionRole());
         if (transactionType.isDebit()) {
             final SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
             final BigDecimal total = calculateTotalTransferAmount(request, savingsAccount);
@@ -294,7 +295,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     @NonNull
     @Transactional
     public CommitTransferResult commitTransfer(@NonNull final JsonCommand command, @NonNull final InteropTransferRequestData request) {
-        final boolean isDebit = request.getTransactionRole().getTransactionType().isDebit();
+        final boolean isDebit = leftoverTransactionType(request.getTransactionRole()).isDebit();
         final SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
         final String transferCode = request.getTransferCode();
         if (findTransaction(savingsAccount, transferCode, (isDebit ? WITHDRAWAL : DEPOSIT).getValue()) != null) {
@@ -389,7 +390,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         if (!savingsAccount.getCurrency().getCode().equals(requestCurrency.getCode())) {
             throw new DifferentCurrenciesException(savingsAccount.getCurrency().getCode(), requestCurrency.getCode());
         }
-        final SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
+        final SavingsAccountTransactionType transactionType = leftoverTransactionType(request.getTransactionRole());
         if (!savingsAccount.isTransactionAllowed(transactionType, request.getExpirationLocalDate())) {
             throw new InteropAccountTransactionNotAllowedException(request.getAccountId());
         }
@@ -471,6 +472,10 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         log.error("Error occured.", dve);
         throw ErrorHandler.getMappable(dve, "error.msg.interop.unknown.data.integrity.issue",
                 "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    private static SavingsAccountTransactionType leftoverTransactionType(final InteropTransactionRole role) {
+        return SavingsAccountTransactionType.fromInt((Integer) role.getTransactionType());
     }
 
     private String getRoutingCode() {

@@ -18,40 +18,33 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 
 /**
- * Single savings transaction view for interop. Composes a resource id instead of
- * extending {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
+ * Single savings transaction view for interop. Composes a resource id instead of extending
+ * {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
+ * <p>
+ * Leftover {@code SavingsAccountTransactionType} is Object-typed — unpublished in savings-api-exported packages
+ * (ADR-021).
  */
 public final class InteropTransactionData {
 
     private final Long resourceId;
-    @NotNull
     private final String accountId;
-    @NotNull
     private final String savingTransactionId;
-    @NotNull
-    private final SavingsAccountTransactionType transactionType;
-    @NotNull
+    private final Object transactionType;
     private final BigDecimal amount;
     private final BigDecimal chargeAmount;
-    @NotNull
     private final String currency;
-    @NotNull
     private final BigDecimal accountBalance;
-    @NotNull
     private final LocalDate bookingDateTime;
-    @NotNull
     private final LocalDate valueDateTime;
     private String note;
 
-    public InteropTransactionData(Long resourceId, String accountId, String transactionId, SavingsAccountTransactionType transactionType,
-            BigDecimal amount, BigDecimal chargeAmount, String currency, BigDecimal accountBalance, LocalDate bookingDateTime,
-            LocalDate valueDateTime, String note) {
+    public InteropTransactionData(Long resourceId, String accountId, String transactionId, Object transactionType, BigDecimal amount,
+            BigDecimal chargeAmount, String currency, BigDecimal accountBalance, LocalDate bookingDateTime, LocalDate valueDateTime,
+            String note) {
         this.resourceId = resourceId;
         this.accountId = accountId;
         this.savingTransactionId = transactionId;
@@ -81,7 +74,7 @@ public final class InteropTransactionData {
         return savingTransactionId;
     }
 
-    public SavingsAccountTransactionType getTransactionType() {
+    public Object getTransactionType() {
         return transactionType;
     }
 

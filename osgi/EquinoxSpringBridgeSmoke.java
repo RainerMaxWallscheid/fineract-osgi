@@ -49,6 +49,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatfor
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
+import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
@@ -349,7 +350,9 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(PaymentDetailWritePlatformService.class, s -> s instanceof PaymentDetailWritePlatformService p
                         && HostedPaymentDetailWritePlatformService.HOSTED_ID == p.id(p.createAndPersistPaymentDetail(null, null))),
                 probeOf(PortfolioNotificationEventPort.class, EquinoxSpringBridgeSmoke::notificationWins),
-                probeOf(SmsCampaignTriggerEventPort.class, EquinoxSpringBridgeSmoke::smsCampaignTriggerWins));
+                probeOf(SmsCampaignTriggerEventPort.class, EquinoxSpringBridgeSmoke::smsCampaignTriggerWins),
+                probeOf(InteropService.class, s -> s instanceof InteropService p
+                        && HostedInteropService.HOSTED.equals(p.getAccountDetails("hosted").getAccountId())));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {

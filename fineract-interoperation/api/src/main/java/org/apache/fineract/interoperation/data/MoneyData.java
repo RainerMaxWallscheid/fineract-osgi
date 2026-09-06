@@ -24,7 +24,6 @@ import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_CURRENCY
 import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_LOCALE;
 
 import com.google.gson.JsonObject;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +36,7 @@ public class MoneyData {
 
     public static final List<String> PARAMS = List.copyOf(Arrays.asList(PARAM_AMOUNT, PARAM_CURRENCY, PARAM_LOCALE));
 
-    @NotNull
     private final BigDecimal amount;
-    @NotNull
     private final String currency;
 
     MoneyData(BigDecimal amount, String currency) {
@@ -59,7 +56,7 @@ public class MoneyData {
         return currency;
     }
 
-    public void normalizeAmount(@NotNull MonetaryCurrency currency) {
+    public void normalizeAmount(MonetaryCurrency currency) {
         if (!currency.getCode().equals(this.currency)) {
             throw new UnsupportedOperationException("Internal error: Invalid currency " + currency.getCode());
         }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -28,25 +27,22 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 
 /**
- * Transfer response: {@link CommandProcessingResult} plus composed
- * {@link InteropResponseData} fields (flattened for Gson) and transfer-specific payload.
+ * Transfer response: {@link CommandProcessingResult} plus composed {@link InteropResponseData} fields (flattened for
+ * Gson) and transfer-specific payload.
  */
 public final class InteropTransferResponseData extends CommandProcessingResult {
 
-    @NotNull
     private final String transactionCode;
-    @NotNull
     private final InteropActionState state;
     private final String expiration;
     private final List<ExtensionData> extensionList;
 
-    @NotNull
     private final String transferCode;
 
     private String completedTimestamp;
 
     private InteropTransferResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull InteropResponseData response, @NotNull String transferCode, LocalDateTime completedTimestamp) {
+            InteropResponseData response, String transferCode, LocalDateTime completedTimestamp) {
         super(resourceId, officeId, commandId, changesOnly);
         this.transactionCode = response.getTransactionCode();
         this.state = response.getState();
@@ -56,24 +52,22 @@ public final class InteropTransferResponseData extends CommandProcessingResult {
         this.completedTimestamp = InteropResponseData.format(completedTimestamp);
     }
 
-    public static InteropTransferResponseData build(Long commandId, @NotNull String transactionCode, @NotNull InteropActionState state,
-            LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String transferCode, LocalDateTime completedTimestamp) {
+    public static InteropTransferResponseData build(Long commandId, String transactionCode, InteropActionState state,
+            LocalDateTime expiration, List<ExtensionData> extensionList, String transferCode, LocalDateTime completedTimestamp) {
         return new InteropTransferResponseData(null, null, commandId, null,
                 InteropResponseData.of(transactionCode, state, expiration, extensionList), transferCode, completedTimestamp);
     }
 
-    public static InteropTransferResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            List<ExtensionData> extensionList, @NotNull String transferCode, LocalDateTime completedTimestamp) {
+    public static InteropTransferResponseData build(String transactionCode, InteropActionState state, List<ExtensionData> extensionList,
+            String transferCode, LocalDateTime completedTimestamp) {
         return build(null, transactionCode, state, null, extensionList, transferCode, completedTimestamp);
     }
 
-    public static InteropTransferResponseData build(Long commandId, @NotNull String transactionCode, @NotNull InteropActionState state,
-            @NotNull String transferCode) {
+    public static InteropTransferResponseData build(Long commandId, String transactionCode, InteropActionState state, String transferCode) {
         return build(commandId, transactionCode, state, null, null, transferCode, null);
     }
 
-    public static InteropTransferResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            @NotNull String transferCode) {
+    public static InteropTransferResponseData build(String transactionCode, InteropActionState state, String transferCode) {
         return build(null, transactionCode, state, transferCode);
     }
 

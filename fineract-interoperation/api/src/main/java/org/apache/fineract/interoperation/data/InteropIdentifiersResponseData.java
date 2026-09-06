@@ -18,13 +18,12 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Account identifiers list response. Composes command-result identifiers instead of
- * extending {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
+ * Account identifiers list response. Composes command-result identifiers instead of extending
+ * {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl.
  */
 public final class InteropIdentifiersResponseData {
 
@@ -33,11 +32,10 @@ public final class InteropIdentifiersResponseData {
     private final Long commandId;
     private final Map<String, Object> changes;
 
-    @NotNull
     private final List<InteropIdentifierData> identifiers;
 
     public InteropIdentifiersResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull List<InteropIdentifierData> identifiers) {
+            List<InteropIdentifierData> identifiers) {
         this.resourceId = resourceId;
         this.officeId = officeId;
         this.commandId = commandId;
@@ -45,7 +43,7 @@ public final class InteropIdentifiersResponseData {
         this.identifiers = identifiers;
     }
 
-    public InteropIdentifiersResponseData(@NotNull List<InteropIdentifierData> identifiers) {
+    public InteropIdentifiersResponseData(List<InteropIdentifierData> identifiers) {
         this(null, null, null, null, identifiers);
     }
 
@@ -65,7 +63,6 @@ public final class InteropIdentifiersResponseData {
         return changes;
     }
 
-    @NotNull
     public List<InteropIdentifierData> getIdentifiers() {
         return identifiers;
     }

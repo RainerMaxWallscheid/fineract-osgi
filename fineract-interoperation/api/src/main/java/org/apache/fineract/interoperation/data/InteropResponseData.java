@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -28,26 +27,23 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 
 /**
- * Shared interop response fields. Specialized responses compose this type and
- * flatten its fields for Gson serialization (they also extend
- * {@link org.apache.fineract.infrastructure.core.data.CommandProcessingResult}).
+ * Shared interop response fields. Specialized responses compose this type and flatten its fields for Gson serialization
+ * (they also extend {@link org.apache.fineract.infrastructure.core.data.CommandProcessingResult}).
  */
 public final class InteropResponseData {
 
     public static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(ISO_DATE_TIME_PATTERN);
 
-    @NotNull
     private final String transactionCode;
 
-    @NotNull
     private final InteropActionState state;
 
     private final String expiration;
 
     private final List<ExtensionData> extensionList;
 
-    public InteropResponseData(@NotNull String transactionCode, @NotNull InteropActionState state, LocalDateTime expiration,
+    public InteropResponseData(String transactionCode, InteropActionState state, LocalDateTime expiration,
             List<ExtensionData> extensionList) {
         this.transactionCode = transactionCode;
         this.state = state;
@@ -55,12 +51,12 @@ public final class InteropResponseData {
         this.extensionList = extensionList;
     }
 
-    public static InteropResponseData of(@NotNull String transactionCode, @NotNull InteropActionState state, LocalDateTime expiration,
+    public static InteropResponseData of(String transactionCode, InteropActionState state, LocalDateTime expiration,
             List<ExtensionData> extensionList) {
         return new InteropResponseData(transactionCode, state, expiration, extensionList);
     }
 
-    public static InteropResponseData of(@NotNull String transactionCode, @NotNull InteropActionState state) {
+    public static InteropResponseData of(String transactionCode, InteropActionState state) {
         return of(transactionCode, state, null, null);
     }
 

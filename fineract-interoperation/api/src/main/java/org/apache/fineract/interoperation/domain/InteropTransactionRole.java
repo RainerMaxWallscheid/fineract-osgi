@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.interoperation.domain;
 
-import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
-
 public enum InteropTransactionRole {
 
     PAYER, //
@@ -29,7 +27,11 @@ public enum InteropTransactionRole {
         return this == PAYER;
     }
 
-    public SavingsAccountTransactionType getTransactionType() {
-        return this == PAYER ? SavingsAccountTransactionType.WITHDRAWAL : SavingsAccountTransactionType.DEPOSIT;
+    /**
+     * Leftover {@code SavingsAccountTransactionType} Integer value: PAYER → withdrawal (2), PAYEE → deposit (1).
+     * Unpublished in savings-api-exported packages (ADR-021).
+     */
+    public Object getTransactionType() {
+        return Integer.valueOf(this == PAYER ? 2 : 1);
     }
 }

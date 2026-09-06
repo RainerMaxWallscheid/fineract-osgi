@@ -18,17 +18,15 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 
 public class InteropIdentifierData {
-    @NotNull
+
     private final InteropIdentifierType idType;
-    @NotNull
     private final String idValue;
     private final String subIdOrType;
 
-    protected InteropIdentifierData(@NotNull InteropIdentifierType idType, @NotNull String idValue) {
+    protected InteropIdentifierData(InteropIdentifierType idType, String idValue) {
         this(idType, idValue, null);
     }
 

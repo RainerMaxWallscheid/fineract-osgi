@@ -22,7 +22,6 @@ import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_KEY;
 import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_VALUE;
 
 import com.google.gson.JsonObject;
-import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -32,7 +31,6 @@ public class ExtensionData {
 
     public static final List<String> PARAMS = List.copyOf(Arrays.asList(PARAM_KEY, PARAM_VALUE));
 
-    @NotNull
     private final String key;
 
     private String value;

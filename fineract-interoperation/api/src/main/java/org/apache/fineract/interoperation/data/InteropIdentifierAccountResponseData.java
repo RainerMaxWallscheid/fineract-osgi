@@ -18,32 +18,29 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
 /**
- * Identifier→account response returned from the command pipeline — must remain a
- * {@link CommandProcessingResult}. Domain payload is composed as flat fields.
+ * Identifier→account response returned from the command pipeline — must remain a {@link CommandProcessingResult}.
+ * Domain payload is composed as flat fields.
  */
 public final class InteropIdentifierAccountResponseData extends CommandProcessingResult {
 
-    @NotEmpty
     private String accountId;
 
     private InteropIdentifierAccountResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull String accountId) {
+            String accountId) {
         super(resourceId, officeId, commandId, changesOnly);
         this.accountId = accountId;
     }
 
     private static InteropIdentifierAccountResponseData build(Long resourceId, Long officeId, Long commandId,
-            Map<String, Object> changesOnly, @NotNull String accountId) {
+            Map<String, Object> changesOnly, String accountId) {
         return new InteropIdentifierAccountResponseData(resourceId, officeId, commandId, changesOnly, accountId);
     }
 
-    public static InteropIdentifierAccountResponseData build(Long resourceId, @NotNull String accountId) {
+    public static InteropIdentifierAccountResponseData build(Long resourceId, String accountId) {
         return build(resourceId, null, null, null, accountId);
     }
 
@@ -51,7 +48,6 @@ public final class InteropIdentifierAccountResponseData extends CommandProcessin
         return build(null, null);
     }
 
-    @NotNull
     public String getAccountId() {
         return accountId;
     }

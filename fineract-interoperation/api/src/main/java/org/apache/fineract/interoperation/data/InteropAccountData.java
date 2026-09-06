@@ -18,20 +18,18 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
-import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountSubStatusEnum;
 
 /**
- * Interop savings account details. Composes command-result identifiers instead of
- * extending {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl
- * ({@code InteropDataFactory}).
+ * Interop savings account details. Composes command-result identifiers instead of extending
+ * {@code CommandProcessingResult}. Entity mapping lives in interoperation-impl ({@code InteropDataFactory}).
+ * <p>
+ * Leftover savings catalog enums ({@code SavingsAccountStatusType}, {@code SavingsAccountSubStatusEnum},
+ * {@code AccountType}, {@code DepositAccountType}) are Object-typed — unpublished in savings-api-exported packages
+ * (ADR-021).
  */
 public final class InteropAccountData {
 
@@ -41,38 +39,27 @@ public final class InteropAccountData {
     private final Map<String, Object> changes;
     private final Long clientId;
 
-    @NotNull
     private final String accountId;
-    @NotNull
     private final String savingProductId;
-    @NotNull
     private final String productName;
-    @NotNull
     private final String shortProductName;
-    @NotNull
     private final String currency;
-    @NotNull
     private final BigDecimal accountBalance;
-    @NotNull
     private final BigDecimal availableBalance;
-    @NotNull
-    private final SavingsAccountStatusType status;
-    private final SavingsAccountSubStatusEnum subStatus;
-    private final AccountType accountType;
-    private final DepositAccountType depositType;
-    @NotNull
+    private final Object status;
+    private final Object subStatus;
+    private final Object accountType;
+    private final Object depositType;
     private final LocalDate activatedOn;
     private final LocalDate statusUpdateOn;
     private final LocalDate withdrawnOn;
     private final LocalDate balanceOn;
-    @NotNull
     private List<InteropIdentifierData> identifiers;
 
     public InteropAccountData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly, String accountId,
             String productId, String productName, String shortProductName, String currency, BigDecimal accountBalance,
-            BigDecimal availableBalance, SavingsAccountStatusType status, SavingsAccountSubStatusEnum subStatus, AccountType accountType,
-            DepositAccountType depositType, LocalDate activatedOn, LocalDate statusUpdateOn, LocalDate withdrawnOn, LocalDate balanceOn,
-            List<InteropIdentifierData> identifiers, long clientId) {
+            BigDecimal availableBalance, Object status, Object subStatus, Object accountType, Object depositType, LocalDate activatedOn,
+            LocalDate statusUpdateOn, LocalDate withdrawnOn, LocalDate balanceOn, List<InteropIdentifierData> identifiers, long clientId) {
         this.resourceId = resourceId;
         this.officeId = officeId;
         this.commandId = commandId;
@@ -97,9 +84,9 @@ public final class InteropAccountData {
     }
 
     public InteropAccountData(String accountId, String productId, String productName, String shortProductName, String currency,
-            BigDecimal accountBalance, BigDecimal availableBalance, SavingsAccountStatusType status, SavingsAccountSubStatusEnum subStatus,
-            AccountType accountType, DepositAccountType depositType, LocalDate activatedOn, LocalDate statusUpdateOn, LocalDate withdrawnOn,
-            LocalDate balanceOn, List<InteropIdentifierData> identifiers, long clientId) {
+            BigDecimal accountBalance, BigDecimal availableBalance, Object status, Object subStatus, Object accountType, Object depositType,
+            LocalDate activatedOn, LocalDate statusUpdateOn, LocalDate withdrawnOn, LocalDate balanceOn,
+            List<InteropIdentifierData> identifiers, long clientId) {
         this(null, null, null, null, accountId, productId, productName, shortProductName, currency, accountBalance, availableBalance,
                 status, subStatus, accountType, depositType, activatedOn, statusUpdateOn, withdrawnOn, balanceOn, identifiers, clientId);
     }
@@ -152,19 +139,19 @@ public final class InteropAccountData {
         return availableBalance;
     }
 
-    public SavingsAccountStatusType getStatus() {
+    public Object getStatus() {
         return status;
     }
 
-    public SavingsAccountSubStatusEnum getSubStatus() {
+    public Object getSubStatus() {
         return subStatus;
     }
 
-    public AccountType getAccountType() {
+    public Object getAccountType() {
         return accountType;
     }
 
-    public DepositAccountType getDepositType() {
+    public Object getDepositType() {
         return depositType;
     }
 

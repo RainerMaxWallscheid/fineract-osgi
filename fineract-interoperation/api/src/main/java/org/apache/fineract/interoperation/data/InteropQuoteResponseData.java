@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,26 +25,23 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 
 /**
- * Quote response: {@link CommandProcessingResult} plus composed
- * {@link InteropResponseData} fields (flattened for Gson) and quote-specific payload.
+ * Quote response: {@link CommandProcessingResult} plus composed {@link InteropResponseData} fields (flattened for Gson)
+ * and quote-specific payload.
  */
 public final class InteropQuoteResponseData extends CommandProcessingResult {
 
-    @NotNull
     private final String transactionCode;
-    @NotNull
     private final InteropActionState state;
     private final String expiration;
     private final List<ExtensionData> extensionList;
 
-    @NotNull
     private final String quoteCode;
 
     private MoneyData fspFee;
     private MoneyData fspCommission;
 
     private InteropQuoteResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull InteropResponseData response, @NotNull String quoteCode, MoneyData fspFee, MoneyData fspCommission) {
+            InteropResponseData response, String quoteCode, MoneyData fspFee, MoneyData fspCommission) {
         super(resourceId, officeId, commandId, changesOnly);
         this.transactionCode = response.getTransactionCode();
         this.state = response.getState();
@@ -56,26 +52,22 @@ public final class InteropQuoteResponseData extends CommandProcessingResult {
         this.fspCommission = fspCommission;
     }
 
-    public static InteropQuoteResponseData build(Long commandId, @NotNull String transactionCode, @NotNull InteropActionState state,
-            LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String quoteCode, MoneyData fspFee,
-            MoneyData fspCommission) {
-        return new InteropQuoteResponseData(null, null, commandId, null, InteropResponseData.of(transactionCode, state, expiration, extensionList),
-                quoteCode, fspFee, fspCommission);
+    public static InteropQuoteResponseData build(Long commandId, String transactionCode, InteropActionState state, LocalDateTime expiration,
+            List<ExtensionData> extensionList, String quoteCode, MoneyData fspFee, MoneyData fspCommission) {
+        return new InteropQuoteResponseData(null, null, commandId, null,
+                InteropResponseData.of(transactionCode, state, expiration, extensionList), quoteCode, fspFee, fspCommission);
     }
 
-    public static InteropQuoteResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String quoteCode, MoneyData fspFee,
-            MoneyData fspCommission) {
+    public static InteropQuoteResponseData build(String transactionCode, InteropActionState state, LocalDateTime expiration,
+            List<ExtensionData> extensionList, String quoteCode, MoneyData fspFee, MoneyData fspCommission) {
         return build(null, transactionCode, state, expiration, extensionList, quoteCode, fspFee, fspCommission);
     }
 
-    public static InteropQuoteResponseData build(Long commandId, @NotNull String transactionCode, @NotNull InteropActionState state,
-            @NotNull String quoteCode) {
+    public static InteropQuoteResponseData build(Long commandId, String transactionCode, InteropActionState state, String quoteCode) {
         return build(commandId, transactionCode, state, null, null, quoteCode, null, null);
     }
 
-    public static InteropQuoteResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            @NotNull String quoteCode) {
+    public static InteropQuoteResponseData build(String transactionCode, InteropActionState state, String quoteCode) {
         return build(null, transactionCode, state, quoteCode);
     }
 

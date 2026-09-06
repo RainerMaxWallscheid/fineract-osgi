@@ -95,6 +95,16 @@ import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
+import org.apache.fineract.interoperation.data.InteropAccountData;
+import org.apache.fineract.interoperation.data.InteropIdentifierAccountResponseData;
+import org.apache.fineract.interoperation.data.InteropIdentifiersResponseData;
+import org.apache.fineract.interoperation.data.InteropKycResponseData;
+import org.apache.fineract.interoperation.data.InteropQuoteResponseData;
+import org.apache.fineract.interoperation.data.InteropTransactionRequestResponseData;
+import org.apache.fineract.interoperation.data.InteropTransactionsData;
+import org.apache.fineract.interoperation.data.InteropTransferResponseData;
+import org.apache.fineract.interoperation.domain.InteropIdentifierType;
+import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
@@ -2292,6 +2302,115 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void interopLookupFacadeDelegatesToPublishedSpringPort() {
+        final InteropService spring = new InteropService() {
+
+            @Override
+            public InteropIdentifiersResponseData getAccountIdentifiers(final String accountId) {
+                return null;
+            }
+
+            @Override
+            public InteropAccountData getAccountDetails(final String accountId) {
+                return new InteropAccountData("hosted", "hosted", "hosted", "hosted", "hosted", BigDecimal.ZERO, BigDecimal.ZERO, null,
+                        null, null, null, LocalDate.EPOCH, null, null, null, List.of(), 1L);
+            }
+
+            @Override
+            public InteropTransactionsData getAccountTransactions(final String accountId, final boolean debit, final boolean credit,
+                    final java.time.LocalDateTime transactionsFrom, final java.time.LocalDateTime transactionsTo) {
+                return null;
+            }
+
+            @Override
+            public InteropIdentifierAccountResponseData getAccountByIdentifier(final InteropIdentifierType idType, final String idValue,
+                    final String subIdOrType) {
+                return null;
+            }
+
+            @Override
+            public InteropIdentifierAccountResponseData registerAccountIdentifier(final InteropIdentifierType idType, final String idValue,
+                    final String subIdOrType, final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropIdentifierAccountResponseData deleteAccountIdentifier(final InteropIdentifierType idType, final String idValue,
+                    final String subIdOrType) {
+                return null;
+            }
+
+            @Override
+            public InteropTransactionRequestResponseData getTransactionRequest(final String transactionCode, final String requestCode) {
+                return null;
+            }
+
+            @Override
+            public InteropTransactionRequestResponseData createTransactionRequest(final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropQuoteResponseData getQuote(final String transactionCode, final String quoteCode) {
+                return null;
+            }
+
+            @Override
+            public InteropQuoteResponseData createQuote(final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropTransferResponseData getTransfer(final String transactionCode, final String transferCode) {
+                return null;
+            }
+
+            @Override
+            public InteropTransferResponseData prepareTransfer(final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropTransferResponseData commitTransfer(final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropTransferResponseData releaseTransfer(final JsonCommand command) {
+                return null;
+            }
+
+            @Override
+            public InteropKycResponseData getKyc(final String accountId) {
+                return null;
+            }
+
+            @Override
+            public String disburseLoan(final String accountId, final String apiRequestBodyAsJson) {
+                return null;
+            }
+
+            @Override
+            public String loanRepayment(final String accountId, final String apiRequestBodyAsJson) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = interopBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final InteropService facade = OsgiBackedPortFactory.of(lookup, InteropService.class);
+
+        assertNull(facade.getAccountDetails("hosted"));
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.getAccountDetails("hosted").getAccountId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.getAccountDetails("hosted"));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2309,6 +2428,7 @@ class EquinoxFrameworkLifecycleTest {
         final List<Object> smsCampaigns = new ArrayList<>();
         OsgiBackedPortFactory.empty(SmsCampaignTriggerEventPort.class).onClientActivated(smsCampaigns::add);
         assertTrue(smsCampaigns.isEmpty());
+        assertNull(OsgiBackedPortFactory.empty(InteropService.class).getAccountDetails("hosted"));
     }
 
     @Test
@@ -4136,6 +4256,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringInteropServiceStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final InteropService interop = new StubInteropService();
+        final SpringOsgiPortBridge bridge = interopBridge(interop);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean interoperationImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.interoperation.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    interoperationImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(interoperationImplActive);
+            final ServiceReference<InteropService> selected = ctx.getServiceReference(InteropService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(interop, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4381,6 +4531,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge smsCampaignTriggerBridge(final SmsCampaignTriggerEventPort smsCampaigns) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsCampaignTriggerEventPort.class, smsCampaigns)));
+    }
+
+    private static SpringOsgiPortBridge interopBridge(final InteropService interop) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(InteropService.class, interop)));
     }
 
     private static Path stagedCatalog() {
@@ -5440,5 +5594,97 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public void onSavingsWithdrawal(final Consumer<Object> handler) {}
+    }
+
+    private static final class StubInteropService implements InteropService {
+
+        @Override
+        public InteropIdentifiersResponseData getAccountIdentifiers(final String accountId) {
+            return null;
+        }
+
+        @Override
+        public InteropAccountData getAccountDetails(final String accountId) {
+            return null;
+        }
+
+        @Override
+        public InteropTransactionsData getAccountTransactions(final String accountId, final boolean debit, final boolean credit,
+                final java.time.LocalDateTime transactionsFrom, final java.time.LocalDateTime transactionsTo) {
+            return null;
+        }
+
+        @Override
+        public InteropIdentifierAccountResponseData getAccountByIdentifier(final InteropIdentifierType idType, final String idValue,
+                final String subIdOrType) {
+            return null;
+        }
+
+        @Override
+        public InteropIdentifierAccountResponseData registerAccountIdentifier(final InteropIdentifierType idType, final String idValue,
+                final String subIdOrType, final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropIdentifierAccountResponseData deleteAccountIdentifier(final InteropIdentifierType idType, final String idValue,
+                final String subIdOrType) {
+            return null;
+        }
+
+        @Override
+        public InteropTransactionRequestResponseData getTransactionRequest(final String transactionCode, final String requestCode) {
+            return null;
+        }
+
+        @Override
+        public InteropTransactionRequestResponseData createTransactionRequest(final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropQuoteResponseData getQuote(final String transactionCode, final String quoteCode) {
+            return null;
+        }
+
+        @Override
+        public InteropQuoteResponseData createQuote(final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropTransferResponseData getTransfer(final String transactionCode, final String transferCode) {
+            return null;
+        }
+
+        @Override
+        public InteropTransferResponseData prepareTransfer(final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropTransferResponseData commitTransfer(final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropTransferResponseData releaseTransfer(final JsonCommand command) {
+            return null;
+        }
+
+        @Override
+        public InteropKycResponseData getKyc(final String accountId) {
+            return null;
+        }
+
+        @Override
+        public String disburseLoan(final String accountId, final String apiRequestBodyAsJson) {
+            return null;
+        }
+
+        @Override
+        public String loanRepayment(final String accountId, final String apiRequestBodyAsJson) {
+            return null;
+        }
     }
 }

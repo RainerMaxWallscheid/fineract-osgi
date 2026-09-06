@@ -45,6 +45,7 @@ import org.apache.fineract.infrastructure.security.service.AccessTokenGeneration
 import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
+import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.notification.service.UserNotificationService;
@@ -87,8 +88,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Boot composition-root Equinox embed (ADR-022 B3). Off unless
- * {@code fineract.osgi.enabled=true}.
+ * Boot composition-root Equinox embed (ADR-022 B3). Off unless {@code fineract.osgi.enabled=true}.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -98,9 +98,8 @@ public class EquinoxOsgiConfiguration {
     public SpringOsgiPortBridge springOsgiPortBridge(final ObjectProvider<ChargeDefinitionPort> charge,
             final ObjectProvider<FloatingRatePort> rates, final ObjectProvider<TaxCatalogPort> tax,
             final ObjectProvider<ContentStoreService> content, final ObjectProvider<ContentStreamPort> contentStreams,
-            final ObjectProvider<CashierTxnValidationPort> cashier,
-            final ObjectProvider<LoanOriginatorReadPlatformService> originator, final ObjectProvider<MixTaxonomyReadService> mix,
-            final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement,
+            final ObjectProvider<CashierTxnValidationPort> cashier, final ObjectProvider<LoanOriginatorReadPlatformService> originator,
+            final ObjectProvider<MixTaxonomyReadService> mix, final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement,
             final ObjectProvider<GLClosureReadPlatformService> closures, final ObjectProvider<SavingsDropdownReadPlatformService> savings,
             final ObjectProvider<LoanProductLookupReadPort> loanProducts, final ObjectProvider<BuyDownFeeReadPlatformService> buyDown,
             final ObjectProvider<WorkingCapitalLoanPeriodPaymentRateChangeReadService> wcRateChange,
@@ -132,77 +131,52 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<HookReadPlatformService> hooks, final ObjectProvider<SmsWritePlatformService> sms,
             final ObjectProvider<ReportMailingJobConfigurationReadPlatformService> reportMailing,
             final ObjectProvider<SmsCampaignDropdownReadPlatformService> smsCampaigns,
-            final ObjectProvider<NotificationConfigurationReadService> gcmConfig,
-            final ObjectProvider<ReportWritePlatformService> reports,
+            final ObjectProvider<NotificationConfigurationReadService> gcmConfig, final ObjectProvider<ReportWritePlatformService> reports,
             final ObjectProvider<ExternalServicesReadPlatformService> externalServices,
             final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties,
-            final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails,
-            final ObjectProvider<CommandDispatcher> commands,
+            final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails, final ObjectProvider<CommandDispatcher> commands,
             final ObjectProvider<PortfolioNotificationEventPort> portfolioNotifications,
-            final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaignTriggers) {
-        return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge),
-                owned(FloatingRatePort.class, rates), owned(TaxCatalogPort.class, tax),
-                owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
-                owned(CashierTxnValidationPort.class, cashier),
-                owned(LoanOriginatorReadPlatformService.class, originator),
-                owned(MixTaxonomyReadService.class, mix),
-                owned(DelayedSettlementAttributeService.class, delayedSettlement),
-                owned(GLClosureReadPlatformService.class, closures),
-                owned(SavingsDropdownReadPlatformService.class, savings),
-                owned(LoanProductLookupReadPort.class, loanProducts),
-                owned(BuyDownFeeReadPlatformService.class, buyDown),
+            final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaignTriggers, final ObjectProvider<InteropService> interop) {
+        return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge), owned(FloatingRatePort.class, rates),
+                owned(TaxCatalogPort.class, tax), owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
+                owned(CashierTxnValidationPort.class, cashier), owned(LoanOriginatorReadPlatformService.class, originator),
+                owned(MixTaxonomyReadService.class, mix), owned(DelayedSettlementAttributeService.class, delayedSettlement),
+                owned(GLClosureReadPlatformService.class, closures), owned(SavingsDropdownReadPlatformService.class, savings),
+                owned(LoanProductLookupReadPort.class, loanProducts), owned(BuyDownFeeReadPlatformService.class, buyDown),
                 owned(WorkingCapitalLoanPeriodPaymentRateChangeReadService.class, wcRateChange),
-                owned(ConfigJobParameterService.class, cobJobs),
-                owned(AccessTokenGenerationService.class, accessTokens),
-                owned(BusinessDateReadPlatformService.class, businessDates),
-                owned(CodeReadPlatformService.class, codes),
-                owned(ProvisioningCategoryReadPlatformService.class, provisioning),
-                owned(CurrencyWritePlatformService.class, currencies),
-                owned(PasswordValidationPolicyReadPlatformService.class, passwordPolicies),
-                owned(AdHocReadPlatformService.class, adhoc),
-                owned(TemplateMergeService.class, templates),
-                owned(UserNotificationService.class, notifications),
-                owned(ScorecardReadPlatformService.class, scorecards),
-                owned(FundReadPlatformService.class, funds),
-                owned(AccountNumberFormatReadPlatformService.class, accountNumbers),
-                owned(ReadLikelihoodService.class, likelihood),
-                owned(TransferWritePlatformService.class, transfers),
-                owned(PaymentTypeReadService.class, paymentTypes),
-                owned(SearchReadService.class, search),
-                owned(CollectionSheetWritePlatformService.class, collectionSheets),
+                owned(ConfigJobParameterService.class, cobJobs), owned(AccessTokenGenerationService.class, accessTokens),
+                owned(BusinessDateReadPlatformService.class, businessDates), owned(CodeReadPlatformService.class, codes),
+                owned(ProvisioningCategoryReadPlatformService.class, provisioning), owned(CurrencyWritePlatformService.class, currencies),
+                owned(PasswordValidationPolicyReadPlatformService.class, passwordPolicies), owned(AdHocReadPlatformService.class, adhoc),
+                owned(TemplateMergeService.class, templates), owned(UserNotificationService.class, notifications),
+                owned(ScorecardReadPlatformService.class, scorecards), owned(FundReadPlatformService.class, funds),
+                owned(AccountNumberFormatReadPlatformService.class, accountNumbers), owned(ReadLikelihoodService.class, likelihood),
+                owned(TransferWritePlatformService.class, transfers), owned(PaymentTypeReadService.class, paymentTypes),
+                owned(SearchReadService.class, search), owned(CollectionSheetWritePlatformService.class, collectionSheets),
                 owned(StandingInstructionWritePlatformService.class, standingInstructions),
                 owned(ShareProductDropdownReadPlatformService.class, shareProducts),
                 owned(GroupLevelReadPlatformService.class, groupLevels),
                 owned(ClientIdentifierWritePlatformService.class, clientIdentifiers),
                 owned(RepaymentWithPostDatedChecksWritePlatformService.class, postDatedChecks),
-                owned(ProductCommandsService.class, productCommands),
-                owned(CacheWritePlatformService.class, cache),
-                owned(FineractEntityAccessReadService.class, entityAccess),
-                owned(CalendarDropdownReadPlatformService.class, calendars),
+                owned(ProductCommandsService.class, productCommands), owned(CacheWritePlatformService.class, cache),
+                owned(FineractEntityAccessReadService.class, entityAccess), owned(CalendarDropdownReadPlatformService.class, calendars),
                 owned(MeetingAttendanceDropdownReadService.class, meetings),
                 owned(FieldConfigurationReadPlatformService.class, addressFields),
-                owned(CreditBureauReadPlatformService.class, creditBureaus),
-                owned(CollateralWritePlatformService.class, collateral),
-                owned(CollateralManagementReadService.class, collateralMgmt),
-                owned(NoteReadPlatformService.class, notes), owned(HookReadPlatformService.class, hooks),
-                owned(SmsWritePlatformService.class, sms),
+                owned(CreditBureauReadPlatformService.class, creditBureaus), owned(CollateralWritePlatformService.class, collateral),
+                owned(CollateralManagementReadService.class, collateralMgmt), owned(NoteReadPlatformService.class, notes),
+                owned(HookReadPlatformService.class, hooks), owned(SmsWritePlatformService.class, sms),
                 owned(ReportMailingJobConfigurationReadPlatformService.class, reportMailing),
                 owned(SmsCampaignDropdownReadPlatformService.class, smsCampaigns),
-                owned(NotificationConfigurationReadService.class, gcmConfig),
-                owned(ReportWritePlatformService.class, reports),
-                owned(ExternalServicesReadPlatformService.class, externalServices),
-                owned(StuckJobExecutorService.class, stuckJobs),
-                owned(PropertyService.class, batchProperties),
-                owned(PaymentDetailWritePlatformService.class, paymentDetails),
-                owned(CommandDispatcher.class, commands),
-                owned(PortfolioNotificationEventPort.class, portfolioNotifications),
-                owned(SmsCampaignTriggerEventPort.class, smsCampaignTriggers)));
+                owned(NotificationConfigurationReadService.class, gcmConfig), owned(ReportWritePlatformService.class, reports),
+                owned(ExternalServicesReadPlatformService.class, externalServices), owned(StuckJobExecutorService.class, stuckJobs),
+                owned(PropertyService.class, batchProperties), owned(PaymentDetailWritePlatformService.class, paymentDetails),
+                owned(CommandDispatcher.class, commands), owned(PortfolioNotificationEventPort.class, portfolioNotifications),
+                owned(SmsCampaignTriggerEventPort.class, smsCampaignTriggers), owned(InteropService.class, interop)));
     }
 
     /**
-     * Resolve the Spring-owned adapter at Equinox start, not at bean
-     * construction — {@code @Primary} OSGi lookup proxies must not be
-     * published back into the Service Registry.
+     * Resolve the Spring-owned adapter at Equinox start, not at bean construction — {@code @Primary} OSGi lookup
+     * proxies must not be published back into the Service Registry.
      */
     private static <T> SpringOsgiPortBridge.Binding<T> owned(final Class<T> type, final ObjectProvider<T> provider) {
         return SpringOsgiPortBridge.bindLater(type, () -> SpringOsgiPortBridge.owned(provider.orderedStream().toList()));

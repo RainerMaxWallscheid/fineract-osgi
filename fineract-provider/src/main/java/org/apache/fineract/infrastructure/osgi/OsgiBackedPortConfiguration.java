@@ -43,6 +43,7 @@ import org.apache.fineract.infrastructure.security.service.AccessTokenGeneration
 import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
+import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.service.MixTaxonomyReadService;
 import org.apache.fineract.notification.service.UserNotificationService;
@@ -108,8 +109,8 @@ import org.springframework.context.annotation.Primary;
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
  * {@code PaymentDetailWritePlatformService}, {@code CommandDispatcher}, {@code PortfolioNotificationEventPort},
- * and {@code SmsCampaignTriggerEventPort} are {@code @Primary} lookup façades when
- * Equinox is on — Boot consumers resolve them from the Service Registry.
+ * {@code SmsCampaignTriggerEventPort}, and {@code InteropService} are {@code @Primary} lookup façades when Equinox is
+ * on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -480,5 +481,11 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public SmsCampaignTriggerEventPort osgiSmsCampaignTriggerEventPort(final OsgiServiceLookup lookup) {
         return backed(lookup, SmsCampaignTriggerEventPort.class);
+    }
+
+    @Bean
+    @Primary
+    public InteropService osgiInteropService(final OsgiServiceLookup lookup) {
+        return backed(lookup, InteropService.class);
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.interoperation.data;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,23 +25,20 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 
 /**
- * Transaction-request response: {@link CommandProcessingResult} plus composed
- * {@link InteropResponseData} fields (flattened for Gson).
+ * Transaction-request response: {@link CommandProcessingResult} plus composed {@link InteropResponseData} fields
+ * (flattened for Gson).
  */
 public final class InteropTransactionRequestResponseData extends CommandProcessingResult {
 
-    @NotNull
     private final String transactionCode;
-    @NotNull
     private final InteropActionState state;
     private final String expiration;
     private final List<ExtensionData> extensionList;
 
-    @NotNull
     private final String requestCode;
 
     private InteropTransactionRequestResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull InteropResponseData response, @NotNull String requestCode) {
+            InteropResponseData response, String requestCode) {
         super(resourceId, officeId, commandId, changesOnly);
         this.transactionCode = response.getTransactionCode();
         this.state = response.getState();
@@ -51,24 +47,23 @@ public final class InteropTransactionRequestResponseData extends CommandProcessi
         this.requestCode = requestCode;
     }
 
-    public static InteropTransactionRequestResponseData build(Long commandId, @NotNull String transactionCode,
-            @NotNull InteropActionState state, LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String requestCode) {
+    public static InteropTransactionRequestResponseData build(Long commandId, String transactionCode, InteropActionState state,
+            LocalDateTime expiration, List<ExtensionData> extensionList, String requestCode) {
         return new InteropTransactionRequestResponseData(null, null, commandId, null,
                 InteropResponseData.of(transactionCode, state, expiration, extensionList), requestCode);
     }
 
-    public static InteropTransactionRequestResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String requestCode) {
+    public static InteropTransactionRequestResponseData build(String transactionCode, InteropActionState state, LocalDateTime expiration,
+            List<ExtensionData> extensionList, String requestCode) {
         return build(null, transactionCode, state, expiration, extensionList, requestCode);
     }
 
-    public static InteropTransactionRequestResponseData build(Long commandId, @NotNull String transactionCode,
-            @NotNull InteropActionState state, @NotNull String requestCode) {
+    public static InteropTransactionRequestResponseData build(Long commandId, String transactionCode, InteropActionState state,
+            String requestCode) {
         return build(commandId, transactionCode, state, null, null, requestCode);
     }
 
-    public static InteropTransactionRequestResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
-            @NotNull String requestCode) {
+    public static InteropTransactionRequestResponseData build(String transactionCode, InteropActionState state, String requestCode) {
         return build(null, transactionCode, state, requestCode);
     }
 

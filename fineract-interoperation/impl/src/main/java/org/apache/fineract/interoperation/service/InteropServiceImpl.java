@@ -60,8 +60,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class InteropServiceImpl implements InteropService {
 
     @java.lang.SuppressWarnings("all")
@@ -97,6 +99,7 @@ public class InteropServiceImpl implements InteropService {
     }
 
     private static final class KycMapper implements RowMapper<InteropKycData> {
+
         private final DatabaseSpecificSQLGenerator sqlGenerator;
 
         KycMapper(final DatabaseSpecificSQLGenerator sqlGenerator) {
@@ -113,7 +116,8 @@ public class InteropServiceImpl implements InteropService {
                     + "inner join m_code_value gender on gender.id=c.gender_cv_id "
                     + "left join m_code_value country on country.id=a.country_id "
                     + "left join m_code_value state on state.id = a.state_province_id "
-                    + "left join m_client_identifier ci on c.id=ci.client_id " + "left join m_code_value kyc on kyc.id = ci.document_type_id ";
+                    + "left join m_client_identifier ci on c.id=ci.client_id "
+                    + "left join m_code_value kyc on kyc.id = ci.document_type_id ";
         }
 
         @Override

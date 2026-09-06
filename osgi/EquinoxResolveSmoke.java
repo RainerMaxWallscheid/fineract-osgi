@@ -105,7 +105,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService",
             "org.apache.fineract.infrastructure.springbatch.PropertyService",
             "org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort",
-            "org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort"
+            "org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort",
+            "org.apache.fineract.interoperation.service.InteropService"
     };
 
     private EquinoxResolveSmoke() {}
