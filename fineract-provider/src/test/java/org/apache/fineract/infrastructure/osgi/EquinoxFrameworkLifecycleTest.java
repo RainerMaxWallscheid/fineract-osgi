@@ -55,6 +55,8 @@ import org.apache.fineract.infrastructure.campaigns.sms.data.SmsProviderData;
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.data.CodeData;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
+import org.apache.fineract.infrastructure.configuration.data.ExternalServicesData;
+import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -1996,6 +1998,26 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void externalServicesLookupFacadeDelegatesToPublishedSpringPort() {
+        final ExternalServicesReadPlatformService spring = name -> "hosted".equals(name)
+                ? new ExternalServicesData().setId(7L).setName("hosted")
+                : null;
+        final SpringOsgiPortBridge bridge = externalServicesBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ExternalServicesReadPlatformService facade = OsgiBackedPortFactory.of(lookup, ExternalServicesReadPlatformService.class);
+
+        assertEquals(null, facade.getExternalServiceDetailsByServiceName("hosted"));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.getExternalServiceDetailsByServiceName("hosted").getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.getExternalServiceDetailsByServiceName("hosted"));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3588,6 +3610,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringExternalServicesPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ExternalServicesReadPlatformService externalServices = new StubExternalServicesReadPlatformService();
+        final SpringOsgiPortBridge bridge = externalServicesBridge(externalServices);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean configurationImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.configuration.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    configurationImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(configurationImplActive);
+            final ServiceReference<ExternalServicesReadPlatformService> selected = ctx
+                    .getServiceReference(ExternalServicesReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(externalServices, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3801,6 +3854,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge reportWriteBridge(final ReportWritePlatformService reports) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ReportWritePlatformService.class, reports)));
+    }
+
+    private static SpringOsgiPortBridge externalServicesBridge(final ExternalServicesReadPlatformService externalServices) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ExternalServicesReadPlatformService.class, externalServices)));
     }
 
     private static Path stagedCatalog() {
@@ -4712,6 +4769,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public CommandProcessingResult deleteReport(final Long reportId) {
             return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubExternalServicesReadPlatformService implements ExternalServicesReadPlatformService {
+
+        @Override
+        public ExternalServicesData getExternalServiceDetailsByServiceName(final String serviceName) {
+            return null;
         }
     }
 }
