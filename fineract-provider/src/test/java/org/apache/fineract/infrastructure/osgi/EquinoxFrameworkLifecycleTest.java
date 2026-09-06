@@ -68,6 +68,7 @@ import org.apache.fineract.infrastructure.hooks.data.HookData;
 import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
+import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
@@ -1821,6 +1822,40 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void smsWriteLookupFacadeDelegatesToPublishedSpringPort() {
+        final SmsWritePlatformService spring = new SmsWritePlatformService() {
+
+            @Override
+            public CommandProcessingResult create(final JsonCommand command) {
+                return CommandProcessingResult.resourceResult(7L);
+            }
+
+            @Override
+            public CommandProcessingResult update(final Long resourceId, final JsonCommand command) {
+                return CommandProcessingResult.empty();
+            }
+
+            @Override
+            public CommandProcessingResult delete(final Long resourceId) {
+                return CommandProcessingResult.empty();
+            }
+        };
+        final SpringOsgiPortBridge bridge = smsWriteBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final SmsWritePlatformService facade = OsgiBackedPortFactory.of(lookup, SmsWritePlatformService.class);
+
+        assertEquals(null, facade.create(null).getResourceId());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.create(null).getResourceId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.create(null).getResourceId());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3260,6 +3295,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringSmsWritePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final SmsWritePlatformService sms = new StubSmsWritePlatformService();
+        final SpringOsgiPortBridge bridge = smsWriteBridge(sms);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean smsImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.sms.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    smsImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(smsImplActive);
+            final ServiceReference<SmsWritePlatformService> selected = ctx.getServiceReference(SmsWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(sms, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3451,6 +3516,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge hookBridge(final HookReadPlatformService hooks) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(HookReadPlatformService.class, hooks)));
+    }
+
+    private static SpringOsgiPortBridge smsWriteBridge(final SmsWritePlatformService sms) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsWritePlatformService.class, sms)));
     }
 
     private static Path stagedCatalog() {
@@ -4271,6 +4340,24 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public HookDetailsData retrieveNewHookDetails(final String templateName) {
             return null;
+        }
+    }
+
+    private static final class StubSmsWritePlatformService implements SmsWritePlatformService {
+
+        @Override
+        public CommandProcessingResult create(final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult update(final Long resourceId, final JsonCommand command) {
+            return CommandProcessingResult.empty();
+        }
+
+        @Override
+        public CommandProcessingResult delete(final Long resourceId) {
+            return CommandProcessingResult.empty();
         }
     }
 }
