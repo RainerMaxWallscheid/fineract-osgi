@@ -27,6 +27,7 @@ import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformServic
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
@@ -81,7 +82,7 @@ import org.springframework.context.annotation.Primary;
 
 /**
  * OSGi→Spring port beans (ADR-022 B4 / playbook §15.5). {@code ChargeDefinitionPort}, {@code FloatingRatePort},
- * {@code TaxCatalogPort}, {@code ContentStoreService}, {@code CashierTxnValidationPort},
+ * {@code TaxCatalogPort}, {@code ContentStoreService}, {@code ContentStreamPort}, {@code CashierTxnValidationPort},
  * {@code LoanOriginatorReadPlatformService}, {@code MixTaxonomyReadService}, {@code DelayedSettlementAttributeService},
  * {@code GLClosureReadPlatformService}, {@code SavingsDropdownReadPlatformService}, {@code LoanProductLookupReadPort},
  * {@code BuyDownFeeReadPlatformService}, {@code WorkingCapitalLoanPeriodPaymentRateChangeReadService},
@@ -104,8 +105,7 @@ import org.springframework.context.annotation.Primary;
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService}, and
  * {@code PaymentDetailWritePlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} stays
- * empty-catalog only.
+ * resolve them from the Service Registry. {@code CommandDispatcher} stays hosted-only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -137,6 +137,12 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public ContentStoreService osgiContentStoreService(final OsgiServiceLookup lookup) {
         return backed(lookup, ContentStoreService.class);
+    }
+
+    @Bean
+    @Primary
+    public ContentStreamPort osgiContentStreamPort(final OsgiServiceLookup lookup) {
+        return backed(lookup, ContentStreamPort.class);
     }
 
     @Bean

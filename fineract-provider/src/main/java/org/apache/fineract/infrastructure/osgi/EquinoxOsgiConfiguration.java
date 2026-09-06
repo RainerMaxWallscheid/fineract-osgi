@@ -29,6 +29,7 @@ import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformServic
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
@@ -93,7 +94,8 @@ public class EquinoxOsgiConfiguration {
     @Bean
     public SpringOsgiPortBridge springOsgiPortBridge(final ObjectProvider<ChargeDefinitionPort> charge,
             final ObjectProvider<FloatingRatePort> rates, final ObjectProvider<TaxCatalogPort> tax,
-            final ObjectProvider<ContentStoreService> content, final ObjectProvider<CashierTxnValidationPort> cashier,
+            final ObjectProvider<ContentStoreService> content, final ObjectProvider<ContentStreamPort> contentStreams,
+            final ObjectProvider<CashierTxnValidationPort> cashier,
             final ObjectProvider<LoanOriginatorReadPlatformService> originator, final ObjectProvider<MixTaxonomyReadService> mix,
             final ObjectProvider<DelayedSettlementAttributeService> delayedSettlement,
             final ObjectProvider<GLClosureReadPlatformService> closures, final ObjectProvider<SavingsDropdownReadPlatformService> savings,
@@ -134,7 +136,8 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails) {
         return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge),
                 owned(FloatingRatePort.class, rates), owned(TaxCatalogPort.class, tax),
-                owned(ContentStoreService.class, content), owned(CashierTxnValidationPort.class, cashier),
+                owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
+                owned(CashierTxnValidationPort.class, cashier),
                 owned(LoanOriginatorReadPlatformService.class, originator),
                 owned(MixTaxonomyReadService.class, mix),
                 owned(DelayedSettlementAttributeService.class, delayedSettlement),

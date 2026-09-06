@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.infrastructure.osgi;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -25,8 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -58,6 +63,7 @@ import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.data.ExternalServicesData;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -454,6 +460,43 @@ class EquinoxFrameworkLifecycleTest {
             lifecycle.stop();
         }
         assertEquals(null, facade.getType());
+    }
+
+    @Test
+    void contentStreamLookupFacadeDelegatesToPublishedSpringPort() {
+        final byte[] hosted = "hosted".getBytes(StandardCharsets.UTF_8);
+        final ContentStreamPort spring = new ContentStreamPort() {
+
+            @Override
+            public InputStream pipe(final OutputStreamWriter writer) {
+                return new ByteArrayInputStream(hosted);
+            }
+
+            @Override
+            public InputStream pipe(final InputStream input, final InputOutputStreamTransformer transformer) {
+                return new ByteArrayInputStream(hosted);
+            }
+
+            @Override
+            public void write(final InputStream input, final OutputStream output, final byte[] buffer) throws IOException {}
+        };
+        final SpringOsgiPortBridge bridge = contentStreamBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ContentStreamPort facade = OsgiBackedPortFactory.of(lookup, ContentStreamPort.class);
+
+        assertNull(facade.pipe(output -> {}));
+        lifecycle.start();
+        try {
+            try (var in = facade.pipe(output -> {})) {
+                assertArrayEquals(hosted, in.readAllBytes());
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.pipe(output -> {}));
     }
 
     @Test
@@ -2157,6 +2200,7 @@ class EquinoxFrameworkLifecycleTest {
         assertEquals(0, OsgiBackedPortFactory.empty(PropertyService.class).getPartitionSize("hosted"));
         assertNull(OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).createAndPersistPaymentDetail(null, null));
         assertEquals(0L, OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).id(null));
+        assertNull(OsgiBackedPortFactory.empty(ContentStreamPort.class).pipe(output -> {}));
     }
 
     @Test
@@ -2272,6 +2316,36 @@ class EquinoxFrameworkLifecycleTest {
             final ServiceReference<ContentStoreService> selected = ctx.getServiceReference(ContentStoreService.class);
             assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
             assertSame(content, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
+    @Test
+    void stagedCatalogStartsAndSpringContentStreamPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ContentStreamPort contentStream = new StubContentStreamPort();
+        final SpringOsgiPortBridge bridge = contentStreamBridge(contentStream);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean documentImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.document.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    documentImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(documentImplActive);
+            final ServiceReference<ContentStreamPort> selected = ctx.getServiceReference(ContentStreamPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(contentStream, ctx.getService(selected));
             ctx.ungetService(selected);
         } finally {
             lifecycle.stop();
@@ -3881,6 +3955,10 @@ class EquinoxFrameworkLifecycleTest {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ContentStoreService.class, content)));
     }
 
+    private static SpringOsgiPortBridge contentStreamBridge(final ContentStreamPort contentStream) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ContentStreamPort.class, contentStream)));
+    }
+
     private static SpringOsgiPortBridge cashierBridge(final CashierTxnValidationPort cashier) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CashierTxnValidationPort.class, cashier)));
     }
@@ -4192,6 +4270,22 @@ class EquinoxFrameworkLifecycleTest {
         public ContentStoreType getType() {
             return ContentStoreType.FILE_SYSTEM;
         }
+    }
+
+    private static final class StubContentStreamPort implements ContentStreamPort {
+
+        @Override
+        public InputStream pipe(final OutputStreamWriter writer) {
+            return null;
+        }
+
+        @Override
+        public InputStream pipe(final InputStream input, final InputOutputStreamTransformer transformer) {
+            return null;
+        }
+
+        @Override
+        public void write(final InputStream input, final OutputStream output, final byte[] buffer) throws IOException {}
     }
 
     private static final class RecordingCashierTxnValidationPort implements CashierTxnValidationPort {

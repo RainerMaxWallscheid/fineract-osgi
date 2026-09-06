@@ -30,6 +30,7 @@ import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformServic
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
@@ -104,6 +105,7 @@ public final class CompositionRootOsgiBridge {
         register(FloatingRatePort.class, new HostedFloatingRatePort());
         register(TaxCatalogPort.class, new HostedTaxCatalogPort());
         register(ContentStoreService.class, new HostedContentStoreService());
+        register(ContentStreamPort.class, new HostedContentStreamPort());
         register(CashierTxnValidationPort.class, new HostedCashierTxnValidationPort());
         register(LoanOriginatorReadPlatformService.class, new HostedLoanOriginatorReadPlatformService());
         register(MixTaxonomyReadService.class, new HostedMixTaxonomyReadService());

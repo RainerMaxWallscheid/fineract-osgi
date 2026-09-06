@@ -41,6 +41,7 @@ import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformServic
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesReadPlatformService;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
@@ -102,8 +103,7 @@ import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * Start the staged catalog, then register every composition-root hosted
- * PILOT_PORT (in-memory, not JPA / Spring). {@link org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort}
- * stays empty-catalog only. Proves ranking over empty catalog ports. Fails
+ * PILOT_PORT (in-memory, not JPA / Spring). Proves ranking over empty catalog ports. Fails
  * when Felix SCR or any fineract bundle is not ACTIVE.
  */
 public final class EquinoxSpringBridgeSmoke {
@@ -219,6 +219,7 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(TaxCatalogPort.class, s -> s instanceof TaxCatalogPort p
                         && p.findTaxGroup(HostedTaxCatalogPort.HOSTED_ID).isPresent()),
                 probeOf(ContentStoreService.class, EquinoxSpringBridgeSmoke::contentWins),
+                probeOf(ContentStreamPort.class, EquinoxSpringBridgeSmoke::contentStreamWins),
                 probeOf(CashierTxnValidationPort.class, EquinoxSpringBridgeSmoke::cashierWins),
                 probeOf(LoanOriginatorReadPlatformService.class, s -> s instanceof LoanOriginatorReadPlatformService p
                         && HostedLoanOriginatorReadPlatformService.HOSTED_ID == p
@@ -357,6 +358,17 @@ public final class EquinoxSpringBridgeSmoke {
         }
         try (var in = port.download(HostedContentStoreService.HOSTED_PATH)) {
             return Arrays.equals(in.readAllBytes(), HostedContentStoreService.HOSTED_BYTES);
+        } catch (final Exception ex) {
+            return false;
+        }
+    }
+
+    private static boolean contentStreamWins(final Object service) {
+        if (!(service instanceof ContentStreamPort port)) {
+            return false;
+        }
+        try (var in = port.pipe(output -> {})) {
+            return Arrays.equals(in.readAllBytes(), HostedContentStreamPort.HOSTED_BYTES);
         } catch (final Exception ex) {
             return false;
         }
