@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
@@ -133,7 +134,8 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<ReportWritePlatformService> reports,
             final ObjectProvider<ExternalServicesReadPlatformService> externalServices,
             final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties,
-            final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails) {
+            final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails,
+            final ObjectProvider<CommandDispatcher> commands) {
         return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge),
                 owned(FloatingRatePort.class, rates), owned(TaxCatalogPort.class, tax),
                 owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
@@ -187,7 +189,8 @@ public class EquinoxOsgiConfiguration {
                 owned(ExternalServicesReadPlatformService.class, externalServices),
                 owned(StuckJobExecutorService.class, stuckJobs),
                 owned(PropertyService.class, batchProperties),
-                owned(PaymentDetailWritePlatformService.class, paymentDetails)));
+                owned(PaymentDetailWritePlatformService.class, paymentDetails),
+                owned(CommandDispatcher.class, commands)));
     }
 
     /**

@@ -21,6 +21,7 @@ package org.apache.fineract.infrastructure.osgi;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
@@ -103,9 +104,9 @@ import org.springframework.context.annotation.Primary;
  * {@code HookReadPlatformService}, {@code SmsWritePlatformService},
  * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService},
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
- * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService}, and
- * {@code PaymentDetailWritePlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
- * resolve them from the Service Registry. {@code CommandDispatcher} stays hosted-only.
+ * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
+ * {@code PaymentDetailWritePlatformService}, and {@code CommandDispatcher} are {@code @Primary} lookup façades when
+ * Equinox is on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -458,5 +459,11 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public PaymentDetailWritePlatformService osgiPaymentDetailWritePlatformService(final OsgiServiceLookup lookup) {
         return backed(lookup, PaymentDetailWritePlatformService.class);
+    }
+
+    @Bean
+    @Primary
+    public CommandDispatcher osgiCommandDispatcher(final OsgiServiceLookup lookup) {
+        return backed(lookup, CommandDispatcher.class);
     }
 }

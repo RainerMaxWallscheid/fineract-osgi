@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.apache.fineract.accounting.closure.data.GLClosureData;
 import org.apache.fineract.accounting.closure.service.GLClosureReadPlatformService;
 import org.apache.fineract.adhocquery.data.AdHocData;
@@ -48,6 +49,8 @@ import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
 import org.apache.fineract.cob.data.JobBusinessStepConfigData;
 import org.apache.fineract.cob.data.JobBusinessStepDetail;
 import org.apache.fineract.cob.service.ConfigJobParameterService;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatReadPlatformService;
@@ -2191,6 +2194,31 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void commandLookupFacadeDelegatesToPublishedSpringPort() {
+        final CommandDispatcher spring = new CommandDispatcher() {
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <REQ, RES> Supplier<RES> dispatch(final Command<REQ> command) {
+                return () -> (RES) "hosted";
+            }
+        };
+        final SpringOsgiPortBridge bridge = commandBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final CommandDispatcher facade = OsgiBackedPortFactory.of(lookup, CommandDispatcher.class);
+
+        assertNull(facade.dispatch(new Command<>()));
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.dispatch(new Command<>()).get());
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.dispatch(new Command<>()));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2201,6 +2229,7 @@ class EquinoxFrameworkLifecycleTest {
         assertNull(OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).createAndPersistPaymentDetail(null, null));
         assertEquals(0L, OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).id(null));
         assertNull(OsgiBackedPortFactory.empty(ContentStreamPort.class).pipe(output -> {}));
+        assertNull(OsgiBackedPortFactory.empty(CommandDispatcher.class).dispatch(new Command<>()));
     }
 
     @Test
@@ -3938,6 +3967,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringCommandDispatcherStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final CommandDispatcher commands = new StubCommandDispatcher();
+        final SpringOsgiPortBridge bridge = commandBridge(commands);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean commandImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.command.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    commandImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(commandImplActive);
+            final ServiceReference<CommandDispatcher> selected = ctx.getServiceReference(CommandDispatcher.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(commands, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4171,6 +4230,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge paymentDetailBridge(final PaymentDetailWritePlatformService paymentDetails) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PaymentDetailWritePlatformService.class, paymentDetails)));
+    }
+
+    private static SpringOsgiPortBridge commandBridge(final CommandDispatcher commands) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(CommandDispatcher.class, commands)));
     }
 
     private static Path stagedCatalog() {
@@ -5193,6 +5256,14 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public Object persistableById(final Long paymentDetailId) {
+            return null;
+        }
+    }
+
+    private static final class StubCommandDispatcher implements CommandDispatcher {
+
+        @Override
+        public <REQ, RES> Supplier<RES> dispatch(final Command<REQ> command) {
             return null;
         }
     }

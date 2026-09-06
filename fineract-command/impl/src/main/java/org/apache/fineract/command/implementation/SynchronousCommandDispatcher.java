@@ -24,11 +24,9 @@ import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.core.CommandHandlerManager;
 import org.apache.fineract.command.core.CommandHookManager;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnMissingBean(value = CommandDispatcher.class, ignored = SynchronousCommandDispatcher.class)
 public class SynchronousCommandDispatcher implements CommandDispatcher {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SynchronousCommandDispatcher.class);
