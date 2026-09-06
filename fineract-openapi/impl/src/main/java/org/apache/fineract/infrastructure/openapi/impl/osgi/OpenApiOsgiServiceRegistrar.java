@@ -19,22 +19,34 @@
 package org.apache.fineract.infrastructure.openapi.impl.osgi;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
+import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
  * Spring ↔ OSGi bridge for openapi peel.
  * <p>
- * Reader/filter classes are pure utilities on the api jar (used by swagger-gradle-plugin
- * via fully-qualified class names). No application service ports are registered.
+ * Reader/filter classes stay swagger-gradle-plugin FQCNs on the api jar. This peel hosts {@link OpenApiPort}.
  */
 @Component
 public class OpenApiOsgiServiceRegistrar implements InitializingBean, DisposableBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpenApiOsgiServiceRegistrar.class);
+
+    private final ObjectProvider<OpenApiPort> openApi;
+    private final List<Object> registrations = new ArrayList<>();
+
+    public OpenApiOsgiServiceRegistrar(final ObjectProvider<OpenApiPort> openApi) {
+        this.openApi = openApi;
+    }
 
     @Override
     public void afterPropertiesSet() {
@@ -49,16 +61,35 @@ public class OpenApiOsgiServiceRegistrar implements InitializingBean, Disposable
             if (context == null) {
                 return;
             }
-            LOG.info("OpenAPI OSGi bundle context present (no service ports to register)");
+            register(context, OpenApiPort.class, openApi.getIfAvailable());
+            LOG.info("Registered {} OpenAPI OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only OpenAPI wiring");
         } catch (final ReflectiveOperationException ex) {
-            LOG.warn("Failed to probe OpenAPI OSGi environment: {}", ex.toString());
+            LOG.warn("Failed to register OpenAPI OSGi services: {}", ex.toString());
         }
+    }
+
+    private <T> void register(final Object context, final Class<T> type, final T service) throws ReflectiveOperationException {
+        if (service == null) {
+            return;
+        }
+        final Dictionary<String, Object> props = new Hashtable<>();
+        props.put("provider", "fineract-openapi-impl");
+        final Object registration = context.getClass().getMethod("registerService", Class.class, Object.class, Dictionary.class)
+                .invoke(context, type, service, props);
+        registrations.add(registration);
     }
 
     @Override
     public void destroy() {
-        // no registrations
+        for (final Object registration : registrations) {
+            try {
+                registration.getClass().getMethod("unregister").invoke(registration);
+            } catch (final ReflectiveOperationException | RuntimeException ignored) {
+                // already unregistered
+            }
+        }
+        registrations.clear();
     }
 }

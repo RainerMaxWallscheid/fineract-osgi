@@ -29,7 +29,8 @@ jar {
                 'Bundle-Name': 'Apache Fineract OpenAPI API',
                 'Bundle-SymbolicName': 'org.apache.fineract.openapi.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.infrastructure.openapi',
+                'Export-Package': 'org.apache.fineract.infrastructure.openapi,'
+                        + 'org.apache.fineract.infrastructure.openapi.moduleapi',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.annotation,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.openapi.api'

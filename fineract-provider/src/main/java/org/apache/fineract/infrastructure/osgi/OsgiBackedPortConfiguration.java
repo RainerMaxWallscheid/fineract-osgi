@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookS
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
+import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
@@ -113,7 +114,7 @@ import org.springframework.context.annotation.Primary;
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
  * {@code PaymentDetailWritePlatformService}, {@code CommandDispatcher}, {@code PortfolioNotificationEventPort},
  * {@code SmsCampaignTriggerEventPort}, {@code InteropService}, {@code BulkImportWorkbookService},
- * {@code BulkImportWorkbookPopulatorService}, and {@code InstanceModePort} are {@code @Primary} lookup façades when Equinox is
+ * {@code BulkImportWorkbookPopulatorService}, {@code InstanceModePort}, and {@code OpenApiPort} are {@code @Primary} lookup façades when Equinox is
  * on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
@@ -509,5 +510,11 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public InstanceModePort osgiInstanceModePort(final OsgiServiceLookup lookup) {
         return backed(lookup, InstanceModePort.class);
+    }
+
+    @Bean
+    @Primary
+    public OpenApiPort osgiOpenApiPort(final OsgiServiceLookup lookup) {
+        return backed(lookup, OpenApiPort.class);
     }
 }

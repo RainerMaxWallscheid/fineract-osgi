@@ -109,7 +109,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.interoperation.service.InteropService",
             "org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService",
             "org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService",
-            "org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort"
+            "org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort",
+            "org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort"
     };
 
     private EquinoxResolveSmoke() {}

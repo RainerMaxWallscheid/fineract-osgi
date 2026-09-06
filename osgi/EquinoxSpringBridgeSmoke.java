@@ -52,6 +52,7 @@ import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTr
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
+import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -360,7 +361,8 @@ public final class EquinoxSpringBridgeSmoke {
                         && HostedBulkImportWorkbookService.HOSTED_ID == p.getImport(1L).getImportId()),
                 probeOf(BulkImportWorkbookPopulatorService.class, s -> s instanceof BulkImportWorkbookPopulatorService p
                         && HostedBulkImportWorkbookPopulatorService.HOSTED.equals(p.getTemplate("hosted", null, null, null))),
-                probeOf(InstanceModePort.class, EquinoxSpringBridgeSmoke::instanceModeWins));
+                probeOf(InstanceModePort.class, EquinoxSpringBridgeSmoke::instanceModeWins),
+                probeOf(OpenApiPort.class, EquinoxSpringBridgeSmoke::openApiWins));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {
@@ -421,6 +423,13 @@ public final class EquinoxSpringBridgeSmoke {
         }
         port.changeMode(true, true, true, true);
         return HostedInstanceModePort.HOSTED.equals(port.last());
+    }
+
+    private static boolean openApiWins(final Object service) {
+        if (!(service instanceof HostedOpenApiPort port)) {
+            return false;
+        }
+        return port.isRemovingUnreferencedDefinitions() && HostedOpenApiPort.HOSTED.equals(port.last());
     }
 
     private static boolean commandWins(final Object service) {

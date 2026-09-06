@@ -65,10 +65,9 @@ KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 # No Equinox Bundle-Activator remains. Empty-catalog ports use DS.
 ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset()
 
-# No Equinox-safe catalog port (AWS / swagger).
+# No Equinox-safe catalog port (AWS SDK).
 NO_PORT_STEMS: frozenset[str] = frozenset(
     {
-        "openapi",
         "s3",
     }
 )

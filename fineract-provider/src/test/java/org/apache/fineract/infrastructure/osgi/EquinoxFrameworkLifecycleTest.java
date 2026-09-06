@@ -110,6 +110,7 @@ import org.apache.fineract.infrastructure.bulkimport.data.LookupMode;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
+import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -2493,6 +2494,32 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void openApiLookupFacadeDelegatesToPublishedSpringPort() {
+        final boolean[] seen = { false };
+        final OpenApiPort spring = () -> {
+            seen[0] = true;
+            return true;
+        };
+        final SpringOsgiPortBridge bridge = openApiBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final OpenApiPort facade = OsgiBackedPortFactory.of(lookup, OpenApiPort.class);
+
+        assertFalse(facade.isRemovingUnreferencedDefinitions());
+        assertFalse(seen[0]);
+        lifecycle.start();
+        try {
+            assertTrue(facade.isRemovingUnreferencedDefinitions());
+            assertTrue(seen[0]);
+        } finally {
+            lifecycle.stop();
+        }
+        seen[0] = false;
+        assertFalse(facade.isRemovingUnreferencedDefinitions());
+        assertFalse(seen[0]);
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2514,6 +2541,7 @@ class EquinoxFrameworkLifecycleTest {
         assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookService.class).getImport(1L));
         assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookPopulatorService.class).getTemplate("hosted", null, null, null));
         OsgiBackedPortFactory.empty(InstanceModePort.class).changeMode(true, true, true, true);
+        assertFalse(OsgiBackedPortFactory.empty(OpenApiPort.class).isRemovingUnreferencedDefinitions());
     }
 
     @Test
@@ -4462,6 +4490,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringOpenApiPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final OpenApiPort openApi = new StubOpenApiPort();
+        final SpringOsgiPortBridge bridge = openApiBridge(openApi);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean openapiImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.openapi.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    openapiImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(openapiImplActive);
+            final ServiceReference<OpenApiPort> selected = ctx.getServiceReference(OpenApiPort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(openApi, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4723,6 +4781,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge instanceModeBridge(final InstanceModePort instanceMode) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(InstanceModePort.class, instanceMode)));
+    }
+
+    private static SpringOsgiPortBridge openApiBridge(final OpenApiPort openApi) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(OpenApiPort.class, openApi)));
     }
 
     private static Path stagedCatalog() {
@@ -5909,5 +5971,13 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public void changeMode(final boolean readEnabled, final boolean writeEnabled, final boolean batchWorkerEnabled,
                 final boolean batchManagerEnabled) {}
+    }
+
+    private static final class StubOpenApiPort implements OpenApiPort {
+
+        @Override
+        public boolean isRemovingUnreferencedDefinitions() {
+            return false;
+        }
     }
 }
