@@ -66,6 +66,8 @@ import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelati
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
+import org.apache.fineract.infrastructure.gcm.domain.NotificationConfigurationData;
+import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.data.HookData;
 import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -1940,6 +1942,25 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void notificationConfigurationLookupFacadeDelegatesToPublishedSpringPort() {
+        final NotificationConfigurationReadService spring = () -> new NotificationConfigurationData().setId(7L).setServerKey("hosted")
+                .setGcmEndPoint("hosted").setFcmEndPoint("hosted");
+        final SpringOsgiPortBridge bridge = notificationConfigurationBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final NotificationConfigurationReadService facade = OsgiBackedPortFactory.of(lookup, NotificationConfigurationReadService.class);
+
+        assertEquals(null, facade.getNotificationConfiguration());
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.getNotificationConfiguration().getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.getNotificationConfiguration());
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3471,6 +3492,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringNotificationConfigurationPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final NotificationConfigurationReadService gcmConfig = new StubNotificationConfigurationReadService();
+        final SpringOsgiPortBridge bridge = notificationConfigurationBridge(gcmConfig);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean gcmImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.gcm.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    gcmImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(gcmImplActive);
+            final ServiceReference<NotificationConfigurationReadService> selected = ctx
+                    .getServiceReference(NotificationConfigurationReadService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(gcmConfig, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3676,6 +3728,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge smsCampaignDropdownBridge(final SmsCampaignDropdownReadPlatformService smsCampaigns) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsCampaignDropdownReadPlatformService.class, smsCampaigns)));
+    }
+
+    private static SpringOsgiPortBridge notificationConfigurationBridge(final NotificationConfigurationReadService gcmConfig) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(NotificationConfigurationReadService.class, gcmConfig)));
     }
 
     private static Path stagedCatalog() {
@@ -4561,6 +4617,14 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public Collection<EnumOptionData> retrivePeriodFrequencyTypes() {
             return List.of();
+        }
+    }
+
+    private static final class StubNotificationConfigurationReadService implements NotificationConfigurationReadService {
+
+        @Override
+        public NotificationConfigurationData getNotificationConfiguration() {
+            return null;
         }
     }
 }
