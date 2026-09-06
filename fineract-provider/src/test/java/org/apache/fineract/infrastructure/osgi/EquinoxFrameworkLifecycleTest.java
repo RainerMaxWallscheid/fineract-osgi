@@ -67,6 +67,8 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.infrastructure.hooks.data.HookData;
 import org.apache.fineract.infrastructure.hooks.data.HookDetailsData;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
+import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobConfigurationData;
+import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.AccessTokenGenerationService;
 import org.apache.fineract.infrastructure.sms.service.SmsWritePlatformService;
 import org.apache.fineract.infrastructure.springbatch.PropertyService;
@@ -1856,6 +1858,36 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void reportMailingJobConfigurationLookupFacadeDelegatesToPublishedSpringPort() {
+        final ReportMailingJobConfigurationReadPlatformService spring = new ReportMailingJobConfigurationReadPlatformService() {
+
+            @Override
+            public Collection<ReportMailingJobConfigurationData> retrieveAllReportMailingJobConfigurations() {
+                return List.of();
+            }
+
+            @Override
+            public ReportMailingJobConfigurationData retrieveReportMailingJobConfiguration(final String name) {
+                return "hosted".equals(name) ? ReportMailingJobConfigurationData.newInstance(7, "hosted", "hosted") : null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = reportMailingJobConfigurationBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final ReportMailingJobConfigurationReadPlatformService facade = OsgiBackedPortFactory.of(lookup,
+                ReportMailingJobConfigurationReadPlatformService.class);
+
+        assertEquals(null, facade.retrieveReportMailingJobConfiguration("hosted"));
+        lifecycle.start();
+        try {
+            assertEquals(7, facade.retrieveReportMailingJobConfiguration("hosted").getId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertEquals(null, facade.retrieveReportMailingJobConfiguration("hosted"));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -3325,6 +3357,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringReportMailingJobConfigurationPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final ReportMailingJobConfigurationReadPlatformService reportMailing = new StubReportMailingJobConfigurationReadPlatformService();
+        final SpringOsgiPortBridge bridge = reportMailingJobConfigurationBridge(reportMailing);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean reportMailingImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.reportmailingjob.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    reportMailingImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(reportMailingImplActive);
+            final ServiceReference<ReportMailingJobConfigurationReadPlatformService> selected = ctx
+                    .getServiceReference(ReportMailingJobConfigurationReadPlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(reportMailing, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -3520,6 +3583,12 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge smsWriteBridge(final SmsWritePlatformService sms) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(SmsWritePlatformService.class, sms)));
+    }
+
+    private static SpringOsgiPortBridge reportMailingJobConfigurationBridge(
+            final ReportMailingJobConfigurationReadPlatformService reportMailing) {
+        return new SpringOsgiPortBridge(
+                List.of(SpringOsgiPortBridge.bind(ReportMailingJobConfigurationReadPlatformService.class, reportMailing)));
     }
 
     private static Path stagedCatalog() {
@@ -4358,6 +4427,20 @@ class EquinoxFrameworkLifecycleTest {
         @Override
         public CommandProcessingResult delete(final Long resourceId) {
             return CommandProcessingResult.empty();
+        }
+    }
+
+    private static final class StubReportMailingJobConfigurationReadPlatformService
+            implements ReportMailingJobConfigurationReadPlatformService {
+
+        @Override
+        public Collection<ReportMailingJobConfigurationData> retrieveAllReportMailingJobConfigurations() {
+            return List.of();
+        }
+
+        @Override
+        public ReportMailingJobConfigurationData retrieveReportMailingJobConfiguration(final String name) {
+            return null;
         }
     }
 }
