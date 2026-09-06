@@ -30,15 +30,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 
 @Entity
 @Table(name = "acc_gl_journal_entry")
 public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-    @ManyToOne
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
     /**
      * Payment-detail id (no JPA association to leftover PaymentDetail — ADR-021).
      */
@@ -87,8 +89,8 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         //
     }
 
-    protected JournalEntry(final Office office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
-        this.office = office;
+    protected JournalEntry(final Object office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
+        this.officeId = OfficeAssociation.id(office);
         this.glAccount = glAccount;
         this.reversalJournalEntry = null;
         this.transactionId = transactionId;
@@ -110,7 +112,7 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         this.submittedOnDate = DateUtils.getBusinessLocalDate();
     }
 
-    public static JournalEntry createNew(final Office office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction, final Long clientTransaction, Long shareTransactionId) {
+    public static JournalEntry createNew(final Object office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction, final Long clientTransaction, Long shareTransactionId) {
         return new JournalEntry(office, paymentDetail, glAccount, currencyCode, transactionId, manualEntry, transactionDate, journalEntryType.getValue(), amount, description, entityType, entityId, referenceNumber, loanTransaction, savingsTransaction, clientTransaction, shareTransactionId);
     }
 
@@ -123,8 +125,8 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")

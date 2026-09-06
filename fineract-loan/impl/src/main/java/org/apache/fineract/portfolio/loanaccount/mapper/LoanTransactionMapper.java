@@ -24,6 +24,7 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -54,8 +55,8 @@ public interface LoanTransactionMapper {
     @Mapping(target = "loanChargePaidByList", source = "loanChargesPaid")
     @Mapping(target = "manuallyReversed", source = "manuallyAdjustedOrReversed")
     @Mapping(target = "transactionRelations", source = "loanTransactionRelations")
-    @Mapping(target = "officeId", source = "office.id")
-    @Mapping(target = "officeName", source = "office.name")
+    @Mapping(target = "officeId", source = "officeId")
+    @Mapping(target = "officeName", source = "officeId", qualifiedByName = "officeIdToName")
     @Mapping(target = "loanId", source = "loan.id")
     @Mapping(target = "externalLoanId", source = "loan.externalId")
     @Mapping(target = "netDisbursalAmount", source = "loan.netDisbursalAmount")
@@ -78,6 +79,11 @@ public interface LoanTransactionMapper {
     @Mapping(target = "transactionAmount", ignore = true)
     @Mapping(target = "classification", expression = "java(loanTransaction.getClassification() != null ? loanTransaction.getClassification().toData() : null)")
     LoanTransactionData mapLoanTransaction(LoanTransaction loanTransaction);
+
+    @org.mapstruct.Named("officeIdToName")
+    default String officeIdToName(final Long officeId) {
+        return OfficeAssociation.name(officeId);
+    }
 
     default PaymentDetailData paymentDetailData(final LoanTransaction loanTransaction) {
         final Object persistable = PaymentDetailAssociation.persistableById(loanTransaction.getPaymentDetailId());

@@ -32,7 +32,8 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
@@ -78,11 +79,15 @@ public class LoanTransactionMapperTest {
         final PaymentDetailWritePlatformService write = org.mockito.Mockito.mock(PaymentDetailWritePlatformService.class);
         when(write.persistableById(1L)).thenReturn(paymentDetail);
         PaymentDetailAssociation.setWritePlatformService(write);
+        final OfficePersistablePort officePort = org.mockito.Mockito.mock(OfficePersistablePort.class);
+        when(officePort.name(1L)).thenReturn("Test Office");
+        OfficeAssociation.setPersistablePort(officePort);
     }
 
     @AfterEach
     void tearDown() {
         PaymentDetailAssociation.setWritePlatformService(null);
+        OfficeAssociation.setPersistablePort(null);
     }
 
     @Test
@@ -103,7 +108,7 @@ public class LoanTransactionMapperTest {
         when(loanTransaction.getPaymentDetailId()).thenReturn(1L);
         when(loanTransaction.getExternalId()).thenReturn(ExternalId.generate());
         when(loanTransaction.isManuallyAdjustedOrReversed()).thenReturn(false);
-        when(loanTransaction.getOffice()).thenReturn(Office.headOffice("Test Office", LocalDate.of(2022, 2, 12), null));
+        when(loanTransaction.getOfficeId()).thenReturn(1L);
         when(loanTransaction.getLoan().getNetDisbursalAmount()).thenReturn(BigDecimal.valueOf(2000));
 
         // Setup payment detail mocks
@@ -126,7 +131,7 @@ public class LoanTransactionMapperTest {
         assertEquals("REPAYMENT", result.getTransactionType());
         assertNotNull(result.getType());
         assertNotNull(result.getPaymentDetailData());
-        assertNull(result.getOfficeId());
+        assertEquals(1L, result.getOfficeId());
         assertEquals("Test Office", result.getOfficeName());
         assertEquals(1L, result.getLoanId());
         assertEquals(loan.getExternalId(), result.getExternalLoanId());

@@ -119,7 +119,7 @@ public class LoanAccountingBridgeMapper {
         final MonetaryCurrency currency = loanTransaction.getLoan().getCurrency();
         final AccountingBridgeLoanTransactionDTO transactionDTO = new AccountingBridgeLoanTransactionDTO();
         transactionDTO.setId(loanTransaction.getId());
-        transactionDTO.setOfficeId(loanTransaction.getOffice().getId());
+        transactionDTO.setOfficeId(loanTransaction.getOfficeId());
         transactionDTO.setType(LoanTransactionEnumerations.transactionType(loanTransaction.getTypeOf()));
         transactionDTO.setReversed(loanTransaction.isReversed());
         transactionDTO.setDate(loanTransaction.getTransactionDate());

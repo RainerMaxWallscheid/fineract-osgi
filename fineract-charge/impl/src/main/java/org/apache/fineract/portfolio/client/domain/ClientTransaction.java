@@ -22,8 +22,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -43,7 +41,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
@@ -58,9 +56,11 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
-    @ManyToOne
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
 
     /**
      * Payment-detail id (no JPA association to leftover PaymentDetail — ADR-021).
@@ -103,14 +103,14 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
 
     protected ClientTransaction() {}
 
-    public static ClientTransaction payCharge(final Object client, final Office office, Object paymentDetail,
+    public static ClientTransaction payCharge(final Object client, final Object office, Object paymentDetail,
             final LocalDate transactionDate, final Money amount, final String currencyCode, final ExternalId externalId) {
         final boolean isReversed = false;
         return new ClientTransaction(client, office, paymentDetail, ClientTransactionType.PAY_CHARGE.getValue(), transactionDate, amount,
                 isReversed, externalId, currencyCode);
     }
 
-    public static ClientTransaction waiver(final Object client, final Office office, final LocalDate transactionDate, final Money amount,
+    public static ClientTransaction waiver(final Object client, final Object office, final LocalDate transactionDate, final Money amount,
             final String currencyCode) {
         final boolean isReversed = false;
         final ExternalId externalId = ExternalId.empty();
@@ -119,11 +119,11 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
                 isReversed, externalId, currencyCode);
     }
 
-    public ClientTransaction(Object client, Office office, Object paymentDetail, Integer typeOf, LocalDate transactionDate,
+    public ClientTransaction(Object client, Object office, Object paymentDetail, Integer typeOf, LocalDate transactionDate,
             Money amount, boolean reversed, ExternalId externalId, String currencyCode) {
 
         this.clientId = ClientAssociation.id(client);
-        this.office = office;
+        this.officeId = OfficeAssociation.id(office);
         this.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         this.typeOf = typeOf;
         this.dateOf = transactionDate;
@@ -152,7 +152,7 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
 
         thisTransactionData.put("id", getId());
         thisTransactionData.put("clientId", getClientId());
-        thisTransactionData.put("officeId", this.office.getId());
+        thisTransactionData.put("officeId", this.officeId);
         thisTransactionData.put("type", transactionType);
         thisTransactionData.put("reversed", Boolean.valueOf(this.reversed));
         thisTransactionData.put("date", getTransactionDate());

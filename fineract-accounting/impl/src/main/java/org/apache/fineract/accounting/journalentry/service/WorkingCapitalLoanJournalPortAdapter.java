@@ -74,7 +74,7 @@ public class WorkingCapitalLoanJournalPortAdapter implements WorkingCapitalLoanJ
                 PortfolioProductType.WORKING_CAPITAL_LOAN.getValue());
         for (final JournalEntry journalEntry : existingEntries) {
             final JournalEntryType reversalType = journalEntry.isDebitEntry() ? JournalEntryType.CREDIT : JournalEntryType.DEBIT;
-            final JournalEntry reversalEntry = JournalEntry.createNew(journalEntry.getOffice(), journalEntry.getPaymentDetailId(),
+            final JournalEntry reversalEntry = JournalEntry.createNew(journalEntry.getOfficeId(), journalEntry.getPaymentDetailId(),
                     journalEntry.getGlAccount(), journalEntry.getCurrencyCode(), transactionId, Boolean.FALSE, reversalDate, reversalType,
                     journalEntry.getAmount(), journalEntry.getDescription(), journalEntry.getEntityType(), journalEntry.getEntityId(),
                     journalEntry.getReferenceNumber(), journalEntry.getLoanTransactionId(), journalEntry.getSavingsTransactionId(),

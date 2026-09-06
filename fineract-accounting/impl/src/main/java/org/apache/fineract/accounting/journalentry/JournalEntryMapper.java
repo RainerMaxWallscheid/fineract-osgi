@@ -27,6 +27,7 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,8 +37,8 @@ import org.mapstruct.Named;
 public interface JournalEntryMapper {
 
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "officeId", source = "office.id")
-    @Mapping(target = "officeName", source = "office.name")
+    @Mapping(target = "officeId", source = "officeId")
+    @Mapping(target = "officeName", source = "officeId", qualifiedByName = "officeIdToName")
     @Mapping(target = "glAccountId", source = "glAccount.id")
     @Mapping(target = "glAccountCode", source = "glAccount.glCode")
     @Mapping(target = "glAccountName", source = "glAccount.name")
@@ -75,6 +76,11 @@ public interface JournalEntryMapper {
     @Mapping(target = "savingTransactionId", ignore = true)
     @Mapping(target = "externalAssetOwner", ignore = true)
     JournalEntryData map(JournalEntry journalEntry);
+
+    @Named("officeIdToName")
+    default String officeIdToName(final Long officeId) {
+        return OfficeAssociation.name(officeId);
+    }
 
     @Named("entityType")
     default PortfolioProductType mapEntityType(Integer entityTypeId) {
