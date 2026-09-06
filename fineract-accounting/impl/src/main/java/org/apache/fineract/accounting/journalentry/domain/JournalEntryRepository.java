@@ -33,7 +33,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     @Query("select DISTINCT j.transactionId from JournalEntry j where j.transactionId not in (select DISTINCT je.transactionId from JournalEntry je where je.glAccount.id = :contraId)")
     List<String> findNonContraTransactionIds(@Param("contraId") Long contraId);
 
-    @Query("select DISTINCT j.transactionId from JournalEntry j where j.office.id = :officeId and j.glAccount.id = :contraId and j.reversed=false and j.transactionId not in (select DISTINCT je.reversalJournalEntry.transactionId from JournalEntry je where je.reversed=true)")
+    @Query("select DISTINCT j.transactionId from JournalEntry j where j.officeId = :officeId and j.glAccount.id = :contraId and j.reversed=false and j.transactionId not in (select DISTINCT je.reversalJournalEntry.transactionId from JournalEntry je where je.reversed=true)")
     List<String> findNonReversedContraTransactionIds(@Param("contraId") Long contraId, @Param("officeId") Long officeId);
 
     @Query("select journalEntry from JournalEntry journalEntry where journalEntry.entityId= :entityId and journalEntry.entityType = :entityType")
@@ -50,7 +50,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     List<LocalDate> findTransactionDatesAfter(LocalDate afterDate);
 
     @Query("""
-                SELECT je.office.id,
+                SELECT je.officeId,
                        je.glAccount.id,
                        SUM(CASE WHEN je.type = 1
                                 THEN -1 * je.amount
@@ -61,7 +61,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
                        SUM(je.amount)
                 FROM JournalEntry je
                 WHERE je.transactionDate = :transactionDate
-                GROUP BY je.office.id, je.glAccount.id, je.transactionDate, je.createdDate
+                GROUP BY je.officeId, je.glAccount.id, je.transactionDate, je.createdDate
             """)
     List<Object[]> findTrialBalanceLinesForDate(@Param("transactionDate") LocalDate transactionDate);
 
