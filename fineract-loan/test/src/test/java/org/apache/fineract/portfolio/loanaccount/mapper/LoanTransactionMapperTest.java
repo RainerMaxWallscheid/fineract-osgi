@@ -39,7 +39,10 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,6 +75,14 @@ public class LoanTransactionMapperTest {
         when(loan.getId()).thenReturn(1L);
         when(loan.getCurrency()).thenReturn(new MonetaryCurrency("USD", 2, 0));
         when(currencyMapper.map(any())).thenReturn(new CurrencyData("USD", "US Dollar", 2, 0, "$", "code"));
+        final PaymentDetailWritePlatformService write = org.mockito.Mockito.mock(PaymentDetailWritePlatformService.class);
+        when(write.persistableById(1L)).thenReturn(paymentDetail);
+        PaymentDetailAssociation.setWritePlatformService(write);
+    }
+
+    @AfterEach
+    void tearDown() {
+        PaymentDetailAssociation.setWritePlatformService(null);
     }
 
     @Test
@@ -89,7 +100,7 @@ public class LoanTransactionMapperTest {
         when(loanTransaction.getInterestPortion()).thenReturn(BigDecimal.valueOf(100));
         when(loanTransaction.getFeeChargesPortion()).thenReturn(BigDecimal.valueOf(50));
         when(loanTransaction.getPenaltyChargesPortion()).thenReturn(BigDecimal.valueOf(50));
-        when(loanTransaction.getPaymentDetail()).thenReturn(paymentDetail);
+        when(loanTransaction.getPaymentDetailId()).thenReturn(1L);
         when(loanTransaction.getExternalId()).thenReturn(ExternalId.generate());
         when(loanTransaction.isManuallyAdjustedOrReversed()).thenReturn(false);
         when(loanTransaction.getOffice()).thenReturn(Office.headOffice("Test Office", LocalDate.of(2022, 2, 12), null));

@@ -22,6 +22,9 @@ import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
+import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -58,7 +61,7 @@ public interface LoanTransactionMapper {
     @Mapping(target = "netDisbursalAmount", source = "loan.netDisbursalAmount")
     @Mapping(target = "transactionType", expression = "java(loanTransaction.getTypeOf().name())")
     @Mapping(target = "type", expression = "java(org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations.transactionType(loanTransaction.getTypeOf()))")
-    @Mapping(target = "paymentDetailData", expression = "java(loanTransaction.getPaymentDetail() != null ? loanTransaction.getPaymentDetail().toData() : null)")
+    @Mapping(target = "paymentDetailData", expression = "java(paymentDetailData(loanTransaction))")
     @Mapping(target = "currency", source = "loan.currency")
     @Mapping(target = "possibleNextRepaymentDate", ignore = true)
     @Mapping(target = "availableDisbursementAmountWithOverApplied", ignore = true)
@@ -75,4 +78,9 @@ public interface LoanTransactionMapper {
     @Mapping(target = "transactionAmount", ignore = true)
     @Mapping(target = "classification", expression = "java(loanTransaction.getClassification() != null ? loanTransaction.getClassification().toData() : null)")
     LoanTransactionData mapLoanTransaction(LoanTransaction loanTransaction);
+
+    default PaymentDetailData paymentDetailData(final LoanTransaction loanTransaction) {
+        final Object persistable = PaymentDetailAssociation.persistableById(loanTransaction.getPaymentDetailId());
+        return persistable instanceof PaymentDetail detail ? detail.toData() : null;
+    }
 }

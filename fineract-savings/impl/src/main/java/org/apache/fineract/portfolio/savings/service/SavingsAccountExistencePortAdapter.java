@@ -26,6 +26,8 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRep
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountTransactionNotFoundException;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
+import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -65,7 +67,8 @@ public class SavingsAccountExistencePortAdapter implements SavingsAccountExisten
     public TransactionSmsView transactionSmsView(final Object savingsTransaction) {
         final SavingsAccountTransaction transaction = (SavingsAccountTransaction) savingsTransaction;
         final SavingsAccount account = transaction.getSavingsAccount();
-        final String receiptNumber = transaction.getPaymentDetail() != null ? transaction.getPaymentDetail().getReceiptNumber() : null;
+        final Object persistable = PaymentDetailAssociation.persistableById(transaction.getPaymentDetailId());
+        final String receiptNumber = persistable instanceof PaymentDetail detail ? detail.getReceiptNumber() : null;
         return new TransactionSmsView(account.getId(), account.clientId(), account.getAccountNumber(),
                 transaction.getAmount(account.getCurrency()), account.getWithdrawableBalance(), transaction.getTransactionDate(),
                 transaction.getId(), receiptNumber);

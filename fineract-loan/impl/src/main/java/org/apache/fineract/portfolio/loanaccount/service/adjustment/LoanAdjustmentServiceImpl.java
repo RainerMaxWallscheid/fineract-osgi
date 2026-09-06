@@ -67,7 +67,6 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanScheduleService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
 import org.apache.fineract.portfolio.loanaccount.service.ReprocessLoanTransactionsService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -101,7 +100,7 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
             Long commandId, Map<String, Object> changes) {
         LocalDate transactionDate = parameter.getTransactionDate();
         BigDecimal transactionAmount = parameter.getTransactionAmount();
-        PaymentDetail paymentDetail = parameter.getPaymentDetail();
+        Object paymentDetail = parameter.getPaymentDetail();
         ExternalId txnExternalId = parameter.getTxnExternalId();
         ExternalId reversalTxnExternalId = parameter.getReversalTxnExternalId();
         String noteText = parameter.getNoteText();

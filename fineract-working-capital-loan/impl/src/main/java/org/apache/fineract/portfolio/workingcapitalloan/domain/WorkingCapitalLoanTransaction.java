@@ -39,7 +39,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionTypeConverter;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 
 @Entity
 @Table(name = "m_wc_loan_transaction", uniqueConstraints = {@UniqueConstraint(columnNames = {"external_id"}, name = "wc_loan_transaction_external_id_UNIQUE")})
@@ -56,9 +56,11 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
     private LocalDate submittedOnDate;
     @Column(name = "transaction_amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal transactionAmount;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "payment_detail_id")
-    private PaymentDetail paymentDetail;
+    /**
+     * Payment-detail id (no JPA association to leftover PaymentDetail — ADR-021).
+     */
+    @Column(name = "payment_detail_id")
+    private Long paymentDetailId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classification_cv_id")
     private CodeValue classification;
@@ -85,25 +87,25 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         return transactionType;
     }
 
-    public static WorkingCapitalLoanTransaction disbursement(final WorkingCapitalLoan loan, final BigDecimal amount, final PaymentDetail paymentDetail, final LocalDate disbursementDate, final ExternalId externalId, final CodeValue classification) {
+    public static WorkingCapitalLoanTransaction disbursement(final WorkingCapitalLoan loan, final BigDecimal amount, final Object paymentDetail, final LocalDate disbursementDate, final ExternalId externalId, final CodeValue classification) {
         final WorkingCapitalLoanTransaction txn = new WorkingCapitalLoanTransaction();
         txn.initialize(loan, LoanTransactionType.DISBURSEMENT, disbursementDate, amount, paymentDetail, classification, externalId);
         return txn;
     }
 
-    public static WorkingCapitalLoanTransaction repayment(final WorkingCapitalLoan loan, final BigDecimal amount, final PaymentDetail paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
+    public static WorkingCapitalLoanTransaction repayment(final WorkingCapitalLoan loan, final BigDecimal amount, final Object paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
         final WorkingCapitalLoanTransaction txn = new WorkingCapitalLoanTransaction();
         txn.initialize(loan, LoanTransactionType.REPAYMENT, transactionDate, amount, paymentDetail, classification, externalId);
         return txn;
     }
 
-    public static WorkingCapitalLoanTransaction goodwillCredit(final WorkingCapitalLoan loan, final BigDecimal amount, final PaymentDetail paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
+    public static WorkingCapitalLoanTransaction goodwillCredit(final WorkingCapitalLoan loan, final BigDecimal amount, final Object paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
         final WorkingCapitalLoanTransaction txn = new WorkingCapitalLoanTransaction();
         txn.initialize(loan, LoanTransactionType.GOODWILL_CREDIT, transactionDate, amount, paymentDetail, classification, externalId);
         return txn;
     }
 
-    public static WorkingCapitalLoanTransaction creditBalanceRefund(final WorkingCapitalLoan loan, final BigDecimal amount, final PaymentDetail paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
+    public static WorkingCapitalLoanTransaction creditBalanceRefund(final WorkingCapitalLoan loan, final BigDecimal amount, final Object paymentDetail, final LocalDate transactionDate, final CodeValue classification, final ExternalId externalId) {
         final WorkingCapitalLoanTransaction txn = new WorkingCapitalLoanTransaction();
         txn.initialize(loan, LoanTransactionType.CREDIT_BALANCE_REFUND, transactionDate, amount, paymentDetail, classification, externalId);
         return txn;
@@ -121,7 +123,7 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         return txn;
     }
 
-    public static WorkingCapitalLoanTransaction discountFee(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final CodeValue classification, final PaymentDetail paymentDetail) {
+    public static WorkingCapitalLoanTransaction discountFee(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final CodeValue classification, final Object paymentDetail) {
         WorkingCapitalLoanTransaction transaction = new WorkingCapitalLoanTransaction();
         transaction.wcLoan = loan;
         transaction.transactionType = LoanTransactionType.DISCOUNT_FEE;
@@ -129,7 +131,7 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         transaction.transactionDate = transactionDate;
         transaction.submittedOnDate = transactionDate;
         transaction.externalId = externalId != null ? externalId : ExternalId.empty();
-        transaction.paymentDetail = paymentDetail;
+        transaction.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         transaction.classification = classification;
         transaction.reversed = false;
         transaction.reversalExternalId = null;
@@ -137,7 +139,7 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         return transaction;
     }
 
-    public static WorkingCapitalLoanTransaction discountFeeAdjustment(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final CodeValue classification, final PaymentDetail paymentDetail) {
+    public static WorkingCapitalLoanTransaction discountFeeAdjustment(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final CodeValue classification, final Object paymentDetail) {
         WorkingCapitalLoanTransaction transaction = new WorkingCapitalLoanTransaction();
         transaction.wcLoan = loan;
         transaction.transactionType = LoanTransactionType.DISCOUNT_FEE_ADJUSTMENT;
@@ -145,7 +147,7 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         transaction.transactionDate = transactionDate;
         transaction.submittedOnDate = transactionDate;
         transaction.externalId = externalId != null ? externalId : ExternalId.empty();
-        transaction.paymentDetail = paymentDetail;
+        transaction.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         transaction.classification = classification;
         transaction.reversed = false;
         transaction.reversalExternalId = null;
@@ -153,19 +155,19 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
         return transaction;
     }
 
-    public static WorkingCapitalLoanTransaction chargeAdjustment(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final PaymentDetail paymentDetail) {
+    public static WorkingCapitalLoanTransaction chargeAdjustment(final WorkingCapitalLoan loan, final ExternalId externalId, final BigDecimal amount, final LocalDate transactionDate, final Object paymentDetail) {
         final WorkingCapitalLoanTransaction transaction = new WorkingCapitalLoanTransaction();
         transaction.initialize(loan, LoanTransactionType.CHARGE_ADJUSTMENT, transactionDate, amount, paymentDetail, null, externalId);
         return transaction;
     }
 
-    private void initialize(final WorkingCapitalLoan loan, final LoanTransactionType transactionType, final LocalDate transactionDate, final BigDecimal amount, final PaymentDetail paymentDetail, final CodeValue classification, final ExternalId externalId) {
+    private void initialize(final WorkingCapitalLoan loan, final LoanTransactionType transactionType, final LocalDate transactionDate, final BigDecimal amount, final Object paymentDetail, final CodeValue classification, final ExternalId externalId) {
         this.wcLoan = loan;
         this.transactionType = transactionType;
         this.transactionDate = transactionDate;
         this.submittedOnDate = transactionDate;
         this.transactionAmount = amount;
-        this.paymentDetail = paymentDetail;
+        this.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         this.classification = classification;
         this.externalId = externalId != null ? externalId : ExternalId.empty();
         this.reversed = false;
@@ -199,8 +201,8 @@ public class WorkingCapitalLoanTransaction extends AbstractAuditableWithUTCDateT
     }
 
     @java.lang.SuppressWarnings("all")
-        public PaymentDetail getPaymentDetail() {
-        return this.paymentDetail;
+        public Long getPaymentDetailId() {
+        return this.paymentDetailId;
     }
 
     @java.lang.SuppressWarnings("all")

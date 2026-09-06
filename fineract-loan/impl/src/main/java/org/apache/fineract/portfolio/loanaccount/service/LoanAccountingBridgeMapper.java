@@ -43,6 +43,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelation;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
+import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort;
 import org.springframework.stereotype.Component;
 
@@ -137,8 +139,9 @@ public class LoanAccountingBridgeMapper {
         if (transactionDTO.getType().isChargeRefund()) {
             transactionDTO.setChargeRefundChargeType(loanTransaction.getChargeRefundChargeType());
         }
-        if (loanTransaction.getPaymentDetail() != null) {
-            transactionDTO.setPaymentTypeId(loanTransaction.getPaymentDetail().getPaymentType().getId());
+        final Object persistable = PaymentDetailAssociation.persistableById(loanTransaction.getPaymentDetailId());
+        if (persistable instanceof PaymentDetail detail && detail.getPaymentType() != null) {
+            transactionDTO.setPaymentTypeId(detail.getPaymentType().getId());
         }
         if (!loanTransaction.getLoanChargesPaid().isEmpty()) {
             List<LoanChargePaidByDTO> loanChargesPaidData = new ArrayList<>();

@@ -74,6 +74,7 @@ import org.apache.fineract.portfolio.account.exception.DifferentCurrenciesExcept
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
@@ -440,8 +441,11 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     private SavingsAccountTransaction findTransaction(final SavingsAccount savingsAccount, final String transactionCode,
             final Integer transactionTypeValue) {
         return savingsAccount.getTransactions().stream().filter(t -> transactionTypeValue.equals(t.getTypeOf())).filter(t -> {
-            final PaymentDetail detail = t.getPaymentDetail();
-            return detail != null && getRoutingCode().equals(detail.getRoutingCode()) && transactionCode.equals(detail.getReceiptNumber());
+            final Object persistable = PaymentDetailAssociation.persistableById(t.getPaymentDetailId());
+            if (!(persistable instanceof PaymentDetail detail)) {
+                return false;
+            }
+            return getRoutingCode().equals(detail.getRoutingCode()) && transactionCode.equals(detail.getReceiptNumber());
         }).findFirst().orElse(null);
     }
 

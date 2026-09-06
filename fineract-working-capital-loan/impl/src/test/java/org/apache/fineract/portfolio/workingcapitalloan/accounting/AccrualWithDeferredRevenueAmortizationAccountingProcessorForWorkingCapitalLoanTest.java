@@ -41,6 +41,8 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanCharge;
@@ -102,7 +104,7 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
         lenient().when(loan.getId()).thenReturn(LOAN_ID);
         lenient().when(txn.getId()).thenReturn(TXN_ID);
         lenient().when(txn.getTransactionDate()).thenReturn(TXN_DATE);
-        lenient().when(txn.getPaymentDetail()).thenReturn(null);
+        lenient().when(txn.getPaymentDetailId()).thenReturn(null);
     }
 
     private void mockChargeAdjustmentRelation(final boolean penaltyCharge) {
@@ -127,6 +129,7 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
     @AfterEach
     void tearDown() {
         ThreadLocalContextUtil.reset();
+        PaymentDetailAssociation.setWritePlatformService(null);
     }
 
     @Test
@@ -246,7 +249,10 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
         final PaymentType paymentType = org.mockito.Mockito.mock(PaymentType.class);
 
         when(txn.getTransactionAmount()).thenReturn(new BigDecimal("1000"));
-        when(txn.getPaymentDetail()).thenReturn(paymentDetail);
+        when(txn.getPaymentDetailId()).thenReturn(1L);
+        final PaymentDetailWritePlatformService write = org.mockito.Mockito.mock(PaymentDetailWritePlatformService.class);
+        when(write.persistableById(1L)).thenReturn(paymentDetail);
+        PaymentDetailAssociation.setWritePlatformService(write);
         when(paymentDetail.getPaymentType()).thenReturn(paymentType);
         when(paymentType.getId()).thenReturn(5L);
         when(allocation.getPrincipalPortion()).thenReturn(new BigDecimal("1000"));

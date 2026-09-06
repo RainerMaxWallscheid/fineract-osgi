@@ -48,6 +48,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 import org.apache.fineract.portfolio.savings.domain.interest.EndOfDayBalance;
@@ -71,9 +72,11 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = true)
-    @JoinColumn(name = "payment_detail_id", nullable = true)
-    private PaymentDetail paymentDetail;
+    /**
+     * Payment-detail id (no JPA association to leftover PaymentDetail — ADR-021).
+     */
+    @Column(name = "payment_detail_id")
+    private Long paymentDetailId;
 
     @Column(name = "transaction_type_enum", nullable = false)
     private Integer typeOf;
@@ -144,7 +147,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
 
     SavingsAccountTransaction() {}
 
-    private SavingsAccountTransaction(final SavingsAccount savingsAccount, final Office office, final PaymentDetail paymentDetail,
+    private SavingsAccountTransaction(final SavingsAccount savingsAccount, final Office office, final Object paymentDetail,
             final Integer typeOf, final LocalDate transactionLocalDate, final BigDecimal amount, final boolean isReversed,
             final boolean isManualTransaction, final Boolean lienTransaction, final String refNo) {
         this.savingsAccount = savingsAccount;
@@ -153,7 +156,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         this.dateOf = transactionLocalDate;
         this.amount = amount;
         this.reversed = isReversed;
-        this.paymentDetail = paymentDetail;
+        this.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         this.createdDateToRemove = null; // #audit backward compatibility deprecated
         this.submittedOnDate = DateUtils.getBusinessLocalDate();
         this.isManualTransaction = isManualTransaction;
@@ -167,7 +170,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         this(savingsAccount, office, null, typeOf, transactionLocalDate, amount, isReversed, isManualTransaction, lienTransaction, refNo);
     }
 
-    private SavingsAccountTransaction(final SavingsAccount savingsAccount, final Office office, final PaymentDetail paymentDetail,
+    private SavingsAccountTransaction(final SavingsAccount savingsAccount, final Office office, final Object paymentDetail,
             final Integer typeOf, final LocalDate transactionLocalDate, final Money amount, final boolean isReversed,
             final boolean isManualTransaction, final Boolean lienTransaction, final String refNo) {
         this(savingsAccount, office, paymentDetail, typeOf, transactionLocalDate, amount.getAmount(), isReversed, isManualTransaction,
@@ -175,7 +178,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction deposit(final SavingsAccount savingsAccount, final Office office,
-            final PaymentDetail paymentDetail, final LocalDate date, final Money amount, final String refNo) {
+            final Object paymentDetail, final LocalDate date, final Money amount, final String refNo) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
         final Boolean lienTransaction = false;
@@ -184,7 +187,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction deposit(final SavingsAccount savingsAccount, final Office office,
-            final PaymentDetail paymentDetail, final LocalDate date, final Money amount,
+            final Object paymentDetail, final LocalDate date, final Money amount,
             final SavingsAccountTransactionType savingsAccountTransactionType, final String refNo) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
@@ -194,7 +197,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction withdrawal(final SavingsAccount savingsAccount, final Office office,
-            final PaymentDetail paymentDetail, final LocalDate date, final Money amount, final String refNo) {
+            final Object paymentDetail, final LocalDate date, final Money amount, final String refNo) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
         final Boolean lienTransaction = false;
@@ -271,7 +274,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
             final LocalDate date) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final Boolean lienTransaction = false;
         final String refNo = null;
         return new SavingsAccountTransaction(savingsAccount, office, paymentDetail,
@@ -283,7 +286,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
             final LocalDate date) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final Boolean lienTransaction = false;
         final String refNo = null;
         return new SavingsAccountTransaction(savingsAccount, office, paymentDetail,
@@ -295,7 +298,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
             final LocalDate date) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final Boolean lienTransaction = false;
         final String refNo = null;
         return new SavingsAccountTransaction(savingsAccount, office, paymentDetail,
@@ -319,7 +322,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     public static SavingsAccountTransaction escheat(final SavingsAccount savingsAccount, final LocalDate date,
             final boolean accountTransaction) {
         final boolean isReversed = false;
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final Boolean lienTransaction = false;
         final String refNo = null;
         return new SavingsAccountTransaction(savingsAccount, savingsAccount.office(), paymentDetail,
@@ -328,13 +331,13 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction copyTransaction(SavingsAccountTransaction accountTransaction) {
-        return new SavingsAccountTransaction(accountTransaction.savingsAccount, accountTransaction.office, accountTransaction.paymentDetail,
+        return new SavingsAccountTransaction(accountTransaction.savingsAccount, accountTransaction.office, accountTransaction.paymentDetailId,
                 accountTransaction.typeOf, accountTransaction.getTransactionDate(), accountTransaction.amount, accountTransaction.reversed,
                 accountTransaction.isManualTransaction, accountTransaction.lienTransaction, accountTransaction.refNo);
     }
 
     public static SavingsAccountTransaction holdAmount(final SavingsAccount savingsAccount, final Office office,
-            final PaymentDetail paymentDetail, final LocalDate date, final Money amount, final Boolean lienTransaction) {
+            final Object paymentDetail, final LocalDate date, final Money amount, final Boolean lienTransaction) {
         final boolean isReversed = false;
         final boolean isManualTransaction = false;
         final String refNo = null;
@@ -343,7 +346,7 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
     }
 
     public static SavingsAccountTransaction releaseAmount(SavingsAccountTransaction accountTransaction, LocalDate transactionDate) {
-        return new SavingsAccountTransaction(accountTransaction.savingsAccount, accountTransaction.office, accountTransaction.paymentDetail,
+        return new SavingsAccountTransaction(accountTransaction.savingsAccount, accountTransaction.office, accountTransaction.paymentDetailId,
                 SavingsAccountTransactionType.AMOUNT_RELEASE.getValue(), transactionDate, accountTransaction.amount,
                 accountTransaction.reversed, accountTransaction.isManualTransaction, accountTransaction.lienTransaction,
                 accountTransaction.refNo);
@@ -459,8 +462,8 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         return this.refNo;
     }
 
-    public PaymentDetail getPaymentDetail() {
-        return this.paymentDetail;
+    public Long getPaymentDetailId() {
+        return this.paymentDetailId;
     }
 
     public void updateReleaseId(Long releaseId) {
@@ -628,8 +631,9 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         thisTransactionData.put("amount", this.amount);
         thisTransactionData.put("overdraftAmount", this.overdraftAmount);
 
-        if (this.paymentDetail != null) {
-            thisTransactionData.put("paymentTypeId", this.paymentDetail.getPaymentType().getId());
+        final Object persistable = PaymentDetailAssociation.persistableById(this.paymentDetailId);
+        if (persistable instanceof PaymentDetail detail && detail.getPaymentType() != null) {
+            thisTransactionData.put("paymentTypeId", detail.getPaymentType().getId());
         }
 
         /***

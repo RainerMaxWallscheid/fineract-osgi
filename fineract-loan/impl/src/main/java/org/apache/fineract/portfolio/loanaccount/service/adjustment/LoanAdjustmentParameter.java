@@ -21,19 +21,19 @@ package org.apache.fineract.portfolio.loanaccount.service.adjustment;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+
 
 public class LoanAdjustmentParameter {
 
     private BigDecimal transactionAmount;
-    private PaymentDetail paymentDetail;
+    private Object paymentDetail;
     private LocalDate transactionDate;
     private ExternalId txnExternalId;
     private ExternalId reversalTxnExternalId;
     private String noteText;
 
     @java.lang.SuppressWarnings("all")
-    LoanAdjustmentParameter(final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final LocalDate transactionDate,
+    LoanAdjustmentParameter(final BigDecimal transactionAmount, final Object paymentDetail, final LocalDate transactionDate,
             final ExternalId txnExternalId, final ExternalId reversalTxnExternalId, final String noteText) {
         this.transactionAmount = transactionAmount;
         this.paymentDetail = paymentDetail;
@@ -49,7 +49,7 @@ public class LoanAdjustmentParameter {
         @java.lang.SuppressWarnings("all")
         private BigDecimal transactionAmount;
         @java.lang.SuppressWarnings("all")
-        private PaymentDetail paymentDetail;
+        private Object paymentDetail;
         @java.lang.SuppressWarnings("all")
         private LocalDate transactionDate;
         @java.lang.SuppressWarnings("all")
@@ -75,7 +75,7 @@ public class LoanAdjustmentParameter {
          * @return {@code this}.
          */
         @java.lang.SuppressWarnings("all")
-        public LoanAdjustmentParameter.LoanAdjustmentParameterBuilder paymentDetail(final PaymentDetail paymentDetail) {
+        public LoanAdjustmentParameter.LoanAdjustmentParameterBuilder paymentDetail(final Object paymentDetail) {
             this.paymentDetail = paymentDetail;
             return this;
         }
@@ -142,7 +142,7 @@ public class LoanAdjustmentParameter {
     }
 
     @java.lang.SuppressWarnings("all")
-    public PaymentDetail getPaymentDetail() {
+    public Object getPaymentDetail() {
         return this.paymentDetail;
     }
 
@@ -172,7 +172,7 @@ public class LoanAdjustmentParameter {
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setPaymentDetail(final PaymentDetail paymentDetail) {
+    public void setPaymentDetail(final Object paymentDetail) {
         this.paymentDetail = paymentDetail;
     }
 

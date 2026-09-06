@@ -473,7 +473,7 @@ Entity residual in **fineract-loan-impl**. Equinox registers `RepaymentWithPostD
 | `fineract-paymentdetail-impl` | `org.apache.fineract.paymentdetail.impl` | Write impl + `PaymentDetailOsgiServiceRegistrar` / DS `OSGI-INF/paymentdetail.xml` |
 | `fineract-paymentdetail-test` | `org.apache.fineract.paymentdetail.test` | Fragment-Host → paymentdetail.impl |
 
-`PaymentDetail` entity / `PaymentDetailData` residual in **fineract-core**. Write port is Object-typed leftover persistable (ADR-021). Equinox empty catalog `create*` / `persist*` / `id` / `persistableById` → null. Hosted Spring adapter ranks above DS.
+`PaymentDetail` entity / `PaymentDetailData` residual in **fineract-core**. Write port is Object-typed leftover persistable (ADR-021). Loan, savings, client, WC, and journal transaction entities store payment-detail id (not leftover `PaymentDetail`). Equinox empty catalog `create*` / `persist*` / `id` / `persistableById` → null. Hosted Spring adapter ranks above DS.
 
 ### Provider peel: fineract-cache (complete)
 

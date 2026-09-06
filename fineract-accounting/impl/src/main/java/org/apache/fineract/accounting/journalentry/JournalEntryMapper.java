@@ -26,6 +26,8 @@ import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.PortfolioProductType;
+import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -51,12 +53,12 @@ public interface JournalEntryMapper {
     @Mapping(target = "manualEntry", source = "manualEntry")
     @Mapping(target = "reversed", source = "reversed")
     @Mapping(target = "referenceNumber", source = "referenceNumber")
-    @Mapping(target = "paymentTypeId", source = "paymentDetail.paymentType.id")
-    @Mapping(target = "accountNumber", source = "paymentDetail.accountNumber")
-    @Mapping(target = "checkNumber", source = "paymentDetail.checkNumber")
-    @Mapping(target = "routingCode", source = "paymentDetail.routingCode")
-    @Mapping(target = "receiptNumber", source = "paymentDetail.receiptNumber")
-    @Mapping(target = "bankNumber", source = "paymentDetail.bankNumber")
+    @Mapping(target = "paymentTypeId", expression = "java(paymentTypeId(journalEntry))")
+    @Mapping(target = "accountNumber", expression = "java(accountNumber(journalEntry))")
+    @Mapping(target = "checkNumber", expression = "java(checkNumber(journalEntry))")
+    @Mapping(target = "routingCode", expression = "java(routingCode(journalEntry))")
+    @Mapping(target = "receiptNumber", expression = "java(receiptNumber(journalEntry))")
+    @Mapping(target = "bankNumber", expression = "java(bankNumber(journalEntry))")
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "createdByUserId", ignore = true)
     @Mapping(target = "createdByUserName", ignore = true)
@@ -103,5 +105,40 @@ public interface JournalEntryMapper {
 
     default CurrencyData mapCurrency(String currencyCode) {
         return new CurrencyData(currencyCode);
+    }
+
+    default Long paymentTypeId(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null || detail.getPaymentType() == null ? null : detail.getPaymentType().getId();
+    }
+
+    default String accountNumber(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null ? null : detail.getAccountNumber();
+    }
+
+    default String checkNumber(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null ? null : detail.getCheckNumber();
+    }
+
+    default String routingCode(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null ? null : detail.getRoutingCode();
+    }
+
+    default String receiptNumber(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null ? null : detail.getReceiptNumber();
+    }
+
+    default String bankNumber(final JournalEntry journalEntry) {
+        final PaymentDetail detail = persistable(journalEntry);
+        return detail == null ? null : detail.getBankNumber();
+    }
+
+    private static PaymentDetail persistable(final JournalEntry journalEntry) {
+        final Object persistable = PaymentDetailAssociation.persistableById(journalEntry.getPaymentDetailId());
+        return persistable instanceof PaymentDetail detail ? detail : null;
     }
 }

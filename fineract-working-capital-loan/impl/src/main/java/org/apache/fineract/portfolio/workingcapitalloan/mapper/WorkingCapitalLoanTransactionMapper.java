@@ -27,6 +27,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanTransactionData;
@@ -41,7 +42,7 @@ public interface WorkingCapitalLoanTransactionMapper {
 
     @Mapping(target = "wcLoanId", source = "wcLoan.id")
     @Mapping(target = "type", source = "transactionType", qualifiedByName = "loanTransactionTypeToEnumData")
-    @Mapping(target = "paymentDetailData", source = "paymentDetail", qualifiedByName = "paymentDetailToData")
+    @Mapping(target = "paymentDetailData", source = "paymentDetailId", qualifiedByName = "paymentDetailIdToData")
     @Mapping(target = "classification", source = "classification", qualifiedByName = "codeValueToData")
     @Mapping(target = "transactionDate", source = "transactionDate")
     @Mapping(target = "principalPortion", source = "allocation.principalPortion")
@@ -55,9 +56,10 @@ public interface WorkingCapitalLoanTransactionMapper {
         return type == null ? null : LoanTransactionEnumerations.transactionType(type);
     }
 
-    @Named("paymentDetailToData")
-    default PaymentDetailData paymentDetailToData(final PaymentDetail paymentDetail) {
-        if (paymentDetail == null) {
+    @Named("paymentDetailIdToData")
+    default PaymentDetailData paymentDetailIdToData(final Long paymentDetailId) {
+        final Object persistable = PaymentDetailAssociation.persistableById(paymentDetailId);
+        if (!(persistable instanceof PaymentDetail paymentDetail)) {
             return null;
         }
         return PaymentDetailData.builder().id(paymentDetail.getId()).paymentType(paymentTypeToData(paymentDetail.getPaymentType()))

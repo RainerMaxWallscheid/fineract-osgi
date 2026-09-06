@@ -258,7 +258,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             }
             final LinkedSavingsAccountPort.TransferTxn withdrawal = this.linkedSavingsAccountPort.handleWithdrawal(fromSavingsAccountId,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction,
+                    (PaymentDetail) accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction,
                     AccountTransferType.fromInt(accountTransferDTO.getTransferType()).isInterestTransfer(),
                     accountTransferDTO.isExceptionForBalanceCheck(), backdatedTxnsAllowedTill);
             LoanTransaction loanTransaction;
@@ -268,7 +268,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             if (AccountTransferType.fromInt(accountTransferDTO.getTransferType()).isChargePayment()) {
                 loanTransaction = this.loanAccountDomainService.makeChargePayment(toLoanAccount, accountTransferDTO.getChargeId(),
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        accountTransferDTO.getPaymentDetail(), null, externalId, accountTransferDTO.getToTransferType(),
+                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), null, externalId, accountTransferDTO.getToTransferType(),
                         accountTransferDTO.getLoanInstallmentNumber());
             } else if (AccountTransferType.fromInt(accountTransferDTO.getTransferType()).isLoanDownPayment()) {
                 final boolean isRecoveryRepayment = false;
@@ -277,7 +277,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                 final String chargeRefundChargeType = null;
                 loanTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.DOWN_PAYMENT, toLoanAccount,
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
+                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
                         isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
                 toLoanAccount = loanTransaction.getLoan();
             } else {
@@ -287,7 +287,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                 final String chargeRefundChargeType = null;
                 loanTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.REPAYMENT, toLoanAccount,
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
+                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
                         isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
                 toLoanAccount = loanTransaction.getLoan();
             }
@@ -319,12 +319,12 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             }
             final LinkedSavingsAccountPort.TransferTxn withdrawal = this.linkedSavingsAccountPort.handleWithdrawal(fromSavingsAccountId,
                     accountTransferDTO.getFmt(), transactionDate, accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction,
+                    (PaymentDetail) accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction,
                     AccountTransferType.fromInt(accountTransferDTO.getTransferType()).isInterestTransfer(),
                     accountTransferDTO.isExceptionForBalanceCheck(), backdatedTxnsAllowedTill);
             final LinkedSavingsAccountPort.TransferTxn deposit = this.linkedSavingsAccountPort.handleDeposit(toSavingsAccountId,
                     accountTransferDTO.getFmt(), transactionDate, accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
+                    (PaymentDetail) accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
             accountTransferDetails = this.accountTransferAssembler.assembleSavingsToSavingsTransfer(accountTransferDTO,
                     fromSavingsAccountId, toSavingsAccountId, withdrawal.transactionId(), deposit.transactionId());
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
@@ -350,16 +350,16 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             if (LoanTransactionType.DISBURSEMENT.getValue().equals(accountTransferDTO.getFromTransferType())) {
                 loanTransaction = this.loanAccountDomainService.makeDisburseTransaction(accountTransferDTO.getFromAccountId(),
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(), externalId);
+                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(), externalId);
             } else {
                 loanTransaction = this.loanAccountDomainService.makeRefund(accountTransferDTO.getFromAccountId(),
                         new CommandProcessingResultBuilder(), accountTransferDTO.getTransactionDate(),
-                        accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(),
+                        accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(),
                         externalId);
             }
             final LinkedSavingsAccountPort.TransferTxn deposit = this.linkedSavingsAccountPort.handleDeposit(toSavingsAccountId,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
+                    (PaymentDetail) accountTransferDTO.getPaymentDetail(), isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
             accountTransferDetails = this.accountTransferAssembler.assembleLoanToSavingsTransfer(accountTransferDTO, fromLoanAccount,
                     toSavingsAccountId, deposit.transactionId(), loanTransaction);
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
@@ -389,12 +389,12 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         }
         ExternalId externalIdForDisbursement = accountTransferDTO.getTxnExternalId();
         LoanTransaction disburseTransaction = this.loanAccountDomainService.makeDisburseTransaction(accountTransferDTO.getFromAccountId(),
-                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(),
+                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(),
                 accountTransferDTO.getNoteText(), externalIdForDisbursement, true);
         final String chargeRefundChargeType = null;
         ExternalId externalIdForRepayment = externalIdFactory.create();
         LoanTransaction repayTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.REPAYMENT, toLoanAccount,
-                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(),
+                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(),
                 null, externalIdForRepayment, false, chargeRefundChargeType, isAccountTransfer, null, false, true);
         AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleLoanToLoanTransfer(accountTransferDTO,
                 fromLoanAccount, toLoanAccount, disburseTransaction, repayTransaction);

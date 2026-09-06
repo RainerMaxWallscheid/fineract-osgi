@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+
 
 public class AccountTransferDTO {
 
@@ -39,7 +39,7 @@ public class AccountTransferDTO {
     private final String description;
     private final Locale locale;
     private final DateTimeFormatter fmt;
-    private final PaymentDetail paymentDetail;
+    private final Object paymentDetail;
     private final Integer fromTransferType;
     private final Integer toTransferType;
     private final Long chargeId;
@@ -59,7 +59,7 @@ public class AccountTransferDTO {
     public AccountTransferDTO(final LocalDate transactionDate, final BigDecimal transactionAmount,
             final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType, final Long fromAccountId,
             final Long toAccountId, final String description, final Locale locale, final DateTimeFormatter fmt,
-            final PaymentDetail paymentDetail, final Integer fromTransferType, final Integer toTransferType, final Long chargeId,
+            final Object paymentDetail, final Integer fromTransferType, final Integer toTransferType, final Long chargeId,
             Integer loanInstallmentNumber, Integer transferType, final AccountTransferDetails accountTransferDetails, final String noteText,
             final ExternalId txnExternalId, final Loan loan, Object toSavingsAccount, final Object fromSavingsAccount,
             final Boolean isRegularTransaction, Boolean isExceptionForBalanceCheck) {
@@ -158,7 +158,7 @@ public class AccountTransferDTO {
         return this.fmt;
     }
 
-    public PaymentDetail getPaymentDetail() {
+    public Object getPaymentDetail() {
         return this.paymentDetail;
     }
 
