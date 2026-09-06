@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.savings.data;
 
 import java.math.BigDecimal;
 import java.util.List;
-import org.apache.fineract.portfolio.accountdetails.data.SavingsSummaryCustom;
 
 public class GSIMContainer {
 
