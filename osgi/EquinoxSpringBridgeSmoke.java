@@ -51,6 +51,7 @@ import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNoti
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
+import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -358,7 +359,8 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(BulkImportWorkbookService.class, s -> s instanceof BulkImportWorkbookService p
                         && HostedBulkImportWorkbookService.HOSTED_ID == p.getImport(1L).getImportId()),
                 probeOf(BulkImportWorkbookPopulatorService.class, s -> s instanceof BulkImportWorkbookPopulatorService p
-                        && HostedBulkImportWorkbookPopulatorService.HOSTED.equals(p.getTemplate("hosted", null, null, null))));
+                        && HostedBulkImportWorkbookPopulatorService.HOSTED.equals(p.getTemplate("hosted", null, null, null))),
+                probeOf(InstanceModePort.class, EquinoxSpringBridgeSmoke::instanceModeWins));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {
@@ -411,6 +413,14 @@ public final class EquinoxSpringBridgeSmoke {
         final Object[] seen = new Object[1];
         port.onClientActivated(v -> seen[0] = v);
         return HostedSmsCampaignTriggerEventPort.HOSTED.equals(seen[0]);
+    }
+
+    private static boolean instanceModeWins(final Object service) {
+        if (!(service instanceof HostedInstanceModePort port)) {
+            return false;
+        }
+        port.changeMode(true, true, true, true);
+        return HostedInstanceModePort.HOSTED.equals(port.last());
     }
 
     private static boolean commandWins(final Object service) {

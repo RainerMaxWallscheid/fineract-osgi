@@ -108,7 +108,8 @@ public final class EquinoxResolveSmoke {
             "org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort",
             "org.apache.fineract.interoperation.service.InteropService",
             "org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService",
-            "org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService"
+            "org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService",
+            "org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort"
     };
 
     private EquinoxResolveSmoke() {}

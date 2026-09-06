@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookP
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
+import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
@@ -139,7 +140,9 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails, final ObjectProvider<CommandDispatcher> commands,
             final ObjectProvider<PortfolioNotificationEventPort> portfolioNotifications,
             final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaignTriggers, final ObjectProvider<InteropService> interop,
-            final ObjectProvider<BulkImportWorkbookService> bulkImport, final ObjectProvider<BulkImportWorkbookPopulatorService> bulkImportPopulator) {
+            final ObjectProvider<BulkImportWorkbookService> bulkImport,
+            final ObjectProvider<BulkImportWorkbookPopulatorService> bulkImportPopulator,
+            final ObjectProvider<InstanceModePort> instanceMode) {
         return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge), owned(FloatingRatePort.class, rates),
                 owned(TaxCatalogPort.class, tax), owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
                 owned(CashierTxnValidationPort.class, cashier), owned(LoanOriginatorReadPlatformService.class, originator),
@@ -176,7 +179,7 @@ public class EquinoxOsgiConfiguration {
                 owned(CommandDispatcher.class, commands), owned(PortfolioNotificationEventPort.class, portfolioNotifications),
                 owned(SmsCampaignTriggerEventPort.class, smsCampaignTriggers), owned(InteropService.class, interop),
                 owned(BulkImportWorkbookService.class, bulkImport),
-                owned(BulkImportWorkbookPopulatorService.class, bulkImportPopulator)));
+                owned(BulkImportWorkbookPopulatorService.class, bulkImportPopulator), owned(InstanceModePort.class, instanceMode)));
     }
 
     /**

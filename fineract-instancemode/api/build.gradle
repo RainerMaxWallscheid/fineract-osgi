@@ -30,7 +30,8 @@ jar {
                 'Bundle-SymbolicName': 'org.apache.fineract.instancemode.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.infrastructure.instancemode.api,'
-                        + 'org.apache.fineract.infrastructure.instancemode.filter',
+                        + 'org.apache.fineract.infrastructure.instancemode.filter,'
+                        + 'org.apache.fineract.infrastructure.instancemode.moduleapi',
                 'Import-Package': 'org.apache.fineract.infrastructure.core.config,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + '*',

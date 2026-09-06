@@ -32,7 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
-import org.apache.fineract.infrastructure.core.config.FineractProperties;
+import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
 public class InstanceModeApiResource implements InitializingBean {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InstanceModeApiResource.class);
-    private final FineractProperties fineractProperties;
+    private final InstanceModePort instanceModePort;
 
     @Override
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
@@ -71,15 +71,13 @@ public class InstanceModeApiResource implements InitializingBean {
         log.warn("Changing instance mode according to the request parameters {}", request);
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-        fineractProperties.getMode().setReadEnabled(request.isReadEnabled());
-        fineractProperties.getMode().setWriteEnabled(request.isWriteEnabled());
-        fineractProperties.getMode().setBatchWorkerEnabled(request.isBatchWorkerEnabled());
-        fineractProperties.getMode().setBatchManagerEnabled(request.isBatchManagerEnabled());
+        instanceModePort.changeMode(request.isReadEnabled(), request.isWriteEnabled(), request.isBatchWorkerEnabled(),
+                request.isBatchManagerEnabled());
         return Response.ok().build();
     }
 
     @java.lang.SuppressWarnings("all")
-        public InstanceModeApiResource(final FineractProperties fineractProperties) {
-        this.fineractProperties = fineractProperties;
+        public InstanceModeApiResource(final InstanceModePort instanceModePort) {
+        this.instanceModePort = instanceModePort;
     }
 }

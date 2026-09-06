@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNoti
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
+import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -170,6 +171,7 @@ public final class CompositionRootOsgiBridge {
         register(InteropService.class, new HostedInteropService());
         register(BulkImportWorkbookService.class, new HostedBulkImportWorkbookService());
         register(BulkImportWorkbookPopulatorService.class, new HostedBulkImportWorkbookPopulatorService());
+        register(InstanceModePort.class, new HostedInstanceModePort());
     }
 
     private <T> void register(final Class<T> type, final T service) {

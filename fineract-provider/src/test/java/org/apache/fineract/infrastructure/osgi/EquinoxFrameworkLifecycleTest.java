@@ -109,6 +109,7 @@ import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
 import org.apache.fineract.infrastructure.bulkimport.data.LookupMode;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
+import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -2469,6 +2470,29 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void instanceModeLookupFacadeDelegatesToPublishedSpringPort() {
+        final boolean[] seen = { false };
+        final InstanceModePort spring = (readEnabled, writeEnabled, batchWorkerEnabled, batchManagerEnabled) -> seen[0] = readEnabled;
+        final SpringOsgiPortBridge bridge = instanceModeBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final InstanceModePort facade = OsgiBackedPortFactory.of(lookup, InstanceModePort.class);
+
+        facade.changeMode(true, true, true, true);
+        assertFalse(seen[0]);
+        lifecycle.start();
+        try {
+            facade.changeMode(true, true, true, true);
+            assertTrue(seen[0]);
+        } finally {
+            lifecycle.stop();
+        }
+        seen[0] = false;
+        facade.changeMode(true, true, true, true);
+        assertFalse(seen[0]);
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2489,6 +2513,7 @@ class EquinoxFrameworkLifecycleTest {
         assertNull(OsgiBackedPortFactory.empty(InteropService.class).getAccountDetails("hosted"));
         assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookService.class).getImport(1L));
         assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookPopulatorService.class).getTemplate("hosted", null, null, null));
+        OsgiBackedPortFactory.empty(InstanceModePort.class).changeMode(true, true, true, true);
     }
 
     @Test
@@ -4407,6 +4432,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringInstanceModePortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final InstanceModePort instanceMode = new StubInstanceModePort();
+        final SpringOsgiPortBridge bridge = instanceModeBridge(instanceMode);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean instancemodeImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.instancemode.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    instancemodeImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(instancemodeImplActive);
+            final ServiceReference<InstanceModePort> selected = ctx.getServiceReference(InstanceModePort.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(instanceMode, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4664,6 +4719,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge bulkImportPopulatorBridge(final BulkImportWorkbookPopulatorService populator) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BulkImportWorkbookPopulatorService.class, populator)));
+    }
+
+    private static SpringOsgiPortBridge instanceModeBridge(final InstanceModePort instanceMode) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(InstanceModePort.class, instanceMode)));
     }
 
     private static Path stagedCatalog() {
@@ -5843,5 +5902,12 @@ class EquinoxFrameworkLifecycleTest {
                 final LookupMode lookupMode) {
             return null;
         }
+    }
+
+    private static final class StubInstanceModePort implements InstanceModePort {
+
+        @Override
+        public void changeMode(final boolean readEnabled, final boolean writeEnabled, final boolean batchWorkerEnabled,
+                final boolean batchManagerEnabled) {}
     }
 }
