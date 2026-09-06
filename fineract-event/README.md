@@ -4,8 +4,8 @@ Provider peel — business events + external event producers/serializers (ADR-02
 
 | Gradle project | Path | BSN | Role |
 |----------------|------|-----|------|
-| `fineract-event-api` | `api/` | `org.apache.fineract.event.api` | Kafka topic auto-create condition |
-| `fineract-event-impl` | `impl/` | `org.apache.fineract.event.impl` | Domain business events, Avro mappers/serializers, JMS/Kafka producers, OSGi |
+| `fineract-event-api` | `api/` | `org.apache.fineract.event.api` | `PortfolioNotificationEventPort`, `SmsCampaignTriggerEventPort` |
+| `fineract-event-impl` | `impl/` | `org.apache.fineract.event.impl` | Domain business events, Avro mappers/serializers, JMS/Kafka producers; Equinox DS `OSGI-INF/event-*.xml` |
 | `fineract-event-test` | `test/` | `org.apache.fineract.event.test` | Fragment-Host → impl |
 
 Core residual (kernel outbox path): notifier/ports, `ExternalEvent` entity/repos, `ExternalEventService`, serializer SPI/factory, message factories, producer port + noop.
