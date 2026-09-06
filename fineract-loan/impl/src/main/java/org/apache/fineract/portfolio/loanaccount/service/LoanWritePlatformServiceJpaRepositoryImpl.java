@@ -371,7 +371,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         businessEventNotifierService.notifyPreBusinessEvent(new LoanDisbursalBusinessEvent(loan));
         final AppUser currentUser = getAppUserIfPresent();
         final Map<String, Object> changes = new LinkedHashMap<>();
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         if (paymentDetail != null && paymentDetail.getPaymentType() != null && paymentDetail.getPaymentType().getIsCashPayment()) {
             BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
             final Long staffId = currentUser != null && currentUser.getStaff() != null ? currentUser.getStaff().getId() : null;
@@ -747,7 +748,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             }
             checkClientOrGroupActive(loan);
             businessEventNotifierService.notifyPreBusinessEvent(new LoanDisbursalBusinessEvent(loan));
-            final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+            final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService
+                    .createAndPersistPaymentDetail(command, changes);
             // Bulk disbursement should happen on meeting date (mostly from
             // collection sheet).
             // FIXME: AA - this should be first meeting date based on
@@ -1077,7 +1079,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             changes.put(LoanApiConstants.externalIdParameterName, txnExternalId);
         }
         Loan loan = this.loanAssembler.assembleFrom(loanId);
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         final Boolean isHolidayValidationDone = false;
         final HolidayDetailDTO holidayDetailDto = null;
         boolean isAccountTransfer = false;
@@ -1137,7 +1140,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         for (final SingleRepaymentCommand singleLoanRepaymentCommand : repaymentCommand) {
             if (singleLoanRepaymentCommand != null) {
                 final Loan loan = this.loanAssembler.assembleFrom(singleLoanRepaymentCommand.getLoanId());
-                final PaymentDetail paymentDetail = singleLoanRepaymentCommand.getPaymentDetail();
+                final PaymentDetail paymentDetail = (PaymentDetail) singleLoanRepaymentCommand.getPaymentDetail();
                 ExternalId externalId = singleLoanRepaymentCommand.getExternalId();
                 if (externalId.isEmpty() && configurationDomainService.isExternalIdAutoGenerationEnabled()) {
                     externalId = ExternalId.generate();
@@ -1208,7 +1211,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         changes.put("locale", command.locale());
         changes.put("dateFormat", command.dateFormat());
         changes.put("paymentTypeId", command.longValueOfParameterNamed("paymentTypeId"));
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         LoanAdjustmentParameter parameter = LoanAdjustmentParameter.builder().transactionAmount(transactionAmount)
                 .paymentDetail(paymentDetail).transactionDate(transactionDate).txnExternalId(txnExternalId)
                 .reversalTxnExternalId(reversalTxnExternalId).noteText(noteText).build();
@@ -1257,9 +1260,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         changes.put("dateFormat", command.dateFormat());
         changes.put("paymentTypeId", command.longValueOfParameterNamed(LoanApiConstants.PAYMENT_TYPE_PARAMNAME));
         final Money transactionAmountAsMoney = Money.of(loan.getCurrency(), transactionAmount);
-        PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         LoanTransaction newTransaction = LoanTransaction.chargeback(loan, transactionAmountAsMoney, paymentDetail, transactionDate,
                 txnExternalId);
@@ -2324,9 +2327,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             changes.put(LoanApiConstants.externalIdParameterName, externalId);
         }
         changes.put("paymentTypeId", command.longValueOfParameterNamed(LoanApiConstants.PAYMENT_TYPE_PARAMNAME));
-        PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         final LoanTransaction loanTransaction = this.loanAccountDomainService.creditBalanceRefund(loan, transactionDate, transactionAmount,
                 noteText, externalId, paymentDetail);
@@ -2670,7 +2673,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // Domain rule validations
         this.loanTransactionValidator.validateRefund(loan, loanTransactionType, transactionDate, scheduleGeneratorDTO);
         // Create payment details
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         // Create note
         createNote(loan, command, changes);
         // Create refund transaction(s)
@@ -2777,7 +2781,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final LocalDate recalculateFrom = loan.isInterestBearingAndInterestRecalculationEnabled() ? transactionDate : null;
         final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom, null);
         this.loanTransactionValidator.validateRefund(loan, LoanTransactionType.INTEREST_REFUND, transactionDate, scheduleGeneratorDTO);
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         createNote(loan, command, changes);
         final LoanTransaction interestRefundTxn = loanAccountDomainService.createManualInterestRefundWithAmount(loan, targetTransaction,
                 amount, paymentDetail, txnExternalId);

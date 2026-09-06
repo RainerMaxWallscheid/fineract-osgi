@@ -8,7 +8,7 @@ Core residual peel — payment detail write path (ADR-022).
 | `fineract-paymentdetail-impl` | `impl/` | `org.apache.fineract.paymentdetail.impl` | Write impl, assembler, starter; Equinox DS `OSGI-INF/paymentdetail.xml` |
 | `fineract-paymentdetail-test` | `test/` | `org.apache.fineract.paymentdetail.test` | Fragment-Host → impl |
 
-Residual in `fineract-core`: `PaymentDetail` entity/repo, `PaymentDetailConstants`, and `PaymentDetailData` (savings transaction DTO coupling).
+Residual in `fineract-core`: `PaymentDetail` entity/repo, `PaymentDetailConstants`, and `PaymentDetailData` (savings transaction DTO coupling). Write port is Object-typed leftover persistable (ADR-021); entity stays in core.
 
 ```bash
 ./gradlew :fineract-paymentdetail-api:jar :fineract-paymentdetail-impl:jar :fineract-paymentdetail-test:test

@@ -21,14 +21,14 @@ package org.apache.fineract.portfolio.savings.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 
 public class SavingsAccountTransactionDTO {
 
     private final DateTimeFormatter formatter;
     private final LocalDate transactionDate;
     private final BigDecimal transactionAmount;
-    private final PaymentDetail paymentDetail;
+    /** Persistable leftover {@code PaymentDetail} (Object-typed, ADR-021). */
+    private final Object paymentDetail;
     private final Long savingsAccountId;
     private final Integer depositAccountType;
 
@@ -42,7 +42,7 @@ public class SavingsAccountTransactionDTO {
      * @param savingsAccountId
      */
     public SavingsAccountTransactionDTO(DateTimeFormatter formatter, LocalDate transactionDate, BigDecimal transactionAmount,
-            PaymentDetail paymentDetail, Long savingsAccountId, final Integer depositAccountType) {
+            Object paymentDetail, Long savingsAccountId, final Integer depositAccountType) {
         this.formatter = formatter;
         this.transactionDate = transactionDate;
         this.transactionAmount = transactionAmount;
@@ -63,7 +63,7 @@ public class SavingsAccountTransactionDTO {
         return this.transactionAmount;
     }
 
-    public PaymentDetail getPaymentDetail() {
+    public Object getPaymentDetail() {
         return this.paymentDetail;
     }
 

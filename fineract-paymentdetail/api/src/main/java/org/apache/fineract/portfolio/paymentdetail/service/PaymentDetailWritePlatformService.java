@@ -20,16 +20,29 @@ package org.apache.fineract.portfolio.paymentdetail.service;
 
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 
+/**
+ * Payment-detail writes (ADR-021). Persistable instances are Object-typed leftover {@code PaymentDetail} — foreign BCs
+ * must not depend on leftover JPA graphs.
+ */
 public interface PaymentDetailWritePlatformService {
 
-    PaymentDetail createAndPersistPaymentDetail(JsonCommand command, Map<String, Object> changes);
+    Object createAndPersistPaymentDetail(JsonCommand command, Map<String, Object> changes);
 
-    PaymentDetail createPaymentDetail(JsonCommand command, Map<String, Object> changes);
+    Object createPaymentDetail(JsonCommand command, Map<String, Object> changes);
 
-    PaymentDetail persistPaymentDetail(PaymentDetail paymentDetail);
+    Object persistPaymentDetail(Object paymentDetail);
 
-    PaymentDetail createPaymentDetail(Long paymentTypeId, String accountNumber, String checkNumber, String routingCode,
-            String receiptNumber, String bankNumber);
+    Object createPaymentDetail(Long paymentTypeId, String accountNumber, String checkNumber, String routingCode, String receiptNumber,
+            String bankNumber);
+
+    /**
+     * Payment-detail id from a persistable instance (Object-typed, ADR-021).
+     */
+    Long id(Object paymentDetail);
+
+    /**
+     * Persistable payment detail for association writes (Object-typed, ADR-021).
+     */
+    Object persistableById(Long paymentDetailId);
 }

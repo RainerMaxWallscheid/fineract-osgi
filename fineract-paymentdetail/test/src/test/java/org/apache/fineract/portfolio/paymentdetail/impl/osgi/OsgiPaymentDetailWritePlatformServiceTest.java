@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.paymentdetail.impl.osgi;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.Test;
 
 class OsgiPaymentDetailWritePlatformServiceTest {
@@ -31,5 +32,7 @@ class OsgiPaymentDetailWritePlatformServiceTest {
         assertNull(port.createPaymentDetail(null, null));
         assertNull(port.persistPaymentDetail(null));
         assertNull(port.createPaymentDetail(null, null, null, null, null, null));
+        assertNull(port.id(null));
+        assertNull(port.persistableById(null));
     }
 }

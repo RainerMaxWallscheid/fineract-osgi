@@ -18,7 +18,7 @@
  */
 
 dependencies {
-    // EnumOptionData, CurrencyData, SavingsProductData, PaymentDetail
+    // EnumOptionData, CurrencyData, SavingsProductData
     api project(path: ':fineract-core')
     // LoanProductLookupData on JLG collection-sheet DTOs
     api project(path: ':fineract-loan-api')

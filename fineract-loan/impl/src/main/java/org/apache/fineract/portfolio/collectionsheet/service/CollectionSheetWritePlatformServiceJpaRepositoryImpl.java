@@ -60,7 +60,8 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
         }
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         changes.putAll(updateBulkRepayments(command, paymentDetail));
         changes.putAll(updateBulkDisbursals(command));
         changes.putAll(updateBulkMandatorySavingsDuePayments(command, paymentDetail));

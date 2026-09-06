@@ -26,34 +26,39 @@ import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailRepositor
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements PaymentDetailWritePlatformService {
+
     private final PaymentDetailRepository paymentDetailRepository;
-    // private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
     private final PaymentTypeRepository paymentTypeRepository;
 
     @Override
-    public PaymentDetail createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+    public Object createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
         final Long paymentTypeId = command.longValueOfParameterNamed(PaymentDetailConstants.paymentTypeParamName);
         if (paymentTypeId == null) {
             return null;
         }
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId).orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
-        final PaymentDetail paymentDetail = PaymentDetail.generatePaymentDetail(paymentType, command, changes);
-        return paymentDetail;
+        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
+                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
+        return PaymentDetail.generatePaymentDetail(paymentType, command, changes);
     }
 
     @Override
     @Transactional
-    public PaymentDetail persistPaymentDetail(final PaymentDetail paymentDetail) {
-        return this.paymentDetailRepository.saveAndFlush(paymentDetail);
+    public Object persistPaymentDetail(final Object paymentDetail) {
+        if (!(paymentDetail instanceof PaymentDetail persistable)) {
+            return null;
+        }
+        return this.paymentDetailRepository.saveAndFlush(persistable);
     }
 
     @Override
     @Transactional
-    public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
-        final PaymentDetail paymentDetail = createPaymentDetail(command, changes);
+    public Object createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+        final Object paymentDetail = createPaymentDetail(command, changes);
         if (paymentDetail != null) {
             return persistPaymentDetail(paymentDetail);
         }
@@ -61,7 +66,7 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
     }
 
     @Override
-    public PaymentDetail createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
+    public Object createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
             final String routingCode, final String receiptNumber, final String bankNumber) {
         if (paymentTypeId == null) {
             return null;
@@ -71,8 +76,24 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         return PaymentDetail.instance(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public PaymentDetailWritePlatformServiceJpaRepositoryImpl(final PaymentDetailRepository paymentDetailRepository, final PaymentTypeRepository paymentTypeRepository) {
+    @Override
+    public Long id(final Object paymentDetail) {
+        if (!(paymentDetail instanceof PaymentDetail persistable)) {
+            return null;
+        }
+        return persistable.getId();
+    }
+
+    @Override
+    public Object persistableById(final Long paymentDetailId) {
+        if (paymentDetailId == null) {
+            return null;
+        }
+        return this.paymentDetailRepository.findById(paymentDetailId).orElse(null);
+    }
+
+    public PaymentDetailWritePlatformServiceJpaRepositoryImpl(final PaymentDetailRepository paymentDetailRepository,
+            final PaymentTypeRepository paymentTypeRepository) {
         this.paymentDetailRepository = paymentDetailRepository;
         this.paymentTypeRepository = paymentTypeRepository;
     }

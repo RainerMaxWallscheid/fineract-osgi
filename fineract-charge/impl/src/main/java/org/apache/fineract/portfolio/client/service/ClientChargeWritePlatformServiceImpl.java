@@ -140,7 +140,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             clientCharge.pay(chargePaid);
             // create Payment Transaction
             final Map<String, Object> changes = new LinkedHashMap<>();
-            final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+            final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
             ClientTransaction clientTransaction = ClientTransaction.payCharge(client, client.getOffice(), paymentDetail, transactionDate, chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
             // update charge paid by associations

@@ -61,6 +61,7 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
@@ -101,10 +102,10 @@ import org.springframework.context.annotation.Primary;
  * {@code HookReadPlatformService}, {@code SmsWritePlatformService},
  * {@code ReportMailingJobConfigurationReadPlatformService}, {@code SmsCampaignDropdownReadPlatformService},
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
- * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, and {@code PropertyService} are
- * {@code @Primary} lookup façades when Equinox is on — Boot consumers resolve them from the Service Registry.
- * {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} and {@code PaymentDetailWritePlatformService}
- * stay empty-catalog only.
+ * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService}, and
+ * {@code PaymentDetailWritePlatformService} are {@code @Primary} lookup façades when Equinox is on — Boot consumers
+ * resolve them from the Service Registry. {@code CommandDispatcher} stays hosted-only. {@code ContentStreamPort} stays
+ * empty-catalog only.
  */
 @Configuration
 @ConditionalOnProperty(name = "fineract.osgi.enabled", havingValue = "true")
@@ -445,5 +446,11 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public PropertyService osgiPropertyService(final OsgiServiceLookup lookup) {
         return backed(lookup, PropertyService.class);
+    }
+
+    @Bean
+    @Primary
+    public PaymentDetailWritePlatformService osgiPaymentDetailWritePlatformService(final OsgiServiceLookup lookup) {
+        return backed(lookup, PaymentDetailWritePlatformService.class);
     }
 }

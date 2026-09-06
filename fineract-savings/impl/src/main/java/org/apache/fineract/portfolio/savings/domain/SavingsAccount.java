@@ -1063,7 +1063,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
         final Money amount = Money.of(this.currency, transactionDTO.getTransactionAmount());
 
-        final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(this, office(), transactionDTO.getPaymentDetail(),
+        final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(this, office(), (PaymentDetail) transactionDTO.getPaymentDetail(),
                 transactionDTO.getTransactionDate(), amount, savingsAccountTransactionType, refNo);
 
         if (backdatedTxnsAllowedTill) {
@@ -1194,13 +1194,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getPaymentDetail(),
+            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), (PaymentDetail) transactionDTO.getPaymentDetail(),
                     backdatedTxnsAllowedTill, refNo);
         }
 
         final Money transactionAmountMoney = Money.of(this.currency, transactionDTO.getTransactionAmount());
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
-                transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney, refNo);
+                (PaymentDetail) transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney, refNo);
 
         if (backdatedTxnsAllowedTill) {
             addTransactionToExisting(transaction);

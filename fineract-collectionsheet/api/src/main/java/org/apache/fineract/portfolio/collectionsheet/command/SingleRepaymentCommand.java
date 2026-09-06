@@ -21,45 +21,47 @@ package org.apache.fineract.portfolio.collectionsheet.command;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 
 /**
  * Immutable command for Single loan repayment.
  */
 public class SingleRepaymentCommand {
+
     private final Long loanId;
     private final ExternalId externalId;
     private final BigDecimal transactionAmount;
     private final LocalDate transactionDate;
-    private final PaymentDetail paymentDetail;
+    /** Persistable leftover {@code PaymentDetail} (Object-typed, ADR-021). */
+    private final Object paymentDetail;
 
     @java.lang.SuppressWarnings("all")
-        public Long getLoanId() {
+    public Long getLoanId() {
         return this.loanId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExternalId getExternalId() {
+    public ExternalId getExternalId() {
         return this.externalId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public BigDecimal getTransactionAmount() {
+    public BigDecimal getTransactionAmount() {
         return this.transactionAmount;
     }
 
     @java.lang.SuppressWarnings("all")
-        public LocalDate getTransactionDate() {
+    public LocalDate getTransactionDate() {
         return this.transactionDate;
     }
 
     @java.lang.SuppressWarnings("all")
-        public PaymentDetail getPaymentDetail() {
+    public Object getPaymentDetail() {
         return this.paymentDetail;
     }
 
     @java.lang.SuppressWarnings("all")
-        public SingleRepaymentCommand(final Long loanId, final ExternalId externalId, final BigDecimal transactionAmount, final LocalDate transactionDate, final PaymentDetail paymentDetail) {
+    public SingleRepaymentCommand(final Long loanId, final ExternalId externalId, final BigDecimal transactionAmount,
+            final LocalDate transactionDate, final Object paymentDetail) {
         this.loanId = loanId;
         this.externalId = externalId;
         this.transactionAmount = transactionAmount;

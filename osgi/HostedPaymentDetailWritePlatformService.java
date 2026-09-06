@@ -16,46 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.paymentdetail.impl.osgi;
 
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 
-/**
- * Empty payment-detail write port for Equinox without Spring/JPA. Published by {@code OSGI-INF/paymentdetail.xml}
- * (ADR-022 B6).
- */
-public final class OsgiPaymentDetailWritePlatformService implements PaymentDetailWritePlatformService {
+/** Composition-root hosted payment-detail writes for the Equinox bridge smoke. */
+final class HostedPaymentDetailWritePlatformService implements PaymentDetailWritePlatformService {
+
+    static final long HOSTED_ID = 1L;
+    private static final Object HOSTED = new Object();
 
     @Override
     public Object createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
-        return null;
+        return HOSTED;
     }
 
     @Override
     public Object createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
-        return null;
+        return HOSTED;
     }
 
     @Override
     public Object persistPaymentDetail(final Object paymentDetail) {
-        return null;
+        return HOSTED;
     }
 
     @Override
     public Object createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
             final String routingCode, final String receiptNumber, final String bankNumber) {
-        return null;
+        return HOSTED;
     }
 
     @Override
     public Long id(final Object paymentDetail) {
-        return null;
+        return paymentDetail == null ? null : HOSTED_ID;
     }
 
     @Override
     public Object persistableById(final Long paymentDetailId) {
-        return null;
+        return HOSTED;
     }
 }

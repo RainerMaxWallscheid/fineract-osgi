@@ -64,6 +64,7 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
@@ -156,6 +157,7 @@ public final class CompositionRootOsgiBridge {
         register(ExternalServicesReadPlatformService.class, new HostedExternalServicesReadPlatformService());
         register(StuckJobExecutorService.class, new HostedStuckJobExecutorService());
         register(PropertyService.class, new HostedPropertyService());
+        register(PaymentDetailWritePlatformService.class, new HostedPaymentDetailWritePlatformService());
     }
 
     private <T> void register(final Class<T> type, final T service) {

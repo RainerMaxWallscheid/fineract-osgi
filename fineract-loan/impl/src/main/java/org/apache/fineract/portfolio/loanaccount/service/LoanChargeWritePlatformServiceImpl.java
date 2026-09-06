@@ -694,9 +694,9 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         loanChargeAdjustmentEntranceValidation(loanCharge, transactionAmount);
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder();
-        PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         LoanTransaction loanTransaction = applyChargeAdjustment(loan, loanCharge, transactionAmount, transactionDate, externalId,
                 paymentDetail);

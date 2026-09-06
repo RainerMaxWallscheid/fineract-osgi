@@ -63,6 +63,7 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
@@ -129,7 +130,8 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<NotificationConfigurationReadService> gcmConfig,
             final ObjectProvider<ReportWritePlatformService> reports,
             final ObjectProvider<ExternalServicesReadPlatformService> externalServices,
-            final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties) {
+            final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties,
+            final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails) {
         return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge),
                 owned(FloatingRatePort.class, rates), owned(TaxCatalogPort.class, tax),
                 owned(ContentStoreService.class, content), owned(CashierTxnValidationPort.class, cashier),
@@ -181,7 +183,8 @@ public class EquinoxOsgiConfiguration {
                 owned(ReportWritePlatformService.class, reports),
                 owned(ExternalServicesReadPlatformService.class, externalServices),
                 owned(StuckJobExecutorService.class, stuckJobs),
-                owned(PropertyService.class, batchProperties)));
+                owned(PropertyService.class, batchProperties),
+                owned(PaymentDetailWritePlatformService.class, paymentDetails)));
     }
 
     /**

@@ -79,7 +79,8 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
@@ -134,7 +135,8 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");

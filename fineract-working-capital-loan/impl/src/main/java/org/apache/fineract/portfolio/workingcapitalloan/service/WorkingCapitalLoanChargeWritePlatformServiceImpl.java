@@ -190,9 +190,9 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
         }
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonObject()) {
             final JsonCommand paymentDetailsCommand = JsonCommand.fromExistingCommand(command, paymentDetailsElement);
-            return paymentDetailService.createPaymentDetail(paymentDetailsCommand, changes);
+            return (PaymentDetail) paymentDetailService.createPaymentDetail(paymentDetailsCommand, changes);
         }
-        return paymentDetailService.createPaymentDetail(command, changes);
+        return (PaymentDetail) paymentDetailService.createPaymentDetail(command, changes);
     }
 
     private WorkingCapitalLoanCharge assemblyChargeFromCommand(WorkingCapitalLoan loan, JsonCommand command) {

@@ -77,6 +77,7 @@ import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadP
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPort;
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksWritePlatformService;
@@ -341,7 +342,9 @@ public final class EquinoxSpringBridgeSmoke {
                                 .getId()),
                 probeOf(StuckJobExecutorService.class, EquinoxSpringBridgeSmoke::stuckJobWins),
                 probeOf(PropertyService.class, s -> s instanceof PropertyService p
-                        && HostedPropertyService.HOSTED_SIZE == p.getPartitionSize("hosted")));
+                        && HostedPropertyService.HOSTED_SIZE == p.getPartitionSize("hosted")),
+                probeOf(PaymentDetailWritePlatformService.class, s -> s instanceof PaymentDetailWritePlatformService p
+                        && HostedPaymentDetailWritePlatformService.HOSTED_ID == p.id(p.createAndPersistPaymentDetail(null, null))));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {

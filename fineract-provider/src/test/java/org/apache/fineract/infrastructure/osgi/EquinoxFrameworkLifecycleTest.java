@@ -122,6 +122,7 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductLookupReadPo
 import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceDropdownReadService;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
@@ -2095,6 +2096,58 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void paymentDetailLookupFacadeDelegatesToPublishedSpringPort() {
+        final PaymentDetailWritePlatformService spring = new PaymentDetailWritePlatformService() {
+
+            private final Object hosted = new Object();
+
+            @Override
+            public Object createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+                return hosted;
+            }
+
+            @Override
+            public Object createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+                return null;
+            }
+
+            @Override
+            public Object persistPaymentDetail(final Object paymentDetail) {
+                return null;
+            }
+
+            @Override
+            public Object createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
+                    final String routingCode, final String receiptNumber, final String bankNumber) {
+                return null;
+            }
+
+            @Override
+            public Long id(final Object paymentDetail) {
+                return paymentDetail == null ? null : 7L;
+            }
+
+            @Override
+            public Object persistableById(final Long paymentDetailId) {
+                return null;
+            }
+        };
+        final SpringOsgiPortBridge bridge = paymentDetailBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final PaymentDetailWritePlatformService facade = OsgiBackedPortFactory.of(lookup, PaymentDetailWritePlatformService.class);
+
+        assertNull(facade.createAndPersistPaymentDetail(null, null));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.id(facade.createAndPersistPaymentDetail(null, null)));
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.createAndPersistPaymentDetail(null, null));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2102,6 +2155,8 @@ class EquinoxFrameworkLifecycleTest {
         final TransferWritePlatformService transfers = OsgiBackedPortFactory.empty(TransferWritePlatformService.class);
         assertEquals(CommandProcessingResult.empty().getClass(), transfers.proposeClientTransfer(1L, null).getClass());
         assertEquals(0, OsgiBackedPortFactory.empty(PropertyService.class).getPartitionSize("hosted"));
+        assertNull(OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).createAndPersistPaymentDetail(null, null));
+        assertEquals(0L, OsgiBackedPortFactory.empty(PaymentDetailWritePlatformService.class).id(null));
     }
 
     @Test
@@ -3778,6 +3833,37 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringPaymentDetailPortStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final PaymentDetailWritePlatformService paymentDetails = new StubPaymentDetailWritePlatformService();
+        final SpringOsgiPortBridge bridge = paymentDetailBridge(paymentDetails);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean paymentDetailImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.paymentdetail.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    paymentDetailImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(paymentDetailImplActive);
+            final ServiceReference<PaymentDetailWritePlatformService> selected = ctx
+                    .getServiceReference(PaymentDetailWritePlatformService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(paymentDetails, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4003,6 +4089,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge propertyBridge(final PropertyService properties) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PropertyService.class, properties)));
+    }
+
+    private static SpringOsgiPortBridge paymentDetailBridge(final PaymentDetailWritePlatformService paymentDetails) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(PaymentDetailWritePlatformService.class, paymentDetails)));
     }
 
     private static Path stagedCatalog() {
@@ -4975,6 +5065,40 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public Integer getPollInterval(final String jobName) {
+            return null;
+        }
+    }
+
+    private static final class StubPaymentDetailWritePlatformService implements PaymentDetailWritePlatformService {
+
+        @Override
+        public Object createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+            return null;
+        }
+
+        @Override
+        public Object createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+            return null;
+        }
+
+        @Override
+        public Object persistPaymentDetail(final Object paymentDetail) {
+            return null;
+        }
+
+        @Override
+        public Object createPaymentDetail(final Long paymentTypeId, final String accountNumber, final String checkNumber,
+                final String routingCode, final String receiptNumber, final String bankNumber) {
+            return null;
+        }
+
+        @Override
+        public Long id(final Object paymentDetail) {
+            return null;
+        }
+
+        @Override
+        public Object persistableById(final Long paymentDetailId) {
             return null;
         }
     }

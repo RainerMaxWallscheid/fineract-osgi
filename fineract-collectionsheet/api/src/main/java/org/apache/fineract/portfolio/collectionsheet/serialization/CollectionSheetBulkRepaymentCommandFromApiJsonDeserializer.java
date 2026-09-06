@@ -34,7 +34,6 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -63,12 +62,12 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
         }
 
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-        final PaymentDetail paymentDetail = fetchPaymentDetail(element.getAsJsonObject());
+        final Object paymentDetail = fetchPaymentDetail(element.getAsJsonObject());
 
         return commandFromApiJson(json, paymentDetail);
     }
 
-    public CollectionSheetBulkRepaymentCommand commandFromApiJson(final String json, final PaymentDetail paymentDetail) {
+    public CollectionSheetBulkRepaymentCommand commandFromApiJson(final String json, final Object paymentDetail) {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
@@ -97,7 +96,7 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
                     final ExternalId externalId = ExternalIdFactory.produce(externalIdStr);
                     final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
                             loanTransactionElement, locale);
-                    PaymentDetail detail = paymentDetail;
+                    Object detail = paymentDetail;
                     if (paymentDetail == null) {
                         detail = fetchPaymentDetail(loanTransactionElement);
                     }
@@ -111,7 +110,7 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
         return new CollectionSheetBulkRepaymentCommand(note, transactionDate, loanRepaymentTransactions);
     }
 
-    private PaymentDetail fetchPaymentDetail(final JsonObject json) {
+    private Object fetchPaymentDetail(final JsonObject json) {
         return this.paymentDetailWritePlatformService.createPaymentDetail(
                 this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName, json),
                 this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.accountNumberParamName, json),

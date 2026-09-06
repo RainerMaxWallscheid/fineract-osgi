@@ -487,7 +487,7 @@ public class DepositAccountAssembler {
                             .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
                     PaymentDetail detail = paymentDetail;
                     if (paymentDetail == null) {
-                        detail = this.paymentDetailWritePlatformService.createPaymentDetail(
+                        detail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(
                                 this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName,
                                         savingsTransactionElement),
                                 this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.accountNumberParamName,

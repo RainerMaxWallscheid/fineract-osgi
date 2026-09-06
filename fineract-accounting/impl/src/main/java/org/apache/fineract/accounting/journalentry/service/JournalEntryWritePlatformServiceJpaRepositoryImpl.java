@@ -126,7 +126,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
              * Capture payment details *
              */
             final Map<String, Object> changes = new LinkedHashMap<>();
-            final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+            final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
             /**
              * Set a transaction Id and save these Journal entries *
              */

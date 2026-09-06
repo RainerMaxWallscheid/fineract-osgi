@@ -55,7 +55,8 @@ public class LoanTransactionAssembler {
         if (!txnExternalId.isEmpty()) {
             changes.put(LoanApiConstants.externalIdParameterName, txnExternalId);
         }
-        final PaymentDetail paymentDetail = paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+        final PaymentDetail paymentDetail = (PaymentDetail) paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+                changes);
         final LoanTransactionType repaymentTransactionType = LoanTransactionType.INTEREST_PAYMENT_WAIVER;
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
