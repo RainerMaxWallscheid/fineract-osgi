@@ -99,6 +99,9 @@ public class ClientActivePortAdapter implements ClientActivePort {
 
     @Override
     public Long id(final Object client) {
+        if (client instanceof Long clientId) {
+            return clientId;
+        }
         if (client == null) {
             return null;
         }

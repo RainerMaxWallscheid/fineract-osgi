@@ -20,6 +20,7 @@
 dependencies {
     api project(path: ':fineract-spm-api')
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-clients-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

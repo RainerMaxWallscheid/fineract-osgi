@@ -25,14 +25,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 
 @Entity
 @Table(name = "m_client_attendance", uniqueConstraints = {@UniqueConstraint(columnNames = {"client_id", "meeting_id"}, name = "unique_client_meeting_attendance")})
 public class MeetingAttendance extends AbstractPersistableCustom<Long> {
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id", nullable = false)
+    private Long clientId;
     @ManyToOne
     @JoinColumn(name = "meeting_id", nullable = false)
     private Meeting meeting;
@@ -40,8 +42,8 @@ public class MeetingAttendance extends AbstractPersistableCustom<Long> {
     private Integer attendanceTypeId;
 
     @java.lang.SuppressWarnings("all")
-        public MeetingAttendance(final Client client, final Meeting meeting, final Integer attendanceTypeId) {
-        this.client = client;
+        public MeetingAttendance(final Object client, final Meeting meeting, final Integer attendanceTypeId) {
+        this.clientId = ClientAssociation.id(client);
         this.meeting = meeting;
         this.attendanceTypeId = attendanceTypeId;
     }
@@ -51,8 +53,8 @@ public class MeetingAttendance extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Client getClient() {
-        return this.client;
+        public Long getClientId() {
+        return this.clientId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -66,8 +68,8 @@ public class MeetingAttendance extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClient(final Client client) {
-        this.client = client;
+        public void setClient(final Object client) {
+        this.clientId = ClientAssociation.id(client);
     }
 
     @java.lang.SuppressWarnings("all")

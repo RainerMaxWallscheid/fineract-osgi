@@ -39,7 +39,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerator;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
@@ -49,9 +49,11 @@ import org.apache.fineract.useradministration.domain.AppUser;
 @Table(name = "m_share_account")
 public class ShareAccount extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id")
+    private Long clientId;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -151,7 +153,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
 
     }
 
-    public ShareAccount(final Client client, final ShareProduct shareProduct, final String externalId, final MonetaryCurrency currency,
+    public ShareAccount(final Object client, final ShareProduct shareProduct, final String externalId, final MonetaryCurrency currency,
             final SavingsAccount savingsAccount, final String accountNo, final Long totalSharesApproved, final Long totalSharesPending,
             final Set<ShareAccountTransaction> purchasedShares, final Boolean allowDividendCalculationForInactiveClients,
             final Integer lockinPeriodFrequency, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriodFrequency,
@@ -160,7 +162,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
             AppUser activatedBy, LocalDate activatedDate, AppUser closedBy, LocalDate closedDate, AppUser modifiedBy,
             LocalDateTime modifiedDate) {
 
-        this.client = client;
+        this.clientId = ClientAssociation.id(client);
         this.shareProduct = shareProduct;
         this.externalId = externalId;
         this.currency = currency;
@@ -332,15 +334,11 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public Long getClientId() {
-        return this.client.getId();
+        return this.clientId;
     }
 
     public String getClientName() {
-        return this.client.getDisplayName();
-    }
-
-    public Client getClient() {
-        return this.client;
+        return ClientAssociation.displayName(this.clientId);
     }
 
     public String getSavingsAccountNo() {
@@ -505,7 +503,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public Long getOfficeId() {
-        return this.client.getOffice().getId();
+        return ClientAssociation.officeId(this.clientId);
     }
 
     public void setTotalPendingShares(final Long shares) {

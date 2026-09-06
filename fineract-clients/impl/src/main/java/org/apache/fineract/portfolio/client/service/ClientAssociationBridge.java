@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.spm.domain;
+package org.apache.fineract.portfolio.client.service;
 
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
+import org.springframework.stereotype.Service;
 
-public interface ScorecardRepository extends JpaRepository<Scorecard, Long> {
+@Service
+public class ClientAssociationBridge {
 
-    List<Scorecard> findBySurvey(Survey survey);
-
-    List<Scorecard> findBySurveyAndClientId(Survey survey, Long clientId);
+    public ClientAssociationBridge(final ClientActivePort port) {
+        ClientAssociation.setActivePort(port);
+    }
 }

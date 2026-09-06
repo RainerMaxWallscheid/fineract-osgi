@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.client.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.math.BigDecimal;
@@ -33,14 +31,17 @@ import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 
 @Entity
 @Table(name = "m_client_charge")
 public class ClientCharge extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id", nullable = false)
+    private Long clientId;
 
     /** Catalog charge definition id (no JPA association to charge-impl). */
     @Column(name = "charge_id", nullable = false)
@@ -101,16 +102,16 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
         //
     }
 
-    public static ClientCharge createNew(final Client client, final ChargeDefinitionData charge, final BigDecimal amount,
+    public static ClientCharge createNew(final Object client, final ChargeDefinitionData charge, final BigDecimal amount,
             final LocalDate dueDate) {
         final boolean status = true;
         return new ClientCharge(client, charge, amount, dueDate, status);
     }
 
-    private ClientCharge(final Client client, final ChargeDefinitionData charge, final BigDecimal amount, final LocalDate dueDate,
+    private ClientCharge(final Object client, final ChargeDefinitionData charge, final BigDecimal amount, final LocalDate dueDate,
             final boolean status) {
 
-        this.client = client;
+        this.clientId = ClientAssociation.id(client);
         this.chargeId = charge.getId();
         this.chargeName = charge.getName();
         this.currencyCode = charge.getCurrencyCode();
@@ -224,10 +225,6 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
         return this.dueDate;
     }
 
-    public Client getClient() {
-        return this.client;
-    }
-
     public Long getChargeId() {
         return this.chargeId;
     }
@@ -281,11 +278,11 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
     }
 
     public Long getClientId() {
-        return client.getId();
+        return this.clientId;
     }
 
     public Long getOfficeId() {
-        return this.client.getOffice().getId();
+        return ClientAssociation.officeId(this.clientId);
     }
 
     public void setCurrency(OrganisationCurrency currency) {

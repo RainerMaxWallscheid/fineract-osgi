@@ -36,7 +36,7 @@ public class ShareAccountNoteSupportImpl implements ShareAccountNoteSupport {
     @Override
     public ShareAccountNoteRef require(final Long shareAccountId) {
         final ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(shareAccountId);
-        final Long clientId = account.getClient() == null ? null : account.getClient().getId();
+        final Long clientId = account.getClientId();
         return new ShareAccountNoteRef(account.getId(), clientId, account.getOfficeId());
     }
 }

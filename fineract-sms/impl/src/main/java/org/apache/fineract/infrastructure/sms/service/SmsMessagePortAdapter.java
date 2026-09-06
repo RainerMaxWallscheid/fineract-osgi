@@ -107,7 +107,7 @@ public class SmsMessagePortAdapter implements SmsMessagePort {
     }
 
     private OutboundView toView(final SmsMessage message) {
-        final Long clientId = message.getClient() == null ? null : message.getClient().getId();
+        final Long clientId = message.getClientId();
         return new OutboundView(message.getId(), clientId, message.getCampaignId(), message.getMobileNo(), message.getMessage(),
                 message.isNotification(), message.getStatusType());
     }

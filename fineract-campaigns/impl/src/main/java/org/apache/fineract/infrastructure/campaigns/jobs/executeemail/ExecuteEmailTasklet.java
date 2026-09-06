@@ -45,6 +45,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.reportmailingjob.helper.IPv4Helper;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.batch.core.StepContribution;
@@ -83,9 +84,10 @@ public class ExecuteEmailTasklet implements Tasklet {
                         final String reportName = reportLookupPort.findReportName(stretchyReportId);
                         final HashMap<String, String> reportStretchyParams = reportMailingJobValidator.validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
                         if (reportStretchyParams.containsKey("selectLoan") || reportStretchyParams.containsKey("loanId")) {
-                            if (emailMessage.getClient() != null) {
-                                final List<Long> loanIds = loanExistencePort.openIdsByClientId(emailMessage.getClient().getId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
+                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
+                            if (persistable instanceof Client client) {
+                                final List<Long> loanIds = loanExistencePort.openIdsByClientId(emailMessage.getClientId());
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
                                 for (final Long loanId : loanIds) {
                                     if (reportStretchyParams.containsKey("selectLoan")) {
                                         reportParams.put("SelectLoan", loanId.toString());
@@ -101,9 +103,10 @@ public class ExecuteEmailTasklet implements Tasklet {
                                 }
                             }
                         } else if (reportStretchyParams.containsKey("savingId")) {
-                            if (emailMessage.getClient() != null) {
-                                final List<Long> savingsIds = savingsAccountExistencePort.activeIdsByClientId(emailMessage.getClient().getId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
+                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
+                            if (persistable instanceof Client client) {
+                                final List<Long> savingsIds = savingsAccountExistencePort.activeIdsByClientId(emailMessage.getClientId());
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
                                 for (final Long savingsId : savingsIds) {
                                     reportParams.put("savingId", savingsId.toString());
                                     File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
@@ -115,8 +118,9 @@ public class ExecuteEmailTasklet implements Tasklet {
                                 }
                             }
                         } else {
-                            if (emailMessage.getClient() != null) {
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
+                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
+                            if (persistable instanceof Client client) {
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
                                 File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
                                 if (file != null) {
                                     attachmentList.add(file);

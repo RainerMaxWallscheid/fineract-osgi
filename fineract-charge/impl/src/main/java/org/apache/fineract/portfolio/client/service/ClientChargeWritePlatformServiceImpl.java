@@ -114,7 +114,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             //
             //
             //
-            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
+            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getOfficeId()).withClientId(clientCharge.getClientId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, null, throwable, dve);
@@ -155,7 +155,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             //
             //
             //
-            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withSubEntityId(clientTransaction.getId()).withSubEntityExternalId(clientTransaction.getExternalId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
+            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withSubEntityId(clientTransaction.getId()).withSubEntityExternalId(clientTransaction.getExternalId()).withOfficeId(clientCharge.getOfficeId()).withClientId(clientCharge.getClientId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);
@@ -189,7 +189,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             //
             //
             //
-            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
+            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getOfficeId()).withClientId(clientCharge.getClientId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);
@@ -210,7 +210,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             //
             //
             //
-            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
+            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getOfficeId()).withClientId(clientCharge.getClientId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);

@@ -66,21 +66,21 @@ public class MeetingAttendanceWriteServiceImpl implements MeetingAttendanceWrite
                 meeting.setClientsAttendance(new HashSet<>());
             }
             for (var clientAttendanceOriginal : meeting.getClientsAttendance()) {
-                if (requireNonNull(clientAttendanceOriginal.getClient().getId()).equals(clientAttendance.getClient().getId())) {
+                if (requireNonNull(clientAttendanceOriginal.getClientId()).equals(clientAttendance.getClientId())) {
                     if (!clientAttendance.getAttendanceTypeId().equals(clientAttendanceOriginal.getAttendanceTypeId())) {
                         clientAttendanceOriginal.setAttendanceTypeId(clientAttendance.getAttendanceTypeId());
                         var clientAttendanceChange = new HashMap<String, Object>();
-                        clientAttendanceChange.put(clientIdParamName, clientAttendanceOriginal.getClient().getId());
+                        clientAttendanceChange.put(clientIdParamName, clientAttendanceOriginal.getClientId());
                         clientAttendanceChange.put(attendanceTypeParamName, clientAttendance.getAttendanceTypeId());
-                        clientAttendanceChanges.put(clientAttendanceOriginal.getClient().getId().toString(), clientAttendanceChange);
+                        clientAttendanceChanges.put(clientAttendanceOriginal.getClientId().toString(), clientAttendanceChange);
                     }
                     continue updateAttendanceLoop;
                 }
             }
             var clientAttendanceChange = new HashMap<String, Object>();
-            clientAttendanceChange.put(clientIdParamName, clientAttendance.getClient().getId());
+            clientAttendanceChange.put(clientIdParamName, clientAttendance.getClientId());
             clientAttendanceChange.put(attendanceTypeParamName, clientAttendance.getAttendanceTypeId());
-            clientAttendanceChanges.put(clientAttendance.getClient().getId().toString(), clientAttendanceChange);
+            clientAttendanceChanges.put(clientAttendance.getClientId().toString(), clientAttendanceChange);
             result.add(clientAttendance);
         }
         actualChanges.put(clientsAttendanceParamName, clientAttendanceChanges);

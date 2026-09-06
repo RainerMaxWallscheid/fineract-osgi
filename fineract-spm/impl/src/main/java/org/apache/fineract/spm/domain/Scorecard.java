@@ -27,7 +27,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.useradministration.domain.AppUser;
 
 @Entity
@@ -50,9 +50,11 @@ public class Scorecard extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "user_id")
     private AppUser appUser;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id")
+    private Long clientId;
 
     @Column(name = "created_on")
     @OrderBy("createdOn DESC")
@@ -97,12 +99,12 @@ public class Scorecard extends AbstractPersistableCustom<Long> {
         this.appUser = appUser;
     }
 
-    public Client getClient() {
-        return client;
+    public Long getClientId() {
+        return clientId;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setClient(final Object client) {
+        this.clientId = ClientAssociation.id(client);
     }
 
     public LocalDateTime getCreatedOn() {

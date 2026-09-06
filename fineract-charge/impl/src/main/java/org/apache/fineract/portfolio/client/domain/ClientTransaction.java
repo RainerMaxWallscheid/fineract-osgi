@@ -44,6 +44,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 
@@ -51,9 +52,11 @@ import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociat
 @Table(name = "m_client_transaction", uniqueConstraints = { @UniqueConstraint(columnNames = { "external_id" }, name = "external_id") })
 public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long> {
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id", nullable = false)
+    private Long clientId;
 
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
@@ -100,14 +103,14 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
 
     protected ClientTransaction() {}
 
-    public static ClientTransaction payCharge(final Client client, final Office office, Object paymentDetail,
+    public static ClientTransaction payCharge(final Object client, final Office office, Object paymentDetail,
             final LocalDate transactionDate, final Money amount, final String currencyCode, final ExternalId externalId) {
         final boolean isReversed = false;
         return new ClientTransaction(client, office, paymentDetail, ClientTransactionType.PAY_CHARGE.getValue(), transactionDate, amount,
                 isReversed, externalId, currencyCode);
     }
 
-    public static ClientTransaction waiver(final Client client, final Office office, final LocalDate transactionDate, final Money amount,
+    public static ClientTransaction waiver(final Object client, final Office office, final LocalDate transactionDate, final Money amount,
             final String currencyCode) {
         final boolean isReversed = false;
         final ExternalId externalId = ExternalId.empty();
@@ -116,10 +119,10 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
                 isReversed, externalId, currencyCode);
     }
 
-    public ClientTransaction(Client client, Office office, Object paymentDetail, Integer typeOf, LocalDate transactionDate,
+    public ClientTransaction(Object client, Office office, Object paymentDetail, Integer typeOf, LocalDate transactionDate,
             Money amount, boolean reversed, ExternalId externalId, String currencyCode) {
 
-        this.client = client;
+        this.clientId = ClientAssociation.id(client);
         this.office = office;
         this.paymentDetailId = PaymentDetailAssociation.id(paymentDetail);
         this.typeOf = typeOf;
@@ -197,11 +200,7 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
     }
 
     public Long getClientId() {
-        return client.getId();
-    }
-
-    public Client getClient() {
-        return this.client;
+        return this.clientId;
     }
 
     public Money getAmount() {

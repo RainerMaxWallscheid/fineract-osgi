@@ -21,6 +21,7 @@ dependencies {
     api project(path: ':fineract-branch-api')
 
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-clients-api'))
     implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-organisation-api'))
     // Cashier allocate/settle journals via CashierJournalPort

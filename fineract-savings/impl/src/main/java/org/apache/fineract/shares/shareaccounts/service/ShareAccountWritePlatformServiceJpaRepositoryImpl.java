@@ -219,7 +219,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClientId(), noteText);
                     changes.put("note", noteText);
                 }
             }
@@ -257,7 +257,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClientId(), noteText);
                     changes.put("note", noteText);
                 }
             }
@@ -289,7 +289,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClientId(), noteText);
                     changes.put("note", noteText);
                 }
             }
@@ -441,7 +441,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 this.shareAccountRepository.saveAndFlush(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
-                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClient().getId(), noteText);
+                    this.noteWritePlatformService.saveShareNote(account.getId(), account.getClientId(), noteText);
                     changes.put("note", noteText);
                 }
                 ShareAccountTransaction transaction = (ShareAccountTransaction) changes.get(ShareAccountApiConstants.requestedshares_paramname);

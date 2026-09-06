@@ -11,7 +11,7 @@ Core residual peel — client pure REST/handlers/services (ADR-022).
 ### Residual
 
 **Kernel residual in `fineract-core`:** `Client` entity hub + related domain, `ClientData` and nested DTOs,
-`ClientApiConstants`, exceptions.
+`ClientApiConstants`, exceptions. Domain entities store client id (not leftover `Client`).
 
 **Composition-root residual:** main Clients REST + main client write/read/template in progressive-loan;
 charges REST/entities in charge-impl; address REST/entities in address-impl.

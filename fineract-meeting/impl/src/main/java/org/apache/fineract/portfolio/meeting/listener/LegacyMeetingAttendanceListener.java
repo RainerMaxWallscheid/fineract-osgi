@@ -119,7 +119,7 @@ final class LegacyMeetingAttendanceListener {
                 meeting.setClientsAttendance(new HashSet<>());
             }
             for (final MeetingAttendance clientAttendanceOriginal : meeting.getClientsAttendance()) {
-                if (requireNonNull(clientAttendanceOriginal.getClient().getId()).equals(clientAttendance.getClient().getId())) {
+                if (requireNonNull(clientAttendanceOriginal.getClientId()).equals(clientAttendance.getClientId())) {
                     if (!clientAttendance.getAttendanceTypeId().equals(clientAttendanceOriginal.getAttendanceTypeId())) {
                         clientAttendanceOriginal.setAttendanceTypeId(clientAttendance.getAttendanceTypeId());
                     }

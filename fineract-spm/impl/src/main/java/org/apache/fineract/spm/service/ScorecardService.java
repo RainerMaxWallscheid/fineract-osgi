@@ -20,7 +20,6 @@ package org.apache.fineract.spm.service;
 
 import java.util.List;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.spm.domain.Scorecard;
 import org.apache.fineract.spm.domain.ScorecardRepository;
 import org.apache.fineract.spm.domain.Survey;
@@ -39,9 +38,9 @@ public class ScorecardService {
         return this.scorecardRepository.findBySurvey(survey);
     }
 
-    public List<Scorecard> findBySurveyAndClient(final Survey survey, final Client client) {
+    public List<Scorecard> findBySurveyAndClientId(final Survey survey, final Long clientId) {
         this.securityContext.authenticatedUser();
-        return this.scorecardRepository.findBySurveyAndClient(survey, client);
+        return this.scorecardRepository.findBySurveyAndClientId(survey, clientId);
     }
 
     @java.lang.SuppressWarnings("all")

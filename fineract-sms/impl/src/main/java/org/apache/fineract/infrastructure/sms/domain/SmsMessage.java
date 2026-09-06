@@ -33,7 +33,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.sms.SmsApiConstants;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.group.domain.Group;
 
 @Entity
@@ -44,9 +44,11 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
+    /**
+     * Client id (no JPA association to leftover Client — ADR-021).
+     */
+    @Column(name = "client_id")
+    private Long clientId;
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private Staff staff;
@@ -66,21 +68,21 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     @Column(name = "is_notification")
     private boolean isNotification;
 
-    public static SmsMessage pendingSms(final String externalId, final Group group, final Client client, final Staff staff,
+    public static SmsMessage pendingSms(final String externalId, final Group group, final Object client, final Staff staff,
             final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
                 .setStatusType(SmsMessageStatusType.PENDING.getValue()).setMessage(message).setMobileNo(mobileNo)
                 .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage sentSms(final String externalId, final Group group, final Client client, final Staff staff,
+    public static SmsMessage sentSms(final String externalId, final Group group, final Object client, final Staff staff,
             final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
                 .setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue()).setMessage(message).setMobileNo(mobileNo)
                 .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage instance(String externalId, final Group group, final Client client, final Staff staff,
+    public static SmsMessage instance(String externalId, final Group group, final Object client, final Staff staff,
             final SmsMessageStatusType statusType, final String message, final String mobileNo, final Long campaignId,
             final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
@@ -109,8 +111,8 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public Client getClient() {
-        return this.client;
+    public Long getClientId() {
+        return this.clientId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -166,8 +168,8 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public SmsMessage setClient(final Client client) {
-        this.client = client;
+    public SmsMessage setClient(final Object client) {
+        this.clientId = ClientAssociation.id(client);
         return this;
     }
 
