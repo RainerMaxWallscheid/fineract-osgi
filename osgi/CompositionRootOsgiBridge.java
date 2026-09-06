@@ -37,6 +37,8 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatfor
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -166,6 +168,8 @@ public final class CompositionRootOsgiBridge {
         register(PortfolioNotificationEventPort.class, new HostedPortfolioNotificationEventPort());
         register(SmsCampaignTriggerEventPort.class, new HostedSmsCampaignTriggerEventPort());
         register(InteropService.class, new HostedInteropService());
+        register(BulkImportWorkbookService.class, new HostedBulkImportWorkbookService());
+        register(BulkImportWorkbookPopulatorService.class, new HostedBulkImportWorkbookPopulatorService());
     }
 
     private <T> void register(final Class<T> type, final T service) {

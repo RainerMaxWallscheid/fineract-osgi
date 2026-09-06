@@ -272,7 +272,7 @@ public class ClientsApiResource {
     @Operation(summary = "Download client template for bulk import", operationId = "getClientTemplate")
     public Response getClientTemplate(@QueryParam("legalFormType") final String legalFormType, @QueryParam("officeId") final Long officeId,
             @QueryParam("staffId") final Long staffId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(legalFormType, officeId, staffId, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(legalFormType, officeId, staffId, dateFormat);
     }
 
     @POST

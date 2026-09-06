@@ -17,8 +17,17 @@
  * under the License.
  */
 
-dependencies {
-    api project(path: ':fineract-core')
-    implementation 'org.apache.poi:poi'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+import org.apache.fineract.infrastructure.bulkimport.data.LookupMode;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+
+/** Composition-root hosted workbook templates for the Equinox bridge smoke. */
+final class HostedBulkImportWorkbookPopulatorService implements BulkImportWorkbookPopulatorService {
+
+    static final String HOSTED = "hosted";
+
+    @Override
+    public Object getTemplate(final String entityType, final Long officeId, final Long staffId, final String dateFormat,
+            final LookupMode lookupMode) {
+        return HOSTED;
+    }
 }

@@ -196,7 +196,7 @@ public class UsersApiResource {
     @Operation(summary = "Download users template", operationId = "getBulkTemplateUser", description = "Returns an Excel template for bulk importing users.", tags = {"Users"})
     @AlternativeOperationId("getUserTemplate")
     public Response getUserTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.USERS.toString(), officeId, staffId, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.USERS.toString(), officeId, staffId, dateFormat);
     }
 
     @POST

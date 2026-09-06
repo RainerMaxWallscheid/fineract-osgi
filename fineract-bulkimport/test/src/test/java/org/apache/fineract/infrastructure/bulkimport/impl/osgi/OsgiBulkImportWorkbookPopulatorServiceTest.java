@@ -16,9 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.infrastructure.bulkimport.impl.osgi;
 
-dependencies {
-    api project(path: ':fineract-core')
-    implementation 'org.apache.poi:poi'
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
+
+class OsgiBulkImportWorkbookPopulatorServiceTest {
+
+    private final OsgiBulkImportWorkbookPopulatorService port = new OsgiBulkImportWorkbookPopulatorService();
+
+    @Test
+    void emptyCatalogReturnsNullTemplate() {
+        assertNull(port.getTemplate(null, null, null, null, null));
+    }
 }

@@ -104,6 +104,11 @@ import org.apache.fineract.interoperation.data.InteropTransactionRequestResponse
 import org.apache.fineract.interoperation.data.InteropTransactionsData;
 import org.apache.fineract.interoperation.data.InteropTransferResponseData;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
+import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
+import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
+import org.apache.fineract.infrastructure.bulkimport.data.LookupMode;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -2411,6 +2416,59 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void bulkImportWorkbookLookupFacadeDelegatesToPublishedSpringPort() {
+        final BulkImportWorkbookService spring = new BulkImportWorkbookService() {
+
+            @Override
+            public Long importWorkbook(final String entityType, final java.io.InputStream inputStream, final Object fileDetail,
+                    final String locale, final String dateFormat) {
+                return null;
+            }
+
+            @Override
+            public java.util.Collection<ImportData> getImports(final GlobalEntityType type) {
+                return null;
+            }
+
+            @Override
+            public ImportData getImport(final Long id) {
+                return ImportData.instance(7L);
+            }
+        };
+        final SpringOsgiPortBridge bridge = bulkImportWorkbookBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final BulkImportWorkbookService facade = OsgiBackedPortFactory.of(lookup, BulkImportWorkbookService.class);
+
+        assertNull(facade.getImport(7L));
+        lifecycle.start();
+        try {
+            assertEquals(7L, facade.getImport(7L).getImportId());
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.getImport(7L));
+    }
+
+    @Test
+    void bulkImportPopulatorLookupFacadeDelegatesToPublishedSpringPort() {
+        final BulkImportWorkbookPopulatorService spring = (entityType, officeId, staffId, dateFormat, lookupMode) -> "hosted";
+        final SpringOsgiPortBridge bridge = bulkImportPopulatorBridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final BulkImportWorkbookPopulatorService facade = OsgiBackedPortFactory.of(lookup, BulkImportWorkbookPopulatorService.class);
+
+        assertNull(facade.getTemplate("hosted", null, null, null));
+        lifecycle.start();
+        try {
+            assertEquals("hosted", facade.getTemplate("hosted", null, null, null));
+        } finally {
+            lifecycle.stop();
+        }
+        assertNull(facade.getTemplate("hosted", null, null, null));
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2429,6 +2487,8 @@ class EquinoxFrameworkLifecycleTest {
         OsgiBackedPortFactory.empty(SmsCampaignTriggerEventPort.class).onClientActivated(smsCampaigns::add);
         assertTrue(smsCampaigns.isEmpty());
         assertNull(OsgiBackedPortFactory.empty(InteropService.class).getAccountDetails("hosted"));
+        assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookService.class).getImport(1L));
+        assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookPopulatorService.class).getTemplate("hosted", null, null, null));
     }
 
     @Test
@@ -4286,6 +4346,67 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringBulkImportWorkbookServiceStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final BulkImportWorkbookService bulkImport = new StubBulkImportWorkbookService();
+        final SpringOsgiPortBridge bridge = bulkImportWorkbookBridge(bulkImport);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean bulkimportImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.bulkimport.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    bulkimportImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(bulkimportImplActive);
+            final ServiceReference<BulkImportWorkbookService> selected = ctx.getServiceReference(BulkImportWorkbookService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(bulkImport, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
+    @Test
+    void stagedCatalogStartsAndSpringBulkImportWorkbookPopulatorServiceStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final BulkImportWorkbookPopulatorService populator = new StubBulkImportWorkbookPopulatorService();
+        final SpringOsgiPortBridge bridge = bulkImportPopulatorBridge(populator);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean bulkimportImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.bulkimport.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    bulkimportImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(bulkimportImplActive);
+            final ServiceReference<BulkImportWorkbookPopulatorService> selected = ctx
+                    .getServiceReference(BulkImportWorkbookPopulatorService.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(populator, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4535,6 +4656,14 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge interopBridge(final InteropService interop) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(InteropService.class, interop)));
+    }
+
+    private static SpringOsgiPortBridge bulkImportWorkbookBridge(final BulkImportWorkbookService bulkImport) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BulkImportWorkbookService.class, bulkImport)));
+    }
+
+    private static SpringOsgiPortBridge bulkImportPopulatorBridge(final BulkImportWorkbookPopulatorService populator) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(BulkImportWorkbookPopulatorService.class, populator)));
     }
 
     private static Path stagedCatalog() {
@@ -5684,6 +5813,34 @@ class EquinoxFrameworkLifecycleTest {
 
         @Override
         public String loanRepayment(final String accountId, final String apiRequestBodyAsJson) {
+            return null;
+        }
+    }
+
+    private static final class StubBulkImportWorkbookService implements BulkImportWorkbookService {
+
+        @Override
+        public Long importWorkbook(final String entityType, final java.io.InputStream inputStream, final Object fileDetail,
+                final String locale, final String dateFormat) {
+            return null;
+        }
+
+        @Override
+        public java.util.Collection<ImportData> getImports(final GlobalEntityType type) {
+            return null;
+        }
+
+        @Override
+        public ImportData getImport(final Long id) {
+            return null;
+        }
+    }
+
+    private static final class StubBulkImportWorkbookPopulatorService implements BulkImportWorkbookPopulatorService {
+
+        @Override
+        public Object getTemplate(final String entityType, final Long officeId, final Long staffId, final String dateFormat,
+                final LookupMode lookupMode) {
             return null;
         }
     }

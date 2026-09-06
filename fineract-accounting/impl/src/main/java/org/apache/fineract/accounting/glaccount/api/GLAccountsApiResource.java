@@ -201,7 +201,7 @@ public class GLAccountsApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getGlAccountsTemplate(@QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.CHART_OF_ACCOUNTS.toString(), null, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.CHART_OF_ACCOUNTS.toString(), null, null, dateFormat);
     }
 
     @POST

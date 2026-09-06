@@ -616,7 +616,7 @@ public class LoansApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getLoansTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId,
             @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOANS.toString(), officeId, staffId, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOANS.toString(), officeId, staffId, dateFormat);
     }
 
     @GET
@@ -674,7 +674,7 @@ public class LoansApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getLoanRepaymentTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat,
             @QueryParam("includeLookups") final Boolean includeLookups) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOAN_TRANSACTIONS.toString(), officeId, null, dateFormat,
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOAN_TRANSACTIONS.toString(), officeId, null, dateFormat,
                 LookupMode.fromIncludeLookups(includeLookups));
     }
 

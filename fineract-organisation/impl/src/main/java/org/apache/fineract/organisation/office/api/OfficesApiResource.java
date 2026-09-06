@@ -203,7 +203,7 @@ public class OfficesApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getOfficeTemplate(@QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.OFFICES.toString(), null, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.OFFICES.toString(), null, null, dateFormat);
     }
 
     @POST

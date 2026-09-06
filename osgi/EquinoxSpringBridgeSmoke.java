@@ -49,6 +49,8 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatfor
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -352,7 +354,11 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(PortfolioNotificationEventPort.class, EquinoxSpringBridgeSmoke::notificationWins),
                 probeOf(SmsCampaignTriggerEventPort.class, EquinoxSpringBridgeSmoke::smsCampaignTriggerWins),
                 probeOf(InteropService.class, s -> s instanceof InteropService p
-                        && HostedInteropService.HOSTED.equals(p.getAccountDetails("hosted").getAccountId())));
+                        && HostedInteropService.HOSTED.equals(p.getAccountDetails("hosted").getAccountId())),
+                probeOf(BulkImportWorkbookService.class, s -> s instanceof BulkImportWorkbookService p
+                        && HostedBulkImportWorkbookService.HOSTED_ID == p.getImport(1L).getImportId()),
+                probeOf(BulkImportWorkbookPopulatorService.class, s -> s instanceof BulkImportWorkbookPopulatorService p
+                        && HostedBulkImportWorkbookPopulatorService.HOSTED.equals(p.getTemplate("hosted", null, null, null))));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {

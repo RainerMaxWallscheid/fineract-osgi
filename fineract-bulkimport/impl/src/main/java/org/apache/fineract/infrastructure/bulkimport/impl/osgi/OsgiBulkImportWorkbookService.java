@@ -16,22 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.bulkimport.service;
+package org.apache.fineract.infrastructure.bulkimport.impl.osgi;
 
 import java.io.InputStream;
 import java.util.Collection;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 
 /**
- * Workbook import (ADR-021). {@code fileDetail} is Object-typed leftover Jersey
- * {@code FormDataContentDisposition} — unpublished in Equinox.
+ * Empty workbook-import port for Equinox without Spring/JPA. Published by {@code OSGI-INF/bulkimport-workbook.xml}
+ * (ADR-022 B6).
  */
-public interface BulkImportWorkbookService {
+public final class OsgiBulkImportWorkbookService implements BulkImportWorkbookService {
 
-    Long importWorkbook(String entityType, InputStream inputStream, Object fileDetail, String locale, String dateFormat);
+    @Override
+    public Long importWorkbook(final String entityType, final InputStream inputStream, final Object fileDetail, final String locale,
+            final String dateFormat) {
+        return null;
+    }
 
-    Collection<ImportData> getImports(GlobalEntityType type);
+    @Override
+    public Collection<ImportData> getImports(final GlobalEntityType type) {
+        return null;
+    }
 
-    ImportData getImport(Long id);
+    @Override
+    public ImportData getImport(final Long id) {
+        return null;
+    }
 }

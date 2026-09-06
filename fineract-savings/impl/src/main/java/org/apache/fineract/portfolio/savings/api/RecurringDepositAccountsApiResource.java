@@ -302,7 +302,7 @@ public class RecurringDepositAccountsApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getRecurringDepositTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS.toString(), officeId, staffId, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS.toString(), officeId, staffId, dateFormat);
     }
 
     @POST
@@ -318,7 +318,7 @@ public class RecurringDepositAccountsApiResource {
     @Path("transactions/downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getRecurringDepositTransactionTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS_TRANSACTIONS.toString(), officeId, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS_TRANSACTIONS.toString(), officeId, null, dateFormat);
     }
 
     @POST

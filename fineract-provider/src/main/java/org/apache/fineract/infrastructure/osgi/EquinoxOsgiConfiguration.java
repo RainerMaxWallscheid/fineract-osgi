@@ -36,6 +36,8 @@ import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadP
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -136,7 +138,8 @@ public class EquinoxOsgiConfiguration {
             final ObjectProvider<StuckJobExecutorService> stuckJobs, final ObjectProvider<PropertyService> batchProperties,
             final ObjectProvider<PaymentDetailWritePlatformService> paymentDetails, final ObjectProvider<CommandDispatcher> commands,
             final ObjectProvider<PortfolioNotificationEventPort> portfolioNotifications,
-            final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaignTriggers, final ObjectProvider<InteropService> interop) {
+            final ObjectProvider<SmsCampaignTriggerEventPort> smsCampaignTriggers, final ObjectProvider<InteropService> interop,
+            final ObjectProvider<BulkImportWorkbookService> bulkImport, final ObjectProvider<BulkImportWorkbookPopulatorService> bulkImportPopulator) {
         return new SpringOsgiPortBridge(List.of(owned(ChargeDefinitionPort.class, charge), owned(FloatingRatePort.class, rates),
                 owned(TaxCatalogPort.class, tax), owned(ContentStoreService.class, content), owned(ContentStreamPort.class, contentStreams),
                 owned(CashierTxnValidationPort.class, cashier), owned(LoanOriginatorReadPlatformService.class, originator),
@@ -171,7 +174,9 @@ public class EquinoxOsgiConfiguration {
                 owned(ExternalServicesReadPlatformService.class, externalServices), owned(StuckJobExecutorService.class, stuckJobs),
                 owned(PropertyService.class, batchProperties), owned(PaymentDetailWritePlatformService.class, paymentDetails),
                 owned(CommandDispatcher.class, commands), owned(PortfolioNotificationEventPort.class, portfolioNotifications),
-                owned(SmsCampaignTriggerEventPort.class, smsCampaignTriggers), owned(InteropService.class, interop)));
+                owned(SmsCampaignTriggerEventPort.class, smsCampaignTriggers), owned(InteropService.class, interop),
+                owned(BulkImportWorkbookService.class, bulkImport),
+                owned(BulkImportWorkbookPopulatorService.class, bulkImportPopulator)));
     }
 
     /**

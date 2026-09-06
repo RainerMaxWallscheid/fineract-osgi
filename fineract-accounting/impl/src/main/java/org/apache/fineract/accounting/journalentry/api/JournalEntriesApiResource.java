@@ -207,7 +207,7 @@ public class JournalEntriesApiResource {
     @Produces("application/vnd.ms-excel")
     @Operation(summary = "Download journal entries template", description = "Returns an Excel template for bulk importing journal entries.", tags = {"Journal Entries"})
     public Response getJournalEntriesTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GL_JOURNAL_ENTRIES.toString(), officeId, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GL_JOURNAL_ENTRIES.toString(), officeId, null, dateFormat);
     }
 
     @POST

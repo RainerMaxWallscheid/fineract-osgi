@@ -150,7 +150,7 @@ public class AccountsApiResource {
     @Operation(summary = "Download share accounts bulk imports template", operationId = "getShareAccountTemplate")
     @AlternativeOperationId("getSharedAccountsTemplate")
     public Response getSharedAccountsTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat, @PathParam("type") @Parameter(description = "type") final String accountType) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.SHARE_ACCOUNTS.toString(), officeId, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.SHARE_ACCOUNTS.toString(), officeId, null, dateFormat);
     }
 
     @POST

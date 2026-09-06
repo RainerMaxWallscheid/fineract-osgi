@@ -117,7 +117,7 @@ public class StaffApiResource {
     @Operation(summary = "Download bulk import template", operationId = "getBulkTemplateStaff")
     @AlternativeOperationId("getTemplate_1")
     public Response getTemplate(@QueryParam("officeId") @Parameter(description = "officeId") final Long officeId, @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.STAFF.toString(), officeId, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.STAFF.toString(), officeId, null, dateFormat);
     }
 
     @POST

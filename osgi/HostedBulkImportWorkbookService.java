@@ -16,22 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.bulkimport.service;
 
 import java.io.InputStream;
 import java.util.Collection;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 
-/**
- * Workbook import (ADR-021). {@code fileDetail} is Object-typed leftover Jersey
- * {@code FormDataContentDisposition} — unpublished in Equinox.
- */
-public interface BulkImportWorkbookService {
+/** Composition-root hosted workbook import for the Equinox bridge smoke. */
+final class HostedBulkImportWorkbookService implements BulkImportWorkbookService {
 
-    Long importWorkbook(String entityType, InputStream inputStream, Object fileDetail, String locale, String dateFormat);
+    static final long HOSTED_ID = 1L;
 
-    Collection<ImportData> getImports(GlobalEntityType type);
+    @Override
+    public Long importWorkbook(final String entityType, final InputStream inputStream, final Object fileDetail, final String locale,
+            final String dateFormat) {
+        return HOSTED_ID;
+    }
 
-    ImportData getImport(Long id);
+    @Override
+    public Collection<ImportData> getImports(final GlobalEntityType type) {
+        return null;
+    }
+
+    @Override
+    public ImportData getImport(final Long id) {
+        return ImportData.instance(HOSTED_ID);
+    }
 }

@@ -68,7 +68,6 @@ ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset()
 # No Equinox-safe catalog port (jersey / AWS / swagger).
 NO_PORT_STEMS: frozenset[str] = frozenset(
     {
-        "bulkimport",
         "instancemode",
         "openapi",
         "s3",

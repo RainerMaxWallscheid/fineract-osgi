@@ -66,9 +66,10 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentMapper mapper;
 
     @Override
-    public Long importWorkbook(String entity, InputStream inputStream, FormDataContentDisposition fileDetail, final String locale, final String dateFormat) {
+    public Long importWorkbook(String entity, InputStream inputStream, Object fileDetail, final String locale, final String dateFormat) {
+        final FormDataContentDisposition disposition = (FormDataContentDisposition) fileDetail;
         try {
-            if (entity != null && inputStream != null && fileDetail != null && locale != null && dateFormat != null) {
+            if (entity != null && inputStream != null && disposition != null && locale != null && dateFormat != null) {
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 inputStream.transferTo(baos);
                 final byte[] bytes = baos.toByteArray();
@@ -147,12 +148,12 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     workbook.close();
                     throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource", "Unable to find requested resource");
                 }
-                return publishEvent(primaryColumn, fileDetail, fileType, entityType, workbook, locale, dateFormat);
+                return publishEvent(primaryColumn, disposition, fileType, entityType, workbook, locale, dateFormat);
             }
             throw new GeneralPlatformDomainRuleException("error.msg.null", "One or more of the given parameters not found");
         } catch (IOException e) {
             log.error("Problem occurred in importWorkbook function", e);
-            throw new GeneralPlatformDomainRuleException("error.msg.io.exception", "IO exception occured with " + fileDetail.getFileName() + " " + e.getMessage(), e);
+            throw new GeneralPlatformDomainRuleException("error.msg.io.exception", "IO exception occured with " + disposition.getFileName() + " " + e.getMessage(), e);
         }
     }
 

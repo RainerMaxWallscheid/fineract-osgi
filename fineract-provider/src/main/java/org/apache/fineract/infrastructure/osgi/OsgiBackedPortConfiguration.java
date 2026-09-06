@@ -34,6 +34,8 @@ import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadP
 import org.apache.fineract.infrastructure.dataqueries.service.ReportWritePlatformService;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNotificationEventPort;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -109,7 +111,8 @@ import org.springframework.context.annotation.Primary;
  * {@code NotificationConfigurationReadService}, {@code ReportWritePlatformService},
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
  * {@code PaymentDetailWritePlatformService}, {@code CommandDispatcher}, {@code PortfolioNotificationEventPort},
- * {@code SmsCampaignTriggerEventPort}, and {@code InteropService} are {@code @Primary} lookup façades when Equinox is
+ * {@code SmsCampaignTriggerEventPort}, {@code InteropService}, {@code BulkImportWorkbookService}, and
+ * {@code BulkImportWorkbookPopulatorService} are {@code @Primary} lookup façades when Equinox is
  * on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
@@ -487,5 +490,17 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public InteropService osgiInteropService(final OsgiServiceLookup lookup) {
         return backed(lookup, InteropService.class);
+    }
+
+    @Bean
+    @Primary
+    public BulkImportWorkbookService osgiBulkImportWorkbookService(final OsgiServiceLookup lookup) {
+        return backed(lookup, BulkImportWorkbookService.class);
+    }
+
+    @Bean
+    @Primary
+    public BulkImportWorkbookPopulatorService osgiBulkImportWorkbookPopulatorService(final OsgiServiceLookup lookup) {
+        return backed(lookup, BulkImportWorkbookPopulatorService.class);
     }
 }

@@ -376,7 +376,7 @@ public class FixedDepositAccountsApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getFixedDepositTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.FIXED_DEPOSIT_ACCOUNTS.toString(), officeId, staffId, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.FIXED_DEPOSIT_ACCOUNTS.toString(), officeId, staffId, dateFormat);
     }
 
     @POST
@@ -392,7 +392,7 @@ public class FixedDepositAccountsApiResource {
     @Path("transaction/downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getFixedDepositTransactionTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.FIXED_DEPOSIT_TRANSACTIONS.toString(), officeId, null, dateFormat);
+        return (Response) bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.FIXED_DEPOSIT_TRANSACTIONS.toString(), officeId, null, dateFormat);
     }
 
     @POST

@@ -16,25 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.bulkimport.service;
+package org.apache.fineract.infrastructure.bulkimport.impl.osgi;
 
 import org.apache.fineract.infrastructure.bulkimport.data.LookupMode;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 
 /**
- * Workbook template download (ADR-021). Return is Object-typed leftover JAX-RS {@code Response} — unpublished in
- * Equinox.
+ * Empty workbook-template port for Equinox without Spring/JPA. Published by
+ * {@code OSGI-INF/bulkimport-populator.xml} (ADR-022 B6).
  */
-public interface BulkImportWorkbookPopulatorService {
+public final class OsgiBulkImportWorkbookPopulatorService implements BulkImportWorkbookPopulatorService {
 
-    /**
-     * @param lookupMode
-     *            controls whether tenant-wide lookup sheets (clients, offices) and their in-sheet dropdown/VLOOKUP
-     *            machinery are embedded in the template (see {@link LookupMode}). Honoured by templates that opt in
-     *            (loan repayment); ignored by the rest.
-     */
-    Object getTemplate(String entityType, Long officeId, Long staffId, String dateFormat, LookupMode lookupMode);
-
-    default Object getTemplate(String entityType, Long officeId, Long staffId, String dateFormat) {
-        return getTemplate(entityType, officeId, staffId, dateFormat, LookupMode.INCLUDE);
+    @Override
+    public Object getTemplate(final String entityType, final Long officeId, final Long staffId, final String dateFormat,
+            final LookupMode lookupMode) {
+        return null;
     }
 }
