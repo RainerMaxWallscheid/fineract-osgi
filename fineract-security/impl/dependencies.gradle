@@ -21,6 +21,8 @@ dependencies {
     api project(path: ':fineract-security-api')
 
     implementation(project(path: ':fineract-core'))
+    // AppUser id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-useradministration-api'))
     // UserNotificationService port (impl residual in notification-impl)
     implementation(project(path: ':fineract-notification-api'))
     // Cache switch write port (entity/runtime residual in core)

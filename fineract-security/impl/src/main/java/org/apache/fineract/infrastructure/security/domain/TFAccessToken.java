@@ -20,24 +20,24 @@ package org.apache.fineract.infrastructure.security.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.data.AccessTokenData;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "twofactor_access_token", uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "appuser_id"}, name = "token_appuser_UNIQUE")})
 public class TFAccessToken extends AbstractPersistableCustom<Long> {
     @Column(name = "token", nullable = false, length = 32)
     private String token;
-    @ManyToOne
-    @JoinColumn(name = "appuser_id", nullable = false)
-    private AppUser user;
+    /**
+     * User id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "appuser_id", nullable = false)
+    private Long userId;
     @Column(name = "valid_from", nullable = false)
     private LocalDateTime validFrom;
     @Column(name = "valid_to", nullable = false)
@@ -45,7 +45,7 @@ public class TFAccessToken extends AbstractPersistableCustom<Long> {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    public static TFAccessToken create(String token, AppUser user, int tokenLiveTimeInSec) {
+    public static TFAccessToken create(String token, final Object user, int tokenLiveTimeInSec) {
         LocalDateTime validFrom = DateUtils.getLocalDateTimeOfTenant();
         LocalDateTime validTo = validFrom.plusSeconds(tokenLiveTimeInSec);
         return new TFAccessToken().setToken(token).setUser(user).setValidFrom(validFrom).setValidTo(validTo).setEnabled(true);
@@ -66,8 +66,8 @@ public class TFAccessToken extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getUser() {
-        return this.user;
+        public Long getUserId() {
+        return this.userId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -98,8 +98,8 @@ public class TFAccessToken extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public TFAccessToken setUser(final AppUser user) {
-        this.user = user;
+        public TFAccessToken setUser(final Object user) {
+        this.userId = AppUserAssociation.id(user);
         return this;
     }
 

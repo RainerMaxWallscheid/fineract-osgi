@@ -36,7 +36,7 @@ public interface ImportDocumentMapper {
     @Mapping(source = "importTime", target = "importTime")
     @Mapping(source = "completed", target = "completed")
     @Mapping(source = "endTime", target = "endTime")
-    @Mapping(source = "createdBy.id", target = "createdBy")
+    @Mapping(source = "createdById", target = "createdBy")
     @Mapping(source = "failureCount", target = "failureCount")
     @Mapping(source = "successCount", target = "successCount")
     @Mapping(source = "totalRecords", target = "totalRecords")

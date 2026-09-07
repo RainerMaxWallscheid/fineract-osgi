@@ -20,13 +20,11 @@ package org.apache.fineract.infrastructure.bulkimport.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_import_document")
@@ -41,9 +39,11 @@ public final class ImportDocument extends AbstractPersistableCustom<Long> {
     private Boolean completed;
     @Column(name = "entity_type")
     private Integer entityType;
-    @ManyToOne
-    @JoinColumn(name = "createdby_id")
-    private AppUser createdBy;
+    /**
+     * Created-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "createdby_id")
+    private Long createdById;
     @Column(name = "total_records", nullable = true)
     private Integer totalRecords;
     @Column(name = "success_count", nullable = true)
@@ -51,7 +51,7 @@ public final class ImportDocument extends AbstractPersistableCustom<Long> {
     @Column(name = "failure_count", nullable = true)
     private Integer failureCount;
 
-    public static ImportDocument instance(final Long documentId, final LocalDateTime importTime, final Integer entityType, final AppUser createdBy, final Integer totalRecords) {
+    public static ImportDocument instance(final Long documentId, final LocalDateTime importTime, final Integer entityType, final Object createdBy, final Integer totalRecords) {
         final Boolean completed = Boolean.FALSE;
         final Integer successCount = 0;
         final Integer failureCount = 0;
@@ -59,13 +59,13 @@ public final class ImportDocument extends AbstractPersistableCustom<Long> {
         return new ImportDocument(documentId, importTime, endTime, completed, entityType, createdBy, totalRecords, successCount, failureCount);
     }
 
-    private ImportDocument(final Long documentId, final LocalDateTime importTime, final LocalDateTime endTime, Boolean completed, final Integer entityType, final AppUser createdBy, final Integer totalRecords, final Integer successCount, final Integer failureCount) {
+    private ImportDocument(final Long documentId, final LocalDateTime importTime, final LocalDateTime endTime, Boolean completed, final Integer entityType, final Object createdBy, final Integer totalRecords, final Integer successCount, final Integer failureCount) {
         this.documentId = documentId;
         this.importTime = importTime;
         this.endTime = endTime;
         this.completed = completed;
         this.entityType = entityType;
-        this.createdBy = createdBy;
+        this.createdById = AppUserAssociation.id(createdBy);
         this.totalRecords = totalRecords;
         this.successCount = successCount;
         this.failureCount = failureCount;
@@ -104,8 +104,8 @@ public final class ImportDocument extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getCreatedBy() {
-        return this.createdBy;
+        public Long getCreatedById() {
+        return this.createdById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -172,8 +172,8 @@ public final class ImportDocument extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ImportDocument setCreatedBy(final AppUser createdBy) {
-        this.createdBy = createdBy;
+        public ImportDocument setCreatedBy(final Object createdBy) {
+        this.createdById = AppUserAssociation.id(createdBy);
         return this;
     }
 

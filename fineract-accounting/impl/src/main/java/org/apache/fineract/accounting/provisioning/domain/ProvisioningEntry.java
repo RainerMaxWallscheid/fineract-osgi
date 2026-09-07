@@ -22,16 +22,14 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_provisioning_history")
@@ -40,14 +38,18 @@ public class ProvisioningEntry extends AbstractPersistableCustom<Long> {
     private Boolean isJournalEntryCreated;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "entry", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<LoanProductProvisioningEntry> provisioningEntries = new HashSet<>();
-    @OneToOne
-    @JoinColumn(name = "createdby_id")
-    private AppUser createdBy;
+    /**
+     * Created-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "createdby_id")
+    private Long createdById;
     @Column(name = "created_date")
     private LocalDate createdDate;
-    @OneToOne
-    @JoinColumn(name = "lastmodifiedby_id")
-    private AppUser lastModifiedBy;
+    /**
+     * Last-modified-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "lastmodifiedby_id")
+    private Long lastModifiedById;
     @Column(name = "lastmodified_date")
     private LocalDate lastModifiedDate;
 
@@ -73,8 +75,8 @@ public class ProvisioningEntry extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getCreatedBy() {
-        return this.createdBy;
+        public Long getCreatedById() {
+        return this.createdById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -83,8 +85,8 @@ public class ProvisioningEntry extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getLastModifiedBy() {
-        return this.lastModifiedBy;
+        public Long getLastModifiedById() {
+        return this.lastModifiedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -105,8 +107,8 @@ public class ProvisioningEntry extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntry setCreatedBy(final AppUser createdBy) {
-        this.createdBy = createdBy;
+        public ProvisioningEntry setCreatedBy(final Object createdBy) {
+        this.createdById = AppUserAssociation.id(createdBy);
         return this;
     }
 
@@ -123,8 +125,8 @@ public class ProvisioningEntry extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntry setLastModifiedBy(final AppUser lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+        public ProvisioningEntry setLastModifiedBy(final Object lastModifiedBy) {
+        this.lastModifiedById = AppUserAssociation.id(lastModifiedBy);
         return this;
     }
 

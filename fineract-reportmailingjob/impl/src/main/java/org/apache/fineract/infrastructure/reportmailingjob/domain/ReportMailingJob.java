@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.reportmailingjob.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
@@ -34,7 +32,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.reportmailingjob.ReportMailingJobConstants;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobEmailAttachmentFileFormat;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_report_mailing_job", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "unique_name")})
@@ -77,16 +75,18 @@ public class ReportMailingJob extends AbstractAuditableCustom {
     private boolean isActive;
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "run_as_userid", nullable = false)
-    private AppUser runAsUser;
+    /**
+     * Run-as user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "run_as_userid", nullable = false)
+    private Long runAsUserId;
 
     /**
      * create a new instance of the ReportMailingJob for a new entry
      *
      * @return ReportMailingJob object
      */
-    public static ReportMailingJob newInstance(final String name, final String description, final LocalDateTime startDateTime, final String recurrence, final String emailRecipients, final String emailSubject, final String emailMessage, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final Long stretchyReportId, final String stretchyReportParamMap, final boolean isActive, final AppUser runAsUser) {
+    public static ReportMailingJob newInstance(final String name, final String description, final LocalDateTime startDateTime, final String recurrence, final String emailRecipients, final String emailSubject, final String emailMessage, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final Long stretchyReportId, final String stretchyReportParamMap, final boolean isActive, final Object runAsUser) {
         return new ReportMailingJob().setName(name).setDescription(description).setStartDateTime(startDateTime).setRecurrence(recurrence).setEmailRecipients(emailRecipients).setEmailSubject(emailSubject).setEmailMessage(emailMessage).setEmailAttachmentFileFormat(emailAttachmentFileFormat.getValue()).setStretchyReportId(stretchyReportId).setStretchyReportParamMap(stretchyReportParamMap).setActive(isActive).setDeleted(false).setRunAsUser(runAsUser);
     }
 
@@ -95,7 +95,7 @@ public class ReportMailingJob extends AbstractAuditableCustom {
      *
      * @return ReportMailingJob object
      */
-    public static ReportMailingJob newInstance(JsonCommand jsonCommand, final Long stretchyReportId, final AppUser runAsUser) {
+    public static ReportMailingJob newInstance(JsonCommand jsonCommand, final Long stretchyReportId, final Object runAsUser) {
         final String name = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.NAME_PARAM_NAME);
         final String description = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.DESCRIPTION_PARAM_NAME);
         final String recurrence = jsonCommand.stringValueOfParameterNamed(ReportMailingJobConstants.RECURRENCE_PARAM_NAME);
@@ -298,8 +298,8 @@ public class ReportMailingJob extends AbstractAuditableCustom {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getRunAsUser() {
-        return this.runAsUser;
+        public Long getRunAsUserId() {
+        return this.runAsUserId;
     }
 
     /**
@@ -468,8 +468,8 @@ public class ReportMailingJob extends AbstractAuditableCustom {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ReportMailingJob setRunAsUser(final AppUser runAsUser) {
-        this.runAsUser = runAsUser;
+        public ReportMailingJob setRunAsUser(final Object runAsUser) {
+        this.runAsUserId = AppUserAssociation.id(runAsUser);
         return this;
     }
 

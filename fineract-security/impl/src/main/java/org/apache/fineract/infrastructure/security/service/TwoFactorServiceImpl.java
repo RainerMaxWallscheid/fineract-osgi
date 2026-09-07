@@ -171,7 +171,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
             + ".getTenant().getTenantIdentifier().concat(#user.username).concat(#token + 'tok')")
     @Transactional(readOnly = true)
     public TFAccessToken fetchAccessTokenForUser(final AppUser user, final String token) {
-        return tfAccessTokenRepository.findByUserAndToken(user, token);
+        return tfAccessTokenRepository.findByUserIdAndToken(user == null ? null : user.getId(), token);
     }
 
     private OTPDeliveryMethod getSMSDeliveryMethodForUser(final AppUser user) {
