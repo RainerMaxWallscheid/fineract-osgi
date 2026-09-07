@@ -20,8 +20,6 @@ package org.apache.fineract.accounting.closure.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
@@ -31,14 +29,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.closure.data.GLClosureJsonInputParams;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 
 @Entity
 @Table(name = "acc_gl_closure", uniqueConstraints = {@UniqueConstraint(columnNames = {"office_id", "closing_date"}, name = "office_id_closing_date")})
 public class GLClosure extends AbstractAuditableCustom {
-    @ManyToOne
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = true;
     @Column(name = "closing_date")
@@ -46,8 +46,8 @@ public class GLClosure extends AbstractAuditableCustom {
     @Column(name = "comments", nullable = true, length = 500)
     private String comments;
 
-    public GLClosure(final Office office, final LocalDate closingDate, final String comments) {
-        this.office = office;
+    public GLClosure(final Object office, final LocalDate closingDate, final String comments) {
+        this.officeId = OfficeAssociation.id(office);
         this.deleted = false;
         this.closingDate = closingDate;
         this.comments = StringUtils.defaultIfEmpty(comments, null);
@@ -56,7 +56,7 @@ public class GLClosure extends AbstractAuditableCustom {
         }
     }
 
-    public static GLClosure fromJson(final Office office, final JsonCommand command) {
+    public static GLClosure fromJson(final Object office, final JsonCommand command) {
         final LocalDate closingDate = command.localDateValueOfParameterNamed(GLClosureJsonInputParams.CLOSING_DATE.getValue());
         final String comments = command.stringValueOfParameterNamed(GLClosureJsonInputParams.COMMENTS.getValue());
         return new GLClosure(office, closingDate, comments);
@@ -84,8 +84,8 @@ public class GLClosure extends AbstractAuditableCustom {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")

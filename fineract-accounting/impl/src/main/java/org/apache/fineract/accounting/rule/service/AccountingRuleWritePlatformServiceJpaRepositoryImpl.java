@@ -101,7 +101,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         }
     }
 
-    private AccountingRule assembleAccountingRuleAndTags(final Office office, final JsonCommand command) {
+    private AccountingRule assembleAccountingRuleAndTags(final Object office, final JsonCommand command) {
         // get the GL Accounts or tags to Debit and Credit
         final String[] debitTags = command.arrayValueOfParameterNamed(AccountingRuleJsonInputParams.DEBIT_ACCOUNT_TAGS.getValue());
         final String[] creditTags = command.arrayValueOfParameterNamed(AccountingRuleJsonInputParams.CREDIT_ACCOUNT_TAGS.getValue());

@@ -33,13 +33,13 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 
 @Entity
 @Table(name = "m_cashier_transactions")
 public class CashierTransaction extends AbstractPersistableCustom<Long> {
     @Transient
-    private Office office;
+    private Long officeId;
     @Transient
     private Teller teller;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -114,8 +114,8 @@ public class CashierTransaction extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -172,8 +172,8 @@ public class CashierTransaction extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public CashierTransaction setOffice(final Office office) {
-        this.office = office;
+        public CashierTransaction setOffice(final Object office) {
+        this.officeId = OfficeAssociation.id(office);
         return this;
     }
 
@@ -272,8 +272,8 @@ public class CashierTransaction extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CashierTransaction(final Office office, final Teller teller, final Cashier cashier, final Integer txnType, final LocalDate txnDate, final BigDecimal txnAmount, final String txnNote, final String entityType, final Long entityId, final LocalDateTime createdDate, final String currencyCode) {
-        this.office = office;
+        public CashierTransaction(final Object office, final Teller teller, final Cashier cashier, final Integer txnType, final LocalDate txnDate, final BigDecimal txnAmount, final String txnNote, final String entityType, final Long entityId, final LocalDateTime createdDate, final String currencyCode) {
+        this.officeId = OfficeAssociation.id(office);
         this.teller = teller;
         this.cashier = cashier;
         this.txnType = txnType;

@@ -26,15 +26,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 
 @Entity
 @Table(name = "m_teller_transactions")
 public class TellerTransaction extends AbstractPersistableCustom<Long> {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teller_id", nullable = false)
     private Teller teller;
@@ -54,8 +56,8 @@ public class TellerTransaction extends AbstractPersistableCustom<Long> {
     private LocalDate postingDate;
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -92,8 +94,8 @@ public class TellerTransaction extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public TellerTransaction setOffice(final Office office) {
-        this.office = office;
+        public TellerTransaction setOffice(final Object office) {
+        this.officeId = OfficeAssociation.id(office);
         return this;
     }
 
@@ -156,8 +158,8 @@ public class TellerTransaction extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public TellerTransaction(final Office office, final Teller teller, final Cashier cashier, final Object client, final Integer type, final Double amount, final LocalDate postingDate) {
-        this.office = office;
+        public TellerTransaction(final Object office, final Teller teller, final Cashier cashier, final Object client, final Integer type, final Double amount, final LocalDate postingDate) {
+        this.officeId = OfficeAssociation.id(office);
         this.teller = teller;
         this.cashier = cashier;
         this.clientId = ClientAssociation.id(client);

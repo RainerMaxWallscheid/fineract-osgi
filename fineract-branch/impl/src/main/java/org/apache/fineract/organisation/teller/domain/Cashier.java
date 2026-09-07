@@ -32,7 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.organisation.staff.domain.Staff;
 
 /**
@@ -47,7 +47,7 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 public class Cashier extends AbstractPersistableCustom<Long> {
     private static final String IS_FULL_DAY_PARAM_NAME = "isFullDay";
     @Transient
-    private Office office;
+    private Long officeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_id", nullable = false)
     private Staff staff;
@@ -67,7 +67,7 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     @Column(name = "end_time", nullable = true, length = 10)
     private String endTime;
 
-    public static Cashier fromJson(final Office cashierOffice, final Teller teller, final Staff staff, final String startTime, final String endTime, final JsonCommand command) {
+    public static Cashier fromJson(final Object cashierOffice, final Teller teller, final Staff staff, final String startTime, final String endTime, final JsonCommand command) {
         final String description = command.stringValueOfParameterNamed("description");
         final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
         final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
@@ -163,8 +163,8 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -211,8 +211,8 @@ public class Cashier extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Cashier setOffice(final Office office) {
-        this.office = office;
+        public Cashier setOffice(final Object office) {
+        this.officeId = OfficeAssociation.id(office);
         return this;
     }
 
@@ -293,8 +293,8 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Cashier(final Office office, final Staff staff, final Teller teller, final String description, final LocalDate startDate, final LocalDate endDate, final Boolean isFullDay, final String startTime, final String endTime) {
-        this.office = office;
+        public Cashier(final Object office, final Staff staff, final Teller teller, final String description, final LocalDate startDate, final LocalDate endDate, final Boolean isFullDay, final String startTime, final String endTime) {
+        this.officeId = OfficeAssociation.id(office);
         this.staff = staff;
         this.teller = teller;
         this.description = description;

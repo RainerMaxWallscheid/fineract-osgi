@@ -20,7 +20,7 @@ package org.apache.fineract.organisation.office.moduleapi;
 
 /**
  * Id / persistable lookup for leftover {@code Office} without JPA associations on
- * transaction/journal entities (ADR-021).
+ * transaction, journal, closure, rule, and teller/cashier entities (ADR-021).
  */
 public final class OfficeAssociation {
 

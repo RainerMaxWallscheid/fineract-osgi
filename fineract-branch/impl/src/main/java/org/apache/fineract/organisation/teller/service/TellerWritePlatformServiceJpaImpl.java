@@ -81,7 +81,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             //
             //
             //
-            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(teller.getId()).withOfficeId(teller.getOffice().getId()).build();
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(teller.getId()).withOfficeId(teller.getOfficeId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleTellerDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -176,7 +176,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             String startTime = " ";
             String endTime = " ";
             final Teller teller = this.tellerRepositoryWrapper.findOneWithNotFoundDetection(tellerId);
-            final Office tellerOffice = teller.getOffice();
+            final Long tellerOfficeId = teller.getOfficeId();
             final Long staffId = command.longValueOfParameterNamed("staffId");
             this.fromApiJsonDeserializer.validateForAllocateCashier(command.json());
             final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
@@ -197,7 +197,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
                     endTime = hourEndTime.toString() + ":" + minEndTime.toString();
                 }
             }
-            final Cashier cashier = Cashier.fromJson(tellerOffice, teller, staff, startTime, endTime, command);
+            final Cashier cashier = Cashier.fromJson(tellerOfficeId, teller, staff, startTime, endTime, command);
             this.cashierTransactionDataValidator.validateCashierAllowedDateAndTime(cashier, teller);
             this.cashierRepository.save(cashier);
             return  //
@@ -328,11 +328,11 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final CashierTransaction cashierTxn = CashierTransaction.fromJson(cashier, command);
             cashierTxn.setTxnType(txnType.getId());
             this.cashierTxnRepository.save(cashierTxn);
-            final Office cashierOffice = cashier.getTeller().getOffice();
+            final Long cashierOfficeId = cashier.getTeller().getOfficeId();
             final Long time = System.currentTimeMillis();
-            final String uniqueVal = String.valueOf(time) + currentUser.getId() + cashierOffice.getId();
+            final String uniqueVal = String.valueOf(time) + currentUser.getId() + cashierOfficeId;
             final String transactionId = Long.toHexString(Long.parseLong(uniqueVal));
-            this.cashierJournalPort.postAllocateOrSettle(txnType.equals(CashierTxnType.ALLOCATE), cashierOffice.getId(),
+            this.cashierJournalPort.postAllocateOrSettle(txnType.equals(CashierTxnType.ALLOCATE), cashierOfficeId,
                     cashierTxn.getCurrencyCode(), cashierTxn.getTxnDate(), cashierTxn.getTxnAmount(), cashierTxn.getTxnNote(),
                     transactionId);
             return  //

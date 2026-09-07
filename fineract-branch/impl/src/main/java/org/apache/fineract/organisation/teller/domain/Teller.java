@@ -33,15 +33,17 @@ import java.util.Set;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.organisation.teller.moduleapi.TellerStatus;
 
 @Entity
 @Table(name = "m_tellers", uniqueConstraints = {@UniqueConstraint(name = "ux_tellers_name", columnNames = {"name"})})
 public class Teller extends AbstractPersistableCustom<Long> {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "debit_account_id", nullable = true)
     private GLAccount debitAccount;
@@ -61,7 +63,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
     @OneToMany(mappedBy = "teller", fetch = FetchType.LAZY)
     private Set<Cashier> cashiers;
 
-    public static Teller fromJson(final Office tellerOffice, final JsonCommand command) {
+    public static Teller fromJson(final Object tellerOffice, final JsonCommand command) {
         final String name = command.stringValueOfParameterNamed("name");
         final String description = command.stringValueOfParameterNamed("description");
         final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
@@ -71,7 +73,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
         return new Teller().setOffice(tellerOffice).setName(name).setDescription(description).setStartDate(startDate).setEndDate(endDate).setStatus(status.getValue());
     }
 
-    public Map<String, Object> update(Office tellerOffice, final JsonCommand command) {
+    public Map<String, Object> update(final Object tellerOffice, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
         final String dateFormatAsInput = command.dateFormat();
         final String localeAsInput = command.locale();
@@ -79,7 +81,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
         if (command.isChangeInLongParameterNamed(officeIdParamName, this.officeId())) {
             final long newValue = command.longValueOfParameterNamed(officeIdParamName);
             actualChanges.put(officeIdParamName, newValue);
-            this.office = tellerOffice;
+            this.officeId = OfficeAssociation.id(tellerOffice);
         }
         final String nameParamName = "name";
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
@@ -123,17 +125,16 @@ public class Teller extends AbstractPersistableCustom<Long> {
     }
 
     public Long officeId() {
-        return this.office.getId();
+        return this.officeId;
     }
 
     public void initializeLazyCollections() {
-        this.office.getId();
         this.cashiers.size();
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -180,8 +181,8 @@ public class Teller extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Teller setOffice(final Office office) {
-        this.office = office;
+        public Teller setOffice(final Object office) {
+        this.officeId = OfficeAssociation.id(office);
         return this;
     }
 
@@ -262,8 +263,8 @@ public class Teller extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Teller(final Office office, final GLAccount debitAccount, final GLAccount creditAccount, final String name, final String description, final LocalDate startDate, final LocalDate endDate, final Integer status, final Set<Cashier> cashiers) {
-        this.office = office;
+        public Teller(final Object office, final GLAccount debitAccount, final GLAccount creditAccount, final String name, final String description, final LocalDate startDate, final LocalDate endDate, final Integer status, final Set<Cashier> cashiers) {
+        this.officeId = OfficeAssociation.id(office);
         this.debitAccount = debitAccount;
         this.creditAccount = creditAccount;
         this.name = name;

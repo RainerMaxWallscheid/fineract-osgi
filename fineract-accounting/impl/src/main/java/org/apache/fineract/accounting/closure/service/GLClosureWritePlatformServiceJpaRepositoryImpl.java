@@ -37,6 +37,7 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -101,7 +102,7 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
         //
         //
         //
-        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(glClosure.getOffice().getId()).withEntityId(glClosure.getId()).with(changesOnly).build();
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(glClosure.getOfficeId()).withEntityId(glClosure.getId()).with(changesOnly).build();
     }
 
     @Transactional
@@ -112,15 +113,16 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
          * check if any closures are present for this branch at a later date than this closure date
          */
         final LocalDate closureDate = glClosure.getClosingDate();
-        final GLClosure latestGLClosure = this.glClosureRepository.getLatestGLClosureByBranch(glClosure.getOffice().getId());
+        final GLClosure latestGLClosure = this.glClosureRepository.getLatestGLClosureByBranch(glClosure.getOfficeId());
         if (DateUtils.isAfter(latestGLClosure.getClosingDate(), closureDate)) {
-            throw new GLClosureInvalidDeleteException(latestGLClosure.getOffice().getId(), latestGLClosure.getOffice().getName(), latestGLClosure.getClosingDate());
+            throw new GLClosureInvalidDeleteException(latestGLClosure.getOfficeId(), OfficeAssociation.name(latestGLClosure.getOfficeId()),
+                    latestGLClosure.getClosingDate());
         }
         this.glClosureRepository.delete(glClosure);
         return  //
         //
         //
-        new CommandProcessingResultBuilder().withOfficeId(glClosure.getOffice().getId()).withEntityId(glClosure.getId()).build();
+        new CommandProcessingResultBuilder().withOfficeId(glClosure.getOfficeId()).withEntityId(glClosure.getId()).build();
     }
 
     /**
