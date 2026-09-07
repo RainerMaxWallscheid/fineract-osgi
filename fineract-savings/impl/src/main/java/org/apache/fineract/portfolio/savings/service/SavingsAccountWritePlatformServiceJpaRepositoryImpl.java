@@ -1343,7 +1343,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         this.fromApiJsonDeserializer.validateForUnAssignSavingsOfficer(command.json());
         final SavingsAccount savingsForUpdate = this.savingAccountRepositoryWrapper.findOneWithNotFoundDetection(savingsAccountId);
-        if (savingsForUpdate.getSavingsOfficer() == null) {
+        if (savingsForUpdate.getSavingsOfficerId() == null) {
             throw new SavingsOfficerUnassignmentException(savingsAccountId);
         }
         final LocalDate dateOfSavingsOfficerUnassigned = command.localDateValueOfParameterNamed("unassignedDate");

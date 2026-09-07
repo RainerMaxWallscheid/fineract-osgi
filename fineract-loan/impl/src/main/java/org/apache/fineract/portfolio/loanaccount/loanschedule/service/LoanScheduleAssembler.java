@@ -1434,9 +1434,9 @@ public class LoanScheduleAssembler {
             loan.setExpectedDisbursementDate(expectedDisbursementDate);
             actualChanges.put(EXPECTED_DISBURSEMENT_DATE, expectedDisbursementDate);
         }
-        if (loan.getLoanOfficer() != null) {
+        if (loan.getLoanOfficerId() != null) {
             final LoanOfficerAssignmentHistory loanOfficerAssignmentHistory = LoanOfficerAssignmentHistory.createNew(loan,
-                    loan.getLoanOfficer(), approvedOn);
+                    loan.getLoanOfficerId(), approvedOn);
             loan.getLoanOfficerHistory().add(loanOfficerAssignmentHistory);
         }
         loan.adjustNetDisbursalAmount(loan.getApprovedPrincipal());

@@ -24,9 +24,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 
 @Entity
 @Table(name = "m_loan_officer_assignment_history")
@@ -36,9 +37,11 @@ public class LoanOfficerAssignmentHistory extends AbstractAuditableCustom {
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
 
-    @ManyToOne
-    @JoinColumn(name = "loan_officer_id", nullable = true)
-    private Staff loanOfficer;
+    /**
+     * Loan-officer staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "loan_officer_id", nullable = true)
+    private Long loanOfficerId;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -46,7 +49,7 @@ public class LoanOfficerAssignmentHistory extends AbstractAuditableCustom {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    public static LoanOfficerAssignmentHistory createNew(final Loan loan, final Staff loanOfficer, final LocalDate startDate) {
+    public static LoanOfficerAssignmentHistory createNew(final Loan loan, final Object loanOfficer, final LocalDate startDate) {
         return new LoanOfficerAssignmentHistory(loan, loanOfficer, startDate, null);
     }
 
@@ -54,15 +57,15 @@ public class LoanOfficerAssignmentHistory extends AbstractAuditableCustom {
         //
     }
 
-    private LoanOfficerAssignmentHistory(final Loan loan, final Staff loanOfficer, final LocalDate startDate, final LocalDate endDate) {
+    private LoanOfficerAssignmentHistory(final Loan loan, final Object loanOfficer, final LocalDate startDate, final LocalDate endDate) {
         this.loan = loan;
-        this.loanOfficer = loanOfficer;
+        this.loanOfficerId = StaffAssociation.id(loanOfficer);
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public void updateLoanOfficer(final Staff loanOfficer) {
-        this.loanOfficer = loanOfficer;
+    public void updateLoanOfficer(final Object loanOfficer) {
+        this.loanOfficerId = StaffAssociation.id(loanOfficer);
     }
 
     public void updateStartDate(final LocalDate startDate) {
@@ -103,7 +106,7 @@ public class LoanOfficerAssignmentHistory extends AbstractAuditableCustom {
         return this.endDate;
     }
 
-    public boolean isSameLoanOfficer(final Staff staff) {
-        return this.loanOfficer.getId().equals(staff.getId());
+    public boolean isSameLoanOfficer(final Object staff) {
+        return Objects.equals(this.loanOfficerId, StaffAssociation.id(staff));
     }
 }

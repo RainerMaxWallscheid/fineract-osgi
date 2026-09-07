@@ -29,9 +29,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.Objects;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 
 @Entity
 @Table(name = "m_savings_officer_assignment_history")
@@ -41,9 +42,11 @@ public class SavingsOfficerAssignmentHistory extends AbstractAuditableWithUTCDat
     @JoinColumn(name = "account_id", nullable = false)
     private SavingsAccount savingsAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "savings_officer_id", nullable = true)
-    private Staff savingsOfficer;
+    /**
+     * Savings-officer staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "savings_officer_id", nullable = true)
+    private Long savingsOfficerId;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -63,25 +66,25 @@ public class SavingsOfficerAssignmentHistory extends AbstractAuditableWithUTCDat
         //
     }
 
-    private SavingsOfficerAssignmentHistory(final SavingsAccount account, final Staff savingsOfficer, final LocalDate startDate,
+    private SavingsOfficerAssignmentHistory(final SavingsAccount account, final Object savingsOfficer, final LocalDate startDate,
             final LocalDate endDate) {
         this.savingsAccount = account;
-        this.savingsOfficer = savingsOfficer;
+        this.savingsOfficerId = StaffAssociation.id(savingsOfficer);
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public static SavingsOfficerAssignmentHistory createNew(final SavingsAccount account, final Staff savingsOfficer,
+    public static SavingsOfficerAssignmentHistory createNew(final SavingsAccount account, final Object savingsOfficer,
             final LocalDate startDate) {
         return new SavingsOfficerAssignmentHistory(account, savingsOfficer, startDate, null);
     }
 
-    public void setSavingsOfficer(final Staff savingsOfficer) {
-        this.savingsOfficer = savingsOfficer;
+    public void setSavingsOfficer(final Object savingsOfficer) {
+        this.savingsOfficerId = StaffAssociation.id(savingsOfficer);
     }
 
-    public boolean isSameSavingsOfficer(final Staff staff) {
-        return this.savingsOfficer.getId().equals(staff.getId());
+    public boolean isSameSavingsOfficer(final Object staff) {
+        return Objects.equals(this.savingsOfficerId, StaffAssociation.id(staff));
     }
 
     public LocalDate getStartDate() {

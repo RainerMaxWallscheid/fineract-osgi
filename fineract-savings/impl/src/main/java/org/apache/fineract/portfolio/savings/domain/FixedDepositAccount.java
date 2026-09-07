@@ -48,7 +48,7 @@ import org.apache.fineract.infrastructure.core.domain.LocalDateInterval;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.organisation.staff.domain.Staff;
+
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartAssembler;
@@ -87,7 +87,7 @@ public class FixedDepositAccount extends SavingsAccount {
     }
 
     public static FixedDepositAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
-            final Staff fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
+            final Object fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
@@ -109,7 +109,7 @@ public class FixedDepositAccount extends SavingsAccount {
         return account;
     }
 
-    private FixedDepositAccount(final Object client, final Object group, final SavingsProduct product, final Staff fieldOfficer,
+    private FixedDepositAccount(final Object client, final Object group, final SavingsProduct product, final Object fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -810,7 +810,7 @@ public class FixedDepositAccount extends SavingsAccount {
         final String accountNumber = null;
         final boolean withHoldTax = this.withHoldTax;
         final FixedDepositAccount reInvestedAccount = FixedDepositAccount.createNewApplicationForSubmittal(persistableClient(), persistableGroup(), product,
-                savingsOfficer, accountNumber, externalId, accountType, getClosedOnDate(), closedBy, interestRate, compoundingPeriodType,
+                savingsOfficerId, accountNumber, externalId, accountType, getClosedOnDate(), closedBy, interestRate, compoundingPeriodType,
                 postingPeriodType, interestCalculationType, daysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency,
                 lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, savingsAccountCharges, newAccountTermAndPreClosure, newChart,
                 withHoldTax);

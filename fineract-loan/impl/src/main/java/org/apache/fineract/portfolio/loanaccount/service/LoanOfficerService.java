@@ -19,8 +19,9 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanOfficerAssignmentHistory;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanOfficerAssignmentException;
@@ -30,13 +31,13 @@ public class LoanOfficerService {
 
     private final LoanOfficerValidator loanOfficerValidator;
 
-    public void reassignLoanOfficer(final Loan loan, final Staff newLoanOfficer, final LocalDate assignmentDate) {
+    public void reassignLoanOfficer(final Loan loan, final Object newLoanOfficer, final LocalDate assignmentDate) {
         final Optional<LoanOfficerAssignmentHistory> latestHistoryRecord = loan.findLatestIncompleteHistoryRecord();
         final LoanOfficerAssignmentHistory lastAssignmentRecord = loan.findLastAssignmentHistoryRecord(newLoanOfficer);
         // assignment date should not be less than loan submitted date
         loanOfficerValidator.validateReassignment(loan, assignmentDate, lastAssignmentRecord);
         loanOfficerValidator.validateAssignmentDateWithHistory(loan, latestHistoryRecord, assignmentDate);
-        if (latestHistoryRecord.isPresent() && loan.getLoanOfficer().getId().equals(newLoanOfficer.getId())) {
+        if (latestHistoryRecord.isPresent() && Objects.equals(loan.getLoanOfficerId(), StaffAssociation.id(newLoanOfficer))) {
             latestHistoryRecord.get().updateStartDate(assignmentDate);
         } else if (latestHistoryRecord.isPresent() && latestHistoryRecord.get().matchesStartDateOf(assignmentDate)) {
             latestHistoryRecord.get().updateLoanOfficer(newLoanOfficer);
@@ -47,19 +48,15 @@ public class LoanOfficerService {
             loan.setLoanOfficer(newLoanOfficer);
             if (loan.isNotSubmittedAndPendingApproval()) {
                 final LoanOfficerAssignmentHistory loanOfficerAssignmentHistory = LoanOfficerAssignmentHistory.createNew(loan,
-                        loan.getLoanOfficer(), assignmentDate);
+                        loan.getLoanOfficerId(), assignmentDate);
                 loan.getLoanOfficerHistory().add(loanOfficerAssignmentHistory);
             }
         }
     }
 
-    public void updateLoanOfficerOnLoanApplication(final Loan loan, final Staff newLoanOfficer) {
+    public void updateLoanOfficerOnLoanApplication(final Loan loan, final Object newLoanOfficer) {
         if (!loan.isSubmittedAndPendingApproval()) {
-            Long loanOfficerId = null;
-            if (loan.getLoanOfficer() != null) {
-                loanOfficerId = loan.getLoanOfficer().getId();
-            }
-            throw new LoanOfficerAssignmentException(loan.getId(), loanOfficerId);
+            throw new LoanOfficerAssignmentException(loan.getId(), loan.getLoanOfficerId());
         }
         loan.setLoanOfficer(newLoanOfficer);
     }

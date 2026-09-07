@@ -64,7 +64,7 @@ import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerat
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -144,9 +144,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fund_id")
     private Fund fund;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "loan_officer_id")
-    private Staff loanOfficer;
+    /**
+     * Loan-officer staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "loan_officer_id")
+    private Long loanOfficerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loanpurpose_cv_id")
     private CodeValue loanPurpose;
@@ -319,7 +321,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private RepaymentStartDateType repaymentStartDateType;
 
     public static Loan newIndividualLoanApplication(final String accountNo, final Object client, final AccountType loanType,
-            final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
@@ -335,7 +337,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newGroupLoanApplication(final String accountNo, final Object group, final AccountType loanType,
-            final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -352,7 +354,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Object client, final Object group,
-            final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Staff officer, final CodeValue loanPurpose,
+            final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -373,7 +375,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     private Loan(final String accountNo, final Object client, final Object group, final AccountType loanType, final Fund fund,
-            final Staff loanOfficer, final CodeValue loanPurpose,
+            final Object loanOfficer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProduct loanProduct,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -394,7 +396,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.groupId = group == null ? null : groupActivePort.id(group);
         this.loanType = loanType;
         this.fund = fund;
-        this.loanOfficer = loanOfficer;
+        this.loanOfficerId = StaffAssociation.id(loanOfficer);
         this.loanPurpose = loanPurpose;
         this.transactionProcessingStrategyCode = transactionProcessingStrategy.getCode();
         this.transactionProcessingStrategyName = transactionProcessingStrategy.getName();
@@ -920,12 +922,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         return loanId.equals(getId());
     }
 
-    public boolean hasLoanOfficer(final Staff fromLoanOfficer) {
-        if (this.loanOfficer != null) {
-            return this.loanOfficer.getId().equals(fromLoanOfficer.getId());
-        } else {
-            return fromLoanOfficer == null;
-        }
+    public boolean hasLoanOfficer(final Object fromLoanOfficer) {
+        return Objects.equals(this.loanOfficerId, StaffAssociation.id(fromLoanOfficer));
     }
 
     public Money getPrincipal() {
@@ -947,14 +945,14 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     public void removeLoanOfficer(final LocalDate unassignDate) {
         findLatestIncompleteHistoryRecord()
                 .ifPresent(loanOfficerAssignmentHistory -> loanOfficerAssignmentHistory.updateEndDate(unassignDate));
-        this.loanOfficer = null;
+        this.loanOfficerId = null;
     }
 
     public Optional<LoanOfficerAssignmentHistory> findLatestIncompleteHistoryRecord() {
         return this.loanOfficerHistory.stream().filter(LoanOfficerAssignmentHistory::isCurrentRecord).findFirst();
     }
 
-    public LoanOfficerAssignmentHistory findLastAssignmentHistoryRecord(final Staff newLoanOfficer) {
+    public LoanOfficerAssignmentHistory findLastAssignmentHistoryRecord(final Object newLoanOfficer) {
         LoanOfficerAssignmentHistory lastAssignmentRecordLatestEndDate = null;
         for (final LoanOfficerAssignmentHistory historyRecord : this.loanOfficerHistory) {
             if (historyRecord.isCurrentRecord() && !historyRecord.isSameLoanOfficer(newLoanOfficer)) {
@@ -1716,8 +1714,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public Staff getLoanOfficer() {
-        return this.loanOfficer;
+    public Long getLoanOfficerId() {
+        return this.loanOfficerId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2061,8 +2059,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setLoanOfficer(final Staff loanOfficer) {
-        this.loanOfficer = loanOfficer;
+    public void setLoanOfficer(final Object loanOfficer) {
+        this.loanOfficerId = StaffAssociation.id(loanOfficer);
     }
 
     @java.lang.SuppressWarnings("all")

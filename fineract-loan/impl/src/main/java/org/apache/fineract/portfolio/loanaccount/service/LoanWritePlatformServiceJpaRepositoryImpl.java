@@ -1753,7 +1753,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final LocalDate dateOfLoanOfficerUnassigned = command.localDateValueOfParameterNamed("unassignedDate");
         final Loan loan = this.loanAssembler.assembleFrom(loanId);
         checkClientOrGroupActive(loan);
-        if (loan.getLoanOfficer() == null) {
+        if (loan.getLoanOfficerId() == null) {
             throw new LoanOfficerUnassignmentException(loanId);
         }
         businessEventNotifierService.notifyPreBusinessEvent(new LoanRemoveOfficerBusinessEvent(loan));

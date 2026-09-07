@@ -69,6 +69,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -91,7 +92,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFoundException;
@@ -167,9 +168,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @JoinColumn(name = "product_id", nullable = false)
     protected SavingsProduct product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_officer_id", nullable = true)
-    protected Staff savingsOfficer;
+    /**
+     * Field-officer staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "field_officer_id", nullable = true)
+    protected Long savingsOfficerId;
 
     @Column(name = "status_enum", nullable = false)
     protected Integer status;
@@ -368,7 +371,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public static SavingsAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
-            final Staff fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
+            final Object fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
@@ -389,7 +392,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 minOverdraftForInterestCalculation, withHoldTax);
     }
 
-    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Staff fieldOfficer,
+    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Object fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -405,7 +408,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 null, withHoldTax);
     }
 
-    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Staff savingsOfficer,
+    protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Object savingsOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -419,7 +422,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.clientId = client == null ? null : clientActivePort.id(client);
         this.groupId = group == null ? null : groupActivePort.id(group);
         this.product = product;
-        this.savingsOfficer = savingsOfficer;
+        this.savingsOfficerId = StaffAssociation.id(savingsOfficer);
         if (StringUtils.isBlank(accountNo)) {
             this.accountNumber = new RandomPasswordGenerator(19).generate();
             this.accountNumberRequiresAutoGeneration = true;
@@ -1891,8 +1894,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.minBalanceForInterestCalculation = product.minBalanceForInterestCalculation();
     }
 
-    public void update(final Staff savingsOfficer) {
-        this.savingsOfficer = savingsOfficer;
+    public void update(final Object savingsOfficer) {
+        this.savingsOfficerId = StaffAssociation.id(savingsOfficer);
     }
 
     public void updateAccountNo(final String newAccountNo) {
@@ -1940,8 +1943,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return office;
     }
 
-    public Staff getSavingsOfficer() {
-        return this.savingsOfficer;
+    public Long getSavingsOfficerId() {
+        return this.savingsOfficerId;
     }
 
     public Boolean getEnforceMinRequiredBalance() {
@@ -1953,11 +1956,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public void unassignSavingsOfficer() {
-        this.savingsOfficer = null;
+        this.savingsOfficerId = null;
     }
 
-    public void assignSavingsOfficer(final Staff fieldOfficer) {
-        this.savingsOfficer = fieldOfficer;
+    public void assignSavingsOfficer(final Object fieldOfficer) {
+        this.savingsOfficerId = StaffAssociation.id(fieldOfficer);
     }
 
     public Long clientId() {
@@ -1989,25 +1992,14 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     public Long hasSavingsOfficerId() {
-        Long id = null;
-        if (this.savingsOfficer != null) {
-            id = this.savingsOfficer.getId();
-        }
-        return id;
+        return this.savingsOfficerId;
     }
 
-    public boolean hasSavingsOfficer(final Staff fromSavingsOfficer) {
-
-        boolean matchesCurrentSavingsOfficer = false;
-        if (this.savingsOfficer != null) {
-            matchesCurrentSavingsOfficer = this.savingsOfficer.getId().equals(fromSavingsOfficer.getId());
-        } else {
-            matchesCurrentSavingsOfficer = fromSavingsOfficer == null;
-        }
-        return matchesCurrentSavingsOfficer;
+    public boolean hasSavingsOfficer(final Object fromSavingsOfficer) {
+        return Objects.equals(this.savingsOfficerId, StaffAssociation.id(fromSavingsOfficer));
     }
 
-    public void reassignSavingsOfficer(final Staff newSavingsOfficer, final LocalDate assignmentDate) {
+    public void reassignSavingsOfficer(final Object newSavingsOfficer, final LocalDate assignmentDate) {
         final SavingsOfficerAssignmentHistory latestHistoryRecord = findLatestIncompleteHistoryRecord();
         final SavingsOfficerAssignmentHistory lastAssignmentRecord = findLastAssignmentHistoryRecord(newSavingsOfficer);
 
@@ -2025,11 +2017,12 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         } else if (DateUtils.isDateInTheFuture(assignmentDate)) {
             final String errorMessage = "The Savings Officer assignment date (" + assignmentDate + ") cannot be in the future.";
             throw new SavingsOfficerAssignmentDateException("cannot.be.a.future.date", errorMessage, assignmentDate);
-        } else if (latestHistoryRecord != null && this.savingsOfficer.getId().equals(newSavingsOfficer.getId())) {
+        } else if (latestHistoryRecord != null
+                && Objects.equals(this.savingsOfficerId, StaffAssociation.id(newSavingsOfficer))) {
             latestHistoryRecord.setStartDate(assignmentDate);
         } else if (latestHistoryRecord != null && latestHistoryRecord.matchesStartDateOf(assignmentDate)) {
             latestHistoryRecord.setSavingsOfficer(newSavingsOfficer);
-            this.savingsOfficer = newSavingsOfficer;
+            this.savingsOfficerId = StaffAssociation.id(newSavingsOfficer);
         } else if (latestHistoryRecord != null && latestHistoryRecord.isBeforeStartDate(assignmentDate)) {
             final String errorMessage = "Savings account with identifier " + getId() + " was already assigned before date "
                     + assignmentDate;
@@ -2041,16 +2034,16 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 // new savings officer
                 latestHistoryRecord.setEndDate(assignmentDate);
             }
-            this.savingsOfficer = newSavingsOfficer;
+            this.savingsOfficerId = StaffAssociation.id(newSavingsOfficer);
             if (isNotSubmittedAndPendingApproval()) {
                 final SavingsOfficerAssignmentHistory savingsOfficerAssignmentHistory = SavingsOfficerAssignmentHistory.createNew(this,
-                        this.savingsOfficer, assignmentDate);
+                        this.savingsOfficerId, assignmentDate);
                 this.savingsOfficerHistory.add(savingsOfficerAssignmentHistory);
             }
         }
     }
 
-    private SavingsOfficerAssignmentHistory findLastAssignmentHistoryRecord(final Staff newSavingsOfficer) {
+    private SavingsOfficerAssignmentHistory findLastAssignmentHistoryRecord(final Object newSavingsOfficer) {
         SavingsOfficerAssignmentHistory lastAssignmentRecordLatestEndDate = null;
         for (final SavingsOfficerAssignmentHistory historyRecord : this.savingsOfficerHistory) {
             if (historyRecord.isCurrentRecord() && !historyRecord.isSameSavingsOfficer(newSavingsOfficer)) {
@@ -2091,7 +2084,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             validateUnassignDate(latestHistoryRecord, unassignDate);
             latestHistoryRecord.setEndDate(unassignDate);
         }
-        this.savingsOfficer = null;
+        this.savingsOfficerId = null;
     }
 
     private SavingsOfficerAssignmentHistory findLatestIncompleteHistoryRecord() {
@@ -2110,7 +2103,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
             final String errorMessage = "The Savings officer Unassign date(" + unassignDate + ") cannot be before its assignment date ("
                     + latestHistoryRecord.getStartDate() + ").";
             throw new SavingsOfficerUnassignmentDateException("cannot.be.before.assignment.date", errorMessage, getId(),
-                    getSavingsOfficer().getId(), latestHistoryRecord.getStartDate(), unassignDate);
+                    getSavingsOfficerId(), latestHistoryRecord.getStartDate(), unassignDate);
         } else if (DateUtils.isDateInTheFuture(unassignDate)) {
             final String errorMessage = "The Savings Officer Unassign date (" + unassignDate + ") cannot be in the future.";
             throw new SavingsOfficerUnassignmentDateException("cannot.be.a.future.date", errorMessage, unassignDate);
@@ -2232,9 +2225,9 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         // this.fieldOfficer, approvedOn);
         // this.loanOfficerHistory.add(loanOfficerAssignmentHistory);
         // }
-        if (this.savingsOfficer != null) {
+        if (this.savingsOfficerId != null) {
             final SavingsOfficerAssignmentHistory savingsOfficerAssignmentHistory = SavingsOfficerAssignmentHistory.createNew(this,
-                    this.savingsOfficer, approvedOn);
+                    this.savingsOfficerId, approvedOn);
             this.savingsOfficerHistory.add(savingsOfficerAssignmentHistory);
         }
         return actualChanges;

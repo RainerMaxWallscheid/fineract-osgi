@@ -269,7 +269,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     @Override
     public void reassignOfficer(final Long savingsAccountId, final Object staff, final LocalDate date) {
         final SavingsAccount account = this.savingsAccountRepository.findOneWithNotFoundDetection(savingsAccountId);
-        account.reassignSavingsOfficer((Staff) staff, date);
+        account.reassignSavingsOfficer(staff, date);
         this.savingsAccountRepository.save(account);
     }
 
