@@ -88,7 +88,7 @@ public class InvestorAccountingHelper {
 
     /**
      * Charge-off GL account as {@code Object} so callers need not touch leftover
-     * {@code ProductToGLAccountMapping.getGlAccount()}.
+     * {@code ProductToGLAccountMapping.getGlAccountId()}.
      */
     public Object chargeOffGlAccount(final Long loanProductId, final Long chargeOffReasonId) {
         return this.transferJournalPort.chargeOffGlAccount(loanProductId, PortfolioProductType.LOAN.getValue(), chargeOffReasonId);

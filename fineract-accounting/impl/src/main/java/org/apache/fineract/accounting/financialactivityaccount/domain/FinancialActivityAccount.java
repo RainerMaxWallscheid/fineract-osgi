@@ -20,28 +20,27 @@ package org.apache.fineract.accounting.financialactivityaccount.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "acc_gl_financial_activity_account")
 public class FinancialActivityAccount extends AbstractPersistableCustom<Long> {
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "gl_account_id")
-    private GLAccount glAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "gl_account_id")
+    private Long glAccountId;
     @Column(name = "financial_activity_type", nullable = false)
     private Integer financialActivityType;
 
-    public static FinancialActivityAccount createNew(final GLAccount glAccount, final Integer financialAccountType) {
+    public static FinancialActivityAccount createNew(final Object glAccount, final Integer financialAccountType) {
         return new FinancialActivityAccount(glAccount, financialAccountType);
     }
 
-    public void updateGlAccount(final GLAccount glAccount) {
-        this.glAccount = glAccount;
+    public void updateGlAccount(final Object glAccount) {
+        this.glAccountId = GLAccountAssociation.id(glAccount);
     }
 
     public void updateFinancialActivityType(final Integer financialActivityType) {
@@ -53,14 +52,14 @@ public class FinancialActivityAccount extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public FinancialActivityAccount(final GLAccount glAccount, final Integer financialActivityType) {
-        this.glAccount = glAccount;
+        public FinancialActivityAccount(final Object glAccount, final Integer financialActivityType) {
+        this.glAccountId = GLAccountAssociation.id(glAccount);
         this.financialActivityType = financialActivityType;
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getGlAccount() {
-        return this.glAccount;
+        public Long getGlAccountId() {
+        return this.glAccountId;
     }
 
     @java.lang.SuppressWarnings("all")

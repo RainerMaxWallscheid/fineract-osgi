@@ -24,7 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
@@ -32,9 +32,11 @@ import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 @Entity
 @Table(name = "acc_product_mapping", uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "product_type", "financial_account_type", "payment_type"}, name = "financial_action")})
 public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "gl_account_id")
-    private GLAccount glAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "gl_account_id")
+    private Long glAccountId;
     @Column(name = "product_id", nullable = true)
     private Long productId;
     @ManyToOne
@@ -62,13 +64,13 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "buydown_fee_classification_id", nullable = true)
     private CodeValue buydownFeeClassification;
 
-    public static ProductToGLAccountMapping createNew(final GLAccount glAccount, final Long productId, final int productType, final int financialAccountType, final CodeValue chargeOffReason, final CodeValue capitalizedIncomeClassification, final CodeValue buydownFeeClassification) {
+    public static ProductToGLAccountMapping createNew(final Object glAccount, final Long productId, final int productType, final int financialAccountType, final CodeValue chargeOffReason, final CodeValue capitalizedIncomeClassification, final CodeValue buydownFeeClassification) {
         return new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(productType).setFinancialAccountType(financialAccountType).setChargeOffReason(chargeOffReason).setCapitalizedIncomeClassification(capitalizedIncomeClassification).setBuydownFeeClassification(buydownFeeClassification);
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getGlAccount() {
-        return this.glAccount;
+        public Long getGlAccountId() {
+        return this.glAccountId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -120,8 +122,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setGlAccount(final GLAccount glAccount) {
-        this.glAccount = glAccount;
+        public ProductToGLAccountMapping setGlAccount(final Object glAccount) {
+        this.glAccountId = GLAccountAssociation.id(glAccount);
         return this;
     }
 

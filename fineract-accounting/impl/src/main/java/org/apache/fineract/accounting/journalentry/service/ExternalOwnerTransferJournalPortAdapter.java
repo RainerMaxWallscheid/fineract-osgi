@@ -33,6 +33,7 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryNotFoundException;
 import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingNotFoundException;
@@ -90,7 +91,7 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
         if (FinancialActivity.fromInt(accountMappingTypeId) != null) {
             final FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository
                     .findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
-            return financialActivityAccount.getGlAccount();
+            return GLAccountAssociation.persistableById(financialActivityAccount.getGlAccountId());
         }
         final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId,
                 PortfolioProductType.LOAN.getValue(), accountMappingTypeId);
@@ -98,7 +99,7 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
             throw new ProductToGLAccountMappingNotFoundException(PortfolioProductType.LOAN, loanProductId,
                     AccountingConstants.AccrualAccountsForLoan.fromInt(accountMappingTypeId).toString());
         }
-        return accountMapping.getGlAccount();
+        return GLAccountAssociation.persistableById(accountMapping.getGlAccountId());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
     public Object chargeOffGlAccount(final Long loanProductId, final int productTypeValue, final Long chargeOffReasonId) {
         final ProductToGLAccountMapping mapping = (ProductToGLAccountMapping) chargeOffMapping(loanProductId, productTypeValue,
                 chargeOffReasonId);
-        return mapping == null ? null : mapping.getGlAccount();
+        return mapping == null ? null : GLAccountAssociation.persistableById(mapping.getGlAccountId());
     }
 
     @Override

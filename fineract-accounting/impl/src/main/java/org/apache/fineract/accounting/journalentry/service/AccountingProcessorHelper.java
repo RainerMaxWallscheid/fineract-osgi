@@ -39,6 +39,7 @@ import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialA
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.journalentry.data.ChargePaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.ChargeTaxPaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.ClientChargePaymentDTO;
@@ -802,7 +803,7 @@ public class AccountingProcessorHelper {
         if (accountMapping == null) {
             throw new ProductToGLAccountMappingNotFoundException(PortfolioProductType.WORKING_CAPITAL_LOAN, workingCapitalLoanProductId, CashAccountsForLoan.fromInt(accountMappingTypeId).toString());
         }
-        return accountMapping.getGlAccount();
+        return leftoverGlAccount(accountMapping.getGlAccountId());
     }
 
     private void createDebitJournalEntryForSavings(final Office office, final String currencyCode, final GLAccount account, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
@@ -922,7 +923,7 @@ public class AccountingProcessorHelper {
         GLAccount glAccount;
         if (isOrganizationAccount(accountMappingTypeId)) {
             FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
-            glAccount = financialActivityAccount.getGlAccount();
+            glAccount = leftoverGlAccount(financialActivityAccount.getGlAccountId());
         } else {
             ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId, PortfolioProductType.LOAN.getValue(), accountMappingTypeId);
             if (accountMappingTypeId == CashAccountsForLoan.FUND_SOURCE.getValue()) {
@@ -940,7 +941,7 @@ public class AccountingProcessorHelper {
             if (accountMapping == null) {
                 throw new ProductToGLAccountMappingNotFoundException(PortfolioProductType.LOAN, loanProductId, AccrualAccountsForLoan.fromInt(accountMappingTypeId).toString());
             }
-            glAccount = accountMapping.getGlAccount();
+            glAccount = leftoverGlAccount(accountMapping.getGlAccountId());
         }
         return glAccount;
     }
@@ -962,7 +963,7 @@ public class AccountingProcessorHelper {
                 accountMapping = chargeSpecificAccountMapping;
             }
         }
-        return accountMapping.getGlAccount();
+        return leftoverGlAccount(accountMapping.getGlAccountId());
     }
 
     private GLAccount getLinkedGLAccountForSavingsCharges(final Long savingsProductId, final int accountMappingTypeId, final Long chargeId) {
@@ -985,14 +986,14 @@ public class AccountingProcessorHelper {
                 accountMapping = chargeSpecificIncomeAccountMapping;
             }
         }
-        return accountMapping.getGlAccount();
+        return leftoverGlAccount(accountMapping.getGlAccountId());
     }
 
     private GLAccount getLinkedGLAccountForSavingsProduct(final Long savingsProductId, final int accountMappingTypeId, final Long paymentTypeId) {
         GLAccount glAccount;
         if (isOrganizationAccount(accountMappingTypeId)) {
             FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
-            glAccount = financialActivityAccount.getGlAccount();
+            glAccount = leftoverGlAccount(financialActivityAccount.getGlAccountId());
         } else {
             ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(savingsProductId, PortfolioProductType.SAVING.getValue(), accountMappingTypeId);
             if (accountMappingTypeId == CashAccountsForSavings.SAVINGS_REFERENCE.getValue()) {
@@ -1007,7 +1008,7 @@ public class AccountingProcessorHelper {
                     accountMapping = paymentChannelSpecificAccountMapping;
                 }
             }
-            glAccount = accountMapping.getGlAccount();
+            glAccount = leftoverGlAccount(accountMapping.getGlAccountId());
         }
         return glAccount;
     }
@@ -1016,7 +1017,7 @@ public class AccountingProcessorHelper {
         GLAccount glAccount;
         if (isOrganizationAccount(accountMappingTypeId)) {
             FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(accountMappingTypeId);
-            glAccount = financialActivityAccount.getGlAccount();
+            glAccount = leftoverGlAccount(financialActivityAccount.getGlAccountId());
         } else {
             ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(shareProductId, PortfolioProductType.SHARES.getValue(), accountMappingTypeId);
             if (accountMappingTypeId == CashAccountsForShares.SHARES_REFERENCE.getValue()) {
@@ -1025,7 +1026,7 @@ public class AccountingProcessorHelper {
                     accountMapping = paymentChannelSpecificAccountMapping;
                 }
             }
-            glAccount = accountMapping.getGlAccount();
+            glAccount = leftoverGlAccount(accountMapping.getGlAccountId());
         }
         return glAccount;
     }
@@ -1043,7 +1044,7 @@ public class AccountingProcessorHelper {
         if (chargeSpecificIncomeAccountMapping != null) {
             accountMapping = chargeSpecificIncomeAccountMapping;
         }
-        return accountMapping.getGlAccount();
+        return leftoverGlAccount(accountMapping.getGlAccountId());
     }
 
     private boolean isOrganizationAccount(final int accountMappingTypeId) {
@@ -1084,12 +1085,16 @@ public class AccountingProcessorHelper {
     }
 
     public void createDebitJournalEntryOrReversalForClientChargePayments(final Office office, final String currencyCode, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
-        final GLAccount account = financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.ASSET_FUND_SOURCE.getValue()).getGlAccount();
+        final GLAccount account = leftoverGlAccount(financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.ASSET_FUND_SOURCE.getValue()).getGlAccountId());
         if (isReversal) {
             createCreditJournalEntryForClientPayments(office, currencyCode, account, clientId, transactionId, transactionDate, amount);
         } else {
             createDebitJournalEntryForClientPayments(office, currencyCode, account, clientId, transactionId, transactionDate, amount);
         }
+    }
+
+    private GLAccount leftoverGlAccount(final Long glAccountId) {
+        return (GLAccount) GLAccountAssociation.persistableById(glAccountId);
     }
 
     private GLAccount getGLAccountById(final Long accountId) {

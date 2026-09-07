@@ -56,7 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccountWritePlatformService {
     private static final Logger LOG = LoggerFactory.getLogger(GLAccountWritePlatformServiceJpaRepositoryImpl.class);
-    private static final String GL_ACCOUNT = "glAccount";
+    private static final String GL_ACCOUNT_ID = "glAccountId";
     private final GLAccountRepository glAccountRepository;
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
@@ -133,7 +133,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
                 /**
                  * a detail account cannot be changed to a header account if transactions are already logged against it
                  */
-                final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+                final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT_ID), glAccountId));
                 if (journalEntriesForAccountExist) {
                     throw new GLAccountInvalidUpdateException(GlAccountInvalidUpdateReason.TRANSANCTIONS_LOGGED, glAccountId);
                 }
@@ -174,12 +174,12 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.HAS_CHILDREN, glAccountId);
         }
         // does this account have transactions logged against it
-        final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+        final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT_ID), glAccountId));
         if (journalEntriesForAccountExist) {
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.TRANSACTIONS_LOGGED, glAccountId);
         }
         // does this account mapped to product
-        final boolean accountMappingForAccountExists = this.productToGLAccountMappingRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+        final boolean accountMappingForAccountExists = this.productToGLAccountMappingRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT_ID), glAccountId));
         if (accountMappingForAccountExists) {
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.PRODUCT_MAPPING, glAccountId);
         }

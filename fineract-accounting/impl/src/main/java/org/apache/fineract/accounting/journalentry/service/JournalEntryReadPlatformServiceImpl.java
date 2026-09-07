@@ -322,7 +322,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
     @Override
     public OfficeOpeningBalancesData retrieveOfficeOpeningBalances(final Long officeId, String currencyCode) {
         final FinancialActivityAccount financialActivityAccountId = this.financialActivityAccountRepositoryWrapper.findByFinancialActivityTypeWithNotFoundDetection(300);
-        final Long contraId = financialActivityAccountId.getGlAccount().getId();
+        final Long contraId = financialActivityAccountId.getGlAccountId();
         if (contraId == null) {
             throw new GeneralPlatformDomainRuleException("error.msg.financial.activity.mapping.opening.balance.contra.account.cannot.be.null", "office-opening-balances-contra-account value can not be null", "office-opening-balances-contra-account");
         }

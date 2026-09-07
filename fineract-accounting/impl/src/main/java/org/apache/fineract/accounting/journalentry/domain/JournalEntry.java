@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
@@ -46,9 +46,11 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
      */
     @Column(name = "payment_details_id")
     private Long paymentDetailId;
-    @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    private GLAccount glAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "account_id", nullable = false)
+    private Long glAccountId;
     @Column(name = "currency_code", length = 3, nullable = false)
     private String currencyCode;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -89,9 +91,9 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         //
     }
 
-    protected JournalEntry(final Object office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
+    protected JournalEntry(final Object office, final Object paymentDetail, final Object glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
         this.officeId = OfficeAssociation.id(office);
-        this.glAccount = glAccount;
+        this.glAccountId = GLAccountAssociation.id(glAccount);
         this.reversalJournalEntry = null;
         this.transactionId = transactionId;
         this.reversed = false;
@@ -112,7 +114,7 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         this.submittedOnDate = DateUtils.getBusinessLocalDate();
     }
 
-    public static JournalEntry createNew(final Object office, final Object paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction, final Long clientTransaction, Long shareTransactionId) {
+    public static JournalEntry createNew(final Object office, final Object paymentDetail, final Object glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction, final Long clientTransaction, Long shareTransactionId) {
         return new JournalEntry(office, paymentDetail, glAccount, currencyCode, transactionId, manualEntry, transactionDate, journalEntryType.getValue(), amount, description, entityType, entityId, referenceNumber, loanTransaction, savingsTransaction, clientTransaction, shareTransactionId);
     }
 
@@ -135,8 +137,8 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getGlAccount() {
-        return this.glAccount;
+        public Long getGlAccountId() {
+        return this.glAccountId;
     }
 
     @java.lang.SuppressWarnings("all")

@@ -25,7 +25,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 
@@ -58,12 +58,16 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     private Long overdueInDays;
     @Column(name = "reseve_amount", nullable = false)
     private BigDecimal reservedAmount;
-    @ManyToOne
-    @JoinColumn(name = "liability_account", nullable = false)
-    private GLAccount liabilityAccount;
-    @ManyToOne
-    @JoinColumn(name = "expense_account", nullable = false)
-    private GLAccount expenseAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "liability_account", nullable = false)
+    private Long liabilityAccountId;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "expense_account", nullable = false)
+    private Long expenseAccountId;
 
     // TODO Note that this domain class does equals() & hashCode() on getId()
     // for @JoinColumn attributes, which not all other classes do...
@@ -73,7 +77,7 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
             return false;
         }
         LoanProductProvisioningEntry other = (LoanProductProvisioningEntry) obj;
-        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.officeId, this.officeId) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.categoryId, this.categoryId) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
+        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.officeId, this.officeId) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.categoryId, this.categoryId) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccountId, this.liabilityAccountId) && Objects.equals(other.expenseAccountId, this.expenseAccountId);
     }
 
     @Override
@@ -83,13 +87,13 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
         // liabilityAccount, expenseAccount);
         // to remain consistent with the implementation in equals(), also use
         // getId() here.
-        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, reservedAmount, liabilityAccountId, expenseAccountId);
     }
 
     public int partialHashCode() {
         // this is used to group together all the entries that have similar parameters (excluding the amount reserved)
         // rather than a check for if the objects are the same based on their values, this tells if they are similar
-        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, liabilityAccountId, expenseAccountId);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -133,13 +137,13 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getLiabilityAccount() {
-        return this.liabilityAccount;
+        public Long getLiabilityAccountId() {
+        return this.liabilityAccountId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getExpenseAccount() {
-        return this.expenseAccount;
+        public Long getExpenseAccountId() {
+        return this.expenseAccountId;
     }
 
     /**
@@ -218,8 +222,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public LoanProductProvisioningEntry setLiabilityAccount(final GLAccount liabilityAccount) {
-        this.liabilityAccount = liabilityAccount;
+        public LoanProductProvisioningEntry setLiabilityAccount(final Object liabilityAccount) {
+        this.liabilityAccountId = GLAccountAssociation.id(liabilityAccount);
         return this;
     }
 
@@ -227,8 +231,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public LoanProductProvisioningEntry setExpenseAccount(final GLAccount expenseAccount) {
-        this.expenseAccount = expenseAccount;
+        public LoanProductProvisioningEntry setExpenseAccount(final Object expenseAccount) {
+        this.expenseAccountId = GLAccountAssociation.id(expenseAccount);
         return this;
     }
 

@@ -18,16 +18,18 @@
  */
 package org.apache.fineract.accounting.journalentry;
 
+import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
-import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -39,10 +41,10 @@ public interface JournalEntryMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "officeId", source = "officeId")
     @Mapping(target = "officeName", source = "officeId", qualifiedByName = "officeIdToName")
-    @Mapping(target = "glAccountId", source = "glAccount.id")
-    @Mapping(target = "glAccountCode", source = "glAccount.glCode")
-    @Mapping(target = "glAccountName", source = "glAccount.name")
-    @Mapping(target = "glAccountType", source = "glAccount.type", qualifiedByName = "glAccountType")
+    @Mapping(target = "glAccountId", source = "glAccountId")
+    @Mapping(target = "glAccountCode", source = "glAccountId", qualifiedByName = "glAccountCode")
+    @Mapping(target = "glAccountName", source = "glAccountId", qualifiedByName = "glAccountName")
+    @Mapping(target = "glAccountType", source = "glAccountId", qualifiedByName = "glAccountTypeFromId")
     @Mapping(target = "transactionDate", source = "transactionDate")
     @Mapping(target = "entryType", source = "type", qualifiedByName = "journalEntryType")
     @Mapping(target = "amount", source = "amount")
@@ -85,6 +87,27 @@ public interface JournalEntryMapper {
     @Named("entityType")
     default PortfolioProductType mapEntityType(Integer entityTypeId) {
         return PortfolioProductType.fromInt(entityTypeId);
+    }
+
+    @Named("glAccountCode")
+    default String glAccountCode(final Long glAccountId) {
+        final GLAccount account = leftoverGlAccount(glAccountId);
+        return account == null ? null : account.getGlCode();
+    }
+
+    @Named("glAccountName")
+    default String glAccountName(final Long glAccountId) {
+        final GLAccount account = leftoverGlAccount(glAccountId);
+        return account == null ? null : account.getName();
+    }
+
+    @Named("glAccountTypeFromId")
+    default EnumOptionData glAccountTypeFromId(final Long glAccountId) {
+        final GLAccount account = leftoverGlAccount(glAccountId);
+        if (account == null || account.getType() == null) {
+            return null;
+        }
+        return mapGlAccountType(GLAccountType.fromInt(account.getType()));
     }
 
     @Named("glAccountType")
@@ -146,5 +169,10 @@ public interface JournalEntryMapper {
     private static PaymentDetail persistable(final JournalEntry journalEntry) {
         final Object persistable = PaymentDetailAssociation.persistableById(journalEntry.getPaymentDetailId());
         return persistable instanceof PaymentDetail detail ? detail : null;
+    }
+
+    private static GLAccount leftoverGlAccount(final Long glAccountId) {
+        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
+        return persistable instanceof GLAccount account ? account : null;
     }
 }

@@ -31,6 +31,7 @@ import org.apache.fineract.accounting.financialactivityaccount.exception.Financi
 import org.apache.fineract.accounting.financialactivityaccount.serialization.FinancialActivityAccountDataValidator;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -76,7 +77,7 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
      */
     private void validateFinancialActivityAndAccountMapping(FinancialActivityAccount financialActivityAccount) {
         FinancialActivity financialActivity = FinancialActivity.fromInt(financialActivityAccount.getFinancialActivityType());
-        GLAccount glAccount = financialActivityAccount.getGlAccount();
+        GLAccount glAccount = (GLAccount) GLAccountAssociation.persistableById(financialActivityAccount.getGlAccountId());
         if (!financialActivity.getMappedGLAccountType().getValue().equals(glAccount.getType())) {
             throw new FinancialActivityAccountInvalidException(financialActivity, glAccount);
         }
@@ -137,7 +138,7 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
 
     public Map<String, Object> findChanges(JsonCommand command, FinancialActivityAccount financialActivityAccount) {
         Map<String, Object> changes = new HashMap<>();
-        Long existingGLAccountId = financialActivityAccount.getGlAccount().getId();
+        Long existingGLAccountId = financialActivityAccount.getGlAccountId();
         Integer financialActivityType = financialActivityAccount.getFinancialActivityType();
         // is the account Id changed?
         if (command.isChangeInLongParameterNamed(FinancialActivityAccountsJsonInputParams.GL_ACCOUNT_ID.getValue(), existingGLAccountId)) {

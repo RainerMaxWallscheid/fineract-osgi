@@ -35,10 +35,13 @@ import org.apache.fineract.accounting.journalentry.data.LoanDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanTransactionDTO;
 import org.apache.fineract.accounting.journalentry.service.AccountingProcessorHelper;
 import org.apache.fineract.accounting.journalentry.service.AccrualBasedAccountingProcessorForLoan;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +79,11 @@ class CreateJournalEntriesForChargeOffLoanTest {
                 false, null, null, null);
     }
 
+    @AfterEach
+    void tearDown() {
+        GLAccountAssociation.setPersistablePort(null);
+    }
+
     @Test
     void shouldCreateJournalEntriesForChargeOff() {
         GLAccount chargeOffGLAccount = new GLAccount();
@@ -85,6 +93,10 @@ class CreateJournalEntriesForChargeOffLoanTest {
 
         ProductToGLAccountMapping chargeToGLAccountMapper = new ProductToGLAccountMapping();
         chargeToGLAccountMapper.setGlAccount(chargeOffGLAccount);
+
+        final GLAccountPersistablePort glAccountPort = mock(GLAccountPersistablePort.class);
+        when(glAccountPort.persistableById(15L)).thenReturn(chargeOffGLAccount);
+        GLAccountAssociation.setPersistablePort(glAccountPort);
 
         when(helper.getChargeOffMappingByCodeValue(1L, PortfolioProductType.LOAN, chargeOffReasonId)).thenReturn(chargeToGLAccountMapper);
 

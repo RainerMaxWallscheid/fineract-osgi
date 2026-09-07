@@ -28,6 +28,7 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.moduleapi.CashierJournalPort;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.springframework.stereotype.Service;
@@ -56,11 +57,11 @@ public class CashierJournalPortAdapter implements CashierJournalPort {
         final GLAccount debitAccount;
         final GLAccount creditAccount;
         if (allocate) {
-            debitAccount = tellerCash.getGlAccount();
-            creditAccount = mainVault.getGlAccount();
+            debitAccount = (GLAccount) GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
+            creditAccount = (GLAccount) GLAccountAssociation.persistableById(mainVault.getGlAccountId());
         } else {
-            debitAccount = mainVault.getGlAccount();
-            creditAccount = tellerCash.getGlAccount();
+            debitAccount = (GLAccount) GLAccountAssociation.persistableById(mainVault.getGlAccountId());
+            creditAccount = (GLAccount) GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
         }
         final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
         final JournalEntry debitJournalEntry = JournalEntry.createNew(office, null, debitAccount, currencyCode, transactionId, false,

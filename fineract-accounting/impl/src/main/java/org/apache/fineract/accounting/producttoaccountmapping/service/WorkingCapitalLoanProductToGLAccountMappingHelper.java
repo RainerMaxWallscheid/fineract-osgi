@@ -195,7 +195,7 @@ public class WorkingCapitalLoanProductToGLAccountMappingHelper {
             if (existingMapping == null) {
                 saveAccountMapping(element, paramName, productId, accountTypeId, expectedAccountTypes);
                 changes.put(paramName, accountId);
-            } else if (existingMapping.getGlAccount() != null && !Objects.equals(existingMapping.getGlAccount().getId(), accountId)) {
+            } else if (existingMapping.getGlAccountId() != null && !Objects.equals(existingMapping.getGlAccountId(), accountId)) {
                 final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountTypes, accountId);
                 changes.put(paramName, accountId);
                 existingMapping.setGlAccount(glAccount);

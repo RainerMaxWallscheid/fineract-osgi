@@ -22,8 +22,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -34,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.rule.data.AccountingRuleJsonInputParams;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
@@ -51,12 +49,16 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
      */
     @Column(name = "office_id")
     private Long officeId;
-    @ManyToOne
-    @JoinColumn(name = "debit_account_id", nullable = true)
-    private GLAccount accountToDebit;
-    @ManyToOne
-    @JoinColumn(name = "credit_account_id", nullable = true)
-    private GLAccount accountToCredit;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "debit_account_id")
+    private Long accountToDebitId;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "credit_account_id")
+    private Long accountToCreditId;
     @Column(name = "description", nullable = true, length = 500)
     private String description;
     @Column(name = "system_defined", nullable = false)
@@ -68,7 +70,7 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
     @Column(name = "allow_multiple_debits", nullable = false)
     private boolean allowMultipleDebitEntries;
 
-    public static AccountingRule fromJson(final Object office, final GLAccount accountToDebit, final GLAccount accountToCredit, final JsonCommand command, final boolean allowMultipleCreditEntries, final boolean allowMultipleDebitEntries) {
+    public static AccountingRule fromJson(final Object office, final Object accountToDebit, final Object accountToCredit, final JsonCommand command, final boolean allowMultipleCreditEntries, final boolean allowMultipleDebitEntries) {
         final String name = command.stringValueOfParameterNamed(AccountingRuleJsonInputParams.NAME.getValue());
         final String description = command.stringValueOfParameterNamed(AccountingRuleJsonInputParams.DESCRIPTION.getValue());
         final boolean systemDefined = false;
@@ -78,8 +80,8 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
     public Map<String, Object> update(final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(10);
         handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.OFFICE_ID.getValue(), this.officeId == null ? 0L : this.officeId);
-        handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.ACCOUNT_TO_DEBIT.getValue(), this.accountToDebit == null ? 0L : this.accountToDebit.getId());
-        handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.ACCOUNT_TO_CREDIT.getValue(), this.accountToCredit == null ? 0L : this.accountToCredit.getId());
+        handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.ACCOUNT_TO_DEBIT.getValue(), this.accountToDebitId == null ? 0L : this.accountToDebitId);
+        handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.ACCOUNT_TO_CREDIT.getValue(), this.accountToCreditId == null ? 0L : this.accountToCreditId);
         handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.NAME.getValue(), this.name);
         handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.DESCRIPTION.getValue(), this.description);
         handlePropertyUpdate(command, actualChanges, AccountingRuleJsonInputParams.SYSTEM_DEFINED.getValue(), this.systemDefined);
@@ -109,10 +111,10 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
             if (paramName.equals(AccountingRuleJsonInputParams.SYSTEM_DEFINED.getValue())) {
                 this.systemDefined = newValue;
             } else if (paramName.equals(AccountingRuleJsonInputParams.ALLOW_MULTIPLE_CREDIT_ENTRIES.getValue())) {
-                if (this.accountToCredit == null) {
+                if (this.accountToCreditId == null) {
                     this.allowMultipleCreditEntries = newValue;
                 }
-            } else if (paramName.equals(AccountingRuleJsonInputParams.ALLOW_MULTIPLE_DEBIT_ENTRIES.getValue()) && this.accountToDebit == null) {
+            } else if (paramName.equals(AccountingRuleJsonInputParams.ALLOW_MULTIPLE_DEBIT_ENTRIES.getValue()) && this.accountToDebitId == null) {
                 this.allowMultipleDebitEntries = newValue;
             }
         }
@@ -184,13 +186,13 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getAccountToDebit() {
-        return this.accountToDebit;
+        public Long getAccountToDebitId() {
+        return this.accountToDebitId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getAccountToCredit() {
-        return this.accountToCredit;
+        public Long getAccountToCreditId() {
+        return this.accountToCreditId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -240,8 +242,8 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public AccountingRule setAccountToDebit(final GLAccount accountToDebit) {
-        this.accountToDebit = accountToDebit;
+        public AccountingRule setAccountToDebit(final Object accountToDebit) {
+        this.accountToDebitId = GLAccountAssociation.id(accountToDebit);
         return this;
     }
 
@@ -249,8 +251,8 @@ public class AccountingRule extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public AccountingRule setAccountToCredit(final GLAccount accountToCredit) {
-        this.accountToCredit = accountToCredit;
+        public AccountingRule setAccountToCredit(final Object accountToCredit) {
+        this.accountToCreditId = GLAccountAssociation.id(accountToCredit);
         return this;
     }
 

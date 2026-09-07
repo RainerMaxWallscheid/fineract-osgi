@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
@@ -63,14 +64,14 @@ public class ProvisioningJournalEntryService {
                     + " and transaction Id " + journalEntry.getTransactionId();
             if (journalEntry.isDebitEntry()) {
                 reversalJournalEntry = JournalEntry.createNew(journalEntry.getOfficeId(), journalEntry.getPaymentDetailId(),
-                        journalEntry.getGlAccount(), journalEntry.getCurrencyCode(), journalEntry.getTransactionId(), Boolean.FALSE,
+                        journalEntry.getGlAccountId(), journalEntry.getCurrencyCode(), journalEntry.getTransactionId(), Boolean.FALSE,
                         reversalTransactionDate, JournalEntryType.CREDIT, journalEntry.getAmount(), reversalComment,
                         journalEntry.getEntityType(), journalEntry.getEntityId(), journalEntry.getReferenceNumber(),
                         journalEntry.getLoanTransactionId(), journalEntry.getSavingsTransactionId(), journalEntry.getClientTransactionId(),
                         journalEntry.getShareTransactionId());
             } else {
                 reversalJournalEntry = JournalEntry.createNew(journalEntry.getOfficeId(), journalEntry.getPaymentDetailId(),
-                        journalEntry.getGlAccount(), journalEntry.getCurrencyCode(), journalEntry.getTransactionId(), Boolean.FALSE,
+                        journalEntry.getGlAccountId(), journalEntry.getCurrencyCode(), journalEntry.getTransactionId(), Boolean.FALSE,
                         reversalTransactionDate, JournalEntryType.DEBIT, journalEntry.getAmount(), reversalComment,
                         journalEntry.getEntityType(), journalEntry.getEntityId(), journalEntry.getReferenceNumber(),
                         journalEntry.getLoanTransactionId(), journalEntry.getSavingsTransactionId(), journalEntry.getClientTransactionId(),
@@ -104,19 +105,21 @@ public class ProvisioningJournalEntryService {
             liabilityMap.clear();
             expenseMap.clear();
             for (LoanProductProvisioningEntry lppEntry : entry.getValue()) {
-                if (liabilityMap.containsKey(lppEntry.getLiabilityAccount())) {
-                    BigDecimal amount = liabilityMap.get(lppEntry.getLiabilityAccount());
+                final GLAccount liabilityAccount = (GLAccount) GLAccountAssociation.persistableById(lppEntry.getLiabilityAccountId());
+                final GLAccount expenseAccount = (GLAccount) GLAccountAssociation.persistableById(lppEntry.getExpenseAccountId());
+                if (liabilityMap.containsKey(liabilityAccount)) {
+                    BigDecimal amount = liabilityMap.get(liabilityAccount);
                     amount = amount.add(lppEntry.getReservedAmount());
-                    liabilityMap.put(lppEntry.getLiabilityAccount(), amount);
+                    liabilityMap.put(liabilityAccount, amount);
                 } else {
-                    liabilityMap.put(lppEntry.getLiabilityAccount(), BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
+                    liabilityMap.put(liabilityAccount, BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
                 }
-                if (expenseMap.containsKey(lppEntry.getExpenseAccount())) {
-                    BigDecimal amount = expenseMap.get(lppEntry.getExpenseAccount());
+                if (expenseMap.containsKey(expenseAccount)) {
+                    BigDecimal amount = expenseMap.get(expenseAccount);
                     amount = amount.add(lppEntry.getReservedAmount());
-                    expenseMap.put(lppEntry.getExpenseAccount(), amount);
+                    expenseMap.put(expenseAccount, amount);
                 } else {
-                    expenseMap.put(lppEntry.getExpenseAccount(), BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
+                    expenseMap.put(expenseAccount, BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
                 }
             }
             createJournalEntry(provisioningEntry.getCreatedDate(), provisioningEntry.getId(), entry.getKey().officeId,
