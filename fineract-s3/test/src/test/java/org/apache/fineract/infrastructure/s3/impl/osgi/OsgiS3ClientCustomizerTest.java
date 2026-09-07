@@ -16,12 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.s3;
+package org.apache.fineract.infrastructure.s3.impl.osgi;
 
-/**
- * S3 client customization without AWS SDK types (ADR-021). Leftover {@code S3ClientBuilder} is Object-typed.
- */
-public interface S3ClientCustomizer {
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-    void customize(Object builder);
+import org.junit.jupiter.api.Test;
+
+class OsgiS3ClientCustomizerTest {
+
+    private final OsgiS3ClientCustomizer port = new OsgiS3ClientCustomizer();
+
+    @Test
+    void emptyCatalogCustomizeIsNoOp() {
+        assertDoesNotThrow(() -> port.customize(null));
+    }
 }

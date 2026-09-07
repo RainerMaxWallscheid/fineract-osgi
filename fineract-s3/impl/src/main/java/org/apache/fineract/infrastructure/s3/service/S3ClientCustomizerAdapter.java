@@ -16,12 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.s3;
+package org.apache.fineract.infrastructure.s3.service;
 
-/**
- * S3 client customization without AWS SDK types (ADR-021). Leftover {@code S3ClientBuilder} is Object-typed.
- */
-public interface S3ClientCustomizer {
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
+import org.springframework.stereotype.Service;
 
-    void customize(Object builder);
+@Service
+public class S3ClientCustomizerAdapter implements S3ClientCustomizer {
+
+    @Override
+    public void customize(final Object builder) {
+        // production default: no extra client customization
+    }
 }

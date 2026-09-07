@@ -53,6 +53,7 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookP
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
@@ -362,7 +363,8 @@ public final class EquinoxSpringBridgeSmoke {
                 probeOf(BulkImportWorkbookPopulatorService.class, s -> s instanceof BulkImportWorkbookPopulatorService p
                         && HostedBulkImportWorkbookPopulatorService.HOSTED.equals(p.getTemplate("hosted", null, null, null))),
                 probeOf(InstanceModePort.class, EquinoxSpringBridgeSmoke::instanceModeWins),
-                probeOf(OpenApiPort.class, EquinoxSpringBridgeSmoke::openApiWins));
+                probeOf(OpenApiPort.class, EquinoxSpringBridgeSmoke::openApiWins),
+                probeOf(S3ClientCustomizer.class, EquinoxSpringBridgeSmoke::s3Wins));
     }
 
     private static NamedProbe probeOf(final Class<?> type, final Predicate<Object> hosted) {
@@ -430,6 +432,14 @@ public final class EquinoxSpringBridgeSmoke {
             return false;
         }
         return port.isRemovingUnreferencedDefinitions() && HostedOpenApiPort.HOSTED.equals(port.last());
+    }
+
+    private static boolean s3Wins(final Object service) {
+        if (!(service instanceof HostedS3ClientCustomizer port)) {
+            return false;
+        }
+        port.customize(null);
+        return HostedS3ClientCustomizer.HOSTED.equals(port.last());
     }
 
     private static boolean commandWins(final Object service) {

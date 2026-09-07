@@ -111,6 +111,7 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookP
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
 import org.apache.fineract.interoperation.service.InteropService;
 import org.apache.fineract.investor.service.DelayedSettlementAttributeService;
 import org.apache.fineract.mix.data.MixTaxonomyData;
@@ -2520,6 +2521,29 @@ class EquinoxFrameworkLifecycleTest {
     }
 
     @Test
+    void s3LookupFacadeDelegatesToPublishedSpringPort() {
+        final boolean[] seen = { false };
+        final S3ClientCustomizer spring = builder -> seen[0] = true;
+        final SpringOsgiPortBridge bridge = s3Bridge(spring);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge);
+        final OsgiServiceLookup lookup = new OsgiServiceLookup(lifecycle::getBundleContext);
+        final S3ClientCustomizer facade = OsgiBackedPortFactory.of(lookup, S3ClientCustomizer.class);
+
+        facade.customize(null);
+        assertFalse(seen[0]);
+        lifecycle.start();
+        try {
+            facade.customize(null);
+            assertTrue(seen[0]);
+        } finally {
+            lifecycle.stop();
+        }
+        seen[0] = false;
+        facade.customize(null);
+        assertFalse(seen[0]);
+    }
+
+    @Test
     void emptyFallbackReturnsOptionalCollectionCommandResultAndZero() {
         final FloatingRatePort rates = OsgiBackedPortFactory.empty(FloatingRatePort.class);
         assertTrue(rates.findFloatingRate(1L).isEmpty());
@@ -2542,6 +2566,7 @@ class EquinoxFrameworkLifecycleTest {
         assertNull(OsgiBackedPortFactory.empty(BulkImportWorkbookPopulatorService.class).getTemplate("hosted", null, null, null));
         OsgiBackedPortFactory.empty(InstanceModePort.class).changeMode(true, true, true, true);
         assertFalse(OsgiBackedPortFactory.empty(OpenApiPort.class).isRemovingUnreferencedDefinitions());
+        OsgiBackedPortFactory.empty(S3ClientCustomizer.class).customize(null);
     }
 
     @Test
@@ -4520,6 +4545,36 @@ class EquinoxFrameworkLifecycleTest {
         assertFalse(lifecycle.isRunning());
     }
 
+    @Test
+    void stagedCatalogStartsAndSpringS3ClientCustomizerStillWins() {
+        final Path catalog = stagedCatalog();
+        assumeTrue(Files.isRegularFile(catalog.resolve("config").resolve("config.ini")), "run ./gradlew osgiStageBundles first");
+        final S3ClientCustomizer s3 = new StubS3ClientCustomizer();
+        final SpringOsgiPortBridge bridge = s3Bridge(s3);
+        final EquinoxFrameworkLifecycle lifecycle = new EquinoxFrameworkLifecycle(bridge, catalog);
+
+        lifecycle.start();
+        try {
+            assertTrue(lifecycle.isRunning());
+            final BundleContext ctx = lifecycle.getBundleContext();
+            boolean s3ImplActive = false;
+            for (final Bundle bundle : ctx.getBundles()) {
+                if ("org.apache.fineract.s3.impl".equals(bundle.getSymbolicName()) && bundle.getState() == Bundle.ACTIVE) {
+                    s3ImplActive = true;
+                    break;
+                }
+            }
+            assertTrue(s3ImplActive);
+            final ServiceReference<S3ClientCustomizer> selected = ctx.getServiceReference(S3ClientCustomizer.class);
+            assertEquals(SpringOsgiPortBridge.PROVIDER, selected.getProperty("provider"));
+            assertSame(s3, ctx.getService(selected));
+            ctx.ungetService(selected);
+        } finally {
+            lifecycle.stop();
+        }
+        assertFalse(lifecycle.isRunning());
+    }
+
     private static SpringOsgiPortBridge wave2Bridge(final ChargeDefinitionPort charge, final DelayedSettlementAttributeService delayed) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(ChargeDefinitionPort.class, charge),
                 SpringOsgiPortBridge.bind(DelayedSettlementAttributeService.class, delayed)));
@@ -4785,6 +4840,10 @@ class EquinoxFrameworkLifecycleTest {
 
     private static SpringOsgiPortBridge openApiBridge(final OpenApiPort openApi) {
         return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(OpenApiPort.class, openApi)));
+    }
+
+    private static SpringOsgiPortBridge s3Bridge(final S3ClientCustomizer s3) {
+        return new SpringOsgiPortBridge(List.of(SpringOsgiPortBridge.bind(S3ClientCustomizer.class, s3)));
     }
 
     private static Path stagedCatalog() {
@@ -5979,5 +6038,11 @@ class EquinoxFrameworkLifecycleTest {
         public boolean isRemovingUnreferencedDefinitions() {
             return false;
         }
+    }
+
+    private static final class StubS3ClientCustomizer implements S3ClientCustomizer {
+
+        @Override
+        public void customize(final Object builder) {}
     }
 }

@@ -16,12 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.s3;
 
-/**
- * S3 client customization without AWS SDK types (ADR-021). Leftover {@code S3ClientBuilder} is Object-typed.
- */
-public interface S3ClientCustomizer {
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
 
-    void customize(Object builder);
+/** Composition-root hosted S3 client customization for the Equinox bridge smoke. */
+final class HostedS3ClientCustomizer implements S3ClientCustomizer {
+
+    static final String HOSTED = "hosted";
+
+    private String last;
+
+    @Override
+    public void customize(final Object builder) {
+        last = HOSTED;
+    }
+
+    String last() {
+        return last;
+    }
 }

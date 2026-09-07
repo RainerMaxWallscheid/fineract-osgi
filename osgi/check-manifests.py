@@ -65,12 +65,8 @@ KNOWN_API_SPLITS: dict[str, frozenset[str]] = {}
 # No Equinox Bundle-Activator remains. Empty-catalog ports use DS.
 ALLOWED_ACTIVATOR_STEMS: frozenset[str] = frozenset()
 
-# No Equinox-safe catalog port (AWS SDK).
-NO_PORT_STEMS: frozenset[str] = frozenset(
-    {
-        "s3",
-    }
-)
+# Every domain impl publishes an Equinox-safe catalog port.
+NO_PORT_STEMS: frozenset[str] = frozenset()
 
 IMPLEMENTATION_CLASS_RE = re.compile(r'<implementation\s+class="([^"]+)"')
 PROVIDE_INTERFACE_RE = re.compile(r'<provide\s+interface="([^"]+)"')

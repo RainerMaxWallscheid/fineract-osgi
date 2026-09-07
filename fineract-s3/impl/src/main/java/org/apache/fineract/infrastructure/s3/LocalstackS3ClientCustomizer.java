@@ -32,10 +32,11 @@ public class LocalstackS3ClientCustomizer implements S3ClientCustomizer {
     private final Environment environment;
 
     @Override
-    public void customize(S3ClientBuilder builder) {
+    public void customize(final Object builder) {
+        final S3ClientBuilder s3Builder = (S3ClientBuilder) builder;
         String env = environment.getProperty("AWS_ENDPOINT_URL", "");
         if (StringUtils.isNotBlank(env)) {
-            builder.endpointOverride(URI.create(env)).forcePathStyle(true);
+            s3Builder.endpointOverride(URI.create(env)).forcePathStyle(true);
         }
     }
 

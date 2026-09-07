@@ -16,12 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.s3;
+package org.apache.fineract.infrastructure.s3.impl.osgi;
+
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
 
 /**
- * S3 client customization without AWS SDK types (ADR-021). Leftover {@code S3ClientBuilder} is Object-typed.
+ * Empty S3 client customizer for Equinox without Spring/AWS. Published by {@code OSGI-INF/s3.xml} (ADR-022 B6).
  */
-public interface S3ClientCustomizer {
+public final class OsgiS3ClientCustomizer implements S3ClientCustomizer {
 
-    void customize(Object builder);
+    @Override
+    public void customize(final Object builder) {
+        // empty catalog: no-op
+    }
 }

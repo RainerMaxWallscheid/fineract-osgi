@@ -30,22 +30,22 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.s3.S3Client;
 
-/** Spring ↔ OSGi bridge for S3 client beans. */
+/**
+ * Spring ↔ OSGi bridge for S3 peel.
+ * <p>
+ * AWS {@code S3Client} stays unpublished. This peel hosts {@link S3ClientCustomizer}.
+ */
 @Component
 public class S3OsgiServiceRegistrar implements InitializingBean, DisposableBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(S3OsgiServiceRegistrar.class);
 
-    private final ObjectProvider<S3Client> s3Client;
-    private final ObjectProvider<List<S3ClientCustomizer>> customizers;
+    private final ObjectProvider<S3ClientCustomizer> customizer;
     private final List<Object> registrations = new ArrayList<>();
 
-    public S3OsgiServiceRegistrar(final ObjectProvider<S3Client> s3Client,
-            final ObjectProvider<List<S3ClientCustomizer>> customizers) {
-        this.s3Client = s3Client;
-        this.customizers = customizers;
+    public S3OsgiServiceRegistrar(final ObjectProvider<S3ClientCustomizer> customizer) {
+        this.customizer = customizer;
     }
 
     @Override
@@ -61,9 +61,8 @@ public class S3OsgiServiceRegistrar implements InitializingBean, DisposableBean 
             if (context == null) {
                 return;
             }
-            register(context, S3Client.class, s3Client.getIfAvailable());
-            LOG.info("Registered {} S3 OSGi service(s) (customizers available: {})", registrations.size(),
-                    customizers.getIfAvailable() != null);
+            register(context, S3ClientCustomizer.class, customizer.getIfAvailable());
+            LOG.info("Registered {} S3 OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only S3 wiring");
         } catch (final ReflectiveOperationException ex) {

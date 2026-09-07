@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTr
 import org.apache.fineract.infrastructure.gcm.service.NotificationConfigurationReadService;
 import org.apache.fineract.infrastructure.instancemode.moduleapi.InstanceModePort;
 import org.apache.fineract.infrastructure.openapi.moduleapi.OpenApiPort;
+import org.apache.fineract.infrastructure.s3.S3ClientCustomizer;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
 import org.apache.fineract.infrastructure.jobs.service.StuckJobExecutorService;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobConfigurationReadPlatformService;
@@ -114,7 +115,7 @@ import org.springframework.context.annotation.Primary;
  * {@code ExternalServicesReadPlatformService}, {@code StuckJobExecutorService}, {@code PropertyService},
  * {@code PaymentDetailWritePlatformService}, {@code CommandDispatcher}, {@code PortfolioNotificationEventPort},
  * {@code SmsCampaignTriggerEventPort}, {@code InteropService}, {@code BulkImportWorkbookService},
- * {@code BulkImportWorkbookPopulatorService}, {@code InstanceModePort}, and {@code OpenApiPort} are {@code @Primary} lookup façades when Equinox is
+ * {@code BulkImportWorkbookPopulatorService}, {@code InstanceModePort}, {@code OpenApiPort}, and {@code S3ClientCustomizer} are {@code @Primary} lookup façades when Equinox is
  * on — Boot consumers resolve them from the Service Registry.
  */
 @Configuration
@@ -516,5 +517,11 @@ public class OsgiBackedPortConfiguration {
     @Primary
     public OpenApiPort osgiOpenApiPort(final OsgiServiceLookup lookup) {
         return backed(lookup, OpenApiPort.class);
+    }
+
+    @Bean
+    @Primary
+    public S3ClientCustomizer osgiS3ClientCustomizer(final OsgiServiceLookup lookup) {
+        return backed(lookup, S3ClientCustomizer.class);
     }
 }
