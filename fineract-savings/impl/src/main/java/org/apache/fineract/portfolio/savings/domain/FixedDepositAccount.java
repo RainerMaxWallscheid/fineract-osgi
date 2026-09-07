@@ -65,7 +65,7 @@ import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.domain.interest.PostingPeriod;
 import org.apache.fineract.portfolio.savings.domain.interest.SavingsAccountTransactionDetailsForPostingPeriod;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @DiscriminatorValue("200")
@@ -88,7 +88,7 @@ public class FixedDepositAccount extends SavingsAccount {
 
     public static FixedDepositAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
             final Object fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
-            final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
+            final LocalDate submittedOnDate, final Object submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
@@ -111,7 +111,7 @@ public class FixedDepositAccount extends SavingsAccount {
 
     private FixedDepositAccount(final Object client, final Object group, final SavingsProduct product, final Object fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
-            final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
+            final LocalDate submittedOnDate, final Object submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
@@ -328,7 +328,7 @@ public class FixedDepositAccount extends SavingsAccount {
         return allPostingPeriods;
     }
 
-    public void prematureClosure(final AppUser currentUser, final JsonCommand command, final Map<String, Object> actualChanges) {
+    public void prematureClosure(final Object currentUser, final JsonCommand command, final Map<String, Object> actualChanges) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
                 .resource(FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME + DepositsApiConstants.preMatureCloseAction);
@@ -404,11 +404,11 @@ public class FixedDepositAccount extends SavingsAccount {
         actualChanges.put(SavingsApiConstants.closedOnDateParamName, closedDate.format(fmt));
 
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = closedDate;
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
         this.summary.updateSummary(this.currency, this.savingsAccountTransactionSummaryWrapper, this.transactions);
     }
 
@@ -417,7 +417,7 @@ public class FixedDepositAccount extends SavingsAccount {
         return Money.of(this.currency, this.accountTermAndPreClosure.depositAmount());
     }
 
-    public void close(final AppUser currentUser, final JsonCommand command, final Map<String, Object> actualChanges) {
+    public void close(final Object currentUser, final JsonCommand command, final Map<String, Object> actualChanges) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
                 .resource(FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME + SavingsApiConstants.closeAction);
@@ -490,11 +490,11 @@ public class FixedDepositAccount extends SavingsAccount {
         actualChanges.put(SavingsApiConstants.closedOnDateParamName, closedDate.format(fmt));
 
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = closedDate;
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
         // this.summary.updateSummary(this.currency,
         // this.savingsAccountTransactionSummaryWrapper, this.transactions);
     }
@@ -671,7 +671,7 @@ public class FixedDepositAccount extends SavingsAccount {
     }
 
     @Override
-    public Map<String, Object> activate(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> activate(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = super.activate(currentUser, command);
 
         // if (isAccountLocked(calculateMaturityDate())) {
@@ -810,7 +810,7 @@ public class FixedDepositAccount extends SavingsAccount {
         final String accountNumber = null;
         final boolean withHoldTax = this.withHoldTax;
         final FixedDepositAccount reInvestedAccount = FixedDepositAccount.createNewApplicationForSubmittal(persistableClient(), persistableGroup(), product,
-                savingsOfficerId, accountNumber, externalId, accountType, getClosedOnDate(), closedBy, interestRate, compoundingPeriodType,
+                savingsOfficerId, accountNumber, externalId, accountType, getClosedOnDate(), this.closedById, interestRate, compoundingPeriodType,
                 postingPeriodType, interestCalculationType, daysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency,
                 lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, savingsAccountCharges, newAccountTermAndPreClosure, newChart,
                 withHoldTax);

@@ -52,6 +52,8 @@ dependencies {
     implementation(project(path: ':fineract-calendar-api'))
     // Staff lookup for deposit account templates
     implementation(project(path: ':fineract-organisation-api'))
+    // AppUser id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-useradministration-api'))
     // Thin EntityDatatableTemplatesReadService for savings account templates
     implementation(project(path: ':fineract-dataqueries-api'))
     // Collection-sheet constants on leftover deposit assembler

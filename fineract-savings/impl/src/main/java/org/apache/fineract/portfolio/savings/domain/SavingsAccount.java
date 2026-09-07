@@ -123,7 +123,7 @@ import org.apache.fineract.portfolio.savings.exception.SavingsTransferTransactio
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 import org.apache.fineract.portfolio.tax.moduleapi.TaxComponentShareData;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -186,44 +186,56 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Column(name = "submittedon_date", nullable = true)
     protected LocalDate submittedOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "submittedon_userid", nullable = true)
-    protected AppUser submittedBy;
+    /**
+     * Submitted-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "submittedon_userid", nullable = true)
+    protected Long submittedById;
 
     @Column(name = "rejectedon_date")
     protected LocalDate rejectedOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "rejectedon_userid", nullable = true)
-    protected AppUser rejectedBy;
+    /**
+     * Rejected-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "rejectedon_userid", nullable = true)
+    protected Long rejectedById;
 
     @Column(name = "withdrawnon_date")
     protected LocalDate withdrawnOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "withdrawnon_userid", nullable = true)
-    protected AppUser withdrawnBy;
+    /**
+     * Withdrawn-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "withdrawnon_userid", nullable = true)
+    protected Long withdrawnById;
 
     @Column(name = "approvedon_date")
     protected LocalDate approvedOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "approvedon_userid", nullable = true)
-    protected AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approvedon_userid", nullable = true)
+    protected Long approvedById;
 
     @Column(name = "activatedon_date", nullable = true)
     protected LocalDate activatedOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "activatedon_userid", nullable = true)
-    protected AppUser activatedBy;
+    /**
+     * Activated-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "activatedon_userid", nullable = true)
+    protected Long activatedById;
 
     @Column(name = "closedon_date")
     protected LocalDate closedOnDate;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "closedon_userid", nullable = true)
-    protected AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closedon_userid", nullable = true)
+    protected Long closedById;
 
     @Column(name = "reason_for_block", nullable = true)
     protected String reasonForBlock;
@@ -372,7 +384,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     public static SavingsAccount createNewApplicationForSubmittal(final Object client, final Object group, final SavingsProduct product,
             final Object fieldOfficer, final String accountNo, final ExternalId externalId, final AccountType accountType,
-            final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,
+            final LocalDate submittedOnDate, final Object submittedBy, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
@@ -394,7 +406,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Object fieldOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
-            final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
+            final LocalDate submittedOnDate, final Object submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
@@ -410,7 +422,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     protected SavingsAccount(final Object client, final Object group, final SavingsProduct product, final Object savingsOfficer,
             final String accountNo, final ExternalId externalId, final SavingsAccountStatusType status, final AccountType accountType,
-            final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal nominalAnnualInterestRate,
+            final LocalDate submittedOnDate, final Object submittedBy, final BigDecimal nominalAnnualInterestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
@@ -435,7 +447,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.status = status.getValue();
         this.accountType = accountType.getValue();
         this.submittedOnDate = submittedOnDate;
-        this.submittedBy = submittedBy;
+        this.submittedById = AppUserAssociation.id(submittedBy);
         this.nominalAnnualInterestRate = nominalAnnualInterestRate;
         this.interestCompoundingPeriodType = interestCompoundingPeriodType.getValue();
         this.interestPostingPeriodType = interestPostingPeriodType.getValue();
@@ -1112,16 +1124,16 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return this.activatedOnDate;
     }
 
-    public AppUser getActivatedBy() {
-        return this.activatedBy;
+    public Long getActivatedById() {
+        return this.activatedById;
     }
 
     public LocalDate getWithdrawnOnDate() {
         return this.withdrawnOnDate;
     }
 
-    public AppUser getWithdrawnBy() {
-        return this.withdrawnBy;
+    public Long getWithdrawnById() {
+        return this.withdrawnById;
     }
 
     // startInterestCalculationDate is set during migration so that there is no
@@ -2073,8 +2085,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return rejectedOnDate;
     }
 
-    public AppUser getRejectedBy() {
-        return this.rejectedBy;
+    public Long getRejectedById() {
+        return this.rejectedById;
     }
 
     public void removeSavingsOfficer(final LocalDate unassignDate) {
@@ -2166,7 +2178,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return this.nominalAnnualInterestRateOverdraft;
     }
 
-    public Map<String, Object> approveApplication(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> approveApplication(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -2191,7 +2203,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         final String approvedOnDateChange = command.stringValueOfParameterNamed(SavingsApiConstants.approvedOnDateParamName);
 
         this.approvedOnDate = approvedOn;
-        this.approvedBy = currentUser;
+        this.approvedById = AppUserAssociation.id(currentUser);
         actualChanges.put(SavingsApiConstants.localeParamName, command.locale());
         actualChanges.put(SavingsApiConstants.dateFormatParamName, command.dateFormat());
         actualChanges.put(SavingsApiConstants.approvedOnDateParamName, approvedOnDateChange);
@@ -2255,13 +2267,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         actualChanges.put(SavingsApiConstants.statusParamName, SavingsEnumerations.status(this.status));
 
         this.approvedOnDate = null;
-        this.approvedBy = null;
+        this.approvedById = null;
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = null;
-        this.closedBy = null;
+        this.closedById = null;
         actualChanges.put(SavingsApiConstants.approvedOnDateParamName, "");
 
         // FIXME - kw - support field officer history for savings accounts
@@ -2397,7 +2409,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
     }
 
-    public Map<String, Object> rejectApplication(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> rejectApplication(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -2422,11 +2434,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         final String rejectedOnAsString = command.stringValueOfParameterNamed(SavingsApiConstants.rejectedOnDateParamName);
 
         this.rejectedOnDate = rejectedOn;
-        this.rejectedBy = currentUser;
+        this.rejectedById = AppUserAssociation.id(currentUser);
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = rejectedOn;
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
 
         actualChanges.put(SavingsApiConstants.localeParamName, command.locale());
         actualChanges.put(SavingsApiConstants.dateFormatParamName, command.dateFormat());
@@ -2458,7 +2470,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return actualChanges;
     }
 
-    public Map<String, Object> applicantWithdrawsFromApplication(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> applicantWithdrawsFromApplication(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -2483,11 +2495,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         final String withdrawnOnAsString = command.stringValueOfParameterNamed(SavingsApiConstants.withdrawnOnDateParamName);
 
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = withdrawnOn;
-        this.withdrawnBy = currentUser;
+        this.withdrawnById = AppUserAssociation.id(currentUser);
         this.closedOnDate = withdrawnOn;
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
 
         actualChanges.put(SavingsApiConstants.localeParamName, command.locale());
         actualChanges.put(SavingsApiConstants.dateFormatParamName, command.dateFormat());
@@ -2519,7 +2531,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return actualChanges;
     }
 
-    public Map<String, Object> activate(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> activate(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -2548,13 +2560,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         actualChanges.put(SavingsApiConstants.activatedOnDateParamName, activationDate.format(fmt));
 
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = null;
-        this.closedBy = null;
+        this.closedById = null;
         this.activatedOnDate = activationDate;
-        this.activatedBy = currentUser;
+        this.activatedById = AppUserAssociation.id(currentUser);
         this.lockedInUntilDate = calculateDateAccountIsLockedUntil(getActivationDate());
 
         /*
@@ -2610,22 +2622,22 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return Money.of(this.currency, this.minRequiredOpeningBalance);
     }
 
-    public void approveAndActivateApplication(final LocalDate appliedonDate, final AppUser appliedBy) {
+    public void approveAndActivateApplication(final LocalDate appliedonDate, final Object appliedBy) {
         this.status = SavingsAccountStatusType.ACTIVE.getValue();
         this.approvedOnDate = appliedonDate;
-        this.approvedBy = appliedBy;
+        this.approvedById = AppUserAssociation.id(appliedBy);
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = null;
-        this.closedBy = null;
+        this.closedById = null;
         this.activatedOnDate = appliedonDate;
-        this.activatedBy = appliedBy;
+        this.activatedById = AppUserAssociation.id(appliedBy);
         this.lockedInUntilDate = calculateDateAccountIsLockedUntil(getActivationDate());
     }
 
-    public Map<String, Object> close(final AppUser currentUser, final JsonCommand command) {
+    public Map<String, Object> close(final Object currentUser, final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -2683,11 +2695,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         actualChanges.put(SavingsApiConstants.closedOnDateParamName, closedDate.format(fmt));
 
         this.rejectedOnDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.withdrawnOnDate = null;
-        this.withdrawnBy = null;
+        this.withdrawnById = null;
         this.closedOnDate = closedDate;
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
 
         return actualChanges;
     }
@@ -2748,8 +2760,8 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return this.closedOnDate;
     }
 
-    public AppUser getClosedBy() {
-        return this.closedBy;
+    public Long getClosedById() {
+        return this.closedById;
     }
 
     public SavingsAccountSummary getSummary() {
@@ -3191,12 +3203,12 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         }
     }
 
-    public AppUser getSubmittedBy() {
-        return this.submittedBy;
+    public Long getSubmittedById() {
+        return this.submittedById;
     }
 
-    public AppUser getApprovedBy() {
-        return this.approvedBy;
+    public Long getApprovedById() {
+        return this.approvedById;
     }
 
     public boolean allowDeposit() {
@@ -3364,11 +3376,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.sub_status = SavingsAccountSubStatusEnum.DORMANT.getValue();
     }
 
-    public void escheat(AppUser appUser) {
+    public void escheat(final Object appUser) {
         this.status = SavingsAccountStatusType.CLOSED.getValue();
         this.sub_status = SavingsAccountSubStatusEnum.ESCHEAT.getValue();
         this.closedOnDate = DateUtils.getBusinessLocalDate();
-        this.closedBy = appUser;
+        this.closedById = AppUserAssociation.id(appUser);
         boolean postInterestAsOnDate = false;
         boolean postReversals = false;
         LocalDate transactionDate = DateUtils.getBusinessLocalDate();

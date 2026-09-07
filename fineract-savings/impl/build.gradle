@@ -63,6 +63,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.savings.service,'
                         + 'org.apache.fineract.infrastructure.core.data,'
                         + 'org.apache.fineract.portfolio.savings.moduleapi,'
+                        + 'org.apache.fineract.useradministration.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.savings.impl'
                 )

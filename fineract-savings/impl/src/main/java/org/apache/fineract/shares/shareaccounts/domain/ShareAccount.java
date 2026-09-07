@@ -43,7 +43,7 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_share_account")
@@ -65,44 +65,56 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     @Column(name = "submitted_date")
     private LocalDate submittedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "submitted_userid")
-    protected AppUser submittedBy;
+    /**
+     * Submitted-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "submitted_userid")
+    protected Long submittedById;
 
     @Column(name = "approved_date")
     protected LocalDate approvedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "approved_userid")
-    protected AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approved_userid")
+    protected Long approvedById;
 
     @Column(name = "rejected_date")
     protected LocalDate rejectedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "rejected_userid")
-    protected AppUser rejectedBy;
+    /**
+     * Rejected-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "rejected_userid")
+    protected Long rejectedById;
 
     @Column(name = "activated_date")
     protected LocalDate activatedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "activated_userid")
-    protected AppUser activatedBy;
+    /**
+     * Activated-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "activated_userid")
+    protected Long activatedById;
 
     @Column(name = "closed_date")
     protected LocalDate closedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "closed_userid")
-    protected AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closed_userid")
+    protected Long closedById;
 
     @Column(name = "lastmodified_date")
     protected LocalDateTime modifiedDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "lastmodifiedby_id")
-    protected AppUser modifiedBy;
+    /**
+     * Last-modified-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "lastmodifiedby_id")
+    protected Long modifiedById;
 
     @Column(name = "external_id")
     private String externalId;
@@ -157,10 +169,10 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
             final SavingsAccount savingsAccount, final String accountNo, final Long totalSharesApproved, final Long totalSharesPending,
             final Set<ShareAccountTransaction> purchasedShares, final Boolean allowDividendCalculationForInactiveClients,
             final Integer lockinPeriodFrequency, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriodFrequency,
-            final PeriodFrequencyType minimumActivePeriodType, Set<ShareAccountCharge> charges, AppUser submittedBy,
-            final LocalDate submittedDate, AppUser approvedBy, LocalDate approvedDate, AppUser rejectedBy, LocalDate rejectedDate,
-            AppUser activatedBy, LocalDate activatedDate, AppUser closedBy, LocalDate closedDate, AppUser modifiedBy,
-            LocalDateTime modifiedDate) {
+            final PeriodFrequencyType minimumActivePeriodType, Set<ShareAccountCharge> charges, final Object submittedBy,
+            final LocalDate submittedDate, final Object approvedBy, final LocalDate approvedDate, final Object rejectedBy,
+            final LocalDate rejectedDate, final Object activatedBy, final LocalDate activatedDate, final Object closedBy,
+            final LocalDate closedDate, final Object modifiedBy, final LocalDateTime modifiedDate) {
 
         this.clientId = ClientAssociation.id(client);
         this.shareProduct = shareProduct;
@@ -183,16 +195,16 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         this.minimumActivePeriodFrequencyType = minimumActivePeriodType;
         this.charges = charges;
         this.submittedDate = submittedDate;
-        this.submittedBy = submittedBy;
+        this.submittedById = AppUserAssociation.id(submittedBy);
         this.approvedDate = approvedDate;
-        this.approvedBy = approvedBy;
+        this.approvedById = AppUserAssociation.id(approvedBy);
         this.rejectedDate = rejectedDate;
-        this.rejectedBy = rejectedBy;
+        this.rejectedById = AppUserAssociation.id(rejectedBy);
         this.activatedDate = activatedDate;
-        this.activatedBy = activatedBy;
+        this.activatedById = AppUserAssociation.id(activatedBy);
         this.closedDate = closedDate;
-        this.closedBy = closedBy;
-        this.modifiedBy = modifiedBy;
+        this.closedById = AppUserAssociation.id(closedBy);
+        this.modifiedById = AppUserAssociation.id(modifiedBy);
         this.modifiedDate = modifiedDate;
         this.status = ShareAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue();
     }
@@ -390,9 +402,9 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         this.charges.add(charge);
     }
 
-    public void approve(final LocalDate approvedDate, final AppUser approvedUser) {
+    public void approve(final LocalDate approvedDate, final Object approvedUser) {
         this.approvedDate = approvedDate;
-        this.approvedBy = approvedUser;
+        this.approvedById = AppUserAssociation.id(approvedUser);
         for (ShareAccountTransaction transaction : this.shareAccountTransactions) {
             transaction.approve();
         }
@@ -401,20 +413,20 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         this.totalSharesPending = null;
     }
 
-    public void activate(final LocalDate approvedDate, final AppUser approvedUser) {
+    public void activate(final LocalDate approvedDate, final Object approvedUser) {
         this.activatedDate = approvedDate;
-        this.activatedBy = approvedUser;
+        this.activatedById = AppUserAssociation.id(approvedUser);
         this.status = ShareAccountStatusType.ACTIVE.getValue();
     }
 
     public void undoApprove() {
         this.status = ShareAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue();
         this.approvedDate = null;
-        this.approvedBy = null;
+        this.approvedById = null;
         this.rejectedDate = null;
-        this.rejectedBy = null;
+        this.rejectedById = null;
         this.closedDate = null;
-        this.closedBy = null;
+        this.closedById = null;
         this.totalSharesApproved = null;
         Long tempTotalShares = Long.valueOf(0);
         for (ShareAccountTransaction transaction : this.shareAccountTransactions) {
@@ -426,9 +438,9 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         this.totalSharesPending = tempTotalShares;
     }
 
-    public void reject(final LocalDate rejectedDate, final AppUser rejectedUser) {
+    public void reject(final LocalDate rejectedDate, final Object rejectedUser) {
         this.rejectedDate = rejectedDate;
-        this.rejectedBy = rejectedUser;
+        this.rejectedById = AppUserAssociation.id(rejectedUser);
         this.status = ShareAccountStatusType.REJECTED.getValue();
         this.totalSharesPending = null;
         this.totalSharesApproved = null;
@@ -439,9 +451,9 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         }
     }
 
-    public void close(final LocalDate closedDate, final AppUser closedBy) {
+    public void close(final LocalDate closedDate, final Object closedBy) {
         this.closedDate = closedDate;
-        this.closedBy = closedBy;
+        this.closedById = AppUserAssociation.id(closedBy);
         this.status = ShareAccountStatusType.CLOSED.getValue();
         this.totalSharesPending = null;
         this.totalSharesApproved = null;
