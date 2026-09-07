@@ -22,6 +22,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-event-api'))
     implementation(project(path: ':fineract-loan-api'))
+    // AppUser id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-useradministration-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

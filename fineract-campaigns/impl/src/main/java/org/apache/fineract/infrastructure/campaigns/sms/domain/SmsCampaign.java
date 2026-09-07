@@ -27,8 +27,6 @@ import static org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCamp
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
@@ -51,7 +49,7 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarWeekDaysType;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "sms_campaign", uniqueConstraints = { @UniqueConstraint(columnNames = { "campaign_name" }, name = "campaign_name_UNIQUE") })
@@ -85,23 +83,29 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
     @Column(name = "closedon_date", nullable = true)
     private LocalDate closureDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "closedon_userid", nullable = true)
-    private AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closedon_userid", nullable = true)
+    private Long closedById;
 
     @Column(name = "submittedon_date", nullable = true)
     private LocalDate submittedOnDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "submittedon_userid", nullable = true)
-    private AppUser submittedBy;
+    /**
+     * Submitted-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "submittedon_userid", nullable = true)
+    private Long submittedById;
 
     @Column(name = "approvedon_date", nullable = true)
     private LocalDate approvedOnDate;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "approvedon_userid", nullable = true)
-    private AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approvedon_userid", nullable = true)
+    private Long approvedById;
 
     @Column(name = "recurrence", nullable = true)
     private String recurrence;
@@ -125,7 +129,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
 
     private SmsCampaign(final String campaignName, final Integer campaignType, final Integer triggerType, final Long businessRuleId,
             final Long providerId, final String paramValue, final String message, final LocalDate submittedOnDate,
-            final AppUser submittedBy, final String recurrence, final LocalDateTime recurrenceStartDate, final boolean isNotification) {
+            final Object submittedBy, final String recurrence, final LocalDateTime recurrenceStartDate, final boolean isNotification) {
         this.campaignName = campaignName;
         this.campaignType = campaignType;
         this.triggerType = SmsCampaignTriggerType.fromInt(triggerType).getValue();
@@ -135,14 +139,14 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         this.status = SmsCampaignStatus.PENDING.getValue();
         this.message = message;
         this.submittedOnDate = submittedOnDate;
-        this.submittedBy = submittedBy;
+        this.submittedById = AppUserAssociation.id(submittedBy);
         this.recurrence = recurrence;
         this.isVisible = true;
         this.recurrenceStartDate = recurrenceStartDate;
         this.isNotification = isNotification;
     }
 
-    public static SmsCampaign instance(final AppUser submittedBy, final Long reportId, final JsonCommand command) {
+    public static SmsCampaign instance(final Object submittedBy, final Long reportId, final JsonCommand command) {
         final String campaignName = command.stringValueOfParameterNamed(SmsCampaignValidator.campaignName);
         final Long campaignType = command.longValueOfParameterNamed(SmsCampaignValidator.campaignType);
         final Long triggerType = command.longValueOfParameterNamed(SmsCampaignValidator.triggerType);
@@ -252,7 +256,7 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
         return actualChanges;
     }
 
-    public void activate(final AppUser currentUser, final DateTimeFormatter formatter, final LocalDate activationLocalDate) {
+    public void activate(final Object currentUser, final DateTimeFormatter formatter, final LocalDate activationLocalDate) {
         if (isActive()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot activate campaign. Campaign is already active.";
@@ -265,13 +269,13 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
         this.approvedOnDate = activationLocalDate;
-        this.approvedBy = currentUser;
+        this.approvedById = AppUserAssociation.id(currentUser);
         this.status = ACTIVE.getValue();
 
         validate();
     }
 
-    public void close(final AppUser currentUser, final DateTimeFormatter dateTimeFormatter, final LocalDate closureLocalDate) {
+    public void close(final Object currentUser, final DateTimeFormatter dateTimeFormatter, final LocalDate closureLocalDate) {
         if (isClosed()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot close campaign. Campaign already in closed state.";
@@ -287,13 +291,13 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
             this.nextTriggerDate = null;
             this.lastTriggerDate = null;
         }
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
         this.closureDate = closureLocalDate;
         this.status = SmsCampaignStatus.CLOSED.getValue();
         validateClosureDate();
     }
 
-    public void reactivate(final AppUser currentUser, final DateTimeFormatter dateTimeFormat, final LocalDate reactivateLocalDate) {
+    public void reactivate(final Object currentUser, final DateTimeFormatter dateTimeFormat, final LocalDate reactivateLocalDate) {
         if (!isClosed()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot reactivate campaign. Campaign must be in closed state.";
@@ -308,10 +312,10 @@ public class SmsCampaign extends AbstractPersistableCustom<Long> {
 
         this.approvedOnDate = reactivateLocalDate;
         this.status = ACTIVE.getValue();
-        this.approvedBy = currentUser;
+        this.approvedById = AppUserAssociation.id(currentUser);
         this.closureDate = null;
         this.isVisible = true;
-        this.closedBy = null;
+        this.closedById = null;
 
         validateReactivate();
     }

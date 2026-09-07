@@ -25,7 +25,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "notification_mapper")
@@ -33,9 +33,11 @@ public class NotificationMapper extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "notification_id")
     private Notification notification;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private AppUser userId;
+    /**
+     * User id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "user_id")
+    private Long userId;
     @Column(name = "is_read")
     private boolean isRead;
     @Column(name = "created_at")
@@ -47,7 +49,7 @@ public class NotificationMapper extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getUserId() {
+        public Long getUserId() {
         return this.userId;
     }
 
@@ -74,8 +76,8 @@ public class NotificationMapper extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public NotificationMapper setUserId(final AppUser userId) {
-        this.userId = userId;
+        public NotificationMapper setUserId(final Object user) {
+        this.userId = AppUserAssociation.id(user);
         return this;
     }
 

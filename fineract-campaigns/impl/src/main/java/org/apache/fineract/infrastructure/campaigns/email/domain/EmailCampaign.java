@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.campaigns.email.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +39,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "scheduled_email_campaign")
@@ -70,19 +68,25 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     private String stretchyReportParamMap;
     @Column(name = "closedon_date", nullable = true)
     private LocalDate closureDate;
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "closedon_userid", nullable = true)
-    private AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closedon_userid", nullable = true)
+    private Long closedById;
     @Column(name = "submittedon_date", nullable = true)
     private LocalDate submittedOnDate;
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "submittedon_userid", nullable = true)
-    private AppUser submittedBy;
+    /**
+     * Submitted-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "submittedon_userid", nullable = true)
+    private Long submittedById;
     @Column(name = "approvedon_date", nullable = true)
     private LocalDate approvedOnDate;
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "approvedon_userid", nullable = true)
-    private AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approvedon_userid", nullable = true)
+    private Long approvedById;
     @Column(name = "recurrence")
     private String recurrence;
     @Column(name = "next_trigger_date")
@@ -100,7 +104,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     @Column(name = "previous_run_error_message", nullable = true)
     private String previousRunErrorMessage;
 
-    public static EmailCampaign instance(final AppUser submittedBy, final Long businessRuleId, final Long stretchyReportId, final JsonCommand command) {
+    public static EmailCampaign instance(final Object submittedBy, final Long businessRuleId, final Long stretchyReportId, final JsonCommand command) {
         final String campaignName = command.stringValueOfParameterNamed(EmailCampaignValidator.campaignName);
         final Long campaignType = command.longValueOfParameterNamed(EmailCampaignValidator.campaignType);
         final String paramValue = command.stringValueOfParameterNamed(EmailCampaignValidator.paramValue);
@@ -177,7 +181,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
         return actualChanges;
     }
 
-    public void activate(final AppUser currentUser, final DateTimeFormatter formatter, final LocalDate activationLocalDate) {
+    public void activate(final Object currentUser, final DateTimeFormatter formatter, final LocalDate activationLocalDate) {
         if (isActive()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot activate campaign. Campaign is already active.";
@@ -187,12 +191,12 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
         this.approvedOnDate = activationLocalDate;
-        this.approvedBy = currentUser;
+        this.approvedById = AppUserAssociation.id(currentUser);
         this.status = EmailCampaignStatus.ACTIVE.getValue();
         validate();
     }
 
-    public void close(final AppUser currentUser, final DateTimeFormatter dateTimeFormatter, final LocalDate closureLocalDate) {
+    public void close(final Object currentUser, final DateTimeFormatter dateTimeFormatter, final LocalDate closureLocalDate) {
         if (isClosed()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot close campaign. Campaign already in closed state.";
@@ -205,13 +209,13 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
             this.nextTriggerDate = null;
             this.lastTriggerDate = null;
         }
-        this.closedBy = currentUser;
+        this.closedById = AppUserAssociation.id(currentUser);
         this.closureDate = closureLocalDate;
         this.status = EmailCampaignStatus.CLOSED.getValue();
         validateClosureDate();
     }
 
-    public void reactivate(final AppUser currentUser, final DateTimeFormatter dateTimeFormat, final LocalDate reactivateLocalDate) {
+    public void reactivate(final Object currentUser, final DateTimeFormatter dateTimeFormat, final LocalDate reactivateLocalDate) {
         if (!isClosed()) {
             // handle errors if already activated
             final String defaultUserMessage = "Cannot reactivate campaign. Campaign must be in closed state.";
@@ -222,7 +226,7 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
         }
         this.approvedOnDate = reactivateLocalDate;
         this.status = EmailCampaignStatus.ACTIVE.getValue();
-        this.approvedBy = currentUser;
+        this.approvedById = AppUserAssociation.id(currentUser);
         this.isVisible = true;
         validateReactivate();
     }
@@ -383,8 +387,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getClosedBy() {
-        return this.closedBy;
+        public Long getClosedById() {
+        return this.closedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -393,8 +397,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getSubmittedBy() {
-        return this.submittedBy;
+        public Long getSubmittedById() {
+        return this.submittedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -403,8 +407,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getApprovedBy() {
-        return this.approvedBy;
+        public Long getApprovedById() {
+        return this.approvedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -550,8 +554,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailCampaign setClosedBy(final AppUser closedBy) {
-        this.closedBy = closedBy;
+        public EmailCampaign setClosedBy(final Object closedBy) {
+        this.closedById = AppUserAssociation.id(closedBy);
         return this;
     }
 
@@ -568,8 +572,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailCampaign setSubmittedBy(final AppUser submittedBy) {
-        this.submittedBy = submittedBy;
+        public EmailCampaign setSubmittedBy(final Object submittedBy) {
+        this.submittedById = AppUserAssociation.id(submittedBy);
         return this;
     }
 
@@ -586,8 +590,8 @@ public class EmailCampaign extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailCampaign setApprovedBy(final AppUser approvedBy) {
-        this.approvedBy = approvedBy;
+        public EmailCampaign setApprovedBy(final Object approvedBy) {
+        this.approvedById = AppUserAssociation.id(approvedBy);
         return this;
     }
 

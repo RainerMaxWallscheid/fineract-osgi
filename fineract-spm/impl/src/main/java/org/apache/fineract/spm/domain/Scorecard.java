@@ -28,7 +28,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_survey_scorecards")
@@ -46,9 +46,11 @@ public class Scorecard extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "response_id")
     private Response response;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private AppUser appUser;
+    /**
+     * User id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "user_id")
+    private Long userId;
 
     /**
      * Client id (no JPA association to leftover Client — ADR-021).
@@ -91,12 +93,12 @@ public class Scorecard extends AbstractPersistableCustom<Long> {
         this.response = response;
     }
 
-    public AppUser getAppUser() {
-        return appUser;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setAppUser(AppUser appUser) {
-        this.appUser = appUser;
+    public void setAppUser(final Object appUser) {
+        this.userId = AppUserAssociation.id(appUser);
     }
 
     public Long getClientId() {

@@ -47,6 +47,8 @@ import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMail
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -189,7 +191,7 @@ public class ExecuteEmailTasklet implements Tasklet {
             return null;
         }
         try {
-            final ByteArrayOutputStream byteArrayOutputStream = readReportingService.generatePentahoReportAsOutputStream(reportName, emailAttachmentFileFormat.getValue(), reportParams, null, emailCampaign.getApprovedBy(), errorLog);
+            final ByteArrayOutputStream byteArrayOutputStream = readReportingService.generatePentahoReportAsOutputStream(reportName, emailAttachmentFileFormat.getValue(), reportParams, null, (AppUser) AppUserAssociation.persistableById(emailCampaign.getApprovedById()), errorLog);
             final Path fileLocation = Path.of(fineractProperties.getContent().getFilesystem().getRootFolder());
             final Path fileNameWithoutExtension = fileLocation.resolve(reportName);
             if (!Files.isDirectory(fileLocation)) {
