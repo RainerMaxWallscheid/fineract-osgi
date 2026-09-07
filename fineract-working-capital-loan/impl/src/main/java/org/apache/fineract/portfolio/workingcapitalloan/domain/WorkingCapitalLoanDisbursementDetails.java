@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 /**
  * Stores expected and actual disbursement details per disbursement. One loan can have multiple disbursement details
@@ -49,9 +49,11 @@ public class WorkingCapitalLoanDisbursementDetails extends AbstractPersistableCu
     private LocalDate actualDisbursementDate;
     @Column(name = "actual_amount", scale = 6, precision = 19)
     private BigDecimal actualAmount;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "disbursedon_userid")
-    private AppUser disbursedBy;
+    /**
+     * Disbursed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "disbursedon_userid")
+    private Long disbursedById;
 
     @java.lang.SuppressWarnings("all")
         public WorkingCapitalLoan getWcLoan() {
@@ -84,8 +86,8 @@ public class WorkingCapitalLoanDisbursementDetails extends AbstractPersistableCu
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getDisbursedBy() {
-        return this.disbursedBy;
+        public Long getDisbursedById() {
+        return this.disbursedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -119,7 +121,7 @@ public class WorkingCapitalLoanDisbursementDetails extends AbstractPersistableCu
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setDisbursedBy(final AppUser disbursedBy) {
-        this.disbursedBy = disbursedBy;
+        public void setDisbursedBy(final Object disbursedBy) {
+        this.disbursedById = AppUserAssociation.id(disbursedBy);
     }
 }

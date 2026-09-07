@@ -80,7 +80,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanSupportedInterestRef
 import org.apache.fineract.portfolio.loanproduct.domain.RepaymentStartDateType;
 import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -181,38 +181,50 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private LocalDate submittedOnDate;
     @Column(name = "rejectedon_date")
     private LocalDate rejectedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rejectedon_userid")
-    private AppUser rejectedBy;
+    /**
+     * Rejected-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "rejectedon_userid")
+    private Long rejectedById;
     @Column(name = "withdrawnon_date")
     private LocalDate withdrawnOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "withdrawnon_userid")
-    private AppUser withdrawnBy;
+    /**
+     * Withdrawn-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "withdrawnon_userid")
+    private Long withdrawnById;
     @Column(name = "approvedon_date")
     private LocalDate approvedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approvedon_userid")
-    private AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approvedon_userid")
+    private Long approvedById;
     @Column(name = "expected_disbursedon_date")
     private LocalDate expectedDisbursementDate;
     @Column(name = "disbursedon_date")
     private LocalDate actualDisbursementDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "disbursedon_userid")
-    private AppUser disbursedBy;
+    /**
+     * Disbursed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "disbursedon_userid")
+    private Long disbursedById;
     @Column(name = "closedon_date")
     private LocalDate closedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "closedon_userid")
-    private AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closedon_userid")
+    private Long closedById;
     @Column(name = "writtenoffon_date")
     private LocalDate writtenOffOnDate;
     @Column(name = "rescheduledon_date")
     private LocalDate rescheduledOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rescheduledon_userid")
-    private AppUser rescheduledByUser;
+    /**
+     * Rescheduled-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "rescheduledon_userid")
+    private Long rescheduledByUserId;
     @Column(name = "expected_maturedon_date")
     private LocalDate expectedMaturityDate;
     @Column(name = "maturedon_date")
@@ -310,9 +322,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private CodeValue chargeOffReason;
     @Column(name = "charged_off_on_date")
     private LocalDate chargedOffOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "charged_off_by_userid")
-    private AppUser chargedOffBy;
+    /**
+     * Charged-off-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "charged_off_by_userid")
+    private Long chargedOffById;
     @Column(name = "enable_installment_level_delinquency", nullable = false)
     private boolean enableInstallmentLevelDelinquency = false;
     @Column(name = "allow_full_term_for_tranche", nullable = false)
@@ -1303,8 +1317,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         return getRepaymentScheduleInstallments().stream().filter(predicate).toList();
     }
 
-    public void updateRescheduledByUser(AppUser rescheduledByUser) {
-        this.rescheduledByUser = rescheduledByUser;
+    public void updateRescheduledByUser(final Object rescheduledByUser) {
+        this.rescheduledByUserId = AppUserAssociation.id(rescheduledByUser);
     }
 
     public LoanProductRelatedDetail getLoanProductRelatedDetail() {
@@ -1563,16 +1577,16 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         return (getLoanProduct().getDelinquencyBucket() != null);
     }
 
-    public void markAsChargedOff(final LocalDate chargedOffOn, final AppUser chargedOffBy, final CodeValue chargeOffReason) {
+    public void markAsChargedOff(final LocalDate chargedOffOn, final Object chargedOffBy, final CodeValue chargeOffReason) {
         this.chargedOff = true;
-        this.chargedOffBy = chargedOffBy;
+        this.chargedOffById = AppUserAssociation.id(chargedOffBy);
         this.chargedOffOnDate = chargedOffOn;
         this.chargeOffReason = chargeOffReason;
     }
 
     public void liftChargeOff() {
         this.chargedOff = false;
-        this.chargedOffBy = null;
+        this.chargedOffById = null;
         this.chargedOffOnDate = null;
         this.chargeOffReason = null;
     }
@@ -1779,8 +1793,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getRejectedBy() {
-        return this.rejectedBy;
+    public Long getRejectedById() {
+        return this.rejectedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1789,8 +1803,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getWithdrawnBy() {
-        return this.withdrawnBy;
+    public Long getWithdrawnById() {
+        return this.withdrawnById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1799,8 +1813,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getApprovedBy() {
-        return this.approvedBy;
+    public Long getApprovedById() {
+        return this.approvedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1814,8 +1828,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getDisbursedBy() {
-        return this.disbursedBy;
+    public Long getDisbursedById() {
+        return this.disbursedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1824,8 +1838,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getClosedBy() {
-        return this.closedBy;
+    public Long getClosedById() {
+        return this.closedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1839,8 +1853,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getRescheduledByUser() {
-        return this.rescheduledByUser;
+    public Long getRescheduledByUserId() {
+        return this.rescheduledByUserId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2034,8 +2048,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public AppUser getChargedOffBy() {
-        return this.chargedOffBy;
+    public Long getChargedOffById() {
+        return this.chargedOffById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2094,8 +2108,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setRejectedBy(final AppUser rejectedBy) {
-        this.rejectedBy = rejectedBy;
+    public void setRejectedBy(final Object rejectedBy) {
+        this.rejectedById = AppUserAssociation.id(rejectedBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2104,8 +2118,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setWithdrawnBy(final AppUser withdrawnBy) {
-        this.withdrawnBy = withdrawnBy;
+    public void setWithdrawnBy(final Object withdrawnBy) {
+        this.withdrawnById = AppUserAssociation.id(withdrawnBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2114,8 +2128,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setApprovedBy(final AppUser approvedBy) {
-        this.approvedBy = approvedBy;
+    public void setApprovedBy(final Object approvedBy) {
+        this.approvedById = AppUserAssociation.id(approvedBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2129,8 +2143,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setDisbursedBy(final AppUser disbursedBy) {
-        this.disbursedBy = disbursedBy;
+    public void setDisbursedBy(final Object disbursedBy) {
+        this.disbursedById = AppUserAssociation.id(disbursedBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2139,8 +2153,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setClosedBy(final AppUser closedBy) {
-        this.closedBy = closedBy;
+    public void setClosedBy(final Object closedBy) {
+        this.closedById = AppUserAssociation.id(closedBy);
     }
 
     @java.lang.SuppressWarnings("all")

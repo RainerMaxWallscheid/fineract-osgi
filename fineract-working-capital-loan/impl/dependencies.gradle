@@ -25,6 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-paymentdetail-api'))
     // Client pure ports/DTOs (entity residual stays in core)
     implementation(project(path: ':fineract-clients-api'))
+    // AppUser id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-fund-api'))
     implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-businessdate-api'))

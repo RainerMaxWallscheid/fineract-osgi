@@ -48,7 +48,6 @@ public interface WorkingCapitalLoanRepository extends JpaRepository<WorkingCapit
             LEFT JOIN FETCH wcl.loanProduct
             LEFT JOIN FETCH wcl.paymentAllocationRules
             LEFT JOIN FETCH wcl.disbursementDetails detail
-            LEFT JOIN FETCH detail.disbursedBy
             WHERE wcl.id = :id
             """)
     Optional<WorkingCapitalLoan> findByIdWithFullDetails(@Param("id") Long id);

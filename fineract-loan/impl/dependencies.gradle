@@ -71,6 +71,8 @@ dependencies {
     implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-collateralmanagement-api'))
     implementation(project(path: ':fineract-organisation-api'))
+    // AppUser id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-branch-api'))
     implementation(project(path: ':fineract-paymenttype-api'))
     // Avro loan event serializers hosted next to leftover Loan

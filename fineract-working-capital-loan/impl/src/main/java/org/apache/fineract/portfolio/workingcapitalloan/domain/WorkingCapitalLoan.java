@@ -43,7 +43,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatusConverter;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProduct;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProductRelatedDetails;
-import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 
 @Entity
 @Table(name = "m_wc_loan", uniqueConstraints = {@UniqueConstraint(columnNames = {"account_no"}, name = "wc_loan_account_no_UNIQUE"), @UniqueConstraint(columnNames = {"external_id"}, name = "wc_loan_externalid_UNIQUE")})
@@ -90,19 +90,25 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     private LocalDate submittedOnDate;
     @Column(name = "rejectedon_date")
     private LocalDate rejectedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rejectedon_userid")
-    private AppUser rejectedBy;
+    /**
+     * Rejected-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "rejectedon_userid")
+    private Long rejectedById;
     @Column(name = "approvedon_date")
     private LocalDate approvedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approvedon_userid")
-    private AppUser approvedBy;
+    /**
+     * Approved-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "approvedon_userid")
+    private Long approvedById;
     @Column(name = "closedon_date")
     private LocalDate closedOnDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "closedon_userid")
-    private AppUser closedBy;
+    /**
+     * Closed-by user id (no JPA association to leftover AppUser — ADR-021).
+     */
+    @Column(name = "closedon_userid")
+    private Long closedById;
     @Column(name = "expected_maturedon_date")
     private LocalDate expectedMaturityDate;
     /**
@@ -195,8 +201,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getRejectedBy() {
-        return this.rejectedBy;
+        public Long getRejectedById() {
+        return this.rejectedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -205,8 +211,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getApprovedBy() {
-        return this.approvedBy;
+        public Long getApprovedById() {
+        return this.approvedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -215,8 +221,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUser getClosedBy() {
-        return this.closedBy;
+        public Long getClosedById() {
+        return this.closedById;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -329,8 +335,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setRejectedBy(final AppUser rejectedBy) {
-        this.rejectedBy = rejectedBy;
+        public void setRejectedBy(final Object rejectedBy) {
+        this.rejectedById = AppUserAssociation.id(rejectedBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -339,8 +345,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setApprovedBy(final AppUser approvedBy) {
-        this.approvedBy = approvedBy;
+        public void setApprovedBy(final Object approvedBy) {
+        this.approvedById = AppUserAssociation.id(approvedBy);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -349,8 +355,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setClosedBy(final AppUser closedBy) {
-        this.closedBy = closedBy;
+        public void setClosedBy(final Object closedBy) {
+        this.closedById = AppUserAssociation.id(closedBy);
     }
 
     @java.lang.SuppressWarnings("all")

@@ -22,18 +22,44 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDisbursementDetailData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
+import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(config = MapstructMapperConfig.class)
 public interface WorkingCapitalLoanDisbursementDetailMapper {
 
     @Mapping(target = "loanId", source = "wcLoan.id")
     @Mapping(target = "principal", source = "expectedAmount")
-    @Mapping(target = "disbursedByUsername", source = "disbursedBy.username")
-    @Mapping(target = "disbursedByFirstname", source = "disbursedBy.firstname")
-    @Mapping(target = "disbursedByLastname", source = "disbursedBy.lastname")
+    @Mapping(target = "disbursedByUsername", source = "disbursedById", qualifiedByName = "userUsername")
+    @Mapping(target = "disbursedByFirstname", source = "disbursedById", qualifiedByName = "userFirstname")
+    @Mapping(target = "disbursedByLastname", source = "disbursedById", qualifiedByName = "userLastname")
     WorkingCapitalLoanDisbursementDetailData toData(WorkingCapitalLoanDisbursementDetails detail);
+
+    @Named("userUsername")
+    default String userUsername(final Long userId) {
+        final AppUser user = persistableUser(userId);
+        return user == null ? null : user.getUsername();
+    }
+
+    @Named("userFirstname")
+    default String userFirstname(final Long userId) {
+        final AppUser user = persistableUser(userId);
+        return user == null ? null : user.getFirstname();
+    }
+
+    @Named("userLastname")
+    default String userLastname(final Long userId) {
+        final AppUser user = persistableUser(userId);
+        return user == null ? null : user.getLastname();
+    }
+
+    default AppUser persistableUser(final Long userId) {
+        final Object persistable = AppUserAssociation.persistableById(userId);
+        return persistable instanceof AppUser user ? user : null;
+    }
 
     default List<WorkingCapitalLoanDisbursementDetailData> toDataList(final List<WorkingCapitalLoanDisbursementDetails> details) {
         if (details == null || details.isEmpty()) {
