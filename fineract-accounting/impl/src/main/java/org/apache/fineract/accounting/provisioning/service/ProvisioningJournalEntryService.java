@@ -33,7 +33,6 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.journalentry.service.AccountingProcessorHelper;
 import org.apache.fineract.accounting.provisioning.domain.LoanProductProvisioningEntry;
 import org.apache.fineract.accounting.provisioning.domain.ProvisioningEntry;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,7 +89,7 @@ public class ProvisioningJournalEntryService {
         Collection<LoanProductProvisioningEntry> provisioningEntries = provisioningEntry.getLoanProductProvisioningEntries();
         Map<OfficeCurrencyKey, List<LoanProductProvisioningEntry>> officeMap = new HashMap<>();
         for (LoanProductProvisioningEntry entry : provisioningEntries) {
-            OfficeCurrencyKey key = new OfficeCurrencyKey(entry.getOffice(), entry.getCurrencyCode());
+            OfficeCurrencyKey key = new OfficeCurrencyKey(entry.getOfficeId(), entry.getCurrencyCode());
             if (officeMap.containsKey(key)) {
                 officeMap.get(key).add(entry);
             } else {
@@ -120,31 +119,31 @@ public class ProvisioningJournalEntryService {
                     expenseMap.put(lppEntry.getExpenseAccount(), BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
                 }
             }
-            createJournalEntry(provisioningEntry.getCreatedDate(), provisioningEntry.getId(), entry.getKey().office,
+            createJournalEntry(provisioningEntry.getCreatedDate(), provisioningEntry.getId(), entry.getKey().officeId,
                     entry.getKey().currency, liabilityMap, expenseMap);
         }
         return "P" + provisioningEntry.getId();
     }
 
-    private void createJournalEntry(final LocalDate transactionDate, final Long entryId, final Office office, final String currencyCode,
+    private void createJournalEntry(final LocalDate transactionDate, final Long entryId, final Long officeId, final String currencyCode,
             final Map<GLAccount, BigDecimal> liabilityMap, final Map<GLAccount, BigDecimal> expenseMap) {
         for (Map.Entry<GLAccount, BigDecimal> entry : liabilityMap.entrySet()) {
-            this.helper.createProvisioningCreditJournalEntry(transactionDate, entryId, office, currencyCode, entry.getKey(),
+            this.helper.createProvisioningCreditJournalEntry(transactionDate, entryId, officeId, currencyCode, entry.getKey(),
                     entry.getValue());
         }
         for (Map.Entry<GLAccount, BigDecimal> entry : expenseMap.entrySet()) {
-            this.helper.createProvisioningDebitJournalEntry(transactionDate, entryId, office, currencyCode, entry.getKey(),
+            this.helper.createProvisioningDebitJournalEntry(transactionDate, entryId, officeId, currencyCode, entry.getKey(),
                     entry.getValue());
         }
     }
 
     private static final class OfficeCurrencyKey {
 
-        private final Office office;
+        private final Long officeId;
         private final String currency;
 
-        OfficeCurrencyKey(final Office office, final String currency) {
-            this.office = office;
+        OfficeCurrencyKey(final Long officeId, final String currency) {
+            this.officeId = officeId;
             this.currency = currency;
         }
 
@@ -153,12 +152,12 @@ public class ProvisioningJournalEntryService {
             if (!(obj instanceof OfficeCurrencyKey copy)) {
                 return false;
             }
-            return Objects.equals(this.office.getId(), copy.office.getId()) && Objects.equals(this.currency, copy.currency);
+            return Objects.equals(this.officeId, copy.officeId) && Objects.equals(this.currency, copy.currency);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.office.getId(), this.currency);
+            return Objects.hash(this.officeId, this.currency);
         }
     }
 }

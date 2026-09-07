@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 
 @Entity
 @Table(name = "m_loanproduct_provisioning_entry")
@@ -37,9 +37,11 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     private ProvisioningEntry entry;
     @Column(name = "criteria_id", nullable = false)
     private Long criteriaId;
-    @ManyToOne
-    @JoinColumn(name = "office_id", nullable = false)
-    private Office office;
+    /**
+     * Office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "office_id", nullable = false)
+    private Long officeId;
     @Column(name = "currency_code", length = 3)
     private String currencyCode;
     /**
@@ -71,7 +73,7 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
             return false;
         }
         LoanProductProvisioningEntry other = (LoanProductProvisioningEntry) obj;
-        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.office.getId(), this.office.getId()) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.categoryId, this.categoryId) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
+        return Objects.equals(other.entry.getId(), this.entry.getId()) && Objects.equals(other.criteriaId, this.criteriaId) && Objects.equals(other.officeId, this.officeId) && Objects.equals(other.currencyCode, this.currencyCode) && Objects.equals(other.productId, this.productId) && Objects.equals(other.categoryId, this.categoryId) && Objects.equals(other.overdueInDays, this.overdueInDays) && Objects.equals(other.reservedAmount, this.reservedAmount) && Objects.equals(other.liabilityAccount.getId(), this.liabilityAccount.getId()) && Objects.equals(other.expenseAccount.getId(), this.expenseAccount.getId());
     }
 
     @Override
@@ -81,13 +83,13 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
         // liabilityAccount, expenseAccount);
         // to remain consistent with the implementation in equals(), also use
         // getId() here.
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, categoryId, overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, reservedAmount, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     public int partialHashCode() {
         // this is used to group together all the entries that have similar parameters (excluding the amount reserved)
         // rather than a check for if the objects are the same based on their values, this tells if they are similar
-        return Objects.hash(entry.getId(), criteriaId, office.getId(), currencyCode, productId, categoryId, overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
+        return Objects.hash(entry.getId(), criteriaId, officeId, currencyCode, productId, categoryId, overdueInDays, liabilityAccount.getId(), expenseAccount.getId());
     }
 
     @java.lang.SuppressWarnings("all")
@@ -101,8 +103,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-        public Office getOffice() {
-        return this.office;
+        public Long getOfficeId() {
+        return this.officeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -162,8 +164,8 @@ public class LoanProductProvisioningEntry extends AbstractPersistableCustom<Long
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public LoanProductProvisioningEntry setOffice(final Office office) {
-        this.office = office;
+        public LoanProductProvisioningEntry setOffice(final Object office) {
+        this.officeId = OfficeAssociation.id(office);
         return this;
     }
 

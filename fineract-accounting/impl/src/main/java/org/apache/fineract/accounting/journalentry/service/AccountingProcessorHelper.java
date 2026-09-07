@@ -753,14 +753,14 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    public void createProvisioningDebitJournalEntry(LocalDate transactionDate, Long provisioningEntryId, Office office, String currencyCode, GLAccount account, BigDecimal amount) {
+    public void createProvisioningDebitJournalEntry(LocalDate transactionDate, Long provisioningEntryId, Object office, String currencyCode, GLAccount account, BigDecimal amount) {
         final boolean manualEntry = false;
         String modifiedTransactionId = PROVISIONING_TRANSACTION_IDENTIFIER + provisioningEntryId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.PROVISIONING.getValue(), provisioningEntryId, null, null, null, null, null);
         persistJournalEntry(journalEntry);
     }
 
-    public void createProvisioningCreditJournalEntry(LocalDate transactionDate, Long provisioningEntryId, Office office, String currencyCode, GLAccount account, BigDecimal amount) {
+    public void createProvisioningCreditJournalEntry(LocalDate transactionDate, Long provisioningEntryId, Object office, String currencyCode, GLAccount account, BigDecimal amount) {
         final boolean manualEntry = false;
         String modifiedTransactionId = PROVISIONING_TRANSACTION_IDENTIFIER + provisioningEntryId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.PROVISIONING.getValue(), provisioningEntryId, null, null, null, null, null);

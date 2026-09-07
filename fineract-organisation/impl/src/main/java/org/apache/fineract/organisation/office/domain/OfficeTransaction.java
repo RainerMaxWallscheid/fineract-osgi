@@ -21,9 +21,6 @@ package org.apache.fineract.organisation.office.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,18 +28,23 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
+import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 
 @Entity
 @Table(name = "m_office_transaction")
 public class OfficeTransaction extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_office_id")
-    private Office from;
+    /**
+     * From-office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "from_office_id")
+    private Long fromOfficeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_office_id")
-    private Office to;
+    /**
+     * To-office id (no JPA association to leftover Office — ADR-021).
+     */
+    @Column(name = "to_office_id")
+    private Long toOfficeId;
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
@@ -56,7 +58,7 @@ public class OfficeTransaction extends AbstractPersistableCustom<Long> {
     @Column(name = "description", nullable = true, length = 100)
     private String description;
 
-    public static OfficeTransaction fromJson(final Office fromOffice, final Office toOffice, final Money amount,
+    public static OfficeTransaction fromJson(final Object fromOffice, final Object toOffice, final Money amount,
             final JsonCommand command) {
 
         final LocalDate transactionLocalDate = command.localDateValueOfParameterNamed("transactionDate");
@@ -69,10 +71,10 @@ public class OfficeTransaction extends AbstractPersistableCustom<Long> {
         this.transactionDate = null;
     }
 
-    private OfficeTransaction(final Office fromOffice, final Office toOffice, final LocalDate transactionLocalDate, final Money amount,
+    private OfficeTransaction(final Object fromOffice, final Object toOffice, final LocalDate transactionLocalDate, final Money amount,
             final String description) {
-        this.from = fromOffice;
-        this.to = toOffice;
+        this.fromOfficeId = OfficeAssociation.id(fromOffice);
+        this.toOfficeId = OfficeAssociation.id(toOffice);
         if (transactionLocalDate != null) {
             this.transactionDate = transactionLocalDate;
         }
