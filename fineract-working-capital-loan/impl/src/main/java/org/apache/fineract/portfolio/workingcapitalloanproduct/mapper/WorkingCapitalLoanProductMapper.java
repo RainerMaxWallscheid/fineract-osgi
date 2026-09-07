@@ -28,6 +28,8 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
+import org.apache.fineract.portfolio.fund.domain.Fund;
+import org.apache.fineract.portfolio.fund.moduleapi.FundAssociation;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloanbreach.mapper.WorkingCapitalBreachMapper;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.mapper.WorkingCapitalNearBreachMapper;
@@ -49,8 +51,8 @@ import org.mapstruct.Named;
         WorkingCapitalNearBreachMapper.class })
 public interface WorkingCapitalLoanProductMapper {
 
-    @Mapping(target = "fundId", source = "fund.id")
-    @Mapping(target = "fundName", source = "fund.name")
+    @Mapping(target = "fundId", source = "fundId")
+    @Mapping(target = "fundName", source = "fundId", qualifiedByName = "fundName")
     @Mapping(target = "externalId", source = "externalId", qualifiedByName = "externalIdToString")
     @Mapping(target = "status", source = "closeDate", qualifiedByName = "productStatus")
     @Mapping(target = "currency", source = "currency", qualifiedByName = "monetaryCurrencyToCurrencyData")
@@ -102,6 +104,12 @@ public interface WorkingCapitalLoanProductMapper {
     WorkingCapitalLoanProductData toData(WorkingCapitalLoanProduct entity);
 
     List<WorkingCapitalLoanProductData> toDataList(List<WorkingCapitalLoanProduct> entities);
+
+    @Named("fundName")
+    default String fundName(final Long fundId) {
+        final Object persistable = FundAssociation.persistableById(fundId);
+        return persistable instanceof Fund fund ? fund.getName() : null;
+    }
 
     @Named("externalIdToString")
     default String externalIdToString(final ExternalId externalId) {

@@ -113,8 +113,8 @@ public class LoanProductUpdateUtil {
             loanProduct.setDescription(newValue);
         }
         Long existingFundId = null;
-        if (loanProduct.getFund() != null) {
-            existingFundId = loanProduct.getFund().getId();
+        if (loanProduct.getFundId() != null) {
+            existingFundId = loanProduct.getFundId();
         }
         final String fundIdParamName = "fundId";
         if (command.isChangeInLongParameterNamed(fundIdParamName, existingFundId)) {

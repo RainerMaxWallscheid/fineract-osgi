@@ -214,7 +214,7 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
             changes.putAll(updateUtil.updateMinMaxConstraints(product.getMinMaxConstraints(), command));
         }
         // Update fund if changed
-        final Long existingFundId = product.getFund() != null ? product.getFund().getId() : null;
+        final Long existingFundId = product.getFundId();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName, existingFundId)) {
             final Long fundId = command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName);
             final Fund fund = findFundByIdIfProvided(fundId);

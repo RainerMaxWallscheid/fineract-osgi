@@ -63,6 +63,7 @@ jar {
                         + 'org.apache.fineract.portfolio.workingcapitalloan.data,'
                         + 'org.apache.fineract.portfolio.client.moduleapi,'
                         + 'org.apache.fineract.useradministration.moduleapi,'
+                        + 'org.apache.fineract.portfolio.fund.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.workingcapitalloan.impl'
                 )

@@ -64,6 +64,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.client.moduleapi,'
                         + 'org.apache.fineract.portfolio.group.moduleapi,'
                         + 'org.apache.fineract.useradministration.moduleapi,'
+                        + 'org.apache.fineract.portfolio.fund.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanproduct.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
                         + 'org.apache.fineract.investor.moduleapi,'

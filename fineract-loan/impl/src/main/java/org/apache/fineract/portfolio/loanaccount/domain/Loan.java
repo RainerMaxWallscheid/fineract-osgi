@@ -68,7 +68,7 @@ import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.fund.domain.Fund;
+import org.apache.fineract.portfolio.fund.moduleapi.FundAssociation;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.LoanRepaymentScheduleTransactionProcessor;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
@@ -141,9 +141,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private LoanProduct loanProduct;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fund_id")
-    private Fund fund;
+    /**
+     * Fund id (no JPA association to leftover Fund — ADR-021).
+     */
+    @Column(name = "fund_id")
+    private Long fundId;
     /**
      * Loan-officer staff id (no JPA association to leftover Staff — ADR-021).
      */
@@ -335,7 +337,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private RepaymentStartDateType repaymentStartDateType;
 
     public static Loan newIndividualLoanApplication(final String accountNo, final Object client, final AccountType loanType,
-            final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
@@ -351,7 +353,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newGroupLoanApplication(final String accountNo, final Object group, final AccountType loanType,
-            final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -368,7 +370,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Object client, final Object group,
-            final AccountType loanType, final LoanProduct loanProduct, final Fund fund, final Object officer, final CodeValue loanPurpose,
+            final AccountType loanType, final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -388,7 +390,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         // empty
     }
 
-    private Loan(final String accountNo, final Object client, final Object group, final AccountType loanType, final Fund fund,
+    private Loan(final String accountNo, final Object client, final Object group, final AccountType loanType, final Object fund,
             final Object loanOfficer, final CodeValue loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProduct loanProduct,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus, final Set<LoanCharge> loanCharges,
@@ -409,7 +411,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.clientId = client == null ? null : clientActivePort.id(client);
         this.groupId = group == null ? null : groupActivePort.id(group);
         this.loanType = loanType;
-        this.fund = fund;
+        this.fundId = FundAssociation.id(fund);
         this.loanOfficerId = StaffAssociation.id(loanOfficer);
         this.loanPurpose = loanPurpose;
         this.transactionProcessingStrategyCode = transactionProcessingStrategy.getCode();
@@ -558,8 +560,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.loanProduct = loanProduct;
     }
 
-    public void updateFund(final Fund fund) {
-        this.fund = fund;
+    public void updateFund(final Object fund) {
+        this.fundId = FundAssociation.id(fund);
     }
 
     public void updateLoanPurpose(final CodeValue loanPurpose) {
@@ -1723,8 +1725,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public Fund getFund() {
-        return this.fund;
+    public Long getFundId() {
+        return this.fundId;
     }
 
     @java.lang.SuppressWarnings("all")

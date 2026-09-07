@@ -38,7 +38,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
-import org.apache.fineract.portfolio.fund.domain.Fund;
+import org.apache.fineract.portfolio.fund.moduleapi.FundAssociation;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatusConverter;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProduct;
@@ -67,9 +67,11 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
      */
     @Column(name = "client_id")
     private Long clientId;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fund_id")
-    private Fund fund;
+    /**
+     * Fund id (no JPA association to leftover Fund — ADR-021).
+     */
+    @Column(name = "fund_id")
+    private Long fundId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private WorkingCapitalLoanProduct loanProduct;
@@ -160,8 +162,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public Fund getFund() {
-        return this.fund;
+        public Long getFundId() {
+        return this.fundId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -294,8 +296,8 @@ public class WorkingCapitalLoan extends AbstractAuditableWithUTCDateTimeCustom<L
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setFund(final Fund fund) {
-        this.fund = fund;
+        public void setFund(final Object fund) {
+        this.fundId = FundAssociation.id(fund);
     }
 
     @java.lang.SuppressWarnings("all")

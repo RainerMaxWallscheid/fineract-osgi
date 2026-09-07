@@ -569,8 +569,8 @@ public class LoanAssemblerImpl implements LoanAssembler {
             loan.setInterestRateDifferential(newValue);
         }
         Long existingFundId = null;
-        if (loan.getFund() != null) {
-            existingFundId = loan.getFund().getId();
+        if (loan.getFundId() != null) {
+            existingFundId = loan.getFundId();
         }
         if (command.isChangeInLongParameterNamed(LoanApiConstants.fundIdParameterName, existingFundId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.fundIdParameterName);

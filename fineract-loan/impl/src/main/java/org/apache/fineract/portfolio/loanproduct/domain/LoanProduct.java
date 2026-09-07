@@ -53,7 +53,7 @@ import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
-import org.apache.fineract.portfolio.fund.domain.Fund;
+import org.apache.fineract.portfolio.fund.moduleapi.FundAssociation;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeCalculationType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeIncomeType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeStrategy;
@@ -82,9 +82,11 @@ import org.apache.fineract.portfolio.rate.domain.Rate;
         @UniqueConstraint(columnNames = { "short_name" }, name = "unq_short_name") })
 public class LoanProduct extends AbstractPersistableCustom<Long> implements LoanEventId {
 
-    @ManyToOne
-    @JoinColumn(name = "fund_id")
-    private Fund fund;
+    /**
+     * Fund id (no JPA association to leftover Fund — ADR-021).
+     */
+    @Column(name = "fund_id")
+    private Long fundId;
     @Column(name = "loan_transaction_strategy_code", nullable = false)
     private String transactionProcessingStrategyCode;
     @Column(name = "loan_transaction_strategy_name")
@@ -197,7 +199,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
         this.loanProductMinMaxConstraints = null;
     }
 
-    public LoanProduct(final Fund fund, final String transactionProcessingStrategyCode,
+    public LoanProduct(final Object fund, final String transactionProcessingStrategyCode,
             final List<LoanProductPaymentAllocationRule> paymentAllocationRules,
             final List<LoanProductCreditAllocationRule> creditAllocationRules, final String name, final String shortName,
             final String description, final MonetaryCurrency currency, final BigDecimal defaultPrincipal,
@@ -241,7 +243,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
             final boolean enableBuyDownFee, final LoanBuyDownFeeCalculationType buyDownFeeCalculationType,
             final LoanBuyDownFeeStrategy buyDownFeeStrategy, final LoanBuyDownFeeIncomeType buyDownFeeIncomeType,
             final boolean merchantBuyDownFee, final boolean allowFullTermForTranche) {
-        this.fund = fund;
+        this.fundId = FundAssociation.id(fund);
         this.transactionProcessingStrategyCode = transactionProcessingStrategyCode;
         this.paymentAllocationRules = paymentAllocationRules;
         if (this.paymentAllocationRules != null) {
@@ -687,8 +689,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
     }
 
     @java.lang.SuppressWarnings("all")
-    public Fund getFund() {
-        return this.fund;
+    public Long getFundId() {
+        return this.fundId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -902,8 +904,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setFund(final Fund fund) {
-        this.fund = fund;
+    public void setFund(final Object fund) {
+        this.fundId = FundAssociation.id(fund);
     }
 
     @java.lang.SuppressWarnings("all")

@@ -226,7 +226,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
             loan.setLoanProduct(product);
             changes.put(WorkingCapitalLoanConstants.productIdParameterName, productId);
         }
-        final Long existingFundId = loan.getFund() != null ? loan.getFund().getId() : null;
+        final Long existingFundId = loan.getFundId();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.fundIdParameterName, existingFundId)) {
             final Long fundId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.fundIdParameterName, element);
             final Fund fund = fundId != null ? fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId)) : null;

@@ -40,7 +40,6 @@ public interface WorkingCapitalLoanProductRepository
 
     @Query("""
             SELECT DISTINCT wclp FROM WorkingCapitalLoanProduct wclp
-            LEFT JOIN FETCH wclp.fund
             LEFT JOIN FETCH wclp.breach
             LEFT JOIN FETCH wclp.paymentAllocationRules
             LEFT JOIN FETCH wclp.configurableAttributes
@@ -50,7 +49,6 @@ public interface WorkingCapitalLoanProductRepository
 
     @Query("""
             SELECT wclp FROM WorkingCapitalLoanProduct wclp
-            LEFT JOIN FETCH wclp.fund
             LEFT JOIN FETCH wclp.breach
             LEFT JOIN FETCH wclp.paymentAllocationRules
             LEFT JOIN FETCH wclp.configurableAttributes
@@ -60,7 +58,6 @@ public interface WorkingCapitalLoanProductRepository
 
     @Query("""
             SELECT wclp FROM WorkingCapitalLoanProduct wclp
-            LEFT JOIN FETCH wclp.fund
             LEFT JOIN FETCH wclp.breach
             LEFT JOIN FETCH wclp.paymentAllocationRules
             LEFT JOIN FETCH wclp.configurableAttributes
