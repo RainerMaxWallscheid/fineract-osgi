@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.sms.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +30,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.sms.SmsApiConstants;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.group.moduleapi.GroupAssociation;
 
@@ -51,9 +49,11 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
      */
     @Column(name = "client_id")
     private Long clientId;
-    @ManyToOne
-    @JoinColumn(name = "staff_id")
-    private Staff staff;
+    /**
+     * Staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "staff_id")
+    private Long staffId;
     /** FK only — SmsCampaign residual stays on provider until campaigns peel. */
     @Column(name = "campaign_id")
     private Long campaignId;
@@ -70,21 +70,21 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     @Column(name = "is_notification")
     private boolean isNotification;
 
-    public static SmsMessage pendingSms(final String externalId, final Object group, final Object client, final Staff staff,
+    public static SmsMessage pendingSms(final String externalId, final Object group, final Object client, final Object staff,
             final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
                 .setStatusType(SmsMessageStatusType.PENDING.getValue()).setMessage(message).setMobileNo(mobileNo)
                 .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage sentSms(final String externalId, final Object group, final Object client, final Staff staff,
+    public static SmsMessage sentSms(final String externalId, final Object group, final Object client, final Object staff,
             final String message, final String mobileNo, final Long campaignId, final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
                 .setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue()).setMessage(message).setMobileNo(mobileNo)
                 .setCampaignId(campaignId).setNotification(isNotification).setSubmittedOnDate(DateUtils.getBusinessLocalDate());
     }
 
-    public static SmsMessage instance(String externalId, final Object group, final Object client, final Staff staff,
+    public static SmsMessage instance(String externalId, final Object group, final Object client, final Object staff,
             final SmsMessageStatusType statusType, final String message, final String mobileNo, final Long campaignId,
             final boolean isNotification) {
         return new SmsMessage().setExternalId(externalId).setGroup(group).setClient(client).setStaff(staff)
@@ -118,8 +118,8 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public Staff getStaff() {
-        return this.staff;
+    public Long getStaffId() {
+        return this.staffId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -176,8 +176,8 @@ public class SmsMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public SmsMessage setStaff(final Staff staff) {
-        this.staff = staff;
+    public SmsMessage setStaff(final Object staff) {
+        this.staffId = StaffAssociation.id(staff);
         return this;
     }
 

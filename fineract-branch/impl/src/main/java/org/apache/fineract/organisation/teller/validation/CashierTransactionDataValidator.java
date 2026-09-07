@@ -72,7 +72,7 @@ public class CashierTransactionDataValidator implements CashierTxnValidationPort
     }
 
     public void validateCashierAllowedDateAndTime(final Cashier cashier, final Teller teller) {
-        Long staffId = cashier.getStaff().getId();
+        Long staffId = cashier.getStaffId();
         final LocalDate fromDate = cashier.getStartDate();
         final LocalDate endDate = cashier.getEndDate();
         final LocalDate tellerFromDate = teller.getStartDate();

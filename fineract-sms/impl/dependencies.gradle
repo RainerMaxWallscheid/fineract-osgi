@@ -24,6 +24,8 @@ dependencies {
     implementation(project(path: ':fineract-clients-api'))
     // Group id / persistable lookup (entity residual stays in core)
     implementation(project(path: ':fineract-group-api'))
+    // Staff id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-organisation-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

@@ -30,7 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.campaigns.email.EmailApiConstants;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
 import org.apache.fineract.portfolio.group.moduleapi.GroupAssociation;
 
@@ -47,9 +47,11 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
      */
     @Column(name = "client_id", nullable = true)
     private Long clientId;
-    @ManyToOne
-    @JoinColumn(name = "staff_id", nullable = true)
-    private Staff staff;
+    /**
+     * Staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "staff_id", nullable = true)
+    private Long staffId;
     @ManyToOne
     @JoinColumn(name = "email_campaign_id", nullable = true)
     private EmailCampaign emailCampaign;
@@ -68,11 +70,11 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
     @Column(name = "error_message")
     private String errorMessage;
 
-    public static EmailMessage pendingEmail(final Object group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final String emailSubject, final String message, final String emailAddress, final String campaignName) {
+    public static EmailMessage pendingEmail(final Object group, final Object client, final Object staff, final EmailCampaign emailCampaign, final String emailSubject, final String message, final String emailAddress, final String campaignName) {
         return new EmailMessage().setGroup(group).setClient(client).setStaff(staff).setEmailCampaign(emailCampaign).setStatusType(emailCampaign.getStatus()).setEmailSubject(emailSubject).setMessage(message).setEmailAddress(emailAddress).setCampaignName(campaignName);
     }
 
-    public static EmailMessage instance(final Object group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final EmailMessageStatusType statusType, final String emailSubject, final String message, final String sourceAddress, final String emailAddress, final String campaignName) {
+    public static EmailMessage instance(final Object group, final Object client, final Object staff, final EmailCampaign emailCampaign, final EmailMessageStatusType statusType, final String emailSubject, final String message, final String sourceAddress, final String emailAddress, final String campaignName) {
         return new EmailMessage().setGroup(group).setClient(client).setStaff(staff).setEmailCampaign(emailCampaign).setEmailSubject(emailSubject).setMessage(message).setEmailAddress(emailAddress).setCampaignName(campaignName).setStatusType(statusType.getValue());
     }
 
@@ -105,8 +107,8 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Staff getStaff() {
-        return this.staff;
+        public Long getStaffId() {
+        return this.staffId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -171,8 +173,8 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailMessage setStaff(final Staff staff) {
-        this.staff = staff;
+        public EmailMessage setStaff(final Object staff) {
+        this.staffId = StaffAssociation.id(staff);
         return this;
     }
 

@@ -33,7 +33,7 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
-import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.moduleapi.StaffAssociation;
 
 /**
  * Provides the base model for a cashier. Represents a row in the &quot;m_cashiers&quot; database table, with each
@@ -48,9 +48,11 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     private static final String IS_FULL_DAY_PARAM_NAME = "isFullDay";
     @Transient
     private Long officeId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id", nullable = false)
-    private Staff staff;
+    /**
+     * Staff id (no JPA association to leftover Staff — ADR-021).
+     */
+    @Column(name = "staff_id", nullable = false)
+    private Long staffId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teller_id", nullable = false)
     private Teller teller;
@@ -67,7 +69,7 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     @Column(name = "end_time", nullable = true, length = 10)
     private String endTime;
 
-    public static Cashier fromJson(final Object cashierOffice, final Teller teller, final Staff staff, final String startTime, final String endTime, final JsonCommand command) {
+    public static Cashier fromJson(final Object cashierOffice, final Teller teller, final Object staff, final String startTime, final String endTime, final JsonCommand command) {
         final String description = command.stringValueOfParameterNamed("description");
         final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
         final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
@@ -168,8 +170,8 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Staff getStaff() {
-        return this.staff;
+        public Long getStaffId() {
+        return this.staffId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -220,8 +222,8 @@ public class Cashier extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Cashier setStaff(final Staff staff) {
-        this.staff = staff;
+        public Cashier setStaff(final Object staff) {
+        this.staffId = StaffAssociation.id(staff);
         return this;
     }
 
@@ -293,9 +295,9 @@ public class Cashier extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Cashier(final Object office, final Staff staff, final Teller teller, final String description, final LocalDate startDate, final LocalDate endDate, final Boolean isFullDay, final String startTime, final String endTime) {
+        public Cashier(final Object office, final Object staff, final Teller teller, final String description, final LocalDate startDate, final LocalDate endDate, final Boolean isFullDay, final String startTime, final String endTime) {
         this.officeId = OfficeAssociation.id(office);
-        this.staff = staff;
+        this.staffId = StaffAssociation.id(staff);
         this.teller = teller;
         this.description = description;
         this.startDate = startDate;
