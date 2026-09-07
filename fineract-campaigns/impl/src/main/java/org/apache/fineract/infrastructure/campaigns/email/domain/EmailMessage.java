@@ -32,14 +32,16 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
-import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.group.moduleapi.GroupAssociation;
 
 @Entity
 @Table(name = "scheduled_email_messages_outbound")
 public class EmailMessage extends AbstractPersistableCustom<Long> {
-    @ManyToOne
-    @JoinColumn(name = "group_id", nullable = true)
-    private Group group;
+    /**
+     * Group id (no JPA association to leftover Group — ADR-021).
+     */
+    @Column(name = "group_id", nullable = true)
+    private Long groupId;
     /**
      * Client id (no JPA association to leftover Client — ADR-021).
      */
@@ -66,11 +68,11 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
     @Column(name = "error_message")
     private String errorMessage;
 
-    public static EmailMessage pendingEmail(final Group group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final String emailSubject, final String message, final String emailAddress, final String campaignName) {
+    public static EmailMessage pendingEmail(final Object group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final String emailSubject, final String message, final String emailAddress, final String campaignName) {
         return new EmailMessage().setGroup(group).setClient(client).setStaff(staff).setEmailCampaign(emailCampaign).setStatusType(emailCampaign.getStatus()).setEmailSubject(emailSubject).setMessage(message).setEmailAddress(emailAddress).setCampaignName(campaignName);
     }
 
-    public static EmailMessage instance(final Group group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final EmailMessageStatusType statusType, final String emailSubject, final String message, final String sourceAddress, final String emailAddress, final String campaignName) {
+    public static EmailMessage instance(final Object group, final Object client, final Staff staff, final EmailCampaign emailCampaign, final EmailMessageStatusType statusType, final String emailSubject, final String message, final String sourceAddress, final String emailAddress, final String campaignName) {
         return new EmailMessage().setGroup(group).setClient(client).setStaff(staff).setEmailCampaign(emailCampaign).setEmailSubject(emailSubject).setMessage(message).setEmailAddress(emailAddress).setCampaignName(campaignName).setStatusType(statusType.getValue());
     }
 
@@ -93,8 +95,8 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Group getGroup() {
-        return this.group;
+        public Long getGroupId() {
+        return this.groupId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -151,8 +153,8 @@ public class EmailMessage extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public EmailMessage setGroup(final Group group) {
-        this.group = group;
+        public EmailMessage setGroup(final Object group) {
+        this.groupId = GroupAssociation.id(group);
         return this;
     }
 
