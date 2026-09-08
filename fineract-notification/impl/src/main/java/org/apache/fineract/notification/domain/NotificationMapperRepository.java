@@ -32,7 +32,7 @@ public interface NotificationMapperRepository extends JpaRepository<Notification
     @Query("""
             select case when count(nm) > 0 then true else false end
             from NotificationMapper nm
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             and nm.isRead = false
             """)
     boolean hasUnreadNotifications(@Param("appUserId") Long appUserId);
@@ -42,7 +42,7 @@ public interface NotificationMapperRepository extends JpaRepository<Notification
     @Query("""
             update NotificationMapper nm
             set nm.isRead = true
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             and nm.isRead = false
             """)
     void markUnreadNotificationsAsRead(@Param("appUserId") Long appUserId);
@@ -60,11 +60,11 @@ public interface NotificationMapperRepository extends JpaRepository<Notification
                 nm.createdAt
             )
             from NotificationMapper nm
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             """, countQuery = """
             select count(nm)
             from NotificationMapper nm
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             """)
     Page<NotificationData> findNotificationDataByUserId(@Param("appUserId") Long appUserId, Pageable pageable);
 
@@ -81,12 +81,12 @@ public interface NotificationMapperRepository extends JpaRepository<Notification
                 nm.createdAt
             )
             from NotificationMapper nm
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             and nm.isRead = false
             """, countQuery = """
             select count(nm)
             from NotificationMapper nm
-            where nm.userId.id = :appUserId
+            where nm.userId = :appUserId
             and nm.isRead = false
             """)
     Page<NotificationData> findUnreadNotificationDataByUserId(@Param("appUserId") Long appUserId, Pageable pageable);
