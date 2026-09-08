@@ -24,11 +24,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
@@ -42,14 +39,18 @@ public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long>
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private LoanOriginatorStatus status;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "originator_type_cv_id")
-    private CodeValue originatorType;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_type_cv_id")
-    private CodeValue channelType;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "originator_type_cv_id")
+    private Long originatorTypeId;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "channel_type_cv_id")
+    private Long channelTypeId;
 
-    public static LoanOriginator create(ExternalId externalId, String name, LoanOriginatorStatus status, CodeValue originatorType, CodeValue channelType) {
+    public static LoanOriginator create(ExternalId externalId, String name, LoanOriginatorStatus status, Object originatorType, Object channelType) {
         LoanOriginator originator = new LoanOriginator();
         originator.setExternalId(externalId);
         originator.setName(name);
@@ -59,11 +60,11 @@ public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return originator;
     }
 
-    public void update(String name, LoanOriginatorStatus status, CodeValue originatorType, CodeValue channelType) {
+    public void update(String name, LoanOriginatorStatus status, Object originatorType, Object channelType) {
         this.name = name;
         this.status = status;
-        this.originatorType = originatorType;
-        this.channelType = channelType;
+        this.originatorTypeId = CodeValueAssociation.id(originatorType);
+        this.channelTypeId = CodeValueAssociation.id(channelType);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -82,13 +83,13 @@ public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getOriginatorType() {
-        return this.originatorType;
+        public Long getOriginatorTypeId() {
+        return this.originatorTypeId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getChannelType() {
-        return this.channelType;
+        public Long getChannelTypeId() {
+        return this.channelTypeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -107,13 +108,13 @@ public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long>
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setOriginatorType(final CodeValue originatorType) {
-        this.originatorType = originatorType;
+        public void setOriginatorType(final Object originatorType) {
+        this.originatorTypeId = CodeValueAssociation.id(originatorType);
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setChannelType(final CodeValue channelType) {
-        this.channelType = channelType;
+        public void setChannelType(final Object channelType) {
+        this.channelTypeId = CodeValueAssociation.id(channelType);
     }
 
     @java.lang.SuppressWarnings("all")

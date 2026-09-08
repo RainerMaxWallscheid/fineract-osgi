@@ -37,8 +37,6 @@ public interface WorkingCapitalLoanOriginatorMappingRepository
     @Query("""
             SELECT m FROM WorkingCapitalLoanOriginatorMapping m
             JOIN FETCH m.originator o
-            LEFT JOIN FETCH o.originatorType
-            LEFT JOIN FETCH o.channelType
             WHERE m.loanId = :loanId
             """)
     List<WorkingCapitalLoanOriginatorMapping> findByLoanIdWithOriginator(@Param("loanId") Long loanId);

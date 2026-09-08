@@ -99,17 +99,17 @@ public class LoanOriginatorWritePlatformServiceImpl implements LoanOriginatorWri
             originator.setStatus(newStatus);
             changes.put(STATUS_PARAM, newStatusValue);
         }
-        final Long currentOriginatorTypeId = originator.getOriginatorType() != null ? originator.getOriginatorType().getId() : null;
+        final Long currentOriginatorTypeId = originator.getOriginatorTypeId();
         if (command.isChangeInLongParameterNamed(ORIGINATOR_TYPE_ID_PARAM, currentOriginatorTypeId)) {
             final CodeValue newOriginatorType = resolveCodeValue(command, ORIGINATOR_TYPE_ID_PARAM, ORIGINATOR_TYPE_CODE_NAME);
             originator.setOriginatorType(newOriginatorType);
-            changes.put(ORIGINATOR_TYPE_ID_PARAM, newOriginatorType != null ? newOriginatorType.getId() : null);
+            changes.put(ORIGINATOR_TYPE_ID_PARAM, originator.getOriginatorTypeId());
         }
-        final Long currentChannelTypeId = originator.getChannelType() != null ? originator.getChannelType().getId() : null;
+        final Long currentChannelTypeId = originator.getChannelTypeId();
         if (command.isChangeInLongParameterNamed(CHANNEL_TYPE_ID_PARAM, currentChannelTypeId)) {
             final CodeValue newChannelType = resolveCodeValue(command, CHANNEL_TYPE_ID_PARAM, CHANNEL_TYPE_CODE_NAME);
             originator.setChannelType(newChannelType);
-            changes.put(CHANNEL_TYPE_ID_PARAM, newChannelType != null ? newChannelType.getId() : null);
+            changes.put(CHANNEL_TYPE_ID_PARAM, originator.getChannelTypeId());
         }
         if (!changes.isEmpty()) {
             this.loanOriginatorRepository.saveAndFlush(originator);

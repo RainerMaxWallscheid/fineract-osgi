@@ -64,6 +64,7 @@ jar {
                         + 'org.apache.fineract.portfolio.loanorigination.data,'
                         + 'org.apache.fineract.portfolio.loanorigination.exception,'
                         + 'org.apache.fineract.portfolio.loanorigination.api,'
+                        + 'org.apache.fineract.infrastructure.codes.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.loanorigination.impl'
                 )

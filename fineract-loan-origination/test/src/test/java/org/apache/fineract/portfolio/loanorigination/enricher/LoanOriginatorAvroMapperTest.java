@@ -24,9 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.apache.fineract.portfolio.loanorigination.moduleapi.LoanOriginatorStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,11 +42,17 @@ class LoanOriginatorAvroMapperTest {
         mapper = new LoanOriginatorAvroMapper();
     }
 
+    @AfterEach
+    void tearDown() {
+        CodeValueAssociation.setPersistablePort(null);
+    }
+
     @Test
     void testToAvro_WithAllFields() {
         // Given
         final CodeValue originatorType = createCodeValue(1L, "MERCHANT", "Merchant");
         final CodeValue channelType = createCodeValue(2L, "ONLINE", "Online");
+        CodeValueAssociation.setPersistablePort(stubPort(originatorType, channelType));
         final LoanOriginator originator = LoanOriginator.create(new ExternalId("test-external-id"), "Test Originator",
                 LoanOriginatorStatus.ACTIVE, originatorType, channelType);
         originator.setId(100L);
@@ -118,5 +127,26 @@ class LoanOriginatorAvroMapperTest {
         codeValue.setActive(true);
         codeValue.setMandatory(false);
         return codeValue;
+    }
+
+    private static CodeValuePersistablePort stubPort(final CodeValue originatorType, final CodeValue channelType) {
+        return new CodeValuePersistablePort() {
+
+            @Override
+            public Long id(final Object codeValue) {
+                return codeValue instanceof CodeValue leftover ? leftover.getId() : null;
+            }
+
+            @Override
+            public Object persistableById(final Long codeValueId) {
+                if (originatorType.getId().equals(codeValueId)) {
+                    return originatorType;
+                }
+                if (channelType.getId().equals(codeValueId)) {
+                    return channelType;
+                }
+                return null;
+            }
+        };
     }
 }

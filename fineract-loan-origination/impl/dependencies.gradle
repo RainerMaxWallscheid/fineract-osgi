@@ -25,6 +25,8 @@ dependencies {
     implementation(project(path: ':fineract-avro-schemas'))
     implementation(project(path: ':fineract-loan-api'))
     implementation(project(path: ':fineract-working-capital-loan-api'))
+    // CodeValue id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-codes-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.collateral.service,'
                         + 'org.apache.fineract.infrastructure.core.api,'
                         + 'org.apache.fineract.infrastructure.core.data,'
+                        + 'org.apache.fineract.infrastructure.codes.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.collateral.impl'
                 )

@@ -21,6 +21,7 @@ package org.apache.fineract.portfolio.loanorigination.enricher;
 import org.apache.fineract.avro.generic.v1.CodeValueDataV1;
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -43,17 +44,18 @@ public class LoanOriginatorAvroMapper {
         builder.setExternalId(originator.getExternalId() != null ? originator.getExternalId().getValue() : null);
         builder.setName(originator.getName());
         builder.setStatus(originator.getStatus() != null ? originator.getStatus().getValue() : null);
-        builder.setOriginatorType(mapCodeValue(originator.getOriginatorType()));
-        builder.setChannelType(mapCodeValue(originator.getChannelType()));
+        builder.setOriginatorType(mapCodeValue(originator.getOriginatorTypeId()));
+        builder.setChannelType(mapCodeValue(originator.getChannelTypeId()));
 
         return builder.build();
     }
 
     /**
-     * Converts a CodeValue entity to CodeValueDataV1 Avro
+     * Converts a leftover CodeValue persistable to CodeValueDataV1 Avro
      */
-    private CodeValueDataV1 mapCodeValue(CodeValue codeValue) {
-        if (codeValue == null) {
+    private CodeValueDataV1 mapCodeValue(final Long codeValueId) {
+        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
+        if (!(persistable instanceof CodeValue codeValue)) {
             return null;
         }
 

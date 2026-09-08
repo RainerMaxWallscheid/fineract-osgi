@@ -19,23 +19,32 @@
 package org.apache.fineract.portfolio.loanorigination.mapper;
 
 import java.util.List;
-import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-@Mapper(config = MapstructMapperConfig.class, uses = { CodeValueMapper.class })
+@Mapper(config = MapstructMapperConfig.class)
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public interface LoanOriginatorMapper {
 
-    @Mapping(target = "originatorType", source = "originatorType")
-    @Mapping(target = "channelType", source = "channelType")
+    @Mapping(target = "originatorType", source = "originatorTypeId", qualifiedByName = "codeValueData")
+    @Mapping(target = "channelType", source = "channelTypeId", qualifiedByName = "codeValueData")
     @Mapping(target = "externalId", source = "externalId")
     @Mapping(target = "status", expression = "java(entity.getStatus().getValue())")
     LoanOriginatorData toData(LoanOriginator entity);
 
     List<LoanOriginatorData> toDataList(List<LoanOriginator> entities);
+
+    @Named("codeValueData")
+    default CodeValueData codeValueData(final Long codeValueId) {
+        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
+        return persistable instanceof CodeValue leftover ? leftover.toData() : null;
+    }
 }

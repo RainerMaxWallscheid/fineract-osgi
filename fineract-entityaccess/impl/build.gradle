@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.infrastructure.entityaccess.service,'
                         + 'org.apache.fineract.infrastructure.entityaccess.data,'
                         + 'org.apache.fineract.infrastructure.entityaccess.domain,'
+                        + 'org.apache.fineract.infrastructure.codes.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.entityaccess.impl'
                 )

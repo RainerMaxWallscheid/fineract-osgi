@@ -20,12 +20,10 @@ package org.apache.fineract.infrastructure.entityaccess.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.entityaccess.FineractEntityAccessConstants;
@@ -37,19 +35,21 @@ public class FineractEntityAccess extends AbstractPersistableCustom<Long> {
     private String entityType;
     @Column(name = "entity_id")
     private Long entityId;
-    @ManyToOne
-    @JoinColumn(name = "access_type_code_value_id", nullable = false)
-    private CodeValue accessType;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "access_type_code_value_id", nullable = false)
+    private Long accessTypeId;
     @Column(name = "second_entity_type", length = 50)
     private String secondEntityType;
     @Column(name = "second_entity_id")
     private Long secondEntityId;
 
-    public static FineractEntityAccess createNew(final String entityType, final Long entityId, final CodeValue accessType, final String secondEntityType, final Long secondEntityId) {
+    public static FineractEntityAccess createNew(final String entityType, final Long entityId, final Object accessType, final String secondEntityType, final Long secondEntityId) {
         return new FineractEntityAccess().setEntityType(entityType).setEntityId(entityId).setAccessType(accessType).setSecondEntityType(secondEntityType).setSecondEntityId(secondEntityId);
     }
 
-    public static FineractEntityAccess fromJson(final CodeValue accessType, final JsonCommand command) {
+    public static FineractEntityAccess fromJson(final Object accessType, final JsonCommand command) {
         final String entityType = command.stringValueOfParameterNamed(FineractEntityAccessConstants.EntityAccessJSONinputParams.ENTITY_TYPE.getValue());
         final Long entityId = command.longValueOfParameterNamed(FineractEntityAccessConstants.EntityAccessJSONinputParams.ENTITY_ID.getValue());
         final String secondEntityType = command.stringValueOfParameterNamed(FineractEntityAccessConstants.EntityAccessJSONinputParams.SECOND_ENTITY_ID.getValue());
@@ -71,10 +71,7 @@ public class FineractEntityAccess extends AbstractPersistableCustom<Long> {
             this.entityId = command.longValueOfParameterNamed(paramName);
             actualChanges.put(paramName, this.entityId);
         }
-        Long existingAccessTypeId = null;
-        if (this.accessType != null) {
-            existingAccessTypeId = this.accessType.getId();
-        }
+        Long existingAccessTypeId = this.accessTypeId;
         paramName = FineractEntityAccessConstants.EntityAccessJSONinputParams.ENTITY_ACCESS_TYPE_ID.getValue();
         if (command.isChangeInLongParameterNamed(paramName, existingAccessTypeId)) {
             final Long newValue = command.longValueOfParameterNamed(paramName);
@@ -105,8 +102,8 @@ public class FineractEntityAccess extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getAccessType() {
-        return this.accessType;
+        public Long getAccessTypeId() {
+        return this.accessTypeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -141,8 +138,8 @@ public class FineractEntityAccess extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public FineractEntityAccess setAccessType(final CodeValue accessType) {
-        this.accessType = accessType;
+        public FineractEntityAccess setAccessType(final Object accessType) {
+        this.accessTypeId = CodeValueAssociation.id(accessType);
         return this;
     }
 
