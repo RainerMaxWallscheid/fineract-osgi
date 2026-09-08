@@ -32,7 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -45,9 +45,11 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-    @ManyToOne
-    @JoinColumn(name = "client_reln_cv_id", nullable = false)
-    private CodeValue clientRelationshipType;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "client_reln_cv_id", nullable = false)
+    private Long clientRelationshipTypeId;
     @Column(name = "type_enum", nullable = false)
     private Integer gurantorType;
     @Column(name = "entity_id")
@@ -83,13 +85,13 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
 
     protected Guarantor() {}
 
-    private Guarantor(final Loan loan, final CodeValue clientRelationshipType, final Integer gurantorType, final Long entityId,
+    private Guarantor(final Loan loan, final Object clientRelationshipType, final Integer gurantorType, final Long entityId,
             final String firstname, final String lastname, final LocalDate dateOfBirth, final String addressLine1,
             final String addressLine2, final String city, final String state, final String country, final String zip,
             final String housePhoneNumber, final String mobilePhoneNumber, final String comment, final boolean active,
             final List<GuarantorFundingDetails> guarantorFundDetails) {
         this.loan = loan;
-        this.clientRelationshipType = clientRelationshipType;
+        this.clientRelationshipTypeId = CodeValueAssociation.id(clientRelationshipType);
         this.gurantorType = gurantorType;
         this.entityId = entityId;
         this.firstname = StringUtils.defaultIfEmpty(firstname, null);
@@ -108,7 +110,7 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         this.guarantorFundDetails.addAll(guarantorFundDetails);
     }
 
-    public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType, final JsonCommand command,
+    public static Guarantor fromJson(final Loan loan, final Object clientRelationshipType, final JsonCommand command,
             final List<GuarantorFundingDetails> fundingDetails) {
         final Integer gurantorType = command.integerValueSansLocaleOfParameterNamed(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue());
         final Long entityId = command.longValueOfParameterNamed(GuarantorJSONinputParams.ENTITY_ID.getValue());
@@ -243,8 +245,8 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         return this.loan.getOfficeId();
     }
 
-    public void updateClientRelationshipType(final CodeValue clientRelationshipType) {
-        this.clientRelationshipType = clientRelationshipType;
+    public void updateClientRelationshipType(final Object clientRelationshipType) {
+        this.clientRelationshipTypeId = CodeValueAssociation.id(clientRelationshipType);
     }
 
     private void updateExistingEntityToNull() {
@@ -314,8 +316,8 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getClientRelationshipType() {
-        return this.clientRelationshipType;
+    public Long getClientRelationshipTypeId() {
+        return this.clientRelationshipTypeId;
     }
 
     @java.lang.SuppressWarnings("all")

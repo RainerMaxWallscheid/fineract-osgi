@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.workingcapitalloan.mapper;
 
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
@@ -43,7 +44,7 @@ public interface WorkingCapitalLoanTransactionMapper {
     @Mapping(target = "wcLoanId", source = "wcLoan.id")
     @Mapping(target = "type", source = "transactionType", qualifiedByName = "loanTransactionTypeToEnumData")
     @Mapping(target = "paymentDetailData", source = "paymentDetailId", qualifiedByName = "paymentDetailIdToData")
-    @Mapping(target = "classification", source = "classification", qualifiedByName = "codeValueToData")
+    @Mapping(target = "classification", source = "classificationId", qualifiedByName = "codeValueToData")
     @Mapping(target = "transactionDate", source = "transactionDate")
     @Mapping(target = "principalPortion", source = "allocation.principalPortion")
     @Mapping(target = "feeChargesPortion", source = "allocation.feeChargesPortion")
@@ -79,8 +80,12 @@ public interface WorkingCapitalLoanTransactionMapper {
     }
 
     @Named("codeValueToData")
-    default CodeValueData codeValueToData(final CodeValue codeValue) {
-        return codeValue == null ? null : CodeValueData.instance(codeValue.getId(), codeValue.getLabel());
+    default CodeValueData codeValueToData(final Long codeValueId) {
+        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
+        if (!(persistable instanceof CodeValue leftover)) {
+            return null;
+        }
+        return leftover.toData();
     }
 
     @Named("currencyData")

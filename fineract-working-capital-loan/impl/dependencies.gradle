@@ -28,6 +28,8 @@ dependencies {
     // AppUser id / persistable lookup (entity residual stays in core)
     implementation(project(path: ':fineract-useradministration-api'))
     implementation(project(path: ':fineract-fund-api'))
+    // CodeValue id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-monetary-api'))
     implementation(project(path: ':fineract-businessdate-api'))
     implementation(project(path: ':fineract-charge-api'))

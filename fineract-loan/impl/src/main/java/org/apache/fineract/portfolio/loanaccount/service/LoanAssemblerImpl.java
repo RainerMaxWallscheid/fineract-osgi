@@ -588,10 +588,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             final Staff newOfficer = findLoanOfficerByIdIfProvided(newValue);
             loanOfficerService.updateLoanOfficerOnLoanApplication(loan, newOfficer);
         }
-        Long existingLoanPurposeId = null;
-        if (loan.getLoanPurpose() != null) {
-            existingLoanPurposeId = loan.getLoanPurpose().getId();
-        }
+        Long existingLoanPurposeId = loan.getLoanPurposeId();
         if (command.isChangeInLongParameterNamed(LoanApiConstants.loanPurposeIdParameterName, existingLoanPurposeId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.loanPurposeIdParameterName);
             changes.put(LoanApiConstants.loanPurposeIdParameterName, newValue);

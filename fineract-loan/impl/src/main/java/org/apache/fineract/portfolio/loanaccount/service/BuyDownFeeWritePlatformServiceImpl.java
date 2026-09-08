@@ -155,7 +155,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         buyDownFeeAdjustment.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(buyDownFeeAdjustment,
                 originalBuyDownFee.get(), LoanTransactionRelationTypeEnum.ADJUSTMENT));
         // Inherit from the target transaction the classification
-        buyDownFeeAdjustment.setClassification(originalBuyDownFee.get().getClassification());
+        buyDownFeeAdjustment.setClassification(originalBuyDownFee.get().getClassificationId());
         // Add transaction to loan
         loan.addLoanTransaction(buyDownFeeAdjustment);
         // Save transaction

@@ -355,7 +355,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                 String errorCode = null;
                 if (guarantor.getGuarantorFundDetails().isEmpty()) {
                     errorCode = "guarantor.can.not.be.own";
-                } else if (guarantor.getClientRelationshipType() != null) {
+                } else if (guarantor.getClientRelationshipTypeId() != null) {
                     errorCode = "guarantor.relation.should.be.empty.for.own";
                 }
                 if (errorCode != null) {

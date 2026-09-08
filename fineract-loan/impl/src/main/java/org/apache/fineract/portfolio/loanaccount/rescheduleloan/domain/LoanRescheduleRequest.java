@@ -30,7 +30,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRescheduleRequestToTermVariationMapping;
@@ -53,9 +53,11 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     private LocalDate rescheduleFromDate;
     @Column(name = "recalculate_interest")
     private Boolean recalculateInterest;
-    @ManyToOne
-    @JoinColumn(name = "reschedule_reason_cv_id")
-    private CodeValue rescheduleReasonCodeValue;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "reschedule_reason_cv_id")
+    private Long rescheduleReasonCodeValueId;
     @Column(name = "reschedule_reason_comment")
     private String rescheduleReasonComment;
     @Column(name = "submitted_on_date")
@@ -91,14 +93,14 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
      * LoanRescheduleRequest constructor
      */
     private LoanRescheduleRequest(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
-            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
+            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final Object rescheduleReasonCodeValue,
             final String rescheduleReasonComment, final LocalDate submittedOnDate, final Object submittedByUser,
             final LocalDate approvedOnDate, final Object approvedByUser, final LocalDate rejectedOnDate, final Object rejectedByUser) {
         this.loan = loan;
         this.statusEnum = statusEnum;
         this.rescheduleFromInstallment = rescheduleFromInstallment;
         this.rescheduleFromDate = rescheduleFromDate;
-        this.rescheduleReasonCodeValue = rescheduleReasonCodeValue;
+        this.rescheduleReasonCodeValueId = CodeValueAssociation.id(rescheduleReasonCodeValue);
         this.rescheduleReasonComment = rescheduleReasonComment;
         this.submittedOnDate = submittedOnDate;
         this.submittedByUserId = AppUserAssociation.id(submittedByUser);
@@ -113,7 +115,7 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
      * @return a new instance of the LoanRescheduleRequest class
      */
     public static LoanRescheduleRequest instance(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
-            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
+            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final Object rescheduleReasonCodeValue,
             final String rescheduleReasonComment, final LocalDate submittedOnDate, final Object submittedByUser,
             final LocalDate approvedOnDate, final Object approvedByUser, final LocalDate rejectedOnDate, final Object rejectedByUser) {
         return new LoanRescheduleRequest(loan, statusEnum, rescheduleFromInstallment, rescheduleFromDate, recalculateInterest,
@@ -203,8 +205,8 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getRescheduleReasonCodeValue() {
-        return this.rescheduleReasonCodeValue;
+    public Long getRescheduleReasonCodeValueId() {
+        return this.rescheduleReasonCodeValueId;
     }
 
     @java.lang.SuppressWarnings("all")

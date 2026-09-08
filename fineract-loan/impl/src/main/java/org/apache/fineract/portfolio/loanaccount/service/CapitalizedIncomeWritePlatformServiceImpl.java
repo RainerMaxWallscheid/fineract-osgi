@@ -146,7 +146,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
                 Money.of(loan.getCurrency(), transactionAmount), paymentDetail, transactionDate, txnExternalId);
         capitalizedIncomeAdjustment.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(capitalizedIncomeAdjustment,
                 capitalizedIncome.get(), LoanTransactionRelationTypeEnum.ADJUSTMENT));
-        capitalizedIncomeAdjustment.setClassification(capitalizedIncome.get().getClassification());
+        capitalizedIncomeAdjustment.setClassification(capitalizedIncome.get().getClassificationId());
         recalculateLoanTransactions(loan, capitalizedIncomeAdjustment);
         loan.addLoanTransaction(capitalizedIncomeAdjustment);
         LoanTransaction savedCapitalizedIncomeAdjustment = loanTransactionRepository.saveAndFlush(capitalizedIncomeAdjustment);

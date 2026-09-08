@@ -55,7 +55,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -151,9 +151,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
      */
     @Column(name = "loan_officer_id")
     private Long loanOfficerId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "loanpurpose_cv_id")
-    private CodeValue loanPurpose;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "loanpurpose_cv_id")
+    private Long loanPurposeId;
     @Column(name = "loan_transaction_strategy_code", nullable = false)
     private String transactionProcessingStrategyCode;
     @Column(name = "loan_transaction_strategy_name")
@@ -299,9 +301,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private Boolean isFloatingInterestRate;
     @Column(name = "interest_rate_differential", scale = 6, precision = 19)
     private BigDecimal interestRateDifferential;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writeoff_reason_cv_id")
-    private CodeValue writeOffReason;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "writeoff_reason_cv_id")
+    private Long writeOffReasonId;
     @Column(name = "loan_sub_status_id")
     private LoanSubStatus loanSubStatus;
     @Column(name = "is_topup", nullable = false)
@@ -319,9 +323,11 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private LocalDate lastClosedBusinessDate;
     @Column(name = "is_charged_off", nullable = false)
     private boolean chargedOff;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "charge_off_reason_cv_id")
-    private CodeValue chargeOffReason;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "charge_off_reason_cv_id")
+    private Long chargeOffReasonId;
     @Column(name = "charged_off_on_date")
     private LocalDate chargedOffOnDate;
     /**
@@ -337,7 +343,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private RepaymentStartDateType repaymentStartDateType;
 
     public static Loan newIndividualLoanApplication(final String accountNo, final Object client, final AccountType loanType,
-            final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Object fund, final Object officer, final Object loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
@@ -353,7 +359,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newGroupLoanApplication(final String accountNo, final Object group, final AccountType loanType,
-            final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
+            final LoanProduct loanProduct, final Object fund, final Object officer, final Object loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -370,7 +376,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Object client, final Object group,
-            final AccountType loanType, final LoanProduct loanProduct, final Object fund, final Object officer, final CodeValue loanPurpose,
+            final AccountType loanType, final LoanProduct loanProduct, final Object fund, final Object officer, final Object loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -391,7 +397,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     private Loan(final String accountNo, final Object client, final Object group, final AccountType loanType, final Object fund,
-            final Object loanOfficer, final CodeValue loanPurpose,
+            final Object loanOfficer, final Object loanPurpose,
             final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy, final LoanProduct loanProduct,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
@@ -413,7 +419,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.loanType = loanType;
         this.fundId = FundAssociation.id(fund);
         this.loanOfficerId = StaffAssociation.id(loanOfficer);
-        this.loanPurpose = loanPurpose;
+        this.loanPurposeId = CodeValueAssociation.id(loanPurpose);
         this.transactionProcessingStrategyCode = transactionProcessingStrategy.getCode();
         this.transactionProcessingStrategyName = transactionProcessingStrategy.getName();
         this.loanProduct = loanProduct;
@@ -564,8 +570,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.fundId = FundAssociation.id(fund);
     }
 
-    public void updateLoanPurpose(final CodeValue loanPurpose) {
-        this.loanPurpose = loanPurpose;
+    public void updateLoanPurpose(final Object loanPurpose) {
+        this.loanPurposeId = CodeValueAssociation.id(loanPurpose);
     }
 
     public void updateTransactionProcessingStrategy(final String transactionProcessingStrategyCode,
@@ -1031,7 +1037,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     public Long fetchChargeOffReasonId() {
-        return isChargedOff() && getChargeOffReason() != null ? getChargeOffReason().getId() : null;
+        return isChargedOff() ? getChargeOffReasonId() : null;
     }
 
     public boolean isSyncDisbursementWithMeeting() {
@@ -1448,8 +1454,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         return nextRepaymentDate;
     }
 
-    public void updateWriteOffReason(CodeValue writeOffReason) {
-        this.writeOffReason = writeOffReason;
+    public void updateWriteOffReason(final Object writeOffReason) {
+        this.writeOffReasonId = CodeValueAssociation.id(writeOffReason);
     }
 
     public void updateLoanScheduleOnForeclosure(final Collection<LoanRepaymentScheduleInstallment> installments) {
@@ -1579,18 +1585,18 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         return (getLoanProduct().getDelinquencyBucket() != null);
     }
 
-    public void markAsChargedOff(final LocalDate chargedOffOn, final Object chargedOffBy, final CodeValue chargeOffReason) {
+    public void markAsChargedOff(final LocalDate chargedOffOn, final Object chargedOffBy, final Object chargeOffReason) {
         this.chargedOff = true;
         this.chargedOffById = AppUserAssociation.id(chargedOffBy);
         this.chargedOffOnDate = chargedOffOn;
-        this.chargeOffReason = chargeOffReason;
+        this.chargeOffReasonId = CodeValueAssociation.id(chargeOffReason);
     }
 
     public void liftChargeOff() {
         this.chargedOff = false;
         this.chargedOffById = null;
         this.chargedOffOnDate = null;
-        this.chargeOffReason = null;
+        this.chargeOffReasonId = null;
     }
 
     public LoanRepaymentScheduleInstallment getLastLoanRepaymentScheduleInstallment() {
@@ -1735,8 +1741,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getLoanPurpose() {
-        return this.loanPurpose;
+    public Long getLoanPurposeId() {
+        return this.loanPurposeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2000,8 +2006,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getWriteOffReason() {
-        return this.writeOffReason;
+    public Long getWriteOffReasonId() {
+        return this.writeOffReasonId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -2040,8 +2046,8 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getChargeOffReason() {
-        return this.chargeOffReason;
+    public Long getChargeOffReasonId() {
+        return this.chargeOffReasonId;
     }
 
     @java.lang.SuppressWarnings("all")

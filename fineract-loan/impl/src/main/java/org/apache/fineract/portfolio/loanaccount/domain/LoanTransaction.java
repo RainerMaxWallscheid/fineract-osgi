@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -119,9 +119,11 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
     private LoanReAgeParameter loanReAgeParameter;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "loanTransaction")
     private LoanReAmortizationParameter loanReAmortizationParameter;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "classification_cv_id")
-    private CodeValue classification;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "classification_cv_id")
+    private Long classificationId;
 
     protected LoanTransaction() {}
 
@@ -293,7 +295,7 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
         if (LoanTransactionType.REAMORTIZE.equals(loanTransaction.getTypeOf())) {
             newTransaction.setLoanReAmortizationParameter(loanTransaction.getLoanReAmortizationParameter().getCopy(newTransaction));
         }
-        newTransaction.setClassification(loanTransaction.getClassification());
+        newTransaction.setClassification(loanTransaction.getClassificationId());
         return newTransaction;
     }
 
@@ -1148,8 +1150,8 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getClassification() {
-        return this.classification;
+    public Long getClassificationId() {
+        return this.classificationId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -1178,7 +1180,7 @@ public class LoanTransaction extends AbstractAuditableWithUTCDateTimeCustom<Long
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setClassification(final CodeValue classification) {
-        this.classification = classification;
+    public void setClassification(final Object classification) {
+        this.classificationId = CodeValueAssociation.id(classification);
     }
 }

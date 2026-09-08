@@ -166,10 +166,9 @@ public class LoanBuilder {
                 chargedOffField.setAccessible(true);
                 chargedOffField.set(loan, true);
 
-                // Use reflection to set chargeOffReason
-                java.lang.reflect.Field chargeOffReasonField = Loan.class.getDeclaredField("chargeOffReason");
+                java.lang.reflect.Field chargeOffReasonField = Loan.class.getDeclaredField("chargeOffReasonId");
                 chargeOffReasonField.setAccessible(true);
-                chargeOffReasonField.set(loan, chargeOffReason);
+                chargeOffReasonField.set(loan, chargeOffReason == null ? null : chargeOffReason.getId());
 
                 // Use reflection to set chargedOffOnDate
                 java.lang.reflect.Field chargedOffOnDateField = Loan.class.getDeclaredField("chargedOffOnDate");

@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.portfolio.loanaccount.mapper;
 
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
@@ -28,6 +31,7 @@ import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(config = MapstructMapperConfig.class, uses = { LoanTransactionRelationMapper.class, LoanChargePaidByMapper.class,
         CurrencyMapper.class })
@@ -77,7 +81,7 @@ public interface LoanTransactionMapper {
     @Mapping(target = "bankNumber", ignore = true)
     @Mapping(target = "accountId", ignore = true)
     @Mapping(target = "transactionAmount", ignore = true)
-    @Mapping(target = "classification", expression = "java(loanTransaction.getClassification() != null ? loanTransaction.getClassification().toData() : null)")
+    @Mapping(target = "classification", source = "classificationId", qualifiedByName = "codeValueData")
     LoanTransactionData mapLoanTransaction(LoanTransaction loanTransaction);
 
     @org.mapstruct.Named("officeIdToName")
@@ -88,5 +92,11 @@ public interface LoanTransactionMapper {
     default PaymentDetailData paymentDetailData(final LoanTransaction loanTransaction) {
         final Object persistable = PaymentDetailAssociation.persistableById(loanTransaction.getPaymentDetailId());
         return persistable instanceof PaymentDetail detail ? detail.toData() : null;
+    }
+
+    @Named("codeValueData")
+    default CodeValueData codeValueData(final Long codeValueId) {
+        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
+        return persistable instanceof CodeValue leftover ? leftover.toData() : null;
     }
 }

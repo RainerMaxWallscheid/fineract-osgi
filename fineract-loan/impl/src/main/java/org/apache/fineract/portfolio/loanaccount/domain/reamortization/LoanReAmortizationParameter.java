@@ -23,10 +23,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
@@ -40,23 +39,25 @@ public class LoanReAmortizationParameter extends AbstractAuditableWithUTCDateTim
     @Enumerated(EnumType.STRING)
     @Column(name = "interest_handling_type")
     private LoanReAmortizationInterestHandlingType interestHandlingType;
-    @ManyToOne
-    @JoinColumn(name = "reamortization_reason_code_value_id", nullable = true)
-    private CodeValue reamortizationReason;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "reamortization_reason_code_value_id")
+    private Long reamortizationReasonId;
 
     // for JPA, don't use
     protected LoanReAmortizationParameter() {}
 
     public LoanReAmortizationParameter getCopy(LoanTransaction loanTransaction) {
-        return new LoanReAmortizationParameter(loanTransaction, interestHandlingType, reamortizationReason);
+        return new LoanReAmortizationParameter(loanTransaction, interestHandlingType, reamortizationReasonId);
     }
 
     @java.lang.SuppressWarnings("all")
     public LoanReAmortizationParameter(final LoanTransaction loanTransaction,
-            final LoanReAmortizationInterestHandlingType interestHandlingType, final CodeValue reamortizationReason) {
+            final LoanReAmortizationInterestHandlingType interestHandlingType, final Object reamortizationReason) {
         this.loanTransaction = loanTransaction;
         this.interestHandlingType = interestHandlingType;
-        this.reamortizationReason = reamortizationReason;
+        this.reamortizationReasonId = CodeValueAssociation.id(reamortizationReason);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -70,7 +71,7 @@ public class LoanReAmortizationParameter extends AbstractAuditableWithUTCDateTim
     }
 
     @java.lang.SuppressWarnings("all")
-    public CodeValue getReamortizationReason() {
-        return this.reamortizationReason;
+    public Long getReamortizationReasonId() {
+        return this.reamortizationReasonId;
     }
 }
