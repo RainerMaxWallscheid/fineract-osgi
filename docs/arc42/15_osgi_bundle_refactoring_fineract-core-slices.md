@@ -12,12 +12,15 @@
 
 This is **policy**, not a leftover backlog. After leftover close-ins 1–30, remaining `fineract-core` (`~802` main / `~77` tests) **is** the shared kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14.7](14_module_api_boundaries.md)). Rank 31 is the floor.
 
+Leftover-retarget of leftover core JPA on domain `*-impl` is **closed**. Remaining leftover JPA of those types (Client, Group, Office, Staff, AppUser, CodeValue, PaymentType, Calendar, Rate, and related hub graphs) is only in `fineract-core`. Do not leftover-retarget leftover core JPA.
+
 | Do | Do not |
 |----|--------|
 | Depend on core from domain modules (**one-way**) | Depend from core on a domain `*-api` if that cycles (`core → module-api → core`) |
 | Put **new** ports, DTOs, REST, and handlers in the owning `*-api` / `*-impl` | Move leftover hub / fund-style types out of core to “thin” it |
 | Keep residual entities next to residual core DTOs that import them | Invent extra `*-api` consumers (e.g. organisation / calendar / search → loan-api) just to relocate `LoanStatus` |
 | Grow core only with true platform types (tenant, Money, exceptions, serialization, command / batch metamodel) | Add new business aggregates or write paths to core |
+| Leave leftover hub JPA in core | Leftover-retarget leftover core JPA |
 
 Inventory and ranks 1–30 below are **historical**. They are not a mandate to peel further.
 
