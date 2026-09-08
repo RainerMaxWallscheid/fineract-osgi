@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.address.service,'
                         + 'org.apache.fineract.portfolio.address.data,'
                         + 'org.apache.fineract.infrastructure.codes.moduleapi,'
+                        + 'org.apache.fineract.portfolio.client.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.address.impl'
                 )
