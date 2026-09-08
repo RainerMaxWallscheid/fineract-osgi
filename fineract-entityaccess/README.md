@@ -16,6 +16,8 @@ Provider residual (loan product/savings product/charge adapters) injects `Finera
 
 Validates mapped entities via loan/savings product repositories and charge-api ports.
 
+Entity-access entities store code-value id (not leftover CodeValue).
+
 ```bash
 ./gradlew :fineract-entityaccess-api:jar :fineract-entityaccess-impl:jar :fineract-entityaccess-test:test
 ```

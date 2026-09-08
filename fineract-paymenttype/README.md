@@ -10,7 +10,7 @@ Core residual peel — payment type catalog (ADR-022).
 
 ### Residual in `fineract-core`
 
-`PaymentType` entity, `PaymentTypeRepository`, `PaymentTypeNotFoundException` — used by payment-detail / charge / accounting JPA associations.
+`PaymentType` entity, `PaymentTypeRepository`, `PaymentTypeNotFoundException` stay in core. Leftover PaymentType JPA is only PaymentDetail in core. Charge and product-to-GL mapping entities store payment-type id (not leftover PaymentType).
 
 ```bash
 ./gradlew :fineract-paymenttype-api:jar :fineract-paymenttype-impl:jar :fineract-paymenttype-test:test

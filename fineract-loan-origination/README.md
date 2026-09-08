@@ -11,6 +11,8 @@ Loan originator catalog + attach/detach mappings (standard loan + working-capita
 
 No `:fineract-loan-origination` façade.
 
+Loan-originator entities store code-value id (not leftover CodeValue).
+
 ### Module API
 
 - `LoanOriginatorReadPlatformService`, `LoanOriginatorWritePlatformService`

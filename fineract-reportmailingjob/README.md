@@ -8,7 +8,7 @@ Provider peel — scheduled report email jobs (ADR-022).
 | `fineract-reportmailingjob-impl` | `impl/` | `org.apache.fineract.reportmailingjob.impl` | Entities, REST, email; Equinox DS `OSGI-INF/reportmailingjob.xml` |
 | `fineract-reportmailingjob-test` | `test/` | `org.apache.fineract.reportmailingjob.test` | Fragment-Host → impl |
 
-`stretchyReportId` is a Long FK (dataqueries `Report` residual on provider). AppUser stays `@ManyToOne` (core).
+`stretchyReportId` is a Long FK (dataqueries `Report` residual on provider). Report-mailing-job entities store user id (not leftover AppUser).
 
 Campaign residual: `ExecuteReportMailingJobs*` loads report via `ReportRepositoryWrapper`.
 

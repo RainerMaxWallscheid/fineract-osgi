@@ -10,7 +10,7 @@ Provider peel — collection/meeting calendars (ADR-022).
 
 ### Residual in `fineract-core`
 
-`Calendar` / `CalendarInstance` / history entities, enums, `CalendarData`, `CalendarUtils`, shared exceptions.
+`Calendar` / `CalendarInstance` / history entities, enums, `CalendarData`, `CalendarUtils`, shared exceptions. Meeting entities store calendar-instance id (not leftover CalendarInstance). Remaining leftover CalendarInstance JPA is only in `fineract-core`.
 
 ### Residual resolve
 

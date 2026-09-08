@@ -14,6 +14,8 @@ Provider peel — client/product/loan collateral management (`portfolio.collater
 constants and repository live in this module. `Loan` / `LoanTransaction` no longer own inverse
 collections; association lifecycle is `LoanCollateralLifecycleService`.
 
+Collateral-management entities store application-currency id (not leftover ApplicationCurrency).
+
 Legacy code-value collateral is `fineract-collateral` (separate peel).
 
 ```bash

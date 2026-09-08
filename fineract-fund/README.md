@@ -10,7 +10,7 @@ Provider peel — funds catalog (ADR-022).
 
 ### Residual in `fineract-core`
 
-`Fund` entity, `FundRepository`, `FundNotFoundException` — used by loan / WC loan JPA associations.
+`Fund` entity, `FundRepository`, `FundNotFoundException` stay in core. Loan, loan-product, WC, and WC-product entities store fund id (not leftover Fund).
 
 ```bash
 ./gradlew :fineract-fund-api:jar :fineract-fund-impl:jar :fineract-fund-test:test

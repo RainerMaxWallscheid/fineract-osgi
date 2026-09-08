@@ -13,6 +13,8 @@
 - `Office` / `Staff` JPA entities, repositories, wrappers, platform exceptions, shared DTOs
 - `Holiday` / `WorkingDays` entities, status/reschedule enums, schedule utils (`HolidayUtil`, `WorkingDaysUtil`, `AdjustedDateDetailsDTO`)
 
+Domain entities store office id and staff id (not leftover Office or Staff). Remaining leftover Office/Staff JPA is only in `fineract-core`.
+
 ### Residual in organisation-impl (not pure api)
 
 - `ProvisioningCriteriaData` + `ProvisioningCriteriaReadPlatformService` (reference `LoanProductData` from loan-impl)

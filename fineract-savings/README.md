@@ -11,6 +11,8 @@ Savings / deposit products & accounts — Wave 3 OSGi modularization
 
 No `:fineract-savings` façade.
 
+Savings account entities store client id and group id (not leftover Client or Group).
+
 ### Consumers
 
 | Module | Depend on |

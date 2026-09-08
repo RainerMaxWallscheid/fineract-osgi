@@ -8,7 +8,7 @@ Provider peel — portfolio notes (ADR-022).
 | `fineract-note-impl` | `impl/` | `org.apache.fineract.note.impl` | Entity (FK ids), REST, handlers; Equinox DS `OSGI-INF/note.xml` |
 | `fineract-note-test` | `test/` | `org.apache.fineract.note.test` | Fragment-Host → impl |
 
-`Note` stores foreign keys as Long columns (no cross-module `@ManyToOne`). Share-account notes use residual `ShareAccountNoteSupport` on provider.
+Note entities store client id and group id (not leftover Client or Group). Share-account notes use residual `ShareAccountNoteSupport` on provider.
 
 ```bash
 ./gradlew :fineract-note-api:jar :fineract-note-impl:jar :fineract-note-test:test

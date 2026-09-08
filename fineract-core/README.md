@@ -6,11 +6,14 @@
 After leftover close-ins 1–30, remaining types (`~802` main / `~77` tests)
 **are** the kernel. Rank 31 is the floor.
 
+Leftover-retarget of leftover core JPA on domain `*-impl` is **closed**. Remaining leftover JPA of those types is only in `fineract-core`. Do not leftover-retarget leftover core JPA.
+
 | Do | Do not |
 |----|--------|
 | Depend on this module from domain `*-api` / `*-impl` (**one-way**) | Depend from core on a domain `*-api` if that cycles |
 | Put **new** ports, DTOs, REST, and handlers in the owning module | Peel hub / fund-style residuals to “thin” core |
 | Grow core only with true platform types (tenant, Money, exceptions, serialization, command / batch metamodel) | Add new business aggregates or write paths here |
+| Leave leftover hub JPA in core | Leftover-retarget leftover core JPA |
 
 Standing rule and inventory:
 [docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-core-slices.md).

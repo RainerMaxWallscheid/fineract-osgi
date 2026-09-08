@@ -23,6 +23,8 @@ Public types for foreign BCs:
 
 Impl-only: `…portfolio.charge.domain.Charge`, repositories, write services, handlers.
 
+Charge entities store payment-type id (not leftover PaymentType).
+
 
 Residual adapters **closed** into charge-impl: `ChargeAccountingDropdownPortAdapter`,
 `ChargeOfficeAccessPortAdapter`. `ConvertChargeDataToSpecificChargeData` is on charge-api

@@ -31,8 +31,8 @@ No `:fineract-rates` façade. Depend on `-api`; composition roots also take `-im
 
 `portfolio.rate` REST/handlers/assembler/read-write impls live in **rates-impl**.
 `RateData` + read/write ports live in **rates-api**.
-Entity `Rate` + `RateAppliesTo` + repo/wrapper + `RateNotFoundException` remain in **core**
-(loan `@ManyToOne Rate` coupling).
+Entity `Rate` + `RateAppliesTo` + repo/wrapper + `RateNotFoundException` remain in **core**.
+Loan and loan-product entities store rate id (not leftover Rate).
 Floating rates remain under `portfolio.floatingrates`.
 
 ```bash

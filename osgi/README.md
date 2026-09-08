@@ -523,7 +523,7 @@ Equinox registers `MeetingAttendanceDropdownReadService` only (`retrieveAttendan
 | `fineract-address-impl` | `org.apache.fineract.address.impl` | REST/JPA + `AddressOsgiServiceRegistrar` / DS `OSGI-INF/address.xml` |
 | `fineract-address-test` | `org.apache.fineract.address.test` | Fragment-Host → address.impl |
 
-`AddressData` residual in **fineract-core**. Equinox registers `FieldConfigurationReadPlatformService` only (`retrieve*` → empty). Did not register `AddressReadPlatformService` (leftover `AddressData`) or `AddressWritePlatformService` (leftover `Client`).
+`AddressData` residual in **fineract-core**. Equinox registers `FieldConfigurationReadPlatformService` only (`retrieve*` → empty). Did not register `AddressReadPlatformService` (leftover `AddressData`) or `AddressWritePlatformService` (Object client; Equinox-safe catalog ports hold). Address write takes Object client (not leftover Client).
 
 ### Provider peel: fineract-creditbureau (complete)
 

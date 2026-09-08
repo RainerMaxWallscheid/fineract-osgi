@@ -32,6 +32,8 @@ Residual closed into **impl**: journal DTOs, command handlers, journal REST + re
 
 Still residual on provider: journal **write service** (+ JPA impl/starter). Provisioning write **closed** into impl (`ProvisioningJournalEntryService`). WC processor closed into working-capital-loan-impl.
 
+Product-to-GL mapping entities store payment-type id (not leftover PaymentType).
+
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test
 ```

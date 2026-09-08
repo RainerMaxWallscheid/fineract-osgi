@@ -33,6 +33,8 @@ next to the catalog repos. WC-impl already depends on loan-impl for that residua
 `LoanReadPlatformServiceCommon` + `ExpectedDisbursementDateValidator` live on **loan-api**.
 `LoanStatus` remains residual in **core**.
 
+Loan, loan-transaction, guarantor, loan-reschedule-request, loan-reage-parameter, and loan-reamortization-parameter entities store code-value id (not leftover CodeValue). Loan and loan-product entities store rate id (not leftover Rate). Loan and loan-product entities store fund id (not leftover Fund). Loan entities store client id and group id (not leftover Client or Group).
+
 ### Consumers
 
 | Module | Depend on |

@@ -12,7 +12,7 @@ Provider peel — legacy loan collateral (`portfolio.collateral`) (ADR-022).
 
 `CollateralData`, `CollateralApiConstants`, and `LoanCollateral` live in this module.
 
-`Loan` no longer owns an inverse `OneToMany` to legacy `LoanCollateral` (avoids loan-impl ↔ collateral-impl cycle). The child side keeps `@ManyToOne Loan`; writes go through `LoanCollateralRepository`.
+`Loan` no longer owns an inverse `OneToMany` to legacy `LoanCollateral` (avoids loan-impl ↔ collateral-impl cycle). The child side keeps `@ManyToOne Loan`; writes go through `LoanCollateralRepository`. Loan-collateral entities store code-value id (not leftover CodeValue).
 
 Newer client/product collateral remains under `portfolio.collateralmanagement` (still on provider / loan residual for management entities).
 

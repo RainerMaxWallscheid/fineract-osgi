@@ -11,7 +11,7 @@ Core residual peel — groups/centers pure services, handlers, and levels API (A
 ### Residual
 
 **Kernel residual in `fineract-core`:** `Group`/`GroupLevel`/`GroupRole` entities and repos, shared DTOs
-(`GroupGeneralData`, `CenterData`, …), exceptions, `GroupingTypesApiConstants`.
+(`GroupGeneralData`, `CenterData`, …), exceptions, `GroupingTypesApiConstants`. Domain entities store group id (not leftover Group). Remaining leftover Group JPA is only in `fineract-core`.
 
 **Composition-root residual:** Centers/Groups REST + `GroupingTypesWritePlatformServiceJpaRepositoryImpl`
 in `fineract-progressive-loan-impl`.

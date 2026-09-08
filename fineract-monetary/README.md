@@ -10,7 +10,7 @@
 
 ### Residual in `fineract-core`
 
-`Money` / `MonetaryCurrency` / `CurrencyData` / currency entities & repos, plus `CurrencyMapper` (MapStruct used by loan/investor) stay in core.
+`Money` / `MonetaryCurrency` / `CurrencyData` / currency entities & repos, plus `CurrencyMapper` (MapStruct used by loan/investor) stay in core. Collateral-management entities store application-currency id (not leftover ApplicationCurrency). Remaining leftover ApplicationCurrency JPA is only in `fineract-core`.
 
 ### Impl coupling (intentional)
 

@@ -10,7 +10,7 @@
 
 ### Residual in `fineract-core`
 
-JPA `Code` / `CodeValue`, repositories, wrappers, platform exceptions, and `CodeValueMapper` stay in core (Client/Group/GLAccount entity graph; avoids core↔codes cycle).
+JPA `Code` / `CodeValue`, repositories, wrappers, platform exceptions, and `CodeValueMapper` stay in core (Client/Group/GLAccount leftover hub graph; avoids core↔codes cycle). Domain `*-impl` entities store code-value id (not leftover CodeValue). Remaining leftover CodeValue JPA is only in `fineract-core`.
 
 Core re-exports `codes-api` so existing `CodeValueData` consumers keep working.
 

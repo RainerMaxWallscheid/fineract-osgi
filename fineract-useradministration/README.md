@@ -10,7 +10,7 @@ Provider peel — users / roles / permissions / password preferences (ADR-022).
 
 ### Residual in `fineract-core`
 
-`AppUser` / `Role` / `Permission` JPA entities, repositories, wrappers, shared DTOs (`AppUserData`, `RoleData`, …), and auth exceptions (`UserNotFoundException`, `UnAuthenticatedUserException`) stay in core — used by security, commands, loan, client, organisation.
+`AppUser` / `Role` / `Permission` JPA entities, repositories, wrappers, shared DTOs (`AppUserData`, `RoleData`, …), and auth exceptions (`UserNotFoundException`, `UnAuthenticatedUserException`) stay in core — used by security, commands, loan, client, organisation. Domain entities store user id (not leftover AppUser). Remaining leftover AppUser JPA is only in `fineract-core`.
 
 ```bash
 ./gradlew :fineract-useradministration-api:jar :fineract-useradministration-impl:jar :fineract-useradministration-test:test
