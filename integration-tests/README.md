@@ -35,6 +35,8 @@ docker compose -f docker/docker-compose-postgresql-test.yml up -d
 
 Expected (Cargo): user `root`, password `postgres`, DB `fineract_tenants`, port `5432`.
 
+When Cargo is enabled, `:test` is never UP-TO-DATE (Cargo starts a live Tomcat Gradle does not fingerprint). A second run still executes the suite.
+
 ## Default backend config (tests)
 
 | Variable | Default |

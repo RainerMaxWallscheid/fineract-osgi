@@ -121,6 +121,8 @@ tasks.named('test').configure {
     if (!project.hasProperty('cargoDisabled')) {
         dependsOn cargoStartLocal
         finalizedBy cargoStopLocal
+        // Cargo starts a live Tomcat Gradle does not fingerprint.
+        outputs.upToDateWhen { false }
     }
 }
 
