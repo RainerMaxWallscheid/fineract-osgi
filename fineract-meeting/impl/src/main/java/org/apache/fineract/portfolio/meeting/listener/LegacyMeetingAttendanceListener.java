@@ -145,8 +145,8 @@ final class LegacyMeetingAttendanceListener {
         // magic strings; not sure if it's worth it though
         final Collection<MeetingAttendance> clientsAttendance = new ArrayList<>();
         Collection<Group> childGroups = null;
-        if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
-            childGroups = this.groupRepository.findByParentId(meeting.getCalendarInstance().getEntityId());
+        if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
+            childGroups = this.groupRepository.findByParentId(meeting.leftoverCalendarInstance().getEntityId());
         }
         final String json = command.json();
         final JsonElement element = this.fromApiJsonHelper.parse(json);
@@ -160,9 +160,9 @@ final class LegacyMeetingAttendanceListener {
                     final Integer attendanceTypeId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(attendanceTypeParamName, attendanceElement);
                     final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
                     client.loadLazyCollections();
-                    if (CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.getCalendarInstance().getEntityId())) {
-                        throw new ClientNotInGroupException(clientId, meeting.getCalendarInstance().getEntityId());
-                    } else if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
+                    if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.leftoverCalendarInstance().getEntityId())) {
+                        throw new ClientNotInGroupException(clientId, meeting.leftoverCalendarInstance().getEntityId());
+                    } else if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
                         if (childGroups != null && !childGroups.isEmpty()) {
                             boolean isChildClient = false;
                             for (final Group group : childGroups) {
@@ -172,8 +172,8 @@ final class LegacyMeetingAttendanceListener {
                                 }
                             }
                             if (!isChildClient) {
-                                final String defaultUserMessage = "Client with identifier " + clientId + " is not in center " + meeting.getCalendarInstance().getEntityId();
-                                throw new ClientNotInGroupException("client.not.in.center", defaultUserMessage, clientId, meeting.getCalendarInstance().getEntityId());
+                                final String defaultUserMessage = "Client with identifier " + clientId + " is not in center " + meeting.leftoverCalendarInstance().getEntityId();
+                                throw new ClientNotInGroupException("client.not.in.center", defaultUserMessage, clientId, meeting.leftoverCalendarInstance().getEntityId());
                             }
                         }
                     }

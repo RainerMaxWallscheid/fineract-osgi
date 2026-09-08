@@ -90,7 +90,7 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
             }
             meeting.setClientsAttendance(new HashSet<>(getClientsAttendance(meeting, request.getClientsAttendance())));
             meetingRepository.saveAndFlush(meeting);
-            var groupId = CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) ? meeting.getCalendarInstance().getEntityId() : null;
+            var groupId = CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) ? meeting.leftoverCalendarInstance().getEntityId() : null;
             return MeetingCreateResponse.builder().entityId(meeting.getId()).groupId(groupId).build();
         } catch (final DataIntegrityViolationException | JpaSystemException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
@@ -111,7 +111,7 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
         var meetingDate = LocalDate.parse(request.getMeetingDate(), DateTimeFormatter.ofPattern(request.getDateFormat(), Locale.of(request.getLocale())));
         if (!meetingDate.equals(meeting.getMeetingDate())) {
             meeting.setMeetingDate(meetingDate);
-            if (meetingDate == null || !meeting.getCalendarInstance().getCalendar().isValidRecurringDate(meetingDate, isSkipRepaymentOnFirstMonth, numberOfDays)) {
+            if (meetingDate == null || !meeting.leftoverCalendarInstance().getCalendar().isValidRecurringDate(meetingDate, isSkipRepaymentOnFirstMonth, numberOfDays)) {
                 throw new NotValidRecurringDateException("meeting", "Not a valid meeting date", meeting.getMeetingDate());
             }
             try {
@@ -121,7 +121,7 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
                 throw handleMeetingDataIntegrityIssues(meeting.getMeetingDate(), throwable, dve);
             }
         }
-        var groupId = CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) ? meeting.getCalendarInstance().getEntityId() : null;
+        var groupId = CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) ? meeting.leftoverCalendarInstance().getEntityId() : null;
         return MeetingUpdateResponse.builder().entityId(meeting.getId()).groupId(groupId).build();
     }
 
@@ -161,13 +161,13 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
         var meetingAttendances = new HashSet<MeetingAttendance>();
         for (var attendance : attendances) {
             var client = clientRepository.findById(attendance.getClientId()).orElseThrow(() -> new ClientNotFoundException(attendance.getClientId()));
-            if (CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.getCalendarInstance().getEntityId())) {
-                throw new ClientNotInGroupException(attendance.getId(), meeting.getCalendarInstance().getEntityId());
-            } else if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
-                if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
-                    var size = groupRepository.findByParentId(meeting.getCalendarInstance().getEntityId()).stream().filter(group -> group.isChildClient(attendance.getId())).count();
+            if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.leftoverCalendarInstance().getEntityId())) {
+                throw new ClientNotInGroupException(attendance.getId(), meeting.leftoverCalendarInstance().getEntityId());
+            } else if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
+                if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
+                    var size = groupRepository.findByParentId(meeting.leftoverCalendarInstance().getEntityId()).stream().filter(group -> group.isChildClient(attendance.getId())).count();
                     if (size == 0L) {
-                        throw new ClientNotInGroupException("client.not.in.center", "Client with identifier " + attendance.getId() + " is not in center " + meeting.getCalendarInstance().getEntityId(), attendance.getId(), meeting.getCalendarInstance().getEntityId());
+                        throw new ClientNotInGroupException("client.not.in.center", "Client with identifier " + attendance.getId() + " is not in center " + meeting.leftoverCalendarInstance().getEntityId(), attendance.getId(), meeting.leftoverCalendarInstance().getEntityId());
                     }
                 }
             }

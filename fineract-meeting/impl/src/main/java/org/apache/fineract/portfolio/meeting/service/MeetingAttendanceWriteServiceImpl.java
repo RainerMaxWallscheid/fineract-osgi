@@ -50,7 +50,7 @@ public class MeetingAttendanceWriteServiceImpl implements MeetingAttendanceWrite
         var clientsAttendance = writeService.getClientsAttendance(meeting, request.getMeetingAttendance());
         var changes = updateAttendance(meeting, clientsAttendance);
         meetingRepository.saveAndFlush(meeting);
-        var groupId = CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) ? meeting.getCalendarInstance().getEntityId() : null;
+        var groupId = CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) ? meeting.leftoverCalendarInstance().getEntityId() : null;
         return MeetingAttendanceUpdateResponse.builder().entityId(meeting.getId()).groupId(groupId).changes(changes).build();
     }
 

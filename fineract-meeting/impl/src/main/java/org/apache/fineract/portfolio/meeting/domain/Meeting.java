@@ -22,8 +22,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -31,21 +29,24 @@ import java.time.LocalDate;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
+import org.apache.fineract.portfolio.calendar.moduleapi.CalendarInstanceAssociation;
 
 @Entity
 @Table(name = "m_meeting", uniqueConstraints = {@UniqueConstraint(columnNames = {"calendar_instance_id", "meeting_date"}, name = "unique_calendar_instance_id_meeting_date")})
 public class Meeting extends AbstractPersistableCustom<Long> {
-    @ManyToOne
-    @JoinColumn(name = "calendar_instance_id", nullable = false)
-    private CalendarInstance calendarInstance;
+    /**
+     * Calendar-instance id (no JPA association to leftover CalendarInstance — ADR-021).
+     */
+    @Column(name = "calendar_instance_id", nullable = false)
+    private Long calendarInstanceId;
     @Column(name = "meeting_date", nullable = false)
     private LocalDate meetingDate;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "meeting", orphanRemoval = true)
     private Set<MeetingAttendance> clientsAttendance;
 
     @java.lang.SuppressWarnings("all")
-        public Meeting(final CalendarInstance calendarInstance, final LocalDate meetingDate, final Set<MeetingAttendance> clientsAttendance) {
-        this.calendarInstance = calendarInstance;
+        public Meeting(final Object calendarInstance, final LocalDate meetingDate, final Set<MeetingAttendance> clientsAttendance) {
+        this.calendarInstanceId = CalendarInstanceAssociation.id(calendarInstance);
         this.meetingDate = meetingDate;
         this.clientsAttendance = clientsAttendance;
     }
@@ -55,8 +56,13 @@ public class Meeting extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CalendarInstance getCalendarInstance() {
-        return this.calendarInstance;
+        public Long getCalendarInstanceId() {
+        return this.calendarInstanceId;
+    }
+
+    public CalendarInstance leftoverCalendarInstance() {
+        final Object persistable = CalendarInstanceAssociation.persistableById(this.calendarInstanceId);
+        return persistable instanceof CalendarInstance leftover ? leftover : null;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -70,8 +76,8 @@ public class Meeting extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCalendarInstance(final CalendarInstance calendarInstance) {
-        this.calendarInstance = calendarInstance;
+        public void setCalendarInstance(final Object calendarInstance) {
+        this.calendarInstanceId = CalendarInstanceAssociation.id(calendarInstance);
     }
 
     @java.lang.SuppressWarnings("all")
