@@ -20,10 +20,9 @@ package org.apache.fineract.portfolio.client.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.address.domain.Address;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
@@ -41,17 +40,19 @@ public class ClientAddress extends AbstractPersistableCustom<Long> {
     @ManyToOne
     private Address address;
 
-    @ManyToOne
-    @JoinColumn(name = "address_type_id")
-    private CodeValue addressType;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "address_type_id")
+    private Long addressTypeId;
 
     @Column(name = "is_active")
     private boolean isActive;
 
-    private ClientAddress(final Object client, final Address address, final CodeValue addressType, final boolean isActive) {
+    private ClientAddress(final Object client, final Address address, final Object addressType, final boolean isActive) {
         this.clientId = ClientAssociation.id(client);
         this.address = address;
-        this.addressType = addressType;
+        this.addressTypeId = CodeValueAssociation.id(addressType);
         this.isActive = isActive;
 
     }
@@ -60,7 +61,7 @@ public class ClientAddress extends AbstractPersistableCustom<Long> {
 
     }
 
-    public static ClientAddress fromJson(final boolean isActive, final Object client, final Address address, final CodeValue address_type) {
+    public static ClientAddress fromJson(final boolean isActive, final Object client, final Address address, final Object address_type) {
 
         return new ClientAddress(client, address, address_type, isActive);
     }
@@ -73,12 +74,12 @@ public class ClientAddress extends AbstractPersistableCustom<Long> {
         return this.address;
     }
 
-    public CodeValue getAddressType() {
-        return this.addressType;
+    public Long getAddressTypeId() {
+        return this.addressTypeId;
     }
 
-    public void setAddressType(final CodeValue addressType) {
-        this.addressType = addressType;
+    public void setAddressType(final Object addressType) {
+        this.addressTypeId = CodeValueAssociation.id(addressType);
     }
 
     public boolean isIs_active() {

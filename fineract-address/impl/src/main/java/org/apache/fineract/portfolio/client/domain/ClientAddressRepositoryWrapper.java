@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.domain;
 
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,9 +31,9 @@ public class ClientAddressRepositoryWrapper {
         this.clientAddressRepository = clientAddressRepository;
     }
 
-    public ClientAddress findOneByClientIdAndAddressTypeAndIsActive(final long clientId, final CodeValue addressType,
+    public ClientAddress findOneByClientIdAndAddressTypeAndIsActive(final long clientId, final Long addressTypeId,
             final boolean isActive) {
-        return this.clientAddressRepository.findByClientIdAndAddressTypeAndIsActive(clientId, addressType, isActive);
+        return this.clientAddressRepository.findByClientIdAndAddressTypeAndIsActive(clientId, addressTypeId, isActive);
     }
 
     public ClientAddress findOneByClientIdAndAddressId(final long clientId, final long addressId) {

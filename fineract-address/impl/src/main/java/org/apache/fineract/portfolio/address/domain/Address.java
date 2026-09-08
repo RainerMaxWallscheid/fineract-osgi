@@ -22,15 +22,13 @@ import com.google.gson.JsonObject;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.domain.ClientAddress;
@@ -68,13 +66,17 @@ public class Address extends AbstractPersistableCustom<Long> {
     @Column(name = "county_district")
     private String countyDistrict;
 
-    @ManyToOne
-    @JoinColumn(name = "state_province_id")
-    private CodeValue stateProvince;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "state_province_id")
+    private Long stateProvinceId;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private CodeValue country;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "country_id")
+    private Long countryId;
 
     @Column(name = "postal_code")
     private String postalCode;
@@ -98,8 +100,8 @@ public class Address extends AbstractPersistableCustom<Long> {
     private LocalDate updatedOn;
 
     private Address(final String street, final String addressLine1, final String addressLine2, final String addressLine3,
-            final String townVillage, final String city, final String countyDistrict, final CodeValue stateProvince,
-            final CodeValue country, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy,
+            final String townVillage, final String city, final String countyDistrict, final Object stateProvince,
+            final Object country, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy,
             final LocalDate createdOn, final String updatedBy, final LocalDate updatedOn) {
         this.street = street;
         this.addressLine1 = addressLine1;
@@ -108,8 +110,8 @@ public class Address extends AbstractPersistableCustom<Long> {
         this.townVillage = townVillage;
         this.city = city;
         this.countyDistrict = countyDistrict;
-        this.stateProvince = stateProvince;
-        this.country = country;
+        this.stateProvinceId = CodeValueAssociation.id(stateProvince);
+        this.countryId = CodeValueAssociation.id(country);
         this.postalCode = postalCode;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -133,7 +135,7 @@ public class Address extends AbstractPersistableCustom<Long> {
 
     }
 
-    public static Address fromJson(final JsonCommand command, final CodeValue stateProvince, final CodeValue country) {
+    public static Address fromJson(final JsonCommand command, final Object stateProvince, final Object country) {
 
         final String street = command.stringValueOfParameterNamed("street");
 
@@ -167,7 +169,7 @@ public class Address extends AbstractPersistableCustom<Long> {
                 postalCode, latitude, longitude, createdBy, createdOn, updatedBy, updatedOn);
     }
 
-    public static Address fromJsonObject(final JsonObject jsonObject, final CodeValue state_province, final CodeValue country) {
+    public static Address fromJsonObject(final JsonObject jsonObject, final Object state_province, final Object country) {
         String street = "";
         String addressLine1 = "";
         String addressLine2 = "";
@@ -305,20 +307,20 @@ public class Address extends AbstractPersistableCustom<Long> {
         this.countyDistrict = countyDistrict;
     }
 
-    public CodeValue getStateProvince() {
-        return this.stateProvince;
+    public Long getStateProvinceId() {
+        return this.stateProvinceId;
     }
 
-    public void setStateProvince(CodeValue stateProvince) {
-        this.stateProvince = stateProvince;
+    public void setStateProvince(final Object stateProvince) {
+        this.stateProvinceId = CodeValueAssociation.id(stateProvince);
     }
 
-    public CodeValue getCountry() {
-        return this.country;
+    public Long getCountryId() {
+        return this.countryId;
     }
 
-    public void setCountry(CodeValue country) {
-        this.country = country;
+    public void setCountry(final Object country) {
+        this.countryId = CodeValueAssociation.id(country);
     }
 
     public String getPostalCode() {
