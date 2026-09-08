@@ -23,7 +23,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -36,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -52,14 +51,18 @@ public class TaxComponent extends AbstractAuditableCustom {
     private BigDecimal percentage;
     @Column(name = "debit_account_type_enum")
     private Integer debitAccountType;
-    @ManyToOne
-    @JoinColumn(name = "debit_account_id")
-    private GLAccount debitAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "debit_account_id")
+    private Long debitAccountId;
     @Column(name = "credit_account_type_enum")
     private Integer creditAccountType;
-    @ManyToOne
-    @JoinColumn(name = "credit_account_id")
-    private GLAccount creditAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "credit_account_id")
+    private Long creditAccountId;
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -71,21 +74,21 @@ public class TaxComponent extends AbstractAuditableCustom {
     protected TaxComponent() {
     }
 
-    private TaxComponent(final String name, final BigDecimal percentage, final GLAccountType debitAccountType, final GLAccount debitAccount, final GLAccountType creditAccountType, final GLAccount creditAccount, final LocalDate startDate) {
+    private TaxComponent(final String name, final BigDecimal percentage, final GLAccountType debitAccountType, final Object debitAccount, final GLAccountType creditAccountType, final Object creditAccount, final LocalDate startDate) {
         this.name = name;
         this.percentage = percentage;
         if (debitAccountType != null) {
             this.debitAccountType = debitAccountType.getValue();
         }
-        this.debitAccount = debitAccount;
+        this.debitAccountId = GLAccountAssociation.id(debitAccount);
         if (creditAccountType != null) {
             this.creditAccountType = creditAccountType.getValue();
         }
-        this.creditAccount = creditAccount;
+        this.creditAccountId = GLAccountAssociation.id(creditAccount);
         this.startDate = startDate;
     }
 
-    public static TaxComponent createTaxComponent(final String name, final BigDecimal percentage, final GLAccountType debitAccountType, final GLAccount debitAccount, final GLAccountType creditAccountType, final GLAccount creditAccount, final LocalDate startDate) {
+    public static TaxComponent createTaxComponent(final String name, final BigDecimal percentage, final GLAccountType debitAccountType, final Object debitAccount, final GLAccountType creditAccountType, final Object creditAccount, final LocalDate startDate) {
         return new TaxComponent(name, percentage, debitAccountType, debitAccount, creditAccountType, creditAccount, startDate);
     }
 
@@ -172,16 +175,16 @@ public class TaxComponent extends AbstractAuditableCustom {
         return this.debitAccountType;
     }
 
-    public GLAccount getDebitAccount() {
-        return this.debitAccount;
+    public Long getDebitAccountId() {
+        return this.debitAccountId;
     }
 
     public Integer getCreditAccountType() {
         return this.creditAccountType;
     }
 
-    public GLAccount getCreditAccount() {
-        return this.creditAccount;
+    public Long getCreditAccountId() {
+        return this.creditAccountId;
     }
 
     @java.lang.SuppressWarnings("all")

@@ -19,19 +19,22 @@
 package org.apache.fineract.portfolio.tax.mapper;
 
 import java.util.List;
-import org.apache.fineract.accounting.glaccount.mapper.GlAccountMapper;
+import org.apache.fineract.accounting.glaccount.data.GLAccountData;
+import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.mapper.GlAccountTypeMapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.tax.data.TaxComponentData;
 import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-@Mapper(config = MapstructMapperConfig.class, uses = { GlAccountMapper.class, GlAccountTypeMapper.class })
+@Mapper(config = MapstructMapperConfig.class, uses = { GlAccountTypeMapper.class })
 public interface TaxComponentMapper {
 
-    @Mapping(target = "creditAccount", source = "taxComponent.creditAccount")
-    @Mapping(target = "debitAccount", source = "taxComponent.debitAccount")
+    @Mapping(target = "creditAccount", source = "creditAccountId", qualifiedByName = "glAccountData")
+    @Mapping(target = "debitAccount", source = "debitAccountId", qualifiedByName = "glAccountData")
     @Mapping(target = "creditAccountType", source = "taxComponent.creditAccountType")
     @Mapping(target = "debitAccountType", source = "taxComponent.debitAccountType")
     @Mapping(target = "glAccountOptions", ignore = true)
@@ -40,5 +43,14 @@ public interface TaxComponentMapper {
     TaxComponentData map(TaxComponent taxComponent);
 
     List<TaxComponentData> map(List<TaxComponent> taxComponents);
+
+    @Named("glAccountData")
+    default GLAccountData glAccountData(final Long glAccountId) {
+        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
+        if (!(persistable instanceof GLAccount account)) {
+            return null;
+        }
+        return new GLAccountData().setId(account.getId()).setName(account.getName()).setGlCode(account.getGlCode());
+    }
 
 }

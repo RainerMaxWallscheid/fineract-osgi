@@ -92,8 +92,8 @@ class ChargeTaxApplicationServiceTest {
         when(component.getId()).thenReturn(9L);
         when(component.getName()).thenReturn("VAT");
         when(component.getApplicablePercentage(actualDate)).thenReturn(new BigDecimal("10"));
-        when(component.getCreditAccount()).thenReturn(null);
-        when(component.getDebitAccount()).thenReturn(null);
+        when(component.getCreditAccountId()).thenReturn(null);
+        when(component.getDebitAccountId()).thenReturn(null);
 
         TaxGroupMappings mapping = mock(TaxGroupMappings.class);
         when(mapping.occursOnDayFromAndUpToAndIncluding(actualDate)).thenReturn(true);

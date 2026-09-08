@@ -62,6 +62,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.tax.moduleapi,'
                         + 'org.apache.fineract.portfolio.tax.exception,'
                         + 'org.apache.fineract.portfolio.tax.api,'
+                        + 'org.apache.fineract.accounting.moduleapi,'
                         + '*',
                 // Domain residual still consumed by charge/loan/savings until Step 8 taxGroupId.
                 'Automatic-Module-Name': 'org.apache.fineract.tax.impl'

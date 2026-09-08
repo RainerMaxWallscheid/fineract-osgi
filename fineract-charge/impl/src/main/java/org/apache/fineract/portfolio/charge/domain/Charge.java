@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.charge.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -35,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -112,14 +112,16 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "payment_type_id", nullable = false)
     private PaymentType paymentType;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "income_or_liability_account_id")
-    private GLAccount account;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "income_or_liability_account_id")
+    private Long incomeOrLiabilityAccountId;
     /** Catalog tax group id (column tax_group_id). No JPA association to tax-impl. */
     @Column(name = "tax_group_id")
     private Long taxGroupId;
 
-    public static Charge fromJson(final JsonCommand command, final GLAccount account, final Long taxGroupId, final PaymentType paymentType) {
+    public static Charge fromJson(final JsonCommand command, final Object account, final Long taxGroupId, final PaymentType paymentType) {
         final String name = command.stringValueOfParameterNamed("name");
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount");
         final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
@@ -153,7 +155,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     protected Charge() {
     }
 
-    private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty, final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval, final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final boolean enableFreeWithdrawalCharge, final Integer freeWithdrawalFrequency, final Integer restartFrequency, final PeriodFrequencyType restartFrequencyEnum, final GLAccount account, final Long taxGroupId, final boolean enablePaymentType, final PaymentType paymentType) {
+    private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty, final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval, final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final boolean enableFreeWithdrawalCharge, final Integer freeWithdrawalFrequency, final Integer restartFrequency, final PeriodFrequencyType restartFrequencyEnum, final Object account, final Long taxGroupId, final boolean enablePaymentType, final PaymentType paymentType) {
         this.name = name;
         this.amount = amount;
         this.currencyCode = currencyCode;
@@ -162,7 +164,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         this.chargeCalculation = chargeCalculationType.getValue();
         this.penalty = penalty;
         this.active = active;
-        this.account = account;
+        this.incomeOrLiabilityAccountId = GLAccountAssociation.id(account);
         this.taxGroupId = taxGroupId;
         this.chargePaymentMode = paymentMode == null ? null : paymentMode.getValue();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -524,8 +526,11 @@ public class Charge extends AbstractPersistableCustom<Long> {
             feeFrequencyType = ChargeEnumerations.feeFrequencyType(this.feeFrequency);
         }
         GLAccountData accountData = null;
-        if (account != null) {
-            accountData = new GLAccountData().setId(account.getId()).setName(account.getName()).setGlCode(account.getGlCode());
+        if (this.incomeOrLiabilityAccountId != null) {
+            final Object persistable = GLAccountAssociation.persistableById(this.incomeOrLiabilityAccountId);
+            if (persistable instanceof GLAccount leftoverAccount) {
+                accountData = new GLAccountData().setId(leftoverAccount.getId()).setName(leftoverAccount.getName()).setGlCode(leftoverAccount.getGlCode());
+            }
         }
         TaxGroupData taxGroupData = null;
         if (this.taxGroupId != null) {
@@ -568,11 +573,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     }
 
     public Long getIncomeAccountId() {
-        Long incomeAccountId = null;
-        if (this.account != null) {
-            incomeAccountId = this.account.getId();
-        }
-        return incomeAccountId;
+        return this.incomeOrLiabilityAccountId;
     }
 
     public Long getTaxGroupId() {
@@ -626,12 +627,12 @@ public class Charge extends AbstractPersistableCustom<Long> {
             return false;
         }
         Charge other = (Charge) o;
-        return Objects.equals(name, other.name) && Objects.equals(amount, other.amount) && Objects.equals(currencyCode, other.currencyCode) && Objects.equals(chargeAppliesTo, other.chargeAppliesTo) && Objects.equals(chargeTimeType, other.chargeTimeType) && Objects.equals(chargeCalculation, other.chargeCalculation) && Objects.equals(chargePaymentMode, other.chargePaymentMode) && Objects.equals(feeOnDay, other.feeOnDay) && Objects.equals(feeInterval, other.feeInterval) && Objects.equals(feeOnMonth, other.feeOnMonth) && penalty == other.penalty && active == other.active && deleted == other.deleted && Objects.equals(minCap, other.minCap) && Objects.equals(maxCap, other.maxCap) && Objects.equals(feeFrequency, other.feeFrequency) && Objects.equals(account, other.account) && Objects.equals(taxGroupId, other.taxGroupId);
+        return Objects.equals(name, other.name) && Objects.equals(amount, other.amount) && Objects.equals(currencyCode, other.currencyCode) && Objects.equals(chargeAppliesTo, other.chargeAppliesTo) && Objects.equals(chargeTimeType, other.chargeTimeType) && Objects.equals(chargeCalculation, other.chargeCalculation) && Objects.equals(chargePaymentMode, other.chargePaymentMode) && Objects.equals(feeOnDay, other.feeOnDay) && Objects.equals(feeInterval, other.feeInterval) && Objects.equals(feeOnMonth, other.feeOnMonth) && penalty == other.penalty && active == other.active && deleted == other.deleted && Objects.equals(minCap, other.minCap) && Objects.equals(maxCap, other.maxCap) && Objects.equals(feeFrequency, other.feeFrequency) && Objects.equals(incomeOrLiabilityAccountId, other.incomeOrLiabilityAccountId) && Objects.equals(taxGroupId, other.taxGroupId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculation, chargePaymentMode, feeOnDay, feeInterval, feeOnMonth, penalty, active, deleted, minCap, maxCap, feeFrequency, account, taxGroupId);
+        return Objects.hash(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculation, chargePaymentMode, feeOnDay, feeInterval, feeOnMonth, penalty, active, deleted, minCap, maxCap, feeFrequency, incomeOrLiabilityAccountId, taxGroupId);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -708,13 +709,8 @@ public class Charge extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getAccount() {
-        return this.account;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public void setAccount(final GLAccount account) {
-        this.account = account;
+        public void setAccount(final Object account) {
+        this.incomeOrLiabilityAccountId = GLAccountAssociation.id(account);
     }
 
     public void setTaxGroupId(final Long taxGroupId) {

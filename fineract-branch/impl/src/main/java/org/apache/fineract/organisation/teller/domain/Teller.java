@@ -21,8 +21,6 @@ package org.apache.fineract.organisation.teller.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -30,7 +28,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
@@ -44,12 +42,16 @@ public class Teller extends AbstractPersistableCustom<Long> {
      */
     @Column(name = "office_id", nullable = false)
     private Long officeId;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "debit_account_id", nullable = true)
-    private GLAccount debitAccount;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "credit_account_id", nullable = true)
-    private GLAccount creditAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "debit_account_id")
+    private Long debitAccountId;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "credit_account_id")
+    private Long creditAccountId;
     @Column(name = "name", nullable = false, length = 100)
     private String name;
     @Column(name = "description", nullable = true, length = 500)
@@ -138,13 +140,13 @@ public class Teller extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getDebitAccount() {
-        return this.debitAccount;
+        public Long getDebitAccountId() {
+        return this.debitAccountId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccount getCreditAccount() {
-        return this.creditAccount;
+        public Long getCreditAccountId() {
+        return this.creditAccountId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -190,8 +192,8 @@ public class Teller extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Teller setDebitAccount(final GLAccount debitAccount) {
-        this.debitAccount = debitAccount;
+        public Teller setDebitAccount(final Object debitAccount) {
+        this.debitAccountId = GLAccountAssociation.id(debitAccount);
         return this;
     }
 
@@ -199,8 +201,8 @@ public class Teller extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public Teller setCreditAccount(final GLAccount creditAccount) {
-        this.creditAccount = creditAccount;
+        public Teller setCreditAccount(final Object creditAccount) {
+        this.creditAccountId = GLAccountAssociation.id(creditAccount);
         return this;
     }
 
@@ -263,10 +265,10 @@ public class Teller extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Teller(final Object office, final GLAccount debitAccount, final GLAccount creditAccount, final String name, final String description, final LocalDate startDate, final LocalDate endDate, final Integer status, final Set<Cashier> cashiers) {
+        public Teller(final Object office, final Object debitAccount, final Object creditAccount, final String name, final String description, final LocalDate startDate, final LocalDate endDate, final Integer status, final Set<Cashier> cashiers) {
         this.officeId = OfficeAssociation.id(office);
-        this.debitAccount = debitAccount;
-        this.creditAccount = creditAccount;
+        this.debitAccountId = GLAccountAssociation.id(debitAccount);
+        this.creditAccountId = GLAccountAssociation.id(creditAccount);
         this.name = name;
         this.description = description;
         this.startDate = startDate;

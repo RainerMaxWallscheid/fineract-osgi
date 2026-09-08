@@ -55,8 +55,8 @@ public class ChargeTaxApplicationServiceImpl implements ChargeTaxApplicationServ
         final Collection<TaxComponentShareData> shares = new ArrayList<>(split.size());
         for (final Map.Entry<TaxComponent, BigDecimal> entry : split.entrySet()) {
             final TaxComponent component = entry.getKey();
-            final Long creditAccountId = component.getCreditAccount() != null ? component.getCreditAccount().getId() : null;
-            final Long debitAccountId = component.getDebitAccount() != null ? component.getDebitAccount().getId() : null;
+            final Long creditAccountId = component.getCreditAccountId();
+            final Long debitAccountId = component.getDebitAccountId();
             shares.add(new TaxComponentShareData(component.getId(), component.getName(), entry.getValue(), creditAccountId, debitAccountId));
         }
         return shares;

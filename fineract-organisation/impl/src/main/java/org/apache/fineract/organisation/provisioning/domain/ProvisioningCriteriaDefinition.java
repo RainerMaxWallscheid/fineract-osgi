@@ -24,7 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
@@ -48,32 +48,36 @@ public class ProvisioningCriteriaDefinition extends AbstractPersistableCustom<Lo
     @Column(name = "provision_percentage", nullable = false)
     private BigDecimal provisioningPercentage;
 
-    @ManyToOne
-    @JoinColumn(name = "liability_account", nullable = false)
-    private GLAccount liabilityAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "liability_account", nullable = false)
+    private Long liabilityAccountId;
 
-    @ManyToOne
-    @JoinColumn(name = "expense_account", nullable = false)
-    private GLAccount expenseAccount;
+    /**
+     * GL account id (no JPA association to leftover GLAccount — ADR-021).
+     */
+    @Column(name = "expense_account", nullable = false)
+    private Long expenseAccountId;
 
     protected ProvisioningCriteriaDefinition() {
 
     }
 
     private ProvisioningCriteriaDefinition(ProvisioningCriteria criteria, ProvisioningCategory provisioningCategory, Long minimumAge,
-            Long maximumAge, BigDecimal provisioningPercentage, GLAccount liabilityAccount, GLAccount expenseAccount) {
+            Long maximumAge, BigDecimal provisioningPercentage, Object liabilityAccount, Object expenseAccount) {
         this.criteria = criteria;
         this.provisioningCategory = provisioningCategory;
         this.minimumAge = minimumAge;
         this.maximumAge = maximumAge;
         this.provisioningPercentage = provisioningPercentage;
-        this.liabilityAccount = liabilityAccount;
-        this.expenseAccount = expenseAccount;
+        this.liabilityAccountId = GLAccountAssociation.id(liabilityAccount);
+        this.expenseAccountId = GLAccountAssociation.id(expenseAccount);
     }
 
     public static ProvisioningCriteriaDefinition newPrivisioningCriteria(ProvisioningCriteria criteria,
             ProvisioningCategory provisioningCategory, Long minimumAge, Long maximumAge, BigDecimal provisioningPercentage,
-            GLAccount liabilityAccount, GLAccount expenseAccount) {
+            Object liabilityAccount, Object expenseAccount) {
 
         return new ProvisioningCriteriaDefinition(criteria, provisioningCategory, minimumAge, maximumAge, provisioningPercentage,
                 liabilityAccount, expenseAccount);
@@ -83,12 +87,12 @@ public class ProvisioningCriteriaDefinition extends AbstractPersistableCustom<Lo
         return this.provisioningCategory == null ? null : this.provisioningCategory.getId();
     }
 
-    public void update(Long minAge, Long maxAge, BigDecimal percentage, GLAccount lia, GLAccount exp) {
+    public void update(Long minAge, Long maxAge, BigDecimal percentage, Object lia, Object exp) {
         this.minimumAge = minAge;
         this.maximumAge = maxAge;
         this.provisioningPercentage = percentage;
-        this.liabilityAccount = lia;
-        this.expenseAccount = exp;
+        this.liabilityAccountId = GLAccountAssociation.id(lia);
+        this.expenseAccountId = GLAccountAssociation.id(exp);
     }
 
     public boolean isOverlapping(ProvisioningCriteriaDefinition def) {

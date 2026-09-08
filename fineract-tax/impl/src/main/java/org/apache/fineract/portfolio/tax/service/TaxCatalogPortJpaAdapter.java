@@ -78,8 +78,8 @@ public class TaxCatalogPortJpaAdapter implements TaxCatalogPort {
     }
 
     static TaxComponentDefinitionData toComponentData(final TaxComponent component) {
-        final Long creditAccountId = component.getCreditAccount() != null ? component.getCreditAccount().getId() : null;
-        final Long debitAccountId = component.getDebitAccount() != null ? component.getDebitAccount().getId() : null;
+        final Long creditAccountId = component.getCreditAccountId();
+        final Long debitAccountId = component.getDebitAccountId();
         return new TaxComponentDefinitionData(component.getId(), component.getName(), component.getPercentage(), creditAccountId,
                 debitAccountId);
     }

@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.organisation.provisioning.service,'
                         + 'org.apache.fineract.organisation.provisioning.data,'
                         + 'org.apache.fineract.organisation.provisioning.moduleapi,'
+                        + 'org.apache.fineract.accounting.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.impl'
                 )
