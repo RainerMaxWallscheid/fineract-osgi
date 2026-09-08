@@ -25,14 +25,12 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
+import org.apache.fineract.portfolio.group.moduleapi.GroupAssociation;
 
 /**
- * Note entity. Foreign keys are stored as Long columns (no cross-module
- * {@code @ManyToOne}) for static weaving safety across loan/savings/share peels.
- * Loan/savings factory helpers take ids; client/group factories still accept
- * aggregate roots for call-site convenience.
+ * Note entity. Foreign keys are stored as Long columns (no JPA association to leftover
+ * Client or Group — ADR-021). Factories take Object and assign via Association.id.
  */
 @Entity
 @Table(name = "m_note")
@@ -65,12 +63,12 @@ public class Note extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @Column(name = "share_account_id")
     private Long shareAccountId;
 
-    public static Note clientNote(final Client client, final String note) {
-        return new Note(client.getId(), null, null, null, note, NoteType.CLIENT.getValue(), null, null, null);
+    public static Note clientNote(final Object client, final String note) {
+        return new Note(ClientAssociation.id(client), null, null, null, note, NoteType.CLIENT.getValue(), null, null, null);
     }
 
-    public static Note groupNote(final Group group, final String note) {
-        return new Note(null, group.getId(), null, null, note, NoteType.GROUP.getValue(), null, null, null);
+    public static Note groupNote(final Object group, final String note) {
+        return new Note(null, GroupAssociation.id(group), null, null, note, NoteType.GROUP.getValue(), null, null, null);
     }
 
     public static Note loanNote(final Long loanId, final Long clientId, final String note) {

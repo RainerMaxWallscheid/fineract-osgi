@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-note-api')
     implementation(project(path: ':fineract-core'))
+    // Client/group leftover persistable via Association.id
+    implementation(project(path: ':fineract-clients-api'))
     // Group/center ports and pure service types
     implementation(project(path: ':fineract-group-api'))
     implementation(project(path: ':fineract-command-api'))
