@@ -347,7 +347,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                 this.accountMappingRepository.deleteAll(existingPaymentChannelToFundSourceMappings);
             } else {
                 for (final ProductToGLAccountMapping existingPaymentChannelToFundSourceMapping : existingPaymentChannelToFundSourceMappings) {
-                    final Long currentPaymentChannelId = existingPaymentChannelToFundSourceMapping.getPaymentType().getId();
+                    final Long currentPaymentChannelId = existingPaymentChannelToFundSourceMapping.getPaymentTypeId();
                     existingPaymentTypes.add(currentPaymentChannelId);
                     // update existing mappings (if required)
                     if (inputPaymentChannelFundSourceMap.containsKey(currentPaymentChannelId)) {

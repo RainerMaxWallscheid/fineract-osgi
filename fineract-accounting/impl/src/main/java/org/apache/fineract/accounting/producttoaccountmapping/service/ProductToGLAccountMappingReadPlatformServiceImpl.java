@@ -52,6 +52,8 @@ import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypeAssociation;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -198,7 +200,7 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         final List<ProductToGLAccountMapping> mappings = productToGLAccountMappingRepository.findAllPaymentTypeMappings(loanProductId, portfolioProductType.getValue());
         List<PaymentTypeToGLAccountMapper> paymentTypeToGLAccountMappers = mappings.isEmpty() ? null : new ArrayList<>();
         for (final ProductToGLAccountMapping mapping : mappings) {
-            final PaymentTypeData paymentTypeData = PaymentTypeData.builder().id(mapping.getPaymentType().getId()).name(mapping.getPaymentType().getName()).build();
+            final PaymentTypeData paymentTypeData = toPaymentTypeData(mapping.getPaymentTypeId());
             final GLAccountData gLAccountData = toGlAccountData(mapping);
             final PaymentTypeToGLAccountMapper paymentTypeToGLAccountMapper = new PaymentTypeToGLAccountMapper().setPaymentType(paymentTypeData).setFundSourceAccount(gLAccountData);
             paymentTypeToGLAccountMappers.add(paymentTypeToGLAccountMapper);
@@ -508,6 +510,14 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     private CodeValueData toCodeValueData(final Long codeValueId) {
         final Object persistable = CodeValueAssociation.persistableById(codeValueId);
         return persistable instanceof CodeValue leftover ? codeValueMapper.map(leftover) : null;
+    }
+
+    private PaymentTypeData toPaymentTypeData(final Long paymentTypeId) {
+        final Object persistable = PaymentTypeAssociation.persistableById(paymentTypeId);
+        if (!(persistable instanceof PaymentType leftover)) {
+            return null;
+        }
+        return PaymentTypeData.builder().id(leftover.getId()).name(leftover.getName()).build();
     }
 
     private GLAccountData toGlAccountData(final ProductToGLAccountMapping mapping) {

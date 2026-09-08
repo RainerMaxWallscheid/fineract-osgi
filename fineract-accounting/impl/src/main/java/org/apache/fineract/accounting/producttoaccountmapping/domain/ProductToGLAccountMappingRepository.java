@@ -35,14 +35,14 @@ public interface ProductToGLAccountMappingRepository
             @Param("productType") int productType, @Param("financialAccountType") int financialAccountType,
             @Param("chargeId") Long ChargeId);
 
-    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.financialAccountType=:financialAccountType and mapping.paymentType is NULL and mapping.chargeId is NULL and mapping.chargeOffReasonId is NULL and mapping.writeOffReasonId is NULL and mapping.capitalizedIncomeClassificationId is NULL and mapping.buydownFeeClassificationId is NULL")
+    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.financialAccountType=:financialAccountType and mapping.paymentTypeId is NULL and mapping.chargeId is NULL and mapping.chargeOffReasonId is NULL and mapping.writeOffReasonId is NULL and mapping.capitalizedIncomeClassificationId is NULL and mapping.buydownFeeClassificationId is NULL")
     ProductToGLAccountMapping findCoreProductToFinAccountMapping(@Param("productId") Long productId, @Param("productType") int productType,
             @Param("financialAccountType") int financialAccountType);
 
     /***
      * The financial Account Type for a fund source will always be an asset (1)
      ***/
-    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.financialAccountType=1 and mapping.paymentType is not NULL")
+    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.financialAccountType=1 and mapping.paymentTypeId is not NULL")
     List<ProductToGLAccountMapping> findAllPaymentTypeToFundSourceMappings(@Param("productId") Long productId,
             @Param("productType") int productType);
 
@@ -77,10 +77,10 @@ public interface ProductToGLAccountMappingRepository
     ProductToGLAccountMapping findChargeOffReasonMapping(@Param("productId") Long productId, @Param("productType") Integer productType,
             @Param("chargeOffReasonId") Long chargeOffReasonId);
 
-    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId AND mapping.productType =:productType AND mapping.chargeId is NULL AND mapping.paymentType IS NULL AND mapping.chargeOffReasonId IS NULL AND mapping.writeOffReasonId IS NULL AND mapping.capitalizedIncomeClassificationId is NULL AND mapping.buydownFeeClassificationId is NULL")
+    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId AND mapping.productType =:productType AND mapping.chargeId is NULL AND mapping.paymentTypeId IS NULL AND mapping.chargeOffReasonId IS NULL AND mapping.writeOffReasonId IS NULL AND mapping.capitalizedIncomeClassificationId is NULL AND mapping.buydownFeeClassificationId is NULL")
     List<ProductToGLAccountMapping> findAllRegularMappings(@Param("productId") Long productId, @Param("productType") Integer productType);
 
-    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.paymentType is not NULL")
+    @Query("select mapping from ProductToGLAccountMapping mapping where mapping.productId =:productId and mapping.productType =:productType and mapping.paymentTypeId is not NULL")
     List<ProductToGLAccountMapping> findAllPaymentTypeMappings(@Param("productId") Long productId,
             @Param("productType") Integer productType);
 

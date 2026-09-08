@@ -20,14 +20,12 @@ package org.apache.fineract.accounting.producttoaccountmapping.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypeAssociation;
 
 @Entity
 @Table(name = "acc_product_mapping", uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "product_type", "financial_account_type", "payment_type"}, name = "financial_action")})
@@ -39,9 +37,11 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     private Long glAccountId;
     @Column(name = "product_id", nullable = true)
     private Long productId;
-    @ManyToOne
-    @JoinColumn(name = "payment_type", nullable = true)
-    private PaymentType paymentType;
+    /**
+     * Payment-type id (no JPA association to leftover PaymentType — ADR-021).
+     */
+    @Column(name = "payment_type")
+    private Long paymentTypeId;
     /**
      * Catalog charge definition id (no JPA association to charge-impl entity — ADR-021 / charge Step 8).
      */
@@ -87,8 +87,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public PaymentType getPaymentType() {
-        return this.paymentType;
+        public Long getPaymentTypeId() {
+        return this.paymentTypeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -148,8 +148,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setPaymentType(final PaymentType paymentType) {
-        this.paymentType = paymentType;
+        public ProductToGLAccountMapping setPaymentType(final Object paymentType) {
+        this.paymentTypeId = PaymentTypeAssociation.id(paymentType);
         return this;
     }
 

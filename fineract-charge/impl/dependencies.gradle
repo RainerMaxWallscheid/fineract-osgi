@@ -36,6 +36,8 @@ dependencies {
     implementation(project(path: ':fineract-tax-api'))
     // Residual adapters: accounting dropdown; office access via entityaccess-api
     implementation(project(path: ':fineract-accounting-api'))
+    // PaymentType id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-paymenttype-api'))
     implementation(project(path: ':fineract-entityaccess-api'))
 
     implementation(

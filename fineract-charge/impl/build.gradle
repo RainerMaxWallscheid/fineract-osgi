@@ -64,6 +64,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
                         + 'org.apache.fineract.portfolio.charge.exception,'
                         + 'org.apache.fineract.accounting.moduleapi,'
+                        + 'org.apache.fineract.portfolio.paymenttype.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )

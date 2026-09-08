@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.charge.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
@@ -56,6 +54,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypeAssociation;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 
 @Entity
@@ -109,9 +108,11 @@ public class Charge extends AbstractPersistableCustom<Long> {
     private Integer restartFrequencyEnum;
     @Column(name = "is_payment_type", nullable = false)
     private boolean enablePaymentType;
-    @ManyToOne
-    @JoinColumn(name = "payment_type_id", nullable = false)
-    private PaymentType paymentType;
+    /**
+     * Payment-type id (no JPA association to leftover PaymentType — ADR-021).
+     */
+    @Column(name = "payment_type_id")
+    private Long paymentTypeId;
     /**
      * GL account id (no JPA association to leftover GLAccount — ADR-021).
      */
@@ -121,7 +122,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @Column(name = "tax_group_id")
     private Long taxGroupId;
 
-    public static Charge fromJson(final JsonCommand command, final Object account, final Long taxGroupId, final PaymentType paymentType) {
+    public static Charge fromJson(final JsonCommand command, final Object account, final Long taxGroupId, final Object paymentType) {
         final String name = command.stringValueOfParameterNamed("name");
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount");
         final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
@@ -155,7 +156,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     protected Charge() {
     }
 
-    private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty, final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval, final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final boolean enableFreeWithdrawalCharge, final Integer freeWithdrawalFrequency, final Integer restartFrequency, final PeriodFrequencyType restartFrequencyEnum, final Object account, final Long taxGroupId, final boolean enablePaymentType, final PaymentType paymentType) {
+    private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty, final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval, final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final boolean enableFreeWithdrawalCharge, final Integer freeWithdrawalFrequency, final Integer restartFrequency, final PeriodFrequencyType restartFrequencyEnum, final Object account, final Long taxGroupId, final boolean enablePaymentType, final Object paymentType) {
         this.name = name;
         this.amount = amount;
         this.currencyCode = currencyCode;
@@ -197,7 +198,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
             }
             if (enablePaymentType && paymentType != null) {
                 this.enablePaymentType = true;
-                this.paymentType = paymentType;
+                this.paymentTypeId = PaymentTypeAssociation.id(paymentType);
             }
         } else if (isLoanCharge()) {
             if (penalty && (chargeTime.isTimeOfDisbursement() || chargeTime.isTrancheDisbursement())) {
@@ -285,12 +286,8 @@ public class Charge extends AbstractPersistableCustom<Long> {
         return this.freeWithdrawalFrequency;
     }
 
-    private Long getPaymentTypeId() {
-        Long paymentTypeId = null;
-        if (this.paymentType != null) {
-            paymentTypeId = this.paymentType.getId();
-        }
-        return paymentTypeId;
+    public Long getPaymentTypeId() {
+        return this.paymentTypeId;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -537,8 +534,9 @@ public class Charge extends AbstractPersistableCustom<Long> {
             taxGroupData = TaxGroupData.lookup(this.taxGroupId, null);
         }
         PaymentTypeData paymentTypeData = null;
-        if (this.paymentType != null) {
-            paymentTypeData = PaymentTypeData.builder().id(paymentType.getId()).name(paymentType.getName()).build();
+        final PaymentType leftoverPaymentType = leftoverPaymentType();
+        if (leftoverPaymentType != null) {
+            paymentTypeData = PaymentTypeData.builder().id(leftoverPaymentType.getId()).name(leftoverPaymentType.getName()).build();
         }
         final CurrencyData currency = new CurrencyData(this.currencyCode, null, 0, 0, null, null);
         return ChargeData.builder().id(getId()).name(this.name).amount(this.amount).currency(currency).chargeTimeType(chargeTimeType).chargeAppliesTo(chargeAppliesTo).chargeCalculationType(chargeCalculationType).chargePaymentMode(chargePaymentMode).feeOnMonthDay(getFeeOnMonthDay()).feeInterval(this.feeInterval).penalty(this.penalty).active(this.active).freeWithdrawal(this.enableFreeWithdrawal).freeWithdrawalChargeFrequency(this.freeWithdrawalFrequency).restartFrequency(this.restartFrequency).restartFrequencyEnum(this.restartFrequencyEnum).isPaymentType(this.enablePaymentType).paymentTypeOptions(paymentTypeData).minCap(this.minCap).maxCap(this.maxCap).feeFrequency(feeFrequencyType).incomeOrLiabilityAccount(accountData).taxGroup(taxGroupData).build();
@@ -584,8 +582,9 @@ public class Charge extends AbstractPersistableCustom<Long> {
      * Stable catalog projection for foreign BCs (loan create, etc.) without exporting this entity.
      */
     public org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData toDefinitionData() {
-        final Long paymentTypeId = this.paymentType != null ? this.paymentType.getId() : null;
-        final String paymentTypeName = this.paymentType != null ? this.paymentType.getName() : null;
+        final PaymentType leftoverPaymentType = leftoverPaymentType();
+        final Long paymentTypeId = leftoverPaymentType != null ? leftoverPaymentType.getId() : this.paymentTypeId;
+        final String paymentTypeName = leftoverPaymentType != null ? leftoverPaymentType.getName() : null;
         return new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(//
                 getId(), //
                 getName(), //
@@ -699,13 +698,13 @@ public class Charge extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setPaymentType(final PaymentType paymentType) {
-        this.paymentType = paymentType;
+        public void setPaymentType(final Object paymentType) {
+        this.paymentTypeId = PaymentTypeAssociation.id(paymentType);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public PaymentType getPaymentType() {
-        return this.paymentType;
+    private PaymentType leftoverPaymentType() {
+        final Object persistable = PaymentTypeAssociation.persistableById(this.paymentTypeId);
+        return persistable instanceof PaymentType leftover ? leftover : null;
     }
 
     @java.lang.SuppressWarnings("all")
