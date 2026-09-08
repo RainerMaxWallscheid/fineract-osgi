@@ -63,6 +63,7 @@ jar {
                         + 'org.apache.fineract.portfolio.floatingrates.data,'
                         + 'org.apache.fineract.portfolio.floatingrates.service,'
                         + 'org.apache.fineract.portfolio.floatingrates.exception,'
+                        + 'org.apache.fineract.portfolio.rate.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.rates.impl'
                 )

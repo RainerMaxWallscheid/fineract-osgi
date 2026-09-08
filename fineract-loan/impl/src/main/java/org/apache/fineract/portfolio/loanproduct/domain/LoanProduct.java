@@ -26,8 +26,6 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -67,6 +65,7 @@ import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanEventId;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductGeneralRuleException;
 import org.apache.fineract.portfolio.rate.domain.Rate;
+import org.apache.fineract.portfolio.rate.moduleapi.RateAssociation;
 
 /**
  * Loan products allow for categorisation of an organisations loans into something meaningful to them.
@@ -110,9 +109,13 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
     @CollectionTable(name = "m_product_loan_charge", joinColumns = @JoinColumn(name = "product_loan_id"))
     @Column(name = "charge_id")
     private List<Long> chargeIds;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "m_product_loan_rate", joinColumns = @JoinColumn(name = "product_loan_id"), inverseJoinColumns = @JoinColumn(name = "rate_id"))
-    private List<Rate> rates;
+    /**
+     * Rate ids (no JPA association to leftover Rate — ADR-021).
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "m_product_loan_rate", joinColumns = @JoinColumn(name = "product_loan_id"))
+    @Column(name = "rate_id")
+    private List<Long> rateIds;
     @Embedded
     private LoanProductRelatedDetail loanProductRelatedDetail;
     @Embedded
@@ -228,7 +231,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
             Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments,
             final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization,
-            final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final boolean disallowExpectedDisbursements,
+            final List<?> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final boolean disallowExpectedDisbursements,
             final boolean allowApprovedDisbursedAmountsOverApplied, final String overAppliedCalculationType,
             final Integer overAppliedNumber, final Integer dueDaysForRepaymentEvent, final Integer overDueDaysForRepaymentEvent,
             final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment,
@@ -323,7 +326,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
         this.overAppliedCalculationType = overAppliedCalculationType;
         this.overAppliedNumber = overAppliedNumber;
         if (rates != null) {
-            this.rates = rates;
+            this.rateIds = RateAssociation.ids(rates);
         }
         this.dueDaysForRepaymentEvent = dueDaysForRepaymentEvent;
         this.overDueDaysForRepaymentEvent = overDueDaysForRepaymentEvent;
@@ -426,21 +429,22 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
         return updated;
     }
 
-    public boolean updateRates(final List<Rate> newProductRates) {
+    public boolean updateRates(final List<?> newProductRates) {
         if (newProductRates == null) {
             return false;
         }
+        final List<Long> newRateIds = RateAssociation.ids(newProductRates);
         boolean updated = false;
-        if (this.rates != null) {
-            final Set<Rate> currentSetOfCharges = new HashSet<>(this.rates);
-            final Set<Rate> newSetOfCharges = new HashSet<>(newProductRates);
-            if (!currentSetOfCharges.equals(newSetOfCharges)) {
+        if (this.rateIds != null) {
+            final Set<Long> currentSetOfRates = new HashSet<>(this.rateIds);
+            final Set<Long> newSetOfRates = new HashSet<>(newRateIds);
+            if (!currentSetOfRates.equals(newSetOfRates)) {
                 updated = true;
-                this.rates = newProductRates;
+                this.rateIds = newRateIds;
             }
         } else {
             updated = true;
-            this.rates = newProductRates;
+            this.rateIds = newRateIds;
         }
         return updated;
     }
@@ -734,8 +738,22 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
     }
 
     @java.lang.SuppressWarnings("all")
-    public List<Rate> getRates() {
-        return this.rates;
+    public List<Long> getRateIds() {
+        return this.rateIds;
+    }
+
+    public List<Rate> leftoverRates() {
+        if (this.rateIds == null) {
+            return null;
+        }
+        final List<Rate> leftover = new ArrayList<>(this.rateIds.size());
+        for (final Long rateId : this.rateIds) {
+            final Object persistable = RateAssociation.persistableById(rateId);
+            if (persistable instanceof Rate rate) {
+                leftover.add(rate);
+            }
+        }
+        return leftover;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -949,8 +967,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> implements Loan
     }
 
     @java.lang.SuppressWarnings("all")
-    public void setRates(final List<Rate> rates) {
-        this.rates = rates;
+    public void setRates(final List<?> rates) {
+        this.rateIds = RateAssociation.ids(rates);
     }
 
     @java.lang.SuppressWarnings("all")

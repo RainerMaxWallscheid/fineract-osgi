@@ -22,14 +22,15 @@ import static org.apache.fineract.portfolio.loanaccount.loanschedule.domain.Loan
 import static org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType.PROGRESSIVE;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -79,6 +80,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRelatedDetail
 import org.apache.fineract.portfolio.loanproduct.domain.LoanSupportedInterestRefundTypes;
 import org.apache.fineract.portfolio.loanproduct.domain.RepaymentStartDateType;
 import org.apache.fineract.portfolio.rate.domain.Rate;
+import org.apache.fineract.portfolio.rate.moduleapi.RateAssociation;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.springframework.lang.NonNull;
@@ -314,9 +316,13 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     private boolean fraud = false;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
     private LoanTopupDetails loanTopupDetails;
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "m_loan_rate", joinColumns = @JoinColumn(name = "loan_id"), inverseJoinColumns = @JoinColumn(name = "rate_id"))
-    private List<Rate> rates;
+    /**
+     * Rate ids (no JPA association to leftover Rate — ADR-021).
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "m_loan_rate", joinColumns = @JoinColumn(name = "loan_id"))
+    @Column(name = "rate_id")
+    private List<Long> rateIds;
     @Column(name = "fixed_principal_percentage_per_installment", scale = 2, precision = 5)
     private BigDecimal fixedPrincipalPercentagePerInstallment;
     @Column(name = "last_closed_business_date")
@@ -348,7 +354,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
             final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate,
-            final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
+            final BigDecimal interestRateDifferential, final List<?> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
             final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency,
             final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, client, null, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
@@ -365,7 +371,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
             final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate,
-            final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
+            final BigDecimal interestRateDifferential, final List<?> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
             final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency,
             final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, null, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
@@ -382,7 +388,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
             final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate,
-            final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
+            final BigDecimal interestRateDifferential, final List<?> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
             final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency,
             final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
@@ -403,7 +409,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
             final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate,
-            final BigDecimal interestRateDifferential, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
+            final BigDecimal interestRateDifferential, final List<?> rates, final BigDecimal fixedPrincipalPercentagePerInstallment,
             final ExternalId externalId, final LoanApplicationTerms loanApplicationTerms, final Boolean enableInstallmentLevelDelinquency,
             final LocalDate submittedOnDate, final Boolean allowFullTermForTranche) {
         this.loanRepaymentScheduleDetail = loanRepaymentScheduleDetail;
@@ -449,7 +455,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
          */
         this.proposedPrincipal = this.loanRepaymentScheduleDetail.getPrincipal().getAmount();
         // rates added here
-        this.rates = rates;
+        this.rateIds = RateAssociation.ids(rates);
         this.fixedPrincipalPercentagePerInstallment = fixedPrincipalPercentagePerInstallment;
         // Add net get net disbursal amount from charges and principal
         this.netDisbursalAmount = this.approvedPrincipal.subtract(deriveSumTotalOfChargesDueAtDisbursement());
@@ -580,12 +586,12 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
         this.transactionProcessingStrategyName = transactionProcessingStrategyName;
     }
 
-    public void updateLoanRates(final List<Rate> loanRates) {
-        if (this.rates == null) {
-            this.rates = new ArrayList<>();
+    public void updateLoanRates(final List<?> loanRates) {
+        if (this.rateIds == null) {
+            this.rateIds = new ArrayList<>();
         }
-        this.rates.clear();
-        this.rates.addAll(loanRates);
+        this.rateIds.clear();
+        this.rateIds.addAll(RateAssociation.ids(loanRates));
     }
 
     public void updateLoanScheduleDependentDerivedFields() {
@@ -2026,8 +2032,22 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> implement
     }
 
     @java.lang.SuppressWarnings("all")
-    public List<Rate> getRates() {
-        return this.rates;
+    public List<Long> getRateIds() {
+        return this.rateIds;
+    }
+
+    public List<Rate> leftoverRates() {
+        if (this.rateIds == null) {
+            return null;
+        }
+        final List<Rate> leftover = new ArrayList<>(this.rateIds.size());
+        for (final Long rateId : this.rateIds) {
+            final Object persistable = RateAssociation.persistableById(rateId);
+            if (persistable instanceof Rate rate) {
+                leftover.add(rate);
+            }
+        }
+        return leftover;
     }
 
     @java.lang.SuppressWarnings("all")

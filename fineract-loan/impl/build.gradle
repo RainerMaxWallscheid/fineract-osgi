@@ -66,6 +66,7 @@ jar {
                         + 'org.apache.fineract.useradministration.moduleapi,'
                         + 'org.apache.fineract.portfolio.fund.moduleapi,'
                         + 'org.apache.fineract.infrastructure.codes.moduleapi,'
+                        + 'org.apache.fineract.portfolio.rate.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanproduct.service,'
                         + 'org.apache.fineract.portfolio.loanproduct.data,'
                         + 'org.apache.fineract.investor.moduleapi,'
