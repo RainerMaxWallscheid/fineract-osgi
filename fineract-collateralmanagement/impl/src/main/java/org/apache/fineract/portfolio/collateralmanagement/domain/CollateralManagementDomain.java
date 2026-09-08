@@ -22,8 +22,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -31,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
+import org.apache.fineract.organisation.monetary.moduleapi.ApplicationCurrencyAssociation;
 
 @Entity
 @Table(name = "m_collateral_management")
@@ -45,9 +44,11 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
     private String unitType;
     @Column(name = "pct_to_base", nullable = false, scale = 5, precision = 20)
     private BigDecimal pctToBase;
-    @ManyToOne
-    @JoinColumn(name = "currency")
-    private ApplicationCurrency currency;
+    /**
+     * Application-currency id (no JPA association to leftover ApplicationCurrency — ADR-021).
+     */
+    @Column(name = "currency")
+    private Long currencyId;
     @OneToMany(mappedBy = "collateral", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<ClientCollateralManagement> clientCollateralManagements = new HashSet<>();
 
@@ -55,13 +56,13 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
         // for JPA
     }
 
-    private CollateralManagementDomain(final String name, final String quality, final BigDecimal basePrice, final String unitType, final BigDecimal pctToBase, final ApplicationCurrency currency) {
+    private CollateralManagementDomain(final String name, final String quality, final BigDecimal basePrice, final String unitType, final BigDecimal pctToBase, final Object currency) {
         this.name = name;
         this.quality = quality;
         this.basePrice = basePrice;
         this.unitType = unitType;
         this.pctToBase = pctToBase;
-        this.currency = currency;
+        this.currencyId = ApplicationCurrencyAssociation.id(currency);
     }
 
 
@@ -78,7 +79,7 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
         @java.lang.SuppressWarnings("all")
                 private BigDecimal pctToBase;
         @java.lang.SuppressWarnings("all")
-                private ApplicationCurrency currency;
+                private Object currency;
 
         @java.lang.SuppressWarnings("all")
                 CollateralManagementDomainBuilder() {
@@ -133,7 +134,7 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
          * @return {@code this}.
          */
         @java.lang.SuppressWarnings("all")
-                public CollateralManagementDomain.CollateralManagementDomainBuilder currency(final ApplicationCurrency currency) {
+                public CollateralManagementDomain.CollateralManagementDomainBuilder currency(final Object currency) {
             this.currency = currency;
             return this;
         }
@@ -181,8 +182,13 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
     }
 
     @java.lang.SuppressWarnings("all")
-        public ApplicationCurrency getCurrency() {
-        return this.currency;
+        public Long getCurrencyId() {
+        return this.currencyId;
+    }
+
+    public String leftoverCurrencyCode() {
+        final Object persistable = ApplicationCurrencyAssociation.persistableById(this.currencyId);
+        return persistable instanceof ApplicationCurrency leftover ? leftover.getCode() : null;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -216,7 +222,7 @@ public class CollateralManagementDomain extends AbstractPersistableCustom<Long> 
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCurrency(final ApplicationCurrency currency) {
-        this.currency = currency;
+        public void setCurrency(final Object currency) {
+        this.currencyId = ApplicationCurrencyAssociation.id(currency);
     }
 }

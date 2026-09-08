@@ -47,7 +47,7 @@ public class CollateralManagementReadServiceImpl implements CollateralManagement
 
     private static CollateralManagementData toData(final CollateralManagementDomain domain) {
         return CollateralManagementData.createNew(domain.getQuality(), domain.getBasePrice(), domain.getUnitType(), domain.getPctToBase(),
-                domain.getCurrency().getCode(), domain.getName(), domain.getId());
+                domain.leftoverCurrencyCode(), domain.getName(), domain.getId());
     }
 
     @java.lang.SuppressWarnings("all")

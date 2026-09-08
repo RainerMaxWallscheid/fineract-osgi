@@ -57,13 +57,13 @@ public class CollateralManagementWriteServiceImpl implements CollateralManagemen
     @Override
     public CollateralProductUpdateResponse updateCollateralProduct(final CollateralProductUpdateRequest request) {
         final CollateralManagementDomain collateral = this.collateralManagementRepositoryWrapper.getCollateral(request.getCollateralId());
-        final ApplicationCurrency applicationCurrency = request.getCurrency() != null ? this.applicationCurrencyRepository.findOneByCode(request.getCurrency()) : collateral.getCurrency();
+        final Object applicationCurrency = request.getCurrency() != null ? this.applicationCurrencyRepository.findOneByCode(request.getCurrency()) : collateral.getCurrencyId();
         final Changes changes = applyChanges(collateral, request, applicationCurrency);
         this.collateralManagementRepositoryWrapper.update(collateral);
         return CollateralProductUpdateResponse.builder().resourceId(request.getCollateralId()).changes(changes).build();
     }
 
-    private static Changes applyChanges(final CollateralManagementDomain collateral, final CollateralProductUpdateRequest request, final ApplicationCurrency applicationCurrency) {
+    private static Changes applyChanges(final CollateralManagementDomain collateral, final CollateralProductUpdateRequest request, final Object applicationCurrency) {
         final Changes.ChangesBuilder changes = Changes.builder();
         if (request.getName() != null && !Objects.equals(collateral.getName(), request.getName())) {
             collateral.setName(request.getName().isEmpty() ? null : request.getName());

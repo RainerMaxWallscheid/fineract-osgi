@@ -31,7 +31,8 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.organisation.monetary.command,'
                         + 'org.apache.fineract.organisation.monetary.data,'
-                        + 'org.apache.fineract.organisation.monetary.service',
+                        + 'org.apache.fineract.organisation.monetary.service,'
+                        + 'org.apache.fineract.organisation.monetary.moduleapi',
                 'Import-Package': 'org.apache.fineract.command.core,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.monetary.api'
