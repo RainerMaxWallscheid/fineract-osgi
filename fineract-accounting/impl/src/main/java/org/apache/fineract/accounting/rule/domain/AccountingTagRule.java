@@ -24,7 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
@@ -33,13 +33,15 @@ public class AccountingTagRule extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "acc_rule_id", nullable = false)
     private AccountingRule accountingRule;
-    @ManyToOne
-    @JoinColumn(name = "tag_id", nullable = false)
-    private CodeValue tagId;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "tag_id", nullable = false)
+    private Long tagId;
     @Column(name = "acc_type_enum", nullable = false)
     private Integer accountType;
 
-    public static AccountingTagRule create(final CodeValue tagId, final Integer accountType) {
+    public static AccountingTagRule create(final Object tagId, final Integer accountType) {
         return new AccountingTagRule().setTagId(tagId).setAccountType(accountType);
     }
 
@@ -49,7 +51,7 @@ public class AccountingTagRule extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getTagId() {
+        public Long getTagId() {
         return this.tagId;
     }
 
@@ -71,8 +73,8 @@ public class AccountingTagRule extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public AccountingTagRule setTagId(final CodeValue tagId) {
-        this.tagId = tagId;
+        public AccountingTagRule setTagId(final Object tagId) {
+        this.tagId = CodeValueAssociation.id(tagId);
         return this;
     }
 

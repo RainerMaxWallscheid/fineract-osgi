@@ -33,6 +33,7 @@ jar {
                 'Export-Package': 'org.apache.fineract.infrastructure.codes,'
                         + 'org.apache.fineract.infrastructure.codes.api,'
                         + 'org.apache.fineract.infrastructure.codes.data,'
+                        + 'org.apache.fineract.infrastructure.codes.moduleapi,'
                         + 'org.apache.fineract.infrastructure.codes.service',
                 'Automatic-Module-Name': 'org.apache.fineract.codes.api'
                 )

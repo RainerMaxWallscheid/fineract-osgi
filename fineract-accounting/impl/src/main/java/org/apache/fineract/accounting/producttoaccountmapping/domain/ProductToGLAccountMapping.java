@@ -25,7 +25,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 
@@ -51,20 +51,28 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     private int productType;
     @Column(name = "financial_account_type", nullable = true)
     private int financialAccountType;
-    @ManyToOne
-    @JoinColumn(name = "charge_off_reason_id", nullable = true)
-    private CodeValue chargeOffReason;
-    @ManyToOne
-    @JoinColumn(name = "write_off_reason_id", nullable = true)
-    private CodeValue writeOffReason;
-    @ManyToOne
-    @JoinColumn(name = "capitalized_income_classification_id", nullable = true)
-    private CodeValue capitalizedIncomeClassification;
-    @ManyToOne
-    @JoinColumn(name = "buydown_fee_classification_id", nullable = true)
-    private CodeValue buydownFeeClassification;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "charge_off_reason_id")
+    private Long chargeOffReasonId;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "write_off_reason_id")
+    private Long writeOffReasonId;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "capitalized_income_classification_id")
+    private Long capitalizedIncomeClassificationId;
+    /**
+     * Code-value id (no JPA association to leftover CodeValue — ADR-021).
+     */
+    @Column(name = "buydown_fee_classification_id")
+    private Long buydownFeeClassificationId;
 
-    public static ProductToGLAccountMapping createNew(final Object glAccount, final Long productId, final int productType, final int financialAccountType, final CodeValue chargeOffReason, final CodeValue capitalizedIncomeClassification, final CodeValue buydownFeeClassification) {
+    public static ProductToGLAccountMapping createNew(final Object glAccount, final Long productId, final int productType, final int financialAccountType, final Object chargeOffReason, final Object capitalizedIncomeClassification, final Object buydownFeeClassification) {
         return new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(productType).setFinancialAccountType(financialAccountType).setChargeOffReason(chargeOffReason).setCapitalizedIncomeClassification(capitalizedIncomeClassification).setBuydownFeeClassification(buydownFeeClassification);
     }
 
@@ -99,23 +107,23 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getChargeOffReason() {
-        return this.chargeOffReason;
+        public Long getChargeOffReasonId() {
+        return this.chargeOffReasonId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getWriteOffReason() {
-        return this.writeOffReason;
+        public Long getWriteOffReasonId() {
+        return this.writeOffReasonId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getCapitalizedIncomeClassification() {
-        return this.capitalizedIncomeClassification;
+        public Long getCapitalizedIncomeClassificationId() {
+        return this.capitalizedIncomeClassificationId;
     }
 
     @java.lang.SuppressWarnings("all")
-        public CodeValue getBuydownFeeClassification() {
-        return this.buydownFeeClassification;
+        public Long getBuydownFeeClassificationId() {
+        return this.buydownFeeClassificationId;
     }
 
     /**
@@ -176,8 +184,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setChargeOffReason(final CodeValue chargeOffReason) {
-        this.chargeOffReason = chargeOffReason;
+        public ProductToGLAccountMapping setChargeOffReason(final Object chargeOffReason) {
+        this.chargeOffReasonId = CodeValueAssociation.id(chargeOffReason);
         return this;
     }
 
@@ -185,8 +193,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setWriteOffReason(final CodeValue writeOffReason) {
-        this.writeOffReason = writeOffReason;
+        public ProductToGLAccountMapping setWriteOffReason(final Object writeOffReason) {
+        this.writeOffReasonId = CodeValueAssociation.id(writeOffReason);
         return this;
     }
 
@@ -194,8 +202,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setCapitalizedIncomeClassification(final CodeValue capitalizedIncomeClassification) {
-        this.capitalizedIncomeClassification = capitalizedIncomeClassification;
+        public ProductToGLAccountMapping setCapitalizedIncomeClassification(final Object capitalizedIncomeClassification) {
+        this.capitalizedIncomeClassificationId = CodeValueAssociation.id(capitalizedIncomeClassification);
         return this;
     }
 
@@ -203,8 +211,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setBuydownFeeClassification(final CodeValue buydownFeeClassification) {
-        this.buydownFeeClassification = buydownFeeClassification;
+        public ProductToGLAccountMapping setBuydownFeeClassification(final Object buydownFeeClassification) {
+        this.buydownFeeClassificationId = CodeValueAssociation.id(buydownFeeClassification);
         return this;
     }
 

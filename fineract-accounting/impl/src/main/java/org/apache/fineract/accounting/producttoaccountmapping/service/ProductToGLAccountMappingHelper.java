@@ -372,8 +372,8 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
 
     private Long getReasonIdByCashAccountForLoan(final ProductToGLAccountMapping productToGLAccountMapping, final CashAccountsForLoan cashAccountsForLoan) {
         return switch (cashAccountsForLoan) {
-            case LOSSES_WRITTEN_OFF -> productToGLAccountMapping != null && productToGLAccountMapping.getWriteOffReason() != null ? productToGLAccountMapping.getWriteOffReason().getId() : null;
-            case CHARGE_OFF_EXPENSE -> productToGLAccountMapping != null && productToGLAccountMapping.getChargeOffReason() != null ? productToGLAccountMapping.getChargeOffReason().getId() : null;
+            case LOSSES_WRITTEN_OFF -> productToGLAccountMapping != null ? productToGLAccountMapping.getWriteOffReasonId() : null;
+            case CHARGE_OFF_EXPENSE -> productToGLAccountMapping != null ? productToGLAccountMapping.getChargeOffReasonId() : null;
             default -> throw new IllegalStateException("Unexpected value: " + cashAccountsForLoan);
         };
     }
@@ -444,7 +444,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                 this.accountMappingRepository.deleteAll(existingClassificationToGLAccountMappings);
             } else {
                 for (final ProductToGLAccountMapping existingClassificationToGLAccountMapping : existingClassificationToGLAccountMappings) {
-                    final Long currentClassificationId = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? existingClassificationToGLAccountMapping.getCapitalizedIncomeClassification().getId() : existingClassificationToGLAccountMapping.getBuydownFeeClassification().getId();
+                    final Long currentClassificationId = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? existingClassificationToGLAccountMapping.getCapitalizedIncomeClassificationId() : existingClassificationToGLAccountMapping.getBuydownFeeClassificationId();
                     if (currentClassificationId != null) {
                         existingClassifications.add(currentClassificationId);
                         // update existing mappings (if required)
@@ -508,8 +508,8 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
 
     private Predicate<? super ProductToGLAccountMapping> matching(final CashAccountsForLoan typeDef, final Long reasonId) {
         return switch (typeDef) {
-            case CHARGE_OFF_EXPENSE -> mapping -> (mapping.getChargeOffReason() != null && mapping.getChargeOffReason().getId() != null && mapping.getChargeOffReason().getId().equals(reasonId));
-            case LOSSES_WRITTEN_OFF -> mapping -> (mapping.getWriteOffReason() != null && mapping.getWriteOffReason().getId() != null && mapping.getWriteOffReason().getId().equals(reasonId));
+            case CHARGE_OFF_EXPENSE -> mapping -> mapping.getChargeOffReasonId() != null && mapping.getChargeOffReasonId().equals(reasonId);
+            case LOSSES_WRITTEN_OFF -> mapping -> mapping.getWriteOffReasonId() != null && mapping.getWriteOffReasonId().equals(reasonId);
             default -> throw new IllegalStateException("Unexpected value: " + typeDef);
         };
     }
@@ -533,9 +533,9 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         final Optional<GLAccount> glAccount = accountRepository.findById(incomeAccountId);
         boolean classificationMappingExists = false;
         if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
-            classificationMappingExists = this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> mapping.getCapitalizedIncomeClassification().getId().equals(classificationId));
+            classificationMappingExists = this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> classificationId.equals(mapping.getCapitalizedIncomeClassificationId()));
         } else {
-            classificationMappingExists = this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> mapping.getBuydownFeeClassification().getId().equals(classificationId));
+            classificationMappingExists = this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> classificationId.equals(mapping.getBuydownFeeClassificationId()));
         }
         final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(classificationId);
         if (glAccount.isPresent() && !classificationMappingExists && codeValueOptional.isPresent()) {

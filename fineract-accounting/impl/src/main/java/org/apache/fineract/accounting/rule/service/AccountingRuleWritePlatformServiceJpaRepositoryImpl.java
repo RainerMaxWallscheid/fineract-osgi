@@ -248,7 +248,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         if (!tagsToRemove.isEmpty()) {
             for (final String tagId : tagsToRemove) {
                 for (final AccountingTagRule accountingTagRule : existingTags) {
-                    if (tagId.equals(accountingTagRule.getTagId().getId().toString())) {
+                    if (tagId.equals(String.valueOf(accountingTagRule.getTagId()))) {
                         accountsToRemove.put(accountingTagRule.getId(), accountingTagRule);
                     }
                 }
@@ -261,7 +261,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
     private Set<String> retrieveExistingTagIds(final Set<AccountingTagRule> existingCreditTags) {
         final Set<String> existingCreditTagIds = new HashSet<>();
         for (final AccountingTagRule accountingTagRule : existingCreditTags) {
-            existingCreditTagIds.add(accountingTagRule.getTagId().getId().toString());
+            existingCreditTagIds.add(String.valueOf(accountingTagRule.getTagId()));
         }
         return existingCreditTagIds;
     }
