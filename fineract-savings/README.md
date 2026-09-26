@@ -15,6 +15,8 @@ Savings account entities store client id and group id (not leftover Client or Gr
 
 Savings and deposit application group lookups use GroupActivePort (not leftover Group repository). Share account create uses ClientActivePort.persistableById (not leftover Client repository).
 
+Savings and deposit field-officer assignment uses StaffPersistablePort (not leftover Staff repository).
+
 ### Consumers
 
 | Module | Depend on |

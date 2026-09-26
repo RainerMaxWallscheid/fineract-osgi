@@ -51,8 +51,8 @@ import org.apache.fineract.infrastructure.event.business.domain.deposit.FixedDep
 import org.apache.fineract.infrastructure.event.business.domain.deposit.RecurringDepositAccountCreateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
@@ -118,7 +118,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final AccountNumberGeneratorService accountNumberGenerator;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteWritePlatformService noteWritePlatformService;
-    private final StaffRepositoryWrapper staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator;
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
     private final AccountAssociationsRepository accountAssociationsRepository;
@@ -468,9 +468,12 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         }
         if (changes.containsKey(SavingsApiConstants.fieldOfficerIdParamName)) {
             final Long fieldOfficerId = command.longValueOfParameterNamed(SavingsApiConstants.fieldOfficerIdParamName);
-            Staff fieldOfficer = null;
+            Object fieldOfficer = null;
             if (fieldOfficerId != null) {
-                fieldOfficer = this.staffRepository.findOneWithNotFoundDetection(fieldOfficerId);
+                fieldOfficer = this.staffPersistablePort.persistableById(fieldOfficerId);
+                if (fieldOfficer == null) {
+                    throw new StaffNotFoundException(fieldOfficerId);
+                }
             } else {
                 changes.put(SavingsApiConstants.fieldOfficerIdParamName, "");
             }
@@ -632,7 +635,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffPersistablePort staffPersistablePort, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;
@@ -642,7 +645,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.accountNumberGenerator = accountNumberGenerator;
         this.savingsProductRepository = savingsProductRepository;
         this.noteWritePlatformService = noteWritePlatformService;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.savingsAccountApplicationTransitionApiJsonValidator = savingsAccountApplicationTransitionApiJsonValidator;
         this.savingsAccountChargeAssembler = savingsAccountChargeAssembler;
         this.accountAssociationsRepository = accountAssociationsRepository;

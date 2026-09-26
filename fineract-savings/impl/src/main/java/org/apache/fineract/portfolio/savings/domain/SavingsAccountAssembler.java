@@ -57,8 +57,8 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.exception.UnsupportedParameterException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -104,7 +104,7 @@ public class SavingsAccountAssembler {
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
     private final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper;
     private final SavingsHelper savingsHelper;
-    private final StaffRepositoryWrapper staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final SavingsProductRepository savingProductRepository;
     private final SavingsAccountRepositoryWrapper savingsAccountRepository;
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
@@ -117,7 +117,7 @@ public class SavingsAccountAssembler {
     @Autowired
     public SavingsAccountAssembler(final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             final SavingsAccountTransactionDataSummaryWrapper savingsAccountTransactionDataSummaryWrapper,
-            final StaffRepositoryWrapper staffRepository, final SavingsProductRepository savingProductRepository,
+            final StaffPersistablePort staffPersistablePort, final SavingsProductRepository savingProductRepository,
             final SavingsAccountRepositoryWrapper savingsAccountRepository,
             final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final FromJsonHelper fromApiJsonHelper,
             final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final JdbcTemplate jdbcTemplate,
@@ -125,7 +125,7 @@ public class SavingsAccountAssembler {
             final ChargeTaxApplicationService chargeTaxApplicationService) {
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
         this.savingsAccountTransactionDataSummaryWrapper = savingsAccountTransactionDataSummaryWrapper;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.savingProductRepository = savingProductRepository;
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountChargeAssembler = savingsAccountChargeAssembler;
@@ -154,7 +154,7 @@ public class SavingsAccountAssembler {
 
         Client client = null;
         Group group = null;
-        Staff fieldOfficer = null;
+        Object fieldOfficer = null;
         AccountType accountType = AccountType.INVALID;
 
         final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, element);
@@ -193,7 +193,10 @@ public class SavingsAccountAssembler {
 
         final Long fieldOfficerId = this.fromApiJsonHelper.extractLongNamed(fieldOfficerIdParamName, element);
         if (fieldOfficerId != null) {
-            fieldOfficer = this.staffRepository.findOneWithNotFoundDetection(fieldOfficerId);
+            fieldOfficer = this.staffPersistablePort.persistableById(fieldOfficerId);
+            if (fieldOfficer == null) {
+                throw new StaffNotFoundException(fieldOfficerId);
+            }
         }
 
         final LocalDate submittedOnDate = this.fromApiJsonHelper.extractLocalDateNamed(submittedOnDateParamName, element);

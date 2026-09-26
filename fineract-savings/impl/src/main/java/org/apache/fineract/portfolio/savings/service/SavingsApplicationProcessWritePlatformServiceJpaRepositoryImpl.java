@@ -53,8 +53,8 @@ import org.apache.fineract.infrastructure.event.business.domain.savings.SavingsR
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberGeneratorService;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
@@ -105,7 +105,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final AccountNumberGeneratorService accountNumberGenerator;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteWritePlatformService noteWritePlatformService;
-    private final StaffRepositoryWrapper staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator;
     private final SavingsAccountChargeAssembler savingsAccountChargeAssembler;
     private final CommandProcessingService commandProcessingService;
@@ -303,9 +303,12 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 }
                 if (changes.containsKey(SavingsApiConstants.fieldOfficerIdParamName)) {
                     final Long fieldOfficerId = command.longValueOfParameterNamed(SavingsApiConstants.fieldOfficerIdParamName);
-                    Staff fieldOfficer = null;
+                    Object fieldOfficer = null;
                     if (fieldOfficerId != null) {
-                        fieldOfficer = this.staffRepository.findOneWithNotFoundDetection(fieldOfficerId);
+                        fieldOfficer = this.staffPersistablePort.persistableById(fieldOfficerId);
+                        if (fieldOfficer == null) {
+                            throw new StaffNotFoundException(fieldOfficerId);
+                        }
                     } else {
                         changes.put(SavingsApiConstants.fieldOfficerIdParamName, "");
                     }
@@ -610,7 +613,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountDataValidator savingsAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final CommandProcessingService commandProcessingService, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GSIMRepositoy gsimRepository, final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService) {
+        public SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountDataValidator savingsAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffPersistablePort staffPersistablePort, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final CommandProcessingService commandProcessingService, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GSIMRepositoy gsimRepository, final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.savingAccountAssembler = savingAccountAssembler;
@@ -618,7 +621,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.accountNumberGenerator = accountNumberGenerator;
         this.savingsProductRepository = savingsProductRepository;
         this.noteWritePlatformService = noteWritePlatformService;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.savingsAccountApplicationTransitionApiJsonValidator = savingsAccountApplicationTransitionApiJsonValidator;
         this.savingsAccountChargeAssembler = savingsAccountChargeAssembler;
         this.commandProcessingService = commandProcessingService;
