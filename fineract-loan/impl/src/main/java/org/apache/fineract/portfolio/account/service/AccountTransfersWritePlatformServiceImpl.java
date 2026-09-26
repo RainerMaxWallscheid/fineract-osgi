@@ -350,7 +350,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             if (LoanTransactionType.DISBURSEMENT.getValue().equals(accountTransferDTO.getFromTransferType())) {
                 loanTransaction = this.loanAccountDomainService.makeDisburseTransaction(accountTransferDTO.getFromAccountId(),
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(), externalId);
+                        accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(), externalId);
             } else {
                 loanTransaction = this.loanAccountDomainService.makeRefund(accountTransferDTO.getFromAccountId(),
                         new CommandProcessingResultBuilder(), accountTransferDTO.getTransactionDate(),
@@ -389,7 +389,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         }
         ExternalId externalIdForDisbursement = accountTransferDTO.getTxnExternalId();
         LoanTransaction disburseTransaction = this.loanAccountDomainService.makeDisburseTransaction(accountTransferDTO.getFromAccountId(),
-                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(),
+                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(),
                 accountTransferDTO.getNoteText(), externalIdForDisbursement, true);
         final String chargeRefundChargeType = null;
         ExternalId externalIdForRepayment = externalIdFactory.create();
