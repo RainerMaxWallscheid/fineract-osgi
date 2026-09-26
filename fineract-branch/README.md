@@ -21,6 +21,8 @@ No `:fineract-branch` façade. Depend on `-api`; composition roots also take `-i
 
 Service impls + `OrganisationTellerConfiguration` live in **branch-impl**. Loan uses **`CashierTxnValidationPort`** only (no validator / domain types).
 
+Teller cashier allocation uses StaffPersistablePort (not leftover Staff repository).
+
 ### Consumers
 
 | Module | Depend on |

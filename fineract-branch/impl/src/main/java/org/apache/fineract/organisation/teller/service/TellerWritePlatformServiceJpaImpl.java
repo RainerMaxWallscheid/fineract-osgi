@@ -32,9 +32,8 @@ import org.apache.fineract.infrastructure.security.exception.NoAuthorizationExce
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.organisation.teller.validation.CashierTransactionDataValidator;
 import org.apache.fineract.organisation.teller.domain.Cashier;
 import org.apache.fineract.organisation.teller.domain.CashierRepository;
@@ -58,7 +57,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     private final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final TellerRepositoryWrapper tellerRepositoryWrapper;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
-    private final StaffRepository staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final CashierRepository cashierRepository;
     private final CashierTransactionRepository cashierTxnRepository;
     private final CashierJournalPort cashierJournalPort;
@@ -179,7 +178,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final Long tellerOfficeId = teller.getOfficeId();
             final Long staffId = command.longValueOfParameterNamed("staffId");
             this.fromApiJsonDeserializer.validateForAllocateCashier(command.json());
-            final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
+            final Object staff = requiredStaff(staffId);
             final Boolean isFullDay = command.booleanObjectValueOfParameterNamed("isFullDay");
             if (!isFullDay) {
                 hourStartTime = command.longValueOfParameterNamed("hourStartTime");
@@ -222,7 +221,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final AppUser currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForAllocateCashier(command.json());
             final Long staffId = command.longValueOfParameterNamed("staffId");
-            final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
+            final Object staff = requiredStaff(staffId);
             final Cashier cashier = validateUserPriviledgeOnCashierAndRetrieve(currentUser, tellerId, cashierId);
             cashier.setStaff(staff);
             // TODO - check if staff office and teller office match
@@ -350,13 +349,21 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
         }
     }
 
+    private Object requiredStaff(final Long staffId) {
+        final Object staff = this.staffPersistablePort.persistableById(staffId);
+        if (staff == null) {
+            throw new StaffNotFoundException(staffId);
+        }
+        return staff;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepository staffRepository, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final CashierJournalPort cashierJournalPort, final CashierTransactionDataValidator cashierTransactionDataValidator) {
+        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffPersistablePort staffPersistablePort, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final CashierJournalPort cashierJournalPort, final CashierTransactionDataValidator cashierTransactionDataValidator) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.tellerRepositoryWrapper = tellerRepositoryWrapper;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.cashierRepository = cashierRepository;
         this.cashierTxnRepository = cashierTxnRepository;
         this.cashierJournalPort = cashierJournalPort;

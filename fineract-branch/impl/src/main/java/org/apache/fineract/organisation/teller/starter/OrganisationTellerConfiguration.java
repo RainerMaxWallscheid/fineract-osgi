@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.security.service.SqlValidator;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.organisation.teller.validation.CashierTransactionDataValidator;
 import org.apache.fineract.organisation.teller.domain.CashierRepository;
@@ -61,10 +61,10 @@ public class OrganisationTellerConfiguration {
     @ConditionalOnMissingBean(TellerWritePlatformService.class)
     public TellerWritePlatformService tellerWritePlatformService(PlatformSecurityContext context,
             TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, TellerRepositoryWrapper tellerRepositoryWrapper,
-            OfficeRepositoryWrapper officeRepositoryWrapper, StaffRepository staffRepository, CashierRepository cashierRepository,
+            OfficeRepositoryWrapper officeRepositoryWrapper, StaffPersistablePort staffPersistablePort, CashierRepository cashierRepository,
             CashierTransactionRepository cashierTxnRepository, CashierJournalPort cashierJournalPort,
             CashierTransactionDataValidator cashierTransactionDataValidator) {
         return new TellerWritePlatformServiceJpaImpl(context, fromApiJsonDeserializer, tellerRepositoryWrapper, officeRepositoryWrapper,
-                staffRepository, cashierRepository, cashierTxnRepository, cashierJournalPort, cashierTransactionDataValidator);
+                staffPersistablePort, cashierRepository, cashierTxnRepository, cashierJournalPort, cashierTransactionDataValidator);
     }
 }
