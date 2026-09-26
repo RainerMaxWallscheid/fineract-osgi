@@ -43,7 +43,6 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 
 @Entity
@@ -159,9 +158,9 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
         thisTransactionData.put("currencyCode", this.currencyCode);
         thisTransactionData.put("amount", this.amount);
 
-        final Object persistable = PaymentDetailAssociation.persistableById(this.paymentDetailId);
-        if (persistable instanceof PaymentDetail detail && detail.getPaymentType() != null) {
-            thisTransactionData.put("paymentTypeId", detail.getPaymentType().getId());
+        final Long paymentTypeId = PaymentDetailAssociation.paymentTypeId(this.paymentDetailId);
+        if (paymentTypeId != null) {
+            thisTransactionData.put("paymentTypeId", paymentTypeId);
         }
 
         if (!this.clientChargePaidByCollection.isEmpty()) {
