@@ -44,15 +44,12 @@ import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGL
 import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingReadPlatformService;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypeAssociation;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +58,6 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductToGLAccountMappingReadPlatformServiceImpl.class);
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
-    private final CodeValueMapper codeValueMapper;
     private final ChargeDefinitionPort chargeDefinitionPort;
 
     @Override
@@ -508,16 +504,15 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     }
 
     private CodeValueData toCodeValueData(final Long codeValueId) {
-        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
-        return persistable instanceof CodeValue leftover ? codeValueMapper.map(leftover) : null;
+        return CodeValueAssociation.toData(codeValueId);
     }
 
     private PaymentTypeData toPaymentTypeData(final Long paymentTypeId) {
         final Object persistable = PaymentTypeAssociation.persistableById(paymentTypeId);
-        if (!(persistable instanceof PaymentType leftover)) {
+        if (persistable == null) {
             return null;
         }
-        return PaymentTypeData.builder().id(leftover.getId()).name(leftover.getName()).build();
+        return PaymentTypeData.builder().id(PaymentTypeAssociation.id(persistable)).name(PaymentTypeAssociation.name(paymentTypeId)).build();
     }
 
     private GLAccountData toGlAccountData(final ProductToGLAccountMapping mapping) {
@@ -526,9 +521,8 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingReadPlatformServiceImpl(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final CodeValueMapper codeValueMapper, final ChargeDefinitionPort chargeDefinitionPort) {
+        public ProductToGLAccountMappingReadPlatformServiceImpl(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final ChargeDefinitionPort chargeDefinitionPort) {
         this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
-        this.codeValueMapper = codeValueMapper;
         this.chargeDefinitionPort = chargeDefinitionPort;
     }
 }

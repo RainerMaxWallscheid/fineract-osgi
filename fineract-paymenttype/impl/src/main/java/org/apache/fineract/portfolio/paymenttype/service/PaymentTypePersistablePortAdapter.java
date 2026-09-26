@@ -50,4 +50,10 @@ public class PaymentTypePersistablePortAdapter implements PaymentTypePersistable
         }
         return this.paymentTypeRepository.findById(paymentTypeId).orElse(null);
     }
+
+    @Override
+    public String name(final Long paymentTypeId) {
+        final Object persistable = persistableById(paymentTypeId);
+        return persistable instanceof PaymentType paymentType ? paymentType.getName() : null;
+    }
 }

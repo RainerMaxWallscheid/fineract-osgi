@@ -32,4 +32,9 @@ public interface PaymentTypePersistablePort {
      * Persistable payment type for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long paymentTypeId);
+
+    /**
+     * Payment-type name, or null when the id is null or missing.
+     */
+    String name(Long paymentTypeId);
 }

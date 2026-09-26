@@ -53,4 +53,8 @@ public final class PaymentTypeAssociation {
     public static Object persistableById(final Long paymentTypeId) {
         return port == null ? null : port.persistableById(paymentTypeId);
     }
+
+    public static String name(final Long paymentTypeId) {
+        return port == null ? null : port.name(paymentTypeId);
+    }
 }
