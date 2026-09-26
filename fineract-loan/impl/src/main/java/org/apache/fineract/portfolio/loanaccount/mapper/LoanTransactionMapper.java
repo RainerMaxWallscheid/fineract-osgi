@@ -25,7 +25,6 @@ import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
@@ -89,8 +88,16 @@ public interface LoanTransactionMapper {
     }
 
     default PaymentDetailData paymentDetailData(final LoanTransaction loanTransaction) {
-        final Object persistable = PaymentDetailAssociation.persistableById(loanTransaction.getPaymentDetailId());
-        return persistable instanceof PaymentDetail detail ? detail.toData() : null;
+        final Long paymentDetailId = loanTransaction.getPaymentDetailId();
+        if (PaymentDetailAssociation.persistableById(paymentDetailId) == null) {
+            return null;
+        }
+        // Payment type stays null, matching PaymentDetail.toData().
+        return PaymentDetailData.builder().id(paymentDetailId).accountNumber(PaymentDetailAssociation.accountNumber(paymentDetailId))
+                .checkNumber(PaymentDetailAssociation.checkNumber(paymentDetailId))
+                .routingCode(PaymentDetailAssociation.routingCode(paymentDetailId))
+                .receiptNumber(PaymentDetailAssociation.receiptNumber(paymentDetailId))
+                .bankNumber(PaymentDetailAssociation.bankNumber(paymentDetailId)).build();
     }
 
     @Named("codeValueData")

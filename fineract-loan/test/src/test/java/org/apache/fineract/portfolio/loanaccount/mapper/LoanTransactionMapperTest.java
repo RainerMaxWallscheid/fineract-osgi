@@ -38,11 +38,10 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailPersistablePort;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,6 +86,7 @@ public class LoanTransactionMapperTest {
     @AfterEach
     void tearDown() {
         PaymentDetailAssociation.setWritePlatformService(null);
+        PaymentDetailAssociation.setPersistablePort(null);
         OfficeAssociation.setPersistablePort(null);
     }
 
@@ -111,9 +111,13 @@ public class LoanTransactionMapperTest {
         when(loanTransaction.getOfficeId()).thenReturn(1L);
         when(loanTransaction.getLoan().getNetDisbursalAmount()).thenReturn(BigDecimal.valueOf(2000));
 
-        // Setup payment detail mocks
-        when(paymentDetail.toData()).thenReturn(new PaymentDetailData(1L, PaymentTypeData.builder().id(1L).name("Cash").build(),
-                "accountNumber", "checkNumber", "routingCode", "receiptNumber", "bankNumber"));
+        final PaymentDetailPersistablePort port = org.mockito.Mockito.mock(PaymentDetailPersistablePort.class);
+        when(port.accountNumber(1L)).thenReturn("accountNumber");
+        when(port.checkNumber(1L)).thenReturn("checkNumber");
+        when(port.routingCode(1L)).thenReturn("routingCode");
+        when(port.receiptNumber(1L)).thenReturn("receiptNumber");
+        when(port.bankNumber(1L)).thenReturn("bankNumber");
+        PaymentDetailAssociation.setPersistablePort(port);
 
         // When
         LoanTransactionData result = mapper.mapLoanTransaction(loanTransaction);
@@ -131,6 +135,8 @@ public class LoanTransactionMapperTest {
         assertEquals("REPAYMENT", result.getTransactionType());
         assertNotNull(result.getType());
         assertNotNull(result.getPaymentDetailData());
+        assertNull(result.getPaymentDetailData().getPaymentType());
+        assertEquals("receiptNumber", result.getPaymentDetailData().getReceiptNumber());
         assertEquals(1L, result.getOfficeId());
         assertEquals("Test Office", result.getOfficeName());
         assertEquals(1L, result.getLoanId());
