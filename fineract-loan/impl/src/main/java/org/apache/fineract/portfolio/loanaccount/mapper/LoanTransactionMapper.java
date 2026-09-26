@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.mapper;
 
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.mapper.CurrencyMapper;
@@ -96,7 +95,6 @@ public interface LoanTransactionMapper {
 
     @Named("codeValueData")
     default CodeValueData codeValueData(final Long codeValueId) {
-        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
-        return persistable instanceof CodeValue leftover ? leftover.toData() : null;
+        return CodeValueAssociation.toData(codeValueId);
     }
 }
