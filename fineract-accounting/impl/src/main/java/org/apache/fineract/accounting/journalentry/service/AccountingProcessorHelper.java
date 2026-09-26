@@ -980,7 +980,7 @@ public class AccountingProcessorHelper {
              */
             final Long incomeAccountId = this.chargeDefinitionPort.getActiveCharge(chargeId).getIncomeOrLiabilityAccountId();
             if (incomeAccountId != null) {
-                return this.glAccountRepository.findById(incomeAccountId).orElse(null);
+                return (GLAccount) this.glAccountPersistablePort.persistableById(incomeAccountId);
             }
             final ProductToGLAccountMapping chargeSpecificIncomeAccountMapping = this.accountMappingRepository.findProductIdAndProductTypeAndFinancialAccountTypeAndChargeId(savingsProductId, PortfolioProductType.SAVING.getValue(), accountMappingTypeId, chargeId);
             if (chargeSpecificIncomeAccountMapping != null) {
