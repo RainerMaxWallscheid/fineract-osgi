@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -96,7 +96,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanRescheduleRequestWritePlatformServiceImpl.class);
     private static final DefaultScheduledDateGenerator DEFAULT_SCHEDULED_DATE_GENERATOR = new DefaultScheduledDateGenerator();
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final PlatformSecurityContext platformSecurityContext;
     @Qualifier("loanRescheduleRequestDataValidator")
     private final LoanRescheduleRequestDataValidator loanRescheduleRequestDataValidator;
@@ -140,7 +140,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             final Long rescheduleReasonId = jsonCommand.longValueOfParameterNamed(RescheduleLoansApiConstants.rescheduleReasonIdParamName);
             // use the reschedule reason code value id to get a CodeValue entity
             // object
-            final CodeValue rescheduleReasonCodeValue = this.codeValueRepositoryWrapper.findOneWithNotFoundDetection(rescheduleReasonId);
+            final Object rescheduleReasonCodeValue = rescheduleReason(rescheduleReasonId);
             // get the grace on principal integer value from the JsonCommand
             // object
             final Integer graceOnPrincipal = jsonCommand
@@ -569,6 +569,17 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
         }
     }
 
+    private Object rescheduleReason(final Long rescheduleReasonId) {
+        if (rescheduleReasonId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object reason = this.codeValuePersistablePort.persistableById(rescheduleReasonId);
+        if (reason == null) {
+            throw new CodeValueNotFoundException(rescheduleReasonId);
+        }
+        return reason;
+    }
+
     /**
      * handles the data integrity violation exception for loan reschedule write services
      *
@@ -582,7 +593,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
     }
 
     @java.lang.SuppressWarnings("all")
-    public LoanRescheduleRequestWritePlatformServiceImpl(final CodeValueRepositoryWrapper codeValueRepositoryWrapper,
+    public LoanRescheduleRequestWritePlatformServiceImpl(final CodeValuePersistablePort codeValuePersistablePort,
             final PlatformSecurityContext platformSecurityContext,
             @Qualifier("loanRescheduleRequestDataValidator") final LoanRescheduleRequestDataValidator loanRescheduleRequestDataValidator,
             final LoanRescheduleRequestRepository loanRescheduleRequestRepository,
@@ -598,7 +609,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             final LoanTermVariationsMapper loanTermVariationsMapper, final LoanScheduleComponent loanSchedule,
             final LoanTransactionRepository loanTransactionRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine,
             final LoanTermVariationsRepository loanTermVariationsRepository) {
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.platformSecurityContext = platformSecurityContext;
         this.loanRescheduleRequestDataValidator = loanRescheduleRequestDataValidator;
         this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
