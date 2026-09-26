@@ -565,7 +565,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     @Override
     public LoanTransaction creditBalanceRefund(final Loan loan, final LocalDate transactionDate, final BigDecimal transactionAmount,
-            final String noteText, final ExternalId externalId, PaymentDetail paymentDetail) {
+            final String noteText, final ExternalId externalId, final Object paymentDetail) {
         if (transactionDate.isAfter(DateUtils.getBusinessLocalDate())) {
             throw new GeneralPlatformDomainRuleException("error.msg.transaction.date.cannot.be.in.the.future",
                     "Loan: " + loan.getId() + ", Credit Balance Refund transaction cannot be created for the future.", loan.getId());

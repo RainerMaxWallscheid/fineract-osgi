@@ -2327,9 +2327,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             changes.put(LoanApiConstants.externalIdParameterName, externalId);
         }
         changes.put("paymentTypeId", command.longValueOfParameterNamed(LoanApiConstants.PAYMENT_TYPE_PARAMNAME));
-        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        Object paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         final LoanTransaction loanTransaction = this.loanAccountDomainService.creditBalanceRefund(loan, transactionDate, transactionAmount,
                 noteText, externalId, paymentDetail);

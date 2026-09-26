@@ -83,7 +83,7 @@ public interface LoanAccountDomainService {
     void disableStandingInstructionsLinkedToClosedLoan(Loan loan);
 
     LoanTransaction creditBalanceRefund(Loan loan, LocalDate transactionDate, BigDecimal transactionAmount, String noteText,
-            ExternalId externalId, PaymentDetail paymentDetail);
+            ExternalId externalId, Object paymentDetail);
 
     Pair<LoanTransaction, LoanTransaction> makeRefund(Loan loan, ScheduleGeneratorDTO scheduleGeneratorDTO,
             LoanTransactionType loanTransactionType, LocalDate transactionDate, BigDecimal transactionAmount, PaymentDetail paymentDetail,
