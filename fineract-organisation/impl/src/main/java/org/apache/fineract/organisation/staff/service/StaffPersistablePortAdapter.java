@@ -20,6 +20,7 @@ package org.apache.fineract.organisation.staff.service;
 
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,11 @@ public class StaffPersistablePortAdapter implements StaffPersistablePort {
             return null;
         }
         return this.staffRepository.findById(staffId).orElse(null);
+    }
+
+    @Override
+    public String mobileNo(final Long staffId) {
+        final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
+        return staff.getMobileNo();
     }
 }

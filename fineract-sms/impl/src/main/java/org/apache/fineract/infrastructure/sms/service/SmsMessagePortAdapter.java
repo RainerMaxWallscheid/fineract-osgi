@@ -23,10 +23,8 @@ import java.util.List;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessage;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,21 +33,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class SmsMessagePortAdapter implements SmsMessagePort {
 
     private final SmsMessageRepository smsMessageRepository;
-    private final ClientRepository clientRepository;
-    private final StaffRepository staffRepository;
+    private final ClientActivePort clientActivePort;
+    private final StaffPersistablePort staffPersistablePort;
 
-    public SmsMessagePortAdapter(final SmsMessageRepository smsMessageRepository, final ClientRepository clientRepository,
-            final StaffRepository staffRepository) {
+    public SmsMessagePortAdapter(final SmsMessageRepository smsMessageRepository, final ClientActivePort clientActivePort,
+            final StaffPersistablePort staffPersistablePort) {
         this.smsMessageRepository = smsMessageRepository;
-        this.clientRepository = clientRepository;
-        this.staffRepository = staffRepository;
+        this.clientActivePort = clientActivePort;
+        this.staffPersistablePort = staffPersistablePort;
     }
 
     @Override
     @Transactional
     public OutboundView persistPending(final PendingRequest request) {
-        final Client client = request.clientId() == null ? null : this.clientRepository.findById(request.clientId()).orElse(null);
-        final Staff staff = request.staffId() == null ? null : this.staffRepository.findById(request.staffId()).orElse(null);
+        final Object client = request.clientId() == null || !this.clientActivePort.exists(request.clientId()) ? null
+                : this.clientActivePort.persistableById(request.clientId());
+        final Object staff = this.staffPersistablePort.persistableById(request.staffId());
         final SmsMessage message = SmsMessage.pendingSms(null, null, client, staff, request.message(), request.mobileNo(),
                 request.campaignId(), request.notification());
         return toView(this.smsMessageRepository.save(message));

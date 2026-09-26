@@ -32,4 +32,9 @@ public interface StaffPersistablePort {
      * Persistable staff for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long staffId);
+
+    /**
+     * Mobile number for the staff. Throws when the id does not exist.
+     */
+    String mobileNo(Long staffId);
 }

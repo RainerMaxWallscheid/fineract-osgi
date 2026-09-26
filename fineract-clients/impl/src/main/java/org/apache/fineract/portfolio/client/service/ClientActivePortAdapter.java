@@ -88,6 +88,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public String mobileNo(final Long clientId) {
+        return client(clientId).mobileNo();
+    }
+
+    @Override
     public String accountNumber(final Long clientId) {
         return client(clientId).getAccountNumber();
     }

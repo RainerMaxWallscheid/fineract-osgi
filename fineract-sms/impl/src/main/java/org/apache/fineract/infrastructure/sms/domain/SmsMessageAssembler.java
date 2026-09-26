@@ -23,15 +23,10 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.sms.SmsApiConstants;
 import org.apache.fineract.infrastructure.sms.exception.SmsNotFoundException;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,20 +36,20 @@ import org.springframework.stereotype.Component;
 public class SmsMessageAssembler {
 
     private final SmsMessageRepository smsMessageRepository;
-    private final GroupRepository groupRepository;
-    private final ClientRepository clientRepository;
-    private final StaffRepository staffRepository;
+    private final GroupActivePort groupActivePort;
+    private final ClientActivePort clientActivePort;
+    private final StaffPersistablePort staffPersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public SmsMessageAssembler(final SmsMessageRepository smsMessageRepository, final GroupRepository groupRepository,
-            final ClientRepository clientRepository, final StaffRepository staffRepository, final FromJsonHelper fromApiJsonHelper,
+    public SmsMessageAssembler(final SmsMessageRepository smsMessageRepository, final GroupActivePort groupActivePort,
+            final ClientActivePort clientActivePort, final StaffPersistablePort staffPersistablePort, final FromJsonHelper fromApiJsonHelper,
             final JdbcTemplate jdbcTemplate) {
         this.smsMessageRepository = smsMessageRepository;
-        this.groupRepository = groupRepository;
-        this.clientRepository = clientRepository;
-        this.staffRepository = staffRepository;
+        this.groupActivePort = groupActivePort;
+        this.clientActivePort = clientActivePort;
+        this.staffPersistablePort = staffPersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -64,11 +59,11 @@ public class SmsMessageAssembler {
         final JsonElement element = command.parsedJson();
 
         String mobileNo = null;
-        Group group = null;
+        Object group = null;
         String externalId = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.groupIdParamName, element)) {
             final Long groupId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.groupIdParamName, element);
-            group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+            group = this.groupActivePort.persistableById(groupId);
         }
 
         Long campaignId = null;
@@ -78,18 +73,21 @@ public class SmsMessageAssembler {
             isNotification = isCampaignNotification(campaignId);
         }
 
-        Client client = null;
+        Object client = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.clientIdParamName, element)) {
             final Long clientId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.clientIdParamName, element);
-            client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
-            mobileNo = client.mobileNo();
+            client = this.clientActivePort.persistableById(clientId);
+            mobileNo = this.clientActivePort.mobileNo(clientId);
         }
 
-        Staff staff = null;
+        Object staff = null;
         if (this.fromApiJsonHelper.parameterExists(SmsApiConstants.staffIdParamName, element)) {
             final Long staffId = this.fromApiJsonHelper.extractLongNamed(SmsApiConstants.staffIdParamName, element);
-            staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
-            mobileNo = staff.getMobileNo();
+            staff = this.staffPersistablePort.persistableById(staffId);
+            if (staff == null) {
+                throw new StaffNotFoundException(staffId);
+            }
+            mobileNo = this.staffPersistablePort.mobileNo(staffId);
         }
 
         final String message = this.fromApiJsonHelper.extractStringNamed(SmsApiConstants.messageParamName, element);

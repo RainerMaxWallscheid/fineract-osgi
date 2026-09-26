@@ -8,6 +8,8 @@ Provider peel — outbound SMS messages (ADR-022).
 | `fineract-sms-impl` | `impl/` | `org.apache.fineract.sms.impl` | Entity, REST, handlers; Equinox DS `OSGI-INF/sms.xml` |
 | `fineract-sms-test` | `test/` | `org.apache.fineract.sms.test` | Fragment-Host → impl |
 
+SMS message assemble and pending persist use ClientActivePort/GroupActivePort/StaffPersistablePort (not leftover Client, Group, or Staff repositories).
+
 Residual on provider:
 - `SmsMessageScheduledJobService` (+ impl) — campaigns `SmsConfigUtils` + GCM notification coupling
 - `SmsCampaign` stays in campaigns; `SmsMessage.campaignId` is a Long FK
