@@ -11,7 +11,7 @@ Loan originator catalog + attach/detach mappings (standard loan + working-capita
 
 No `:fineract-loan-origination` façade.
 
-Loan-originator entities store code-value id (not leftover CodeValue). Loan originator type and channel reads use CodeValuePersistablePort (not leftover CodeValue). Loan originator type and channel assignment uses CodeValuePersistablePort (not leftover CodeValue repository).
+Loan-originator entities store code-value id (not leftover CodeValue). Loan originator type and channel reads use CodeValuePersistablePort (not leftover CodeValue). Loan originator type and channel assignment uses CodeValuePersistablePort (not leftover CodeValue repository). Loan originator template options use CodeValueReadPlatformService (not leftover CodeValue repository).
 
 ### Module API
 

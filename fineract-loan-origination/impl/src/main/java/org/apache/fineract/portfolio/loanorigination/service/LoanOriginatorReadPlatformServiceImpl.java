@@ -21,8 +21,7 @@ package org.apache.fineract.portfolio.loanorigination.service;
 import java.util.Collections;
 import java.util.List;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
-import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
+import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
@@ -45,8 +44,7 @@ public class LoanOriginatorReadPlatformServiceImpl implements LoanOriginatorRead
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final LoanOriginatorMappingRepository loanOriginatorMappingRepository;
     private final LoanOriginatorMapper loanOriginatorMapper;
-    private final CodeValueRepository codeValueRepository;
-    private final CodeValueMapper codeValueMapper;
+    private final CodeValueReadPlatformService codeValueReadPlatformService;
 
     @Override
     public List<LoanOriginatorData> retrieveAll() {
@@ -83,17 +81,16 @@ public class LoanOriginatorReadPlatformServiceImpl implements LoanOriginatorRead
 
     @Override
     public LoanOriginatorTemplateData retrieveTemplate() {
-        final List<CodeValueData> originationTypeOptions = codeValueMapper.map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME));
-        final List<CodeValueData> channelTypeOptions = codeValueMapper.map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME));
+        final List<CodeValueData> originationTypeOptions = this.codeValueReadPlatformService.retrieveAllCodeValues(LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME);
+        final List<CodeValueData> channelTypeOptions = this.codeValueReadPlatformService.retrieveAllCodeValues(LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME);
         return new LoanOriginatorTemplateData(ExternalId.generate().getValue(), LoanOriginatorStatus.getAllValues(), originationTypeOptions, channelTypeOptions);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanOriginatorReadPlatformServiceImpl(final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorMapper loanOriginatorMapper, final CodeValueRepository codeValueRepository, final CodeValueMapper codeValueMapper) {
+        public LoanOriginatorReadPlatformServiceImpl(final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorMapper loanOriginatorMapper, final CodeValueReadPlatformService codeValueReadPlatformService) {
         this.loanOriginatorRepository = loanOriginatorRepository;
         this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
         this.loanOriginatorMapper = loanOriginatorMapper;
-        this.codeValueRepository = codeValueRepository;
-        this.codeValueMapper = codeValueMapper;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
     }
 }
