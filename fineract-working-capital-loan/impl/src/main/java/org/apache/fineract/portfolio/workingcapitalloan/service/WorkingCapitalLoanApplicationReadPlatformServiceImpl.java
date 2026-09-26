@@ -61,7 +61,7 @@ import org.apache.fineract.portfolio.workingcapitalloannearbreach.service.Workin
 import org.apache.fineract.portfolio.workingcapitalloanproduct.data.WorkingCapitalLoanProductData;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanDelinquencyStartType;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.service.WorkingCapitalLoanProductReadPlatformService;
-import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -87,7 +87,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     private final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService;
     private final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService;
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper;
-    private final AppUserRepository appUserRepository;
+    private final AppUserPersistablePort appUserPersistablePort;
 
     @Override
     public WorkingCapitalLoanTemplateData retrieveTemplate(final Long productId, final Long clientId) {
@@ -202,10 +202,13 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         if (data.getTimeline() == null) {
             return;
         }
-        loan.getCreatedBy().flatMap(appUserRepository::findById).ifPresent(user -> {
-            data.getTimeline().setSubmittedByUsername(user.getUsername());
-            data.getTimeline().setSubmittedByFirstname(user.getFirstname());
-            data.getTimeline().setSubmittedByLastname(user.getLastname());
+        loan.getCreatedBy().ifPresent(userId -> {
+            if (this.appUserPersistablePort.persistableById(userId) == null) {
+                return;
+            }
+            data.getTimeline().setSubmittedByUsername(this.appUserPersistablePort.username(userId));
+            data.getTimeline().setSubmittedByFirstname(this.appUserPersistablePort.firstname(userId));
+            data.getTimeline().setSubmittedByLastname(this.appUserPersistablePort.lastname(userId));
         });
     }
 
@@ -267,7 +270,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanApplicationReadPlatformServiceImpl(final WorkingCapitalLoanRepository repository, final WorkingCapitalLoanMapper mapper, final WorkingCapitalLoanProductReadPlatformService productReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService, final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final AppUserRepository appUserRepository) {
+        public WorkingCapitalLoanApplicationReadPlatformServiceImpl(final WorkingCapitalLoanRepository repository, final WorkingCapitalLoanMapper mapper, final WorkingCapitalLoanProductReadPlatformService productReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService, final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final AppUserPersistablePort appUserPersistablePort) {
         this.repository = repository;
         this.mapper = mapper;
         this.productReadPlatformService = productReadPlatformService;
@@ -283,6 +286,6 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         this.originatorReadService = originatorReadService;
         this.chargeReadPlatformService = chargeReadPlatformService;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
-        this.appUserRepository = appUserRepository;
+        this.appUserPersistablePort = appUserPersistablePort;
     }
 }

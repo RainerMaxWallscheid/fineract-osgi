@@ -32,4 +32,19 @@ public interface AppUserPersistablePort {
      * Persistable user for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long userId);
+
+    /**
+     * Username for the user. Throws when the id does not exist.
+     */
+    String username(Long userId);
+
+    /**
+     * First name for the user. Throws when the id does not exist.
+     */
+    String firstname(Long userId);
+
+    /**
+     * Last name for the user. Throws when the id does not exist.
+     */
+    String lastname(Long userId);
 }

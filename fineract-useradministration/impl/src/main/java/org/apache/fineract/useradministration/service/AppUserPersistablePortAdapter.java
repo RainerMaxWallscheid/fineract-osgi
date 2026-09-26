@@ -20,6 +20,7 @@ package org.apache.fineract.useradministration.service;
 
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.exception.UserNotFoundException;
 import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,24 @@ public class AppUserPersistablePortAdapter implements AppUserPersistablePort {
             return null;
         }
         return this.appUserRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public String username(final Long userId) {
+        return user(userId).getUsername();
+    }
+
+    @Override
+    public String firstname(final Long userId) {
+        return user(userId).getFirstname();
+    }
+
+    @Override
+    public String lastname(final Long userId) {
+        return user(userId).getLastname();
+    }
+
+    private AppUser user(final Long userId) {
+        return this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

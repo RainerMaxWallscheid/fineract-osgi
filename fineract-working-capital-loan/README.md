@@ -11,7 +11,7 @@ Working capital loans — Wave 4 OSGi modularization
 
 No façade. Consumers: **api + impl**.
 
-WC-transaction entities store code-value id (not leftover CodeValue). WC and WC-product entities store fund id (not leftover Fund). WC loan entities store client id (not leftover Client).
+WC-transaction entities store code-value id (not leftover CodeValue). WC and WC-product entities store fund id (not leftover Fund). WC loan entities store client id (not leftover Client). Working capital loan submitted-by names use AppUserPersistablePort (not leftover AppUser repository).
 
 `AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapitalLoan` lives in **impl**
 (implements `WorkingCapitalLoanAccountingProcessor`; uses accounting-impl `AccountingProcessorHelper`).
