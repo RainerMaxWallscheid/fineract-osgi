@@ -2780,8 +2780,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final LocalDate recalculateFrom = loan.isInterestBearingAndInterestRecalculationEnabled() ? transactionDate : null;
         final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom, null);
         this.loanTransactionValidator.validateRefund(loan, LoanTransactionType.INTEREST_REFUND, transactionDate, scheduleGeneratorDTO);
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
-                changes);
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         createNote(loan, command, changes);
         final LoanTransaction interestRefundTxn = loanAccountDomainService.createManualInterestRefundWithAmount(loan, targetTransaction,
                 amount, paymentDetail, txnExternalId);
