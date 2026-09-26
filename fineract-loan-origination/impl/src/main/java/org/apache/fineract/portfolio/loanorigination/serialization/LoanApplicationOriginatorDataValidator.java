@@ -27,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -42,7 +42,7 @@ public class LoanApplicationOriginatorDataValidator {
     private static final String RESOURCE_NAME = "loan.originator";
     private static final String ID_PARAM = "id";
     private static final String NAME_PARAM = "name";
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
 
     public LoanApplicationOriginatorData validateAndExtract(JsonObject jsonObject) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -92,7 +92,7 @@ public class LoanApplicationOriginatorDataValidator {
 
     private void validateCodeValue(Long codeValueId, String codeName, String paramName, DataValidatorBuilder baseDataValidator) {
         try {
-            this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(codeName, codeValueId);
+            this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
         } catch (CodeValueNotFoundException e) {
             baseDataValidator.reset().parameter(paramName).value(codeValueId).failWithCode("invalid.code.value", "Invalid code value id " + codeValueId + " for " + codeName);
         }
@@ -105,7 +105,7 @@ public class LoanApplicationOriginatorDataValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanApplicationOriginatorDataValidator(final CodeValueRepositoryWrapper codeValueRepositoryWrapper) {
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        public LoanApplicationOriginatorDataValidator(final CodeValuePersistablePort codeValuePersistablePort) {
+        this.codeValuePersistablePort = codeValuePersistablePort;
     }
 }

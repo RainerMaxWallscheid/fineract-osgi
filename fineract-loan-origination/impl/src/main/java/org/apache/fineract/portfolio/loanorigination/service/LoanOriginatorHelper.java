@@ -21,8 +21,7 @@ package org.apache.fineract.portfolio.loanorigination.service;
 import static org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants.ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
 import org.apache.fineract.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
@@ -43,7 +42,7 @@ public class LoanOriginatorHelper {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanOriginatorHelper.class);
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
 
     // REQUIRES_NEW isolates the INSERT into a separate transaction and persistence context,
     // so a constraint violation does not corrupt the caller's session or mark the
@@ -80,23 +79,23 @@ public class LoanOriginatorHelper {
 
     private LoanOriginator createNewOriginator(final LoanApplicationOriginatorData data, final ExternalId externalId) {
         log.info("Creating new originator with externalId: {} during loan application", data.getExternalId());
-        final CodeValue originatorType = resolveCodeValue(data.getTypeId(), ORIGINATOR_TYPE_CODE_NAME);
-        final CodeValue channelType = resolveCodeValue(data.getChannelTypeId(), CHANNEL_TYPE_CODE_NAME);
+        final Object originatorType = resolveCodeValue(data.getTypeId(), ORIGINATOR_TYPE_CODE_NAME);
+        final Object channelType = resolveCodeValue(data.getChannelTypeId(), CHANNEL_TYPE_CODE_NAME);
         final LoanOriginator originator = LoanOriginator.create(externalId, data.getName(), LoanOriginatorStatus.ACTIVE, originatorType, channelType);
         return loanOriginatorRepository.saveAndFlush(originator);
     }
 
-    private CodeValue resolveCodeValue(final Long codeValueId, final String codeName) {
+    private Object resolveCodeValue(final Long codeValueId, final String codeName) {
         if (codeValueId == null) {
             return null;
         }
-        return codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(codeName, codeValueId);
+        return this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanOriginatorHelper(final LoanOriginatorRepository loanOriginatorRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final CodeValueRepositoryWrapper codeValueRepositoryWrapper) {
+        public LoanOriginatorHelper(final LoanOriginatorRepository loanOriginatorRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final CodeValuePersistablePort codeValuePersistablePort) {
         this.loanOriginatorRepository = loanOriginatorRepository;
         this.globalConfigurationRepository = globalConfigurationRepository;
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.codeValuePersistablePort = codeValuePersistablePort;
     }
 }

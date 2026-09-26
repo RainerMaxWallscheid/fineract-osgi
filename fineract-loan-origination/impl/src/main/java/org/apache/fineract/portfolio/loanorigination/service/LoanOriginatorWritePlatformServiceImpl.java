@@ -27,8 +27,7 @@ import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorAp
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.STATUS_PARAM;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -58,7 +57,7 @@ public class LoanOriginatorWritePlatformServiceImpl implements LoanOriginatorWri
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final LoanOriginatorMappingRepository loanOriginatorMappingRepository;
     private final LoanOriginatorDataValidator loanOriginatorDataValidator;
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanExistencePort loanExistencePort;
 
     @Override
@@ -72,8 +71,8 @@ public class LoanOriginatorWritePlatformServiceImpl implements LoanOriginatorWri
         final String name = command.stringValueOfParameterNamed(NAME_PARAM);
         final String statusValue = command.stringValueOfParameterNamed(STATUS_PARAM);
         final LoanOriginatorStatus status = (statusValue != null && !statusValue.isEmpty()) ? LoanOriginatorStatus.fromString(statusValue) : LoanOriginatorStatus.ACTIVE;
-        final CodeValue originatorType = resolveCodeValue(command, ORIGINATOR_TYPE_ID_PARAM, ORIGINATOR_TYPE_CODE_NAME);
-        final CodeValue channelType = resolveCodeValue(command, CHANNEL_TYPE_ID_PARAM, CHANNEL_TYPE_CODE_NAME);
+        final Object originatorType = resolveCodeValue(command, ORIGINATOR_TYPE_ID_PARAM, ORIGINATOR_TYPE_CODE_NAME);
+        final Object channelType = resolveCodeValue(command, CHANNEL_TYPE_ID_PARAM, CHANNEL_TYPE_CODE_NAME);
         final LoanOriginator originator = LoanOriginator.create(externalId, name, status, originatorType, channelType);
         this.loanOriginatorRepository.saveAndFlush(originator);
         return  //
@@ -101,13 +100,13 @@ public class LoanOriginatorWritePlatformServiceImpl implements LoanOriginatorWri
         }
         final Long currentOriginatorTypeId = originator.getOriginatorTypeId();
         if (command.isChangeInLongParameterNamed(ORIGINATOR_TYPE_ID_PARAM, currentOriginatorTypeId)) {
-            final CodeValue newOriginatorType = resolveCodeValue(command, ORIGINATOR_TYPE_ID_PARAM, ORIGINATOR_TYPE_CODE_NAME);
+            final Object newOriginatorType = resolveCodeValue(command, ORIGINATOR_TYPE_ID_PARAM, ORIGINATOR_TYPE_CODE_NAME);
             originator.setOriginatorType(newOriginatorType);
             changes.put(ORIGINATOR_TYPE_ID_PARAM, originator.getOriginatorTypeId());
         }
         final Long currentChannelTypeId = originator.getChannelTypeId();
         if (command.isChangeInLongParameterNamed(CHANNEL_TYPE_ID_PARAM, currentChannelTypeId)) {
-            final CodeValue newChannelType = resolveCodeValue(command, CHANNEL_TYPE_ID_PARAM, CHANNEL_TYPE_CODE_NAME);
+            final Object newChannelType = resolveCodeValue(command, CHANNEL_TYPE_ID_PARAM, CHANNEL_TYPE_CODE_NAME);
             originator.setChannelType(newChannelType);
             changes.put(CHANNEL_TYPE_ID_PARAM, originator.getChannelTypeId());
         }
@@ -174,20 +173,20 @@ public class LoanOriginatorWritePlatformServiceImpl implements LoanOriginatorWri
         new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(this.loanExistencePort.externalId(loanId)).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
     }
 
-    private CodeValue resolveCodeValue(final JsonCommand command, final String paramName, final String codeName) {
+    private Object resolveCodeValue(final JsonCommand command, final String paramName, final String codeName) {
         final Long codeValueId = command.longValueOfParameterNamed(paramName);
         if (codeValueId == null) {
             return null;
         }
-        return this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(codeName, codeValueId);
+        return this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanOriginatorWritePlatformServiceImpl(final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorDataValidator loanOriginatorDataValidator, final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final LoanExistencePort loanExistencePort) {
+        public LoanOriginatorWritePlatformServiceImpl(final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorDataValidator loanOriginatorDataValidator, final CodeValuePersistablePort codeValuePersistablePort, final LoanExistencePort loanExistencePort) {
         this.loanOriginatorRepository = loanOriginatorRepository;
         this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
         this.loanOriginatorDataValidator = loanOriginatorDataValidator;
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanExistencePort = loanExistencePort;
     }
 }
