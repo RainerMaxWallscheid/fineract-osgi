@@ -35,9 +35,9 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -49,7 +49,7 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GLClosureWritePlatformServiceJpaRepositoryImpl.class);
     private final GLClosureRepository glClosureRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final GLClosureCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 
     @Transactional
@@ -60,7 +60,7 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
             closureCommand.validateForCreate();
             // check office is valid
             final Long officeId = command.longValueOfParameterNamed(GLClosureJsonInputParams.OFFICE_ID.getValue());
-            final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Object office = officeById(officeId);
             // TODO: Get Tenant specific date
             // ensure closure date is not in the future
             final LocalDate closureDate = command.localDateValueOfParameterNamed(GLClosureJsonInputParams.CLOSING_DATE.getValue());
@@ -138,10 +138,21 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
         throw ErrorHandler.getMappable(dve, "error.msg.glClosure.unknown.data.integrity.issue", "Unknown data integrity issue with resource GL Closure: " + realCause.getMessage());
     }
 
+    private Object officeById(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (office == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return office;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public GLClosureWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final GLClosureCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        public GLClosureWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final OfficePersistablePort officePersistablePort, final GLClosureCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
         this.glClosureRepository = glClosureRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
     }
 }
