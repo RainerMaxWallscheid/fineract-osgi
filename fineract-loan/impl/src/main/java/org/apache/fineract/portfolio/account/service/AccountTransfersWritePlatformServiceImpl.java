@@ -63,7 +63,6 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.adjustment.LoanAdjustmentParameter;
 import org.apache.fineract.portfolio.loanaccount.service.adjustment.LoanAdjustmentService;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -410,7 +409,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             throw new GeneralPlatformDomainRuleException("error.msg.account.transfer.already.reversed",
                     "Account transfer is already reverted", command.entityId());
         }
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         PortfolioAccountType fromAccountType = accountTransferDetails.fromLoanAccount() != null ? PortfolioAccountType.LOAN
                 : accountTransferDetails.fromSavingsAccountId() != null ? PortfolioAccountType.SAVINGS : throwUnsupported();
         PortfolioAccountType toAccountType = accountTransferDetails.toLoanAccount() != null ? PortfolioAccountType.LOAN
