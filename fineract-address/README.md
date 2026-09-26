@@ -13,7 +13,7 @@ Provider peel — client addresses and field configuration (ADR-022).
 - `AddressData` stays in `fineract-core` (embedded in `ClientData`).
 - Client residual APIs/handlers in provider use address-api ports; `ClientAddress` entity lives on address-impl.
 
-Address and client-address entities store code-value id (not leftover CodeValue). Address write takes Object client (not leftover Client).
+Address and client-address entities store code-value id (not leftover CodeValue). Address write takes Object client (not leftover Client). Address state, country, and address type writes pass the code value id (not leftover CodeValue repository).
 
 ```bash
 ./gradlew :fineract-address-api:jar :fineract-address-impl:jar :fineract-address-test:test
