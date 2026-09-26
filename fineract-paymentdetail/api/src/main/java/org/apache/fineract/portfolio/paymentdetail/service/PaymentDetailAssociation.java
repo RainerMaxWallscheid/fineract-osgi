@@ -67,6 +67,29 @@ public final class PaymentDetailAssociation {
     }
 
     /**
+     * In-memory payment-type name. Null when the detail or its payment type is missing. A null name throws
+     * {@link NullPointerException}, matching {@code getPaymentType().getName().equals}.
+     */
+    public static String paymentTypeName(final Object paymentDetail) {
+        if (paymentDetail == null) {
+            return null;
+        }
+        try {
+            final Object paymentType = paymentDetail.getClass().getMethod("getPaymentType").invoke(paymentDetail);
+            if (paymentType == null) {
+                return null;
+            }
+            final Object name = paymentType.getClass().getMethod("getName").invoke(paymentType);
+            if (name == null) {
+                throw new NullPointerException();
+            }
+            return (String) name;
+        } catch (final ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    /**
      * Cash-payment flag for a persistable payment detail. False when the detail or the port is missing.
      */
     public static boolean cashPayment(final Object paymentDetail) {

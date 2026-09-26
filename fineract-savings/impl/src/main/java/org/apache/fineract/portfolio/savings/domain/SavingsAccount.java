@@ -99,7 +99,7 @@ import org.apache.fineract.portfolio.savings.exception.SavingsAccountChargeNotFo
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
@@ -1078,7 +1078,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
         final Money amount = Money.of(this.currency, transactionDTO.getTransactionAmount());
 
-        final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(this, office(), (PaymentDetail) transactionDTO.getPaymentDetail(),
+        final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(this, office(), transactionDTO.getPaymentDetail(),
                 transactionDTO.getTransactionDate(), amount, savingsAccountTransactionType, refNo);
 
         if (backdatedTxnsAllowedTill) {
@@ -1209,13 +1209,13 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), (PaymentDetail) transactionDTO.getPaymentDetail(),
-                    backdatedTxnsAllowedTill, refNo);
+            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(),
+                    transactionDTO.getPaymentDetail(), backdatedTxnsAllowedTill, refNo);
         }
 
         final Money transactionAmountMoney = Money.of(this.currency, transactionDTO.getTransactionAmount());
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
-                (PaymentDetail) transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney, refNo);
+                transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney, refNo);
 
         if (backdatedTxnsAllowedTill) {
             addTransactionToExisting(transaction);
@@ -1247,7 +1247,7 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
         return result;
     }
 
-    private void payWithdrawalFee(final BigDecimal transactionAmount, final LocalDate transactionDate, final PaymentDetail paymentDetail,
+    private void payWithdrawalFee(final BigDecimal transactionAmount, final LocalDate transactionDate, final Object paymentDetail,
             final boolean backdatedTxnsAllowedTill, final String refNo) {
         for (SavingsAccountCharge charge : this.charges()) {
             if (charge.isWithdrawalFee() && charge.isActive()) {
@@ -1258,13 +1258,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
 
                 if (charge.isEnablePaymentType() && charge.isEnableFreeWithdrawal()) { // discount transaction to
                                                                                        // specific paymentType
-                    if (paymentDetail != null && paymentDetail.getPaymentType() != null
-                            && paymentDetail.getPaymentType().getName().equals(charge.getPaymentTypeName())) {
+                    if (withdrawalFeePaymentTypeMatches(paymentDetail, charge.getPaymentTypeName())) {
                         resetFreeChargeDaysCount(charge, transactionAmount, transactionDate, refNo);
                     }
                 } else if (charge.isEnablePaymentType()) { // normal charge-transaction to specific paymentType
-                    if (paymentDetail != null && paymentDetail.getPaymentType() != null
-                            && paymentDetail.getPaymentType().getName().equals(charge.getPaymentTypeName())) {
+                    if (withdrawalFeePaymentTypeMatches(paymentDetail, charge.getPaymentTypeName())) {
                         charge.updateWithdralFeeAmount(transactionAmount);
                         this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, backdatedTxnsAllowedTill,
                                 refNo);
@@ -1281,6 +1279,11 @@ public class SavingsAccount extends AbstractAuditableWithUTCDateTimeCustom<Long>
                 }
             }
         }
+    }
+
+    private boolean withdrawalFeePaymentTypeMatches(final Object paymentDetail, final String chargePaymentTypeName) {
+        final String paymentTypeName = PaymentDetailAssociation.paymentTypeName(paymentDetail);
+        return paymentTypeName != null && paymentTypeName.equals(chargePaymentTypeName);
     }
 
     private void resetFreeChargeDaysCount(SavingsAccountCharge charge, final BigDecimal transactionAmount, final LocalDate transactionDate,
