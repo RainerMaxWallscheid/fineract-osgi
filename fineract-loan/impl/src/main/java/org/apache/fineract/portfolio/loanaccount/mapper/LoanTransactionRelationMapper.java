@@ -23,7 +23,7 @@ import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionRelationData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelation;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -45,8 +45,8 @@ public interface LoanTransactionRelationMapper {
         if (toTransaction == null) {
             return null;
         }
-        final Object persistable = PaymentDetailAssociation.persistableById(toTransaction.getPaymentDetailId());
-        if (!(persistable instanceof PaymentDetail detail) || detail.getPaymentType() == null) {
+        final PaymentDetailData detail = PaymentDetailAssociation.toData(toTransaction.getPaymentDetailId());
+        if (detail == null || detail.getPaymentType() == null) {
             return null;
         }
         return detail.getPaymentType().getName();
