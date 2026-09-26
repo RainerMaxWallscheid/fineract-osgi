@@ -18,6 +18,8 @@ Provider peel — in-app user notifications (ADR-022).
 
 `NotificationDomainServiceImpl` + `NotificationDomainServiceConfiguration` → **impl** (listens to loan/savings events and share/FD/RD events carrying `PortfolioAccountEventData`).
 
+Notification mapper writes use AppUserPersistablePort (not leftover AppUser repository). Office and permission filters still use AppUserRepository.
+
 ```bash
 ./gradlew :fineract-notification-api:jar :fineract-notification-impl:jar :fineract-notification-test:test
 ```

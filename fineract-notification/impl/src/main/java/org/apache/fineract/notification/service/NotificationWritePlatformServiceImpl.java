@@ -21,18 +21,18 @@ package org.apache.fineract.notification.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.notification.domain.Notification;
 import org.apache.fineract.notification.domain.NotificationMapper;
-import org.apache.fineract.useradministration.domain.AppUser;
-import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class NotificationWritePlatformServiceImpl implements NotificationWritePlatformService {
     private final NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService;
     private final NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper;
-    private final AppUserRepository appUserRepository;
+    private final AppUserPersistablePort appUserPersistablePort;
     private final NotificationMapperWritePlatformService notificationMapperWritePlatformService;
 
     private Long insertIntoNotificationGenerator(String objectType, Long objectIdentifier, String action, Long actorId, String notificationContent, boolean isSystemGenerated) {
@@ -51,7 +51,7 @@ public class NotificationWritePlatformServiceImpl implements NotificationWritePl
         List<Long> mappedIds = new ArrayList<>();
         Notification notification = this.notificationGeneratorReadRepositoryWrapper.findById(generatedNotificationId);
         for (Long userId : userIds) {
-            AppUser appUser = this.appUserRepository.findById(userId).orElseThrow();
+            final Object appUser = Optional.ofNullable(this.appUserPersistablePort.persistableById(userId)).orElseThrow();
             NotificationMapper notificationMapper = new NotificationMapper().setNotification(notification).setUserId(appUser).setRead(false).setCreatedAt(DateUtils.getLocalDateTimeOfSystem());
             this.notificationMapperWritePlatformService.create(notificationMapper);
             mappedIds.add(notificationMapper.getId());
@@ -60,10 +60,10 @@ public class NotificationWritePlatformServiceImpl implements NotificationWritePl
     }
 
     @java.lang.SuppressWarnings("all")
-        public NotificationWritePlatformServiceImpl(final NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService, final NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper, final AppUserRepository appUserRepository, final NotificationMapperWritePlatformService notificationMapperWritePlatformService) {
+        public NotificationWritePlatformServiceImpl(final NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService, final NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper, final AppUserPersistablePort appUserPersistablePort, final NotificationMapperWritePlatformService notificationMapperWritePlatformService) {
         this.notificationGeneratorWritePlatformService = notificationGeneratorWritePlatformService;
         this.notificationGeneratorReadRepositoryWrapper = notificationGeneratorReadRepositoryWrapper;
-        this.appUserRepository = appUserRepository;
+        this.appUserPersistablePort = appUserPersistablePort;
         this.notificationMapperWritePlatformService = notificationMapperWritePlatformService;
     }
 }

@@ -32,6 +32,7 @@ import org.apache.fineract.notification.service.NotificationWritePlatformService
 import org.apache.fineract.notification.service.UserNotificationService;
 import org.apache.fineract.notification.service.UserNotificationServiceImpl;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,10 +51,10 @@ public class NotificationConfiguration {
     @ConditionalOnMissingBean(NotificationWritePlatformService.class)
     public NotificationWritePlatformService notificationWritePlatformService(
             NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService,
-            NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper, AppUserRepository appUserRepository,
+            NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper, AppUserPersistablePort appUserPersistablePort,
             NotificationMapperWritePlatformService notificationMapperWritePlatformService) {
         return new NotificationWritePlatformServiceImpl(notificationGeneratorWritePlatformService,
-                notificationGeneratorReadRepositoryWrapper, appUserRepository, notificationMapperWritePlatformService);
+                notificationGeneratorReadRepositoryWrapper, appUserPersistablePort, notificationMapperWritePlatformService);
     }
 
     @Bean
