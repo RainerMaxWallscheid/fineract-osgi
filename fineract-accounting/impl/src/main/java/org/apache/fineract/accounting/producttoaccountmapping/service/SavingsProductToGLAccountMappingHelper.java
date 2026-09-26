@@ -34,7 +34,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypePersistablePort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,9 +43,9 @@ public class SavingsProductToGLAccountMappingHelper extends ProductToGLAccountMa
     public SavingsProductToGLAccountMappingHelper(final GLAccountRepository glAccountRepository,
             final ProductToGLAccountMappingRepository glAccountMappingRepository, final FromJsonHelper fromApiJsonHelper,
             final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper,
-            final PaymentTypeRepository paymentTypeRepository, final CodeValueRepository codeValueRepository) {
+            final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
         super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, accountRepositoryWrapper,
-                paymentTypeRepository, codeValueRepository);
+                paymentTypePersistablePort, codeValueRepository);
     }
 
     /***

@@ -49,9 +49,8 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypePersistablePort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -63,7 +62,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     protected final FromJsonHelper fromApiJsonHelper;
     private final ChargeDefinitionPort chargeDefinitionPort;
     protected final GLAccountRepositoryWrapper accountRepositoryWrapper;
-    private final PaymentTypeRepository paymentTypeRepository;
+    private final PaymentTypePersistablePort paymentTypePersistablePort;
     private final CodeValueRepository codeValueRepository;
 
     public void saveProductToAccountMapping(final JsonElement element, final String paramName, final Long productId, final int placeHolderTypeId, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
@@ -475,7 +474,10 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
      * @param productId
      */
     private void savePaymentChannelToFundSourceMapping(final Long productId, final Long paymentTypeId, final Long paymentTypeSpecificFundAccountId, final PortfolioProductType portfolioProductType) {
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId).orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
+        final Object paymentType = this.paymentTypePersistablePort.persistableById(paymentTypeId);
+        if (paymentType == null) {
+            throw new PaymentTypeNotFoundException(paymentTypeId);
+        }
         final GLAccount glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), paymentTypeSpecificFundAccountId);
         final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.FUND_SOURCE.getValue()).setPaymentType(paymentType);
         this.accountMappingRepository.saveAndFlush(accountMapping);
@@ -666,13 +668,13 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypeRepository paymentTypeRepository, final CodeValueRepository codeValueRepository) {
+        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
         this.accountRepository = accountRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.accountRepositoryWrapper = accountRepositoryWrapper;
-        this.paymentTypeRepository = paymentTypeRepository;
+        this.paymentTypePersistablePort = paymentTypePersistablePort;
         this.codeValueRepository = codeValueRepository;
     }
 }
