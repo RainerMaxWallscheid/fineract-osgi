@@ -41,7 +41,6 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequestRepository;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -167,8 +166,7 @@ public class LoanExistencePortAdapter implements LoanExistencePort {
     public RepaymentSmsView repaymentSmsView(final Object loanTransaction) {
         final LoanTransaction transaction = (LoanTransaction) loanTransaction;
         final Loan loan = transaction.getLoan();
-        final Object persistable = PaymentDetailAssociation.persistableById(transaction.getPaymentDetailId());
-        final String receiptNumber = persistable instanceof PaymentDetail detail ? detail.getReceiptNumber() : null;
+        final String receiptNumber = PaymentDetailAssociation.receiptNumber(transaction.getPaymentDetailId());
         return new RepaymentSmsView(loan.getId(), transaction.getId(), loan.getClientId(), loan.getGroupId(), loan.hasInvalidLoanType(),
                 loan.isGroupLoan(), loan.isIndividualLoan(), loan.getPrincipal(), transaction.getOutstandingLoanBalance(),
                 loan.getAccountNumber(), transaction.getAmount(loan.getCurrency()), transaction.getCreatedDate().orElse(null),
