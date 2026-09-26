@@ -1260,9 +1260,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         changes.put("dateFormat", command.dateFormat());
         changes.put("paymentTypeId", command.longValueOfParameterNamed(LoanApiConstants.PAYMENT_TYPE_PARAMNAME));
         final Money transactionAmountAsMoney = Money.of(loan.getCurrency(), transactionAmount);
-        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        Object paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         LoanTransaction newTransaction = LoanTransaction.chargeback(loan, transactionAmountAsMoney, paymentDetail, transactionDate,
                 txnExternalId);
