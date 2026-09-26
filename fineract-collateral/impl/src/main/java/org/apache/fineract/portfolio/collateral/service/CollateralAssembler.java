@@ -24,14 +24,9 @@ import com.google.gson.JsonObject;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateralRepository;
@@ -39,8 +34,7 @@ import org.apache.fineract.portfolio.collateral.exception.CollateralNotFoundExce
 
 public class CollateralAssembler {
     private final FromJsonHelper fromApiJsonHelper;
-    private final CodeValueRepositoryWrapper codeValueRepository;
-    private final CodeValueRepository codeValueRepositoryDirect;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanCollateralRepository loanCollateralRepository;
 
     public Set<LoanCollateral> fromParsedJson(final JsonElement element) {
@@ -50,16 +44,11 @@ public class CollateralAssembler {
             if (topLevelJsonElement.has("collateral") && topLevelJsonElement.get("collateral").isJsonArray()) {
                 final JsonArray array = topLevelJsonElement.get("collateral").getAsJsonArray();
                 final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(topLevelJsonElement);
-                Set<Long> collateralTypeIds = new HashSet<>();
-                for (int i = 0; i < array.size(); i++) {
-                    collateralTypeIds.add(this.fromApiJsonHelper.extractLongNamed("type", array.get(i).getAsJsonObject()));
-                }
-                Map<Long, CodeValue> codeValueMap = this.codeValueRepositoryDirect.findAllById(collateralTypeIds).stream().collect(Collectors.toMap(CodeValue::getId, Function.identity()));
                 for (int i = 0; i < array.size(); i++) {
                     final JsonObject collateralItemElement = array.get(i).getAsJsonObject();
                     final Long id = this.fromApiJsonHelper.extractLongNamed("id", collateralItemElement);
                     final Long collateralTypeId = this.fromApiJsonHelper.extractLongNamed("type", collateralItemElement);
-                    final CodeValue collateralType = codeValueMap.get(collateralTypeId);
+                    final Object collateralType = this.codeValuePersistablePort.persistableById(collateralTypeId);
                     if (collateralType == null) {
                         throw new CodeValueNotFoundException(collateralTypeId);
                     }
@@ -81,10 +70,9 @@ public class CollateralAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public CollateralAssembler(final FromJsonHelper fromApiJsonHelper, final CodeValueRepositoryWrapper codeValueRepository, final CodeValueRepository codeValueRepositoryDirect, final LoanCollateralRepository loanCollateralRepository) {
+        public CollateralAssembler(final FromJsonHelper fromApiJsonHelper, final CodeValuePersistablePort codeValuePersistablePort, final LoanCollateralRepository loanCollateralRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.codeValueRepository = codeValueRepository;
-        this.codeValueRepositoryDirect = codeValueRepositoryDirect;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanCollateralRepository = loanCollateralRepository;
     }
 }
