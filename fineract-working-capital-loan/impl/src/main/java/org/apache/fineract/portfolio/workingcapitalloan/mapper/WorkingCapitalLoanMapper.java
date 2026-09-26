@@ -34,7 +34,6 @@ import org.apache.fineract.portfolio.workingcapitalloanbreach.mapper.WorkingCapi
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.mapper.WorkingCapitalNearBreachMapper;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProductRelatedDetails;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.mapper.WorkingCapitalLoanProductMapper;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -142,43 +141,32 @@ public interface WorkingCapitalLoanMapper {
         timelineData.setSubmittedOnDate(loan.getSubmittedOnDate());
         timelineData.setExpectedMaturityDate(loan.getExpectedMaturityDate());
         timelineData.setActualMaturityDate(loan.getMaturedOnDate());
-        final AppUser approvedBy = persistableUser(loan.getApprovedById());
-        if (approvedBy != null) {
-            timelineData.setApprovedByUsername(approvedBy.getUsername());
-            timelineData.setApprovedByFirstname(approvedBy.getFirstname());
-            timelineData.setApprovedByLastname(approvedBy.getLastname());
+        if (AppUserAssociation.persistableById(loan.getApprovedById()) != null) {
+            timelineData.setApprovedByUsername(AppUserAssociation.username(loan.getApprovedById()));
+            timelineData.setApprovedByFirstname(AppUserAssociation.firstname(loan.getApprovedById()));
+            timelineData.setApprovedByLastname(AppUserAssociation.lastname(loan.getApprovedById()));
             timelineData.setApprovedOnDate(loan.getApprovedOnDate());
         }
         final WorkingCapitalLoanDisbursementDetails firstDisbursement = loan.getDisbursementDetails().stream()
                 .filter(d -> d.getActualDisbursementDate() != null).findFirst().orElse(null);
-        if (firstDisbursement != null) {
-            final AppUser disbursedBy = persistableUser(firstDisbursement.getDisbursedById());
-            if (disbursedBy != null) {
-                timelineData.setDisbursedByUsername(disbursedBy.getUsername());
-                timelineData.setDisbursedByFirstname(disbursedBy.getFirstname());
-                timelineData.setDisbursedByLastname(disbursedBy.getLastname());
-                timelineData.setActualDisbursementDate(firstDisbursement.getActualDisbursementDate());
-            }
+        if (firstDisbursement != null && AppUserAssociation.persistableById(firstDisbursement.getDisbursedById()) != null) {
+            timelineData.setDisbursedByUsername(AppUserAssociation.username(firstDisbursement.getDisbursedById()));
+            timelineData.setDisbursedByFirstname(AppUserAssociation.firstname(firstDisbursement.getDisbursedById()));
+            timelineData.setDisbursedByLastname(AppUserAssociation.lastname(firstDisbursement.getDisbursedById()));
+            timelineData.setActualDisbursementDate(firstDisbursement.getActualDisbursementDate());
         }
-        final AppUser closedBy = persistableUser(loan.getClosedById());
-        if (closedBy != null) {
-            timelineData.setClosedByUsername(closedBy.getUsername());
-            timelineData.setClosedByFirstname(closedBy.getFirstname());
-            timelineData.setClosedByLastname(closedBy.getLastname());
+        if (AppUserAssociation.persistableById(loan.getClosedById()) != null) {
+            timelineData.setClosedByUsername(AppUserAssociation.username(loan.getClosedById()));
+            timelineData.setClosedByFirstname(AppUserAssociation.firstname(loan.getClosedById()));
+            timelineData.setClosedByLastname(AppUserAssociation.lastname(loan.getClosedById()));
             timelineData.setClosedOnDate(loan.getClosedOnDate());
         }
-        final AppUser rejectedBy = persistableUser(loan.getRejectedById());
-        if (rejectedBy != null) {
-            timelineData.setRejectedByUsername(rejectedBy.getUsername());
-            timelineData.setRejectedByFirstname(rejectedBy.getFirstname());
-            timelineData.setRejectedByLastname(rejectedBy.getLastname());
+        if (AppUserAssociation.persistableById(loan.getRejectedById()) != null) {
+            timelineData.setRejectedByUsername(AppUserAssociation.username(loan.getRejectedById()));
+            timelineData.setRejectedByFirstname(AppUserAssociation.firstname(loan.getRejectedById()));
+            timelineData.setRejectedByLastname(AppUserAssociation.lastname(loan.getRejectedById()));
             timelineData.setRejectedOnDate(loan.getRejectedOnDate());
         }
         return timelineData;
-    }
-
-    default AppUser persistableUser(final Long userId) {
-        final Object persistable = AppUserAssociation.persistableById(userId);
-        return persistable instanceof AppUser user ? user : null;
     }
 }

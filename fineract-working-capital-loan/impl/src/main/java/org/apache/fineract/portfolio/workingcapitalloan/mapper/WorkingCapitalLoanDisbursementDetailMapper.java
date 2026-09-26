@@ -22,7 +22,6 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDisbursementDetailData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -40,25 +39,17 @@ public interface WorkingCapitalLoanDisbursementDetailMapper {
 
     @Named("userUsername")
     default String userUsername(final Long userId) {
-        final AppUser user = persistableUser(userId);
-        return user == null ? null : user.getUsername();
+        return AppUserAssociation.persistableById(userId) == null ? null : AppUserAssociation.username(userId);
     }
 
     @Named("userFirstname")
     default String userFirstname(final Long userId) {
-        final AppUser user = persistableUser(userId);
-        return user == null ? null : user.getFirstname();
+        return AppUserAssociation.persistableById(userId) == null ? null : AppUserAssociation.firstname(userId);
     }
 
     @Named("userLastname")
     default String userLastname(final Long userId) {
-        final AppUser user = persistableUser(userId);
-        return user == null ? null : user.getLastname();
-    }
-
-    default AppUser persistableUser(final Long userId) {
-        final Object persistable = AppUserAssociation.persistableById(userId);
-        return persistable instanceof AppUser user ? user : null;
+        return AppUserAssociation.persistableById(userId) == null ? null : AppUserAssociation.lastname(userId);
     }
 
     default List<WorkingCapitalLoanDisbursementDetailData> toDataList(final List<WorkingCapitalLoanDisbursementDetails> details) {

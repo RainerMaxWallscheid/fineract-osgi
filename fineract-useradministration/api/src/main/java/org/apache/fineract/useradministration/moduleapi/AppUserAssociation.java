@@ -53,4 +53,16 @@ public final class AppUserAssociation {
     public static Object persistableById(final Long userId) {
         return port == null ? null : port.persistableById(userId);
     }
+
+    public static String username(final Long userId) {
+        return port == null ? null : port.username(userId);
+    }
+
+    public static String firstname(final Long userId) {
+        return port == null ? null : port.firstname(userId);
+    }
+
+    public static String lastname(final Long userId) {
+        return port == null ? null : port.lastname(userId);
+    }
 }
