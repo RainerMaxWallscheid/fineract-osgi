@@ -37,9 +37,8 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.delinquency.exception.DelinquencyBucketNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
-import org.apache.fineract.portfolio.fund.domain.Fund;
-import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
+import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
@@ -73,7 +72,7 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
     private final WorkingCapitalLoanProductRepository repository;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final WorkingCapitalLoanProductUpdateUtil updateUtil;
-    private final FundRepository fundRepository;
+    private final FundPersistablePort fundPersistablePort;
     private final DelinquencyCatalogPort delinquencyCatalogPort;
     private final WorkingCapitalAdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser;
     private final WorkingCapitalBreachRepository breachRepository;
@@ -84,7 +83,7 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
     @Override
     public CommandProcessingResult createWorkingCapitalLoanProduct(final JsonCommand command) {
         this.validator.validateForCreate(command.json());
-        final Fund fund = findFundByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.fundIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName) : null);
+        final Object fund = findFundByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.fundIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName) : null);
         final Long delinquencyBucketId = findDelinquencyBucketIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName) : null);
         final WorkingCapitalBreach breach = findBreachByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.breachIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachIdParamName) : null);
         final WorkingCapitalNearBreach nearBreach = (breach == null) ? null : findNearBreachByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.nearBreachIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.nearBreachIdParamName) : null);
@@ -217,7 +216,7 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         final Long existingFundId = product.getFundId();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName, existingFundId)) {
             final Long fundId = command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName);
-            final Fund fund = findFundByIdIfProvided(fundId);
+            final Object fund = findFundByIdIfProvided(fundId);
             product.setFund(fund);
             changes.put(WorkingCapitalLoanProductConstants.fundIdParamName, fundId);
         }
@@ -290,7 +289,7 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         }
     }
 
-    private WorkingCapitalLoanProduct createProductFromCommand(final Fund fund, final Long delinquencyBucketId, final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach, final JsonCommand command, final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules) {
+    private WorkingCapitalLoanProduct createProductFromCommand(final Object fund, final Long delinquencyBucketId, final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach, final JsonCommand command, final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules) {
         // Details category
         final String name = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.nameParamName);
         final String shortName = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.shortNameParamName);
@@ -379,11 +378,15 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         return configurableAttributes;
     }
 
-    private Fund findFundByIdIfProvided(final Long fundId) {
+    private Object findFundByIdIfProvided(final Long fundId) {
         if (fundId == null) {
             return null;
         }
-        return this.fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId));
+        final Object fund = this.fundPersistablePort.persistableById(fundId);
+        if (fund == null) {
+            throw new FundNotFoundException(fundId);
+        }
+        return fund;
     }
 
     private Long findDelinquencyBucketIdIfProvided(final Long delinquencyBucketId) {
@@ -397,12 +400,12 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanProductWritePlatformServiceImpl(final WorkingCapitalLoanProductDataValidator validator, final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalLoanProductUpdateUtil updateUtil, final FundRepository fundRepository, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalAdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachRepository nearBreachRepository) {
+        public WorkingCapitalLoanProductWritePlatformServiceImpl(final WorkingCapitalLoanProductDataValidator validator, final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalLoanProductUpdateUtil updateUtil, final FundPersistablePort fundPersistablePort, final DelinquencyCatalogPort delinquencyCatalogPort, final WorkingCapitalAdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachRepository nearBreachRepository) {
         this.validator = validator;
         this.repository = repository;
         this.workingCapitalLoanRepository = workingCapitalLoanRepository;
         this.updateUtil = updateUtil;
-        this.fundRepository = fundRepository;
+        this.fundPersistablePort = fundPersistablePort;
         this.delinquencyCatalogPort = delinquencyCatalogPort;
         this.advancedPaymentAllocationsJsonParser = advancedPaymentAllocationsJsonParser;
         this.breachRepository = breachRepository;

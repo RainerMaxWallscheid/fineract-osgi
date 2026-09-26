@@ -40,9 +40,8 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.DelinquencyCatalogPort;
-import org.apache.fineract.portfolio.fund.domain.Fund;
-import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
+import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloan.WorkingCapitalLoanConstants;
@@ -81,7 +80,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
 
     private final FromJsonHelper fromApiJsonHelper;
     private final WorkingCapitalLoanProductRepository loanProductRepository;
-    private final FundRepository fundRepository;
+    private final FundPersistablePort fundPersistablePort;
     private final DelinquencyCatalogPort delinquencyCatalogPort;
     private final ExternalIdFactory externalIdFactory;
     private final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser;
@@ -100,7 +99,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         final Long productId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.productIdParameterName, element);
         final WorkingCapitalLoanProduct product = loanProductRepository.findById(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         final Long fundId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.fundIdParameterName, element);
-        final Fund fund = fundId != null ? fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId)) : null;
+        final Object fund = fundByIdIfProvided(fundId);
         final String accountNo = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.accountNoParameterName, element);
         final String externalIdStr = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.externalIdParameterName, element);
         final ExternalId externalId = externalIdFactory.create(externalIdStr);
@@ -229,7 +228,7 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         final Long existingFundId = loan.getFundId();
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanConstants.fundIdParameterName, existingFundId)) {
             final Long fundId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.fundIdParameterName, element);
-            final Fund fund = fundId != null ? fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId)) : null;
+            final Object fund = fundByIdIfProvided(fundId);
             loan.setFund(fund);
             changes.put(WorkingCapitalLoanConstants.fundIdParameterName, fundId);
         }
@@ -375,6 +374,17 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
         loan.setAccountNumber(generated);
     }
 
+    private Object fundByIdIfProvided(final Long fundId) {
+        if (fundId == null) {
+            return null;
+        }
+        final Object fund = this.fundPersistablePort.persistableById(fundId);
+        if (fund == null) {
+            throw new FundNotFoundException(fundId);
+        }
+        return fund;
+    }
+
     private WorkingCapitalBreach findBreachById(final Long breachId) {
         return breachRepository.findById(breachId).orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.wclp.breach.not.found", "Working Capital Breach with id " + breachId + " was not found.", breachId));
     }
@@ -384,10 +394,10 @@ public class WorkingCapitalLoanAssemblerImpl implements WorkingCapitalLoanAssemb
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final FundRepository fundRepository, final DelinquencyCatalogPort delinquencyCatalogPort, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
+        public WorkingCapitalLoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanProductRepository loanProductRepository, final FundPersistablePort fundPersistablePort, final DelinquencyCatalogPort delinquencyCatalogPort, final ExternalIdFactory externalIdFactory, final WorkingCapitalAdvancedPaymentAllocationsJsonParser paymentAllocationParser, final AccountNumberFormatLookup accountNumberFormatLookup, final AccountNumberGeneratorService accountNumberGeneratorService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalNearBreachRepository nearBreachRepository, final WorkingCapitalLoanPaymentAllocationMapper workingCapitalLoanPaymentAllocationMapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanProductRepository = loanProductRepository;
-        this.fundRepository = fundRepository;
+        this.fundPersistablePort = fundPersistablePort;
         this.delinquencyCatalogPort = delinquencyCatalogPort;
         this.externalIdFactory = externalIdFactory;
         this.paymentAllocationParser = paymentAllocationParser;
