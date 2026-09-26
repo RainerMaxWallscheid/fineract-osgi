@@ -30,6 +30,7 @@ import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -71,6 +72,8 @@ public class ExecuteEmailConfig {
     private ClientActivePort clientActivePort;
     @Autowired
     private StaffPersistablePort staffPersistablePort;
+    @Autowired
+    private AppUserPersistablePort appUserPersistablePort;
 
     @Bean
     protected Step executeEmailStep() {
@@ -87,6 +90,6 @@ public class ExecuteEmailConfig {
     public ExecuteEmailTasklet executeEmailTasklet() {
         return new ExecuteEmailTasklet(emailMessageRepository, emailCampaignRepository, loanExistencePort, savingsAccountExistencePort,
                 emailMessageJobEmailService, readReportingService, reportLookupPort, reportMailingJobValidator, fineractProperties,
-                clientActivePort, staffPersistablePort);
+                clientActivePort, staffPersistablePort, appUserPersistablePort);
     }
 }

@@ -24,6 +24,8 @@ SMS campaign client lookups use ClientActivePort (not leftover Client repository
 
 Email execute report parameters use ClientActivePort and StaffPersistablePort.officeId (not leftover Client).
 
+Email execute report run-as user uses AppUserPersistablePort (not leftover AppUser).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```

@@ -523,7 +523,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     }
 
     @Override
-    public ByteArrayOutputStream generatePentahoReportAsOutputStream(final String reportName, final String outputTypeParam, final Map<String, String> queryParams, final Locale locale, final AppUser runReportAsUser, final StringBuilder errorLog) {
+    public ByteArrayOutputStream generatePentahoReportAsOutputStream(final String reportName, final String outputTypeParam, final Map<String, String> queryParams, final Locale locale, final Object runReportAsUser, final StringBuilder errorLog) {
         // This complete implementation should be moved to Pentaho Report
         // Service
         /*

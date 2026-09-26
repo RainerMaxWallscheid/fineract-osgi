@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportParameterData;
-import org.apache.fineract.useradministration.domain.AppUser;
 
 public interface ReadReportingService {
 
@@ -52,5 +51,5 @@ public interface ReadReportingService {
 
     // TODO kill this when tackling https://issues.apache.org/jira/browse/FINERACT-1264
     ByteArrayOutputStream generatePentahoReportAsOutputStream(String reportName, String outputTypeParam, Map<String, String> queryParams,
-            Locale locale, AppUser runReportAsUser, StringBuilder errorLog);
+            Locale locale, Object runReportAsUser, StringBuilder errorLog);
 }
