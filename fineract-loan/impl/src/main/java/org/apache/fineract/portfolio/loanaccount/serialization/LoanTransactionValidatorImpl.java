@@ -34,8 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -111,7 +110,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator;
     private final LoanDisbursementValidator loanDisbursementValidator;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final ConfigurationDomainService configurationDomainService;
     private ClientActivePort clientActivePort;
 
@@ -1035,7 +1034,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
         baseDataValidator.reset().parameter(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME)
                 .value(transactionClassificationId).ignoreIfNull().positiveAmount();
         if (transactionClassificationId != null) {
-            final CodeValue codeValue = codeValueRepository.findByCodeNameAndId(codeName, transactionClassificationId);
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(codeName, transactionClassificationId);
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME)
                         .failWithCode("code.value.classification.not.exists", "Code value does not exists in the code " + codeName);
@@ -1051,7 +1050,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             final CalendarInstanceLookupPort calendarInstanceRepository,
             final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator,
-            final LoanDisbursementValidator loanDisbursementValidator, final CodeValueRepository codeValueRepository,
+            final LoanDisbursementValidator loanDisbursementValidator, final CodeValuePersistablePort codeValuePersistablePort,
             final ConfigurationDomainService configurationDomainService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
@@ -1064,7 +1063,7 @@ public class LoanTransactionValidatorImpl implements LoanTransactionValidator {
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.loanDownPaymentTransactionValidator = loanDownPaymentTransactionValidator;
         this.loanDisbursementValidator = loanDisbursementValidator;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.configurationDomainService = configurationDomainService;
     }
 }
