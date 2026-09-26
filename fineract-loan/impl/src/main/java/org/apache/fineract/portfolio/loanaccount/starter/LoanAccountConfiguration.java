@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.starter;
 
 import org.apache.fineract.cob.service.LoanHardLockPort;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -250,7 +249,7 @@ public class LoanAccountConfiguration {
     @ConditionalOnMissingBean(LoanAssembler.class)
     public LoanAssembler loanAssembler(FromJsonHelper fromApiJsonHelper, LoanRepositoryWrapper loanRepository,
             LoanProductRepository loanProductRepository, GroupRepositoryWrapper groupRepository, FundRepository fundRepository,
-            StaffRepository staffRepository, CodeValueRepositoryWrapper codeValueRepository, LoanScheduleAssembler loanScheduleAssembler,
+            StaffRepository staffRepository, CodeValuePersistablePort codeValuePersistablePort, LoanScheduleAssembler loanScheduleAssembler,
             LoanChargeAssembler loanChargeAssembler, LoanCollateralPort loanCollateralPort,
             LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
             HolidayRepository holidayRepository, ConfigurationDomainService configurationDomainService,
@@ -262,7 +261,7 @@ public class LoanAccountConfiguration {
             LoanAccrualsProcessingService loanAccrualsProcessingService, LoanDisbursementService loanDisbursementService,
             LoanChargeService loanChargeService, LoanOfficerService loanOfficerService, LoanScheduleComponent loanSchedule) {
         return new LoanAssemblerImpl(fromApiJsonHelper, loanRepository, loanProductRepository, groupRepository, fundRepository,
-                staffRepository, codeValueRepository, loanScheduleAssembler, loanChargeAssembler, loanCollateralPort,
+                staffRepository, codeValuePersistablePort, loanScheduleAssembler, loanChargeAssembler, loanCollateralPort,
                 loanRepaymentScheduleTransactionProcessorFactory, holidayRepository, configurationDomainService, workingDaysRepository,
                 rateAssembler, externalIdFactory, accountNumberFormatRepository, glimRepository, accountNumberGenerator,
                 glimAccountInfoWritePlatformService, calculationPlatformService, loanDisbursementDetailsAssembler, loanChargeMapper,

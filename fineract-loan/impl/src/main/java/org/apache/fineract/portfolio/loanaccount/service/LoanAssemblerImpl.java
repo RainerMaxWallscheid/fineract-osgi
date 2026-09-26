@@ -34,8 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormat;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.configuration.service.TemporaryConfigurationServiceContainer;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -121,7 +121,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final GroupRepositoryWrapper groupRepository;
     private final FundRepository fundRepository;
     private final StaffRepository staffRepository;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanScheduleAssembler loanScheduleAssembler;
     private final LoanChargeAssembler loanChargeAssembler;
     private final LoanCollateralPort loanCollateralPort;
@@ -190,10 +190,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
                 .determineProcessor(transactionProcessingStrategyCode);
         final Fund fund = findFundByIdIfProvided(fundId);
         final Staff loanOfficer = findLoanOfficerByIdIfProvided(loanOfficerId);
-        CodeValue loanPurpose = null;
-        if (loanPurposeId != null) {
-            loanPurpose = this.codeValueRepository.findOneWithNotFoundDetection(loanPurposeId);
-        }
+        final Object loanPurpose = findCodeValueByIdIfProvided(loanPurposeId);
         List<LoanDisbursementDetails> disbursementDetails = new ArrayList<>();
         BigDecimal fixedEmiAmount = null;
         if (loanProduct.isMultiDisburseLoan() || loanProduct.isCanDefineInstallmentAmount()) {
@@ -382,10 +379,13 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @Override
-    public CodeValue findCodeValueByIdIfProvided(final Long codeValueId) {
-        CodeValue codeValue = null;
-        if (codeValueId != null) {
-            codeValue = this.codeValueRepository.findOneWithNotFoundDetection(codeValueId);
+    public Object findCodeValueByIdIfProvided(final Long codeValueId) {
+        if (codeValueId == null) {
+            return null;
+        }
+        final Object codeValue = this.codeValuePersistablePort.persistableById(codeValueId);
+        if (codeValue == null) {
+            throw new CodeValueNotFoundException(codeValueId);
         }
         return codeValue;
     }
@@ -592,7 +592,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         if (command.isChangeInLongParameterNamed(LoanApiConstants.loanPurposeIdParameterName, existingLoanPurposeId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.loanPurposeIdParameterName);
             changes.put(LoanApiConstants.loanPurposeIdParameterName, newValue);
-            final CodeValue loanPurpose = findCodeValueByIdIfProvided(newValue);
+            final Object loanPurpose = findCodeValueByIdIfProvided(newValue);
             loan.updateLoanPurpose(loanPurpose);
         }
         if (command.isChangeInStringParameterNamed(LoanApiConstants.transactionProcessingStrategyCodeParameterName,
@@ -843,7 +843,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository,
             final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository,
             final FundRepository fundRepository, final StaffRepository staffRepository,
-            final CodeValueRepositoryWrapper codeValueRepository, final LoanScheduleAssembler loanScheduleAssembler,
+            final CodeValuePersistablePort codeValuePersistablePort, final LoanScheduleAssembler loanScheduleAssembler,
             final LoanChargeAssembler loanChargeAssembler, final LoanCollateralPort loanCollateralPort,
             final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
             final HolidayRepository holidayRepository, final ConfigurationDomainService configurationDomainService,
@@ -862,7 +862,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.groupRepository = groupRepository;
         this.fundRepository = fundRepository;
         this.staffRepository = staffRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanScheduleAssembler = loanScheduleAssembler;
         this.loanChargeAssembler = loanChargeAssembler;
         this.loanCollateralPort = loanCollateralPort;

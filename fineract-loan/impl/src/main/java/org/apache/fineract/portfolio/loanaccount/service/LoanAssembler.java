@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.util.Map;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.organisation.staff.domain.Staff;
@@ -41,7 +40,7 @@ public interface LoanAssembler {
 
     void accountNumberGeneration(JsonCommand command, Loan loan);
 
-    CodeValue findCodeValueByIdIfProvided(Long codeValueId);
+    Object findCodeValueByIdIfProvided(Long codeValueId);
 
     Fund findFundByIdIfProvided(Long fundId);
 
