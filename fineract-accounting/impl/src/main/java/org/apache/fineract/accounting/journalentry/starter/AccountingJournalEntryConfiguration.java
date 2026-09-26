@@ -63,12 +63,13 @@ public class AccountingJournalEntryConfiguration {
     public AccountingProcessorHelper accountingProcessorHelper(JournalEntryRepository glJournalEntryRepository,
             ProductToGLAccountMappingRepository accountMappingRepository,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, GLClosureRepository closureRepository,
-            GLAccountRepository glAccountRepository, OfficeRepository officeRepository,
+            GLAccountRepository glAccountRepository, GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository,
             AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             BusinessEventNotifierService businessEventNotifierService,
             org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         return new AccountingProcessorHelper(glJournalEntryRepository, accountMappingRepository, financialActivityAccountRepository,
-                closureRepository, glAccountRepository, officeRepository, accountTransfersReadPlatformService, chargeDefinitionPort,
+                closureRepository, glAccountRepository, glAccountPersistablePort, officeRepository, accountTransfersReadPlatformService,
+                chargeDefinitionPort,
                 businessEventNotifierService, taxCatalogPort);
     }
 

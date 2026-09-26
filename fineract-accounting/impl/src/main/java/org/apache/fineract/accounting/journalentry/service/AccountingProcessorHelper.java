@@ -40,6 +40,7 @@ import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialA
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.journalentry.data.ChargePaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.ChargeTaxPaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.ClientChargePaymentDTO;
@@ -92,6 +93,7 @@ public class AccountingProcessorHelper {
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
     private final GLClosureRepository closureRepository;
     private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final OfficeRepository officeRepository;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
     private final ChargeDefinitionPort chargeDefinitionPort;
@@ -713,12 +715,12 @@ public class AccountingProcessorHelper {
     }
 
     public void createCreditJournalEntryForLoanByGLAccountId(final Office office, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Long glAccountId) {
-        final GLAccount account = glAccountRepository.findById(glAccountId).orElseThrow(() -> new IllegalStateException("GL account not found for tax liability entry: " + glAccountId));
+        final Object account = taxLiabilityGlAccount(glAccountId, "GL account not found for tax liability entry: ");
         createCreditJournalEntryForLoan(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
     }
 
     public void createDebitJournalEntryForLoanByGLAccountId(final Office office, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Long glAccountId) {
-        final GLAccount account = glAccountRepository.findById(glAccountId).orElseThrow(() -> new IllegalStateException("GL account not found for tax liability debit entry: " + glAccountId));
+        final Object account = taxLiabilityGlAccount(glAccountId, "GL account not found for tax liability debit entry: ");
         createDebitJournalEntryForLoan(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
     }
 
@@ -741,7 +743,7 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    private void createCreditJournalEntryForLoan(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createCreditJournalEntryForLoan(final Office office, final String currencyCode, final Object account, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         Long loanTransactionId = null;
         String modifiedTransactionId = transactionId;
@@ -767,7 +769,7 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    public void createDebitJournalEntryForLoan(final Office office, final String currencyCode, final GLAccount account, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    public void createDebitJournalEntryForLoan(final Office office, final String currencyCode, final Object account, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         Long loanTransactionId = null;
         String modifiedTransactionId = transactionId;
@@ -1100,6 +1102,17 @@ public class AccountingProcessorHelper {
         return this.glAccountRepository.getReferenceById(accountId);
     }
 
+    private Object taxLiabilityGlAccount(final Long glAccountId, final String missingMessage) {
+        if (glAccountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object glAccount = this.glAccountPersistablePort.persistableById(glAccountId);
+        if (glAccount == null) {
+            throw new IllegalStateException(missingMessage + glAccountId);
+        }
+        return glAccount;
+    }
+
     public Integer getValueForFeeOrPenaltyIncomeAccount(final String chargeRefundChargeType) {
         if (chargeRefundChargeType == null || !(chargeRefundChargeType.equalsIgnoreCase("P") || chargeRefundChargeType.equalsIgnoreCase("F"))) {
             String errorValue;
@@ -1150,12 +1163,13 @@ public class AccountingProcessorHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
+        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.financialActivityAccountRepository = financialActivityAccountRepository;
         this.closureRepository = closureRepository;
         this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.officeRepository = officeRepository;
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
         this.chargeDefinitionPort = chargeDefinitionPort;
