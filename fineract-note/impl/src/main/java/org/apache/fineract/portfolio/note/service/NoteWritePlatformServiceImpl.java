@@ -20,11 +20,8 @@ package org.apache.fineract.portfolio.note.service;
 
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
@@ -49,18 +46,18 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteWritePlatformServiceImpl.class);
 
     private final NoteRepository noteRepository;
-    private final ClientRepository clientRepository;
-    private final GroupRepository groupRepository;
+    private final ClientActivePort clientActivePort;
+    private final GroupActivePort groupActivePort;
     private final LoanExistencePort loanExistencePort;
     private final SavingsAccountExistencePort savingsAccountExistencePort;
     private final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
 
-    public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientRepository clientRepository,
-            final GroupRepository groupRepository, final LoanExistencePort loanExistencePort,
+    public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientActivePort clientActivePort,
+            final GroupActivePort groupActivePort, final LoanExistencePort loanExistencePort,
             final SavingsAccountExistencePort savingsAccountExistencePort, final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport) {
         this.noteRepository = noteRepository;
-        this.clientRepository = clientRepository;
-        this.groupRepository = groupRepository;
+        this.clientActivePort = clientActivePort;
+        this.groupActivePort = groupActivePort;
         this.loanExistencePort = loanExistencePort;
         this.savingsAccountExistencePort = savingsAccountExistencePort;
         this.shareAccountNoteSupport = shareAccountNoteSupport;
@@ -72,16 +69,14 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
         Long officeId;
         switch (request.getType()) {
             case CLIENT -> {
-                final Client client = this.clientRepository.findById(request.getResourceId())
-                        .orElseThrow(() -> new ClientNotFoundException(request.getResourceId()));
+                final Object client = this.clientActivePort.persistableById(request.getResourceId());
                 note = noteRepository.saveAndFlush(Note.clientNote(client, request.getNote()));
-                officeId = client.officeId();
+                officeId = this.clientActivePort.officeId(request.getResourceId());
             }
             case GROUP -> {
-                final var group = groupRepository.findById(request.getResourceId())
-                        .orElseThrow(() -> new GroupNotFoundException(request.getResourceId()));
+                final Object group = this.groupActivePort.persistableById(request.getResourceId());
                 note = noteRepository.saveAndFlush(Note.groupNote(group, request.getNote()));
-                officeId = group.officeId();
+                officeId = this.groupActivePort.officeId(request.getResourceId());
             }
             case LOAN -> {
                 final var ref = loanExistencePort.require(request.getResourceId());
@@ -189,14 +184,14 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
         Long officeId = null;
         switch (type) {
             case CLIENT -> {
-                final var client = clientRepository.findById(resourceId).orElseThrow(() -> new ClientNotFoundException(resourceId));
-                note = noteRepository.findByClientIdAndId(client.getId(), noteId);
-                officeId = client.officeId();
+                final Object client = this.clientActivePort.persistableById(resourceId);
+                note = noteRepository.findByClientIdAndId(this.clientActivePort.id(client), noteId);
+                officeId = this.clientActivePort.officeId(resourceId);
             }
             case GROUP -> {
-                final var group = groupRepository.findById(resourceId).orElseThrow(() -> new GroupNotFoundException(resourceId));
-                note = noteRepository.findByGroupIdAndId(group.getId(), noteId);
-                officeId = group.officeId();
+                final Object group = this.groupActivePort.persistableById(resourceId);
+                note = noteRepository.findByGroupIdAndId(this.groupActivePort.id(group), noteId);
+                officeId = this.groupActivePort.officeId(resourceId);
             }
             case LOAN -> {
                 final var ref = loanExistencePort.require(resourceId);

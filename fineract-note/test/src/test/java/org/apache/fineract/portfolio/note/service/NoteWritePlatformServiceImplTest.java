@@ -24,8 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
@@ -50,9 +50,9 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private NoteRepository noteRepository;
     @Mock
-    private ClientRepository clientRepository;
+    private ClientActivePort clientActivePort;
     @Mock
-    private GroupRepository groupRepository;
+    private GroupActivePort groupActivePort;
     @Mock
     private LoanExistencePort loanExistencePort;
     @Mock
@@ -68,7 +68,7 @@ class NoteWritePlatformServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        subject = new NoteWritePlatformServiceImpl(noteRepository, clientRepository, groupRepository, loanExistencePort,
+        subject = new NoteWritePlatformServiceImpl(noteRepository, clientActivePort, groupActivePort, loanExistencePort,
                 savingsAccountExistencePort, shareAccountNoteSupport);
     }
 
