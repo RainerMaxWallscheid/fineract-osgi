@@ -61,4 +61,8 @@ public final class GLAccountAssociation {
     public static String glCode(final Long glAccountId) {
         return port == null ? null : port.glCode(glAccountId);
     }
+
+    public static Integer accountType(final Long glAccountId) {
+        return port == null ? null : port.accountType(glAccountId);
+    }
 }

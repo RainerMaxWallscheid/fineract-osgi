@@ -42,4 +42,9 @@ public interface GLAccountPersistablePort {
      * GL account code, or null when the id is null or missing.
      */
     String glCode(Long glAccountId);
+
+    /**
+     * GL account type, or null when the id is null, missing, or the type is null.
+     */
+    Integer accountType(Long glAccountId);
 }

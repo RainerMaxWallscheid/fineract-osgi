@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.journalentry;
 
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
@@ -91,23 +90,21 @@ public interface JournalEntryMapper {
 
     @Named("glAccountCode")
     default String glAccountCode(final Long glAccountId) {
-        final GLAccount account = leftoverGlAccount(glAccountId);
-        return account == null ? null : account.getGlCode();
+        return GLAccountAssociation.glCode(glAccountId);
     }
 
     @Named("glAccountName")
     default String glAccountName(final Long glAccountId) {
-        final GLAccount account = leftoverGlAccount(glAccountId);
-        return account == null ? null : account.getName();
+        return GLAccountAssociation.name(glAccountId);
     }
 
     @Named("glAccountTypeFromId")
     default EnumOptionData glAccountTypeFromId(final Long glAccountId) {
-        final GLAccount account = leftoverGlAccount(glAccountId);
-        if (account == null || account.getType() == null) {
+        final Integer type = GLAccountAssociation.accountType(glAccountId);
+        if (type == null) {
             return null;
         }
-        return mapGlAccountType(GLAccountType.fromInt(account.getType()));
+        return mapGlAccountType(GLAccountType.fromInt(type));
     }
 
     @Named("glAccountType")
@@ -169,10 +166,5 @@ public interface JournalEntryMapper {
     private static PaymentDetail persistable(final JournalEntry journalEntry) {
         final Object persistable = PaymentDetailAssociation.persistableById(journalEntry.getPaymentDetailId());
         return persistable instanceof PaymentDetail detail ? detail : null;
-    }
-
-    private static GLAccount leftoverGlAccount(final Long glAccountId) {
-        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
-        return persistable instanceof GLAccount account ? account : null;
     }
 }
