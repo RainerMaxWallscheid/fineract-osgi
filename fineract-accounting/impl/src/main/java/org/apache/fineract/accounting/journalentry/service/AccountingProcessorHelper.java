@@ -76,7 +76,6 @@ import org.apache.fineract.portfolio.loanaccount.data.ChargeTaxDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargePaidByDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 import org.apache.fineract.shares.shareaccounts.data.ShareAccountTransactionEnumData;
 import org.springframework.dao.DataAccessException;
@@ -780,13 +779,13 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    public void createCreditJournalEntryForWorkingCapitalLoan(final Office office, final String currencyCode, final GLAccount account, final Long workingCapitalLoanId, final Long workingCapitalLoanTransactionId, final LocalDate transactionDate, final BigDecimal amount, final PaymentDetail paymentDetail) {
+    public void createCreditJournalEntryForWorkingCapitalLoan(final Office office, final String currencyCode, final GLAccount account, final Long workingCapitalLoanId, final Long workingCapitalLoanTransactionId, final LocalDate transactionDate, final BigDecimal amount, final Object paymentDetail) {
         final String modifiedTransactionId = WORKING_CAPITAL_LOAN_TRANSACTION_IDENTIFIER + workingCapitalLoanTransactionId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId, false, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.WORKING_CAPITAL_LOAN.getValue(), workingCapitalLoanId, null, null, null, null, null);
         persistJournalEntry(journalEntry);
     }
 
-    public void createDebitJournalEntryForWorkingCapitalLoan(final Office office, final String currencyCode, final GLAccount account, final Long workingCapitalLoanId, final Long workingCapitalLoanTransactionId, final LocalDate transactionDate, final BigDecimal amount, final PaymentDetail paymentDetail) {
+    public void createDebitJournalEntryForWorkingCapitalLoan(final Office office, final String currencyCode, final GLAccount account, final Long workingCapitalLoanId, final Long workingCapitalLoanTransactionId, final LocalDate transactionDate, final BigDecimal amount, final Object paymentDetail) {
         final String modifiedTransactionId = WORKING_CAPITAL_LOAN_TRANSACTION_IDENTIFIER + workingCapitalLoanTransactionId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId, false, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.WORKING_CAPITAL_LOAN.getValue(), workingCapitalLoanId, null, null, null, null, null);
         persistJournalEntry(journalEntry);
