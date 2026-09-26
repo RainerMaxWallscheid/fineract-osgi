@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
@@ -199,7 +198,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
             final boolean backdatedTxnsAllowedTill) {
         final SavingsAccount account = this.savingsAccountAssembler.assembleFrom(savingsAccountId, backdatedTxnsAllowedTill);
         final SavingsAccountTransaction txn = this.savingsAccountDomainService.handleDeposit(account, fmt, transactionDate, amount,
-                (PaymentDetail) paymentDetail, isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
+                paymentDetail, isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
         return toTxn(account, txn);
     }
 
@@ -211,7 +210,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
         final SavingsTransactionBooleanValues values = new SavingsTransactionBooleanValues(isAccountTransfer, isRegularTransaction,
                 account.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isExceptionForBalanceCheck);
         final SavingsAccountTransaction txn = this.savingsAccountDomainService.handleWithdrawal(account, fmt, transactionDate, amount,
-                (PaymentDetail) paymentDetail, values, backdatedTxnsAllowedTill);
+                paymentDetail, values, backdatedTxnsAllowedTill);
         return toTxn(account, txn);
     }
 
@@ -230,7 +229,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     @Override
     public List<Long> mandatoryDeposits(final JsonCommand command, final Object paymentDetail) {
         final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.depositAccountAssembler
-                .assembleBulkMandatorySavingsAccountTransactionDTOs(command, (PaymentDetail) paymentDetail);
+                .assembleBulkMandatorySavingsAccountTransactionDTOs(command, paymentDetail);
         final List<Long> ids = new ArrayList<>();
         for (final SavingsAccountTransactionDTO dto : savingsTransactions) {
             try {

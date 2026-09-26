@@ -87,7 +87,6 @@ import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountOnClosureType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -463,7 +462,7 @@ public class DepositAccountAssembler {
     }
 
     public Collection<SavingsAccountTransactionDTO> assembleBulkMandatorySavingsAccountTransactionDTOs(final JsonCommand command,
-            final PaymentDetail paymentDetail) {
+            final Object paymentDetail) {
         final String json = command.json();
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
@@ -488,9 +487,9 @@ public class DepositAccountAssembler {
                             savingsTransactionElement, locale);
                     final Integer depositAccountType = this.fromApiJsonHelper
                             .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
-                    PaymentDetail detail = paymentDetail;
+                    Object detail = paymentDetail;
                     if (paymentDetail == null) {
-                        detail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(
+                        detail = this.paymentDetailWritePlatformService.createPaymentDetail(
                                 this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName,
                                         savingsTransactionElement),
                                 this.fromApiJsonHelper.extractStringNamed(PaymentDetailConstants.accountNumberParamName,
