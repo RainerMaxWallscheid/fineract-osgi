@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.collateralmanagement.starter;
 
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepository;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
@@ -79,11 +78,10 @@ public class CollateralManagementConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(LoanCollateralAssembler.class)
-    public LoanCollateralAssembler loanCollateralAssembler(FromJsonHelper fromApiJsonHelper, CodeValueRepositoryWrapper codeValueRepository,
+    public LoanCollateralAssembler loanCollateralAssembler(FromJsonHelper fromApiJsonHelper,
             LoanCollateralManagementRepository loanCollateralRepository,
             ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper) {
-        return new LoanCollateralAssembler(fromApiJsonHelper, codeValueRepository, loanCollateralRepository,
-                clientCollateralManagementRepositoryWrapper);
+        return new LoanCollateralAssembler(fromApiJsonHelper, loanCollateralRepository, clientCollateralManagementRepositoryWrapper);
     }
 
     @Bean

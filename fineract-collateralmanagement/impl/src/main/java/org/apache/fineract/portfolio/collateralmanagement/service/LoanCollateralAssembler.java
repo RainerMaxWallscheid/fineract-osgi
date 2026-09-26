@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagementRepositoryWrapper;
@@ -36,7 +35,6 @@ import org.apache.fineract.portfolio.loanaccount.exception.InvalidAmountOfCollat
 
 public class LoanCollateralAssembler {
     private final FromJsonHelper fromApiJsonHelper;
-    private final CodeValueRepositoryWrapper codeValueRepository;
     private final LoanCollateralManagementRepository loanCollateralRepository;
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
 
@@ -80,9 +78,8 @@ public class LoanCollateralAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanCollateralAssembler(final FromJsonHelper fromApiJsonHelper, final CodeValueRepositoryWrapper codeValueRepository, final LoanCollateralManagementRepository loanCollateralRepository, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper) {
+        public LoanCollateralAssembler(final FromJsonHelper fromApiJsonHelper, final LoanCollateralManagementRepository loanCollateralRepository, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.codeValueRepository = codeValueRepository;
         this.loanCollateralRepository = loanCollateralRepository;
         this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
     }
