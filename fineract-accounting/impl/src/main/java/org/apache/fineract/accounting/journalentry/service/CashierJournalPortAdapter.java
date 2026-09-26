@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
@@ -54,14 +53,14 @@ public class CashierJournalPortAdapter implements CashierJournalPort {
                 .findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.CASH_AT_MAINVAULT.getValue());
         final FinancialActivityAccount tellerCash = this.financialActivityAccountRepositoryWrapper
                 .findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.CASH_AT_TELLER.getValue());
-        final GLAccount debitAccount;
-        final GLAccount creditAccount;
+        final Object debitAccount;
+        final Object creditAccount;
         if (allocate) {
-            debitAccount = (GLAccount) GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
-            creditAccount = (GLAccount) GLAccountAssociation.persistableById(mainVault.getGlAccountId());
+            debitAccount = GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
+            creditAccount = GLAccountAssociation.persistableById(mainVault.getGlAccountId());
         } else {
-            debitAccount = (GLAccount) GLAccountAssociation.persistableById(mainVault.getGlAccountId());
-            creditAccount = (GLAccount) GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
+            debitAccount = GLAccountAssociation.persistableById(mainVault.getGlAccountId());
+            creditAccount = GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
         }
         final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
         final JournalEntry debitJournalEntry = JournalEntry.createNew(office, null, debitAccount, currencyCode, transactionId, false,
