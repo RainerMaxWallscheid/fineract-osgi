@@ -65,4 +65,10 @@ public interface PaymentDetailPersistablePort {
      * Bank number, or null when the detail id is null, missing, or the number is null.
      */
     String bankNumber(Long paymentDetailId);
+
+    /**
+     * Unsaved payment detail. A null payment type is kept. Does not look up by id.
+     */
+    Object unsaved(Object paymentType, String accountNumber, String checkNumber, String routingCode, String receiptNumber,
+            String bankNumber);
 }

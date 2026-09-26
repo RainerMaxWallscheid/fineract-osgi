@@ -93,6 +93,13 @@ public class PaymentDetailPersistablePortAdapter implements PaymentDetailPersist
         return detail == null ? null : detail.getBankNumber();
     }
 
+    @Override
+    public Object unsaved(final Object paymentType, final String accountNumber, final String checkNumber, final String routingCode,
+            final String receiptNumber, final String bankNumber) {
+        return PaymentDetail.instance(paymentType == null ? null : (PaymentType) paymentType, accountNumber, checkNumber, routingCode,
+                receiptNumber, bankNumber);
+    }
+
     private PaymentTypeData paymentTypeData(final PaymentType paymentType) {
         if (paymentType == null) {
             return null;

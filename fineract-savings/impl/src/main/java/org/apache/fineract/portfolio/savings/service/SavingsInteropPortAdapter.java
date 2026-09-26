@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.savings.service;
 
 import static org.apache.fineract.interoperation.util.InteropUtil.DEFAULT_LOCALE;
 import static org.apache.fineract.interoperation.util.InteropUtil.DEFAULT_ROUTING_CODE;
-import static org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail.instance;
 import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionType.AMOUNT_HOLD;
 import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionType.DEPOSIT;
 import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionType.WITHDRAWAL;
@@ -76,6 +75,7 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailPersistablePort;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
@@ -115,6 +115,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     private final ConfigurationDomainService configurationDomainService;
     private final ChargeTaxApplicationService chargeTaxApplicationService;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
+    private final PaymentDetailPersistablePort paymentDetailPersistablePort;
     private ClientActivePort clientActivePort;
     private GroupActivePort groupActivePort;
 
@@ -125,7 +126,8 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService,
             final ChargeTaxApplicationService chargeTaxApplicationService,
-            final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
+            final PaymentDetailWritePlatformService paymentDetailWritePlatformService,
+            final PaymentDetailPersistablePort paymentDetailPersistablePort) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.currencyRepository = currencyRepository;
@@ -137,6 +139,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         this.configurationDomainService = configurationDomainService;
         this.chargeTaxApplicationService = chargeTaxApplicationService;
         this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
+        this.paymentDetailPersistablePort = paymentDetailPersistablePort;
     }
 
     @Autowired
@@ -441,7 +444,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     }
 
     private Object createAndPersistInteropPaymentDetail(final SavingsAccount savingsAccount, final String transferCode) {
-        return this.paymentDetailWritePlatformService.persistPaymentDetail(instance(findPaymentType(),
+        return this.paymentDetailWritePlatformService.persistPaymentDetail(this.paymentDetailPersistablePort.unsaved(findPaymentType(),
                 savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null));
     }
 
