@@ -24,8 +24,8 @@ import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailRepository;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypePersistablePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements PaymentDetailWritePlatformService {
 
     private final PaymentDetailRepository paymentDetailRepository;
-    private final PaymentTypeRepository paymentTypeRepository;
+    private final PaymentTypePersistablePort paymentTypePersistablePort;
 
     @Override
     public Object createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
@@ -41,9 +41,7 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         if (paymentTypeId == null) {
             return null;
         }
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
-                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
-        return PaymentDetail.generatePaymentDetail(paymentType, command, changes);
+        return PaymentDetail.generatePaymentDetail(paymentTypeById(paymentTypeId), command, changes);
     }
 
     @Override
@@ -71,9 +69,8 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         if (paymentTypeId == null) {
             return null;
         }
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
-                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
-        return PaymentDetail.instance(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
+        return PaymentDetail.instance(paymentTypeById(paymentTypeId), accountNumber, checkNumber, routingCode, receiptNumber,
+                bankNumber);
     }
 
     @Override
@@ -92,9 +89,17 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         return this.paymentDetailRepository.findById(paymentDetailId).orElse(null);
     }
 
+    private PaymentType paymentTypeById(final Long paymentTypeId) {
+        final Object paymentType = this.paymentTypePersistablePort.persistableById(paymentTypeId);
+        if (paymentType == null) {
+            throw new PaymentTypeNotFoundException(paymentTypeId);
+        }
+        return (PaymentType) paymentType;
+    }
+
     public PaymentDetailWritePlatformServiceJpaRepositoryImpl(final PaymentDetailRepository paymentDetailRepository,
-            final PaymentTypeRepository paymentTypeRepository) {
+            final PaymentTypePersistablePort paymentTypePersistablePort) {
         this.paymentDetailRepository = paymentDetailRepository;
-        this.paymentTypeRepository = paymentTypeRepository;
+        this.paymentTypePersistablePort = paymentTypePersistablePort;
     }
 }
