@@ -23,8 +23,7 @@ import static org.apache.fineract.infrastructure.core.service.DateUtils.getBusin
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -45,7 +44,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoanReAmortizationValidator {
 
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
 
     public void validateReAmortize(Loan loan, JsonCommand command) {
         validateReAmortizeRequest(command);
@@ -68,7 +67,7 @@ public class LoanReAmortizationValidator {
         baseDataValidator.reset().parameter(LoanReAmortizationApiConstants.reasonCodeValueIdParamName).value(reasonCodeValueId)
                 .ignoreIfNull();
         if (reasonCodeValueId != null) {
-            final CodeValue reasonCodeValue = codeValueRepository.findByCodeNameAndId(LoanApiConstants.REAMORTIZATION_REASONS,
+            final Object reasonCodeValue = this.codeValuePersistablePort.findByCodeNameAndId(LoanApiConstants.REAMORTIZATION_REASONS,
                     reasonCodeValueId);
             if (reasonCodeValue == null) {
                 dataValidationErrors.add(ApiParameterError.parameterError("validation.msg.reamortization.reason.invalid",
@@ -171,7 +170,7 @@ public class LoanReAmortizationValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-    public LoanReAmortizationValidator(final CodeValueRepository codeValueRepository) {
-        this.codeValueRepository = codeValueRepository;
+    public LoanReAmortizationValidator(final CodeValuePersistablePort codeValuePersistablePort) {
+        this.codeValuePersistablePort = codeValuePersistablePort;
     }
 }

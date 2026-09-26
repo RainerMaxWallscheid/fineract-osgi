@@ -28,8 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -78,7 +77,7 @@ public class LoanReAmortizationService {
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanChargeValidator loanChargeValidator;
     private final ReprocessLoanTransactionsService reprocessLoanTransactionsService;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanScheduleService loanScheduleService;
     private final LoanRepaymentScheduleService loanRepaymentScheduleService;
     private final LoanReadPlatformService loanReadPlatformService;
@@ -208,9 +207,9 @@ public class LoanReAmortizationService {
         if (reAmortizationInterestHandlingType == null) {
             reAmortizationInterestHandlingType = LoanReAmortizationInterestHandlingType.DEFAULT;
         }
-        CodeValue reasonCodeValue = null;
+        Object reasonCodeValue = null;
         if (command.parameterExists(LoanReAmortizationApiConstants.reasonCodeValueIdParamName)) {
-            reasonCodeValue = codeValueRepository.findByCodeNameAndId(LoanApiConstants.REAMORTIZATION_REASONS,
+            reasonCodeValue = this.codeValuePersistablePort.findByCodeNameAndId(LoanApiConstants.REAMORTIZATION_REASONS,
                     command.longValueOfParameterNamed(LoanReAmortizationApiConstants.reasonCodeValueIdParamName));
         }
         return new LoanReAmortizationParameter(reAmortizationTransaction, reAmortizationInterestHandlingType, reasonCodeValue);
@@ -241,7 +240,7 @@ public class LoanReAmortizationService {
     public LoanReAmortizationService(final LoanAssembler loanAssembler, final LoanReAmortizationValidator reAmortizationValidator,
             final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService,
             final LoanTransactionRepository loanTransactionRepository, final LoanChargeValidator loanChargeValidator,
-            final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final CodeValueRepository codeValueRepository,
+            final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final CodeValuePersistablePort codeValuePersistablePort,
             final LoanScheduleService loanScheduleService, final LoanRepaymentScheduleService loanRepaymentScheduleService,
             final LoanReadPlatformService loanReadPlatformService,
             final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository) {
@@ -252,7 +251,7 @@ public class LoanReAmortizationService {
         this.loanTransactionRepository = loanTransactionRepository;
         this.loanChargeValidator = loanChargeValidator;
         this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanScheduleService = loanScheduleService;
         this.loanRepaymentScheduleService = loanRepaymentScheduleService;
         this.loanReadPlatformService = loanReadPlatformService;
