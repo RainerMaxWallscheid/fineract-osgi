@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.paymentdetail.service;
 
+import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
+
 /**
  * Id / persistable lookup for leftover {@code PaymentDetail} without JPA associations on
  * transaction entities (ADR-021).
@@ -82,5 +84,9 @@ public final class PaymentDetailAssociation {
 
     public static String bankNumber(final Long paymentDetailId) {
         return port == null ? null : port.bankNumber(paymentDetailId);
+    }
+
+    public static PaymentDetailData toData(final Long paymentDetailId) {
+        return port == null ? null : port.toData(paymentDetailId);
     }
 }

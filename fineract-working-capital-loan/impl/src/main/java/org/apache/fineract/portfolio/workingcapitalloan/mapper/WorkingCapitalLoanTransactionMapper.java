@@ -26,10 +26,7 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransactionEnumerations;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
-import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanTransactionData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanTransaction;
@@ -58,24 +55,7 @@ public interface WorkingCapitalLoanTransactionMapper {
 
     @Named("paymentDetailIdToData")
     default PaymentDetailData paymentDetailIdToData(final Long paymentDetailId) {
-        final Object persistable = PaymentDetailAssociation.persistableById(paymentDetailId);
-        if (!(persistable instanceof PaymentDetail paymentDetail)) {
-            return null;
-        }
-        return PaymentDetailData.builder().id(paymentDetail.getId()).paymentType(paymentTypeToData(paymentDetail.getPaymentType()))
-                .accountNumber(paymentDetail.getAccountNumber()).checkNumber(paymentDetail.getCheckNumber())
-                .routingCode(paymentDetail.getRoutingCode()).receiptNumber(paymentDetail.getReceiptNumber())
-                .bankNumber(paymentDetail.getBankNumber()).build();
-    }
-
-    @Named("paymentTypeToData")
-    default PaymentTypeData paymentTypeToData(final PaymentType paymentType) {
-        if (paymentType == null) {
-            return null;
-        }
-        return PaymentTypeData.builder().id(paymentType.getId()).name(paymentType.getName()).description(paymentType.getDescription())
-                .isCashPayment(paymentType.getIsCashPayment()).position(paymentType.getPosition()).codeName(paymentType.getCodeName())
-                .isSystemDefined(paymentType.getIsSystemDefined()).build();
+        return PaymentDetailAssociation.toData(paymentDetailId);
     }
 
     @Named("codeValueToData")

@@ -18,8 +18,11 @@
  */
 package org.apache.fineract.portfolio.paymentdetail.service;
 
+import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailRepository;
+import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +32,17 @@ public class PaymentDetailPersistablePortAdapter implements PaymentDetailPersist
 
     public PaymentDetailPersistablePortAdapter(final PaymentDetailRepository paymentDetailRepository) {
         this.paymentDetailRepository = paymentDetailRepository;
+    }
+
+    @Override
+    public PaymentDetailData toData(final Long paymentDetailId) {
+        final PaymentDetail detail = detail(paymentDetailId);
+        if (detail == null) {
+            return null;
+        }
+        return PaymentDetailData.builder().id(detail.getId()).paymentType(paymentTypeData(detail.getPaymentType()))
+                .accountNumber(detail.getAccountNumber()).checkNumber(detail.getCheckNumber()).routingCode(detail.getRoutingCode())
+                .receiptNumber(detail.getReceiptNumber()).bankNumber(detail.getBankNumber()).build();
     }
 
     @Override
@@ -68,6 +82,15 @@ public class PaymentDetailPersistablePortAdapter implements PaymentDetailPersist
     public String bankNumber(final Long paymentDetailId) {
         final PaymentDetail detail = detail(paymentDetailId);
         return detail == null ? null : detail.getBankNumber();
+    }
+
+    private PaymentTypeData paymentTypeData(final PaymentType paymentType) {
+        if (paymentType == null) {
+            return null;
+        }
+        return PaymentTypeData.builder().id(paymentType.getId()).name(paymentType.getName()).description(paymentType.getDescription())
+                .isCashPayment(paymentType.getIsCashPayment()).position(paymentType.getPosition()).codeName(paymentType.getCodeName())
+                .isSystemDefined(paymentType.getIsSystemDefined()).build();
     }
 
     private PaymentDetail detail(final Long paymentDetailId) {

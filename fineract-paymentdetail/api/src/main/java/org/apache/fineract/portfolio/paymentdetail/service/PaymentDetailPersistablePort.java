@@ -18,10 +18,17 @@
  */
 package org.apache.fineract.portfolio.paymentdetail.service;
 
+import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
+
 /**
  * Field lookup for leftover {@code PaymentDetail} (ADR-021). Spring-only; not an Equinox catalog port.
  */
 public interface PaymentDetailPersistablePort {
+
+    /**
+     * Payment detail data, including payment type, or null when the id is null or missing.
+     */
+    PaymentDetailData toData(Long paymentDetailId);
 
     /**
      * Payment-type id, or null when the detail id is null, missing, or the detail has no payment type.
