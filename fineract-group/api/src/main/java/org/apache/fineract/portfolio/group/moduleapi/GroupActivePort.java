@@ -31,6 +31,8 @@ public interface GroupActivePort {
 
     boolean isCenter(Long groupId);
 
+    boolean isGroup(Long groupId);
+
     boolean isActivatedAfter(Long groupId, LocalDate date);
 
     LocalDate activationDate(Long groupId);

@@ -50,6 +50,11 @@ public class GroupActivePortAdapter implements GroupActivePort {
     }
 
     @Override
+    public boolean isGroup(final Long groupId) {
+        return group(groupId).isGroup();
+    }
+
+    @Override
     public boolean isActivatedAfter(final Long groupId, final LocalDate date) {
         return group(groupId).isActivatedAfter(date);
     }

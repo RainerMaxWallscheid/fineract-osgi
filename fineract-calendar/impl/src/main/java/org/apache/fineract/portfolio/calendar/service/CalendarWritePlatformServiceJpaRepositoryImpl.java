@@ -44,12 +44,8 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.serialization.CalendarCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.util.CollectionUtils;
 
@@ -60,8 +56,8 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
     private final CalendarInstanceRepository calendarInstanceRepository;
     private final LoanExistencePort loanExistencePort;
     private final ConfigurationDomainService configurationDomainService;
-    private final GroupRepository groupRepository;
-    private final ClientRepository clientRepository;
+    private final GroupActivePort groupActivePort;
+    private final ClientActivePort clientActivePort;
 
     @Override
     public CommandProcessingResult createCalendar(final JsonCommand command) {
@@ -69,11 +65,10 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
         Long entityId = null;
         CalendarEntityType entityType = CalendarEntityType.INVALID;
         LocalDate entityActivationDate = null;
-        Group centerOrGroup = null;
-        if (command.getGroupId() != null) {
-            centerOrGroup = this.groupRepository.findById(command.getGroupId()).orElseThrow(() -> new GroupNotFoundException(command.getGroupId()));
-            entityActivationDate = centerOrGroup.getActivationDate();
-            entityType = centerOrGroup.isCenter() ? CalendarEntityType.CENTERS : CalendarEntityType.GROUPS;
+        final boolean hasGroup = command.getGroupId() != null;
+        if (hasGroup) {
+            entityActivationDate = this.groupActivePort.activationDate(command.getGroupId());
+            entityType = this.groupActivePort.isCenter(command.getGroupId()) ? CalendarEntityType.CENTERS : CalendarEntityType.GROUPS;
             entityId = command.getGroupId();
         } else if (command.getLoanId() != null) {
             final var dates = this.loanExistencePort.requireCalendarDates(command.getLoanId());
@@ -81,8 +76,7 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
             entityType = CalendarEntityType.LOANS;
             entityId = command.getLoanId();
         } else if (command.getClientId() != null) {
-            final Client client = this.clientRepository.findById(command.getClientId()).orElseThrow(() -> new ClientNotFoundException(command.getClientId()));
-            entityActivationDate = client.getActivationDate();
+            entityActivationDate = this.clientActivePort.activationDate(command.getClientId());
             entityType = CalendarEntityType.CLIENTS;
             entityId = command.getClientId();
         }
@@ -99,12 +93,12 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
             final String errorMessage = "cannot.be.before." + entityType.name().toLowerCase() + ".activation.date";
             baseDataValidator.reset().parameter(CalendarSupportedParameters.START_DATE.getValue()).value(dateAsString).failWithCodeNoParameterAddedToErrorCode(errorMessage);
         }
-        if (centerOrGroup != null) {
-            Long centerOrGroupId = centerOrGroup.getId();
+        if (hasGroup) {
+            Long centerOrGroupId = command.getGroupId();
             Integer centerOrGroupEntityTypeId = entityType.getValue();
-            final Group parent = centerOrGroup.getParent();
-            if (parent != null) {
-                centerOrGroupId = parent.getId();
+            final Long parentId = this.groupActivePort.parentId(command.getGroupId());
+            if (parentId != null) {
+                centerOrGroupId = parentId;
                 centerOrGroupEntityTypeId = CalendarEntityType.CENTERS.getValue();
             }
             final CalendarInstance collectionCalendarInstance = this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(centerOrGroupId, centerOrGroupEntityTypeId, CalendarType.COLLECTION.getValue());
@@ -131,15 +125,13 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
     public void validateIsEditMeetingAllowed(Long groupId) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("calendar");
-        Group centerOrGroup = null;
-        if (groupId != null) {
-            centerOrGroup = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
-            final Group parent = centerOrGroup.getParent();
+        if (groupId != null && this.groupActivePort.isGroup(groupId)) {
+            final Long parentId = this.groupActivePort.parentId(groupId);
             /* Check if it is a Group and belongs to a center */
-            if (centerOrGroup.isGroup() && parent != null) {
+            if (parentId != null) {
                 Integer centerEntityTypeId = CalendarEntityType.CENTERS.getValue();
                 /* Check if calendar is created at center */
-                final CalendarInstance collectionCalendarInstance = this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(parent.getId(), centerEntityTypeId, CalendarType.COLLECTION.getValue());
+                final CalendarInstance collectionCalendarInstance = this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(parentId, centerEntityTypeId, CalendarType.COLLECTION.getValue());
                 /*
                  * If calendar is created by parent group, then it cannot be edited by the child group
                  */
@@ -274,14 +266,14 @@ public class CalendarWritePlatformServiceJpaRepositoryImpl implements CalendarWr
     }
 
     @java.lang.SuppressWarnings("all")
-        public CalendarWritePlatformServiceJpaRepositoryImpl(final CalendarRepository calendarRepository, final CalendarHistoryRepository calendarHistoryRepository, final CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CalendarInstanceRepository calendarInstanceRepository, final LoanExistencePort loanExistencePort, final ConfigurationDomainService configurationDomainService, final GroupRepository groupRepository, final ClientRepository clientRepository) {
+        public CalendarWritePlatformServiceJpaRepositoryImpl(final CalendarRepository calendarRepository, final CalendarHistoryRepository calendarHistoryRepository, final CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CalendarInstanceRepository calendarInstanceRepository, final LoanExistencePort loanExistencePort, final ConfigurationDomainService configurationDomainService, final GroupActivePort groupActivePort, final ClientActivePort clientActivePort) {
         this.calendarRepository = calendarRepository;
         this.calendarHistoryRepository = calendarHistoryRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.loanExistencePort = loanExistencePort;
         this.configurationDomainService = configurationDomainService;
-        this.groupRepository = groupRepository;
-        this.clientRepository = clientRepository;
+        this.groupActivePort = groupActivePort;
+        this.clientActivePort = clientActivePort;
     }
 }

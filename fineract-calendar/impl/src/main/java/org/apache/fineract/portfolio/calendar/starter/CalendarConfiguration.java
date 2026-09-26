@@ -29,8 +29,8 @@ import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformServic
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.calendar.service.CalendarWritePlatformService;
 import org.apache.fineract.portfolio.calendar.service.CalendarWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -58,8 +58,8 @@ public class CalendarConfiguration {
     public CalendarWritePlatformService calendarWritePlatformService(CalendarRepository calendarRepository,
             CalendarHistoryRepository calendarHistoryRepository, CalendarCommandFromApiJsonDeserializer fromApiJsonDeserializer,
             CalendarInstanceRepository calendarInstanceRepository, LoanExistencePort loanExistencePort,
-            ConfigurationDomainService configurationDomainService, GroupRepository groupRepository, ClientRepository clientRepository) {
+            ConfigurationDomainService configurationDomainService, GroupActivePort groupActivePort, ClientActivePort clientActivePort) {
         return new CalendarWritePlatformServiceJpaRepositoryImpl(calendarRepository, calendarHistoryRepository, fromApiJsonDeserializer,
-                calendarInstanceRepository, loanExistencePort, configurationDomainService, groupRepository, clientRepository);
+                calendarInstanceRepository, loanExistencePort, configurationDomainService, groupActivePort, clientActivePort);
     }
 }

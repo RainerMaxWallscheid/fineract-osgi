@@ -20,8 +20,10 @@
 dependencies {
     api project(path: ':fineract-calendar-api')
     implementation(project(path: ':fineract-core'))
-    // Group/center ports and pure service types
+    // GroupActivePort (entity residual stays in core)
     implementation(project(path: ':fineract-group-api'))
+    // ClientActivePort (entity residual stays in core)
+    implementation(project(path: ':fineract-clients-api'))
     implementation(project(path: ':fineract-command-api'))
     // Loan calendar dates and meeting reschedule via LoanExistencePort
     implementation(project(path: ':fineract-loan-api'))

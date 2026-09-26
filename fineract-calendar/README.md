@@ -14,7 +14,7 @@ Provider peel — collection/meeting calendars (ADR-022).
 
 ### Residual resolve
 
-- `GroupRepository` + `GroupNotFoundException` moved to core (used by calendar write).
+- Calendar write uses ClientActivePort/GroupActivePort (not leftover Client or Group repositories).
 - `generateNextEligibleMeetingDateForCollection` takes `LocalDate` (not `MeetingData`) so api does not depend on meeting residual.
 
 ```bash
