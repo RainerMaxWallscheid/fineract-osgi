@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.domain.Charge;
@@ -53,7 +53,7 @@ class ChargeWritePlatformServiceJpaRepositoryImplTest {
     private ChargeRepository chargeRepository;
     private JdbcTemplate jdbcTemplate;
     private ChargeOfficeAccessPort chargeOfficeAccessPort;
-    private GLAccountRepositoryWrapper glAccountRepository;
+    private GLAccountPersistablePort glAccountPersistablePort;
     private TaxCatalogPort taxCatalogPort;
     private PaymentTypePersistablePort paymentTypePersistablePort;
     private ChargeWritePlatformServiceJpaRepositoryImpl service;
@@ -65,11 +65,11 @@ class ChargeWritePlatformServiceJpaRepositoryImplTest {
         chargeRepository = mock(ChargeRepository.class);
         jdbcTemplate = mock(JdbcTemplate.class);
         chargeOfficeAccessPort = mock(ChargeOfficeAccessPort.class);
-        glAccountRepository = mock(GLAccountRepositoryWrapper.class);
+        glAccountPersistablePort = mock(GLAccountPersistablePort.class);
         taxCatalogPort = mock(TaxCatalogPort.class);
         paymentTypePersistablePort = mock(PaymentTypePersistablePort.class);
         service = new ChargeWritePlatformServiceJpaRepositoryImpl(context, deserializer, chargeRepository, jdbcTemplate,
-                chargeOfficeAccessPort, glAccountRepository, taxCatalogPort, paymentTypePersistablePort);
+                chargeOfficeAccessPort, glAccountPersistablePort, taxCatalogPort, paymentTypePersistablePort);
     }
 
     @Test

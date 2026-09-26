@@ -21,8 +21,8 @@ package org.apache.fineract.portfolio.charge.service;
 import jakarta.persistence.PersistenceException;
 import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -58,7 +58,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     private final ChargeRepository chargeRepository;
     private final JdbcTemplate jdbcTemplate;
     private final ChargeOfficeAccessPort chargeOfficeAccessPort;
-    private final GLAccountRepositoryWrapper glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final TaxCatalogPort taxCatalogPort;
     private final PaymentTypePersistablePort paymentTypePersistablePort;
 
@@ -71,9 +71,9 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             // Retrieve linked GLAccount for Client charges (if present)
             final Long glAccountId = command.longValueOfParameterNamed(ChargesApiConstants.glAccountIdParamName);
-            GLAccount glAccount = null;
+            Object glAccount = null;
             if (glAccountId != null) {
-                glAccount = this.glAccountRepository.findOneWithNotFoundDetection(glAccountId);
+                glAccount = glAccountById(glAccountId);
             }
             final Long taxGroupId = command.longValueOfParameterNamed(ChargesApiConstants.taxGroupIdParamName);
             if (taxGroupId != null) {
@@ -135,11 +135,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
             // Has account Id been changed ?
             if (changes.containsKey(ChargesApiConstants.glAccountIdParamName)) {
                 final Long newValue = command.longValueOfParameterNamed(ChargesApiConstants.glAccountIdParamName);
-                GLAccount newIncomeAccount = null;
-                if (newValue != null) {
-                    newIncomeAccount = this.glAccountRepository.findOneWithNotFoundDetection(newValue);
-                }
-                chargeForUpdate.setAccount(newIncomeAccount);
+                chargeForUpdate.setAccount(newValue == null ? null : glAccountById(newValue));
             }
             final String paymentTypeIdParamName = "paymentTypeId";
             if (changes.containsKey(paymentTypeIdParamName)) {
@@ -204,6 +200,14 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         throw ErrorHandler.getMappable(dve, "error.msg.charge.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
+    private Object glAccountById(final Long glAccountId) {
+        final Object glAccount = this.glAccountPersistablePort.persistableById(glAccountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(glAccountId);
+        }
+        return glAccount;
+    }
+
     private Object paymentTypeById(final Long paymentTypeId) {
         final Object paymentType = this.paymentTypePersistablePort.persistableById(paymentTypeId);
         if (paymentType == null) {
@@ -239,14 +243,14 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository,
             final JdbcTemplate jdbcTemplate, final ChargeOfficeAccessPort chargeOfficeAccessPort,
-            final GLAccountRepositoryWrapper glAccountRepository, final TaxCatalogPort taxCatalogPort,
+            final GLAccountPersistablePort glAccountPersistablePort, final TaxCatalogPort taxCatalogPort,
             final PaymentTypePersistablePort paymentTypePersistablePort) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.chargeRepository = chargeRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.chargeOfficeAccessPort = chargeOfficeAccessPort;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.taxCatalogPort = taxCatalogPort;
         this.paymentTypePersistablePort = paymentTypePersistablePort;
     }

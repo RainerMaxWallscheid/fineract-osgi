@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.charge.starter;
 
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
@@ -73,9 +73,9 @@ public class ChargeConfiguration {
     @ConditionalOnMissingBean(ChargeWritePlatformService.class)
     public ChargeWritePlatformService chargeWritePlatformService(PlatformSecurityContext context,
             ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, ChargeRepository chargeRepository,
-            JdbcTemplate jdbcTemplate, ChargeOfficeAccessPort chargeOfficeAccessPort, GLAccountRepositoryWrapper glAccountRepository,
+            JdbcTemplate jdbcTemplate, ChargeOfficeAccessPort chargeOfficeAccessPort, GLAccountPersistablePort glAccountPersistablePort,
             TaxCatalogPort taxCatalogPort, PaymentTypePersistablePort paymentTypePersistablePort) {
         return new ChargeWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, chargeRepository, jdbcTemplate,
-                chargeOfficeAccessPort, glAccountRepository, taxCatalogPort, paymentTypePersistablePort);
+                chargeOfficeAccessPort, glAccountPersistablePort, taxCatalogPort, paymentTypePersistablePort);
     }
 }

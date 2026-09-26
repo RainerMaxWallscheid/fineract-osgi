@@ -23,6 +23,8 @@ dependencies {
     testImplementation(project(path: ':fineract-core'))
     // charge-impl uses paymenttype-api as implementation — not transitive to this fragment.
     testImplementation(project(path: ':fineract-paymenttype-api'))
+    // charge-impl uses accounting-api as implementation — not transitive to this fragment.
+    testImplementation(project(path: ':fineract-accounting-api'))
     // charge-impl uses tax as implementation — not transitive to this fragment.
     testImplementation(project(path: ':fineract-tax-api'))
 
