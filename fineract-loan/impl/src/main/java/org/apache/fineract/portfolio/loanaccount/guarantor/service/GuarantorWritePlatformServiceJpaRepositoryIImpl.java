@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -87,7 +86,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final GuarantorRepository guarantorRepository;
     private final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final GuarantorDomainService guarantorDomainService;
 
@@ -95,14 +94,14 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
             final GuarantorRepository guarantorRepository, final StaffRepositoryWrapper staffRepositoryWrapper,
             final GroupRepositoryWrapper groupRepositoryWrapper, final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-            final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final AccountAssociationsRepository accountAssociationsRepository,
+            final CodeValuePersistablePort codeValuePersistablePort, final AccountAssociationsRepository accountAssociationsRepository,
             final GuarantorDomainService guarantorDomainService) {
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.groupRepositoryWrapper = groupRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.guarantorRepository = guarantorRepository;
         this.staffRepositoryWrapper = staffRepositoryWrapper;
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.accountAssociationsRepository = accountAssociationsRepository;
         this.guarantorDomainService = guarantorDomainService;
     }
@@ -141,10 +140,10 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             }
 
             final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
-            CodeValue clientRelationshipType = null;
+            Object clientRelationshipType = null;
 
             if (clientRelationshipId != null) {
-                clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                clientRelationshipType = this.codeValuePersistablePort.persistableByCodeNameAndId(
                         GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
             }
 
@@ -231,9 +230,9 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
 
             if (changesOnly.containsKey(GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue())) {
                 final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
-                CodeValue clientRelationshipType = null;
+                Object clientRelationshipType = null;
                 if (clientRelationshipId != null) {
-                    clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                    clientRelationshipType = this.codeValuePersistablePort.persistableByCodeNameAndId(
                             GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
                 }
                 guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
