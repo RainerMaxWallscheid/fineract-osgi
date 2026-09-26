@@ -47,7 +47,6 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
@@ -633,9 +632,9 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
         thisTransactionData.put("amount", this.amount);
         thisTransactionData.put("overdraftAmount", this.overdraftAmount);
 
-        final Object persistable = PaymentDetailAssociation.persistableById(this.paymentDetailId);
-        if (persistable instanceof PaymentDetail detail && detail.getPaymentType() != null) {
-            thisTransactionData.put("paymentTypeId", detail.getPaymentType().getId());
+        final Long paymentTypeId = PaymentDetailAssociation.paymentTypeId(this.paymentDetailId);
+        if (paymentTypeId != null) {
+            thisTransactionData.put("paymentTypeId", paymentTypeId);
         }
 
         /***
