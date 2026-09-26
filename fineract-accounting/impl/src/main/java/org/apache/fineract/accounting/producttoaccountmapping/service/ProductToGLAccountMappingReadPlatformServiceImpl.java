@@ -34,7 +34,6 @@ import org.apache.fineract.accounting.common.AccountingConstants.SharesProductAc
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.common.AccountingValidations;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.producttoaccountmapping.data.AdvancedMappingToExpenseAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ChargeToGLAccountMapper;
@@ -255,11 +254,7 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     private List<AdvancedMappingToExpenseAccountData> fetchAdvancedMappingToExpenseAccountData(final List<ProductToGLAccountMapping> mappings) {
         List<AdvancedMappingToExpenseAccountData> advancedMappingToExpenseAccountData = mappings.isEmpty() ? null : new ArrayList<>();
         for (final ProductToGLAccountMapping mapping : mappings) {
-            final GLAccount leftoverAccount = leftoverGlAccount(mapping);
-            final Long glAccountId = leftoverAccount.getId();
-            final String glAccountName = leftoverAccount.getName();
-            final String glCode = leftoverAccount.getGlCode();
-            final GLAccountData expenseAccount = new GLAccountData().setId(glAccountId).setName(glAccountName).setGlCode(glCode);
+            final GLAccountData expenseAccount = toGlAccountData(mapping);
             final CodeValueData codeValue = mapping.getChargeOffReasonId() != null ? toCodeValueData(mapping.getChargeOffReasonId()) : toCodeValueData(mapping.getWriteOffReasonId());
             advancedMappingToExpenseAccountData.add(new AdvancedMappingToExpenseAccountData().setReasonCodeValue(codeValue).setExpenseAccount(expenseAccount));
         }
@@ -270,11 +265,7 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         final List<ProductToGLAccountMapping> mappings = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? productToGLAccountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(loanProductId, portfolioProductType.getValue()) : productToGLAccountMappingRepository.findAllBuyDownFeeClassificationsMappings(loanProductId, portfolioProductType.getValue());
         List<ClassificationToGLAccountData> classificationToGLAccountMappers = mappings.isEmpty() ? null : new ArrayList<>();
         for (final ProductToGLAccountMapping mapping : mappings) {
-            final GLAccount leftoverAccount = leftoverGlAccount(mapping);
-            final Long glAccountId = leftoverAccount.getId();
-            final String glAccountName = leftoverAccount.getName();
-            final String glCode = leftoverAccount.getGlCode();
-            final GLAccountData glAccountData = new GLAccountData().setId(glAccountId).setName(glAccountName).setGlCode(glCode);
+            final GLAccountData glAccountData = toGlAccountData(mapping);
             final CodeValueData classificationCodeValue = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? toCodeValueData(mapping.getCapitalizedIncomeClassificationId()) : toCodeValueData(mapping.getBuydownFeeClassificationId());
             final ClassificationToGLAccountData classificationToGLAccountMapper = new ClassificationToGLAccountData().setClassificationCodeValue(classificationCodeValue).setIncomeAccount(glAccountData);
             classificationToGLAccountMappers.add(classificationToGLAccountMapper);
@@ -499,10 +490,6 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         return accountMappingDetails;
     }
 
-    private GLAccount leftoverGlAccount(final ProductToGLAccountMapping mapping) {
-        return (GLAccount) GLAccountAssociation.persistableById(mapping.getGlAccountId());
-    }
-
     private CodeValueData toCodeValueData(final Long codeValueId) {
         return CodeValueAssociation.toData(codeValueId);
     }
@@ -516,8 +503,14 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     }
 
     private GLAccountData toGlAccountData(final ProductToGLAccountMapping mapping) {
-        final GLAccount glAccount = leftoverGlAccount(mapping);
-        return new GLAccountData().setId(glAccount.getId()).setName(glAccount.getName()).setGlCode(glAccount.getGlCode());
+        final Long glAccountId = mapping.getGlAccountId();
+        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
+        // A missing account still NPEs, matching the old cast then getId().
+        if (persistable == null) {
+            throw new NullPointerException();
+        }
+        return new GLAccountData().setId(GLAccountAssociation.id(persistable)).setName(GLAccountAssociation.name(glAccountId))
+                .setGlCode(GLAccountAssociation.glCode(glAccountId));
     }
 
     @java.lang.SuppressWarnings("all")

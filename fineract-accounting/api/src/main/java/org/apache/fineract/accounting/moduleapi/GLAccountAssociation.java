@@ -53,4 +53,12 @@ public final class GLAccountAssociation {
     public static Object persistableById(final Long glAccountId) {
         return port == null ? null : port.persistableById(glAccountId);
     }
+
+    public static String name(final Long glAccountId) {
+        return port == null ? null : port.name(glAccountId);
+    }
+
+    public static String glCode(final Long glAccountId) {
+        return port == null ? null : port.glCode(glAccountId);
+    }
 }

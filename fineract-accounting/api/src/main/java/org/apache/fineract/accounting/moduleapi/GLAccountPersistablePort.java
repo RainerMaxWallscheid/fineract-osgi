@@ -32,4 +32,14 @@ public interface GLAccountPersistablePort {
      * Persistable GL account for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long glAccountId);
+
+    /**
+     * GL account name, or null when the id is null or missing.
+     */
+    String name(Long glAccountId);
+
+    /**
+     * GL account code, or null when the id is null or missing.
+     */
+    String glCode(Long glAccountId);
 }

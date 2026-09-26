@@ -32,7 +32,7 @@ Residual closed into **impl**: journal DTOs, command handlers, journal REST + re
 
 Still residual on provider: journal **write service** (+ JPA impl/starter). Provisioning write **closed** into impl (`ProvisioningJournalEntryService`). WC processor closed into working-capital-loan-impl.
 
-Product-to-GL mapping entities store payment-type id (not leftover PaymentType). Product-to-GL mapping code value and payment type reads use CodeValuePersistablePort and PaymentTypePersistablePort (not leftover CodeValue or PaymentType).
+Product-to-GL mapping entities store payment-type id (not leftover PaymentType). Product-to-GL mapping code value and payment type reads use CodeValuePersistablePort and PaymentTypePersistablePort (not leftover CodeValue or PaymentType). Product-to-GL mapping GL account reads use GLAccountPersistablePort (not leftover GLAccount).
 
 ```bash
 ./gradlew :fineract-accounting-api:jar :fineract-accounting-impl:jar :fineract-accounting-test:test
