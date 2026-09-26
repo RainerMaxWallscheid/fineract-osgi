@@ -20,6 +20,7 @@ package org.apache.fineract.organisation.office.service;
 
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +56,11 @@ public class OfficePersistablePortAdapter implements OfficePersistablePort {
     public String name(final Long officeId) {
         final Object persistable = persistableById(officeId);
         return persistable instanceof Office office ? office.getName() : null;
+    }
+
+    @Override
+    public boolean doesNotHaveAnOfficeInHierarchyWithId(final Long officeId, final Long hierarchyOfficeId) {
+        final Office office = this.officeRepository.findById(officeId).orElseThrow(() -> new OfficeNotFoundException(officeId));
+        return office.doesNotHaveAnOfficeInHierarchyWithId(hierarchyOfficeId);
     }
 }

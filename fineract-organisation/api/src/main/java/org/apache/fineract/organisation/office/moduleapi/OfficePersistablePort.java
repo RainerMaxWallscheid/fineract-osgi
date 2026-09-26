@@ -37,4 +37,10 @@ public interface OfficePersistablePort {
      * Office name for transaction/journal mapping (ADR-021).
      */
     String name(Long officeId);
+
+    /**
+     * True when the office does not contain {@code hierarchyOfficeId} in its hierarchy. Throws when
+     * {@code officeId} does not exist.
+     */
+    boolean doesNotHaveAnOfficeInHierarchyWithId(Long officeId, Long hierarchyOfficeId);
 }

@@ -42,9 +42,7 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.moduleapi.SmsCampaignTriggerEventPort;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
 import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
-import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
@@ -58,7 +56,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SmsCampaignDomainServiceImpl.class);
     private final SmsCampaignRepository smsCampaignRepository;
     private final SmsMessagePort smsMessagePort;
-    private final OfficeRepository officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler;
     private final GroupActivePort groupActivePort;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
@@ -181,8 +179,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                 if (spkeycheck && !(value.equals("-1") || spvalue.equals(value))) {
                                     if (entry.getKey().equals("officeId")) {
                                         Long officeId = Long.valueOf(value);
-                                        Office campaignOffice = this.officeRepository.findById(Long.valueOf(value)).orElseThrow(() -> new OfficeNotFoundException(officeId));
-                                        if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(this.clientActivePort.officeId(clientId))) {
+                                        if (this.officePersistablePort.doesNotHaveAnOfficeInHierarchyWithId(officeId, this.clientActivePort.officeId(clientId))) {
                                             throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                         }
                                     } else {
@@ -238,8 +235,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         if (spkeycheck && !(value.equals("-1") || spvalue.equals(value))) {
                             if (entry.getKey().equals("officeId")) {
                                 Long officeId = Long.valueOf(value);
-                                Office campaignOffice = this.officeRepository.findById(officeId).orElseThrow(() -> new OfficeNotFoundException(officeId));
-                                if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(this.clientActivePort.officeId(clientId))) {
+                                if (this.officePersistablePort.doesNotHaveAnOfficeInHierarchyWithId(officeId, this.clientActivePort.officeId(clientId))) {
                                     throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                 }
                             } else {
@@ -351,10 +347,10 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupActivePort groupActivePort, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort, final ClientActivePort clientActivePort) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficePersistablePort officePersistablePort, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupActivePort groupActivePort, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort, final ClientActivePort clientActivePort) {
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsMessagePort = smsMessagePort;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.smsCampaignWritePlatformCommandHandler = smsCampaignWritePlatformCommandHandler;
         this.groupActivePort = groupActivePort;
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;

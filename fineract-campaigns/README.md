@@ -26,6 +26,8 @@ Email execute report parameters use ClientActivePort and StaffPersistablePort.of
 
 Email execute report run-as user uses AppUserPersistablePort (not leftover AppUser).
 
+SMS campaign office hierarchy checks use OfficePersistablePort (not leftover Office repository).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```
