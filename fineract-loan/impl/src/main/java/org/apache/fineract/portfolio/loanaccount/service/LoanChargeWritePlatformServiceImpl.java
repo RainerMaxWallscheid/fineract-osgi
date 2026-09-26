@@ -132,7 +132,6 @@ import org.apache.fineract.portfolio.loanaccount.service.adjustment.LoanAdjustme
 import org.apache.fineract.portfolio.loanproduct.data.LoanOverdueDTO;
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -694,9 +693,9 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         loanChargeAdjustmentEntranceValidation(loanCharge, transactionAmount);
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder();
-        PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        Object paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         if (paymentDetail != null) {
-            paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            paymentDetail = this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
         }
         LoanTransaction loanTransaction = applyChargeAdjustment(loan, loanCharge, transactionAmount, transactionDate, externalId,
                 paymentDetail);
@@ -821,7 +820,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
     }
 
     private LoanTransaction applyChargeAdjustment(final Loan loan, final LoanCharge loanCharge, final BigDecimal transactionAmount,
-            final LocalDate transactionDate, final ExternalId txnExternalId, PaymentDetail paymentDetail) {
+            final LocalDate transactionDate, final ExternalId txnExternalId, final Object paymentDetail) {
         businessEventNotifierService.notifyPreBusinessEvent(new LoanChargeAdjustmentPreBusinessEvent(loan));
         LoanTransaction loanChargeAdjustmentTransaction = LoanTransaction.chargeAdjustment(loan, transactionAmount, transactionDate,
                 txnExternalId, paymentDetail);
