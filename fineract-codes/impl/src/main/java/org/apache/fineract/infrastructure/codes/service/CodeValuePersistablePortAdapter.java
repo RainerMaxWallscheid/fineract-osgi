@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.infrastructure.codes.service;
 
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
@@ -49,5 +50,11 @@ public class CodeValuePersistablePortAdapter implements CodeValuePersistablePort
             return null;
         }
         return this.codeValueRepository.findById(codeValueId).orElse(null);
+    }
+
+    @Override
+    public CodeValueData toData(final Long codeValueId) {
+        final Object persistable = persistableById(codeValueId);
+        return persistable instanceof CodeValue codeValue ? codeValue.toData() : null;
     }
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.codes.moduleapi;
 
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+
 /**
  * Id / persistable lookup for leftover {@code CodeValue} without JPA associations
  * on domain entities (ADR-021).
@@ -52,5 +54,9 @@ public final class CodeValueAssociation {
 
     public static Object persistableById(final Long codeValueId) {
         return port == null ? null : port.persistableById(codeValueId);
+    }
+
+    public static CodeValueData toData(final Long codeValueId) {
+        return port == null ? null : port.toData(codeValueId);
     }
 }

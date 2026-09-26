@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.mapper;
 
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -81,11 +80,7 @@ public interface WorkingCapitalLoanTransactionMapper {
 
     @Named("codeValueToData")
     default CodeValueData codeValueToData(final Long codeValueId) {
-        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
-        if (!(persistable instanceof CodeValue leftover)) {
-            return null;
-        }
-        return leftover.toData();
+        return CodeValueAssociation.toData(codeValueId);
     }
 
     @Named("currencyData")

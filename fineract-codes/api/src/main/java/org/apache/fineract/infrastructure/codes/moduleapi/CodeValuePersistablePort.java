@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.codes.moduleapi;
 
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+
 /**
  * Id / persistable lookup for leftover {@code CodeValue} (ADR-021).
  */
@@ -32,4 +34,9 @@ public interface CodeValuePersistablePort {
      * Persistable code value for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long codeValueId);
+
+    /**
+     * Code value data, or null when the id is null or missing.
+     */
+    CodeValueData toData(Long codeValueId);
 }
