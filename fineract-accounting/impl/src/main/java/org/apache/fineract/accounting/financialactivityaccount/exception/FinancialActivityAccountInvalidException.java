@@ -19,7 +19,6 @@
 package org.apache.fineract.accounting.financialactivityaccount.exception;
 
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
 /**
@@ -29,14 +28,14 @@ public class FinancialActivityAccountInvalidException extends AbstractPlatformDo
 
     private static final String ERROR_CODE = "error.msg.financialActivityAccount.invalid";
 
-    public FinancialActivityAccountInvalidException(final FinancialActivity financialActivity, final GLAccount glAccount) {
+    public FinancialActivityAccountInvalidException(final FinancialActivity financialActivity, final String glAccountName,
+            final String glCode) {
         super(ERROR_CODE,
                 "Financial Activity '" + financialActivity.getCode() + "' with Id :" + financialActivity.getValue()
                         + "' can only be associated with a Ledger Account of Type " + financialActivity.getMappedGLAccountType().getCode()
-                        + " the provided Ledger Account '" + glAccount.getName() + "(" + glAccount.getGlCode()
-                        + ")'  does not of the required type",
+                        + " the provided Ledger Account '" + glAccountName + "(" + glCode + ")'  does not of the required type",
                 financialActivity.getCode(), financialActivity.getValue(), financialActivity.getMappedGLAccountType().getCode(),
-                glAccount.getName(), glAccount.getGlCode());
+                glAccountName, glCode);
     }
 
     public static String getErrorcode() {

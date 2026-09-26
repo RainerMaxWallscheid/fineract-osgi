@@ -77,9 +77,15 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
      */
     private void validateFinancialActivityAndAccountMapping(FinancialActivityAccount financialActivityAccount) {
         FinancialActivity financialActivity = FinancialActivity.fromInt(financialActivityAccount.getFinancialActivityType());
-        GLAccount glAccount = (GLAccount) GLAccountAssociation.persistableById(financialActivityAccount.getGlAccountId());
-        if (!financialActivity.getMappedGLAccountType().getValue().equals(glAccount.getType())) {
-            throw new FinancialActivityAccountInvalidException(financialActivity, glAccount);
+        final Long glAccountId = financialActivityAccount.getGlAccountId();
+        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
+        // A missing account still NPEs, matching the old cast then getType().
+        if (persistable == null) {
+            throw new NullPointerException();
+        }
+        if (!financialActivity.getMappedGLAccountType().getValue().equals(GLAccountAssociation.accountType(glAccountId))) {
+            throw new FinancialActivityAccountInvalidException(financialActivity, GLAccountAssociation.name(glAccountId),
+                    GLAccountAssociation.glCode(glAccountId));
         }
     }
 
