@@ -30,7 +30,7 @@ No `:fineract-tax` façade.
 Residual **closed**: `TaxAssembler`, read/write platform services, and `TaxConfiguration` live in tax-impl
 (depends on accounting-api for dropdown port; GLAccount residual in core).
 Request DTOs live in **tax-api**. Fat tax DTOs (`TaxGroupData`, `TaxComponentData`, …) remain in **core**
-(`SavingsAccountData` / `ChargeData` coupling). Tax component GL account reads use GLAccountPersistablePort (not leftover GLAccount).
+(`SavingsAccountData` / `ChargeData` coupling). Tax component GL account reads use GLAccountPersistablePort (not leftover GLAccount). Tax component debit and credit accounts use GLAccountPersistablePort.persistableById (not leftover GLAccount repository).
 
 ```bash
 ./gradlew :fineract-tax-api:jar :fineract-tax-impl:jar :fineract-tax-test:test

@@ -28,9 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
+import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -45,7 +45,7 @@ import org.apache.fineract.portfolio.tax.domain.TaxGroupMappings;
 
 public class TaxAssembler {
     private final FromJsonHelper fromApiJsonHelper;
-    private final GLAccountRepositoryWrapper glAccountRepositoryWrapper;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper;
 
     public TaxComponent assembleTaxComponentFrom(final JsonCommand command) {
@@ -60,10 +60,11 @@ public class TaxAssembler {
         if (debitAccountType != null) {
             debitGlAccountType = GLAccountType.fromInt(debitAccountType);
         }
-        GLAccount debitGlAccount = null;
+        Object debitGlAccount = null;
         if (debitAccountId != null) {
-            debitGlAccount = this.glAccountRepositoryWrapper.findOneWithNotFoundDetection(debitAccountId);
-            if (!debitGlAccount.getType().equals(debitAccountType) || debitGlAccount.isHeaderAccount()) {
+            debitGlAccount = glAccountById(debitAccountId);
+            final Integer accountType = this.glAccountPersistablePort.accountType(debitAccountId);
+            if (!accountType.equals(debitAccountType) || this.glAccountPersistablePort.headerAccount(debitAccountId)) {
                 baseDataValidator.parameter(TaxApiConstants.debitAccountIdParamName).value(debitAccountId).failWithCode("not.a.valid.account");
             }
         }
@@ -73,10 +74,11 @@ public class TaxAssembler {
             creditGlAccountType = GLAccountType.fromInt(creditAccountType);
         }
         final Long creditAccountId = this.fromApiJsonHelper.extractLongNamed(TaxApiConstants.creditAccountIdParamName, element);
-        GLAccount creditGlAccount = null;
+        Object creditGlAccount = null;
         if (creditAccountId != null) {
-            creditGlAccount = this.glAccountRepositoryWrapper.findOneWithNotFoundDetection(creditAccountId);
-            if (!creditGlAccount.getType().equals(creditAccountType) || creditGlAccount.isHeaderAccount()) {
+            creditGlAccount = glAccountById(creditAccountId);
+            final Integer accountType = this.glAccountPersistablePort.accountType(creditAccountId);
+            if (!accountType.equals(creditAccountType) || this.glAccountPersistablePort.headerAccount(creditAccountId)) {
                 baseDataValidator.parameter(TaxApiConstants.creditAccountIdParamName).value(creditAccountId).failWithCode("not.a.valid.account");
             }
         }
@@ -129,6 +131,14 @@ public class TaxAssembler {
         return groupMappings;
     }
 
+    private Object glAccountById(final Long accountId) {
+        final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(accountId);
+        }
+        return glAccount;
+    }
+
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
@@ -136,9 +146,9 @@ public class TaxAssembler {
     }
 
     @java.lang.SuppressWarnings("all")
-        public TaxAssembler(final FromJsonHelper fromApiJsonHelper, final GLAccountRepositoryWrapper glAccountRepositoryWrapper, final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper) {
+        public TaxAssembler(final FromJsonHelper fromApiJsonHelper, final GLAccountPersistablePort glAccountPersistablePort, final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.glAccountRepositoryWrapper = glAccountRepositoryWrapper;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.taxComponentRepositoryWrapper = taxComponentRepositoryWrapper;
     }
 }

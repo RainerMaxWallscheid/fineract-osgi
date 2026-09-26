@@ -21,7 +21,7 @@ dependencies {
     api project(path: ':fineract-tax-api')
 
     implementation(project(path: ':fineract-core'))
-    // Tax residual: TaxAssembler / TaxRead use GLAccount + AccountingDropdownReadPlatformService
+    // TaxRead uses AccountingDropdownReadPlatformService; TaxAssembler uses GLAccountPersistablePort
     implementation(project(path: ':fineract-accounting-api'))
 
     implementation(

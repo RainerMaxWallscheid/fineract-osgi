@@ -57,4 +57,9 @@ public interface GLAccountPersistablePort {
      * Whether manual entries are allowed, or null when the id is null or missing.
      */
     Boolean manualEntriesAllowed(Long glAccountId);
+
+    /**
+     * Whether the account is a header account, or null when the id is null or missing.
+     */
+    Boolean headerAccount(Long glAccountId);
 }

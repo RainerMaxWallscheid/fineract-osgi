@@ -19,7 +19,7 @@
 package org.apache.fineract.portfolio.tax.starter;
 
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.tax.domain.TaxComponentRepository;
 import org.apache.fineract.portfolio.tax.domain.TaxComponentRepositoryWrapper;
@@ -42,9 +42,9 @@ public class TaxConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TaxAssembler.class)
-    public TaxAssembler taxAssembler(FromJsonHelper fromApiJsonHelper, GLAccountRepositoryWrapper glAccountRepositoryWrapper,
+    public TaxAssembler taxAssembler(FromJsonHelper fromApiJsonHelper, GLAccountPersistablePort glAccountPersistablePort,
             TaxComponentRepositoryWrapper taxComponentRepositoryWrapper) {
-        return new TaxAssembler(fromApiJsonHelper, glAccountRepositoryWrapper, taxComponentRepositoryWrapper);
+        return new TaxAssembler(fromApiJsonHelper, glAccountPersistablePort, taxComponentRepositoryWrapper);
     }
 
     @Bean

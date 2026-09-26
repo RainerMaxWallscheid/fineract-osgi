@@ -80,4 +80,10 @@ public class GLAccountPersistablePortAdapter implements GLAccountPersistablePort
         final Object persistable = persistableById(glAccountId);
         return persistable instanceof GLAccount account ? account.isManualEntriesAllowed() : null;
     }
+
+    @Override
+    public Boolean headerAccount(final Long glAccountId) {
+        final Object persistable = persistableById(glAccountId);
+        return persistable instanceof GLAccount account ? account.isHeaderAccount() : null;
+    }
 }
