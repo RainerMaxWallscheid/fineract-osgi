@@ -40,10 +40,8 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
-import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailPersistablePort;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanCharge;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanTransaction;
@@ -130,6 +128,7 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
     void tearDown() {
         ThreadLocalContextUtil.reset();
         PaymentDetailAssociation.setWritePlatformService(null);
+        PaymentDetailAssociation.setPersistablePort(null);
     }
 
     @Test
@@ -245,16 +244,11 @@ class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorkingCapital
 
     @Test
     void testAdvanceAccountingUsesPaymentChannelFundSource() {
-        final PaymentDetail paymentDetail = org.mockito.Mockito.mock(PaymentDetail.class);
-        final PaymentType paymentType = org.mockito.Mockito.mock(PaymentType.class);
-
         when(txn.getTransactionAmount()).thenReturn(new BigDecimal("1000"));
         when(txn.getPaymentDetailId()).thenReturn(1L);
-        final PaymentDetailWritePlatformService write = org.mockito.Mockito.mock(PaymentDetailWritePlatformService.class);
-        when(write.persistableById(1L)).thenReturn(paymentDetail);
-        PaymentDetailAssociation.setWritePlatformService(write);
-        when(paymentDetail.getPaymentType()).thenReturn(paymentType);
-        when(paymentType.getId()).thenReturn(5L);
+        final PaymentDetailPersistablePort port = org.mockito.Mockito.mock(PaymentDetailPersistablePort.class);
+        when(port.paymentTypeId(1L)).thenReturn(5L);
+        PaymentDetailAssociation.setPersistablePort(port);
         when(allocation.getPrincipalPortion()).thenReturn(new BigDecimal("1000"));
         when(allocation.getFeeChargesPortion()).thenReturn(BigDecimal.ZERO);
         when(allocation.getPenaltyChargesPortion()).thenReturn(BigDecimal.ZERO);

@@ -30,7 +30,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanTransaction;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanTransactionAllocation;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.springframework.stereotype.Component;
 
@@ -253,11 +252,7 @@ public class AccrualWithDeferredRevenueAmortizationAccountingProcessorForWorking
     }
 
     private Long extractPaymentTypeId(final WorkingCapitalLoanTransaction txn) {
-        final Object persistable = PaymentDetailAssociation.persistableById(txn.getPaymentDetailId());
-        if (persistable instanceof PaymentDetail detail && detail.getPaymentType() != null) {
-            return detail.getPaymentType().getId();
-        }
-        return null;
+        return PaymentDetailAssociation.paymentTypeId(txn.getPaymentDetailId());
     }
 
     private class JournalEntryPostingHelper {
