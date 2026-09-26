@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
@@ -146,6 +147,12 @@ class LoanOriginatorAvroMapperTest {
                     return channelType;
                 }
                 return null;
+            }
+
+            @Override
+            public CodeValueData toData(final Long codeValueId) {
+                final Object persistable = persistableById(codeValueId);
+                return persistable instanceof CodeValue codeValue ? codeValue.toData() : null;
             }
         };
     }

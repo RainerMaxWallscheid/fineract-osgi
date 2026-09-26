@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanorigination.mapper;
 
 import java.util.List;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
@@ -44,7 +43,6 @@ public interface LoanOriginatorMapper {
 
     @Named("codeValueData")
     default CodeValueData codeValueData(final Long codeValueId) {
-        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
-        return persistable instanceof CodeValue leftover ? leftover.toData() : null;
+        return CodeValueAssociation.toData(codeValueId);
     }
 }

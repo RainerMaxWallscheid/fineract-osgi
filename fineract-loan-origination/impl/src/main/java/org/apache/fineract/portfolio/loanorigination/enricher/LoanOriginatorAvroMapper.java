@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.loanorigination.enricher;
 
 import org.apache.fineract.avro.generic.v1.CodeValueDataV1;
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -51,21 +51,21 @@ public class LoanOriginatorAvroMapper {
     }
 
     /**
-     * Converts a leftover CodeValue persistable to CodeValueDataV1 Avro
+     * Converts a code-value id to CodeValueDataV1 Avro.
      */
     private CodeValueDataV1 mapCodeValue(final Long codeValueId) {
-        final Object persistable = CodeValueAssociation.persistableById(codeValueId);
-        if (!(persistable instanceof CodeValue codeValue)) {
+        final CodeValueData data = CodeValueAssociation.toData(codeValueId);
+        if (data == null) {
             return null;
         }
 
         CodeValueDataV1.Builder builder = CodeValueDataV1.newBuilder();
-        builder.setId(codeValue.getId());
-        builder.setName(codeValue.getLabel());
-        builder.setPosition(codeValue.getPosition());
-        builder.setDescription(codeValue.getDescription());
-        builder.setActive(codeValue.isActive());
-        builder.setMandatory(codeValue.isMandatory());
+        builder.setId(data.getId());
+        builder.setName(data.getName());
+        builder.setPosition(data.getPosition());
+        builder.setDescription(data.getDescription());
+        builder.setActive(data.getActive());
+        builder.setMandatory(data.getMandatory());
 
         return builder.build();
     }
