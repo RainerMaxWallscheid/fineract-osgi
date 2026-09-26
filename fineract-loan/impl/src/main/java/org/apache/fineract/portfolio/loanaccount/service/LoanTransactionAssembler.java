@@ -32,7 +32,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.lang.NonNull;
 
@@ -55,8 +54,7 @@ public class LoanTransactionAssembler {
         if (!txnExternalId.isEmpty()) {
             changes.put(LoanApiConstants.externalIdParameterName, txnExternalId);
         }
-        final PaymentDetail paymentDetail = (PaymentDetail) paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
-                changes);
+        final Object paymentDetail = paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         final LoanTransactionType repaymentTransactionType = LoanTransactionType.INTEREST_PAYMENT_WAIVER;
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
