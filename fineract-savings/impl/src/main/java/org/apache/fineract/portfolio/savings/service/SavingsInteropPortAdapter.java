@@ -75,7 +75,6 @@ import org.apache.fineract.portfolio.account.exception.DifferentCurrenciesExcept
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
@@ -277,7 +276,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
             if (findTransaction(savingsAccount, transferCode, AMOUNT_HOLD.getValue()) != null) {
                 throw new InteropTransferAlreadyOnHoldException(savingsAccount.getExternalId().getValue(), transferCode);
             }
-            final PaymentDetail paymentDetail = createAndPersistInteropPaymentDetail(savingsAccount, transferCode);
+            final Object paymentDetail = createAndPersistInteropPaymentDetail(savingsAccount, transferCode);
             final SavingsAccountTransaction holdTransaction = SavingsAccountTransaction.holdAmount(savingsAccount, savingsAccount.office(),
                     paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false);
             final MonetaryCurrency accountCurrency = savingsAccount.getCurrency().copy();
@@ -441,10 +440,9 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         return null;
     }
 
-    private PaymentDetail createAndPersistInteropPaymentDetail(final SavingsAccount savingsAccount, final String transferCode) {
-        final PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(),
-                transferCode, null);
-        return (PaymentDetail) this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+    private Object createAndPersistInteropPaymentDetail(final SavingsAccount savingsAccount, final String transferCode) {
+        return this.paymentDetailWritePlatformService.persistPaymentDetail(instance(findPaymentType(),
+                savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null));
     }
 
     private SavingsAccountTransaction findTransaction(final SavingsAccount savingsAccount, final String transactionCode,
