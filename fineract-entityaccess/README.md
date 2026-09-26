@@ -16,7 +16,7 @@ Provider residual (loan product/savings product/charge adapters) injects `Finera
 
 Validates mapped entities via loan/savings product repositories and charge-api ports.
 
-Entity-access entities store code-value id (not leftover CodeValue). Entity access writes take Object access type (not leftover CodeValue). Entity access util no longer injects leftover CodeValue repository.
+Entity-access entities store code-value id (not leftover CodeValue). Entity access writes take Object access type (not leftover CodeValue). Entity access util no longer injects leftover CodeValue repository. Entity access office checks use OfficePersistablePort.persistableById (not leftover Office repository).
 
 ```bash
 ./gradlew :fineract-entityaccess-api:jar :fineract-entityaccess-impl:jar :fineract-entityaccess-test:test

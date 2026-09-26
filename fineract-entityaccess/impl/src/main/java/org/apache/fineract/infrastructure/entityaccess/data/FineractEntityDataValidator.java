@@ -35,7 +35,8 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.entityaccess.api.FineractEntityApiResourceConstants;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
 public class FineractEntityDataValidator {
 
     private final FromJsonHelper fromApiJsonHelper;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final LoanProductExistencePort loanProductExistencePort;
     private final SavingsProductExistencePort savingsProductExistencePort;
     private final ChargeDefinitionPort chargeDefinitionPort;
@@ -67,11 +68,11 @@ public class FineractEntityDataValidator {
                     FineractEntityApiResourceConstants.endDate));
 
     @Autowired
-    public FineractEntityDataValidator(final FromJsonHelper fromApiJsonHelper, final OfficeRepositoryWrapper officeRepositoryWrapper,
+    public FineractEntityDataValidator(final FromJsonHelper fromApiJsonHelper, final OfficePersistablePort officePersistablePort,
             final LoanProductExistencePort loanProductExistencePort, final SavingsProductExistencePort savingsProductExistencePort,
             final ChargeDefinitionPort chargeDefinitionPort, final RoleReadPlatformService roleReadPlatformService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.loanProductExistencePort = loanProductExistencePort;
         this.savingsProductExistencePort = savingsProductExistencePort;
         this.chargeDefinitionPort = chargeDefinitionPort;
@@ -154,7 +155,12 @@ public class FineractEntityDataValidator {
     }
 
     public void checkForOffice(Long id) {
-        this.officeRepositoryWrapper.findOneWithNotFoundDetection(id);
+        if (id == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        if (this.officePersistablePort.persistableById(id) == null) {
+            throw new OfficeNotFoundException(id);
+        }
     }
 
     public void checkForLoanProducts(final Long id) {
