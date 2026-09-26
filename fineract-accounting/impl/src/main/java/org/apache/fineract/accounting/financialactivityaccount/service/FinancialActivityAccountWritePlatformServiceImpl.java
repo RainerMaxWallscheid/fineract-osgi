@@ -29,9 +29,9 @@ import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialA
 import org.apache.fineract.accounting.financialactivityaccount.exception.DuplicateFinancialActivityAccountFoundException;
 import org.apache.fineract.accounting.financialactivityaccount.exception.FinancialActivityAccountInvalidException;
 import org.apache.fineract.accounting.financialactivityaccount.serialization.FinancialActivityAccountDataValidator;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -46,7 +46,7 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FinancialActivityAccountWritePlatformServiceImpl.class);
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository;
     private final FinancialActivityAccountDataValidator fromApiJsonDeserializer;
-    private final GLAccountRepositoryWrapper glAccountRepositoryWrapper;
+    private final GLAccountPersistablePort glAccountPersistablePort;
 
     @Override
     public CommandProcessingResult createFinancialActivityAccountMapping(JsonCommand command) {
@@ -54,7 +54,7 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Integer financialActivityId = command.integerValueSansLocaleOfParameterNamed(FinancialActivityAccountsJsonInputParams.FINANCIAL_ACTIVITY_ID.getValue());
             final Long accountId = command.longValueOfParameterNamed(FinancialActivityAccountsJsonInputParams.GL_ACCOUNT_ID.getValue());
-            final GLAccount glAccount = glAccountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
+            final Object glAccount = glAccountById(accountId);
             FinancialActivityAccount financialActivityAccount = FinancialActivityAccount.createNew(glAccount, financialActivityId);
             validateFinancialActivityAndAccountMapping(financialActivityAccount);
             this.financialActivityAccountRepository.saveAndFlush(financialActivityAccount);
@@ -97,7 +97,7 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
             Map<String, Object> changes = findChanges(command, financialActivityAccount);
             if (changes.containsKey(FinancialActivityAccountsJsonInputParams.GL_ACCOUNT_ID.getValue())) {
                 final Long accountId = command.longValueOfParameterNamed(FinancialActivityAccountsJsonInputParams.GL_ACCOUNT_ID.getValue());
-                final GLAccount glAccount = glAccountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
+                final Object glAccount = glAccountById(accountId);
                 financialActivityAccount.updateGlAccount(glAccount);
             }
             if (changes.containsKey(FinancialActivityAccountsJsonInputParams.FINANCIAL_ACTIVITY_ID.getValue())) {
@@ -159,10 +159,21 @@ public class FinancialActivityAccountWritePlatformServiceImpl implements Financi
         return changes;
     }
 
+    private Object glAccountById(final Long accountId) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(accountId);
+        }
+        return glAccount;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public FinancialActivityAccountWritePlatformServiceImpl(final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final FinancialActivityAccountDataValidator fromApiJsonDeserializer, final GLAccountRepositoryWrapper glAccountRepositoryWrapper) {
+        public FinancialActivityAccountWritePlatformServiceImpl(final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final FinancialActivityAccountDataValidator fromApiJsonDeserializer, final GLAccountPersistablePort glAccountPersistablePort) {
         this.financialActivityAccountRepository = financialActivityAccountRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-        this.glAccountRepositoryWrapper = glAccountRepositoryWrapper;
+        this.glAccountPersistablePort = glAccountPersistablePort;
     }
 }
