@@ -13,6 +13,8 @@ No `:fineract-savings` façade.
 
 Savings account entities store client id and group id (not leftover Client or Group).
 
+Savings and deposit application group lookups use GroupActivePort (not leftover Group repository). Share account create uses ClientActivePort.persistableById (not leftover Client repository).
+
 ### Consumers
 
 | Module | Depend on |

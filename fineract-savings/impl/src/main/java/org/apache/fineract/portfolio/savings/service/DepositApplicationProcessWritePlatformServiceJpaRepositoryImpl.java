@@ -68,11 +68,8 @@ import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.DepositsApiConstants;
@@ -119,7 +116,6 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final DepositAccountAssembler depositAccountAssembler;
     private final DepositAccountDataValidator depositAccountDataValidator;
     private final AccountNumberGeneratorService accountNumberGenerator;
-    private final GroupRepository groupRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteWritePlatformService noteWritePlatformService;
     private final StaffRepositoryWrapper staffRepository;
@@ -269,14 +265,15 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 final String defaultUserMessage = "Client belongs to more than one group. Cannot support recurring deposit.";
                 throw new GeneralPlatformDomainRuleException("error.msg.recurring.deposit.account.cannot.create.belongs.to.multiple.groups", defaultUserMessage, account.clientId());
             } else {
-                Group group = this.groupRepository.findById(groupIds.get(0)).orElseThrow(() -> new GroupNotFoundException(groupIds.get(0)));
-                Group parent = group.getParent();
-                Integer entityType = CalendarEntityType.GROUPS.getValue();
-                if (parent != null) {
-                    groupId = parent.getId();
+                final Long memberGroupId = groupIds.get(0);
+                final Long parentId = this.groupActivePort.parentId(memberGroupId);
+                final Integer entityType;
+                if (parentId != null) {
+                    groupId = parentId;
                     entityType = CalendarEntityType.CENTERS.getValue();
                 } else {
-                    groupId = group.getId();
+                    groupId = memberGroupId;
+                    entityType = CalendarEntityType.GROUPS.getValue();
                 }
                 CalendarInstance parentCalendarInstance = this.calendarInstanceRepository.findByEntityIdAndEntityTypeIdAndCalendarTypeId(groupId, entityType, CalendarType.COLLECTION.getValue());
                 if (parentCalendarInstance == null) {
@@ -452,7 +449,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
             final Long groupId = command.longValueOfParameterNamed(SavingsApiConstants.groupIdParamName);
             if (groupId != null) {
-                final Group group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+                final Object group = this.groupActivePort.persistableById(groupId);
                 if (!this.groupActivePort.isActive(groupId)) {
                     if (this.groupActivePort.isCenter(groupId)) {
                         throw new CenterNotActiveException(groupId);
@@ -635,7 +632,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        public DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final FixedDepositAccountRepository fixedDepositAccountRepository, final RecurringDepositAccountRepository recurringDepositAccountRepository, final DepositAccountAssembler depositAccountAssembler, final DepositAccountDataValidator depositAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final AccountAssociationsRepository accountAssociationsRepository, final FromJsonHelper fromJsonHelper, final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.fixedDepositAccountRepository = fixedDepositAccountRepository;
@@ -643,7 +640,6 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.depositAccountAssembler = depositAccountAssembler;
         this.depositAccountDataValidator = depositAccountDataValidator;
         this.accountNumberGenerator = accountNumberGenerator;
-        this.groupRepository = groupRepository;
         this.savingsProductRepository = savingsProductRepository;
         this.noteWritePlatformService = noteWritePlatformService;
         this.staffRepository = staffRepository;

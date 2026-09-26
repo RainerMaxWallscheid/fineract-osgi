@@ -53,8 +53,7 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -87,7 +86,7 @@ public class ShareAccountDataSerializer {
 
     private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
 
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
 
     private final ShareProductRepositoryWrapper shareProductRepository;
 
@@ -111,13 +110,13 @@ public class ShareAccountDataSerializer {
     @Autowired
     public ShareAccountDataSerializer(final PlatformSecurityContext platformSecurityContext, final FromJsonHelper fromApiJsonHelper,
             final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
-            final ClientRepositoryWrapper clientRepositoryWrapper, final ShareProductRepositoryWrapper shareProductRepository,
+            final ClientActivePort clientActivePort, final ShareProductRepositoryWrapper shareProductRepository,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
         this.platformSecurityContext = platformSecurityContext;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountRepositoryWrapper = savingsAccountRepositoryWrapper;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.shareProductRepository = shareProductRepository;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
     }
@@ -189,7 +188,7 @@ public class ShareAccountDataSerializer {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
 
-        Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Object client = this.clientActivePort.persistableById(clientId);
         if (!this.savingsAccountReadPlatformService.isAccountBelongsToClient(clientId, savingsAccountId, DepositAccountType.SAVINGS_DEPOSIT,
                 shareProduct.getCurrency().getCode())) {
             throw new SavingsAccountNotFoundException(savingsAccountId);

@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.savings.service;
 
 import java.math.BigDecimal;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.savings.domain.GSIMRepositoy;
 import org.apache.fineract.portfolio.savings.domain.GroupSavingsIndividualMonitoring;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,7 @@ public class GroupSavingsIndividualMonitoringWritePlatformServiceImpl implements
     private final GSIMRepositoy gsimAccountRepository;
 
     @Override
-    public GroupSavingsIndividualMonitoring addGSIMAccountInfo(String accountNumber, Group group, BigDecimal parentDeposit, Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
+    public GroupSavingsIndividualMonitoring addGSIMAccountInfo(String accountNumber, Object group, BigDecimal parentDeposit, Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
         GroupSavingsIndividualMonitoring glimAccountInfo = GroupSavingsIndividualMonitoring.getInstance(accountNumber, group, parentDeposit, childAccountsCount, isAcceptingChild, loanStatus, applicationId);
         return this.gsimAccountRepository.save(glimAccountInfo);
     }

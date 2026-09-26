@@ -59,12 +59,8 @@ import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNum
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.CenterNotActiveException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountDataDTO;
@@ -107,7 +103,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final SavingsAccountAssembler savingAccountAssembler;
     private final SavingsAccountDataValidator savingsAccountDataValidator;
     private final AccountNumberGeneratorService accountNumberGenerator;
-    private final GroupRepository groupRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final NoteWritePlatformService noteWritePlatformService;
     private final StaffRepositoryWrapper staffRepository;
@@ -120,7 +115,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     private final BusinessEventNotifierService businessEventNotifierService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
     private final GSIMRepositoy gsimRepository;
-    private final GroupRepositoryWrapper groupRepositoryWrapper;
     private final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService;
 
     @Transactional
@@ -164,7 +158,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     if (command.booleanObjectValueOfParameterNamed("lastApplication") != null) {
                         isLastChildApplication = command.booleanPrimitiveValueOfParameterNamed("lastApplication");
                     }
-                    Group group = this.groupRepositoryWrapper.findOneWithNotFoundDetection(groupId);
+                    final Object group = this.groupActivePort.persistableById(groupId);
                     if (command.booleanObjectValueOfParameterNamed("isParentAccount") != null && ("1".equals(command.stringValueOfParameterNamed("isParentAccount")) || command.booleanObjectValueOfParameterNamed("isParentAccount"))) {
                         // empty table check
                         if (gsimRepository.count() != 0) {
@@ -290,7 +284,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
                     final Long groupId = command.longValueOfParameterNamed(SavingsApiConstants.groupIdParamName);
                     if (groupId != null) {
-                        final Group group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+                        final Object group = this.groupActivePort.persistableById(groupId);
                         if (!this.groupActivePort.isActive(groupId)) {
                             if (this.groupActivePort.isCenter(groupId)) {
                                 throw new CenterNotActiveException(groupId);
@@ -616,13 +610,12 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     }
 
     @java.lang.SuppressWarnings("all")
-        public SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountDataValidator savingsAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final CommandProcessingService commandProcessingService, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GSIMRepositoy gsimRepository, final GroupRepositoryWrapper groupRepositoryWrapper, final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService) {
+        public SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountDataValidator savingsAccountDataValidator, final AccountNumberGeneratorService accountNumberGenerator, final SavingsProductRepository savingsProductRepository, final NoteWritePlatformService noteWritePlatformService, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final CommandProcessingService commandProcessingService, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GSIMRepositoy gsimRepository, final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService) {
         this.context = context;
         this.savingAccountRepository = savingAccountRepository;
         this.savingAccountAssembler = savingAccountAssembler;
         this.savingsAccountDataValidator = savingsAccountDataValidator;
         this.accountNumberGenerator = accountNumberGenerator;
-        this.groupRepository = groupRepository;
         this.savingsProductRepository = savingsProductRepository;
         this.noteWritePlatformService = noteWritePlatformService;
         this.staffRepository = staffRepository;
@@ -635,7 +628,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         this.businessEventNotifierService = businessEventNotifierService;
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
         this.gsimRepository = gsimRepository;
-        this.groupRepositoryWrapper = groupRepositoryWrapper;
         this.gsimWritePlatformService = gsimWritePlatformService;
     }
 }
