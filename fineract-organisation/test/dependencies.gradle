@@ -21,6 +21,8 @@ dependencies {
     testImplementation(project(path: ':fineract-organisation-impl'))
     testImplementation(project(path: ':fineract-core'))
     testImplementation(project(path: ':fineract-accounting-impl'))
+    // organisation-impl uses accounting-api as implementation, not transitive to this fragment test
+    testImplementation(project(path: ':fineract-accounting-api'))
     testImplementation(project(path: ':fineract-loan-impl'))
     testImplementation 'com.google.code.gson:gson'
     testImplementation ('org.springframework.boot:spring-boot-starter-data-jpa') {

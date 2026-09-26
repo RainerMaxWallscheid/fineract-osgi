@@ -31,8 +31,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesReadPlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -60,11 +59,11 @@ class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImplTest {
     private final ProvisioningCriteriaDefinitionJsonDeserializer deserializer = mock(ProvisioningCriteriaDefinitionJsonDeserializer.class);
     private final ProvisioningCriteriaAssembler assembler = mock(ProvisioningCriteriaAssembler.class);
     private final ProvisioningCriteriaRepository criteriaRepository = mock(ProvisioningCriteriaRepository.class);
-    private final GLAccountRepository glAccountRepository = mock(GLAccountRepository.class);
+    private final GLAccountPersistablePort glAccountPersistablePort = mock(GLAccountPersistablePort.class);
     private final ProvisioningEntriesReadPlatformService entriesReadService = mock(ProvisioningEntriesReadPlatformService.class);
 
     private final ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl service = new ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl(
-            deserializer, assembler, criteriaRepository, new FromJsonHelper(), glAccountRepository, entriesReadService);
+            deserializer, assembler, criteriaRepository, new FromJsonHelper(), glAccountPersistablePort, entriesReadService);
 
     @Test
     void update_appliesChangesToDefinitionMatchedByCategoryId() {
@@ -105,7 +104,7 @@ class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImplTest {
         when(criteria.getDefinitionsByCategoryId()).thenReturn(Map.of(7L, definition));
         when(criteriaRepository.findById(CRITERIA_ID)).thenReturn(Optional.of(criteria));
         when(assembler.parseLoanProductIds(any())).thenReturn(List.of());
-        when(glAccountRepository.findById(anyLong())).thenReturn(Optional.of(mock(GLAccount.class)));
+        when(glAccountPersistablePort.persistableById(anyLong())).thenReturn(new Object());
     }
 
     private JsonCommand command(final String json) {

@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesReadPlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -56,7 +55,7 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
     private final ProvisioningCriteriaAssembler provisioningCriteriaAssembler;
     private final ProvisioningCriteriaRepository provisioningCriteriaRepository;
     private final FromJsonHelper fromApiJsonHelper;
-    private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
 
     @Override
@@ -133,8 +132,8 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
             BigDecimal provisioningpercentage = this.fromApiJsonHelper.extractBigDecimalNamed(ProvisioningCriteriaConstants.JSON_PROVISIONING_PERCENTAGE_PARAM, jsonObject, locale);
             Long liabilityAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_LIABILITY_ACCOUNT_PARAM, jsonObject);
             Long expenseAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_EXPENSE_ACCOUNT_PARAM, jsonObject);
-            GLAccount liabilityAccount = glAccountRepository.findById(liabilityAccountId).orElse(null);
-            GLAccount expenseAccount = glAccountRepository.findById(expenseAccountId).orElse(null);
+            final Object liabilityAccount = optionalGlAccount(liabilityAccountId);
+            final Object expenseAccount = optionalGlAccount(expenseAccountId);
             final ProvisioningCriteriaDefinition definition = existingByCategoryId.get(categoryId);
             if (definition == null) {
                 throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError("error.msg.provisioningcriteria.definition.category.not.found", "Provisioning criteria has no definition for the given category", ProvisioningCriteriaConstants.JSON_CATEOGRYID_PARAM, categoryId)));
@@ -157,13 +156,20 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
         throw ErrorHandler.getMappable(dve, "error.msg.provisioning.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
+    private Object optionalGlAccount(final Long accountId) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        return this.glAccountPersistablePort.persistableById(accountId);
+    }
+
     @java.lang.SuppressWarnings("all")
-        public ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl(final ProvisioningCriteriaDefinitionJsonDeserializer fromApiJsonDeserializer, final ProvisioningCriteriaAssembler provisioningCriteriaAssembler, final ProvisioningCriteriaRepository provisioningCriteriaRepository, final FromJsonHelper fromApiJsonHelper, final GLAccountRepository glAccountRepository, final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService) {
+        public ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl(final ProvisioningCriteriaDefinitionJsonDeserializer fromApiJsonDeserializer, final ProvisioningCriteriaAssembler provisioningCriteriaAssembler, final ProvisioningCriteriaRepository provisioningCriteriaRepository, final FromJsonHelper fromApiJsonHelper, final GLAccountPersistablePort glAccountPersistablePort, final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService) {
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.provisioningCriteriaAssembler = provisioningCriteriaAssembler;
         this.provisioningCriteriaRepository = provisioningCriteriaRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
     }
 }

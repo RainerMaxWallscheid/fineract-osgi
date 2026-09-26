@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.organisation.provisioning.starter;
 
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesReadPlatformService;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -65,9 +65,9 @@ public class OrganisationProvisioningConfiguration {
     @ConditionalOnMissingBean(ProvisioningCriteriaAssembler.class)
     public ProvisioningCriteriaAssembler provisioningCriteriaAssembler(FromJsonHelper fromApiJsonHelper,
             ProvisioningCategoryRepository provisioningCategoryRepository, LoanProductExistencePort loanProductExistencePort,
-            GLAccountRepository glAccountRepository, PlatformSecurityContext platformSecurityContext) {
+            GLAccountPersistablePort glAccountPersistablePort, PlatformSecurityContext platformSecurityContext) {
         return new ProvisioningCriteriaAssembler(fromApiJsonHelper, provisioningCategoryRepository, loanProductExistencePort,
-                glAccountRepository, platformSecurityContext);
+                glAccountPersistablePort, platformSecurityContext);
     }
 
     @Bean
@@ -84,10 +84,10 @@ public class OrganisationProvisioningConfiguration {
     public ProvisioningCriteriaWritePlatformService provisioningCriteriaWritePlatformService(
             ProvisioningCriteriaDefinitionJsonDeserializer fromApiJsonDeserializer,
             ProvisioningCriteriaAssembler provisioningCriteriaAssembler, ProvisioningCriteriaRepository provisioningCriteriaRepository,
-            FromJsonHelper fromApiJsonHelper, GLAccountRepository glAccountRepository,
+            FromJsonHelper fromApiJsonHelper, GLAccountPersistablePort glAccountPersistablePort,
             ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService) {
         return new ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl(fromApiJsonDeserializer, provisioningCriteriaAssembler,
-                provisioningCriteriaRepository, fromApiJsonHelper, glAccountRepository, provisioningEntriesReadPlatformService);
+                provisioningCriteriaRepository, fromApiJsonHelper, glAccountPersistablePort, provisioningEntriesReadPlatformService);
     }
 
 }

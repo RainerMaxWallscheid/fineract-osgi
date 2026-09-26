@@ -27,8 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -46,7 +45,7 @@ public class ProvisioningCriteriaAssembler {
     private final FromJsonHelper fromApiJsonHelper;
     private final ProvisioningCategoryRepository provisioningCategoryRepository;
     private final LoanProductExistencePort loanProductExistencePort;
-    private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final PlatformSecurityContext platformSecurityContext;
 
     public List<Long> parseLoanProductIds(final JsonElement jsonElement) {
@@ -113,17 +112,24 @@ public class ProvisioningCriteriaAssembler {
         Long liabilityAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_LIABILITY_ACCOUNT_PARAM, jsonObject);
         Long expenseAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_EXPENSE_ACCOUNT_PARAM, jsonObject);
         ProvisioningCategory provisioningCategory = provisioningCategoryRepository.findById(categoryId).orElse(null);
-        GLAccount liabilityAccount = glAccountRepository.findById(liabilityAccountId).orElse(null);
-        GLAccount expenseAccount = glAccountRepository.findById(expenseAccountId).orElse(null);
+        final Object liabilityAccount = optionalGlAccount(liabilityAccountId);
+        final Object expenseAccount = optionalGlAccount(expenseAccountId);
         return ProvisioningCriteriaDefinition.newPrivisioningCriteria(criteria, provisioningCategory, minimumAge, maximumAge, provisioningpercentage, liabilityAccount, expenseAccount);
     }
 
+    private Object optionalGlAccount(final Long accountId) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        return this.glAccountPersistablePort.persistableById(accountId);
+    }
+
     @java.lang.SuppressWarnings("all")
-        public ProvisioningCriteriaAssembler(final FromJsonHelper fromApiJsonHelper, final ProvisioningCategoryRepository provisioningCategoryRepository, final LoanProductExistencePort loanProductExistencePort, final GLAccountRepository glAccountRepository, final PlatformSecurityContext platformSecurityContext) {
+        public ProvisioningCriteriaAssembler(final FromJsonHelper fromApiJsonHelper, final ProvisioningCategoryRepository provisioningCategoryRepository, final LoanProductExistencePort loanProductExistencePort, final GLAccountPersistablePort glAccountPersistablePort, final PlatformSecurityContext platformSecurityContext) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.provisioningCategoryRepository = provisioningCategoryRepository;
         this.loanProductExistencePort = loanProductExistencePort;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.platformSecurityContext = platformSecurityContext;
     }
 }
