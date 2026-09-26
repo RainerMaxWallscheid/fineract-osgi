@@ -55,7 +55,6 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.WorkingCapitalLoanConstants;
 import org.apache.fineract.portfolio.workingcapitalloan.accounting.WorkingCapitalLoanAccountingProcessor;
@@ -249,7 +248,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         changes.put(WorkingCapitalLoanConstants.actualDisbursementDateParamName, actualDisbursementDate);
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
         changes.put(WorkingCapitalLoanConstants.classificationIdParamName, classificationId);
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         this.stateMachine.transition(WorkingCapitalLoanEvent.LOAN_DISBURSED, loan);
         if (!loan.getDisbursementDetails().isEmpty()) {
             loan.getDisbursementDetails().getFirst().setActualDisbursementDate(actualDisbursementDate);
@@ -348,7 +347,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         transactionRepository.saveAndFlush(fromTxn);
     }
 
-    private WorkingCapitalLoanTransaction createAndPersistDiscountFeeTransaction(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction disbursementTransaction, ExternalId txnExternalId, BigDecimal amount, LocalDate transactionDate, Object classification, PaymentDetail paymentDetail) {
+    private WorkingCapitalLoanTransaction createAndPersistDiscountFeeTransaction(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction disbursementTransaction, ExternalId txnExternalId, BigDecimal amount, LocalDate transactionDate, Object classification, Object paymentDetail) {
         if (amount != null) {
             loan.getLoanProductRelatedDetails().setDiscount(amount);
         }
@@ -389,7 +388,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final Object classification = classificationId != null ? Optional.ofNullable(this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
         final Map<String, Object> changes = new LinkedHashMap<>();
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         handleNote(loan, command, changes);
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, amount);
         changes.put(WorkingCapitalLoanConstants.relatedResourceIdParamName, relatedDisbursementTransactionId);
@@ -426,7 +425,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final Object classification = classificationId != null ? Optional.ofNullable(this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
         final Map<String, Object> changes = new LinkedHashMap<>();
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final WorkingCapitalLoanTransaction adjustmentTransaction = WorkingCapitalLoanTransaction.discountFeeAdjustment(loan, txnExternalId, amount, transactionDate, classification, paymentDetail);
         transactionRepository.saveAndFlush(adjustmentTransaction);
         saveNewTransactionRelation(adjustmentTransaction, relatedDiscountTransaction, LoanTransactionRelationTypeEnum.RELATED);
@@ -505,7 +504,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put(WorkingCapitalLoanConstants.transactionDateParamName, transactionDate);
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final Long classificationId = command.longValueOfParameterNamed(WorkingCapitalLoanConstants.classificationIdParamName);
         final Object classification = classificationId != null ? this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME, classificationId) : null;
         changes.put(WorkingCapitalLoanConstants.classificationIdParamName, classificationId);
@@ -538,7 +537,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         }
     }
 
-    private WorkingCapitalLoanTransaction resolveNewTransaction(final LoanTransactionType transactionType, WorkingCapitalLoan loan, BigDecimal transactionAmount, PaymentDetail paymentDetail, LocalDate transactionDate, Object classification, ExternalId txnExternalId) {
+    private WorkingCapitalLoanTransaction resolveNewTransaction(final LoanTransactionType transactionType, WorkingCapitalLoan loan, BigDecimal transactionAmount, Object paymentDetail, LocalDate transactionDate, Object classification, ExternalId txnExternalId) {
         return switch (transactionType) {
             case REPAYMENT -> WorkingCapitalLoanTransaction.repayment(loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
             case GOODWILL_CREDIT -> WorkingCapitalLoanTransaction.goodwillCredit(loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
@@ -574,7 +573,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put(WorkingCapitalLoanConstants.transactionDateParamName, transactionDate);
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final Long classificationId = command.longValueOfParameterNamed(WorkingCapitalLoanConstants.classificationIdParamName);
         final Object classification = classificationId != null ? this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME, classificationId) : null;
         changes.put(WorkingCapitalLoanConstants.classificationIdParamName, classificationId);
@@ -685,16 +684,16 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         return makeRepaymentLikeTransaction(loanId, command, LoanTransactionType.GOODWILL_CREDIT);
     }
 
-    private PaymentDetail createAndPersistPaymentDetailFromCommand(final JsonCommand command, final Map<String, Object> changes) {
+    private Object createAndPersistPaymentDetailFromCommand(final JsonCommand command, final Map<String, Object> changes) {
         final JsonElement paymentDetailsElement = command.jsonElement(WorkingCapitalLoanConstants.paymentDetailsParamName);
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonNull()) {
             return null;
         }
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonObject()) {
             final JsonCommand paymentDetailsCommand = JsonCommand.fromExistingCommand(command, paymentDetailsElement);
-            return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(paymentDetailsCommand, changes);
+            return paymentDetailService.createAndPersistPaymentDetail(paymentDetailsCommand, changes);
         }
-        return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(command, changes);
+        return paymentDetailService.createAndPersistPaymentDetail(command, changes);
     }
 
     private void updateBalanceOnDisburse(final WorkingCapitalLoan loan, final BigDecimal disbursedAmount) {

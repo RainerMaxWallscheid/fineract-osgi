@@ -42,7 +42,6 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.WorkingCapitalLoanConstants;
 import org.apache.fineract.portfolio.workingcapitalloan.accounting.WorkingCapitalLoanAccountingProcessor;
@@ -125,7 +124,7 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
         changes.put(WorkingCapitalLoanChargeConstants.amountParamName, amount);
         changes.put(WorkingCapitalLoanChargeConstants.transactionDateParamName, transactionDate);
         changes.put(WorkingCapitalLoanChargeConstants.externalIdParamName, externalId);
-        final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
+        final Object paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final WorkingCapitalLoanTransaction adjustmentTx = WorkingCapitalLoanTransaction.chargeAdjustment(loan, externalId, amount, transactionDate, paymentDetail);
         businessEventNotifierService.notifyPreBusinessEvent(new WorkingCapitalLoanChargeAdjustmentPreBusinessEvent(adjustmentTx, loan.getId()));
         final WorkingCapitalLoanTransactionRelation relation = WorkingCapitalLoanTransactionRelation.linkToCharge(adjustmentTx, wcCharge, LoanTransactionRelationTypeEnum.CHARGE_ADJUSTMENT);
@@ -183,16 +182,16 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
         }
     }
 
-    private PaymentDetail createAndPersistPaymentDetailFromCommand(final JsonCommand command, final Map<String, Object> changes) {
+    private Object createAndPersistPaymentDetailFromCommand(final JsonCommand command, final Map<String, Object> changes) {
         final JsonElement paymentDetailsElement = command.jsonElement(WorkingCapitalLoanConstants.paymentDetailsParamName);
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonNull()) {
             return null;
         }
         if (paymentDetailsElement != null && paymentDetailsElement.isJsonObject()) {
             final JsonCommand paymentDetailsCommand = JsonCommand.fromExistingCommand(command, paymentDetailsElement);
-            return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(paymentDetailsCommand, changes);
+            return paymentDetailService.createAndPersistPaymentDetail(paymentDetailsCommand, changes);
         }
-        return (PaymentDetail) paymentDetailService.createAndPersistPaymentDetail(command, changes);
+        return paymentDetailService.createAndPersistPaymentDetail(command, changes);
     }
 
     private WorkingCapitalLoanCharge assemblyChargeFromCommand(WorkingCapitalLoan loan, JsonCommand command) {
