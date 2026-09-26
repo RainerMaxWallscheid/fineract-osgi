@@ -174,7 +174,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Transactional
     @Override
     public LoanTransaction makeRepayment(final LoanTransactionType repaymentTransactionType, final Loan loan,
-            final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final String noteText,
+            final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail, final String noteText,
             final ExternalId txnExternalId, final boolean isRecoveryRepayment, final String chargeRefundChargeType,
             boolean isAccountTransfer, HolidayDetailDTO holidayDetailDto, Boolean isHolidayValidationDone) {
         return makeRepayment(repaymentTransactionType, loan, transactionDate, transactionAmount, paymentDetail, noteText, txnExternalId,
@@ -212,7 +212,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Transactional
     @Override
     public LoanTransaction makeRepayment(final LoanTransactionType repaymentTransactionType, Loan loan, final LocalDate transactionDate,
-            final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final String noteText, final ExternalId txnExternalId,
+            final BigDecimal transactionAmount, final Object paymentDetail, final String noteText, final ExternalId txnExternalId,
             final boolean isRecoveryRepayment, final String chargeRefundChargeType, boolean isAccountTransfer,
             HolidayDetailDTO holidayDetailDto, Boolean isHolidayValidationDone, final boolean isLoanToLoanTransfer) {
         checkClientOrGroupActive(loan);

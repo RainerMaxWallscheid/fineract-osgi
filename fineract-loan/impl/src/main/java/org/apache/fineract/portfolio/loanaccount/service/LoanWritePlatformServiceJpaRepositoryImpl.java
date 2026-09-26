@@ -216,6 +216,7 @@ import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequired
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecksRepository;
@@ -1079,8 +1080,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             changes.put(LoanApiConstants.externalIdParameterName, txnExternalId);
         }
         Loan loan = this.loanAssembler.assembleFrom(loanId);
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
-                changes);
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         final Boolean isHolidayValidationDone = false;
         final HolidayDetailDTO holidayDetailDto = null;
         boolean isAccountTransfer = false;
@@ -1140,12 +1140,12 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         for (final SingleRepaymentCommand singleLoanRepaymentCommand : repaymentCommand) {
             if (singleLoanRepaymentCommand != null) {
                 final Loan loan = this.loanAssembler.assembleFrom(singleLoanRepaymentCommand.getLoanId());
-                final PaymentDetail paymentDetail = (PaymentDetail) singleLoanRepaymentCommand.getPaymentDetail();
+                final Object paymentDetail = singleLoanRepaymentCommand.getPaymentDetail();
                 ExternalId externalId = singleLoanRepaymentCommand.getExternalId();
                 if (externalId.isEmpty() && configurationDomainService.isExternalIdAutoGenerationEnabled()) {
                     externalId = ExternalId.generate();
                 }
-                if (paymentDetail != null && paymentDetail.getId() == null) {
+                if (paymentDetail != null && PaymentDetailAssociation.id(paymentDetail) == null) {
                     this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
                 }
                 final String chargeRefundChargeType = null;

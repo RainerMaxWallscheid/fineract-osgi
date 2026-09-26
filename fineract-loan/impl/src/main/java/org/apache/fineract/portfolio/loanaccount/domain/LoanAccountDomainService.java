@@ -34,7 +34,7 @@ import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 public interface LoanAccountDomainService {
 
     LoanTransaction makeRepayment(LoanTransactionType repaymentTransactionType, Loan loan, LocalDate transactionDate,
-            BigDecimal transactionAmount, PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId,
+            BigDecimal transactionAmount, Object paymentDetail, String noteText, ExternalId txnExternalId,
             boolean isRecoveryRepayment, String chargeRefundChargeType, boolean isAccountTransfer, HolidayDetailDTO holidayDetailDto,
             Boolean isHolidayValidationDone);
 
@@ -67,7 +67,7 @@ public interface LoanAccountDomainService {
     void setLoanDelinquencyTag(Loan loan, LocalDate transactionDate, List<LoanDelinquencyActionData> effectiveDelinquencyList);
 
     LoanTransaction makeRepayment(LoanTransactionType repaymentTransactionType, Loan loan, LocalDate transactionDate,
-            BigDecimal transactionAmount, PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId,
+            BigDecimal transactionAmount, Object paymentDetail, String noteText, ExternalId txnExternalId,
             boolean isRecoveryRepayment, String chargeRefundChargeType, boolean isAccountTransfer, HolidayDetailDTO holidayDetailDto,
             Boolean isHolidayValidationDone, boolean isLoanToLoanTransfer);
 

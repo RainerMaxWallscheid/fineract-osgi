@@ -101,7 +101,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final PortfolioAccountType fromAccountType = PortfolioAccountType.fromInt(fromAccountTypeId);
         final Integer toAccountTypeId = command.integerValueSansLocaleOfParameterNamed(toAccountTypeParamName);
         final PortfolioAccountType toAccountType = PortfolioAccountType.fromInt(toAccountTypeId);
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         Long fromSavingsAccountId = null;
         Long transferDetailId = null;
         boolean isInterestTransfer = false;
@@ -277,7 +277,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                 final String chargeRefundChargeType = null;
                 loanTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.DOWN_PAYMENT, toLoanAccount,
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
+                        accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
                         isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
                 toLoanAccount = loanTransaction.getLoan();
             } else {
@@ -287,7 +287,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                 final String chargeRefundChargeType = null;
                 loanTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.REPAYMENT, toLoanAccount,
                         accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                        (PaymentDetail) accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
+                        accountTransferDTO.getPaymentDetail(), null, externalId, isRecoveryRepayment, chargeRefundChargeType,
                         isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
                 toLoanAccount = loanTransaction.getLoan();
             }
@@ -394,7 +394,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final String chargeRefundChargeType = null;
         ExternalId externalIdForRepayment = externalIdFactory.create();
         LoanTransaction repayTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.REPAYMENT, toLoanAccount,
-                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(),
+                accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(),
                 null, externalIdForRepayment, false, chargeRefundChargeType, isAccountTransfer, null, false, true);
         AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleLoanToLoanTransfer(accountTransferDTO,
                 fromLoanAccount, toLoanAccount, disburseTransaction, repayTransaction);
