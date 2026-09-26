@@ -19,8 +19,7 @@
 package org.apache.fineract.portfolio.collateral.service;
 
 import java.util.Map;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -54,7 +53,7 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     private final PlatformSecurityContext context;
     private final LoanExistencePort loanExistencePort;
     private final LoanCollateralRepository collateralRepository;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer;
 
     @Transactional
@@ -67,7 +66,7 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
             if (!this.loanExistencePort.isSubmittedAndPendingApproval(loanId)) {
                 throw new CollateralCannotBeCreatedException(LoanCollateralCannotBeCreatedReason.LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE, loanId);
             }
-            final CodeValue collateralType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralCommand.getCollateralTypeId());
+            final Object collateralType = this.codeValuePersistablePort.persistableByCodeNameAndId(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralCommand.getCollateralTypeId());
             final LoanCollateral collateral = LoanCollateral.fromJson(loanId, collateralType, command);
             this.collateralRepository.saveAndFlush(collateral);
             return  //
@@ -92,11 +91,11 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
             if (!this.loanExistencePort.existsById(loanId)) {
                 throw new LoanNotFoundException(loanId);
             }
-            CodeValue collateralType = null;
+            Object collateralType = null;
             final LoanCollateral collateralForUpdate = this.collateralRepository.findById(collateralId).orElseThrow(() -> new CollateralNotFoundException(loanId, collateralId));
             final Map<String, Object> changes = collateralForUpdate.update(command);
             if (changes.containsKey(CollateralJSONinputParams.COLLATERAL_TYPE_ID.getValue())) {
-                collateralType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralTypeId);
+                collateralType = this.codeValuePersistablePort.persistableByCodeNameAndId(CollateralApiConstants.COLLATERAL_CODE_NAME, collateralTypeId);
                 collateralForUpdate.setCollateralType(collateralType);
             }
             if (!this.loanExistencePort.isSubmittedAndPendingApproval(loanId)) {
@@ -147,11 +146,11 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     }
 
     @java.lang.SuppressWarnings("all")
-        public CollateralWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanExistencePort loanExistencePort, final LoanCollateralRepository collateralRepository, final CodeValueRepositoryWrapper codeValueRepository, final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
+        public CollateralWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanExistencePort loanExistencePort, final LoanCollateralRepository collateralRepository, final CodeValuePersistablePort codeValuePersistablePort, final CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
         this.context = context;
         this.loanExistencePort = loanExistencePort;
         this.collateralRepository = collateralRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.collateralCommandFromApiJsonDeserializer = collateralCommandFromApiJsonDeserializer;
     }
 }

@@ -154,6 +154,11 @@ class LoanOriginatorAvroMapperTest {
                 final Object persistable = persistableById(codeValueId);
                 return persistable instanceof CodeValue codeValue ? codeValue.toData() : null;
             }
+
+            @Override
+            public Object persistableByCodeNameAndId(final String codeName, final Long codeValueId) {
+                return persistableById(codeValueId);
+            }
         };
     }
 }

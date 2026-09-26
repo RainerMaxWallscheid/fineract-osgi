@@ -21,6 +21,7 @@ package org.apache.fineract.infrastructure.codes.service;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.springframework.stereotype.Service;
 
@@ -56,5 +57,14 @@ public class CodeValuePersistablePortAdapter implements CodeValuePersistablePort
     public CodeValueData toData(final Long codeValueId) {
         final Object persistable = persistableById(codeValueId);
         return persistable instanceof CodeValue codeValue ? codeValue.toData() : null;
+    }
+
+    @Override
+    public Object persistableByCodeNameAndId(final String codeName, final Long codeValueId) {
+        final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(codeName, codeValueId);
+        if (codeValue == null) {
+            throw new CodeValueNotFoundException(codeName, codeValueId);
+        }
+        return codeValue;
     }
 }

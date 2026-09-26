@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.collateral.starter;
 
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateralRepository;
@@ -56,10 +57,10 @@ public class CollateralConfiguration {
     @ConditionalOnMissingBean(CollateralWritePlatformService.class)
     public CollateralWritePlatformService collateralWritePlatformService(PlatformSecurityContext context,
             LoanExistencePort loanExistencePort, LoanCollateralRepository collateralRepository,
-            CodeValueRepositoryWrapper codeValueRepository,
+            CodeValuePersistablePort codeValuePersistablePort,
             CollateralCommandFromApiJsonDeserializer collateralCommandFromApiJsonDeserializer) {
         return new CollateralWritePlatformServiceJpaRepositoryImpl(context, loanExistencePort, collateralRepository,
-                codeValueRepository, collateralCommandFromApiJsonDeserializer);
+                codeValuePersistablePort, collateralCommandFromApiJsonDeserializer);
     }
 
 }
