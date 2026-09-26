@@ -34,7 +34,8 @@ import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsFor
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingValidator;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
@@ -61,7 +62,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     protected final ProductToGLAccountMappingRepository accountMappingRepository;
     protected final FromJsonHelper fromApiJsonHelper;
     private final ChargeDefinitionPort chargeDefinitionPort;
-    protected final GLAccountRepositoryWrapper accountRepositoryWrapper;
+    protected final GLAccountPersistablePort glAccountPersistablePort;
     private final PaymentTypePersistablePort paymentTypePersistablePort;
     private final CodeValueRepository codeValueRepository;
 
@@ -69,7 +70,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
         if (accountId != null) {
             // optional entries may be null
-            final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
+            final Object glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
             final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderTypeId);
             this.accountMappingRepository.saveAndFlush(accountMapping);
         }
@@ -103,7 +104,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                 }
             } else {
                 if (accountMapping.getGlAccountId() != null && !Objects.equals(accountMapping.getGlAccountId(), accountId)) {
-                    final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
+                    final Object glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                     changes.put(paramName, accountId);
                     accountMapping.setGlAccount(glAccount);
                     this.accountMappingRepository.saveAndFlush(accountMapping);
@@ -118,12 +119,12 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         if (accountId != null) {
             final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId, portfolioProductType.getValue(), accountTypeId);
             if (accountMapping == null) {
-                final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
+                final Object glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                 changes.put(paramName, accountId);
                 ProductToGLAccountMapping newAccountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(accountTypeId);
                 this.accountMappingRepository.saveAndFlush(newAccountMapping);
             } else if (accountMapping.getGlAccountId() != null && !Objects.equals(accountMapping.getGlAccountId(), accountId)) {
-                final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
+                final Object glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                 changes.put(paramName, accountId);
                 accountMapping.setGlAccount(glAccount);
                 this.accountMappingRepository.saveAndFlush(accountMapping);
@@ -289,7 +290,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                     if (inputChargeToIncomeAccountMap.containsKey(currentCharge)) {
                         final Long newGLAccountId = inputChargeToIncomeAccountMap.get(currentCharge);
                         if (!newGLAccountId.equals(chargeToIncomeAccountMapping.getGlAccountId())) {
-                            final GLAccount glAccount;
+                            final Object glAccount;
                             if (isPenalty) {
                                 glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), GLAccountType.INCOME, newGLAccountId);
                             } else {
@@ -352,7 +353,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                     if (inputPaymentChannelFundSourceMap.containsKey(currentPaymentChannelId)) {
                         final Long newGLAccountId = inputPaymentChannelFundSourceMap.get(currentPaymentChannelId);
                         if (!newGLAccountId.equals(existingPaymentChannelToFundSourceMapping.getGlAccountId())) {
-                            final GLAccount glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), newGLAccountId);
+                            final Object glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), newGLAccountId);
                             existingPaymentChannelToFundSourceMapping.setGlAccount(glAccount);
                             this.accountMappingRepository.saveAndFlush(existingPaymentChannelToFundSourceMapping);
                         }
@@ -478,7 +479,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         if (paymentType == null) {
             throw new PaymentTypeNotFoundException(paymentTypeId);
         }
-        final GLAccount glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), paymentTypeSpecificFundAccountId);
+        final Object glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), paymentTypeSpecificFundAccountId);
         final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.FUND_SOURCE.getValue()).setPaymentType(paymentType);
         this.accountMappingRepository.saveAndFlush(accountMapping);
     }
@@ -491,7 +492,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         this.chargeDefinitionPort.getActiveCharge(chargeId);
         // TODO Vishwas: Need to validate if given charge is fee or Penalty
         // based on input condition
-        GLAccount glAccount;
+        Object glAccount;
         /**
          * Both CASH and Accrual placeholders have the same value for income from Interest and penalties
          */
@@ -567,29 +568,40 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
      * @param accountId
      * @return
      */
-    public GLAccount getAccountByIdAndType(final String paramName, final GLAccountType expectedAccountType, final Long accountId) {
-        final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
+    public Object getAccountByIdAndType(final String paramName, final GLAccountType expectedAccountType, final Long accountId) {
+        final Object glAccount = glAccountById(accountId);
+        final Integer accountType = this.glAccountPersistablePort.accountType(accountId);
         // validate account is of the expected Type
-        if (glAccount.getType().intValue() != expectedAccountType.getValue()) {
-            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountType.fromInt(glAccount.getType()).toString(), expectedAccountType.toString());
+        if (accountType.intValue() != expectedAccountType.getValue()) {
+            throw new ProductToGLAccountMappingInvalidException(paramName, this.glAccountPersistablePort.name(accountId), accountId,
+                    GLAccountType.fromInt(accountType).toString(), expectedAccountType.toString());
         }
         return glAccount;
     }
 
-    public GLAccount getAccountById(final String paramName, final Long accountId) {
-        final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
-        return glAccount;
+    public Object getAccountById(final String paramName, final Long accountId) {
+        return glAccountById(accountId);
     }
 
-    public GLAccount getAccountByIdAndType(final String paramName, final List<GLAccountType> expectedAccountTypes, final Long accountId) {
-        final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
+    public Object getAccountByIdAndType(final String paramName, final List<GLAccountType> expectedAccountTypes, final Long accountId) {
+        final Object glAccount = glAccountById(accountId);
+        final Integer accountType = this.glAccountPersistablePort.accountType(accountId);
         // validate account is of the expected Type
         List<Integer> glAccountTypeValues = new ArrayList<>();
         for (GLAccountType glAccountType : expectedAccountTypes) {
             glAccountTypeValues.add(glAccountType.getValue());
         }
-        if (!glAccountTypeValues.contains(glAccount.getType())) {
-            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountType.fromInt(glAccount.getType()).toString(), glAccountTypeValues.toString());
+        if (!glAccountTypeValues.contains(accountType)) {
+            throw new ProductToGLAccountMappingInvalidException(paramName, this.glAccountPersistablePort.name(accountId), accountId,
+                    GLAccountType.fromInt(accountType).toString(), glAccountTypeValues.toString());
+        }
+        return glAccount;
+    }
+
+    private Object glAccountById(final Long accountId) {
+        final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(accountId);
         }
         return glAccount;
     }
@@ -668,12 +680,12 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
+        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
         this.accountRepository = accountRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
-        this.accountRepositoryWrapper = accountRepositoryWrapper;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.paymentTypePersistablePort = paymentTypePersistablePort;
         this.codeValueRepository = codeValueRepository;
     }

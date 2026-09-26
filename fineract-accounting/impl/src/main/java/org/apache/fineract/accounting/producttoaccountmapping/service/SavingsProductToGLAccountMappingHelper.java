@@ -26,7 +26,7 @@ import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsFor
 import org.apache.fineract.accounting.common.AccountingConstants.SavingProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
@@ -42,9 +42,9 @@ public class SavingsProductToGLAccountMappingHelper extends ProductToGLAccountMa
 
     public SavingsProductToGLAccountMappingHelper(final GLAccountRepository glAccountRepository,
             final ProductToGLAccountMappingRepository glAccountMappingRepository, final FromJsonHelper fromApiJsonHelper,
-            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper,
+            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort,
             final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
-        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, accountRepositoryWrapper,
+        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort,
                 paymentTypePersistablePort, codeValueRepository);
     }
 

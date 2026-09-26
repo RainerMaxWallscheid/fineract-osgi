@@ -26,9 +26,8 @@ import org.apache.fineract.accounting.common.AccountingConstants.AccrualAccounts
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForLoan;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingRuleType;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -47,9 +46,9 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
 
     public LoanProductToGLAccountMappingHelper(final GLAccountRepository glAccountRepository,
             final ProductToGLAccountMappingRepository glAccountMappingRepository, final FromJsonHelper fromApiJsonHelper,
-            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper,
+            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort,
             final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
-        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, accountRepositoryWrapper,
+        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort,
                 paymentTypePersistablePort, codeValueRepository);
     }
 
@@ -481,11 +480,11 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
         GLAccountType gLAccountType = null;
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
         if (accountId != null) {
-            final GLAccount glAccount = getAccountById(paramName, accountId);
-            gLAccountType = GLAccountType.fromInt(glAccount.getType());
+            getAccountById(paramName, accountId);
+            gLAccountType = GLAccountType.fromInt(this.glAccountPersistablePort.accountType(accountId));
             if (!allowedTypes.contains(gLAccountType)) {
-                throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, gLAccountType.toString(),
-                        GLAccountType.ASSET.getCode() + " or " + GLAccountType.LIABILITY.getCode());
+                throw new ProductToGLAccountMappingInvalidException(paramName, this.glAccountPersistablePort.name(accountId), accountId,
+                        gLAccountType.toString(), GLAccountType.ASSET.getCode() + " or " + GLAccountType.LIABILITY.getCode());
             }
         }
         return gLAccountType;
