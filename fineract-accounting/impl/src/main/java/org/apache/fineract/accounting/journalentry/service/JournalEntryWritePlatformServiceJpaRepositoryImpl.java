@@ -155,9 +155,9 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
                     }
                     saveAllDebitOrCreditEntries(journalEntryCommand, office, paymentDetail, currencyCode, transactionDate, journalEntryCommand.getCredits(), transactionId, JournalEntryType.CREDIT, referenceNumber, externalAssetOwnerId);
                 } else {
-                    final GLAccount creditAccountHead = (GLAccount) GLAccountAssociation.persistableById(accountingRule.getAccountToCreditId());
-                    validateGLAccountForTransaction(creditAccountHead);
-                    validateDebitOrCreditArrayForExistingGLAccount(creditAccountHead, journalEntryCommand.getCredits());
+                    final Long creditAccountId = accountingRule.getAccountToCreditId();
+                    validateGLAccountForTransaction(creditAccountId);
+                    validateDebitOrCreditArrayForExistingGLAccount(creditAccountId, journalEntryCommand.getCredits());
                     saveAllDebitOrCreditEntries(journalEntryCommand, office, paymentDetail, currencyCode, transactionDate, journalEntryCommand.getCredits(), transactionId, JournalEntryType.CREDIT, referenceNumber, externalAssetOwnerId);
                 }
                 if (accountingRule.getAccountToDebitId() == null) {
@@ -170,9 +170,9 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
                     }
                     saveAllDebitOrCreditEntries(journalEntryCommand, office, paymentDetail, currencyCode, transactionDate, journalEntryCommand.getDebits(), transactionId, JournalEntryType.DEBIT, referenceNumber, externalAssetOwnerId);
                 } else {
-                    final GLAccount debitAccountHead = (GLAccount) GLAccountAssociation.persistableById(accountingRule.getAccountToDebitId());
-                    validateGLAccountForTransaction(debitAccountHead);
-                    validateDebitOrCreditArrayForExistingGLAccount(debitAccountHead, journalEntryCommand.getDebits());
+                    final Long debitAccountId = accountingRule.getAccountToDebitId();
+                    validateGLAccountForTransaction(debitAccountId);
+                    validateDebitOrCreditArrayForExistingGLAccount(debitAccountId, journalEntryCommand.getDebits());
                     saveAllDebitOrCreditEntries(journalEntryCommand, office, paymentDetail, currencyCode, transactionDate, journalEntryCommand.getDebits(), transactionId, JournalEntryType.DEBIT, referenceNumber, externalAssetOwnerId);
                 }
             } else {
@@ -190,12 +190,12 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         }
     }
 
-    private void validateDebitOrCreditArrayForExistingGLAccount(final GLAccount glaccount, final SingleDebitOrCreditEntryCommand[] creditOrDebits) {
+    private void validateDebitOrCreditArrayForExistingGLAccount(final Long glAccountId, final SingleDebitOrCreditEntryCommand[] creditOrDebits) {
         if (creditOrDebits.length != 1) {
             throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.INVALID_DEBIT_OR_CREDIT_ACCOUNTS, null, null, null);
         }
         for (final SingleDebitOrCreditEntryCommand creditOrDebit : creditOrDebits) {
-            if (glaccount == null || creditOrDebit == null || !Objects.equals(glaccount.getId(), creditOrDebit.getGlAccountId())) {
+            if (glAccountId == null || creditOrDebit == null || !Objects.equals(glAccountId, creditOrDebit.getGlAccountId())) {
                 throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.INVALID_DEBIT_OR_CREDIT_ACCOUNTS, null, null, null);
             }
         }
@@ -257,11 +257,18 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         }
     }
 
-    private void validateGLAccountForTransaction(final GLAccount creditOrDebitAccountHead) {
-        if (creditOrDebitAccountHead.isDisabled()) {
-            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.GL_ACCOUNT_DISABLED, null, creditOrDebitAccountHead.getName(), creditOrDebitAccountHead.getGlCode());
-        } else if (!creditOrDebitAccountHead.isManualEntriesAllowed()) {
-            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.GL_ACCOUNT_MANUAL_ENTRIES_NOT_PERMITTED, null, creditOrDebitAccountHead.getName(), creditOrDebitAccountHead.getGlCode());
+    private void validateGLAccountForTransaction(final Long glAccountId) {
+        final Object persistable = GLAccountAssociation.persistableById(glAccountId);
+        // A missing account still NPEs, matching the old isDisabled() call.
+        if (persistable == null) {
+            throw new NullPointerException();
+        }
+        final String glAccountName = GLAccountAssociation.name(glAccountId);
+        final String glCode = GLAccountAssociation.glCode(glAccountId);
+        if (Boolean.TRUE.equals(GLAccountAssociation.disabled(glAccountId))) {
+            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.GL_ACCOUNT_DISABLED, null, glAccountName, glCode);
+        } else if (!Boolean.TRUE.equals(GLAccountAssociation.manualEntriesAllowed(glAccountId))) {
+            throw new JournalEntryInvalidException(GlJournalEntryInvalidReason.GL_ACCOUNT_MANUAL_ENTRIES_NOT_PERMITTED, null, glAccountName, glCode);
         }
     }
 
@@ -438,7 +445,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
             final GLAccount glAccount = this.glAccountRepository.findById(singleDebitOrCreditEntryCommand.getGlAccountId()).orElseThrow(() -> new GLAccountNotFoundException(singleDebitOrCreditEntryCommand.getGlAccountId()));
-            validateGLAccountForTransaction(glAccount);
+            validateGLAccountForTransaction(glAccount.getId());
             String comments = command.getComments();
             if (!StringUtils.isBlank(singleDebitOrCreditEntryCommand.getComments())) {
                 comments = singleDebitOrCreditEntryCommand.getComments();
@@ -516,13 +523,13 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         if (!GLAccountType.fromInt(contraAccount.getType()).isEquityType()) {
             throw new GeneralPlatformDomainRuleException("error.msg.configuration.opening.balance.contra.account.value.is.invalid.account.type", "Global configuration \'office-opening-balances-contra-account\' value is not an equity type account", contraAccountId);
         }
-        validateGLAccountForTransaction(contraAccount);
+        validateGLAccountForTransaction(contraAccount.getId());
         final JournalEntryType contraType = getContraType(type);
         String comments = command.getComments();
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
             final GLAccount glAccount = this.glAccountRepository.findById(singleDebitOrCreditEntryCommand.getGlAccountId()).orElseThrow(() -> new GLAccountNotFoundException(singleDebitOrCreditEntryCommand.getGlAccountId()));
-            validateGLAccountForTransaction(glAccount);
+            validateGLAccountForTransaction(glAccount.getId());
             if (!StringUtils.isBlank(singleDebitOrCreditEntryCommand.getComments())) {
                 comments = singleDebitOrCreditEntryCommand.getComments();
             }

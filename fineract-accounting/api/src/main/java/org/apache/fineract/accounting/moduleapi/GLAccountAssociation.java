@@ -65,4 +65,12 @@ public final class GLAccountAssociation {
     public static Integer accountType(final Long glAccountId) {
         return port == null ? null : port.accountType(glAccountId);
     }
+
+    public static Boolean disabled(final Long glAccountId) {
+        return port == null ? null : port.disabled(glAccountId);
+    }
+
+    public static Boolean manualEntriesAllowed(final Long glAccountId) {
+        return port == null ? null : port.manualEntriesAllowed(glAccountId);
+    }
 }
