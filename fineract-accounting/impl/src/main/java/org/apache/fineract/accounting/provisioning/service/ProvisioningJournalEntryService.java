@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
@@ -99,28 +98,14 @@ public class ProvisioningJournalEntryService {
                 officeMap.put(key, list);
             }
         }
-        Map<GLAccount, BigDecimal> liabilityMap = new HashMap<>();
-        Map<GLAccount, BigDecimal> expenseMap = new HashMap<>();
+        Map<Long, BigDecimal> liabilityMap = new HashMap<>();
+        Map<Long, BigDecimal> expenseMap = new HashMap<>();
         for (Map.Entry<OfficeCurrencyKey, List<LoanProductProvisioningEntry>> entry : officeMap.entrySet()) {
             liabilityMap.clear();
             expenseMap.clear();
             for (LoanProductProvisioningEntry lppEntry : entry.getValue()) {
-                final GLAccount liabilityAccount = (GLAccount) GLAccountAssociation.persistableById(lppEntry.getLiabilityAccountId());
-                final GLAccount expenseAccount = (GLAccount) GLAccountAssociation.persistableById(lppEntry.getExpenseAccountId());
-                if (liabilityMap.containsKey(liabilityAccount)) {
-                    BigDecimal amount = liabilityMap.get(liabilityAccount);
-                    amount = amount.add(lppEntry.getReservedAmount());
-                    liabilityMap.put(liabilityAccount, amount);
-                } else {
-                    liabilityMap.put(liabilityAccount, BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
-                }
-                if (expenseMap.containsKey(expenseAccount)) {
-                    BigDecimal amount = expenseMap.get(expenseAccount);
-                    amount = amount.add(lppEntry.getReservedAmount());
-                    expenseMap.put(expenseAccount, amount);
-                } else {
-                    expenseMap.put(expenseAccount, BigDecimal.ZERO.add(lppEntry.getReservedAmount()));
-                }
+                addReservedAmount(liabilityMap, lppEntry.getLiabilityAccountId(), lppEntry.getReservedAmount());
+                addReservedAmount(expenseMap, lppEntry.getExpenseAccountId(), lppEntry.getReservedAmount());
             }
             createJournalEntry(provisioningEntry.getCreatedDate(), provisioningEntry.getId(), entry.getKey().officeId,
                     entry.getKey().currency, liabilityMap, expenseMap);
@@ -128,15 +113,21 @@ public class ProvisioningJournalEntryService {
         return "P" + provisioningEntry.getId();
     }
 
+    private void addReservedAmount(final Map<Long, BigDecimal> amounts, final Long glAccountId, final BigDecimal reservedAmount) {
+        // A missing account still aggregates under a null key, matching the old entity-identity map.
+        final Long accountKey = GLAccountAssociation.id(GLAccountAssociation.persistableById(glAccountId));
+        amounts.put(accountKey, amounts.getOrDefault(accountKey, BigDecimal.ZERO).add(reservedAmount));
+    }
+
     private void createJournalEntry(final LocalDate transactionDate, final Long entryId, final Long officeId, final String currencyCode,
-            final Map<GLAccount, BigDecimal> liabilityMap, final Map<GLAccount, BigDecimal> expenseMap) {
-        for (Map.Entry<GLAccount, BigDecimal> entry : liabilityMap.entrySet()) {
-            this.helper.createProvisioningCreditJournalEntry(transactionDate, entryId, officeId, currencyCode, entry.getKey(),
-                    entry.getValue());
+            final Map<Long, BigDecimal> liabilityMap, final Map<Long, BigDecimal> expenseMap) {
+        for (Map.Entry<Long, BigDecimal> entry : liabilityMap.entrySet()) {
+            this.helper.createProvisioningCreditJournalEntry(transactionDate, entryId, officeId, currencyCode,
+                    GLAccountAssociation.persistableById(entry.getKey()), entry.getValue());
         }
-        for (Map.Entry<GLAccount, BigDecimal> entry : expenseMap.entrySet()) {
-            this.helper.createProvisioningDebitJournalEntry(transactionDate, entryId, officeId, currencyCode, entry.getKey(),
-                    entry.getValue());
+        for (Map.Entry<Long, BigDecimal> entry : expenseMap.entrySet()) {
+            this.helper.createProvisioningDebitJournalEntry(transactionDate, entryId, officeId, currencyCode,
+                    GLAccountAssociation.persistableById(entry.getKey()), entry.getValue());
         }
     }
 
