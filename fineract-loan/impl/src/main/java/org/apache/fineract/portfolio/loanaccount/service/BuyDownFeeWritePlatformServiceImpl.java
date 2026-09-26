@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -80,7 +80,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
     private final ExternalIdFactory externalIdFactory;
     private final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final TransactionBoundApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -214,7 +214,8 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         final Long transactionClassificationId = command
                 .longValueOfParameterNamed(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME);
         if (transactionClassificationId != null) {
-            loanTransaction.setClassification(codeValueRepository.findByCodeNameAndId(codeName, transactionClassificationId));
+            loanTransaction.setClassification(
+                    this.codeValuePersistablePort.findByCodeNameAndId(codeName, transactionClassificationId));
         }
     }
 
@@ -223,7 +224,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
             final LoanAssembler loanAssembler, final LoanTransactionRepository loanTransactionRepository,
             final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final LoanJournalEntryPoster loanJournalEntryPoster,
             final ExternalIdFactory externalIdFactory, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository,
-            final BusinessEventNotifierService businessEventNotifierService, final CodeValueRepository codeValueRepository,
+            final BusinessEventNotifierService businessEventNotifierService, final CodeValuePersistablePort codeValuePersistablePort,
             final TransactionBoundApplicationEventPublisher eventPublisher) {
         this.loanTransactionValidator = loanTransactionValidator;
         this.loanAssembler = loanAssembler;
@@ -233,7 +234,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         this.externalIdFactory = externalIdFactory;
         this.loanBuyDownFeeBalanceRepository = loanBuyDownFeeBalanceRepository;
         this.businessEventNotifierService = businessEventNotifierService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.eventPublisher = eventPublisher;
     }
 }
