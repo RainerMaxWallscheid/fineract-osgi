@@ -39,7 +39,7 @@ public interface LoanAccountDomainService {
             Boolean isHolidayValidationDone);
 
     LoanTransaction makeRefund(Long accountId, CommandProcessingResultBuilder builderResult, LocalDate transactionDate,
-            BigDecimal transactionAmount, PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId);
+            BigDecimal transactionAmount, Object paymentDetail, String noteText, ExternalId txnExternalId);
 
     LoanTransaction makeDisburseTransaction(Long loanId, LocalDate transactionDate, BigDecimal transactionAmount,
             Object paymentDetail, String noteText, ExternalId txnExternalId, boolean isLoanToLoanTransfer);

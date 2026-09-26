@@ -354,7 +354,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             } else {
                 loanTransaction = this.loanAccountDomainService.makeRefund(accountTransferDTO.getFromAccountId(),
                         new CommandProcessingResultBuilder(), accountTransferDTO.getTransactionDate(),
-                        accountTransferDTO.getTransactionAmount(), (PaymentDetail) accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(),
+                        accountTransferDTO.getTransactionAmount(), accountTransferDTO.getPaymentDetail(), accountTransferDTO.getNoteText(),
                         externalId);
             }
             final LinkedSavingsAccountPort.TransferTxn deposit = this.linkedSavingsAccountPort.handleDeposit(toSavingsAccountId,

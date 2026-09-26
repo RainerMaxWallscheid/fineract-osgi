@@ -444,7 +444,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     @Override
     public LoanTransaction makeRefund(final Long accountId, final CommandProcessingResultBuilder builderResult,
-            final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final String noteText,
+            final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail, final String noteText,
             final ExternalId txnExternalId) {
         final Loan loan = this.loanAccountAssembler.assembleFrom(accountId);
         checkClientOrGroupActive(loan);
