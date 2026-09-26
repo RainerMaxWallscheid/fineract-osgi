@@ -24,7 +24,6 @@ import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.portfolio.client.domain.Client;
 
 public interface SmsCampaignWritePlatformService {
 
@@ -49,7 +48,7 @@ public interface SmsCampaignWritePlatformService {
 
     CampaignPreviewData previewMessage(JsonQuery query);
 
-    void insertDirectCampaignIntoSmsOutboundTable(Client client, SmsCampaign smsCampaign);
+    void insertDirectCampaignIntoSmsOutboundTable(Long clientId, SmsCampaign smsCampaign);
 
     void insertDirectCampaignIntoSmsOutboundTable(Long savingsAccountId, Long clientId, SmsCampaign smsCampaign);
 

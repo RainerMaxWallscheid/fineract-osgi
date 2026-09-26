@@ -45,13 +45,11 @@ import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -68,20 +66,15 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     private final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort;
     private final SavingsAccountExistencePort savingsAccountExistencePort;
     private final LoanExistencePort loanExistencePort;
-    private ClientRepositoryWrapper clientRepositoryWrapper;
-
-    @Autowired
-    public void setClientRepositoryWrapper(final ClientRepositoryWrapper clientRepositoryWrapper) {
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
-    }
+    private final ClientActivePort clientActivePort;
 
     @PostConstruct
     public void addListeners() {
         loanExistencePort.onApproved(this::notifyAcceptedLoanOwner);
         loanExistencePort.onRejected(this::notifyRejectedLoanOwner);
         loanExistencePort.onRepayment(this::sendSmsForLoanRepayment);
-        smsCampaignTriggerEventPort.onClientActivated(client -> notifyClientActivated((Client) client));
-        smsCampaignTriggerEventPort.onClientRejected(client -> notifyClientRejected((Client) client));
+        smsCampaignTriggerEventPort.onClientActivated(client -> notifyClientActivated(this.clientActivePort.id(client)));
+        smsCampaignTriggerEventPort.onClientRejected(client -> notifyClientRejected(this.clientActivePort.id(client)));
         smsCampaignTriggerEventPort.onSavingsActivated(this::notifySavingsAccountActivated);
         smsCampaignTriggerEventPort.onSavingsRejected(this::notifySavingsAccountRejected);
         smsCampaignTriggerEventPort.onSavingsDeposit(transaction -> sendSmsForSavingsTransaction(transaction, true));
@@ -112,20 +105,20 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         }
     }
 
-    private void notifyClientActivated(final Client client) {
+    private void notifyClientActivated(final Long clientId) {
         List<SmsCampaign> smsCampaigns = retrieveSmsCampaigns("Client Activated");
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign campaign : smsCampaigns) {
-                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(client, campaign);
+                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(clientId, campaign);
             }
         }
     }
 
-    private void notifyClientRejected(final Client client) {
+    private void notifyClientRejected(final Long clientId) {
         List<SmsCampaign> smsCampaigns = retrieveSmsCampaigns("Client Rejected");
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign campaign : smsCampaigns) {
-                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(client, campaign);
+                this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(clientId, campaign);
             }
         }
     }
@@ -158,24 +151,26 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
             for (SmsCampaign smsCampaign : smsCampaigns) {
                 try {
                     final var view = this.loanExistencePort.repaymentSmsView(leftoverTransaction);
-                    final Set<Client> groupClients = new HashSet<>();
+                    final Set<Long> groupClients = new HashSet<>();
                     if (view.invalidLoanType()) {
                         throw new InvalidLoanTypeException("Loan Type cannot be Invalid for the Triggered Sms Campaign");
                     }
                     if (view.groupLoan()) {
                         for (final Long memberId : this.groupActivePort.clientMemberIds(view.groupId())) {
-                            groupClients.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(memberId));
+                            this.clientActivePort.persistableById(memberId);
+                            groupClients.add(memberId);
                         }
                     } else {
                         if (view.clientId() != null) {
-                            groupClients.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(view.clientId()));
+                            this.clientActivePort.persistableById(view.clientId());
+                            groupClients.add(view.clientId());
                         }
                     }
                     HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
                     });
                     if (!groupClients.isEmpty()) {
-                        for (Client client : groupClients) {
-                            HashMap<String, Object> smsParams = processRepaymentDataForSms(view, client);
+                        for (final Long clientId : groupClients) {
+                            HashMap<String, Object> smsParams = processRepaymentDataForSms(view, clientId);
                             for (Map.Entry<String, String> entry : campaignParams.entrySet()) {
                                 String value = entry.getValue();
                                 String spvalue = null;
@@ -187,7 +182,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                     if (entry.getKey().equals("officeId")) {
                                         Long officeId = Long.valueOf(value);
                                         Office campaignOffice = this.officeRepository.findById(Long.valueOf(value)).orElseThrow(() -> new OfficeNotFoundException(officeId));
-                                        if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(client.getOffice().getId())) {
+                                        if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(this.clientActivePort.officeId(clientId))) {
                                             throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                         }
                                     } else {
@@ -197,13 +192,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                             }
                             String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), smsParams);
                             Object mobileNo = smsParams.get("mobileNo");
-                            if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                            if (this.smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                                 String mobileNumber = null;
                                 if (mobileNo != null) {
                                     mobileNumber = mobileNo.toString();
                                 }
                                 final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
-                                        client.getId(), null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                                        clientId, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
                                 Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                                 smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                                 this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
@@ -226,11 +221,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
             for (SmsCampaign smsCampaign : smsCampaigns) {
                 try {
                     final var view = this.savingsAccountExistencePort.transactionSmsView(leftoverTransaction);
-                    final Client client = view.clientId() == null ? null
-                            : this.clientRepositoryWrapper.findOneWithNotFoundDetection(view.clientId());
+                    final Long clientId = view.clientId();
+                    if (clientId != null) {
+                        this.clientActivePort.persistableById(clientId);
+                    }
                     HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
                     });
-                    HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(view, client);
+                    HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(view, clientId);
                     for (Map.Entry<String, String> entry : campaignParams.entrySet()) {
                         String value = entry.getValue();
                         String spvalue = null;
@@ -242,7 +239,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                             if (entry.getKey().equals("officeId")) {
                                 Long officeId = Long.valueOf(value);
                                 Office campaignOffice = this.officeRepository.findById(officeId).orElseThrow(() -> new OfficeNotFoundException(officeId));
-                                if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(client.getOffice().getId())) {
+                                if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(this.clientActivePort.officeId(clientId))) {
                                     throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                 }
                             } else {
@@ -252,13 +249,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                     }
                     String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), smsParams);
                     Object mobileNo = smsParams.get("mobileNo");
-                    if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                    if (this.smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                         String mobileNumber = null;
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
                         final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
-                                client.getId(), null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                                clientId, null, message, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
                         Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                         smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                         this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
@@ -276,31 +273,32 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         return smsCampaignRepository.findActiveSmsCampaigns("%" + paramValue + "%", SmsCampaignTriggerType.TRIGGERED.getValue());
     }
 
-    private HashMap<String, Object> processRepaymentDataForSms(final LoanExistencePort.RepaymentSmsView view, Client groupClient) {
+    private HashMap<String, Object> processRepaymentDataForSms(final LoanExistencePort.RepaymentSmsView view, final Long groupClientId) {
         HashMap<String, Object> smsParams = new HashMap<String, Object>();
-        final Client client;
-        if (view.groupLoan() && groupClient != null) {
-            client = groupClient;
+        final Long clientId;
+        if (view.groupLoan() && groupClientId != null) {
+            clientId = groupClientId;
         } else if (view.individualLoan()) {
-            client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(view.clientId());
+            clientId = view.clientId();
         } else {
             throw new InvalidParameterException("");
         }
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM:d:yyyy");
         smsParams.put("id", view.clientId());
-        smsParams.put("firstname", client.getFirstname());
-        smsParams.put("middlename", client.getMiddlename());
-        smsParams.put("lastname", client.getLastname());
-        smsParams.put("FullName", client.getDisplayName());
-        smsParams.put("mobileNo", client.mobileNo());
+        smsParams.put("firstname", this.clientActivePort.firstname(clientId));
+        smsParams.put("middlename", this.clientActivePort.middlename(clientId));
+        smsParams.put("lastname", this.clientActivePort.lastname(clientId));
+        smsParams.put("FullName", this.clientActivePort.displayName(clientId));
+        smsParams.put("mobileNo", this.clientActivePort.mobileNo(clientId));
         smsParams.put("LoanAmount", view.principal());
         smsParams.put("LoanOutstanding", view.outstanding());
         smsParams.put("loanId", view.loanId());
         smsParams.put("LoanAccountId", view.accountNumber());
-        smsParams.put("officeId", client.getOffice().getId());
-        if (client.getStaff() != null) {
-            smsParams.put("loanOfficerId", client.getStaff().getId());
+        smsParams.put("officeId", this.clientActivePort.officeId(clientId));
+        final Long staffId = this.clientActivePort.staffId(clientId);
+        if (staffId != null) {
+            smsParams.put("loanOfficerId", staffId);
         } else {
             smsParams.put("loanOfficerId", -1);
         }
@@ -317,29 +315,30 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     private HashMap<String, Object> processSavingsTransactionDataForSms(final SavingsAccountExistencePort.TransactionSmsView view,
-            Client client) {
+            final Long clientId) {
         // {{savingsId}} {{id}} {{firstname}} {{middlename}} {{lastname}}
         // {{FullName}} {{mobileNo}} {{savingsAccountId}} {{depositAmount}}
         // {{balance}}
         // transactionDate
         HashMap<String, Object> smsParams = new HashMap<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM:d:yyyy");
-        smsParams.put("clientId", client.getId());
-        smsParams.put("firstname", client.getFirstname());
-        smsParams.put("middlename", client.getMiddlename());
-        smsParams.put("lastname", client.getLastname());
-        smsParams.put("FullName", client.getDisplayName());
-        smsParams.put("mobileNo", client.mobileNo());
+        smsParams.put("clientId", clientId.longValue());
+        smsParams.put("firstname", this.clientActivePort.firstname(clientId));
+        smsParams.put("middlename", this.clientActivePort.middlename(clientId));
+        smsParams.put("lastname", this.clientActivePort.lastname(clientId));
+        smsParams.put("FullName", this.clientActivePort.displayName(clientId));
+        smsParams.put("mobileNo", this.clientActivePort.mobileNo(clientId));
         smsParams.put("savingsId", view.savingsAccountId());
         smsParams.put("savingsAccountNo", view.accountNumber());
         smsParams.put("withdrawAmount", view.amount());
         smsParams.put("depositAmount", view.amount());
         smsParams.put("balance", view.balance());
-        smsParams.put("officeId", client.getOffice().getId());
+        smsParams.put("officeId", this.clientActivePort.officeId(clientId));
         smsParams.put("transactionDate", view.transactionDate().format(dateFormatter));
         smsParams.put("savingsTransactionId", view.transactionId());
-        if (client.getStaff() != null) {
-            smsParams.put("loanOfficerId", client.getStaff().getId());
+        final Long staffId = this.clientActivePort.staffId(clientId);
+        if (staffId != null) {
+            smsParams.put("loanOfficerId", staffId);
         } else {
             smsParams.put("loanOfficerId", -1);
         }
@@ -352,7 +351,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupActivePort groupActivePort, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupActivePort groupActivePort, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort, final ClientActivePort clientActivePort) {
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsMessagePort = smsMessagePort;
         this.officeRepository = officeRepository;
@@ -363,5 +362,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         this.smsCampaignTriggerEventPort = smsCampaignTriggerEventPort;
         this.savingsAccountExistencePort = savingsAccountExistencePort;
         this.loanExistencePort = loanExistencePort;
+        this.clientActivePort = clientActivePort;
     }
 }

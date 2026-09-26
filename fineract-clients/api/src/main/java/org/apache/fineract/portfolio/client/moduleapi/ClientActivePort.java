@@ -58,6 +58,20 @@ public interface ClientActivePort {
 
     String displayName(Long clientId);
 
+    String firstname(Long clientId);
+
+    String middlename(Long clientId);
+
+    String lastname(Long clientId);
+
+    /**
+     * Staff id for the client, or null when the client has no staff.
+     *
+     * @throws org.apache.fineract.portfolio.client.exception.ClientNotFoundException
+     *             when the id does not exist
+     */
+    Long staffId(Long clientId);
+
     String mobileNo(Long clientId);
 
     String emailAddress(Long clientId);

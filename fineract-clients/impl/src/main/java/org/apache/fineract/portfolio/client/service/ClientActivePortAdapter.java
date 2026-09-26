@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -90,6 +91,27 @@ public class ClientActivePortAdapter implements ClientActivePort {
     @Override
     public String displayName(final Long clientId) {
         return client(clientId).getDisplayName();
+    }
+
+    @Override
+    public String firstname(final Long clientId) {
+        return client(clientId).getFirstname();
+    }
+
+    @Override
+    public String middlename(final Long clientId) {
+        return client(clientId).getMiddlename();
+    }
+
+    @Override
+    public String lastname(final Long clientId) {
+        return client(clientId).getLastname();
+    }
+
+    @Override
+    public Long staffId(final Long clientId) {
+        final Staff staff = client(clientId).getStaff();
+        return staff == null ? null : staff.getId();
     }
 
     @Override

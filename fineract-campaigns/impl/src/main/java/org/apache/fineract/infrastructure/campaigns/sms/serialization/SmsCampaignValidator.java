@@ -37,7 +37,7 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.calendar.domain.CalendarFrequencyType;
-import org.apache.fineract.portfolio.client.domain.Client;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -325,7 +325,7 @@ public class SmsCampaignValidator {
         }
     }
 
-    public boolean isValidNotificationOrSms(Client client, SmsCampaign smsCampaign, Object mobileNo) {
+    public boolean isValidNotificationOrSms(SmsCampaign smsCampaign, Object mobileNo) {
         if (smsCampaign.isNotification()) {
             return false;
         }

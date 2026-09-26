@@ -65,8 +65,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
 import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -84,7 +83,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     private final SmsCampaignValidator smsCampaignValidator;
     private final ReportLookupPort reportLookupPort;
     private final SmsMessagePort smsMessagePort;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final GroupActivePort groupActivePort;
     private final ReadReportingService readReportingService;
     private final GenericDataService genericDataService;
@@ -189,13 +188,14 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
                     String textMessage = compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), entry);
                     Integer clientId = (Integer) entry.get("id");
                     Object mobileNo = entry.get("mobileNo");
-                    Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId.longValue());
-                    if (smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                    final long resolvedClientId = clientId.longValue();
+                    this.clientActivePort.persistableById(resolvedClientId);
+                    if (smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                         String mobileNumber = null;
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(client.getId(), null, textMessage,
+                        this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(resolvedClientId, null, textMessage,
                                 mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
                     }
                 }
@@ -212,7 +212,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             if (invalidLoanType) {
                 throw new InvalidLoanTypeException("Loan Type cannot be 0 for the Triggered Sms Campaign");
             }
-            Set<Client> clientSet = new HashSet<>();
+            Set<Long> clientSet = new HashSet<>();
             HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
             campaignParams.put("loanId", loanId.toString());
@@ -221,28 +221,29 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             queryParamForRunReport.put("loanId", loanId.toString());
             if (groupLoan) {
                 for (final Long memberId : this.groupActivePort.clientMemberIds(groupId)) {
-                    clientSet.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(memberId));
+                    this.clientActivePort.persistableById(memberId);
+                    clientSet.add(memberId);
                 }
                 queryParamForRunReport.put("groupId", groupId.toString());
             } else {
-                Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
-                clientSet.add(client);
+                this.clientActivePort.persistableById(clientId);
+                clientSet.add(clientId);
             }
-            for (Client client : clientSet) {
-                campaignParams.put("clientId", client.getId().toString());
-                queryParamForRunReport.put("clientId", client.getId().toString());
+            for (final Long resolvedClientId : clientSet) {
+                campaignParams.put("clientId", resolvedClientId.toString());
+                queryParamForRunReport.put("clientId", resolvedClientId.toString());
                 List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
                 if (runReportObject != null && runReportObject.size() > 0) {
                     for (HashMap<String, Object> entry : runReportObject) {
                         String textMessage = this.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), entry);
                         Object mobileNo = entry.get("mobileNo");
-                        if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                        if (this.smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                             String mobileNumber = null;
                             if (mobileNo != null) {
                                 mobileNumber = mobileNo.toString();
                             }
                             final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
-                                    client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
+                                    resolvedClientId, null, textMessage, mobileNumber, smsCampaign.getId(), smsCampaign.isNotification()));
                             Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                             smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                             this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
@@ -256,27 +257,27 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @Override
-    public void insertDirectCampaignIntoSmsOutboundTable(final Client client, final SmsCampaign smsCampaign) {
+    public void insertDirectCampaignIntoSmsOutboundTable(final Long clientId, final SmsCampaign smsCampaign) {
         try {
             HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            campaignParams.put("clientId", client.getId().toString());
+            campaignParams.put("clientId", clientId.toString());
             HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
-            campaignParams.put("clientId", client.getId().toString());
-            queryParamForRunReport.put("clientId", client.getId().toString());
+            campaignParams.put("clientId", clientId.toString());
+            queryParamForRunReport.put("clientId", clientId.toString());
             List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
             if (runReportObject != null && runReportObject.size() > 0) {
                 for (HashMap<String, Object> entry : runReportObject) {
                     String textMessage = this.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), entry);
                     Object mobileNo = entry.get("mobileNo");
-                    if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                    if (this.smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                         String mobileNumber = null;
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
                         final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
-                                client == null ? null : client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(),
+                                clientId, null, textMessage, mobileNumber, smsCampaign.getId(),
                                 smsCampaign.isNotification()));
                         Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                         smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
@@ -298,19 +299,21 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
             });
             queryParamForRunReport.put("savingsId", savingsAccountId.toString());
-            Client client = clientId == null ? null : this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+            if (clientId != null) {
+                this.clientActivePort.persistableById(clientId);
+            }
             List<HashMap<String, Object>> runReportObject = this.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
             if (runReportObject != null && runReportObject.size() > 0) {
                 for (HashMap<String, Object> entry : runReportObject) {
                     String textMessage = this.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), entry);
                     Object mobileNo = entry.get("mobileNo");
-                    if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
+                    if (this.smsCampaignValidator.isValidNotificationOrSms(smsCampaign, mobileNo)) {
                         String mobileNumber = null;
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
                         final SmsMessagePort.OutboundView smsMessage = this.smsMessagePort.persistPending(new SmsMessagePort.PendingRequest(
-                                client == null ? null : client.getId(), null, textMessage, mobileNumber, smsCampaign.getId(),
+                                clientId, null, textMessage, mobileNumber, smsCampaign.getId(),
                                 smsCampaign.isNotification()));
                         Map<SmsCampaign, Collection<SmsMessagePort.OutboundView>> smsDataMap = new HashMap<>();
                         smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
@@ -488,13 +491,13 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessagePort smsMessagePort, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupActivePort groupActivePort, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
+        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessagePort smsMessagePort, final ClientActivePort clientActivePort, final GroupActivePort groupActivePort, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
         this.context = context;
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsCampaignValidator = smsCampaignValidator;
         this.reportLookupPort = reportLookupPort;
         this.smsMessagePort = smsMessagePort;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.groupActivePort = groupActivePort;
         this.readReportingService = readReportingService;
         this.genericDataService = genericDataService;
