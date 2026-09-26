@@ -23,6 +23,8 @@ Public types for foreign BCs:
 
 Impl-only: `…portfolio.charge.domain.Charge`, repositories, write services, handlers.
 
+Client charge and client transaction writes use ClientActivePort.assertActiveInUserScope (not leftover Client repository).
+
 Charge entities store payment-type id (not leftover PaymentType).
 
 

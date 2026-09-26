@@ -51,11 +51,10 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.data.ClientChargeDataValidator;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientCharge;
 import org.apache.fineract.portfolio.client.domain.ClientChargePaidBy;
 import org.apache.fineract.portfolio.client.domain.ClientChargeRepositoryWrapper;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.apache.fineract.portfolio.client.domain.ClientTransactionRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
@@ -70,7 +69,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientChargeWritePlatformServiceImpl.class);
     private final ChargeDefinitionPort chargeDefinitionPort;
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final ClientChargeDataValidator clientChargeDataValidator;
     private final ConfigurationDomainService configurationDomainService;
     private final HolidayRepositoryWrapper holidayRepository;
@@ -85,7 +84,8 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     public CommandProcessingResult addCharge(Long clientId, JsonCommand command) {
         try {
             this.clientChargeDataValidator.validateAdd(command.json());
-            final Client client = clientRepository.getActiveClientInUserScope(clientId);
+            this.clientActivePort.assertActiveInUserScope(clientId);
+            final Object client = this.clientActivePort.persistableById(clientId);
             final Long chargeDefinitionId = command.longValueOfParameterNamed(ClientApiConstants.chargeIdParamName);
             final ChargeDefinitionData charge = this.chargeDefinitionPort.getActiveCharge(chargeDefinitionId);
             // validate for client charge
@@ -100,7 +100,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
-            LocalDate activationDate = client.getActivationDate();
+            LocalDate activationDate = this.clientActivePort.activationDate(clientId);
             LocalDate dueDate = clientCharge.getDueLocalDate();
             if (DateUtils.isBefore(dueDate, activationDate)) {
                 baseDataValidator.reset().parameter(ClientApiConstants.dueAsOfDateParamName).value(dueDate.format(fmt)).failWithCodeNoParameterAddedToErrorCode("dueDate.before.activationDate");
@@ -126,7 +126,8 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     public CommandProcessingResult payCharge(Long clientId, Long clientChargeId, JsonCommand command) {
         try {
             this.clientChargeDataValidator.validatePayCharge(command.json());
-            final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
+            this.clientActivePort.assertActiveInUserScope(clientId);
+            final Object client = this.clientActivePort.persistableById(clientId);
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
             final Locale locale = command.extractLocale();
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
@@ -135,13 +136,13 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             final ExternalId transactionExternalId = ExternalIdFactory.produce(command.stringValueOfParameterNamedAllowingNull(ClientApiConstants.externalIdParamName));
             final Money chargePaid = Money.of(clientCharge.getCurrency(), amountPaid);
             // Validate business rules for payment
-            validatePaymentTransaction(client, clientCharge, fmt, transactionDate, amountPaid);
+            validatePaymentTransaction(clientId, clientCharge, fmt, transactionDate, amountPaid);
             // pay the charge
             clientCharge.pay(chargePaid);
             // create Payment Transaction
             final Map<String, Object> changes = new LinkedHashMap<>();
             final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
-            ClientTransaction clientTransaction = ClientTransaction.payCharge(client, client.getOffice(), paymentDetail, transactionDate, chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
+            ClientTransaction clientTransaction = ClientTransaction.payCharge(client, this.clientActivePort.office(clientId), paymentDetail, transactionDate, chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
             // update charge paid by associations
             final ClientChargePaidBy chargePaidBy = ClientChargePaidBy.instance(clientTransaction, clientCharge, amountPaid);
@@ -171,15 +172,16 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     @Override
     public CommandProcessingResult waiveCharge(Long clientId, Long clientChargeId) {
         try {
-            final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
+            this.clientActivePort.assertActiveInUserScope(clientId);
+            final Object client = this.clientActivePort.persistableById(clientId);
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
             final LocalDate transactionDate = DateUtils.getBusinessLocalDate();
             // Validate business rules for payment
-            validateWaiverTransaction(client, clientCharge);
+            validateWaiverTransaction(clientId, clientCharge);
             // waive the charge
             Money waivedAmount = clientCharge.waive();
             // create Waiver Transaction
-            ClientTransaction clientTransaction = ClientTransaction.waiver(client, client.getOffice(), transactionDate, waivedAmount, clientCharge.getCurrency().getCode());
+            ClientTransaction clientTransaction = ClientTransaction.waiver(client, this.clientActivePort.office(clientId), transactionDate, waivedAmount, clientCharge.getCurrency().getCode());
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
             // update charge paid by associations
             final ClientChargePaidBy chargePaidBy = ClientChargePaidBy.instance(clientTransaction, clientCharge, waivedAmount.getAmount());
@@ -200,10 +202,10 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     @Override
     public CommandProcessingResult deleteCharge(Long clientId, Long clientChargeId) {
         try {
-            final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
+            this.clientActivePort.assertActiveInUserScope(clientId);
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
             // Validate business rules for charge deletion
-            validateChargeDeletion(client, clientCharge);
+            validateChargeDeletion(clientId, clientCharge);
             // delete the charge
             clientChargeRepository.delete(clientCharge);
             return  //
@@ -236,7 +238,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      *            if set to false transaction amount validation is skipped
      * @return
      */
-    private void validatePaymentDateAndAmount(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid, final boolean requiresTransactionDateValidation, final boolean requiresTransactionAmountValidation) {
+    private void validatePaymentDateAndAmount(final Long clientId, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid, final boolean requiresTransactionDateValidation, final boolean requiresTransactionAmountValidation) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         if (clientCharge.isNotActive()) {
@@ -247,7 +249,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         }
         if (requiresTransactionDateValidation) {
             validateTransactionDateOnWorkingDay(transactionDate, clientCharge, fmt);
-            if (DateUtils.isBefore(transactionDate, client.getActivationDate())) {
+            if (DateUtils.isBefore(transactionDate, this.clientActivePort.activationDate(clientId))) {
                 baseDataValidator.reset().parameter(ClientApiConstants.transactionDateParamName).value(transactionDate.format(fmt)).failWithCodeNoParameterAddedToErrorCode("transaction.before.activationDate");
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
@@ -279,28 +281,28 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         }
     }
 
-    public void validateWaiverTransaction(final Client client, final ClientCharge clientCharge) {
+    public void validateWaiverTransaction(final Long clientId, final ClientCharge clientCharge) {
         DateTimeFormatter fmt = null;
         LocalDate transactionDate = null;
         BigDecimal amountPaid = null;
         boolean requiresTransactionDateValidation = false;
         boolean requiresTransactionAmountValidation = false;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(clientId, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
-    public void validatePaymentTransaction(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid) {
+    public void validatePaymentTransaction(final Long clientId, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid) {
         boolean requiresTransactionDateValidation = true;
         boolean requiresTransactionAmountValidation = true;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(clientId, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
-    public void validateChargeDeletion(final Client client, final ClientCharge clientCharge) {
+    public void validateChargeDeletion(final Long clientId, final ClientCharge clientCharge) {
         DateTimeFormatter fmt = null;
         LocalDate transactionDate = null;
         BigDecimal amountPaid = null;
         boolean requiresTransactionDateValidation = false;
         boolean requiresTransactionAmountValidation = false;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(clientId, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
     /**
@@ -387,9 +389,9 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientChargeWritePlatformServiceImpl(final ChargeDefinitionPort chargeDefinitionPort, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ClientTransactionJournalPort clientTransactionJournalPort, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
+        public ClientChargeWritePlatformServiceImpl(final ChargeDefinitionPort chargeDefinitionPort, final ClientActivePort clientActivePort, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ClientTransactionJournalPort clientTransactionJournalPort, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
         this.chargeDefinitionPort = chargeDefinitionPort;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.clientChargeDataValidator = clientChargeDataValidator;
         this.configurationDomainService = configurationDomainService;
         this.holidayRepository = holidayRepository;

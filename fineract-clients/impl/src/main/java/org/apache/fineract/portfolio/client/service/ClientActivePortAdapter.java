@@ -47,6 +47,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public void assertActiveInUserScope(final Long clientId) {
+        this.clientRepository.getActiveClientInUserScope(clientId);
+    }
+
+    @Override
     public boolean exists(final Long clientId) {
         try {
             client(clientId);

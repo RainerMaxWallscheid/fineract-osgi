@@ -24,10 +24,9 @@ import org.apache.fineract.accounting.moduleapi.ClientTransactionJournalPort;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientCharge;
 import org.apache.fineract.portfolio.client.domain.ClientChargePaidBy;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.apache.fineract.portfolio.client.domain.ClientTransactionRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientTransactionCannotBeUndoneException;
@@ -36,13 +35,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements ClientTransactionWritePlatformService {
     private final ClientTransactionRepositoryWrapper clientTransactionRepository;
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository;
     private final ClientTransactionJournalPort clientTransactionJournalPort;
 
     @Override
     public CommandProcessingResult undo(Long clientId, Long transactionId) {
-        final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
+        this.clientActivePort.assertActiveInUserScope(clientId);
         final ClientTransaction clientTransaction = this.clientTransactionRepository.findOneWithNotFoundDetection(clientId, transactionId);
         // validate that transaction can be undone
         if (clientTransaction.isReversed()) {
@@ -71,7 +70,7 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
         //
         //
         //
-        new CommandProcessingResultBuilder().withEntityId(transactionId).withOfficeId(client.officeId()).withClientId(clientId).build();
+        new CommandProcessingResultBuilder().withEntityId(transactionId).withOfficeId(this.clientActivePort.officeId(clientId)).withClientId(clientId).build();
     }
 
     private void generateAccountingEntries(ClientTransaction clientTransaction) {
@@ -80,9 +79,9 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientTransactionWritePlatformServiceJpaRepositoryImpl(final ClientTransactionRepositoryWrapper clientTransactionRepository, final ClientRepositoryWrapper clientRepository, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final ClientTransactionJournalPort clientTransactionJournalPort) {
+        public ClientTransactionWritePlatformServiceJpaRepositoryImpl(final ClientTransactionRepositoryWrapper clientTransactionRepository, final ClientActivePort clientActivePort, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final ClientTransactionJournalPort clientTransactionJournalPort) {
         this.clientTransactionRepository = clientTransactionRepository;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.organisationCurrencyRepository = organisationCurrencyRepository;
         this.clientTransactionJournalPort = clientTransactionJournalPort;
     }

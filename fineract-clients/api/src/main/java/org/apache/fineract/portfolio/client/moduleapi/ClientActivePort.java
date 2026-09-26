@@ -30,6 +30,17 @@ public interface ClientActivePort {
 
     boolean isActive(Long clientId);
 
+    /**
+     * Client exists, is active, and is in the current user's office hierarchy.
+     * Same checks as leftover {@code getActiveClientInUserScope}.
+     *
+     * @throws org.apache.fineract.portfolio.client.exception.ClientNotFoundException
+     *             when the id does not exist
+     * @throws org.apache.fineract.portfolio.client.exception.ClientNotActiveException
+     *             when the client is not active
+     */
+    void assertActiveInUserScope(Long clientId);
+
     boolean exists(Long clientId);
 
     boolean isActivatedAfter(Long clientId, LocalDate date);
