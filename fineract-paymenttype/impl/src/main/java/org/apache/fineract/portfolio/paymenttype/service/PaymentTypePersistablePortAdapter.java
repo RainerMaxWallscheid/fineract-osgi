@@ -56,4 +56,14 @@ public class PaymentTypePersistablePortAdapter implements PaymentTypePersistable
         final Object persistable = persistableById(paymentTypeId);
         return persistable instanceof PaymentType paymentType ? paymentType.getName() : null;
     }
+
+    @Override
+    public Object firstNonCash() {
+        for (final PaymentType paymentType : this.paymentTypeRepository.findAll()) {
+            if (!paymentType.getIsCashPayment()) {
+                return paymentType;
+            }
+        }
+        return null;
+    }
 }

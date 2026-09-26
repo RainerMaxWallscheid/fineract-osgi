@@ -37,4 +37,10 @@ public interface PaymentTypePersistablePort {
      * Payment-type name, or null when the id is null or missing.
      */
     String name(Long paymentTypeId);
+
+    /**
+     * First non-cash payment type in repository order, or null when every type is cash. A null cash flag throws
+     * NullPointerException.
+     */
+    Object firstNonCash();
 }

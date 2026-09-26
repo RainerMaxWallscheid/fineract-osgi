@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -77,8 +76,7 @@ import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailPersistablePort;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
+import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypePersistablePort;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -107,7 +105,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
     private final SavingsAccountRepository savingsAccountRepository;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     private final ApplicationCurrencyRepository currencyRepository;
-    private final PaymentTypeRepository paymentTypeRepository;
+    private final PaymentTypePersistablePort paymentTypePersistablePort;
     private final InteropIdentifierRepository identifierRepository;
     private final SavingsHelper savingsHelper;
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
@@ -121,7 +119,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
 
     public SavingsInteropPortAdapter(final SavingsAccountRepository savingsAccountRepository,
             final SavingsAccountTransactionRepository savingsAccountTransactionRepository,
-            final ApplicationCurrencyRepository currencyRepository, final PaymentTypeRepository paymentTypeRepository,
+            final ApplicationCurrencyRepository currencyRepository, final PaymentTypePersistablePort paymentTypePersistablePort,
             final InteropIdentifierRepository identifierRepository, final SavingsHelper savingsHelper,
             final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper,
             final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService,
@@ -131,7 +129,7 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.currencyRepository = currencyRepository;
-        this.paymentTypeRepository = paymentTypeRepository;
+        this.paymentTypePersistablePort = paymentTypePersistablePort;
         this.identifierRepository = identifierRepository;
         this.savingsHelper = savingsHelper;
         this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
@@ -433,19 +431,10 @@ public class SavingsInteropPortAdapter implements SavingsInteropPort {
         return DateTimeFormatter.ofPattern(dateFormat).withLocale(locale);
     }
 
-    private PaymentType findPaymentType() {
-        final List<PaymentType> paymentTypes = paymentTypeRepository.findAll();
-        for (final PaymentType paymentType : paymentTypes) {
-            if (!paymentType.getIsCashPayment()) {
-                return paymentType;
-            }
-        }
-        return null;
-    }
-
     private Object createAndPersistInteropPaymentDetail(final SavingsAccount savingsAccount, final String transferCode) {
-        return this.paymentDetailWritePlatformService.persistPaymentDetail(this.paymentDetailPersistablePort.unsaved(findPaymentType(),
-                savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null));
+        return this.paymentDetailWritePlatformService.persistPaymentDetail(this.paymentDetailPersistablePort.unsaved(
+                this.paymentTypePersistablePort.firstNonCash(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(),
+                transferCode, null));
     }
 
     private SavingsAccountTransaction findTransaction(final SavingsAccount savingsAccount, final String transactionCode,
