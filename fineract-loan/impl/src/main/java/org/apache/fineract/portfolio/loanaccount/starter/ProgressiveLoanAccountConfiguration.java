@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.starter;
 
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.TransactionBoundApplicationEventPublisher;
@@ -59,12 +59,12 @@ public class ProgressiveLoanAccountConfiguration {
             ExternalIdFactory externalIdFactory, LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository,
             ReprocessLoanTransactionsService reprocessLoanTransactionsService, LoanBalanceService loanBalanceService,
             LoanLifecycleStateMachine loanLifecycleStateMachine, BusinessEventNotifierService businessEventNotifierService,
-            CodeValueRepository codeValueRepository, LoanScheduleService loanScheduleService,
+            CodeValuePersistablePort codeValuePersistablePort, LoanScheduleService loanScheduleService,
             TransactionBoundApplicationEventPublisher eventPublisher) {
         return new CapitalizedIncomeWritePlatformServiceImpl(loanTransactionValidator, loanAssembler, loanTransactionRepository,
                 paymentDetailWritePlatformService, journalEntryPoster, externalIdFactory, capitalizedIncomeBalanceRepository,
                 reprocessLoanTransactionsService, loanBalanceService, loanLifecycleStateMachine, businessEventNotifierService,
-                codeValueRepository, loanScheduleService, eventPublisher);
+                codeValuePersistablePort, loanScheduleService, eventPublisher);
     }
 
     @Bean

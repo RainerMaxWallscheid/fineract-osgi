@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -67,7 +67,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
     private final LoanBalanceService loanBalanceService;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
     private final BusinessEventNotifierService businessEventNotifierService;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanScheduleService loanScheduleService;
     private final TransactionBoundApplicationEventPublisher eventPublisher;
 
@@ -216,7 +216,8 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         final Long transactionClassificationId = command
                 .longValueOfParameterNamed(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME);
         if (transactionClassificationId != null) {
-            loanTransaction.setClassification(codeValueRepository.findByCodeNameAndId(codeName, transactionClassificationId));
+            loanTransaction.setClassification(
+                    this.codeValuePersistablePort.findByCodeNameAndId(codeName, transactionClassificationId));
         }
     }
 
@@ -227,7 +228,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
             final ExternalIdFactory externalIdFactory, final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository,
             final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanBalanceService loanBalanceService,
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final BusinessEventNotifierService businessEventNotifierService,
-            final CodeValueRepository codeValueRepository, final LoanScheduleService loanScheduleService,
+            final CodeValuePersistablePort codeValuePersistablePort, final LoanScheduleService loanScheduleService,
             final TransactionBoundApplicationEventPublisher eventPublisher) {
         this.loanTransactionValidator = loanTransactionValidator;
         this.loanAssembler = loanAssembler;
@@ -240,7 +241,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         this.loanBalanceService = loanBalanceService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.businessEventNotifierService = businessEventNotifierService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanScheduleService = loanScheduleService;
         this.eventPublisher = eventPublisher;
     }
