@@ -27,7 +27,7 @@ import org.apache.fineract.accounting.rule.service.AccountingRuleReadPlatformSer
 import org.apache.fineract.accounting.rule.service.AccountingRuleReadPlatformServiceImpl;
 import org.apache.fineract.accounting.rule.service.AccountingRuleWritePlatformService;
 import org.apache.fineract.accounting.rule.service.AccountingRuleWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -49,9 +49,9 @@ public class AccountingRuleConfiguration {
     public AccountingRuleWritePlatformService accountingRuleWritePlatformService(
             AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, AccountingRuleRepository accountingRuleRepository,
             GLAccountPersistablePort glAccountPersistablePort, OfficeRepositoryWrapper officeRepositoryWrapper,
-            AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, CodeValueRepository codeValueRepository) {
+            AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, CodeValuePersistablePort codeValuePersistablePort) {
         return new AccountingRuleWritePlatformServiceJpaRepositoryImpl(accountingRuleRepositoryWrapper, accountingRuleRepository,
-                glAccountPersistablePort, officeRepositoryWrapper, fromApiJsonDeserializer, codeValueRepository);
+                glAccountPersistablePort, officeRepositoryWrapper, fromApiJsonDeserializer, codeValuePersistablePort);
     }
 
 }

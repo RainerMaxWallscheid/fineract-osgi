@@ -38,9 +38,8 @@ import org.apache.fineract.accounting.rule.domain.AccountingTagRule;
 import org.apache.fineract.accounting.rule.exception.AccountingRuleDataException;
 import org.apache.fineract.accounting.rule.exception.AccountingRuleDuplicateException;
 import org.apache.fineract.accounting.rule.serialization.AccountingRuleCommandFromApiJsonDeserializer;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -60,7 +59,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
     private final GLAccountPersistablePort glAccountPersistablePort;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
 
     /**
      * @param command
@@ -280,7 +279,10 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         for (final String creditOrDebitTag : creditOrDebitTagArray) {
             if (creditOrDebitTag != null && StringUtils.isNotBlank(creditOrDebitTag)) {
                 final Long creditOrDebitTagIdLongValue = Long.valueOf(creditOrDebitTag);
-                final CodeValue creditOrDebitAccount = this.codeValueRepository.findById(creditOrDebitTagIdLongValue).orElseThrow(() -> new CodeValueNotFoundException(creditOrDebitTagIdLongValue));
+                final Object creditOrDebitAccount = this.codeValuePersistablePort.persistableById(creditOrDebitTagIdLongValue);
+                if (creditOrDebitAccount == null) {
+                    throw new CodeValueNotFoundException(creditOrDebitTagIdLongValue);
+                }
                 final AccountingTagRule accountingTagRule = AccountingTagRule.create(creditOrDebitAccount, transactionType.getValue());
                 accountingTagRules.add(accountingTagRule);
             }
@@ -297,12 +299,12 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValueRepository codeValueRepository) {
+        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort) {
         this.accountingRuleRepositoryWrapper = accountingRuleRepositoryWrapper;
         this.accountingRuleRepository = accountingRuleRepository;
         this.glAccountPersistablePort = glAccountPersistablePort;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
     }
 }
