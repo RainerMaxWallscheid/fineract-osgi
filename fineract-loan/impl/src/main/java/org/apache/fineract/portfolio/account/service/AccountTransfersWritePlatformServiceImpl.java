@@ -470,7 +470,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
         final Locale locale = command.extractLocale();
         final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         Long transferTransactionId = null;
         final Long fromLoanAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
         final Loan fromLoanAccount = this.loanAccountAssembler.assembleFrom(fromLoanAccountId);

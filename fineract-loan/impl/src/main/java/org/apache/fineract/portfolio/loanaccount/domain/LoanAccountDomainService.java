@@ -53,7 +53,7 @@ public interface LoanAccountDomainService {
             PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId);
 
     LoanTransaction makeRefundForActiveLoan(Long accountId, CommandProcessingResultBuilder builderResult, LocalDate transactionDate,
-            BigDecimal transactionAmount, PaymentDetail paymentDetail, String noteText, ExternalId txnExternalId);
+            BigDecimal transactionAmount, Object paymentDetail, String noteText, ExternalId txnExternalId);
 
     /**
      * This method is to set a Delinquency Tag If the loan is overdue, If the loan after the repayment transaction is

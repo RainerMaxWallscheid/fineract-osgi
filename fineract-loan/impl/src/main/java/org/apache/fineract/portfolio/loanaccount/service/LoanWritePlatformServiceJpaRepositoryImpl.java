@@ -2391,7 +2391,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
         }
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder();
         LoanTransaction loanTransaction = this.loanAccountDomainService.makeRefundForActiveLoan(loanId, commandProcessingResultBuilder,
                 transactionDate, transactionAmount, paymentDetail, noteText, externalId);
