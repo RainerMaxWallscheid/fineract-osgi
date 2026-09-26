@@ -53,7 +53,6 @@ import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.DepositAccountOnClosureType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.DepositsApiConstants;
@@ -81,7 +80,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleWithdrawal(final SavingsAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final boolean applyWithdrawFee, final boolean isRegularTransaction) {
+    public SavingsAccountTransaction handleWithdrawal(final SavingsAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail, final boolean applyWithdrawFee, final boolean isRegularTransaction) {
         boolean isAccountTransfer = false;
         boolean isInterestTransfer = false;
         boolean isWithdrawBalance = false;
@@ -92,7 +91,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleFDDeposit(final FixedDepositAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail) {
+    public SavingsAccountTransaction handleFDDeposit(final FixedDepositAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail) {
         boolean isAccountTransfer = false;
         boolean isRegularTransaction = false;
         final boolean backdatedTxnsAllowedTill = false;
@@ -101,7 +100,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleRDDeposit(final RecurringDepositAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final boolean isRegularTransaction) {
+    public SavingsAccountTransaction handleRDDeposit(final RecurringDepositAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail, final boolean isRegularTransaction) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         boolean isAccountTransfer = false;
@@ -129,7 +128,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleSavingDeposit(final SavingsAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final boolean isRegularTransaction) {
+    public SavingsAccountTransaction handleSavingDeposit(final SavingsAccount account, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail, final boolean isRegularTransaction) {
         boolean isAccountTransfer = false;
         final boolean backdatedTxnsAllowedTill = false;
         final SavingsAccountTransaction deposit = this.savingsAccountDomainService.handleDeposit(account, fmt, transactionDate, transactionAmount, paymentDetail, isAccountTransfer, isRegularTransaction, backdatedTxnsAllowedTill);
@@ -151,7 +150,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleFDAccountClosure(final FixedDepositAccount account, final PaymentDetail paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
+    public Long handleFDAccountClosure(final FixedDepositAccount account, final Object paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         boolean isRegularTransaction = false;
@@ -208,7 +207,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleFDAccountMaturityClosure(final FixedDepositAccount account, final PaymentDetail paymentDetail, final AppUser user, final DateTimeFormatter fmt, final LocalDate closedDate, final Integer onAccountClosureId, final Long toSavingsId, final String transferDescription, Map<String, Object> changes) {
+    public Long handleFDAccountMaturityClosure(final FixedDepositAccount account, final Object paymentDetail, final AppUser user, final DateTimeFormatter fmt, final LocalDate closedDate, final Integer onAccountClosureId, final Long toSavingsId, final String transferDescription, Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         boolean isRegularTransaction = false;
@@ -268,7 +267,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleRDAccountClosure(final RecurringDepositAccount account, final PaymentDetail paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
+    public Long handleRDAccountClosure(final RecurringDepositAccount account, final Object paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         final boolean postReversals = false;
@@ -359,7 +358,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleFDAccountPreMatureClosure(final FixedDepositAccount account, final PaymentDetail paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
+    public Long handleFDAccountPreMatureClosure(final FixedDepositAccount account, final Object paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         boolean isAccountTransfer = false;
@@ -397,7 +396,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleRDAccountPreMatureClosure(final RecurringDepositAccount account, final PaymentDetail paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
+    public Long handleRDAccountPreMatureClosure(final RecurringDepositAccount account, final Object paymentDetail, final AppUser user, final JsonCommand command, final Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         final boolean postReversals = false;
