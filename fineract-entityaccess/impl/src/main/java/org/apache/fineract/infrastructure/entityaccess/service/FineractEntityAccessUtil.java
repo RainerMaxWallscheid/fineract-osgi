@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.entityaccess.service;
 
 import java.time.LocalDate;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
@@ -43,7 +42,6 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
     private final PlatformSecurityContext context;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
-    private final CodeValueRepositoryWrapper codeValueRepository;
     private final FineractEntityAccessWriteService fineractEntityAccessWriteService;
     private final FineractEntityAccessReadService fineractEntityAccessReadService;
     private final FineractEntityRelationRepositoryWrapper fineractEntityRelationRepositoryWrapper;
@@ -53,7 +51,7 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
     public FineractEntityAccessUtil(final PlatformSecurityContext context,
             final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityAccessWriteService fineractEntityAccessWriteService,
-            final CodeValueReadPlatformService codeValueReadPlatformService, final CodeValueRepositoryWrapper codeValueRepository,
+            final CodeValueReadPlatformService codeValueReadPlatformService,
             final FineractEntityAccessReadService fineractEntityAccessReadService,
             final FineractEntityRelationRepositoryWrapper fineractEntityRelationRepositoryWrapper,
             final FineractEntityToEntityMappingRepository fineractEntityToEntityMappingRepository) {
@@ -61,7 +59,6 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
         this.globalConfigurationRepository = globalConfigurationRepository;
         this.fineractEntityAccessWriteService = fineractEntityAccessWriteService;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
-        this.codeValueRepository = codeValueRepository;
         this.fineractEntityAccessReadService = fineractEntityAccessReadService;
         this.fineractEntityRelationRepositoryWrapper = fineractEntityRelationRepositoryWrapper;
         this.fineractEntityToEntityMappingRepository = fineractEntityToEntityMappingRepository;
