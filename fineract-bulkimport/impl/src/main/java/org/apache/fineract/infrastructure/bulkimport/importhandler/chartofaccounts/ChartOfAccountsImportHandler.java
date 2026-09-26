@@ -25,13 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountUsage;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
 import org.apache.fineract.accounting.journalentry.data.CreditDebit;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -65,13 +64,13 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ChartOfAccountsImportHandler.class);
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final GLAccountRepositoryWrapper glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
 
     @Autowired
     public ChartOfAccountsImportHandler(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            GLAccountRepositoryWrapper glAccountRepository) {
+            GLAccountPersistablePort glAccountPersistablePort) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
     }
 
     @Override
@@ -238,8 +237,11 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
         String currencyCode = ImportHandlerUtils.readAsString(ChartOfAccountsConstants.CURRENCY_CODE, row);
         String accountToBeDebitedCredited = ImportHandlerUtils.readAsString(ChartOfAccountsConstants.ACCOUNT_NAME_COL, row);
         String glCode = ImportHandlerUtils.readAsString(ChartOfAccountsConstants.GL_CODE_COL, row);
-        GLAccount glAccount = this.glAccountRepository.findOneByGlCodeWithNotFoundDetection(glCode);
-        Long glAccountIdToDebitedCredited = glAccount.getId();
+        Object glAccount = this.glAccountPersistablePort.persistableByGlCode(glCode);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(glCode);
+        }
+        Long glAccountIdToDebitedCredited = this.glAccountPersistablePort.id(glAccount);
         if (glAccountIdToDebitedCredited == null) {
             throw new GLAccountNotFoundException("Account does not exist");
         }

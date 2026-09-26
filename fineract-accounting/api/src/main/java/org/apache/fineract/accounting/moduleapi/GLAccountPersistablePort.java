@@ -34,6 +34,12 @@ public interface GLAccountPersistablePort {
     Object persistableById(Long glAccountId);
 
     /**
+     * Persistable GL account for a GL code, or null when none matches. A null code is looked up as given (not
+     * short-circuited).
+     */
+    Object persistableByGlCode(String glCode);
+
+    /**
      * GL account name, or null when the id is null or missing.
      */
     String name(Long glAccountId);

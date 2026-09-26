@@ -52,6 +52,11 @@ public class GLAccountPersistablePortAdapter implements GLAccountPersistablePort
     }
 
     @Override
+    public Object persistableByGlCode(final String glCode) {
+        return this.glAccountRepository.findOneByGlCode(glCode).orElse(null);
+    }
+
+    @Override
     public String name(final Long glAccountId) {
         final Object persistable = persistableById(glAccountId);
         return persistable instanceof GLAccount account ? account.getName() : null;
