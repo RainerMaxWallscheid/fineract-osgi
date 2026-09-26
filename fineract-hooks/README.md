@@ -8,7 +8,7 @@ Provider peel — webhooks / external event hooks (ADR-022).
 | `fineract-hooks-impl` | `impl/` | `org.apache.fineract.hooks.impl` | Entities, REST, processors; Equinox DS `OSGI-INF/hooks.xml` |
 | `fineract-hooks-test` | `test/` | `org.apache.fineract.hooks.test` | Fragment-Host → impl |
 
-Residual: **closed** — `MessageGatewayHookProcessor` in hooks-impl (sms + campaigns scheduler).
+Residual: **closed** — `MessageGatewayHookProcessor` in hooks-impl (sms + campaigns scheduler). Hook SMS processors use ClientActivePort (not leftover Client repository).
 `HookEvent` / `HookEventSource` residual in core for command processing.
 
 ```bash

@@ -30,8 +30,7 @@ import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.hooks.domain.Hook;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfiguration;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.template.data.TemplateData;
 import org.apache.fineract.template.service.TemplateDomainService;
 import org.apache.fineract.template.service.TemplateMergeService;
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Service;
 public class MessageGatewayHookProcessor implements HookProcessor {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MessageGatewayHookProcessor.class);
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final TemplateDomainService templateDomainService;
     private final TemplateMergeService templateMergeService;
     private final TwoFactorSmsDeliveryPort smsDeliveryPort;
@@ -81,18 +80,17 @@ public class MessageGatewayHookProcessor implements HookProcessor {
         Map<String, Object> reqMap = new Gson().fromJson(payload, type);
         if (reqMap.get("clientId") != null) {
             Long clientId = (Long) reqMap.get("clientId");
-            Client client = clientRepository.findOneWithNotFoundDetection(clientId);
-            reqMap.put("clientName", client.getDisplayName());
+            reqMap.put("clientName", this.clientActivePort.displayName(clientId));
             // 3: compile template using Mustache
             String smsText = this.templateMergeService.compile(template, reqMap);
             // 4 : send message to the url
-            this.smsDeliveryPort.deliverClientSms(client, smsText, SMSProviderId);
+            this.smsDeliveryPort.deliverClientSms(clientId, this.clientActivePort.mobileNo(clientId), smsText, SMSProviderId);
         }
     }
 
     @java.lang.SuppressWarnings("all")
-        public MessageGatewayHookProcessor(final ClientRepositoryWrapper clientRepository, final TemplateDomainService templateDomainService, final TemplateMergeService templateMergeService, final TwoFactorSmsDeliveryPort smsDeliveryPort) {
-        this.clientRepository = clientRepository;
+        public MessageGatewayHookProcessor(final ClientActivePort clientActivePort, final TemplateDomainService templateDomainService, final TemplateMergeService templateMergeService, final TwoFactorSmsDeliveryPort smsDeliveryPort) {
+        this.clientActivePort = clientActivePort;
         this.templateDomainService = templateDomainService;
         this.templateMergeService = templateMergeService;
         this.smsDeliveryPort = smsDeliveryPort;

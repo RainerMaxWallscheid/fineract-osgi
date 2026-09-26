@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.campaigns.sms.service;
 
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.portfolio.client.domain.Client;
 
 /**
  * Narrow campaigns/sms port for triggered outbound SMS.
@@ -37,5 +36,5 @@ public interface TwoFactorSmsDeliveryPort {
     /**
      * Persist a pending client SMS and trigger immediate delivery via the configured provider.
      */
-    void deliverClientSms(Client client, String messageText, long smsProviderId);
+    void deliverClientSms(Long clientId, String mobileNo, String messageText, long smsProviderId);
 }

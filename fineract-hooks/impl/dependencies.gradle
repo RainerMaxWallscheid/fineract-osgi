@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-hooks-api')
     implementation(project(path: ':fineract-core'))
+    // ClientActivePort.displayName / mobileNo (entity residual stays in core)
+    implementation(project(path: ':fineract-clients-api'))
     implementation(project(path: ':fineract-command-api'))
     // UGD template id + TemplateDomainService / TemplateMergeService
     implementation(project(path: ':fineract-template-api'))

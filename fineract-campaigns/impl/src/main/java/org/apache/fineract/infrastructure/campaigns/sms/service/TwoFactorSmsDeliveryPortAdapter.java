@@ -22,7 +22,6 @@ import java.util.Collections;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
 import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.portfolio.client.domain.Client;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +45,8 @@ public class TwoFactorSmsDeliveryPortAdapter implements TwoFactorSmsDeliveryPort
 
     @Override
     @Transactional
-    public void deliverClientSms(final Client client, final String messageText, final long smsProviderId) {
-        persistAndTrigger(null, client.getId(), messageText, client.mobileNo(), smsProviderId);
+    public void deliverClientSms(final Long clientId, final String mobileNo, final String messageText, final long smsProviderId) {
+        persistAndTrigger(null, clientId, messageText, mobileNo, smsProviderId);
     }
 
     private void persistAndTrigger(final Long staffId, final Long clientId, final String messageText, final String mobileNo,

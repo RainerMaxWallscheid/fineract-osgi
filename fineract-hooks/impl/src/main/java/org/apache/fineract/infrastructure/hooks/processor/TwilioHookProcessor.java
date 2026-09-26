@@ -33,9 +33,7 @@ import org.apache.fineract.infrastructure.hooks.data.HookSmsProviderData;
 import org.apache.fineract.infrastructure.hooks.domain.Hook;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfiguration;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfigurationRepository;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.template.service.TemplateDomainService;
 import org.apache.fineract.template.service.TemplateMergeService;
 import org.springframework.stereotype.Service;
@@ -45,7 +43,7 @@ import retrofit2.Callback;
 public class TwilioHookProcessor implements HookProcessor {
     private final HookConfigurationRepository hookConfigurationRepository;
     private final TemplateMergeService templateMergeService;
-    private final ClientRepository clientRepository;
+    private final ClientActivePort clientActivePort;
     private final ProcessorHelper processorHelper;
     private final TemplateDomainService templateDomainService;
 
@@ -93,8 +91,7 @@ public class TwilioHookProcessor implements HookProcessor {
         map.put("BASE_URI", System.getProperty("baseUrl"));
         if (map.containsKey("clientId")) {
             final Long clientId = Long.valueOf(Integer.toString((int) map.get("clientId")));
-            final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
-            final String mobileNo = client.mobileNo();
+            final String mobileNo = this.clientActivePort.mobileNo(clientId);
             if (mobileNo != null && !mobileNo.isEmpty()) {
                 final String compiledMessage = this.templateMergeService.compile(templateDomainService.findOneById(hook.getUgdTemplateId()), map).replace("<p>", "").replace("</p>", "");
                 final Map<String, String> jsonMap = new HashMap<>();
@@ -109,11 +106,11 @@ public class TwilioHookProcessor implements HookProcessor {
 
     @java.lang.SuppressWarnings("all")
     public TwilioHookProcessor(final HookConfigurationRepository hookConfigurationRepository,
-            final TemplateMergeService templateMergeService, final ClientRepository clientRepository,
+            final TemplateMergeService templateMergeService, final ClientActivePort clientActivePort,
             final ProcessorHelper processorHelper, final TemplateDomainService templateDomainService) {
         this.hookConfigurationRepository = hookConfigurationRepository;
         this.templateMergeService = templateMergeService;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.processorHelper = processorHelper;
         this.templateDomainService = templateDomainService;
     }
