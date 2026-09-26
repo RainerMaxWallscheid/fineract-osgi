@@ -50,7 +50,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.repository.LoanBuyDownFeeBalanceRepository;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.domain.NoteType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +91,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         checkClientOrGroupActive(loan);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
                 changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
@@ -137,7 +136,7 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         checkClientOrGroupActive(loan);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
                 changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
