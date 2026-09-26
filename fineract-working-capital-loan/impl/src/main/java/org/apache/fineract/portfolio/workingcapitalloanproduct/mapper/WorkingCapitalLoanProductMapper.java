@@ -28,7 +28,6 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.fund.moduleapi.FundAssociation;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloanbreach.mapper.WorkingCapitalBreachMapper;
@@ -107,8 +106,7 @@ public interface WorkingCapitalLoanProductMapper {
 
     @Named("fundName")
     default String fundName(final Long fundId) {
-        final Object persistable = FundAssociation.persistableById(fundId);
-        return persistable instanceof Fund fund ? fund.getName() : null;
+        return FundAssociation.name(fundId);
     }
 
     @Named("externalIdToString")

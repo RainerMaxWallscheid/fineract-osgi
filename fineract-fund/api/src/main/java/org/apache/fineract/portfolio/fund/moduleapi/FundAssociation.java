@@ -53,4 +53,8 @@ public final class FundAssociation {
     public static Object persistableById(final Long fundId) {
         return port == null ? null : port.persistableById(fundId);
     }
+
+    public static String name(final Long fundId) {
+        return port == null ? null : port.name(fundId);
+    }
 }

@@ -32,4 +32,9 @@ public interface FundPersistablePort {
      * Persistable fund for leftover-impl reads (Object-typed, ADR-021).
      */
     Object persistableById(Long fundId);
+
+    /**
+     * Fund name, or null when the id is null or missing.
+     */
+    String name(Long fundId);
 }

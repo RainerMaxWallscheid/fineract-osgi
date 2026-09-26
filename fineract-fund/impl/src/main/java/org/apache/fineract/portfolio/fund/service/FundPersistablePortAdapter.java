@@ -50,4 +50,10 @@ public class FundPersistablePortAdapter implements FundPersistablePort {
         }
         return this.fundRepository.findById(fundId).orElse(null);
     }
+
+    @Override
+    public String name(final Long fundId) {
+        final Object persistable = persistableById(fundId);
+        return persistable instanceof Fund fund ? fund.getName() : null;
+    }
 }
