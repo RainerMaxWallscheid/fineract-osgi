@@ -25,7 +25,6 @@ import org.apache.fineract.accounting.common.AccountingConstants.AccrualAccounts
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForSavings;
 import org.apache.fineract.accounting.common.AccountingConstants.SavingProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingRuleType;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -40,12 +39,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SavingsProductToGLAccountMappingHelper extends ProductToGLAccountMappingHelper {
 
-    public SavingsProductToGLAccountMappingHelper(final GLAccountRepository glAccountRepository,
-            final ProductToGLAccountMappingRepository glAccountMappingRepository, final FromJsonHelper fromApiJsonHelper,
-            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort,
-            final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
-        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort,
-                paymentTypePersistablePort, codeValueRepository);
+    public SavingsProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository glAccountMappingRepository,
+            final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
+            final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort,
+            final CodeValueRepository codeValueRepository) {
+        super(glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort, paymentTypePersistablePort,
+                codeValueRepository);
     }
 
     /***

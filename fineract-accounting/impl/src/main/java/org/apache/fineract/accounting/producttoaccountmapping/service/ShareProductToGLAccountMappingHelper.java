@@ -24,7 +24,6 @@ import java.util.Map;
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForShares;
 import org.apache.fineract.accounting.common.AccountingConstants.SharesProductAccountingParams;
 import org.apache.fineract.accounting.common.AccountingRuleType;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -39,12 +38,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ShareProductToGLAccountMappingHelper extends ProductToGLAccountMappingHelper {
 
-    public ShareProductToGLAccountMappingHelper(final GLAccountRepository glAccountRepository,
-            final ProductToGLAccountMappingRepository glAccountMappingRepository, final FromJsonHelper fromApiJsonHelper,
-            final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort,
-            final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
-        super(glAccountRepository, glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort,
-                paymentTypePersistablePort, codeValueRepository);
+    public ShareProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository glAccountMappingRepository,
+            final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
+            final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort,
+            final CodeValueRepository codeValueRepository) {
+        super(glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort, paymentTypePersistablePort,
+                codeValueRepository);
     }
 
     /***

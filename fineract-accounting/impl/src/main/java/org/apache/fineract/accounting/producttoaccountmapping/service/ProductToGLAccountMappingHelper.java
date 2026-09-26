@@ -32,8 +32,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForLoan;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
 import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
@@ -58,7 +56,6 @@ import org.springframework.stereotype.Component;
 public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappingValidator {
     protected static final List<GLAccountType> ASSET_LIABILITY_TYPES = List.of(GLAccountType.ASSET, GLAccountType.LIABILITY);
     private static final Integer GL_ACCOUNT_EXPENSE_TYPE = 5;
-    protected final GLAccountRepository accountRepository;
     protected final ProductToGLAccountMappingRepository accountMappingRepository;
     protected final FromJsonHelper fromApiJsonHelper;
     private final ChargeDefinitionPort chargeDefinitionPort;
@@ -404,9 +401,9 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                         if (inputReasonToGLAccountMap.containsKey(currentReasonId)) {
                             final Long newGLAccountId = inputReasonToGLAccountMap.get(currentReasonId);
                             if (!newGLAccountId.equals(existingReasonToGLAccountMapping.getGlAccountId())) {
-                                final Optional<GLAccount> glAccount = accountRepository.findById(newGLAccountId);
-                                if (glAccount.isPresent()) {
-                                    existingReasonToGLAccountMapping.setGlAccount(glAccount.get());
+                                final Object glAccount = optionalGlAccount(newGLAccountId);
+                                if (glAccount != null) {
+                                    existingReasonToGLAccountMapping.setGlAccount(glAccount);
                                     this.accountMappingRepository.saveAndFlush(existingReasonToGLAccountMapping);
                                 }
                             }
@@ -451,9 +448,9 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                         if (inputClassificationToGLAccountMap.containsKey(currentClassificationId)) {
                             final Long newGLAccountId = inputClassificationToGLAccountMap.get(currentClassificationId);
                             if (!newGLAccountId.equals(existingClassificationToGLAccountMapping.getGlAccountId())) {
-                                final Optional<GLAccount> glAccount = accountRepository.findById(newGLAccountId);
-                                if (glAccount.isPresent()) {
-                                    existingClassificationToGLAccountMapping.setGlAccount(glAccount.get());
+                                final Object glAccount = optionalGlAccount(newGLAccountId);
+                                if (glAccount != null) {
+                                    existingClassificationToGLAccountMapping.setGlAccount(glAccount);
                                     this.accountMappingRepository.saveAndFlush(existingClassificationToGLAccountMapping);
                                 }
                             }
@@ -518,11 +515,11 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     private void saveReasonToExpenseMapping(final Long productId, final Long reasonId, final Long expenseAccountId, final PortfolioProductType portfolioProductType, final CashAccountsForLoan cashAccountsForLoan) {
-        final Optional<GLAccount> glAccount = accountRepository.findById(expenseAccountId);
+        final Object glAccount = optionalGlAccount(expenseAccountId);
         final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(reasonId);
         final boolean reasonMappingExists = this.accountMappingRepository.findAllProductToGLAccountMappingsByProductIdAndProductTypeAndFinancialAccountType(productId, portfolioProductType.getValue(), cashAccountsForLoan.getValue()).stream().anyMatch(matching(cashAccountsForLoan, reasonId));
-        if (!reasonMappingExists && glAccount.isPresent() && codeValueOptional.isPresent()) {
-            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get()).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(cashAccountsForLoan.getValue());
+        if (!reasonMappingExists && glAccount != null && codeValueOptional.isPresent()) {
+            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(cashAccountsForLoan.getValue());
             switch (cashAccountsForLoan) {
                 case CHARGE_OFF_EXPENSE -> accountMapping.setChargeOffReason(codeValueOptional.get());
                 case LOSSES_WRITTEN_OFF -> accountMapping.setWriteOffReason(codeValueOptional.get());
@@ -533,7 +530,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     private void saveClassificationToIncomeMapping(final Long productId, final Long classificationId, final Long incomeAccountId, final PortfolioProductType portfolioProductType, final LoanProductAccountingParams classificationParameter) {
-        final Optional<GLAccount> glAccount = accountRepository.findById(incomeAccountId);
+        final Object glAccount = optionalGlAccount(incomeAccountId);
         boolean classificationMappingExists = false;
         if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
             classificationMappingExists = this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> classificationId.equals(mapping.getCapitalizedIncomeClassificationId()));
@@ -541,8 +538,8 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
             classificationMappingExists = this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> classificationId.equals(mapping.getBuydownFeeClassificationId()));
         }
         final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(classificationId);
-        if (glAccount.isPresent() && !classificationMappingExists && codeValueOptional.isPresent()) {
-            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get()).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.CLASSIFICATION_INCOME.getValue());
+        if (glAccount != null && !classificationMappingExists && codeValueOptional.isPresent()) {
+            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.CLASSIFICATION_INCOME.getValue());
             if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
                 accountMapping.setCapitalizedIncomeClassification(codeValueOptional.get());
             } else {
@@ -598,6 +595,13 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         return glAccount;
     }
 
+    private Object optionalGlAccount(final Long accountId) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        return this.glAccountPersistablePort.persistableById(accountId);
+    }
+
     private Object glAccountById(final Long accountId) {
         final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
         if (glAccount == null) {
@@ -635,8 +639,9 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         for (JsonObject jsonObject : mappings) {
             final Long expenseGlAccountId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue(), jsonObject);
             // Validation: expenseGLAccountId must exist as a valid Expense GL account
-            final Optional<GLAccount> glAccount = accountRepository.findById(expenseGlAccountId);
-            if (glAccount.isEmpty() || !glAccount.get().getType().equals(GL_ACCOUNT_EXPENSE_TYPE)) {
+            final Object glAccount = optionalGlAccount(expenseGlAccountId);
+            final Integer accountType = glAccount == null ? null : this.glAccountPersistablePort.accountType(expenseGlAccountId);
+            if (glAccount == null || !accountType.equals(GL_ACCOUNT_EXPENSE_TYPE)) {
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found", "GL Account with ID " + expenseGlAccountId + " does not exist or is not an Expense GL account", LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue()));
             }
         }
@@ -668,8 +673,9 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.classification.invalid", "Classification with ID " + classificationCodeValueId + " does not exist", dataCodeName));
             }
             // Validation: expenseGLAccountId must exist as a valid Expense GL account
-            final Optional<GLAccount> glAccount = accountRepository.findById(incomeGlAccountId);
-            if (glAccount.isEmpty() || !GLAccountType.fromInt(glAccount.get().getType()).isIncomeType()) {
+            final Object glAccount = optionalGlAccount(incomeGlAccountId);
+            final Integer accountType = glAccount == null ? null : this.glAccountPersistablePort.accountType(incomeGlAccountId);
+            if (glAccount == null || !GLAccountType.fromInt(accountType).isIncomeType()) {
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found", "GL Account with ID " + incomeGlAccountId + " does not exist or is not an Income GL account", LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()));
             }
         }
@@ -680,8 +686,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
-        this.accountRepository = accountRepository;
+        public ProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
         this.accountMappingRepository = accountMappingRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
