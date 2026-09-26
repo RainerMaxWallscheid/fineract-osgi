@@ -33,8 +33,6 @@ import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.data.GLAccountDataForLookup;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
@@ -50,6 +48,7 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntriesNotFoundException;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
@@ -92,7 +91,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryWritePlatformServiceJpaRepositoryImpl.class);
     private final GLClosureRepository glClosureRepository;
-    private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final JournalEntryRepository glJournalEntryRepository;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory;
@@ -443,8 +442,9 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         final boolean manualEntry = true;
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
-            final GLAccount glAccount = this.glAccountRepository.findById(singleDebitOrCreditEntryCommand.getGlAccountId()).orElseThrow(() -> new GLAccountNotFoundException(singleDebitOrCreditEntryCommand.getGlAccountId()));
-            validateGLAccountForTransaction(glAccount.getId());
+            final Long glAccountId = singleDebitOrCreditEntryCommand.getGlAccountId();
+            final Object glAccount = glAccountById(glAccountId);
+            validateGLAccountForTransaction(glAccountId);
             String comments = command.getComments();
             if (!StringUtils.isBlank(singleDebitOrCreditEntryCommand.getComments())) {
                 comments = singleDebitOrCreditEntryCommand.getComments();
@@ -518,17 +518,18 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
     private void saveAllDebitOrCreditOpeningBalanceEntries(final JournalEntryCommand command, final Office office, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final Long contraAccountId) {
         final boolean manualEntry = true;
-        final GLAccount contraAccount = this.glAccountRepository.findById(contraAccountId).orElseThrow(() -> new GLAccountNotFoundException(contraAccountId));
-        if (!GLAccountType.fromInt(contraAccount.getType()).isEquityType()) {
+        final Object contraAccount = glAccountById(contraAccountId);
+        if (!GLAccountType.fromInt(this.glAccountPersistablePort.accountType(contraAccountId)).isEquityType()) {
             throw new GeneralPlatformDomainRuleException("error.msg.configuration.opening.balance.contra.account.value.is.invalid.account.type", "Global configuration \'office-opening-balances-contra-account\' value is not an equity type account", contraAccountId);
         }
-        validateGLAccountForTransaction(contraAccount.getId());
+        validateGLAccountForTransaction(contraAccountId);
         final JournalEntryType contraType = getContraType(type);
         String comments = command.getComments();
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
-            final GLAccount glAccount = this.glAccountRepository.findById(singleDebitOrCreditEntryCommand.getGlAccountId()).orElseThrow(() -> new GLAccountNotFoundException(singleDebitOrCreditEntryCommand.getGlAccountId()));
-            validateGLAccountForTransaction(glAccount.getId());
+            final Long glAccountId = singleDebitOrCreditEntryCommand.getGlAccountId();
+            final Object glAccount = glAccountById(glAccountId);
+            validateGLAccountForTransaction(glAccountId);
             if (!StringUtils.isBlank(singleDebitOrCreditEntryCommand.getComments())) {
                 comments = singleDebitOrCreditEntryCommand.getComments();
             }
@@ -570,7 +571,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
     @java.lang.SuppressWarnings("all")
     public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository,
-            final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository,
+            final GLAccountPersistablePort glAccountPersistablePort, final JournalEntryRepository glJournalEntryRepository,
             final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
             final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory,
             final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper,
@@ -583,7 +584,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
             final ConfigurationReadPlatformService configurationReadPlatformService,
             final ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort) {
         this.glClosureRepository = glClosureRepository;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.accountingProcessorForLoanFactory = accountingProcessorForLoanFactory;
@@ -600,6 +601,17 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         this.accountingProcessorForClientTransactions = accountingProcessorForClientTransactions;
         this.configurationReadPlatformService = configurationReadPlatformService;
         this.externalAssetOwnerJournalPort = externalAssetOwnerJournalPort;
+    }
+
+    private Object glAccountById(final Long accountId) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(accountId);
+        }
+        return glAccount;
     }
 }
 

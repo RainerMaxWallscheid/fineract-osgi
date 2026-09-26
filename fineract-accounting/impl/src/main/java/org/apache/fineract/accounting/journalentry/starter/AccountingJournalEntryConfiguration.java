@@ -21,6 +21,7 @@ package org.apache.fineract.accounting.journalentry.starter;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.serialization.JournalEntryCommandFromApiJsonDeserializer;
@@ -84,7 +85,7 @@ public class AccountingJournalEntryConfiguration {
     @Bean
     @ConditionalOnMissingBean(JournalEntryWritePlatformService.class)
     public JournalEntryWritePlatformService journalEntryWritePlatformService(GLClosureRepository glClosureRepository,
-            GLAccountRepository glAccountRepository, JournalEntryRepository glJournalEntryRepository,
+            GLAccountPersistablePort glAccountPersistablePort, JournalEntryRepository glJournalEntryRepository,
             OfficeRepositoryWrapper officeRepositoryWrapper, AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
             AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory,
             AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, AccountingProcessorHelper helper,
@@ -95,7 +96,7 @@ public class AccountingJournalEntryConfiguration {
             CashBasedAccountingProcessorForClientTransactions accountingProcessorForClientTransactions,
             ConfigurationReadPlatformService configurationReadPlatformService,
             ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort) {
-        return new JournalEntryWritePlatformServiceJpaRepositoryImpl(glClosureRepository, glAccountRepository, glJournalEntryRepository,
+        return new JournalEntryWritePlatformServiceJpaRepositoryImpl(glClosureRepository, glAccountPersistablePort, glJournalEntryRepository,
                 officeRepositoryWrapper, accountingProcessorForLoanFactory, accountingProcessorForSavingsFactory,
                 accountingProcessorForSharesFactory, helper, fromApiJsonDeserializer, accountingRuleRepository,
                 glAccountReadPlatformService, organisationCurrencyRepository, context, paymentDetailWritePlatformService,
