@@ -31,7 +31,6 @@ import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransac
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
 import org.springframework.stereotype.Service;
@@ -60,8 +59,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
         }
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
-                changes);
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         changes.putAll(updateBulkRepayments(command, paymentDetail));
         changes.putAll(updateBulkDisbursals(command));
         changes.putAll(updateBulkMandatorySavingsDuePayments(command, paymentDetail));
@@ -87,7 +85,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
         }
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         changes.putAll(updateBulkRepayments(command, paymentDetail));
         changes.putAll(updateBulkDisbursals(command));
         changes.putAll(updateBulkMandatorySavingsDuePayments(command, paymentDetail));
@@ -101,7 +99,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                 .withGroupId(command.entityId()).with(changes).with(changes).build();
     }
 
-    private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
+    private Map<String, Object> updateBulkRepayments(final JsonCommand command, final Object paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
@@ -117,7 +115,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         return changes;
     }
 
-    private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {
+    private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final Object paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         changes.put("SavingsTransactions", this.linkedSavingsAccountPort.mandatoryDeposits(command, paymentDetail));
         return changes;
