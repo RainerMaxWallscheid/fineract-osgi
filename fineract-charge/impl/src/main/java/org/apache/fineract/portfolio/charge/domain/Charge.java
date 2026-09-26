@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -53,7 +52,6 @@ import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
-import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.moduleapi.PaymentTypeAssociation;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 
@@ -525,8 +523,10 @@ public class Charge extends AbstractPersistableCustom<Long> {
         GLAccountData accountData = null;
         if (this.incomeOrLiabilityAccountId != null) {
             final Object persistable = GLAccountAssociation.persistableById(this.incomeOrLiabilityAccountId);
-            if (persistable instanceof GLAccount leftoverAccount) {
-                accountData = new GLAccountData().setId(leftoverAccount.getId()).setName(leftoverAccount.getName()).setGlCode(leftoverAccount.getGlCode());
+            if (persistable != null) {
+                accountData = new GLAccountData().setId(GLAccountAssociation.id(persistable))
+                        .setName(GLAccountAssociation.name(this.incomeOrLiabilityAccountId))
+                        .setGlCode(GLAccountAssociation.glCode(this.incomeOrLiabilityAccountId));
             }
         }
         TaxGroupData taxGroupData = null;
@@ -534,9 +534,10 @@ public class Charge extends AbstractPersistableCustom<Long> {
             taxGroupData = TaxGroupData.lookup(this.taxGroupId, null);
         }
         PaymentTypeData paymentTypeData = null;
-        final PaymentType leftoverPaymentType = leftoverPaymentType();
-        if (leftoverPaymentType != null) {
-            paymentTypeData = PaymentTypeData.builder().id(leftoverPaymentType.getId()).name(leftoverPaymentType.getName()).build();
+        final Object paymentType = PaymentTypeAssociation.persistableById(this.paymentTypeId);
+        if (paymentType != null) {
+            paymentTypeData = PaymentTypeData.builder().id(PaymentTypeAssociation.id(paymentType))
+                    .name(PaymentTypeAssociation.name(this.paymentTypeId)).build();
         }
         final CurrencyData currency = new CurrencyData(this.currencyCode, null, 0, 0, null, null);
         return ChargeData.builder().id(getId()).name(this.name).amount(this.amount).currency(currency).chargeTimeType(chargeTimeType).chargeAppliesTo(chargeAppliesTo).chargeCalculationType(chargeCalculationType).chargePaymentMode(chargePaymentMode).feeOnMonthDay(getFeeOnMonthDay()).feeInterval(this.feeInterval).penalty(this.penalty).active(this.active).freeWithdrawal(this.enableFreeWithdrawal).freeWithdrawalChargeFrequency(this.freeWithdrawalFrequency).restartFrequency(this.restartFrequency).restartFrequencyEnum(this.restartFrequencyEnum).isPaymentType(this.enablePaymentType).paymentTypeOptions(paymentTypeData).minCap(this.minCap).maxCap(this.maxCap).feeFrequency(feeFrequencyType).incomeOrLiabilityAccount(accountData).taxGroup(taxGroupData).build();
@@ -582,9 +583,9 @@ public class Charge extends AbstractPersistableCustom<Long> {
      * Stable catalog projection for foreign BCs (loan create, etc.) without exporting this entity.
      */
     public org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData toDefinitionData() {
-        final PaymentType leftoverPaymentType = leftoverPaymentType();
-        final Long paymentTypeId = leftoverPaymentType != null ? leftoverPaymentType.getId() : this.paymentTypeId;
-        final String paymentTypeName = leftoverPaymentType != null ? leftoverPaymentType.getName() : null;
+        final Object paymentType = PaymentTypeAssociation.persistableById(this.paymentTypeId);
+        final Long paymentTypeId = paymentType != null ? PaymentTypeAssociation.id(paymentType) : this.paymentTypeId;
+        final String paymentTypeName = paymentType != null ? PaymentTypeAssociation.name(this.paymentTypeId) : null;
         return new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(//
                 getId(), //
                 getName(), //
@@ -700,11 +701,6 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public void setPaymentType(final Object paymentType) {
         this.paymentTypeId = PaymentTypeAssociation.id(paymentType);
-    }
-
-    private PaymentType leftoverPaymentType() {
-        final Object persistable = PaymentTypeAssociation.persistableById(this.paymentTypeId);
-        return persistable instanceof PaymentType leftover ? leftover : null;
     }
 
     @java.lang.SuppressWarnings("all")
