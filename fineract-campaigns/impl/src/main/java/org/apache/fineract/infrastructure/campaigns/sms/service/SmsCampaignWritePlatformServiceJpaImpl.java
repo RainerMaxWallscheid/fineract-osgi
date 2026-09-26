@@ -67,8 +67,7 @@ import org.apache.fineract.infrastructure.sms.service.SmsMessagePort;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -86,7 +85,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     private final ReportLookupPort reportLookupPort;
     private final SmsMessagePort smsMessagePort;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
-    private final GroupRepository groupRepository;
+    private final GroupActivePort groupActivePort;
     private final ReadReportingService readReportingService;
     private final GenericDataService genericDataService;
     private final FromJsonHelper fromJsonHelper;
@@ -221,9 +220,10 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
             });
             queryParamForRunReport.put("loanId", loanId.toString());
             if (groupLoan) {
-                Group group = this.groupRepository.findById(groupId).orElse(null);
-                clientSet.addAll(group.getClientMembers());
-                queryParamForRunReport.put("groupId", group.getId().toString());
+                for (final Long memberId : this.groupActivePort.clientMemberIds(groupId)) {
+                    clientSet.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(memberId));
+                }
+                queryParamForRunReport.put("groupId", groupId.toString());
             } else {
                 Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
                 clientSet.add(client);
@@ -488,14 +488,14 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessagePort smsMessagePort, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupRepository groupRepository, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
+        public SmsCampaignWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final SmsCampaignRepository smsCampaignRepository, final SmsCampaignValidator smsCampaignValidator, final ReportLookupPort reportLookupPort, final SmsMessagePort smsMessagePort, final ClientRepositoryWrapper clientRepositoryWrapper, final GroupActivePort groupActivePort, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper, final SmsMessageScheduledJobService smsMessageScheduledJobService) {
         this.context = context;
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsCampaignValidator = smsCampaignValidator;
         this.reportLookupPort = reportLookupPort;
         this.smsMessagePort = smsMessagePort;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
-        this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.readReportingService = readReportingService;
         this.genericDataService = genericDataService;
         this.fromJsonHelper = fromJsonHelper;

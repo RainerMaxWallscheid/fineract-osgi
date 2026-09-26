@@ -47,9 +47,7 @@ import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidLoanTypeException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsAccountExistencePort;
@@ -64,7 +62,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     private final SmsMessagePort smsMessagePort;
     private final OfficeRepository officeRepository;
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler;
-    private final GroupRepository groupRepository;
+    private final GroupActivePort groupActivePort;
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
     private final SmsCampaignValidator smsCampaignValidator;
     private final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort;
@@ -165,8 +163,9 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         throw new InvalidLoanTypeException("Loan Type cannot be Invalid for the Triggered Sms Campaign");
                     }
                     if (view.groupLoan()) {
-                        Group group = this.groupRepository.findById(view.groupId()).orElseThrow(() -> new GroupNotFoundException(view.groupId()));
-                        groupClients.addAll(group.getClientMembers());
+                        for (final Long memberId : this.groupActivePort.clientMemberIds(view.groupId())) {
+                            groupClients.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(memberId));
+                        }
                     } else {
                         if (view.clientId() != null) {
                             groupClients.add(this.clientRepositoryWrapper.findOneWithNotFoundDetection(view.clientId()));
@@ -353,12 +352,12 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort) {
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessagePort smsMessagePort, final OfficeRepository officeRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupActivePort groupActivePort, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator, final SmsCampaignTriggerEventPort smsCampaignTriggerEventPort, final SavingsAccountExistencePort savingsAccountExistencePort, final LoanExistencePort loanExistencePort) {
         this.smsCampaignRepository = smsCampaignRepository;
         this.smsMessagePort = smsMessagePort;
         this.officeRepository = officeRepository;
         this.smsCampaignWritePlatformCommandHandler = smsCampaignWritePlatformCommandHandler;
-        this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.smsMessageScheduledJobService = smsMessageScheduledJobService;
         this.smsCampaignValidator = smsCampaignValidator;
         this.smsCampaignTriggerEventPort = smsCampaignTriggerEventPort;

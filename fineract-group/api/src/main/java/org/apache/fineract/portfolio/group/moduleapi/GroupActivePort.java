@@ -47,6 +47,14 @@ public interface GroupActivePort {
     boolean hasClientAsMember(Long groupId, Long clientId);
 
     /**
+     * Client member ids of the group. Empty when the group has no client members.
+     *
+     * @throws org.apache.fineract.portfolio.group.exception.GroupNotFoundException
+     *             when the id does not exist
+     */
+    List<Long> clientMemberIds(Long groupId);
+
+    /**
      * Ids of groups whose parent is {@code parentId}. Empty when none.
      */
     List<Long> childIds(Long parentId);

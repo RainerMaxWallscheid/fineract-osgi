@@ -16,6 +16,8 @@ SMS/email campaign write, domain service, `SmsConfigUtils`, gateway/email batch 
 
 Email message assemble uses ClientActivePort/GroupActivePort/StaffPersistablePort (not leftover Client, Group, or Staff repositories).
 
+SMS campaign group lookups use GroupActivePort.clientMemberIds (not leftover Group repository).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```

@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
@@ -77,6 +79,19 @@ public class GroupActivePortAdapter implements GroupActivePort {
     @Override
     public boolean hasClientAsMember(final Long groupId, final Long clientId) {
         return group(groupId).isChildClient(clientId);
+    }
+
+    @Override
+    public List<Long> clientMemberIds(final Long groupId) {
+        final Set<Client> members = group(groupId).getClientMembers();
+        if (members == null || members.isEmpty()) {
+            return List.of();
+        }
+        final List<Long> ids = new ArrayList<>(members.size());
+        for (final Client member : members) {
+            ids.add(member.getId());
+        }
+        return ids;
     }
 
     @Override
