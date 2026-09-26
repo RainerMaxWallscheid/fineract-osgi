@@ -25,7 +25,7 @@ Impl-only: `…portfolio.charge.domain.Charge`, repositories, write services, ha
 
 Client charge and client transaction writes use ClientActivePort.assertActiveInUserScope (not leftover Client repository).
 
-Charge entities store payment-type id (not leftover PaymentType). Charge data reads use GLAccountPersistablePort and PaymentTypePersistablePort (not leftover GLAccount or PaymentType). Client transaction payment type ids use PaymentDetailPersistablePort (not leftover PaymentDetail).
+Charge entities store payment-type id (not leftover PaymentType). Charge data reads use GLAccountPersistablePort and PaymentTypePersistablePort (not leftover GLAccount or PaymentType). Client transaction payment type ids use PaymentDetailPersistablePort (not leftover PaymentDetail). Client charge payment detail creates use Object payment details (not leftover PaymentDetail).
 
 
 Residual adapters **closed** into charge-impl: `ChargeAccountingDropdownPortAdapter`,

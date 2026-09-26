@@ -57,7 +57,6 @@ import org.apache.fineract.portfolio.client.domain.ClientChargeRepositoryWrapper
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.apache.fineract.portfolio.client.domain.ClientTransactionRepository;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -141,7 +140,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             clientCharge.pay(chargePaid);
             // create Payment Transaction
             final Map<String, Object> changes = new LinkedHashMap<>();
-            final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+            final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
             ClientTransaction clientTransaction = ClientTransaction.payCharge(client, this.clientActivePort.office(clientId), paymentDetail, transactionDate, chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
             // update charge paid by associations
