@@ -18,6 +18,8 @@ Email message assemble uses ClientActivePort/GroupActivePort/StaffPersistablePor
 
 SMS campaign group lookups use GroupActivePort.clientMemberIds (not leftover Group repository).
 
+Email campaign outbound uses ClientActivePort (not leftover Client repository).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```

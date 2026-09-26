@@ -43,8 +43,7 @@ import org.apache.fineract.infrastructure.campaigns.email.service.EmailCampaignR
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailCampaignWritePlatformService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -55,7 +54,7 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateEmailOutboundWithCampaignMessageTasklet.class);
     private final EmailCampaignReadPlatformService emailCampaignReadPlatformService;
     private final EmailCampaignRepository emailCampaignRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final EmailMessageRepository emailMessageRepository;
     private final EmailCampaignWritePlatformService emailCampaignWritePlatformService;
 
@@ -88,8 +87,8 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
                 for (HashMap<String, Object> entry : runReportObject) {
                     String message = compileEmailTemplate(messageTemplate, campaignName, entry);
                     Integer clientId = (Integer) entry.get("id");
-                    Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId.longValue());
-                    String emailAddress = client.emailAddress();
+                    final Object client = this.clientActivePort.persistableById(clientId.longValue());
+                    final String emailAddress = this.clientActivePort.emailAddress(clientId.longValue());
                     if (emailAddress != null && isValidEmail(emailAddress)) {
                         EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailSubject, message, emailAddress, campaignName);
                         emailMessageRepository.save(emailMessage);
@@ -134,10 +133,10 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UpdateEmailOutboundWithCampaignMessageTasklet(final EmailCampaignReadPlatformService emailCampaignReadPlatformService, final EmailCampaignRepository emailCampaignRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final EmailMessageRepository emailMessageRepository, final EmailCampaignWritePlatformService emailCampaignWritePlatformService) {
+        public UpdateEmailOutboundWithCampaignMessageTasklet(final EmailCampaignReadPlatformService emailCampaignReadPlatformService, final EmailCampaignRepository emailCampaignRepository, final ClientActivePort clientActivePort, final EmailMessageRepository emailMessageRepository, final EmailCampaignWritePlatformService emailCampaignWritePlatformService) {
         this.emailCampaignReadPlatformService = emailCampaignReadPlatformService;
         this.emailCampaignRepository = emailCampaignRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.emailMessageRepository = emailMessageRepository;
         this.emailCampaignWritePlatformService = emailCampaignWritePlatformService;
     }

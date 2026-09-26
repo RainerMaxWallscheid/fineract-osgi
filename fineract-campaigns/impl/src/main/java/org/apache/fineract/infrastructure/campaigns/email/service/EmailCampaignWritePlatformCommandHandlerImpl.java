@@ -61,8 +61,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingServi
 import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -80,7 +79,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     private final EmailCampaignValidator emailCampaignValidator;
     private final ReportLookupPort reportLookupPort;
     private final EmailMessageRepository emailMessageRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final ReadReportingService readReportingService;
     private final GenericDataService genericDataService;
     private final FromJsonHelper fromJsonHelper;
@@ -171,8 +170,8 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
                     if (clientId == null) {
                         continue;
                     }
-                    Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
-                    String emailAddress = client.emailAddress();
+                    final Object client = this.clientActivePort.persistableById(clientId);
+                    final String emailAddress = this.clientActivePort.emailAddress(clientId);
                     if (emailAddress != null && isValidEmail(emailAddress)) {
                         EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailCampaign.getEmailSubject(), message, emailAddress, emailCampaign.getCampaignName());
                         this.emailMessageRepository.save(emailMessage);
@@ -196,8 +195,8 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
                     String message = this.compileEmailTemplate(messageTemplate, campaignName, entry);
                     Integer clientId = (Integer) entry.get("id");
                     EmailCampaign emailCampaign = this.emailCampaignRepository.findById(campaignId).orElse(null);
-                    Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId.longValue());
-                    String emailAddress = client.emailAddress();
+                    final Object client = this.clientActivePort.persistableById(clientId.longValue());
+                    final String emailAddress = this.clientActivePort.emailAddress(clientId.longValue());
                     if (emailAddress != null && isValidEmail(emailAddress)) {
                         EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailSubject, message, emailAddress, campaignName);
                         this.emailMessageRepository.save(emailMessage);
@@ -374,13 +373,13 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     }
 
     @java.lang.SuppressWarnings("all")
-        public EmailCampaignWritePlatformCommandHandlerImpl(final PlatformSecurityContext context, final EmailCampaignRepository emailCampaignRepository, final EmailCampaignValidator emailCampaignValidator, final ReportLookupPort reportLookupPort, final EmailMessageRepository emailMessageRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper) {
+        public EmailCampaignWritePlatformCommandHandlerImpl(final PlatformSecurityContext context, final EmailCampaignRepository emailCampaignRepository, final EmailCampaignValidator emailCampaignValidator, final ReportLookupPort reportLookupPort, final EmailMessageRepository emailMessageRepository, final ClientActivePort clientActivePort, final ReadReportingService readReportingService, final GenericDataService genericDataService, final FromJsonHelper fromJsonHelper) {
         this.context = context;
         this.emailCampaignRepository = emailCampaignRepository;
         this.emailCampaignValidator = emailCampaignValidator;
         this.reportLookupPort = reportLookupPort;
         this.emailMessageRepository = emailMessageRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.readReportingService = readReportingService;
         this.genericDataService = genericDataService;
         this.fromJsonHelper = fromJsonHelper;

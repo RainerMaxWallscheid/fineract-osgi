@@ -23,7 +23,7 @@ import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessageRep
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailCampaignReadPlatformService;
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailCampaignWritePlatformService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -47,7 +47,7 @@ public class UpdateEmailOutboundWithCampaignMessageConfig {
     @Autowired
     private EmailCampaignRepository emailCampaignRepository;
     @Autowired
-    private ClientRepositoryWrapper clientRepositoryWrapper;
+    private ClientActivePort clientActivePort;
     @Autowired
     private EmailMessageRepository emailMessageRepository;
     @Autowired
@@ -68,6 +68,6 @@ public class UpdateEmailOutboundWithCampaignMessageConfig {
     @Bean
     public UpdateEmailOutboundWithCampaignMessageTasklet updateEmailOutboundWithCampaignMessageTasklet() {
         return new UpdateEmailOutboundWithCampaignMessageTasklet(emailCampaignReadPlatformService, emailCampaignRepository,
-                clientRepositoryWrapper, emailMessageRepository, emailCampaignWritePlatformService);
+                clientActivePort, emailMessageRepository, emailCampaignWritePlatformService);
     }
 }
