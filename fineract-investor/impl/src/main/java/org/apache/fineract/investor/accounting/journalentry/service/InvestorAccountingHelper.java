@@ -25,7 +25,6 @@ import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalid
 import org.apache.fineract.accounting.moduleapi.ExternalOwnerTransferJournalPort;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GlJournalEntryInvalidReason;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -65,7 +64,7 @@ public class InvestorAccountingHelper {
         }
     }
 
-    public Object createDebitJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final int accountMappingTypeId, final Long loanProductId, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder) {
+    public Object createDebitJournalEntryOrReversalForInvestor(final Object office, final String currencyCode, final int accountMappingTypeId, final Long loanProductId, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder) {
         final Object account = getLinkedGLAccountForLoanProduct(loanProductId, accountMappingTypeId);
         if (isReversalOrder) {
             return createCreditJournalEntryForInvestor(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
@@ -74,7 +73,7 @@ public class InvestorAccountingHelper {
         }
     }
 
-    public Object createCreditJournalEntryOrReversalForInvestor(final Office office, final String currencyCode, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder, final Object account) {
+    public Object createCreditJournalEntryOrReversalForInvestor(final Object office, final String currencyCode, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversalOrder, final Object account) {
         if (isReversalOrder) {
             return createDebitJournalEntryForInvestor(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
         } else {
@@ -94,13 +93,13 @@ public class InvestorAccountingHelper {
         return this.transferJournalPort.chargeOffGlAccount(loanProductId, PortfolioProductType.LOAN.getValue(), chargeOffReasonId);
     }
 
-    private Object createCreditJournalEntryForInvestor(final Office office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private Object createCreditJournalEntryForInvestor(final Object office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
         return this.transferJournalPort.postInvestorCredit(office, currencyCode, account, modifiedTransactionId, transactionDate, amount,
                 loanId);
     }
 
-    private Object createDebitJournalEntryForInvestor(final Office office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private Object createDebitJournalEntryForInvestor(final Object office, final String currencyCode, final Object account, final Long loanId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final String modifiedTransactionId = INVESTOR_TRANSFER_IDENTIFIER + transactionId;
         return this.transferJournalPort.postInvestorDebit(office, currencyCode, account, modifiedTransactionId, transactionDate, amount,
                 loanId);

@@ -24,7 +24,6 @@ import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.JournalEntryMapper;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
@@ -37,7 +36,6 @@ import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingNotFoundException;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +79,7 @@ public class ExternalOwnerTransferJournalPortAdapter implements ExternalOwnerTra
     private Object persist(final Object office, final String currencyCode, final Object glAccount, final String transactionId,
             final LocalDate transactionDate, final BigDecimal amount, final Long loanId, final JournalEntryType type) {
         final boolean manualEntry = false;
-        final JournalEntry journalEntry = JournalEntry.createNew((Office) office, null, (GLAccount) glAccount, currencyCode, transactionId,
+        final JournalEntry journalEntry = JournalEntry.createNew(office, null, glAccount, currencyCode, transactionId,
                 manualEntry, transactionDate, type, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null, null, null, null, null);
         return this.journalEntryRepository.saveAndFlush(journalEntry);
     }

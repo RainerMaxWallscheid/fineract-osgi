@@ -38,7 +38,6 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerJournalEntryMapping
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMapping;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferJournalEntryMappingRepository;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferJournalContextPort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanTransferSnapshotPort;
 import org.springframework.lang.NonNull;
@@ -201,7 +200,7 @@ public class AccountingServiceImpl implements AccountingService {
     private List<Object> createJournalEntries(final Object loan, final Long transactionId, final LocalDate transactionDate, final BigDecimal principalAmount, final BigDecimal interestAmount, final BigDecimal feesAmount, final BigDecimal penaltiesAmount, final BigDecimal overPaymentAmount, final boolean isReversalOrder) {
         final Long loanProductId = loanTransferJournalContextPort.productId(loan);
         final Long loanId = loanTransferJournalContextPort.loanId(loan);
-        final Office office = (Office) loanTransferJournalContextPort.office(loan);
+        final Object office = loanTransferJournalContextPort.office(loan);
         final String currencyCode = loanTransferJournalContextPort.currencyCode(loan);
         final boolean chargedOff = loanTransferJournalContextPort.chargedOff(loan);
         final List<Object> journalEntryList = new ArrayList<>();

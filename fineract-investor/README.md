@@ -21,7 +21,7 @@ No `:fineract-investor` façade.
 
 ### Residual (impl, composition root)
 
-Provider journal/loan poster still uses **entities** (`ExternalAssetOwner*`) and `AccountingService` (entity-typed port) from **impl**.
+Provider journal/loan poster still uses **entities** (`ExternalAssetOwner*`) and `AccountingService` (entity-typed port) from **impl**. External-owner transfer investor journals use Object office and GL accounts (not leftover Office or GLAccount).
 
 ### Consumers
 
