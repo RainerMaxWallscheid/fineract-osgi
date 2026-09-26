@@ -1211,7 +1211,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         changes.put("locale", command.locale());
         changes.put("dateFormat", command.dateFormat());
         changes.put("paymentTypeId", command.longValueOfParameterNamed("paymentTypeId"));
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createPaymentDetail(command, changes);
         LoanAdjustmentParameter parameter = LoanAdjustmentParameter.builder().transactionAmount(transactionAmount)
                 .paymentDetail(paymentDetail).transactionDate(transactionDate).txnExternalId(txnExternalId)
                 .reversalTxnExternalId(reversalTxnExternalId).noteText(noteText).build();
