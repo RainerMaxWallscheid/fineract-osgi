@@ -662,7 +662,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         updateInstallmentsPostDate(loan, foreClosureDate);
         LoanTransaction payment = null;
         if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()) {
-            final PaymentDetail paymentDetail = null;
+            final Object paymentDetail = null;
             payment = LoanTransaction.repayment(loan.getOffice(), payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable),
                     paymentDetail, foreClosureDate, externalId);
             payment.updateLoan(loan);
