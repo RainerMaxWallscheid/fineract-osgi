@@ -36,6 +36,12 @@ public interface PaymentDetailPersistablePort {
     Long paymentTypeId(Long paymentDetailId);
 
     /**
+     * Cash-payment flag. False when the id is null, the detail is missing, or it has no payment type. Unboxes a null
+     * cash flag.
+     */
+    boolean cashPayment(Long paymentDetailId);
+
+    /**
      * Account number, or null when the detail id is null, missing, or the number is null.
      */
     String accountNumber(Long paymentDetailId);

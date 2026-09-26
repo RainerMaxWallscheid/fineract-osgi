@@ -57,7 +57,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidator;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanDisbursementValidator;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+
 import org.springframework.lang.NonNull;
 
 public class LoanDisbursementService {
@@ -209,7 +209,7 @@ public class LoanDisbursementService {
         return disburseAmount;
     }
 
-    public void handleDisbursementTransaction(final Loan loan, final LocalDate disbursedOn, final PaymentDetail paymentDetail) {
+    public void handleDisbursementTransaction(final Loan loan, final LocalDate disbursedOn, final Object paymentDetail) {
         // add repayment transaction to track incoming money from client to mfi
         // for (charges due at time of disbursement)
         /*

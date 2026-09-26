@@ -66,6 +66,16 @@ public final class PaymentDetailAssociation {
         return port == null ? null : port.paymentTypeId(paymentDetailId);
     }
 
+    /**
+     * Cash-payment flag for a persistable payment detail. False when the detail or the port is missing.
+     */
+    public static boolean cashPayment(final Object paymentDetail) {
+        if (paymentDetail == null || port == null) {
+            return false;
+        }
+        return port.cashPayment(id(paymentDetail));
+    }
+
     public static String accountNumber(final Long paymentDetailId) {
         return port == null ? null : port.accountNumber(paymentDetailId);
     }

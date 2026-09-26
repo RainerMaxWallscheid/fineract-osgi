@@ -55,6 +55,15 @@ public class PaymentDetailPersistablePortAdapter implements PaymentDetailPersist
     }
 
     @Override
+    public boolean cashPayment(final Long paymentDetailId) {
+        final PaymentDetail detail = detail(paymentDetailId);
+        if (detail == null || detail.getPaymentType() == null) {
+            return false;
+        }
+        return detail.getPaymentType().getIsCashPayment();
+    }
+
+    @Override
     public String accountNumber(final Long paymentDetailId) {
         final PaymentDetail detail = detail(paymentDetailId);
         return detail == null ? null : detail.getAccountNumber();
