@@ -51,8 +51,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.cob.exceptions.AccountLockCannotBeOverruledException;
 import org.apache.fineract.cob.service.LoanHardLockPort;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.configuration.service.TemporaryConfigurationServiceContainer;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -282,7 +281,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final GuarantorDomainService guarantorDomainService;
     private final LoanUtilService loanUtilService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final CashierTxnValidationPort cashierTxnValidationPort;
     private final GLIMAccountInfoRepository glimRepository;
     private final LoanRepository loanRepository;
@@ -1398,8 +1397,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final Loan loan = this.loanAssembler.assembleFrom(loanId);
         if (command.hasParameter("writeoffReasonId")) {
             Long writeoffReasonId = command.longValueOfParameterNamed("writeoffReasonId");
-            CodeValue writeoffReason = this.codeValueRepository
-                    .findOneByCodeNameAndIdWithNotFoundDetection(LoanApiConstants.WRITEOFFREASONS, writeoffReasonId);
+            Object writeoffReason = this.codeValuePersistablePort.persistableByCodeNameAndId(LoanApiConstants.WRITEOFFREASONS,
+                    writeoffReasonId);
             changes.put("writeoffReasonId", writeoffReasonId);
             loan.updateWriteOffReason(writeoffReason);
         }
@@ -2538,8 +2537,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         businessEventNotifierService.notifyPreBusinessEvent(new LoanChargeOffPreBusinessEvent(loan));
         if (command.hasParameter(LoanApiConstants.chargeOffReasonIdParamName)) {
             Long chargeOffReasonId = command.longValueOfParameterNamed(LoanApiConstants.chargeOffReasonIdParamName);
-            CodeValue chargeOffReason = this.codeValueRepository
-                    .findOneByCodeNameAndIdWithNotFoundDetection(LoanApiConstants.CHARGE_OFF_REASONS, chargeOffReasonId);
+            Object chargeOffReason = this.codeValuePersistablePort.persistableByCodeNameAndId(LoanApiConstants.CHARGE_OFF_REASONS,
+                    chargeOffReasonId);
             changes.put(LoanApiConstants.chargeOffReasonIdParamName, chargeOffReasonId);
             loan.markAsChargedOff(transactionDate, currentUser, chargeOffReason);
         } else {
@@ -3400,7 +3399,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final BusinessEventNotifierService businessEventNotifierService, final GuarantorDomainService guarantorDomainService,
             final LoanUtilService loanUtilService,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final CodeValueRepositoryWrapper codeValueRepository, final CashierTxnValidationPort cashierTxnValidationPort,
+            final CodeValuePersistablePort codeValuePersistablePort, final CashierTxnValidationPort cashierTxnValidationPort,
             final GLIMAccountInfoRepository glimRepository, final LoanRepository loanRepository,
             final RepaymentWithPostDatedChecksAssembler repaymentWithPostDatedChecksAssembler,
             final PostDatedChecksRepository postDatedChecksRepository,
@@ -3446,7 +3445,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         this.guarantorDomainService = guarantorDomainService;
         this.loanUtilService = loanUtilService;
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.cashierTxnValidationPort = cashierTxnValidationPort;
         this.glimRepository = glimRepository;
         this.loanRepository = loanRepository;
