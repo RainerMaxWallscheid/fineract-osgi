@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValueAssociation;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
@@ -115,13 +114,7 @@ public class LoanCollateral extends AbstractPersistableCustom<Long> {
     }
 
     public CollateralData toData() {
-        CodeValueData typeData = null;
-        if (this.typeId != null) {
-            final Object persistable = CodeValueAssociation.persistableById(this.typeId);
-            if (persistable instanceof CodeValue leftover) {
-                typeData = leftover.toData();
-            }
-        }
+        final CodeValueData typeData = CodeValueAssociation.toData(this.typeId);
         return CollateralData.instance(getId(), typeData, this.value, this.description, null);
     }
 
