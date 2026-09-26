@@ -26,10 +26,16 @@ public final class PaymentDetailAssociation {
 
     private static PaymentDetailWritePlatformService write;
 
+    private static PaymentDetailPersistablePort port;
+
     private PaymentDetailAssociation() {}
 
     public static void setWritePlatformService(final PaymentDetailWritePlatformService write) {
         PaymentDetailAssociation.write = write;
+    }
+
+    public static void setPersistablePort(final PaymentDetailPersistablePort port) {
+        PaymentDetailAssociation.port = port;
     }
 
     public static Long id(final Object paymentDetail) {
@@ -52,5 +58,29 @@ public final class PaymentDetailAssociation {
 
     public static Object persistableById(final Long paymentDetailId) {
         return write == null ? null : write.persistableById(paymentDetailId);
+    }
+
+    public static Long paymentTypeId(final Long paymentDetailId) {
+        return port == null ? null : port.paymentTypeId(paymentDetailId);
+    }
+
+    public static String accountNumber(final Long paymentDetailId) {
+        return port == null ? null : port.accountNumber(paymentDetailId);
+    }
+
+    public static String checkNumber(final Long paymentDetailId) {
+        return port == null ? null : port.checkNumber(paymentDetailId);
+    }
+
+    public static String routingCode(final Long paymentDetailId) {
+        return port == null ? null : port.routingCode(paymentDetailId);
+    }
+
+    public static String receiptNumber(final Long paymentDetailId) {
+        return port == null ? null : port.receiptNumber(paymentDetailId);
+    }
+
+    public static String bankNumber(final Long paymentDetailId) {
+        return port == null ? null : port.bankNumber(paymentDetailId);
     }
 }

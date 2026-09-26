@@ -28,7 +28,6 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.office.moduleapi.OfficeAssociation;
 import org.apache.fineract.portfolio.PortfolioProductType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailAssociation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -134,37 +133,26 @@ public interface JournalEntryMapper {
     }
 
     default Long paymentTypeId(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null || detail.getPaymentType() == null ? null : detail.getPaymentType().getId();
+        return PaymentDetailAssociation.paymentTypeId(journalEntry.getPaymentDetailId());
     }
 
     default String accountNumber(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null ? null : detail.getAccountNumber();
+        return PaymentDetailAssociation.accountNumber(journalEntry.getPaymentDetailId());
     }
 
     default String checkNumber(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null ? null : detail.getCheckNumber();
+        return PaymentDetailAssociation.checkNumber(journalEntry.getPaymentDetailId());
     }
 
     default String routingCode(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null ? null : detail.getRoutingCode();
+        return PaymentDetailAssociation.routingCode(journalEntry.getPaymentDetailId());
     }
 
     default String receiptNumber(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null ? null : detail.getReceiptNumber();
+        return PaymentDetailAssociation.receiptNumber(journalEntry.getPaymentDetailId());
     }
 
     default String bankNumber(final JournalEntry journalEntry) {
-        final PaymentDetail detail = persistable(journalEntry);
-        return detail == null ? null : detail.getBankNumber();
-    }
-
-    private static PaymentDetail persistable(final JournalEntry journalEntry) {
-        final Object persistable = PaymentDetailAssociation.persistableById(journalEntry.getPaymentDetailId());
-        return persistable instanceof PaymentDetail detail ? detail : null;
+        return PaymentDetailAssociation.bankNumber(journalEntry.getPaymentDetailId());
     }
 }

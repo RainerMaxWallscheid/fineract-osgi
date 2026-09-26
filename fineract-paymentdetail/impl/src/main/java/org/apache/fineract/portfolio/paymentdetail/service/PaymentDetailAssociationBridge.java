@@ -23,7 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentDetailAssociationBridge {
 
-    public PaymentDetailAssociationBridge(final PaymentDetailWritePlatformService write) {
+    public PaymentDetailAssociationBridge(final PaymentDetailWritePlatformService write, final PaymentDetailPersistablePort port) {
         PaymentDetailAssociation.setWritePlatformService(write);
+        PaymentDetailAssociation.setPersistablePort(port);
     }
 }
