@@ -39,7 +39,7 @@ public class PaymentDetailAssembler {
         this.paymentTypeRepository = paymentTypeRepository;
     }
 
-    public PaymentDetail fetchPaymentDetail(final JsonObject json) {
+    public Object fetchPaymentDetail(final JsonObject json) {
         final Long paymentTypeId = this.fromApiJsonHelper.extractLongNamed(PaymentDetailConstants.paymentTypeParamName, json);
         if (paymentTypeId == null) {
             return null;
