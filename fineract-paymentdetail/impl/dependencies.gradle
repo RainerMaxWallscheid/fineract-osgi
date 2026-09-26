@@ -20,6 +20,7 @@
 dependencies {
     api project(path: ':fineract-paymentdetail-api')
     implementation(project(path: ':fineract-core'))
+    implementation(project(path: ':fineract-paymenttype-api'))
     implementation(project(path: ':fineract-command-api'))
 
     implementation(
