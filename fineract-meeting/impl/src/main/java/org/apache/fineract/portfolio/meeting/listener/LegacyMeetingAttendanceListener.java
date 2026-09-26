@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -43,12 +44,9 @@ import org.apache.fineract.portfolio.calendar.exception.CalendarInstanceNotFound
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.meeting.domain.Meeting;
 import org.apache.fineract.portfolio.meeting.domain.MeetingAttendance;
 import org.apache.fineract.portfolio.meeting.domain.MeetingRepository;
@@ -69,8 +67,8 @@ final class LegacyMeetingAttendanceListener {
     private final CalendarInstanceLookupPort calendarInstanceLookupPort;
     private final MeetingRepository meetingRepository;
     private final MeetingRepositoryWrapper meetingRepositoryWrapper;
-    private final GroupRepository groupRepository;
-    private final ClientRepository clientRepository;
+    private final GroupActivePort groupActivePort;
+    private final ClientActivePort clientActivePort;
     private final FromJsonHelper fromApiJsonHelper;
 
     @EventListener
@@ -144,9 +142,9 @@ final class LegacyMeetingAttendanceListener {
         // TODO: maybe slightly more modern approach could be to introduce Jackson's ObjectMapper to avoid all these
         // magic strings; not sure if it's worth it though
         final Collection<MeetingAttendance> clientsAttendance = new ArrayList<>();
-        Collection<Group> childGroups = null;
+        List<Long> childGroupIds = null;
         if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
-            childGroups = this.groupRepository.findByParentId(meeting.leftoverCalendarInstance().getEntityId());
+            childGroupIds = this.groupActivePort.childIds(meeting.leftoverCalendarInstance().getEntityId());
         }
         final String json = command.json();
         final JsonElement element = this.fromApiJsonHelper.parse(json);
@@ -158,15 +156,15 @@ final class LegacyMeetingAttendanceListener {
                     final JsonObject attendanceElement = array.get(i).getAsJsonObject();
                     final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, attendanceElement);
                     final Integer attendanceTypeId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(attendanceTypeParamName, attendanceElement);
-                    final Client client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
-                    client.loadLazyCollections();
-                    if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.leftoverCalendarInstance().getEntityId())) {
+                    final Object client = this.clientActivePort.persistableById(clientId, true);
+                    if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId())
+                            && !this.groupActivePort.hasClientAsMember(meeting.leftoverCalendarInstance().getEntityId(), clientId)) {
                         throw new ClientNotInGroupException(clientId, meeting.leftoverCalendarInstance().getEntityId());
                     } else if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
-                        if (childGroups != null && !childGroups.isEmpty()) {
+                        if (childGroupIds != null && !childGroupIds.isEmpty()) {
                             boolean isChildClient = false;
-                            for (final Group group : childGroups) {
-                                if (group.isChildClient(clientId)) {
+                            for (final Long childGroupId : childGroupIds) {
+                                if (this.groupActivePort.hasClientAsMember(childGroupId, clientId)) {
                                     isChildClient = true;
                                     break;
                                 }
@@ -209,12 +207,14 @@ final class LegacyMeetingAttendanceListener {
             /*
              * If group is within a center then center entityType should be passed for retrieving CalendarInstance.
              */
-            final Group group = this.groupRepository.findById(entityId).orElseThrow();
-            if (group.isCenter()) {
+            if (this.groupActivePort.isCenter(entityId)) {
                 entityType = CalendarEntityType.CENTERS;
-            } else if (group.isChildGroup()) {
-                entityType = CalendarEntityType.CENTERS;
-                entityId = group.getParent().getId();
+            } else {
+                final Long parentId = this.groupActivePort.parentId(entityId);
+                if (parentId != null) {
+                    entityType = CalendarEntityType.CENTERS;
+                    entityId = parentId;
+                }
             }
         }
         final CalendarInstance calendarInstance = this.calendarInstanceLookupPort.findByCalendarIdAndEntityIdAndEntityTypeId(calendarForUpdate.getId(), entityId, entityType.getValue());
@@ -227,14 +227,14 @@ final class LegacyMeetingAttendanceListener {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepository clientRepository, final FromJsonHelper fromApiJsonHelper) {
+        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupActivePort groupActivePort, final ClientActivePort clientActivePort, final FromJsonHelper fromApiJsonHelper) {
         this.configurationDomainService = configurationDomainService;
         this.calendarRepository = calendarRepository;
         this.calendarInstanceLookupPort = calendarInstanceLookupPort;
         this.meetingRepository = meetingRepository;
         this.meetingRepositoryWrapper = meetingRepositoryWrapper;
-        this.groupRepository = groupRepository;
-        this.clientRepository = clientRepository;
+        this.groupActivePort = groupActivePort;
+        this.clientActivePort = clientActivePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

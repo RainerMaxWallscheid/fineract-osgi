@@ -36,11 +36,9 @@ import org.apache.fineract.portfolio.calendar.exception.CalendarInstanceNotFound
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceData;
 import org.apache.fineract.portfolio.meeting.data.MeetingCreateRequest;
 import org.apache.fineract.portfolio.meeting.data.MeetingCreateResponse;
@@ -66,8 +64,8 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     private final MeetingRepository meetingRepository;
     private final CalendarInstanceLookupPort calendarInstanceLookupPort;
     private final CalendarRepository calendarRepository;
-    private final ClientRepository clientRepository;
-    private final GroupRepository groupRepository;
+    private final ClientActivePort clientActivePort;
+    private final GroupActivePort groupActivePort;
     private final ConfigurationDomainService configurationDomainService;
 
     @Override
@@ -142,12 +140,14 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     private CalendarInstance getCalendarInstance(Long calendarId, Long entityId, CalendarEntityType entityType) {
         var calendar = this.calendarRepository.findById(calendarId).orElseThrow(() -> new CalendarNotFoundException(calendarId));
         if (CalendarEntityType.GROUPS.equals(entityType)) {
-            final Group group = this.groupRepository.findById(entityId).orElseThrow();
-            if (group.isCenter()) {
+            if (this.groupActivePort.isCenter(entityId)) {
                 entityType = CalendarEntityType.CENTERS;
-            } else if (group.isChildGroup()) {
-                entityType = CalendarEntityType.CENTERS;
-                entityId = group.getParent().getId();
+            } else {
+                final Long parentId = this.groupActivePort.parentId(entityId);
+                if (parentId != null) {
+                    entityType = CalendarEntityType.CENTERS;
+                    entityId = parentId;
+                }
             }
         }
         final var calendarInstance = this.calendarInstanceLookupPort.findByCalendarIdAndEntityIdAndEntityTypeId(calendar.getId(), entityId, entityType.getValue());
@@ -160,12 +160,19 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     HashSet<MeetingAttendance> getClientsAttendance(Meeting meeting, List<MeetingAttendanceData> attendances) {
         var meetingAttendances = new HashSet<MeetingAttendance>();
         for (var attendance : attendances) {
-            var client = clientRepository.findById(attendance.getClientId()).orElseThrow(() -> new ClientNotFoundException(attendance.getClientId()));
-            if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.leftoverCalendarInstance().getEntityId())) {
+            final Object client = this.clientActivePort.persistableById(attendance.getClientId());
+            final Long clientId = this.clientActivePort.id(client);
+            if (CalendarEntityType.isGroup(meeting.leftoverCalendarInstance().getEntityTypeId())
+                    && !this.groupActivePort.hasClientAsMember(meeting.leftoverCalendarInstance().getEntityId(), clientId)) {
                 throw new ClientNotInGroupException(attendance.getId(), meeting.leftoverCalendarInstance().getEntityId());
             } else if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
                 if (CalendarEntityType.isCenter(meeting.leftoverCalendarInstance().getEntityTypeId())) {
-                    var size = groupRepository.findByParentId(meeting.leftoverCalendarInstance().getEntityId()).stream().filter(group -> group.isChildClient(attendance.getId())).count();
+                    long size = 0L;
+                    for (final Long childId : this.groupActivePort.childIds(meeting.leftoverCalendarInstance().getEntityId())) {
+                        if (this.groupActivePort.hasClientAsMember(childId, attendance.getId())) {
+                            size++;
+                        }
+                    }
                     if (size == 0L) {
                         throw new ClientNotInGroupException("client.not.in.center", "Client with identifier " + attendance.getId() + " is not in center " + meeting.leftoverCalendarInstance().getEntityId(), attendance.getId(), meeting.leftoverCalendarInstance().getEntityId());
                     }
@@ -184,12 +191,12 @@ public class MeetingWriteServiceImpl implements MeetingWriteService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public MeetingWriteServiceImpl(final MeetingRepository meetingRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final CalendarRepository calendarRepository, final ClientRepository clientRepository, final GroupRepository groupRepository, final ConfigurationDomainService configurationDomainService) {
+        public MeetingWriteServiceImpl(final MeetingRepository meetingRepository, final CalendarInstanceLookupPort calendarInstanceLookupPort, final CalendarRepository calendarRepository, final ClientActivePort clientActivePort, final GroupActivePort groupActivePort, final ConfigurationDomainService configurationDomainService) {
         this.meetingRepository = meetingRepository;
         this.calendarInstanceLookupPort = calendarInstanceLookupPort;
         this.calendarRepository = calendarRepository;
-        this.clientRepository = clientRepository;
-        this.groupRepository = groupRepository;
+        this.clientActivePort = clientActivePort;
+        this.groupActivePort = groupActivePort;
         this.configurationDomainService = configurationDomainService;
     }
 }

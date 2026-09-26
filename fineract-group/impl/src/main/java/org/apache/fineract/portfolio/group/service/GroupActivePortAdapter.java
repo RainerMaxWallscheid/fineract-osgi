@@ -19,7 +19,11 @@
 package org.apache.fineract.portfolio.group.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.springframework.stereotype.Service;
@@ -28,9 +32,11 @@ import org.springframework.stereotype.Service;
 public class GroupActivePortAdapter implements GroupActivePort {
 
     private final GroupRepositoryWrapper groupRepository;
+    private final GroupRepository groupRepositoryDirect;
 
-    public GroupActivePortAdapter(final GroupRepositoryWrapper groupRepository) {
+    public GroupActivePortAdapter(final GroupRepositoryWrapper groupRepository, final GroupRepository groupRepositoryDirect) {
         this.groupRepository = groupRepository;
+        this.groupRepositoryDirect = groupRepositoryDirect;
     }
 
     @Override
@@ -66,6 +72,19 @@ public class GroupActivePortAdapter implements GroupActivePort {
     @Override
     public boolean hasClientAsMember(final Long groupId, final Long clientId) {
         return group(groupId).isChildClient(clientId);
+    }
+
+    @Override
+    public List<Long> childIds(final Long parentId) {
+        final Collection<Group> children = this.groupRepositoryDirect.findByParentId(parentId);
+        if (children == null || children.isEmpty()) {
+            return List.of();
+        }
+        final List<Long> ids = new ArrayList<>(children.size());
+        for (final Group child : children) {
+            ids.add(child.getId());
+        }
+        return ids;
     }
 
     @Override

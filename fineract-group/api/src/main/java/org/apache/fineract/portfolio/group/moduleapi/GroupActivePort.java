@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.group.moduleapi;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * ID-only group activity check (ADR-021). Foreign BCs must not depend on
@@ -42,6 +43,11 @@ public interface GroupActivePort {
     Object office(Long groupId);
 
     boolean hasClientAsMember(Long groupId, Long clientId);
+
+    /**
+     * Ids of groups whose parent is {@code parentId}. Empty when none.
+     */
+    List<Long> childIds(Long parentId);
 
     /**
      * Parent group/center id, or null when the group has no parent.
