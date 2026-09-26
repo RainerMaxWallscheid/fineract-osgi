@@ -67,6 +67,7 @@ jar {
                         + 'org.apache.fineract.infrastructure.codes.moduleapi,'
                         + 'org.apache.fineract.portfolio.paymenttype.moduleapi,'
                         + 'org.apache.fineract.organisation.provisioning.moduleapi,'
+                        + 'org.apache.fineract.organisation.office.moduleapi,'
                         + 'org.apache.fineract.useradministration.moduleapi,'
                         + 'org.apache.fineract.portfolio.loanaccount.moduleapi,'
                         + 'org.apache.fineract.portfolio.savings.moduleapi,'

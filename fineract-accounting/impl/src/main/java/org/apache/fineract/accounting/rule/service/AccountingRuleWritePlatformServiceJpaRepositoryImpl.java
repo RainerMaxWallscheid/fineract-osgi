@@ -44,8 +44,8 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -57,7 +57,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
     private final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper;
     private final AccountingRuleRepository accountingRuleRepository;
     private final GLAccountPersistablePort glAccountPersistablePort;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final CodeValuePersistablePort codeValuePersistablePort;
 
@@ -82,9 +82,9 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             // check office is valid
             final Long officeId = command.longValueOfParameterNamed(GLClosureJsonInputParams.OFFICE_ID.getValue());
-            Office office = null;
+            Object office = null;
             if (officeId != null) {
-                office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+                office = officeById(officeId);
             }
             final AccountingRule accountingRule = assembleAccountingRuleAndTags(office, command);
             this.accountingRuleRepository.saveAndFlush(accountingRule);
@@ -212,8 +212,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
                 }
             }
             if (officeId != null && changesOnly.containsKey(AccountingRuleJsonInputParams.OFFICE_ID.getValue())) {
-                final Office userOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
-                accountingRule.setOffice(userOffice);
+                accountingRule.setOffice(officeById(officeId));
             }
             if (!changesOnly.isEmpty()) {
                 this.accountingRuleRepository.saveAndFlush(accountingRule);
@@ -298,12 +297,20 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         return glAccount;
     }
 
+    private Object officeById(final Long officeId) {
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (office == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return office;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort) {
+        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficePersistablePort officePersistablePort, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort) {
         this.accountingRuleRepositoryWrapper = accountingRuleRepositoryWrapper;
         this.accountingRuleRepository = accountingRuleRepository;
         this.glAccountPersistablePort = glAccountPersistablePort;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.codeValuePersistablePort = codeValuePersistablePort;
     }
