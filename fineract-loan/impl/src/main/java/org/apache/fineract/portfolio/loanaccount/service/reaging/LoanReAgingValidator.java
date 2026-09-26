@@ -31,8 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -59,7 +58,7 @@ import org.springframework.stereotype.Component;
 public class LoanReAgingValidator {
 
     private final LoanTransactionRepository loanTransactionRepository;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
     private final List<String> reAgeSupportedParameters = List.of(LoanReAgingApiConstants.externalIdParameterName,
             LoanReAgingApiConstants.startDate, LoanReAgingApiConstants.frequencyType, LoanReAgingApiConstants.frequencyNumber,
@@ -119,7 +118,8 @@ public class LoanReAgingValidator {
         Long reasonCodeValueId = command.longValueOfParameterNamed(LoanReAgingApiConstants.reasonCodeValueIdParamName);
         baseDataValidator.reset().parameter(LoanReAgingApiConstants.reasonCodeValueIdParamName).value(reasonCodeValueId).ignoreIfNull();
         if (reasonCodeValueId != null) {
-            final CodeValue reasonCodeValue = codeValueRepository.findByCodeNameAndId(LoanApiConstants.REAGE_REASONS, reasonCodeValueId);
+            final Object reasonCodeValue = this.codeValuePersistablePort.findByCodeNameAndId(LoanApiConstants.REAGE_REASONS,
+                    reasonCodeValueId);
             if (reasonCodeValue == null) {
                 dataValidationErrors.add(ApiParameterError.parameterError("validation.msg.reage.reason.invalid",
                         "Reage Reason with ID " + reasonCodeValueId + " does not exist", LoanApiConstants.REAGE_REASONS));
@@ -242,10 +242,10 @@ public class LoanReAgingValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-    public LoanReAgingValidator(final LoanTransactionRepository loanTransactionRepository, final CodeValueRepository codeValueRepository,
-            final FromJsonHelper fromApiJsonHelper) {
+    public LoanReAgingValidator(final LoanTransactionRepository loanTransactionRepository,
+            final CodeValuePersistablePort codeValuePersistablePort, final FromJsonHelper fromApiJsonHelper) {
         this.loanTransactionRepository = loanTransactionRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

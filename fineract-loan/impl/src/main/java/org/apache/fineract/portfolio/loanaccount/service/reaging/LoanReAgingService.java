@@ -30,8 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -93,7 +92,7 @@ public class LoanReAgingService {
     private final LoanUtilService loanUtilService;
     private final LoanScheduleService loanScheduleService;
     private final ReprocessLoanTransactionsService reprocessLoanTransactionsService;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanRepaymentScheduleService loanRepaymentScheduleService;
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository;
@@ -259,9 +258,9 @@ public class LoanReAgingService {
         if (reAgeInterestHandlingType == null) {
             reAgeInterestHandlingType = LoanReAgeInterestHandlingType.DEFAULT;
         }
-        CodeValue reasonCodeValue = null;
+        Object reasonCodeValue = null;
         if (command.parameterExists(LoanReAgingApiConstants.reasonCodeValueIdParamName)) {
-            reasonCodeValue = codeValueRepository.findByCodeNameAndId(LoanApiConstants.REAGE_REASONS,
+            reasonCodeValue = this.codeValuePersistablePort.findByCodeNameAndId(LoanApiConstants.REAGE_REASONS,
                     command.longValueOfParameterNamed(LoanReAgingApiConstants.reasonCodeValueIdParamName));
         }
         return new LoanReAgeParameter(reAgeTransaction, periodFrequencyType, periodFrequencyNumber, startDate, numberOfInstallments,
@@ -327,7 +326,7 @@ public class LoanReAgingService {
             final LoanTransactionRepository loanTransactionRepository, final NoteWritePlatformService noteWritePlatformService,
             final LoanChargeValidator loanChargeValidator, final LoanUtilService loanUtilService,
             final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService,
-            final CodeValueRepository codeValueRepository, final LoanRepaymentScheduleService loanRepaymentScheduleService,
+            final CodeValuePersistablePort codeValuePersistablePort, final LoanRepaymentScheduleService loanRepaymentScheduleService,
             final LoanReadPlatformService loanReadPlatformService,
             final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository) {
         this.loanAssembler = loanAssembler;
@@ -340,7 +339,7 @@ public class LoanReAgingService {
         this.loanUtilService = loanUtilService;
         this.loanScheduleService = loanScheduleService;
         this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanRepaymentScheduleService = loanRepaymentScheduleService;
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanCapitalizedIncomeBalanceRepository = loanCapitalizedIncomeBalanceRepository;
