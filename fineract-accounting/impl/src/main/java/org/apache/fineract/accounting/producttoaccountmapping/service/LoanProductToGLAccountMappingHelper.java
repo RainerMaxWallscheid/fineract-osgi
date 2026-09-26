@@ -32,7 +32,7 @@ import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGL
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingInvalidException;
 import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingHelper;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.PortfolioProductType;
@@ -46,9 +46,9 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
     public LoanProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository glAccountMappingRepository,
             final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
             final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort,
-            final CodeValueRepository codeValueRepository) {
+            final CodeValuePersistablePort codeValuePersistablePort) {
         super(glAccountMappingRepository, fromApiJsonHelper, chargeDefinitionPort, glAccountPersistablePort, paymentTypePersistablePort,
-                codeValueRepository);
+                codeValuePersistablePort);
     }
 
     /***

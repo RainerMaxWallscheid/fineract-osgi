@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForLoan;
@@ -40,8 +39,7 @@ import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGL
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingInvalidException;
 import org.apache.fineract.accounting.producttoaccountmapping.exception.ProductToGLAccountMappingNotFoundException;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -61,7 +59,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     private final ChargeDefinitionPort chargeDefinitionPort;
     protected final GLAccountPersistablePort glAccountPersistablePort;
     private final PaymentTypePersistablePort paymentTypePersistablePort;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
 
     public void saveProductToAccountMapping(final JsonElement element, final String paramName, final Long productId, final int placeHolderTypeId, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
@@ -516,13 +514,13 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
 
     private void saveReasonToExpenseMapping(final Long productId, final Long reasonId, final Long expenseAccountId, final PortfolioProductType portfolioProductType, final CashAccountsForLoan cashAccountsForLoan) {
         final Object glAccount = optionalGlAccount(expenseAccountId);
-        final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(reasonId);
+        final Object codeValue = optionalCodeValue(reasonId);
         final boolean reasonMappingExists = this.accountMappingRepository.findAllProductToGLAccountMappingsByProductIdAndProductTypeAndFinancialAccountType(productId, portfolioProductType.getValue(), cashAccountsForLoan.getValue()).stream().anyMatch(matching(cashAccountsForLoan, reasonId));
-        if (!reasonMappingExists && glAccount != null && codeValueOptional.isPresent()) {
+        if (!reasonMappingExists && glAccount != null && codeValue != null) {
             final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(cashAccountsForLoan.getValue());
             switch (cashAccountsForLoan) {
-                case CHARGE_OFF_EXPENSE -> accountMapping.setChargeOffReason(codeValueOptional.get());
-                case LOSSES_WRITTEN_OFF -> accountMapping.setWriteOffReason(codeValueOptional.get());
+                case CHARGE_OFF_EXPENSE -> accountMapping.setChargeOffReason(codeValue);
+                case LOSSES_WRITTEN_OFF -> accountMapping.setWriteOffReason(codeValue);
                 default -> throw new IllegalStateException("Unexpected value: " + cashAccountsForLoan);
             }
             this.accountMappingRepository.saveAndFlush(accountMapping);
@@ -537,13 +535,13 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         } else {
             classificationMappingExists = this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> classificationId.equals(mapping.getBuydownFeeClassificationId()));
         }
-        final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(classificationId);
-        if (glAccount != null && !classificationMappingExists && codeValueOptional.isPresent()) {
+        final Object codeValue = optionalCodeValue(classificationId);
+        if (glAccount != null && !classificationMappingExists && codeValue != null) {
             final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.CLASSIFICATION_INCOME.getValue());
             if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
-                accountMapping.setCapitalizedIncomeClassification(codeValueOptional.get());
+                accountMapping.setCapitalizedIncomeClassification(codeValue);
             } else {
-                accountMapping.setBuydownFeeClassification(codeValueOptional.get());
+                accountMapping.setBuydownFeeClassification(codeValue);
             }
             this.accountMappingRepository.saveAndFlush(accountMapping);
         }
@@ -602,6 +600,13 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         return this.glAccountPersistablePort.persistableById(accountId);
     }
 
+    private Object optionalCodeValue(final Long codeValueId) {
+        if (codeValueId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        return this.codeValuePersistablePort.persistableById(codeValueId);
+    }
+
     private Object glAccountById(final Long accountId) {
         final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
         if (glAccount == null) {
@@ -628,7 +633,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         for (JsonObject jsonObject : mappings) {
             final Long writeOffReasonCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.WRITE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: writeOffReasonCodeValueId must exist in the database
-            CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId("WriteOffReasons", writeOffReasonCodeValueId);
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId("WriteOffReasons", writeOffReasonCodeValueId);
             if (codeValue == null) {
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.writeoffreason.invalid", "Write-off reason with ID " + writeOffReasonCodeValueId + " does not exist", LoanProductAccountingParams.WRITE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
             }
@@ -651,7 +656,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
         for (JsonObject jsonObject : mappings) {
             final Long chargeOffReasonCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.CHARGE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: chargeOffReasonCodeValueId must exist in the database
-            CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId("ChargeOffReasons", chargeOffReasonCodeValueId);
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId("ChargeOffReasons", chargeOffReasonCodeValueId);
             if (codeValue == null) {
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.chargeoffreason.invalid", "Charge-off reason with ID " + chargeOffReasonCodeValueId + " does not exist", LoanProductAccountingParams.CHARGE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
             }
@@ -668,7 +673,7 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
             final Long incomeGlAccountId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), jsonObject);
             final Long classificationCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: classificationCodeValueId must exist in the database
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(dataCodeName, classificationCodeValueId);
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(dataCodeName, classificationCodeValueId);
             if (codeValue == null) {
                 validationErrors.add(ApiParameterError.parameterError("validation.msg.classification.invalid", "Classification with ID " + classificationCodeValueId + " does not exist", dataCodeName));
             }
@@ -686,12 +691,12 @@ public class ProductToGLAccountMappingHelper implements ProductToGLAccountMappin
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValueRepository codeValueRepository) {
+        public ProductToGLAccountMappingHelper(final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountPersistablePort glAccountPersistablePort, final PaymentTypePersistablePort paymentTypePersistablePort, final CodeValuePersistablePort codeValuePersistablePort) {
         this.accountMappingRepository = accountMappingRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.glAccountPersistablePort = glAccountPersistablePort;
         this.paymentTypePersistablePort = paymentTypePersistablePort;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
     }
 }
