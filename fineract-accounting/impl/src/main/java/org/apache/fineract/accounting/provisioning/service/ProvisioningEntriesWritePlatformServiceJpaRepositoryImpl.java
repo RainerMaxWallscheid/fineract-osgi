@@ -27,9 +27,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningJournalEntryService;
 import org.apache.fineract.accounting.provisioning.data.LoanProductProvisioningEntryData;
 import org.apache.fineract.accounting.provisioning.data.ProvisioningEntryData;
@@ -71,7 +70,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
     private final ProvisioningExistencePort provisioningExistencePort;
     private final LoanProductExistencePort loanProductExistencePort;
-    private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final OfficeRepository officeRepository;
     private final PlatformSecurityContext platformSecurityContext;
     private final ProvisioningEntryRepository provisioningEntryRepository;
@@ -185,10 +184,10 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     private Collection<LoanProductProvisioningEntry> generateLoanProvisioningEntry(ProvisioningEntry parent, LocalDate date) {
         Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveLoanProductsProvisioningData(date);
-        // Collect all referenced IDs upfront and bulk-fetch office/GL via
-        // findAllById; loan products and provision categories are existence-checked
-        // through already-on-api ports (no leftover LoanProductRepository /
-        // ProvisioningCategoryRepository — FINERACT-2561 / ADR-021).
+        // Collect all referenced IDs upfront. Offices are bulk-fetched via findAllById.
+        // GL accounts use GLAccountPersistablePort.persistableById. Loan products and
+        // provision categories are existence-checked through already-on-api ports
+        // (no leftover LoanProductRepository / ProvisioningCategoryRepository — FINERACT-2561 / ADR-021).
         Set<Long> productIds = entries.stream().map(LoanProductProvisioningEntryData::getProductId).collect(Collectors.toSet());
         Set<Long> officeIds = entries.stream().map(LoanProductProvisioningEntryData::getOfficeId).collect(Collectors.toSet());
         Set<Long> categoryIds = entries.stream().map(LoanProductProvisioningEntryData::getCategoryId).collect(Collectors.toSet());
@@ -204,18 +203,27 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             }
         }
         Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
-        Map<Long, GLAccount> glAccountMap = glAccountRepository.findAllById(glAccountIds).stream().collect(Collectors.toMap(GLAccount::getId, Function.identity()));
+        Map<Long, Object> glAccountMap = new HashMap<>();
+        for (Long glAccountId : glAccountIds) {
+            if (glAccountId == null) {
+                continue;
+            }
+            final Object glAccount = this.glAccountPersistablePort.persistableById(glAccountId);
+            if (glAccount != null) {
+                glAccountMap.put(glAccountId, glAccount);
+            }
+        }
         Map<Integer, LoanProductProvisioningEntry> provisioningEntries = new HashMap<>();
         for (LoanProductProvisioningEntryData data : entries) {
             Office office = officeMap.get(data.getOfficeId());
             if (office == null) {
                 throw new OfficeNotFoundException(data.getOfficeId());
             }
-            GLAccount liabilityAccount = glAccountMap.get(data.getLiablityAccount());
+            Object liabilityAccount = glAccountMap.get(data.getLiablityAccount());
             if (liabilityAccount == null) {
                 throw new GLAccountNotFoundException(data.getLiablityAccount());
             }
-            GLAccount expenseAccount = glAccountMap.get(data.getExpenseAccount());
+            Object expenseAccount = glAccountMap.get(data.getExpenseAccount());
             if (expenseAccount == null) {
                 throw new GLAccountNotFoundException(data.getExpenseAccount());
             }
@@ -237,11 +245,11 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningExistencePort provisioningExistencePort, final LoanProductExistencePort loanProductExistencePort, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningExistencePort provisioningExistencePort, final LoanProductExistencePort loanProductExistencePort, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepository officeRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
         this.provisioningExistencePort = provisioningExistencePort;
         this.loanProductExistencePort = loanProductExistencePort;
-        this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.officeRepository = officeRepository;
         this.platformSecurityContext = platformSecurityContext;
         this.provisioningEntryRepository = provisioningEntryRepository;

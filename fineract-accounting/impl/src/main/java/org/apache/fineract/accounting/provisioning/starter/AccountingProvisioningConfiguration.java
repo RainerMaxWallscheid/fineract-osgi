@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.accounting.provisioning.starter;
 
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningJournalEntryService;
 import org.apache.fineract.accounting.provisioning.domain.ProvisioningEntryRepository;
 import org.apache.fineract.accounting.provisioning.serialization.ProvisioningEntriesDefinitionJsonDeserializer;
@@ -55,11 +55,11 @@ public class AccountingProvisioningConfiguration {
     public ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService(
             ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService,
             ProvisioningExistencePort provisioningExistencePort, LoanProductExistencePort loanProductExistencePort,
-            GLAccountRepository glAccountRepository, OfficeRepository officeRepository, PlatformSecurityContext platformSecurityContext,
+            GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository, PlatformSecurityContext platformSecurityContext,
             ProvisioningEntryRepository provisioningEntryRepository, ProvisioningJournalEntryService provisioningJournalEntryService,
             ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, FromJsonHelper fromApiJsonHelper) {
         return new ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(provisioningEntriesReadPlatformService,
-                provisioningExistencePort, loanProductExistencePort, glAccountRepository, officeRepository, platformSecurityContext,
+                provisioningExistencePort, loanProductExistencePort, glAccountPersistablePort, officeRepository, platformSecurityContext,
                 provisioningEntryRepository, provisioningJournalEntryService, fromApiJsonDeserializer, fromApiJsonHelper) {};
     }
 
