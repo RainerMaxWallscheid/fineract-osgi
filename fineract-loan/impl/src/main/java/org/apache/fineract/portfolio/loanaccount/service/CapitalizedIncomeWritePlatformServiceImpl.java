@@ -49,7 +49,6 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.repository.LoanCapitalizedIncomeBalanceRepository;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.domain.NoteType;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +78,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
                 changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
@@ -135,7 +134,7 @@ public class CapitalizedIncomeWritePlatformServiceImpl implements CapitalizedInc
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final Map<String, Object> changes = new LinkedHashMap<>();
         // Create payment details
-        final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
+        final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command,
                 changes);
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
