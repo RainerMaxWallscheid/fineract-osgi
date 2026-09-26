@@ -20,7 +20,6 @@ package org.apache.fineract.accounting.journalentry.starter;
 
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
@@ -63,12 +62,12 @@ public class AccountingJournalEntryConfiguration {
     public AccountingProcessorHelper accountingProcessorHelper(JournalEntryRepository glJournalEntryRepository,
             ProductToGLAccountMappingRepository accountMappingRepository,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, GLClosureRepository closureRepository,
-            GLAccountRepository glAccountRepository, GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository,
+            GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository,
             AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             BusinessEventNotifierService businessEventNotifierService,
             org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         return new AccountingProcessorHelper(glJournalEntryRepository, accountMappingRepository, financialActivityAccountRepository,
-                closureRepository, glAccountRepository, glAccountPersistablePort, officeRepository, accountTransfersReadPlatformService,
+                closureRepository, glAccountPersistablePort, officeRepository, accountTransfersReadPlatformService,
                 chargeDefinitionPort,
                 businessEventNotifierService, taxCatalogPort);
     }
