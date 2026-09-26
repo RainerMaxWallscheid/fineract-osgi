@@ -63,7 +63,6 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundi
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorRepository;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductGuaranteeDetails;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
 import org.apache.fineract.portfolio.savings.moduleapi.DepositAccountOnHoldPort;
 import org.apache.fineract.portfolio.savings.moduleapi.OnHoldReverseResult;
@@ -219,7 +218,7 @@ public class GuarantorDomainServiceImpl implements GuarantorDomainService {
         final String description = "Payment from guarantor savings";
         final Locale locale = null;
         final DateTimeFormatter fmt = null;
-        final PaymentDetail paymentDetail = null;
+        final Object paymentDetail = null;
         final Integer fromTransferType = null;
         final Integer toTransferType = null;
         final Long chargeId = null;
