@@ -36,9 +36,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.spm.data.ScorecardData;
 import org.apache.fineract.spm.domain.Scorecard;
 import org.apache.fineract.spm.domain.Survey;
@@ -57,7 +55,7 @@ public class ScorecardApiResource {
     private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
     private final ScorecardService scorecardService;
-    private final ClientRepository clientRepository;
+    private final ClientActivePort clientActivePort;
     private final ScorecardReadPlatformService scorecardReadPlatformService;
 
     @GET
@@ -83,7 +81,7 @@ public class ScorecardApiResource {
     public void createScorecard(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @Parameter(description = "scorecardData") final ScorecardData scorecardData) {
         final AppUser appUser = this.securityContext.authenticatedUser();
         final Survey survey = this.spmService.findById(surveyId);
-        final Client client = findClient(scorecardData.getClientId());
+        final Object client = findClient(scorecardData.getClientId());
         this.scorecardService.createScorecard(ScorecardMapper.map(scorecardData, survey, appUser, client));
     }
 
@@ -110,16 +108,16 @@ public class ScorecardApiResource {
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardByClient(clientId);
     }
 
-    private Client findClient(final Long clientId) {
-        return this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
+    private Object findClient(final Long clientId) {
+        return this.clientActivePort.persistableById(clientId);
     }
 
     @java.lang.SuppressWarnings("all")
-        public ScorecardApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final ScorecardService scorecardService, final ClientRepository clientRepository, final ScorecardReadPlatformService scorecardReadPlatformService) {
+        public ScorecardApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final ScorecardService scorecardService, final ClientActivePort clientActivePort, final ScorecardReadPlatformService scorecardReadPlatformService) {
         this.securityContext = securityContext;
         this.spmService = spmService;
         this.scorecardService = scorecardService;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.scorecardReadPlatformService = scorecardReadPlatformService;
     }
 }

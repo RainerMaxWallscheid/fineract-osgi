@@ -20,6 +20,7 @@
 dependencies {
     api project(path: ':fineract-spm-api')
     implementation(project(path: ':fineract-core'))
+    // ClientActivePort.persistableById (entity residual stays in core)
     implementation(project(path: ':fineract-clients-api'))
     // AppUser id / persistable lookup (entity residual stays in core)
     implementation(project(path: ':fineract-useradministration-api'))
