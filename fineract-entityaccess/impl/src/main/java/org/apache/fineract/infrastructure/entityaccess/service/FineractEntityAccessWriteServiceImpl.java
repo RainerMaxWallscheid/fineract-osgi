@@ -22,7 +22,6 @@ import jakarta.persistence.PersistenceException;
 import java.time.LocalDate;
 import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -78,7 +77,7 @@ public class FineractEntityAccessWriteServiceImpl implements FineractEntityAcces
 
     @Override
     @Transactional
-    public void addNewEntityAccess(final String entityType, final Long entityId, final CodeValue accessType, final String secondEntityType,
+    public void addNewEntityAccess(final String entityType, final Long entityId, final Object accessType, final String secondEntityType,
             final Long secondEntityId) {
         FineractEntityAccess entityAccess = FineractEntityAccess.createNew(entityType, entityId, accessType, secondEntityType,
                 secondEntityId);
