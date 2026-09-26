@@ -28,7 +28,7 @@ import org.apache.fineract.portfolio.rate.service.RateReadService;
 import org.apache.fineract.portfolio.rate.service.RateReadServiceImpl;
 import org.apache.fineract.portfolio.rate.service.RateWriteService;
 import org.apache.fineract.portfolio.rate.service.RateWriteServiceImpl;
-import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,8 +51,8 @@ public class RateConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(RateWriteService.class)
-    public RateWriteService rateWriteService(RateRepository rateRepository, AppUserRepository appUserRepository,
+    public RateWriteService rateWriteService(RateRepository rateRepository, AppUserPersistablePort appUserPersistablePort,
             PlatformSecurityContext context, RateDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
-        return new RateWriteServiceImpl(rateRepository, appUserRepository, context, fromApiJsonDeserializer);
+        return new RateWriteServiceImpl(rateRepository, appUserPersistablePort, context, fromApiJsonDeserializer);
     }
 }

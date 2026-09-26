@@ -32,9 +32,8 @@ import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.rate.domain.RateRepository;
 import org.apache.fineract.portfolio.rate.exception.RateNotFoundException;
 import org.apache.fineract.portfolio.rate.serialization.RateDefinitionCommandFromApiJsonDeserializer;
-import org.apache.fineract.useradministration.domain.AppUser;
-import org.apache.fineract.useradministration.domain.AppUserRepository;
 import org.apache.fineract.useradministration.exception.UserNotFoundException;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +45,7 @@ public class RateWriteServiceImpl implements RateWriteService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RateWriteServiceImpl.class);
     private final RateRepository rateRepository;
-    private final AppUserRepository appUserRepository;
+    private final AppUserPersistablePort appUserPersistablePort;
     private final PlatformSecurityContext context;
     private final RateDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 
@@ -56,9 +55,12 @@ public class RateWriteServiceImpl implements RateWriteService {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Long approveUserId = command.longValueOfParameterNamed(approveUserIdParamName);
-            AppUser approveUser = null;
+            Object approveUser = null;
             if (approveUserId != null) {
-                approveUser = this.appUserRepository.findById(approveUserId).orElseThrow(() -> new UserNotFoundException(approveUserId));
+                approveUser = this.appUserPersistablePort.persistableById(approveUserId);
+                if (approveUser == null) {
+                    throw new UserNotFoundException(approveUserId);
+                }
             }
             final Rate rate = Rate.fromJson(command, approveUser);
             this.rateRepository.saveAndFlush(rate);
@@ -86,9 +88,12 @@ public class RateWriteServiceImpl implements RateWriteService {
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
             if (changes.containsKey(approveUserIdParamName)) {
                 final Long newApproveUserId = (Long) changes.get(approveUserIdParamName);
-                AppUser newApproveUser = null;
+                Object newApproveUser = null;
                 if (newApproveUserId != null) {
-                    newApproveUser = this.appUserRepository.findById(newApproveUserId).orElseThrow(() -> new UserNotFoundException(newApproveUserId));
+                    newApproveUser = this.appUserPersistablePort.persistableById(newApproveUserId);
+                    if (newApproveUser == null) {
+                        throw new UserNotFoundException(newApproveUserId);
+                    }
                 }
                 rateToUpdate.setApproveUser(newApproveUser);
             }
@@ -123,9 +128,9 @@ public class RateWriteServiceImpl implements RateWriteService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public RateWriteServiceImpl(final RateRepository rateRepository, final AppUserRepository appUserRepository, final PlatformSecurityContext context, final RateDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        public RateWriteServiceImpl(final RateRepository rateRepository, final AppUserPersistablePort appUserPersistablePort, final PlatformSecurityContext context, final RateDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
         this.rateRepository = rateRepository;
-        this.appUserRepository = appUserRepository;
+        this.appUserPersistablePort = appUserPersistablePort;
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
     }

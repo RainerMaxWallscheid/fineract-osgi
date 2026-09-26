@@ -103,8 +103,8 @@ public class Rate extends AbstractAuditableCustom {
         return approveUser;
     }
 
-    public void setApproveUser(AppUser approveUser) {
-        this.approveUser = approveUser;
+    public void setApproveUser(final Object approveUser) {
+        this.approveUser = (AppUser) approveUser;
     }
 
     public Integer getProductApply() {
@@ -125,7 +125,7 @@ public class Rate extends AbstractAuditableCustom {
         return new Rate(name, percentage, productApply, active);
     }
 
-    public static Rate fromJson(final JsonCommand command, AppUser user) {
+    public static Rate fromJson(final JsonCommand command, final Object user) {
 
         final String name = command.stringValueOfParameterNamed("name");
 
@@ -135,7 +135,7 @@ public class Rate extends AbstractAuditableCustom {
 
         final boolean active = command.booleanPrimitiveValueOfParameterNamed("active");
 
-        return new Rate(name, percentage, productApply, active, user);
+        return new Rate(name, percentage, productApply, active, (AppUser) user);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
