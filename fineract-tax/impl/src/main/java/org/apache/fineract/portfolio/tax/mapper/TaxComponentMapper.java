@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.tax.mapper;
 
 import java.util.List;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.mapper.GlAccountTypeMapper;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
@@ -47,10 +46,11 @@ public interface TaxComponentMapper {
     @Named("glAccountData")
     default GLAccountData glAccountData(final Long glAccountId) {
         final Object persistable = GLAccountAssociation.persistableById(glAccountId);
-        if (!(persistable instanceof GLAccount account)) {
+        if (persistable == null) {
             return null;
         }
-        return new GLAccountData().setId(account.getId()).setName(account.getName()).setGlCode(account.getGlCode());
+        return new GLAccountData().setId(GLAccountAssociation.id(persistable)).setName(GLAccountAssociation.name(glAccountId))
+                .setGlCode(GLAccountAssociation.glCode(glAccountId));
     }
 
 }
