@@ -34,6 +34,11 @@ public interface StaffPersistablePort {
     Object persistableById(Long staffId);
 
     /**
+     * Office id for the staff. Throws when the id does not exist.
+     */
+    Long officeId(Long staffId);
+
+    /**
      * Mobile number for the staff. Throws when the id does not exist.
      */
     String mobileNo(Long staffId);

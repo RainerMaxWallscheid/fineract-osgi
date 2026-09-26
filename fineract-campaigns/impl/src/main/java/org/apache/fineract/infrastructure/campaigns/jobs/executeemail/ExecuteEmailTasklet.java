@@ -44,8 +44,8 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingServi
 import org.apache.fineract.infrastructure.dataqueries.service.ReportLookupPort;
 import org.apache.fineract.infrastructure.reportmailingjob.helper.IPv4Helper;
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.moduleapi.ClientAssociation;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.moduleapi.AppUserAssociation;
@@ -67,6 +67,8 @@ public class ExecuteEmailTasklet implements Tasklet {
     private final ReportLookupPort reportLookupPort;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final FineractProperties fineractProperties;
+    private final ClientActivePort clientActivePort;
+    private final StaffPersistablePort staffPersistablePort;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -85,11 +87,11 @@ public class ExecuteEmailTasklet implements Tasklet {
                         final Long stretchyReportId = emailCampaign.getStretchyReportId();
                         final String reportName = reportLookupPort.findReportName(stretchyReportId);
                         final HashMap<String, String> reportStretchyParams = reportMailingJobValidator.validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
+                        final Long clientId = emailMessage.getClientId();
+                        this.clientActivePort.persistableById(clientId);
                         if (reportStretchyParams.containsKey("selectLoan") || reportStretchyParams.containsKey("loanId")) {
-                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
-                            if (persistable instanceof Client client) {
-                                final List<Long> loanIds = loanExistencePort.openIdsByClientId(emailMessage.getClientId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
+                                final List<Long> loanIds = loanExistencePort.openIdsByClientId(clientId);
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, clientId);
                                 for (final Long loanId : loanIds) {
                                     if (reportStretchyParams.containsKey("selectLoan")) {
                                         reportParams.put("SelectLoan", loanId.toString());
@@ -103,12 +105,9 @@ public class ExecuteEmailTasklet implements Tasklet {
                                         errorLog.append(reportParams);
                                     }
                                 }
-                            }
                         } else if (reportStretchyParams.containsKey("savingId")) {
-                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
-                            if (persistable instanceof Client client) {
-                                final List<Long> savingsIds = savingsAccountExistencePort.activeIdsByClientId(emailMessage.getClientId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
+                                final List<Long> savingsIds = savingsAccountExistencePort.activeIdsByClientId(clientId);
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, clientId);
                                 for (final Long savingsId : savingsIds) {
                                     reportParams.put("savingId", savingsId.toString());
                                     File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
@@ -118,18 +117,14 @@ public class ExecuteEmailTasklet implements Tasklet {
                                         errorLog.append(reportParams);
                                     }
                                 }
-                            }
                         } else {
-                            final Object persistable = ClientAssociation.persistableById(emailMessage.getClientId());
-                            if (persistable instanceof Client client) {
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, client);
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, clientId);
                                 File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
                                 if (file != null) {
                                     attachmentList.add(file);
                                 } else {
                                     errorLog.append(reportParams);
                                 }
-                            }
                         }
                     }
                     final EmailMessageWithAttachmentData emailMessageWithAttachmentData = EmailMessageWithAttachmentData.createNew(emailMessage.getEmailAddress(), emailMessage.getMessage(), emailMessage.getEmailSubject(), attachmentList);
@@ -159,22 +154,23 @@ public class ExecuteEmailTasklet implements Tasklet {
         return isValid;
     }
 
-    private HashMap<String, String> replaceStretchyParamsWithActualClientParams(final HashMap<String, String> stretchyParams, final Client client) {
+    private HashMap<String, String> replaceStretchyParamsWithActualClientParams(final HashMap<String, String> stretchyParams, final Long clientId) {
         HashMap<String, String> actualParams = new HashMap<>();
         for (Map.Entry<String, String> entry : stretchyParams.entrySet()) {
             switch (entry.getKey()) {
-            case "selectOffice": 
-                if (client.getStaff() != null) {
-                    actualParams.put(entry.getKey(), client.getStaff().getOffice().getId().toString());
+            case "selectOffice":
+                final Long staffId = this.clientActivePort.staffId(clientId);
+                if (staffId != null) {
+                    actualParams.put(entry.getKey(), this.staffPersistablePort.officeId(staffId).toString());
                 } else {
-                    actualParams.put(entry.getKey(), client.getOffice().getId().toString());
+                    actualParams.put(entry.getKey(), this.clientActivePort.officeId(clientId).toString());
                 }
                 break;
-            case "selectClient": 
-                actualParams.put(entry.getKey(), client.getId().toString());
+            case "selectClient":
+                actualParams.put(entry.getKey(), clientId.toString());
                 break;
-            case "selectLoanofficer": 
-                actualParams.put(entry.getKey(), client.getStaff().getId().toString());
+            case "selectLoanofficer":
+                actualParams.put(entry.getKey(), this.clientActivePort.staffId(clientId).toString());
                 break;
             case "environementUrl": 
                 actualParams.put(entry.getKey(), entry.getKey());
@@ -214,7 +210,7 @@ public class ExecuteEmailTasklet implements Tasklet {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanExistencePort loanExistencePort, final SavingsAccountExistencePort savingsAccountExistencePort, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
+        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanExistencePort loanExistencePort, final SavingsAccountExistencePort savingsAccountExistencePort, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportLookupPort reportLookupPort, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties, final ClientActivePort clientActivePort, final StaffPersistablePort staffPersistablePort) {
         this.emailMessageRepository = emailMessageRepository;
         this.emailCampaignRepository = emailCampaignRepository;
         this.loanExistencePort = loanExistencePort;
@@ -224,5 +220,7 @@ public class ExecuteEmailTasklet implements Tasklet {
         this.reportLookupPort = reportLookupPort;
         this.reportMailingJobValidator = reportMailingJobValidator;
         this.fineractProperties = fineractProperties;
+        this.clientActivePort = clientActivePort;
+        this.staffPersistablePort = staffPersistablePort;
     }
 }

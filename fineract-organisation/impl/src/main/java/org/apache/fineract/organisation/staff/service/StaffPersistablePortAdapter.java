@@ -53,6 +53,12 @@ public class StaffPersistablePortAdapter implements StaffPersistablePort {
     }
 
     @Override
+    public Long officeId(final Long staffId) {
+        final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
+        return staff.getOffice().getId();
+    }
+
+    @Override
     public String mobileNo(final Long staffId) {
         final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
         return staff.getMobileNo();
