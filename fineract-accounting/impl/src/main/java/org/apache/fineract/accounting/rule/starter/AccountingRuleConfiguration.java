@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.accounting.rule.starter;
 
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
 import org.apache.fineract.accounting.rule.domain.AccountingRuleRepository;
 import org.apache.fineract.accounting.rule.domain.AccountingRuleRepositoryWrapper;
@@ -48,10 +48,10 @@ public class AccountingRuleConfiguration {
     @ConditionalOnMissingBean(AccountingRuleWritePlatformService.class)
     public AccountingRuleWritePlatformService accountingRuleWritePlatformService(
             AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, AccountingRuleRepository accountingRuleRepository,
-            GLAccountRepositoryWrapper accountRepositoryWrapper, OfficeRepositoryWrapper officeRepositoryWrapper,
+            GLAccountPersistablePort glAccountPersistablePort, OfficeRepositoryWrapper officeRepositoryWrapper,
             AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, CodeValueRepository codeValueRepository) {
         return new AccountingRuleWritePlatformServiceJpaRepositoryImpl(accountingRuleRepositoryWrapper, accountingRuleRepository,
-                accountRepositoryWrapper, officeRepositoryWrapper, fromApiJsonDeserializer, codeValueRepository);
+                glAccountPersistablePort, officeRepositoryWrapper, fromApiJsonDeserializer, codeValueRepository);
     }
 
 }

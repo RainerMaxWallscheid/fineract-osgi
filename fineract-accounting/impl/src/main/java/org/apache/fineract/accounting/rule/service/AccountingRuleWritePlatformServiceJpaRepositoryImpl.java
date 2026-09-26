@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.closure.data.GLClosureJsonInputParams;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
-import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.rule.data.AccountingRuleJsonInputParams;
 import org.apache.fineract.accounting.rule.domain.AccountingRule;
@@ -57,7 +57,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccountingRuleWritePlatformServiceJpaRepositoryImpl.class);
     private final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper;
     private final AccountingRuleRepository accountingRuleRepository;
-    private final GLAccountRepositoryWrapper accountRepositoryWrapper;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final CodeValueRepository codeValueRepository;
@@ -111,13 +111,13 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         final Long accountToCreditId = command.longValueOfParameterNamed(AccountingRuleJsonInputParams.ACCOUNT_TO_CREDIT.getValue());
         boolean allowMultipleCreditEntries = false;
         boolean allowMultipleDebitEntries = false;
-        GLAccount debitAccount = null;
-        GLAccount creditAccount = null;
+        Object debitAccount = null;
+        Object creditAccount = null;
         List<AccountingTagRule> accountingTagRules = new ArrayList<>();
         if ((accountToDebitId != null && debitTags != null) || (accountToDebitId == null && debitTags == null)) {
             throw new AccountingRuleDataException(AccountingRuleJsonInputParams.ACCOUNT_TO_DEBIT.getValue(), AccountingRuleJsonInputParams.DEBIT_ACCOUNT_TAGS.getValue());
         } else if (accountToDebitId != null) {
-            debitAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountToDebitId);
+            debitAccount = glAccountById(accountToDebitId);
         } else if (debitTags != null) {
             accountingTagRules = saveDebitOrCreditTags(incomingDebitTags, JournalEntryType.DEBIT, accountingTagRules);
             allowMultipleDebitEntries = command.booleanPrimitiveValueOfParameterNamed(AccountingRuleJsonInputParams.ALLOW_MULTIPLE_DEBIT_ENTRIES.getValue());
@@ -125,7 +125,7 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         if ((accountToCreditId != null && creditTags != null) || (accountToCreditId == null && creditTags == null)) {
             throw new AccountingRuleDataException(AccountingRuleJsonInputParams.ACCOUNT_TO_CREDIT.getValue(), AccountingRuleJsonInputParams.CREDIT_ACCOUNT_TAGS.getValue());
         } else if (accountToCreditId != null) {
-            creditAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountToCreditId);
+            creditAccount = glAccountById(accountToCreditId);
         } else if (creditTags != null) {
             accountingTagRules = saveDebitOrCreditTags(incomingCreditTags, JournalEntryType.CREDIT, accountingTagRules);
             allowMultipleCreditEntries = command.booleanPrimitiveValueOfParameterNamed(AccountingRuleJsonInputParams.ALLOW_MULTIPLE_CREDIT_ENTRIES.getValue());
@@ -177,12 +177,12 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
             final AccountingRule accountingRule = this.accountingRuleRepositoryWrapper.findOneWithNotFoundDetection(accountingRuleId);
             final Map<String, Object> changesOnly = accountingRule.update(command);
             if (accountToDebitId != null && changesOnly.containsKey(AccountingRuleJsonInputParams.ACCOUNT_TO_DEBIT.getValue())) {
-                final GLAccount accountToDebit = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountToDebitId);
+                final Object accountToDebit = glAccountById(accountToDebitId);
                 accountingRule.setAccountToDebit(accountToDebit);
                 accountingRule.updateTags(JournalEntryType.CREDIT);
             }
             if (accountToCreditId != null && changesOnly.containsKey(AccountingRuleJsonInputParams.ACCOUNT_TO_CREDIT.getValue())) {
-                final GLAccount accountToCredit = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountToCreditId);
+                final Object accountToCredit = glAccountById(accountToCreditId);
                 accountingRule.setAccountToCredit(accountToCredit);
                 accountingRule.updateTags(JournalEntryType.DEBIT);
             }
@@ -288,11 +288,19 @@ public class AccountingRuleWritePlatformServiceJpaRepositoryImpl implements Acco
         return accountingTagRules;
     }
 
+    private Object glAccountById(final Long accountId) {
+        final Object glAccount = this.glAccountPersistablePort.persistableById(accountId);
+        if (glAccount == null) {
+            throw new GLAccountNotFoundException(accountId);
+        }
+        return glAccount;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountRepositoryWrapper accountRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValueRepository codeValueRepository) {
+        public AccountingRuleWritePlatformServiceJpaRepositoryImpl(final AccountingRuleRepositoryWrapper accountingRuleRepositoryWrapper, final AccountingRuleRepository accountingRuleRepository, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingRuleCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValueRepository codeValueRepository) {
         this.accountingRuleRepositoryWrapper = accountingRuleRepositoryWrapper;
         this.accountingRuleRepository = accountingRuleRepository;
-        this.accountRepositoryWrapper = accountRepositoryWrapper;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.codeValueRepository = codeValueRepository;
