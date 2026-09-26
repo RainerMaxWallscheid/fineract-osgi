@@ -80,7 +80,6 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
-import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -127,7 +126,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
              * Capture payment details *
              */
             final Map<String, Object> changes = new LinkedHashMap<>();
-            final PaymentDetail paymentDetail = (PaymentDetail) this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
+            final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
             /**
              * Set a transaction Id and save these Journal entries *
              */
@@ -440,7 +439,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         checkDebitAndCreditAmounts(credits, debits);
     }
 
-    private void saveAllDebitOrCreditEntries(final JournalEntryCommand command, final Office office, final PaymentDetail paymentDetail, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final String referenceNumber, final ExternalId externalAssetOwnerId) {
+    private void saveAllDebitOrCreditEntries(final JournalEntryCommand command, final Office office, final Object paymentDetail, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final String referenceNumber, final ExternalId externalAssetOwnerId) {
         final boolean manualEntry = true;
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
