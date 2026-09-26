@@ -44,4 +44,9 @@ public interface CodeValuePersistablePort {
      * Persistable code value for the named code. Throws when the id does not exist for that code.
      */
     Object persistableByCodeNameAndId(String codeName, Long codeValueId);
+
+    /**
+     * Persistable code value for the named code, or null when the id is null or missing.
+     */
+    Object findByCodeNameAndId(String codeName, Long codeValueId);
 }

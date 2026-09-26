@@ -61,10 +61,18 @@ public class CodeValuePersistablePortAdapter implements CodeValuePersistablePort
 
     @Override
     public Object persistableByCodeNameAndId(final String codeName, final Long codeValueId) {
-        final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(codeName, codeValueId);
+        final Object codeValue = findByCodeNameAndId(codeName, codeValueId);
         if (codeValue == null) {
             throw new CodeValueNotFoundException(codeName, codeValueId);
         }
         return codeValue;
+    }
+
+    @Override
+    public Object findByCodeNameAndId(final String codeName, final Long codeValueId) {
+        if (codeValueId == null) {
+            return null;
+        }
+        return this.codeValueRepository.findByCodeNameAndId(codeName, codeValueId);
     }
 }

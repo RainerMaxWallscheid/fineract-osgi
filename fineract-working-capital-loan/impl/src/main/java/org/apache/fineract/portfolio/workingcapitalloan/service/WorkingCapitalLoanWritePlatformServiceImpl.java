@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -109,7 +108,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
     private final PaymentDetailWritePlatformService paymentDetailService;
     private final WorkingCapitalLoanBalanceRepository balanceRepository;
     private final WorkingCapitalLoanAmortizationScheduleWriteService amortizationScheduleWriteService;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final WorkingCapitalLoanAccountingProcessor accountingProcessor;
     private final WorkingCapitalLoanTransactionRelationRepository relationRepository;
@@ -245,7 +244,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final LocalDate actualDisbursementDate = command.localDateValueOfParameterNamed(WorkingCapitalLoanConstants.actualDisbursementDateParamName);
         final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed(WorkingCapitalLoanConstants.transactionAmountParamName, command.parsedJson(), new HashSet<>());
         final Long classificationId = this.fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.classificationIdParamName, command.parsedJson());
-        final CodeValue classification = classificationId != null ? this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME, classificationId) : null;
+        final Object classification = classificationId != null ? this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME, classificationId) : null;
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put(WorkingCapitalLoanConstants.actualDisbursementDateParamName, actualDisbursementDate);
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
@@ -349,7 +348,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         transactionRepository.saveAndFlush(fromTxn);
     }
 
-    private WorkingCapitalLoanTransaction createAndPersistDiscountFeeTransaction(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction disbursementTransaction, ExternalId txnExternalId, BigDecimal amount, LocalDate transactionDate, CodeValue classification, PaymentDetail paymentDetail) {
+    private WorkingCapitalLoanTransaction createAndPersistDiscountFeeTransaction(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction disbursementTransaction, ExternalId txnExternalId, BigDecimal amount, LocalDate transactionDate, Object classification, PaymentDetail paymentDetail) {
         if (amount != null) {
             loan.getLoanProductRelatedDetails().setDiscount(amount);
         }
@@ -387,7 +386,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
             throw new PlatformApiDataValidationException("validation.msg.wc.loan.discount.already.set.before.disbursement", "Discount was already set before disbursement and cannot be added again", WorkingCapitalLoanConstants.discountAmountParamName);
         }
         final Long classificationId = fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.classificationIdParamName, command.parsedJson());
-        final CodeValue classification = classificationId != null ? Optional.ofNullable(codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
+        final Object classification = classificationId != null ? Optional.ofNullable(this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
         final Map<String, Object> changes = new LinkedHashMap<>();
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
         final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
@@ -424,7 +423,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final LocalDate transactionDate = requestedTransactionDate != null ? requestedTransactionDate : relatedDiscountTransaction.getTransactionDate();
         validator.validateDiscountAdjustmentTransaction(loan, command.json(), amount, relatedDiscountTransaction, remainingDiscountAmount, transactionDate);
         final Long classificationId = command.longValueOfParameterNamed(WorkingCapitalLoanConstants.classificationIdParamName);
-        final CodeValue classification = classificationId != null ? Optional.ofNullable(codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
+        final Object classification = classificationId != null ? Optional.ofNullable(this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId)).orElseThrow(() -> new PlatformApiDataValidationException("validation.msg.wc.loan.classification.not.found", "Classification with ID " + classificationId + " not found", "classificationId")) : null;
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
         final Map<String, Object> changes = new LinkedHashMap<>();
         final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
@@ -508,7 +507,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
         final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final Long classificationId = command.longValueOfParameterNamed(WorkingCapitalLoanConstants.classificationIdParamName);
-        final CodeValue classification = classificationId != null ? codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME, classificationId) : null;
+        final Object classification = classificationId != null ? this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME, classificationId) : null;
         changes.put(WorkingCapitalLoanConstants.classificationIdParamName, classificationId);
         final ExternalId txnExternalId = this.externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
         final WorkingCapitalLoanTransaction transaction = resolveNewTransaction(transactionType, loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
@@ -539,7 +538,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         }
     }
 
-    private WorkingCapitalLoanTransaction resolveNewTransaction(final LoanTransactionType transactionType, WorkingCapitalLoan loan, BigDecimal transactionAmount, PaymentDetail paymentDetail, LocalDate transactionDate, CodeValue classification, ExternalId txnExternalId) {
+    private WorkingCapitalLoanTransaction resolveNewTransaction(final LoanTransactionType transactionType, WorkingCapitalLoan loan, BigDecimal transactionAmount, PaymentDetail paymentDetail, LocalDate transactionDate, Object classification, ExternalId txnExternalId) {
         return switch (transactionType) {
             case REPAYMENT -> WorkingCapitalLoanTransaction.repayment(loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
             case GOODWILL_CREDIT -> WorkingCapitalLoanTransaction.goodwillCredit(loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
@@ -577,7 +576,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         changes.put(WorkingCapitalLoanConstants.transactionAmountParamName, transactionAmount);
         final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
         final Long classificationId = command.longValueOfParameterNamed(WorkingCapitalLoanConstants.classificationIdParamName);
-        final CodeValue classification = classificationId != null ? codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME, classificationId) : null;
+        final Object classification = classificationId != null ? this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME, classificationId) : null;
         changes.put(WorkingCapitalLoanConstants.classificationIdParamName, classificationId);
         final ExternalId txnExternalId = this.externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
         final WorkingCapitalLoanTransaction creditBalanceRefundTransaction = WorkingCapitalLoanTransaction.creditBalanceRefund(loan, transactionAmount, paymentDetail, transactionDate, classification, txnExternalId);
@@ -813,7 +812,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanWritePlatformServiceImpl(final PlatformSecurityContext context, final WorkingCapitalLoanRepository loanRepository, final WorkingCapitalLoanDataValidator validator, final WorkingCapitalLoanLifecycleStateMachine stateMachine, final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanNoteRepository noteRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionAllocationRepository allocationRepository, final PaymentDetailWritePlatformService paymentDetailService, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanAmortizationScheduleWriteService amortizationScheduleWriteService, final CodeValueRepository codeValueRepository, final BusinessEventNotifierService businessEventNotifierService, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final WorkingCapitalLoanTransactionRelationRepository relationRepository, final WorkingCapitalLoanPeriodPaymentRateChangeRepository rateChangeRepository, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService, final WorkingCapitalLoanTransactionReprocessingService transactionReprocessingService, final WorkingCapitalLoanChargeRepository chargeRepository, final WorkingCapitalLoanDelinquencyRangeScheduleService delinquencyRangeScheduleService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService, final WorkingCapitalLoanBreachScheduleService breachScheduleService, final WorkingCapitalLoanTransactionProcessor transactionProcessor) {
+        public WorkingCapitalLoanWritePlatformServiceImpl(final PlatformSecurityContext context, final WorkingCapitalLoanRepository loanRepository, final WorkingCapitalLoanDataValidator validator, final WorkingCapitalLoanLifecycleStateMachine stateMachine, final FromJsonHelper fromApiJsonHelper, final WorkingCapitalLoanNoteRepository noteRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionAllocationRepository allocationRepository, final PaymentDetailWritePlatformService paymentDetailService, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanAmortizationScheduleWriteService amortizationScheduleWriteService, final CodeValuePersistablePort codeValuePersistablePort, final BusinessEventNotifierService businessEventNotifierService, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final WorkingCapitalLoanTransactionRelationRepository relationRepository, final WorkingCapitalLoanPeriodPaymentRateChangeRepository rateChangeRepository, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService, final WorkingCapitalLoanTransactionReprocessingService transactionReprocessingService, final WorkingCapitalLoanChargeRepository chargeRepository, final WorkingCapitalLoanDelinquencyRangeScheduleService delinquencyRangeScheduleService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService, final WorkingCapitalLoanBreachScheduleService breachScheduleService, final WorkingCapitalLoanTransactionProcessor transactionProcessor) {
         this.context = context;
         this.loanRepository = loanRepository;
         this.validator = validator;
@@ -826,7 +825,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         this.paymentDetailService = paymentDetailService;
         this.balanceRepository = balanceRepository;
         this.amortizationScheduleWriteService = amortizationScheduleWriteService;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.businessEventNotifierService = businessEventNotifierService;
         this.accountingProcessor = accountingProcessor;
         this.relationRepository = relationRepository;

@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -70,7 +69,7 @@ public class WorkingCapitalLoanDataValidator {
     private final FromJsonHelper fromApiJsonHelper;
     private final ExpectedDisbursementDateValidator expectedDisbursementDateValidator;
     private final WorkingCapitalLoanTransactionRepository transactionRepository;
-    private final CodeValueRepository codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final WorkingCapitalLoanBreachActionRepository breachActionRepository;
     // Per requirement: only principal, discount, approved date, expected disbursement date, and notes
     private static final Set<String> APPROVAL_SUPPORTED_PARAMETERS = new HashSet<>(Arrays.asList("locale", "dateFormat", WorkingCapitalLoanConstants.approvedOnDateParamName, WorkingCapitalLoanConstants.approvedLoanAmountParamName, WorkingCapitalLoanConstants.expectedDisbursementDateParamName, WorkingCapitalLoanConstants.discountAmountParamName, WorkingCapitalLoanConstants.noteParamName));
@@ -119,7 +118,7 @@ public class WorkingCapitalLoanDataValidator {
         final Integer classificationId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(WorkingCapitalLoanConstants.classificationIdParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).value(classificationId).ignoreIfNull().integerGreaterThanZero();
         if (classificationId != null) {
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId.longValue());
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId.longValue());
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).failWithCode("code.value.classification.not.exists", "Code value does not exist in code " + WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME);
             }
@@ -154,7 +153,7 @@ public class WorkingCapitalLoanDataValidator {
         final Integer classificationId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(WorkingCapitalLoanConstants.classificationIdParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).value(classificationId).ignoreIfNull().integerGreaterThanZero();
         if (classificationId != null) {
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId.longValue());
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME, classificationId.longValue());
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).failWithCode("code.value.classification.not.exists", "Code value does not exist in code " + WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME);
             }
@@ -361,7 +360,7 @@ public class WorkingCapitalLoanDataValidator {
         final Long classificationId = this.fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.classificationIdParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).value(classificationId).ignoreIfNull().positiveAmount();
         if (classificationId != null) {
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME, classificationId);
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME, classificationId);
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).failWithCode("code.value.classification.not.exists", "Code value does not exists in the code " + WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME);
             }
@@ -478,7 +477,7 @@ public class WorkingCapitalLoanDataValidator {
         final Integer classificationId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(WorkingCapitalLoanConstants.classificationIdParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).value(classificationId).ignoreIfNull().integerGreaterThanZero();
         if (classificationId != null) {
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME, classificationId.longValue());
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME, classificationId.longValue());
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).failWithCode("code.value.classification.not.exists", "Code value does not exist in code " + WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME);
             }
@@ -535,7 +534,7 @@ public class WorkingCapitalLoanDataValidator {
         final Integer classificationId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(WorkingCapitalLoanConstants.classificationIdParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).value(classificationId).ignoreIfNull().integerGreaterThanZero();
         if (classificationId != null) {
-            final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME, classificationId.longValue());
+            final Object codeValue = this.codeValuePersistablePort.findByCodeNameAndId(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME, classificationId.longValue());
             if (codeValue == null) {
                 baseDataValidator.reset().parameter(WorkingCapitalLoanConstants.classificationIdParamName).failWithCode("code.value.classification.not.exists", "Code value does not exist in code " + WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME);
             }
@@ -665,11 +664,11 @@ public class WorkingCapitalLoanDataValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanDataValidator(final FromJsonHelper fromApiJsonHelper, final ExpectedDisbursementDateValidator expectedDisbursementDateValidator, final WorkingCapitalLoanTransactionRepository transactionRepository, final CodeValueRepository codeValueRepository, final WorkingCapitalLoanBreachActionRepository breachActionRepository) {
+        public WorkingCapitalLoanDataValidator(final FromJsonHelper fromApiJsonHelper, final ExpectedDisbursementDateValidator expectedDisbursementDateValidator, final WorkingCapitalLoanTransactionRepository transactionRepository, final CodeValuePersistablePort codeValuePersistablePort, final WorkingCapitalLoanBreachActionRepository breachActionRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.expectedDisbursementDateValidator = expectedDisbursementDateValidator;
         this.transactionRepository = transactionRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.breachActionRepository = breachActionRepository;
     }
 }
