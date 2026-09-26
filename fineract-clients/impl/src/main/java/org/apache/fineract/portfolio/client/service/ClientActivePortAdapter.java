@@ -93,6 +93,11 @@ public class ClientActivePortAdapter implements ClientActivePort {
     }
 
     @Override
+    public String emailAddress(final Long clientId) {
+        return client(clientId).emailAddress();
+    }
+
+    @Override
     public String accountNumber(final Long clientId) {
         return client(clientId).getAccountNumber();
     }

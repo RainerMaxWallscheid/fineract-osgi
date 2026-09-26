@@ -49,6 +49,8 @@ public interface ClientActivePort {
 
     String mobileNo(Long clientId);
 
+    String emailAddress(Long clientId);
+
     String accountNumber(Long clientId);
 
     ExternalId externalId(Long clientId);

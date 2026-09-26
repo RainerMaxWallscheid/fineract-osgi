@@ -14,6 +14,8 @@ SMS/email campaign write, domain service, `SmsConfigUtils`, gateway/email batch 
 
 `TwoFactorSmsDeliveryPort` (api) + adapter (impl) deliver 2FA OTP SMS for security-impl and client SMS for hooks message-gateway.
 
+Email message assemble uses ClientActivePort/GroupActivePort/StaffPersistablePort (not leftover Client, Group, or Staff repositories).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```

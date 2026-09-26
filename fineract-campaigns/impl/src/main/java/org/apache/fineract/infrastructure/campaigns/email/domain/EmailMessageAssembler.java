@@ -23,15 +23,10 @@ import org.apache.fineract.infrastructure.campaigns.email.EmailApiConstants;
 import org.apache.fineract.infrastructure.campaigns.email.exception.EmailNotFoundException;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepository;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
-import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,18 +34,18 @@ import org.springframework.stereotype.Component;
 public class EmailMessageAssembler {
 
     private final EmailMessageRepository emailMessageRepository;
-    private final GroupRepository groupRepository;
-    private final ClientRepository clientRepository;
-    private final StaffRepository staffRepository;
+    private final GroupActivePort groupActivePort;
+    private final ClientActivePort clientActivePort;
+    private final StaffPersistablePort staffPersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
-    public EmailMessageAssembler(final EmailMessageRepository emailMessageRepository, final GroupRepository groupRepository,
-            final ClientRepository clientRepository, final StaffRepository staffRepository, final FromJsonHelper fromApiJsonHelper) {
+    public EmailMessageAssembler(final EmailMessageRepository emailMessageRepository, final GroupActivePort groupActivePort,
+            final ClientActivePort clientActivePort, final StaffPersistablePort staffPersistablePort, final FromJsonHelper fromApiJsonHelper) {
         this.emailMessageRepository = emailMessageRepository;
-        this.groupRepository = groupRepository;
-        this.clientRepository = clientRepository;
-        this.staffRepository = staffRepository;
+        this.groupActivePort = groupActivePort;
+        this.clientActivePort = clientActivePort;
+        this.staffPersistablePort = staffPersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
@@ -60,24 +55,27 @@ public class EmailMessageAssembler {
 
         String emailAddress = null;
 
-        Group group = null;
+        Object group = null;
         if (this.fromApiJsonHelper.parameterExists(EmailApiConstants.groupIdParamName, element)) {
             final Long groupId = this.fromApiJsonHelper.extractLongNamed(EmailApiConstants.groupIdParamName, element);
-            group = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+            group = this.groupActivePort.persistableById(groupId);
         }
 
-        Client client = null;
+        Object client = null;
         if (this.fromApiJsonHelper.parameterExists(EmailApiConstants.clientIdParamName, element)) {
             final Long clientId = this.fromApiJsonHelper.extractLongNamed(EmailApiConstants.clientIdParamName, element);
-            client = this.clientRepository.findById(clientId).orElseThrow(() -> new ClientNotFoundException(clientId));
-            emailAddress = client.emailAddress();
+            client = this.clientActivePort.persistableById(clientId);
+            emailAddress = this.clientActivePort.emailAddress(clientId);
         }
 
-        Staff staff = null;
+        Object staff = null;
         if (this.fromApiJsonHelper.parameterExists(EmailApiConstants.staffIdParamName, element)) {
             final Long staffId = this.fromApiJsonHelper.extractLongNamed(EmailApiConstants.staffIdParamName, element);
-            staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
-            emailAddress = staff.getEmailAddress();
+            staff = this.staffPersistablePort.persistableById(staffId);
+            if (staff == null) {
+                throw new StaffNotFoundException(staffId);
+            }
+            emailAddress = this.staffPersistablePort.emailAddress(staffId);
         }
 
         final String message = this.fromApiJsonHelper.extractStringNamed(EmailApiConstants.messageParamName, element);

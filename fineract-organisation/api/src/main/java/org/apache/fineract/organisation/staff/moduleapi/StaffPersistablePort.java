@@ -37,4 +37,9 @@ public interface StaffPersistablePort {
      * Mobile number for the staff. Throws when the id does not exist.
      */
     String mobileNo(Long staffId);
+
+    /**
+     * Email address for the staff. Throws when the id does not exist.
+     */
+    String emailAddress(Long staffId);
 }

@@ -57,4 +57,10 @@ public class StaffPersistablePortAdapter implements StaffPersistablePort {
         final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
         return staff.getMobileNo();
     }
+
+    @Override
+    public String emailAddress(final Long staffId) {
+        final Staff staff = this.staffRepository.findById(staffId).orElseThrow(() -> new StaffNotFoundException(staffId));
+        return staff.getEmailAddress();
+    }
 }
