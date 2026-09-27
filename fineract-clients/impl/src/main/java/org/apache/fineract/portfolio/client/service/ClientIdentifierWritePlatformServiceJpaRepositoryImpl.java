@@ -33,7 +33,8 @@ import org.apache.fineract.portfolio.client.command.ClientIdentifierCommand;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientIdentifier;
 import org.apache.fineract.portfolio.client.domain.ClientIdentifierRepository;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.exception.ClientIdentifierNotFoundException;
 import org.apache.fineract.portfolio.client.exception.DuplicateClientIdentifierException;
 import org.apache.fineract.portfolio.client.serialization.ClientIdentifierCommandFromApiJsonDeserializer;
@@ -51,18 +52,18 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
     private static final Logger LOG = LoggerFactory.getLogger(ClientIdentifierWritePlatformServiceJpaRepositoryImpl.class);
 
     private final PlatformSecurityContext context;
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final ClientIdentifierRepository clientIdentifierRepository;
     private final CodeValuePersistablePort codeValuePersistablePort;
     private final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer;
 
     @Autowired
     public ClientIdentifierWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final ClientRepositoryWrapper clientRepository, final ClientIdentifierRepository clientIdentifierRepository,
+            final ClientActivePort clientActivePort, final ClientIdentifierRepository clientIdentifierRepository,
             final CodeValuePersistablePort codeValuePersistablePort,
             final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer) {
         this.context = context;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.clientIdentifierRepository = clientIdentifierRepository;
         this.codeValuePersistablePort = codeValuePersistablePort;
         this.clientIdentifierCommandFromApiJsonDeserializer = clientIdentifierCommandFromApiJsonDeserializer;
@@ -81,7 +82,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
         String documentTypeLabel = null;
         Long documentTypeId = null;
         try {
-            final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            final Client client = requireClient(clientId);
 
             final CodeValue documentType = requireCodeValue(clientIdentifierCommand.getDocumentTypeId());
             documentTypeId = documentType.getId();
@@ -122,7 +123,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
         try {
             CodeValue documentType = null;
 
-            final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            final Client client = requireClient(clientId);
             final ClientIdentifier clientIdentifierForUpdate = this.clientIdentifierRepository.findById(identifierId)
                     .orElseThrow(() -> new ClientIdentifierNotFoundException(identifierId));
 
@@ -172,7 +173,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
     @Override
     public CommandProcessingResult deleteClientIdentifier(final Long clientId, final Long identifierId, final Long commandId) {
 
-        final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+        final Client client = requireClient(clientId);
 
         final ClientIdentifier clientIdentifier = this.clientIdentifierRepository.findById(identifierId)
                 .orElseThrow(() -> new ClientIdentifierNotFoundException(identifierId));
@@ -184,6 +185,17 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
                 .withClientId(clientId) //
                 .withEntityId(identifierId) //
                 .build();
+    }
+
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return persisted;
     }
 
     private CodeValue requireCodeValue(final Long codeValueId) {
