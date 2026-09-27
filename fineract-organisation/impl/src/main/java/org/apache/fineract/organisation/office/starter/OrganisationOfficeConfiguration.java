@@ -26,6 +26,7 @@ import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformSer
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.domain.OfficeTransactionRepository;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.mapper.OfficeDataMapper;
 import org.apache.fineract.organisation.office.serialization.OfficeCommandFromApiJsonDeserializer;
 import org.apache.fineract.organisation.office.serialization.OfficeTransactionCommandFromApiJsonDeserializer;
@@ -55,10 +56,10 @@ public class OrganisationOfficeConfiguration {
     public OfficeWritePlatformService officeWritePlatformService(PlatformSecurityContext context,
             OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer,
             OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer,
-            OfficeRepositoryWrapper officeRepositoryWrapper, OfficeTransactionRepository officeTransactionRepository,
-            ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
+            OfficeRepositoryWrapper officeRepositoryWrapper, OfficePersistablePort officePersistablePort,
+            OfficeTransactionRepository officeTransactionRepository, ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
         return new OfficeWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer,
-                moneyTransferCommandFromApiJsonDeserializer, officeRepositoryWrapper, officeTransactionRepository,
+                moneyTransferCommandFromApiJsonDeserializer, officeRepositoryWrapper, officePersistablePort, officeTransactionRepository,
                 applicationCurrencyRepository);
     }
 }

@@ -36,6 +36,8 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.domain.OfficeTransaction;
 import org.apache.fineract.organisation.office.domain.OfficeTransactionRepository;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.serialization.OfficeCommandFromApiJsonDeserializer;
 import org.apache.fineract.organisation.office.serialization.OfficeTransactionCommandFromApiJsonDeserializer;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -52,6 +54,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     private final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final OfficeTransactionRepository officeTransactionRepository;
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
 
@@ -132,13 +135,13 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
         Office fromOffice = null;
         final Long fromOfficeId = command.longValueOfParameterNamed("fromOfficeId");
         if (fromOfficeId != null) {
-            fromOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(fromOfficeId);
+            fromOffice = requireOffice(fromOfficeId);
             officeId = fromOffice.getId();
         }
         Office toOffice = null;
         final Long toOfficeId = command.longValueOfParameterNamed("toOfficeId");
         if (toOfficeId != null) {
-            toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(toOfficeId);
+            toOffice = requireOffice(toOfficeId);
             officeId = toOffice.getId();
         }
         final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
@@ -184,6 +187,14 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
      * used to restrict modifying operations to office that are either the users office or lower (child) in the office
      * hierarchy
      */
+    private Office requireOffice(final Long officeId) {
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     private Office validateUserPriviledgeOnOfficeAndRetrieve(final AppUser currentUser, final Long officeId) {
         final Long userOfficeId = currentUser.getOffice().getId();
         final Office userOffice = this.officeRepositoryWrapper.findOfficeHierarchy(userOfficeId);
@@ -202,11 +213,12 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     }
 
     @java.lang.SuppressWarnings("all")
-        public OfficeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer, final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer, final OfficeRepositoryWrapper officeRepositoryWrapper, final OfficeTransactionRepository officeTransactionRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
+        public OfficeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer, final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer, final OfficeRepositoryWrapper officeRepositoryWrapper, final OfficePersistablePort officePersistablePort, final OfficeTransactionRepository officeTransactionRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.moneyTransferCommandFromApiJsonDeserializer = moneyTransferCommandFromApiJsonDeserializer;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.officeTransactionRepository = officeTransactionRepository;
         this.applicationCurrencyRepository = applicationCurrencyRepository;
     }
