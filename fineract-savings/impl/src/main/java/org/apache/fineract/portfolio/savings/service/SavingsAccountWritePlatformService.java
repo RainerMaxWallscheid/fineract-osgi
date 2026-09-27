@@ -23,8 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
@@ -56,7 +54,7 @@ public interface SavingsAccountWritePlatformService {
 
     void rejectSavingsTransfer(SavingsAccount account);
 
-    SavingsAccountTransaction acceptSavingsTransfer(SavingsAccount account, LocalDate transferDate, Office acceptedInOffice, Staff staff);
+    SavingsAccountTransaction acceptSavingsTransfer(SavingsAccount account, LocalDate transferDate, Object acceptedInOffice, Object staff);
 
     CommandProcessingResult addSavingsAccountCharge(JsonCommand command);
 

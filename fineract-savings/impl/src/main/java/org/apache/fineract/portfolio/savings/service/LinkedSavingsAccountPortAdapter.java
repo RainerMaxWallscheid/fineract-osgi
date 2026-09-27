@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.data.GroupSavingsIndividualMonitoringAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
@@ -262,7 +260,7 @@ public class LinkedSavingsAccountPortAdapter implements LinkedSavingsAccountPort
     @Override
     public void acceptTransfer(final Long savingsAccountId, final LocalDate lastTransactionDate, final Object office, final Object staff) {
         final SavingsAccount account = this.savingsAccountAssembler.assembleFrom(savingsAccountId, false);
-        this.savingsAccountWritePlatformService.acceptSavingsTransfer(account, lastTransactionDate, (Office) office, (Staff) staff);
+        this.savingsAccountWritePlatformService.acceptSavingsTransfer(account, lastTransactionDate, office, staff);
     }
 
     @Override
