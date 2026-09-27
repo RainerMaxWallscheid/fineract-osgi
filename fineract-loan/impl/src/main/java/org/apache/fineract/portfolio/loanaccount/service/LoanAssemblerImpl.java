@@ -187,7 +187,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
                 : loanProduct.getTransactionProcessingStrategyCode();
         final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy = this.loanRepaymentScheduleTransactionProcessorFactory
                 .determineProcessor(transactionProcessingStrategyCode);
-        final Fund fund = findFundByIdIfProvided(fundId);
+        final Object fund = findFundByIdIfProvided(fundId);
         final Staff loanOfficer = findLoanOfficerByIdIfProvided(loanOfficerId);
         final Object loanPurpose = findCodeValueByIdIfProvided(loanPurposeId);
         List<LoanDisbursementDetails> disbursementDetails = new ArrayList<>();
@@ -390,12 +390,11 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @Override
-    public Fund findFundByIdIfProvided(final Long fundId) {
-        Fund fund = null;
-        if (fundId != null) {
-            fund = requireFund(fundId);
+    public Object findFundByIdIfProvided(final Long fundId) {
+        if (fundId == null) {
+            return null;
         }
-        return fund;
+        return requireFund(fundId);
     }
 
     private Group requireGroup(final Long groupId) {
@@ -406,12 +405,12 @@ public class LoanAssemblerImpl implements LoanAssembler {
         return persisted;
     }
 
-    private Fund requireFund(final Long fundId) {
+    private Object requireFund(final Long fundId) {
         final Object fund = this.fundPersistablePort.persistableById(fundId);
-        if (!(fund instanceof Fund persisted)) {
+        if (!(fund instanceof Fund)) {
             throw new FundNotFoundException(fundId);
         }
-        return persisted;
+        return fund;
     }
 
     @Override
@@ -598,7 +597,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         if (command.isChangeInLongParameterNamed(LoanApiConstants.fundIdParameterName, existingFundId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.fundIdParameterName);
             changes.put(LoanApiConstants.fundIdParameterName, newValue);
-            final Fund fund = findFundByIdIfProvided(newValue);
+            final Object fund = findFundByIdIfProvided(newValue);
             loan.updateFund(fund);
         }
         Long existingLoanOfficerId = null;
