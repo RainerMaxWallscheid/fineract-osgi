@@ -28,8 +28,8 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.moduleapi.CashierJournalPort;
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,13 +37,13 @@ public class CashierJournalPortAdapter implements CashierJournalPort {
 
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper;
     private final JournalEntryRepository journalEntryRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
 
     public CashierJournalPortAdapter(final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper,
-            final JournalEntryRepository journalEntryRepository, final OfficeRepositoryWrapper officeRepositoryWrapper) {
+            final JournalEntryRepository journalEntryRepository, final OfficePersistablePort officePersistablePort) {
         this.financialActivityAccountRepositoryWrapper = financialActivityAccountRepositoryWrapper;
         this.journalEntryRepository = journalEntryRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
     }
 
     @Override
@@ -62,12 +62,23 @@ public class CashierJournalPortAdapter implements CashierJournalPort {
             debitAccount = GLAccountAssociation.persistableById(mainVault.getGlAccountId());
             creditAccount = GLAccountAssociation.persistableById(tellerCash.getGlAccountId());
         }
-        final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        final Object office = officeById(officeId);
         final JournalEntry debitJournalEntry = JournalEntry.createNew(office, null, debitAccount, currencyCode, transactionId, false,
                 transactionDate, JournalEntryType.DEBIT, amount, description, null, null, null, null, null, null, null);
         final JournalEntry creditJournalEntry = JournalEntry.createNew(office, null, creditAccount, currencyCode, transactionId, false,
                 transactionDate, JournalEntryType.CREDIT, amount, description, null, null, null, null, null, null, null);
         this.journalEntryRepository.saveAndFlush(debitJournalEntry);
         this.journalEntryRepository.saveAndFlush(creditJournalEntry);
+    }
+
+    private Object officeById(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (office == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return office;
     }
 }
