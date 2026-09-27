@@ -30,7 +30,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -55,11 +55,11 @@ public class AccountingProvisioningConfiguration {
     public ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService(
             ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService,
             ProvisioningExistencePort provisioningExistencePort, LoanProductExistencePort loanProductExistencePort,
-            GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository, PlatformSecurityContext platformSecurityContext,
+            GLAccountPersistablePort glAccountPersistablePort, OfficePersistablePort officePersistablePort, PlatformSecurityContext platformSecurityContext,
             ProvisioningEntryRepository provisioningEntryRepository, ProvisioningJournalEntryService provisioningJournalEntryService,
             ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, FromJsonHelper fromApiJsonHelper) {
         return new ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(provisioningEntriesReadPlatformService,
-                provisioningExistencePort, loanProductExistencePort, glAccountPersistablePort, officeRepository, platformSecurityContext,
+                provisioningExistencePort, loanProductExistencePort, glAccountPersistablePort, officePersistablePort, platformSecurityContext,
                 provisioningEntryRepository, provisioningJournalEntryService, fromApiJsonDeserializer, fromApiJsonHelper) {};
     }
 

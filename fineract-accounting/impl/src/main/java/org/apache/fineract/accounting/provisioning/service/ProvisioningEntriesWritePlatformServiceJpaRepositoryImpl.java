@@ -22,9 +22,9 @@ import com.google.gson.JsonObject;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
@@ -51,9 +51,8 @@ import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepos
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.provisioning.exception.ProvisioningCategoryNotFoundException;
 import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExistencePort;
 import org.apache.fineract.portfolio.PortfolioProductType;
@@ -71,7 +70,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     private final ProvisioningExistencePort provisioningExistencePort;
     private final LoanProductExistencePort loanProductExistencePort;
     private final GLAccountPersistablePort glAccountPersistablePort;
-    private final OfficeRepository officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final PlatformSecurityContext platformSecurityContext;
     private final ProvisioningEntryRepository provisioningEntryRepository;
     private final ProvisioningJournalEntryService provisioningJournalEntryService;
@@ -184,7 +183,9 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     private Collection<LoanProductProvisioningEntry> generateLoanProvisioningEntry(ProvisioningEntry parent, LocalDate date) {
         Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveLoanProductsProvisioningData(date);
-        // Collect all referenced IDs upfront. Offices are bulk-fetched via findAllById.
+        // Collect all referenced IDs upfront. Offices are existence-checked with
+        // OfficePersistablePort.persistableById; the entry stores the office id.
+        // A null office id is absent and throws OfficeNotFoundException, not IAE.
         // GL accounts use GLAccountPersistablePort.persistableById. Loan products and
         // provision categories are existence-checked through already-on-api ports
         // (no leftover LoanProductRepository / ProvisioningCategoryRepository — FINERACT-2561 / ADR-021).
@@ -202,7 +203,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
                 throw new ProvisioningCategoryNotFoundException(categoryId);
             }
         }
-        Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
+        final Set<Long> existingOfficeIds = new HashSet<>();
+        for (Long officeId : officeIds) {
+            if (officeId != null && this.officePersistablePort.persistableById(officeId) != null) {
+                existingOfficeIds.add(officeId);
+            }
+        }
         Map<Long, Object> glAccountMap = new HashMap<>();
         for (Long glAccountId : glAccountIds) {
             if (glAccountId == null) {
@@ -215,9 +221,9 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         }
         Map<Integer, LoanProductProvisioningEntry> provisioningEntries = new HashMap<>();
         for (LoanProductProvisioningEntryData data : entries) {
-            Office office = officeMap.get(data.getOfficeId());
-            if (office == null) {
-                throw new OfficeNotFoundException(data.getOfficeId());
+            final Long officeId = data.getOfficeId();
+            if (!existingOfficeIds.contains(officeId)) {
+                throw new OfficeNotFoundException(officeId);
             }
             Object liabilityAccount = glAccountMap.get(data.getLiablityAccount());
             if (liabilityAccount == null) {
@@ -232,7 +238,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             Money money = Money.of(currency, data.getBalance());
             Money amountToReserve = money.percentageOf(data.getPercentage(), MoneyHelper.getMathContext());
             Long criteraId = data.getCriteriaId();
-            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setProductId(data.getProductId()).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setCategoryId(data.getCategoryId()).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
+            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setProductId(data.getProductId()).setOffice(officeId).setCurrencyCode(data.getCurrencyCode()).setCategoryId(data.getCategoryId()).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
             entry.setEntry(parent);
             if (!provisioningEntries.containsKey(entry.partialHashCode())) {
                 provisioningEntries.put(entry.partialHashCode(), entry);
@@ -245,12 +251,12 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningExistencePort provisioningExistencePort, final LoanProductExistencePort loanProductExistencePort, final GLAccountPersistablePort glAccountPersistablePort, final OfficeRepository officeRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningExistencePort provisioningExistencePort, final LoanProductExistencePort loanProductExistencePort, final GLAccountPersistablePort glAccountPersistablePort, final OfficePersistablePort officePersistablePort, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final ProvisioningJournalEntryService provisioningJournalEntryService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
         this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
         this.provisioningExistencePort = provisioningExistencePort;
         this.loanProductExistencePort = loanProductExistencePort;
         this.glAccountPersistablePort = glAccountPersistablePort;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.platformSecurityContext = platformSecurityContext;
         this.provisioningEntryRepository = provisioningEntryRepository;
         this.provisioningJournalEntryService = provisioningJournalEntryService;
