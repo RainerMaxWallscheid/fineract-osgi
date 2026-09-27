@@ -22,7 +22,6 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.useradministration.domain.AppUser;
 
 public interface LoanAssembler {
 
@@ -48,5 +47,5 @@ public interface LoanAssembler {
 
     Map<String, Object> updateLoanApplicationAttributesForWithdrawal(Loan loan, JsonCommand command, Object currentUser);
 
-    Map<String, Object> updateLoanApplicationAttributesForRejection(Loan loan, JsonCommand command, AppUser currentUser);
+    Map<String, Object> updateLoanApplicationAttributesForRejection(Loan loan, JsonCommand command, Object currentUser);
 }

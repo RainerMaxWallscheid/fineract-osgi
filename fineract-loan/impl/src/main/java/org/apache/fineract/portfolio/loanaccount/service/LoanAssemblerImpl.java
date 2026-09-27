@@ -97,7 +97,6 @@ import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundEx
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.rate.service.RateAssembler;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoanAssemblerImpl implements LoanAssembler {
@@ -844,7 +843,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @Override
-    public Map<String, Object> updateLoanApplicationAttributesForRejection(Loan loan, JsonCommand command, AppUser currentUser) {
+    public Map<String, Object> updateLoanApplicationAttributesForRejection(Loan loan, JsonCommand command, Object currentUser) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
         final LocalDate rejectedOn = command.localDateValueOfParameterNamed(Loan.REJECTED_ON_DATE);
         loan.setRejectedOnDate(rejectedOn);
