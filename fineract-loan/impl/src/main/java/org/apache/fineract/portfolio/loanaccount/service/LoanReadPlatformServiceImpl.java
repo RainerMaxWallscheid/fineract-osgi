@@ -218,11 +218,12 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
     }
 
     private String getHierarchyString() {
-        AppUser currentUser = null;
+        Object currentUser = null;
         if (this.context != null) {
             currentUser = this.context.getAuthenticatedUserIfPresent();
         }
-        return Optional.ofNullable(currentUser).map(appUser -> appUser.getOffice().getHierarchy()).orElse(".");
+        final AppUser appUser = (AppUser) currentUser;
+        return Optional.ofNullable(appUser).map(user -> user.getOffice().getHierarchy()).orElse(".");
     }
 
     @Override
