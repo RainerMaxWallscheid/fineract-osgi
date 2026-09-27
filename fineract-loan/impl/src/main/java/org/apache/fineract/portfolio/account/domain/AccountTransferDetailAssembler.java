@@ -31,7 +31,8 @@ import java.util.Locale;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -45,17 +46,17 @@ import org.springframework.stereotype.Service;
 public class AccountTransferDetailAssembler {
 
     private final ClientRepositoryWrapper clientRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanAssembler loanAccountAssembler;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Autowired
     public AccountTransferDetailAssembler(final ClientRepositoryWrapper clientRepository,
-            final OfficeRepositoryWrapper officeRepositoryWrapper, final FromJsonHelper fromApiJsonHelper,
+            final OfficePersistablePort officePersistablePort, final FromJsonHelper fromApiJsonHelper,
             final LoanAssembler loanAccountAssembler) {
         this.clientRepository = clientRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanAccountAssembler = loanAccountAssembler;
     }
@@ -93,11 +94,11 @@ public class AccountTransferDetailAssembler {
             final Long toSavingsAccountId) {
         final JsonElement element = command.parsedJson();
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
-        final Office fromOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(fromOfficeId);
+        final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
         final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
-        final Office toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(toOfficeId);
+        final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
         final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
@@ -109,11 +110,11 @@ public class AccountTransferDetailAssembler {
             final Loan toLoanAccount) {
         final JsonElement element = command.parsedJson();
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
-        final Office fromOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(fromOfficeId);
+        final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
         final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
-        final Office toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(toOfficeId);
+        final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
         final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
@@ -125,16 +126,26 @@ public class AccountTransferDetailAssembler {
             final Long toSavingsAccountId) {
         final JsonElement element = command.parsedJson();
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
-        final Office fromOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(fromOfficeId);
+        final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
         final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
-        final Office toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(toOfficeId);
+        final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
         final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
         return AccountTransferDetails.loanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccountId,
                 transfertype);
+    }
+
+    private Long requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        if (this.officePersistablePort.persistableById(officeId) == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return officeId;
     }
 
     public AccountTransferDetails assembleSavingsToLoanTransfer(final Long fromSavingsAccountId, final Loan toLoanAccount,
