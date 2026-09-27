@@ -1409,8 +1409,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, false);
     }
 
-    private AppUser getAppUserIfPresent() {
-        AppUser user = null;
+    private Object getAppUserIfPresent() {
+        Object user = null;
         if (this.context != null) {
             user = this.context.getAuthenticatedUserIfPresent();
         }
