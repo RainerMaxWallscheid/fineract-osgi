@@ -141,7 +141,7 @@ public class SavingsAccountAssembler {
      * Assembles a new {@link SavingsAccount} from JSON details passed in request inheriting details where relevant from
      * chosen {@link SavingsProduct}.
      */
-    public SavingsAccount assembleFrom(final JsonCommand command, final AppUser submittedBy) {
+    public SavingsAccount assembleFrom(final JsonCommand command, final Object submittedBy) {
 
         final JsonElement element = command.parsedJson();
 
