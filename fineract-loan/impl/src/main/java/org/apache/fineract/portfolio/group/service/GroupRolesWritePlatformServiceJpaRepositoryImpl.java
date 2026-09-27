@@ -29,7 +29,8 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.group.api.GroupingTypesApiConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRole;
@@ -50,7 +51,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     private final GroupActivePort groupActivePort;
     private final GroupRolesDataValidator fromApiJsonDeserializer;
     private final CodeValuePersistablePort codeValuePersistablePort;
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final GroupRoleRepositoryWrapper groupRoleRepository;
 
     @Override
@@ -61,7 +62,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
             final Long roleId = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
             final CodeValue role = requireCodeValue(roleId);
             final Long clientId = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
-            final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+            final Client client = requireClient(clientId);
             final Group group = requireGroup(command.getGroupId());
             if (!group.hasClientAsMember(client)) {
                 throw new ClientNotInGroupException(clientId, command.getGroupId());
@@ -116,7 +117,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
                 final Long newValue = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
                 Client client = null;
                 if (newValue != null) {
-                    client = this.clientRepository.findOneWithNotFoundDetection(newValue);
+                    client = requireClient(newValue);
                     if (!group.hasClientAsMember(client)) {
                         throw new ClientNotInGroupException(newValue, command.getGroupId());
                     }
@@ -149,13 +150,13 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     @java.lang.SuppressWarnings("all")
     public GroupRolesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final GroupActivePort groupActivePort, final GroupRolesDataValidator fromApiJsonDeserializer,
-            final CodeValuePersistablePort codeValuePersistablePort, final ClientRepositoryWrapper clientRepository,
+            final CodeValuePersistablePort codeValuePersistablePort, final ClientActivePort clientActivePort,
             final GroupRoleRepositoryWrapper groupRoleRepository) {
         this.context = context;
         this.groupActivePort = groupActivePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.codeValuePersistablePort = codeValuePersistablePort;
-        this.clientRepository = clientRepository;
+        this.clientActivePort = clientActivePort;
         this.groupRoleRepository = groupRoleRepository;
     }
 
@@ -177,6 +178,17 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
         final Object codeValue = this.codeValuePersistablePort.persistableById(codeValueId);
         if (!(codeValue instanceof CodeValue persisted)) {
             throw new CodeValueNotFoundException(codeValueId);
+        }
+        return persisted;
+    }
+
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
         }
         return persisted;
     }
