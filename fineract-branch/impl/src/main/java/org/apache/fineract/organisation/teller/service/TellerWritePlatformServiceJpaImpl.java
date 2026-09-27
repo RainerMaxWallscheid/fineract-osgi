@@ -30,8 +30,8 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.organisation.teller.validation.CashierTransactionDataValidator;
@@ -56,7 +56,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     private final PlatformSecurityContext context;
     private final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final TellerRepositoryWrapper tellerRepositoryWrapper;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final StaffPersistablePort staffPersistablePort;
     private final CashierRepository cashierRepository;
     private final CashierTransactionRepository cashierTxnRepository;
@@ -72,8 +72,8 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             this.fromApiJsonDeserializer.validateForCreateAndUpdateTeller(command.json());
             // final Office parent =
             // validateUserPriviledgeOnOfficeAndRetrieve(currentUser, officeId);
-            final Office tellerOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
-            final Teller teller = Teller.fromJson(tellerOffice, command);
+            requireOffice(officeId);
+            final Teller teller = Teller.fromJson(officeId, command);
             // pre save to generate id for use in office hierarchy
             this.tellerRepositoryWrapper.saveAndFlush(teller);
             return  //
@@ -96,11 +96,11 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     public CommandProcessingResult modifyTeller(Long tellerId, JsonCommand command) {
         try {
             final Long officeId = command.longValueOfParameterNamed("officeId");
-            final Office tellerOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            requireOffice(officeId);
             final AppUser currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreateAndUpdateTeller(command.json());
             final Teller teller = validateUserPriviledgeOnTellerAndRetrieve(currentUser, tellerId);
-            final Map<String, Object> changes = teller.update(tellerOffice, command);
+            final Map<String, Object> changes = teller.update(officeId, command);
             if (!changes.isEmpty()) {
                 this.tellerRepositoryWrapper.saveAndFlush(teller);
             }
@@ -126,10 +126,9 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
      */
     private Teller validateUserPriviledgeOnTellerAndRetrieve(final AppUser currentUser, final Long tellerId) {
         final Long userOfficeId = currentUser.getOffice().getId();
-        final Office userOffice = this.officeRepositoryWrapper.findOfficeHierarchy(userOfficeId);
         final Teller tellerToReturn = this.tellerRepositoryWrapper.findOneWithNotFoundDetection(tellerId);
         final Long tellerOfficeId = tellerToReturn.officeId();
-        if (userOffice.doesNotHaveAnOfficeInHierarchyWithId(tellerOfficeId)) {
+        if (this.officePersistablePort.doesNotHaveAnOfficeInHierarchyWithId(userOfficeId, tellerOfficeId)) {
             throw new NoAuthorizationException("User does not have sufficient priviledges to act on the provided office.");
         }
         return tellerToReturn;
@@ -349,6 +348,15 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
         }
     }
 
+    private void requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        if (this.officePersistablePort.persistableById(officeId) == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+    }
+
     private Object requiredStaff(final Long staffId) {
         final Object staff = this.staffPersistablePort.persistableById(staffId);
         if (staff == null) {
@@ -358,11 +366,11 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     }
 
     @java.lang.SuppressWarnings("all")
-        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffPersistablePort staffPersistablePort, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final CashierJournalPort cashierJournalPort, final CashierTransactionDataValidator cashierTransactionDataValidator) {
+        public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context, final TellerCommandFromApiJsonDeserializer fromApiJsonDeserializer, final TellerRepositoryWrapper tellerRepositoryWrapper, final OfficePersistablePort officePersistablePort, final StaffPersistablePort staffPersistablePort, final CashierRepository cashierRepository, final CashierTransactionRepository cashierTxnRepository, final CashierJournalPort cashierJournalPort, final CashierTransactionDataValidator cashierTransactionDataValidator) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.tellerRepositoryWrapper = tellerRepositoryWrapper;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.staffPersistablePort = staffPersistablePort;
         this.cashierRepository = cashierRepository;
         this.cashierTxnRepository = cashierTxnRepository;
