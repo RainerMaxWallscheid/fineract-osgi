@@ -83,7 +83,7 @@ public class GroupConfiguration {
     @Bean
     @ConditionalOnMissingBean(GroupingTypesWritePlatformService.class)
     public GroupingTypesWritePlatformService groupingTypesWritePlatformService(PlatformSecurityContext context,
-            GroupRepositoryWrapper groupRepository, ClientActivePort clientActivePort,
+            GroupRepositoryWrapper groupRepository, GroupActivePort groupActivePort, ClientActivePort clientActivePort,
             OfficePersistablePort officePersistablePort, StaffRepositoryWrapper staffRepository,
             NoteWritePlatformService noteWritePlatformService, GroupLevelRepository groupLevelRepository,
             GroupingTypesDataValidator fromApiJsonDeserializer, LoanRepositoryWrapper loanRepositoryWrapper,
@@ -94,7 +94,7 @@ public class GroupConfiguration {
             BusinessEventNotifierService businessEventNotifierService, LoanOfficerService loanOfficerService
 
     ) {
-        return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientActivePort,
+        return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, groupActivePort, clientActivePort,
                 officePersistablePort, staffRepository, noteWritePlatformService, groupLevelRepository, fromApiJsonDeserializer,
                 loanRepositoryWrapper, codeValuePersistablePort, commandProcessingService, calendarInstanceRepository,
                 configurationDomainService, accountNumberFormatRepository, accountNumberGenerator,

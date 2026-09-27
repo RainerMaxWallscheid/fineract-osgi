@@ -76,6 +76,8 @@ import org.apache.fineract.portfolio.group.domain.GroupLevelRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.GroupTypes;
 import org.apache.fineract.portfolio.group.exception.GroupAccountExistsException;
+import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.exception.GroupHasNoStaffException;
 import org.apache.fineract.portfolio.group.exception.GroupMemberCountNotInPermissibleRangeException;
 import org.apache.fineract.portfolio.group.exception.GroupMustBePendingToBeDeletedException;
@@ -100,6 +102,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GroupingTypesWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final GroupRepositoryWrapper groupRepository;
+    private final GroupActivePort groupActivePort;
     private final ClientActivePort clientActivePort;
     private final OfficePersistablePort officePersistablePort;
     private final StaffRepositoryWrapper staffRepository;
@@ -135,7 +138,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
             if (centerId == null) {
                 officeId = command.longValueOfParameterNamed(GroupingTypesApiConstants.officeIdParamName);
             } else {
-                parentGroup = this.groupRepository.findOneWithNotFoundDetection(centerId);
+                parentGroup = requireGroup(centerId);
                 officeId = parentGroup.officeId();
             }
             final Office groupOffice = requireOffice(officeId);
@@ -353,7 +356,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                     actualChanges.put(GroupingTypesApiConstants.centerIdParamName, newValue);
                     Group newParentGroup = null;
                     if (newValue != null) {
-                        newParentGroup = this.groupRepository.findOneWithNotFoundDetection(newValue);
+                        newParentGroup = requireGroup(newValue);
                         if (!newParentGroup.isOfficeIdentifiedBy(officeId)) {
                             final String errorMessage = "Group and parent group must have the same office";
                             throw new InvalidOfficeException("group", "attach.to.parent.group", errorMessage);
@@ -601,7 +604,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         if (!ObjectUtils.isEmpty(childGroupsArray)) {
             for (final String groupId : childGroupsArray) {
                 final Long id = Long.valueOf(groupId);
-                final Group group = this.groupRepository.findOneWithNotFoundDetection(id);
+                final Group group = requireGroup(id);
                 if (!group.isOfficeIdentifiedBy(officeId)) {
                     final String errorMessage = "Group and child groups must have the same office.";
                     throw new InvalidOfficeException("group", "attach.to.parent.group", errorMessage);
@@ -831,6 +834,17 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         return persisted;
     }
 
+    private Group requireGroup(final Long groupId) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object group = this.groupActivePort.persistableById(groupId);
+        if (!(group instanceof Group persisted)) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
+    }
+
     private CodeValue requireCodeValue(final String codeName, final Long codeValueId) {
         final Object codeValue = this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
         if (!(codeValue instanceof CodeValue persisted)) {
@@ -841,7 +855,8 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
 
     @java.lang.SuppressWarnings("all")
     public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final GroupRepositoryWrapper groupRepository, final ClientActivePort clientActivePort,
+            final GroupRepositoryWrapper groupRepository, final GroupActivePort groupActivePort,
+            final ClientActivePort clientActivePort,
             final OfficePersistablePort officePersistablePort, final StaffRepositoryWrapper staffRepository,
             final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository,
             final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -852,6 +867,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
             final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
         this.context = context;
         this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.clientActivePort = clientActivePort;
         this.officePersistablePort = officePersistablePort;
         this.staffRepository = staffRepository;
