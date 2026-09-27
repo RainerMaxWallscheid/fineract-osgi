@@ -65,7 +65,8 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.service.LoanStatusMapper;
 import org.apache.fineract.portfolio.group.api.GroupingTypesApiConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -98,7 +99,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GroupingTypesWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final GroupRepositoryWrapper groupRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final OfficePersistablePort officePersistablePort;
     private final StaffRepositoryWrapper staffRepository;
     private final NoteWritePlatformService noteWritePlatformService;
@@ -584,7 +585,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         if (!ObjectUtils.isEmpty(clientMembersArray)) {
             for (final String clientId : clientMembersArray) {
                 final Long id = Long.valueOf(clientId);
-                final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(id);
+                final Client client = requireClient(id);
                 if (!client.isOfficeIdentifiedBy(groupOfficeId)) {
                     final String errorMessage = "Client with identifier " + clientId + " must have the same office as group.";
                     throw new InvalidOfficeException("client", "attach.to.group", errorMessage, clientId, groupOfficeId);
@@ -820,9 +821,20 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         return persisted;
     }
 
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
+            final GroupRepositoryWrapper groupRepository, final ClientActivePort clientActivePort,
             final OfficePersistablePort officePersistablePort, final StaffRepositoryWrapper staffRepository,
             final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository,
             final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -833,7 +845,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
             final BusinessEventNotifierService businessEventNotifierService, final LoanOfficerService loanOfficerService) {
         this.context = context;
         this.groupRepository = groupRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.officePersistablePort = officePersistablePort;
         this.staffRepository = staffRepository;
         this.noteWritePlatformService = noteWritePlatformService;

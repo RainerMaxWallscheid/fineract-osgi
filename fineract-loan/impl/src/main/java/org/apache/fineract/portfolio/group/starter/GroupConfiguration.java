@@ -38,7 +38,6 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.GroupLevelRepository;
@@ -85,7 +84,7 @@ public class GroupConfiguration {
     @Bean
     @ConditionalOnMissingBean(GroupingTypesWritePlatformService.class)
     public GroupingTypesWritePlatformService groupingTypesWritePlatformService(PlatformSecurityContext context,
-            GroupRepositoryWrapper groupRepository, ClientRepositoryWrapper clientRepositoryWrapper,
+            GroupRepositoryWrapper groupRepository, ClientActivePort clientActivePort,
             OfficePersistablePort officePersistablePort, StaffRepositoryWrapper staffRepository,
             NoteWritePlatformService noteWritePlatformService, GroupLevelRepository groupLevelRepository,
             GroupingTypesDataValidator fromApiJsonDeserializer, LoanRepositoryWrapper loanRepositoryWrapper,
@@ -96,7 +95,7 @@ public class GroupConfiguration {
             BusinessEventNotifierService businessEventNotifierService, LoanOfficerService loanOfficerService
 
     ) {
-        return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientRepositoryWrapper,
+        return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientActivePort,
                 officePersistablePort, staffRepository, noteWritePlatformService, groupLevelRepository, fromApiJsonDeserializer,
                 loanRepositoryWrapper, codeValueRepository, commandProcessingService, calendarInstanceRepository,
                 configurationDomainService, accountNumberFormatRepository, accountNumberGenerator,
