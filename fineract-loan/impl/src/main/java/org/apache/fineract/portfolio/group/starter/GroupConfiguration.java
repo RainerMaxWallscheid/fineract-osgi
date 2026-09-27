@@ -42,6 +42,7 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.GroupLevelRepository;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.GroupRoleRepositoryWrapper;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.serialization.GroupRolesDataValidator;
 import org.apache.fineract.portfolio.group.serialization.GroupingTypesDataValidator;
 import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
@@ -130,10 +131,10 @@ public class GroupConfiguration {
     @Bean
     @ConditionalOnMissingBean(GroupRolesWritePlatformService.class)
     public GroupRolesWritePlatformService groupRolesWritePlatformService(PlatformSecurityContext context,
-            GroupRepositoryWrapper groupRepository, GroupRolesDataValidator fromApiJsonDeserializer,
+            GroupActivePort groupActivePort, GroupRolesDataValidator fromApiJsonDeserializer,
             CodeValueRepositoryWrapper codeValueRepository, ClientRepositoryWrapper clientRepository,
             GroupRoleRepositoryWrapper groupRoleRepository) {
-        return new GroupRolesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, fromApiJsonDeserializer, codeValueRepository,
+        return new GroupRolesWritePlatformServiceJpaRepositoryImpl(context, groupActivePort, fromApiJsonDeserializer, codeValueRepository,
                 clientRepository, groupRoleRepository);
     }
 }

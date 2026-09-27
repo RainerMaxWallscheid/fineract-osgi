@@ -31,10 +31,11 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.group.api.GroupingTypesApiConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.GroupRole;
 import org.apache.fineract.portfolio.group.domain.GroupRoleRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
+import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.serialization.GroupRolesDataValidator;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -45,7 +46,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GroupRolesWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
-    private final GroupRepositoryWrapper groupRepository;
+    private final GroupActivePort groupActivePort;
     private final GroupRolesDataValidator fromApiJsonDeserializer;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final ClientRepositoryWrapper clientRepository;
@@ -60,7 +61,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
             final CodeValue role = this.codeValueRepository.findOneWithNotFoundDetection(roleId);
             final Long clientId = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-            final Group group = this.groupRepository.findOneWithNotFoundDetection(command.getGroupId());
+            final Group group = requireGroup(command.getGroupId());
             if (!group.hasClientAsMember(client)) {
                 throw new ClientNotInGroupException(clientId, command.getGroupId());
             }
@@ -99,7 +100,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForUpdateRole(command);
-            final Group group = this.groupRepository.findOneWithNotFoundDetection(command.getGroupId());
+            final Group group = requireGroup(command.getGroupId());
             final GroupRole groupRole = this.groupRoleRepository.findOneWithNotFoundDetection(command.entityId());
             final Map<String, Object> actualChanges = groupRole.update(command);
             if (actualChanges.containsKey(GroupingTypesApiConstants.roleParamName)) {
@@ -146,14 +147,25 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
 
     @java.lang.SuppressWarnings("all")
     public GroupRolesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final GroupRepositoryWrapper groupRepository, final GroupRolesDataValidator fromApiJsonDeserializer,
+            final GroupActivePort groupActivePort, final GroupRolesDataValidator fromApiJsonDeserializer,
             final CodeValueRepositoryWrapper codeValueRepository, final ClientRepositoryWrapper clientRepository,
             final GroupRoleRepositoryWrapper groupRoleRepository) {
         this.context = context;
-        this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.codeValueRepository = codeValueRepository;
         this.clientRepository = clientRepository;
         this.groupRoleRepository = groupRoleRepository;
+    }
+
+    private Group requireGroup(final Long groupId) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object group = this.groupActivePort.persistableById(groupId);
+        if (!(group instanceof Group persisted)) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
     }
 }
