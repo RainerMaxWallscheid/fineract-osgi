@@ -19,7 +19,7 @@
 package org.apache.fineract.organisation.staff.starter;
 
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.mapper.StaffCreateRequestMapper;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
@@ -42,8 +42,8 @@ class StaffConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(StaffWriteService.class)
-    StaffWriteService staffWriteService(StaffRepository staffRepository, OfficeRepository officeRepository,
+    StaffWriteService staffWriteService(StaffRepository staffRepository, OfficePersistablePort officePersistablePort,
             StaffCreateRequestMapper staffCreateRequestMapper) {
-        return new StaffWriteServiceImpl(staffRepository, officeRepository, staffCreateRequestMapper);
+        return new StaffWriteServiceImpl(staffRepository, officePersistablePort, staffCreateRequestMapper);
     }
 }

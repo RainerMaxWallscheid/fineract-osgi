@@ -61,6 +61,7 @@ jar {
                         + 'org.apache.fineract.organisation.provisioning.data,'
                         + 'org.apache.fineract.organisation.provisioning.moduleapi,'
                         + 'org.apache.fineract.accounting.moduleapi,'
+                        + 'org.apache.fineract.organisation.office.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.organisation.impl'
                 )

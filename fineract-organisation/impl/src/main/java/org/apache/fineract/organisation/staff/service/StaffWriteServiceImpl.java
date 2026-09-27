@@ -24,8 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.moduleapi.StaffCreateRequest;
 import org.apache.fineract.organisation.staff.moduleapi.StaffCreateResponse;
 import org.apache.fineract.organisation.staff.data.StaffUpdateRequest;
@@ -41,7 +42,7 @@ public class StaffWriteServiceImpl implements StaffWriteService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffWriteServiceImpl.class);
     private final StaffRepository staffRepository;
-    private final OfficeRepository officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final StaffCreateRequestMapper staffCreateRequestMapper;
 
     @Transactional
@@ -49,7 +50,7 @@ public class StaffWriteServiceImpl implements StaffWriteService {
     public StaffCreateResponse createStaff(final StaffCreateRequest request) {
         try {
             var staff = staffCreateRequestMapper.map(request);
-            var office = officeRepository.findById(request.getOfficeId()).orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
+            var office = requireOffice(request.getOfficeId());
             staff.setOffice(office);
             staff.setDisplayName(StringUtils.isEmpty(staff.getFirstname()) ? staff.getLastname() : staff.getLastname() + ", " + staff.getFirstname());
             staffRepository.saveAndFlush(staff);
@@ -69,7 +70,7 @@ public class StaffWriteServiceImpl implements StaffWriteService {
             var staff = this.staffRepository.findById(request.getId()).orElseThrow(() -> new StaffNotFoundException(request.getId()));
             var changes = new HashMap<String, Object>();
             if (request.getOfficeId() != null) {
-                var office = officeRepository.findById(request.getOfficeId()).orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
+                var office = requireOffice(request.getOfficeId());
                 staff.setOffice(office);
                 changes.put(StaffUpdateRequest.Fields.officeId, request.getOfficeId());
             }
@@ -127,10 +128,21 @@ public class StaffWriteServiceImpl implements StaffWriteService {
         return ErrorHandler.getMappable(dve, "error.msg.staff.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
+    private Office requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public StaffWriteServiceImpl(final StaffRepository staffRepository, final OfficeRepository officeRepository, final StaffCreateRequestMapper staffCreateRequestMapper) {
+        public StaffWriteServiceImpl(final StaffRepository staffRepository, final OfficePersistablePort officePersistablePort, final StaffCreateRequestMapper staffCreateRequestMapper) {
         this.staffRepository = staffRepository;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.staffCreateRequestMapper = staffCreateRequestMapper;
     }
 }
