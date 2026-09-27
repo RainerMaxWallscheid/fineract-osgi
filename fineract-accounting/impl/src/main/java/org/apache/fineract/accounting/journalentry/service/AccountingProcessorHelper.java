@@ -824,27 +824,27 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    public void createJournalEntriesForShares(final Office office, final String currencyCode, final int accountTypeToDebitId, final int accountTypeToCreditId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    public void createJournalEntriesForShares(final Object office, final String currencyCode, final int accountTypeToDebitId, final int accountTypeToCreditId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         createDebitJournalEntryForShares(office, currencyCode, accountTypeToDebitId, shareProductId, paymentTypeId, shareAccountId, transactionId, transactionDate, amount);
         createCreditJournalEntryForShares(office, currencyCode, accountTypeToCreditId, shareProductId, paymentTypeId, shareAccountId, transactionId, transactionDate, amount);
     }
 
-    public void createDebitJournalEntryForShares(final Office office, final String currencyCode, final int accountTypeToDebitId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    public void createDebitJournalEntryForShares(final Object office, final String currencyCode, final int accountTypeToDebitId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final GLAccount debitAccount = getLinkedGLAccountForShareProduct(shareProductId, accountTypeToDebitId, paymentTypeId);
         createDebitJournalEntryForShares(office, currencyCode, debitAccount, shareAccountId, transactionId, transactionDate, amount);
     }
 
-    public void createCreditJournalEntryForShares(final Office office, final String currencyCode, final int accountTypeToCreditId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    public void createCreditJournalEntryForShares(final Object office, final String currencyCode, final int accountTypeToCreditId, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final GLAccount creditAccount = getLinkedGLAccountForShareProduct(shareProductId, accountTypeToCreditId, paymentTypeId);
         createCreditJournalEntryForShares(office, currencyCode, creditAccount, shareAccountId, transactionId, transactionDate, amount);
     }
 
-    public void createCashBasedJournalEntriesForSharesCharges(final Office office, final String currencyCode, final CashAccountsForShares accountTypeToBeDebited, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
+    public void createCashBasedJournalEntriesForSharesCharges(final Object office, final String currencyCode, final CashAccountsForShares accountTypeToBeDebited, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long paymentTypeId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
         createDebitJournalEntryForShares(office, currencyCode, accountTypeToBeDebited.getValue(), shareProductId, paymentTypeId, shareAccountId, transactionId, transactionDate, totalAmount);
         createCashBasedJournalEntryForSharesCharges(office, currencyCode, accountTypeToBeCredited, shareProductId, shareAccountId, transactionId, transactionDate, totalAmount, chargePaymentDTOs);
     }
 
-    public void createCashBasedJournalEntryForSharesCharges(final Office office, final String currencyCode, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
+    public void createCashBasedJournalEntryForSharesCharges(final Object office, final String currencyCode, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
         final Map<GLAccount, BigDecimal> creditDetailsMap = new LinkedHashMap<>();
         for (final ChargePaymentDTO chargePaymentDTO : chargePaymentDTOs) {
             final GLAccount chargeSpecificAccount = getLinkedGLAccountForShareCharges(shareProductId, accountTypeToBeCredited.getValue(), chargePaymentDTO.getChargeId());
@@ -869,7 +869,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void revertCashBasedJournalEntryForSharesCharges(final Office office, final String currencyCode, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
+    public void revertCashBasedJournalEntryForSharesCharges(final Object office, final String currencyCode, final CashAccountsForShares accountTypeToBeCredited, final Long shareProductId, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final List<ChargePaymentDTO> chargePaymentDTOs) {
         final Map<GLAccount, BigDecimal> creditDetailsMap = new LinkedHashMap<>();
         for (final ChargePaymentDTO chargePaymentDTO : chargePaymentDTOs) {
             final GLAccount chargeSpecificAccount = getLinkedGLAccountForShareCharges(shareProductId, accountTypeToBeCredited.getValue(), chargePaymentDTO.getChargeId());
@@ -894,7 +894,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    private void createDebitJournalEntryForShares(final Office office, final String currencyCode, final GLAccount account, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createDebitJournalEntryForShares(final Object office, final String currencyCode, final GLAccount account, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         Long shareTransactionId = null;
         String modifiedTransactionId = transactionId;
@@ -906,7 +906,7 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    private void createCreditJournalEntryForShares(final Office office, final String currencyCode, final GLAccount account, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createCreditJournalEntryForShares(final Object office, final String currencyCode, final GLAccount account, final Long shareAccountId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         Long shareTransactionId = null;
         String modifiedTransactionId = transactionId;
