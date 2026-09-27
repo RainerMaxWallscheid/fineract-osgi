@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface DepositAccountDomainService {
@@ -53,6 +52,6 @@ public interface DepositAccountDomainService {
     Long handleFDAccountPreMatureClosure(FixedDepositAccount account, Object paymentDetail, Object user, JsonCommand command,
             Map<String, Object> changes);
 
-    Long handleRDAccountPreMatureClosure(RecurringDepositAccount account, Object paymentDetail, AppUser user, JsonCommand command,
+    Long handleRDAccountPreMatureClosure(RecurringDepositAccount account, Object paymentDetail, Object user, JsonCommand command,
             Map<String, Object> changes);
 }
