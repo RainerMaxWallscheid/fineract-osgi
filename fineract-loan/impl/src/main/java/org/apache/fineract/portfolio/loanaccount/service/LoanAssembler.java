@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.useradministration.domain.AppUser;
 
@@ -43,7 +42,7 @@ public interface LoanAssembler {
 
     Object findFundByIdIfProvided(Long fundId);
 
-    Staff findLoanOfficerByIdIfProvided(Long loanOfficerId);
+    Object findLoanOfficerByIdIfProvided(Long loanOfficerId);
 
     Map<String, Object> updateFrom(JsonCommand command, Loan loan);
 

@@ -188,7 +188,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         final LoanRepaymentScheduleTransactionProcessor transactionProcessingStrategy = this.loanRepaymentScheduleTransactionProcessorFactory
                 .determineProcessor(transactionProcessingStrategyCode);
         final Object fund = findFundByIdIfProvided(fundId);
-        final Staff loanOfficer = findLoanOfficerByIdIfProvided(loanOfficerId);
+        final Object loanOfficer = findLoanOfficerByIdIfProvided(loanOfficerId);
         final Object loanPurpose = findCodeValueByIdIfProvided(loanPurposeId);
         List<LoanDisbursementDetails> disbursementDetails = new ArrayList<>();
         BigDecimal fixedEmiAmount = null;
@@ -414,23 +414,23 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @Override
-    public Staff findLoanOfficerByIdIfProvided(final Long loanOfficerId) {
-        Staff staff = null;
-        if (loanOfficerId != null) {
-            staff = requireStaff(loanOfficerId);
-            if (!staff.isLoanOfficer()) {
-                throw new StaffRoleException(loanOfficerId, StaffRoleException.StaffRole.LOAN_OFFICER);
-            }
+    public Object findLoanOfficerByIdIfProvided(final Long loanOfficerId) {
+        if (loanOfficerId == null) {
+            return null;
+        }
+        final Staff staff = (Staff) requireStaff(loanOfficerId);
+        if (!staff.isLoanOfficer()) {
+            throw new StaffRoleException(loanOfficerId, StaffRoleException.StaffRole.LOAN_OFFICER);
         }
         return staff;
     }
 
-    private Staff requireStaff(final Long staffId) {
+    private Object requireStaff(final Long staffId) {
         final Object staff = this.staffPersistablePort.persistableById(staffId);
-        if (!(staff instanceof Staff persisted)) {
+        if (!(staff instanceof Staff)) {
             throw new StaffNotFoundException(staffId);
         }
-        return persisted;
+        return staff;
     }
 
     private void copyAdvancedPaymentRulesIfApplicable(String transactionProcessingStrategyCode, LoanProduct loanProduct,
@@ -607,7 +607,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         if (command.isChangeInLongParameterNamed(LoanApiConstants.loanOfficerIdParameterName, existingLoanOfficerId)) {
             final Long newValue = command.longValueOfParameterNamed(LoanApiConstants.loanOfficerIdParameterName);
             changes.put(LoanApiConstants.loanOfficerIdParameterName, newValue);
-            final Staff newOfficer = findLoanOfficerByIdIfProvided(newValue);
+            final Object newOfficer = findLoanOfficerByIdIfProvided(newValue);
             loanOfficerService.updateLoanOfficerOnLoanApplication(loan, newOfficer);
         }
         Long existingLoanPurposeId = loan.getLoanPurposeId();
