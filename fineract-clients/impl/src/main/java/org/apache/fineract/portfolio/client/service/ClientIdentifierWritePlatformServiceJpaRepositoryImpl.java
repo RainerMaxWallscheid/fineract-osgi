@@ -22,8 +22,8 @@ import jakarta.persistence.PersistenceException;
 import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -53,18 +53,18 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
     private final PlatformSecurityContext context;
     private final ClientRepositoryWrapper clientRepository;
     private final ClientIdentifierRepository clientIdentifierRepository;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer;
 
     @Autowired
     public ClientIdentifierWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientIdentifierRepository clientIdentifierRepository,
-            final CodeValueRepositoryWrapper codeValueRepository,
+            final CodeValuePersistablePort codeValuePersistablePort,
             final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientIdentifierRepository = clientIdentifierRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.clientIdentifierCommandFromApiJsonDeserializer = clientIdentifierCommandFromApiJsonDeserializer;
     }
 
@@ -83,8 +83,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
         try {
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
 
-            final CodeValue documentType = this.codeValueRepository
-                    .findOneWithNotFoundDetection(clientIdentifierCommand.getDocumentTypeId());
+            final CodeValue documentType = requireCodeValue(clientIdentifierCommand.getDocumentTypeId());
             documentTypeId = documentType.getId();
             documentTypeLabel = documentType.getLabel();
 
@@ -130,10 +129,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
             final Map<String, Object> changes = clientIdentifierForUpdate.update(command);
 
             if (changes.containsKey("documentTypeId")) {
-                documentType = this.codeValueRepository.findOneWithNotFoundDetection(documentTypeId);
-                if (documentType == null) {
-                    throw new CodeValueNotFoundException(documentTypeId);
-                }
+                documentType = requireCodeValue(documentTypeId);
 
                 documentTypeId = documentType.getId();
                 documentTypeLabel = documentType.getLabel();
@@ -188,6 +184,17 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
                 .withClientId(clientId) //
                 .withEntityId(identifierId) //
                 .build();
+    }
+
+    private CodeValue requireCodeValue(final Long codeValueId) {
+        if (codeValueId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object codeValue = this.codeValuePersistablePort.persistableById(codeValueId);
+        if (!(codeValue instanceof CodeValue persisted)) {
+            throw new CodeValueNotFoundException(codeValueId);
+        }
+        return persisted;
     }
 
     private void handleClientIdentifierDataIntegrityViolation(final String documentTypeLabel, final Long documentTypeId,

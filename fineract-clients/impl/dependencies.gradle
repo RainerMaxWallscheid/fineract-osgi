@@ -20,6 +20,8 @@
 dependencies {
     api project(path: ':fineract-clients-api')
     implementation(project(path: ':fineract-core'))
+    // CodeValue id / persistable lookup (entity residual stays in core)
+    implementation(project(path: ':fineract-codes-api'))
     implementation(project(path: ':fineract-command-api'))
     implementation(project(path: ':fineract-validation'))
     // EntityImageIdAdapter for Client image FK
