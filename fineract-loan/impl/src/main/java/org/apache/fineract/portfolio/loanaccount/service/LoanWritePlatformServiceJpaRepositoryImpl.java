@@ -558,7 +558,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     }
 
     private void disburseLoan(JsonCommand command, boolean isPaymentTypeApplicableForDisbursementCharge, Object paymentDetail,
-            Loan loan, AppUser currentUser, Map<String, Object> changes, ScheduleGeneratorDTO scheduleGeneratorDTO) {
+            Loan loan, Object currentUser, Map<String, Object> changes, ScheduleGeneratorDTO scheduleGeneratorDTO) {
         final Object paymentDetail1 = isPaymentTypeApplicableForDisbursementCharge ? paymentDetail : null;
         final LocalDate actualDisbursementDate1 = command.localDateValueOfParameterNamed(ACTUAL_DISBURSEMENT_DATE);
         loan.setDisbursedBy(currentUser);
@@ -726,7 +726,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Override
     public Map<String, Object> bulkLoanDisbursal(final JsonCommand command, final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand,
             Boolean isAccountTransfer) {
-        final AppUser currentUser = (AppUser) getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         final SingleDisbursalCommand[] disbursalCommand = bulkDisbursalCommand.getDisburseTransactions();
         final Map<String, Object> changes = new LinkedHashMap<>();
         if (disbursalCommand == null) {
