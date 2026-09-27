@@ -21,7 +21,7 @@ package org.apache.fineract.portfolio.transfer.starter;
 import org.apache.fineract.infrastructure.core.service.TransactionBoundApplicationEventPublisher;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -43,13 +43,13 @@ public class TransferConfiguration {
     @Bean
     @ConditionalOnMissingBean(TransferWritePlatformService.class)
     public TransferWritePlatformService transferWritePlatformService(ClientRepositoryWrapper clientRepositoryWrapper,
-            OfficeRepositoryWrapper officeRepository, CalendarInstanceLookupPort calendarInstanceRepository,
+            OfficePersistablePort officePersistablePort, CalendarInstanceLookupPort calendarInstanceRepository,
             LoanWritePlatformService loanWritePlatformService, GroupRepositoryWrapper groupRepository,
             LoanRepositoryWrapper loanRepositoryWrapper, TransfersDataValidator transfersDataValidator,
             StaffRepositoryWrapper staffRepositoryWrapper, ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper,
             PlatformSecurityContext context, LoanOfficerService loanOfficerService,
             TransactionBoundApplicationEventPublisher eventPublisher, BusinessEventNotifierService businessEventNotifierService) {
-        return new TransferWritePlatformServiceJpaRepositoryImpl(clientRepositoryWrapper, officeRepository, calendarInstanceRepository,
+        return new TransferWritePlatformServiceJpaRepositoryImpl(clientRepositoryWrapper, officePersistablePort, calendarInstanceRepository,
                 groupRepository, loanWritePlatformService, loanRepositoryWrapper, transfersDataValidator, staffRepositoryWrapper,
                 clientTransferDetailsRepositoryWrapper, context, loanOfficerService, eventPublisher, businessEventNotifierService);
     }

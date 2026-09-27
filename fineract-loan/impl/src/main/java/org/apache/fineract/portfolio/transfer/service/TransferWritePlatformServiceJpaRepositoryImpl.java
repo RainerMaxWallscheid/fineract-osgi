@@ -36,7 +36,8 @@ import org.apache.fineract.infrastructure.event.business.domain.client.ClientTra
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
@@ -75,7 +76,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWritePlatformService {
 
     private final ClientRepositoryWrapper clientRepositoryWrapper;
-    private final OfficeRepositoryWrapper officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final LoanWritePlatformService loanWritePlatformService;
@@ -241,7 +242,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         // validation
         this.transfersDataValidator.validateForProposeAndAcceptClientTransfer(jsonCommand.json());
         final Long destinationOfficeId = jsonCommand.longValueOfParameterNamed(TransferApiConstants.destinationOfficeIdParamName);
-        final Office office = this.officeRepository.findOneWithNotFoundDetection(destinationOfficeId);
+        final Office office = requireOffice(destinationOfficeId);
         final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId, true);
         handleClientTransferLifecycleEvent(client, office, TransferEventType.PROPOSAL, jsonCommand);
         this.clientRepositoryWrapper.saveAndFlush(client);
@@ -271,7 +272,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         // validation
         this.transfersDataValidator.validateForProposeClientTransfer(jsonCommand.json());
         final Long destinationOfficeId = jsonCommand.longValueOfParameterNamed(TransferApiConstants.destinationOfficeIdParamName);
-        final Office office = this.officeRepository.findOneWithNotFoundDetection(destinationOfficeId);
+        final Office office = requireOffice(destinationOfficeId);
         final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
         if (client.getOffice().getId().equals(destinationOfficeId)) {
             throw new GeneralPlatformDomainRuleException(TransferApiConstants.transferClientToSameOfficeException,
@@ -501,9 +502,20 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         }
     }
 
+    private Office requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper,
-            final OfficeRepositoryWrapper officeRepository, final CalendarInstanceLookupPort calendarInstanceRepository,
+            final OfficePersistablePort officePersistablePort, final CalendarInstanceLookupPort calendarInstanceRepository,
             final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService,
             final LoanRepositoryWrapper loanRepositoryWrapper, final TransfersDataValidator transfersDataValidator,
             final StaffRepositoryWrapper staffRepositoryWrapper,
@@ -511,7 +523,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
             final LoanOfficerService loanOfficerService, final TransactionBoundApplicationEventPublisher eventPublisher,
             final BusinessEventNotifierService businessEventNotifierService) {
         this.clientRepositoryWrapper = clientRepositoryWrapper;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.groupRepository = groupRepository;
         this.loanWritePlatformService = loanWritePlatformService;
