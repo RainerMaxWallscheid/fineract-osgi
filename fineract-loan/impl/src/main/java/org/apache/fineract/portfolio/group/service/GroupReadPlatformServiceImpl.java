@@ -196,8 +196,8 @@ public class GroupReadPlatformServiceImpl implements GroupReadPlatformService {
     @Override
     public GroupGeneralData retrieveOne(final Long groupId) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
-            final String hierarchy = currentUser.getOffice().getHierarchy();
+            final Object currentUser = this.context.authenticatedUser();
+            final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
             final String hierarchySearchString = hierarchy + "%";
             final String sql = "select " + ALL_GROUP_TYPES_DATA_MAPPER.schema() + " where g.id = ? and o.hierarchy like ?";
             return this.jdbcTemplate.queryForObject(sql, ALL_GROUP_TYPES_DATA_MAPPER, groupId, hierarchySearchString); // NOSONAR
