@@ -37,7 +37,8 @@ import org.apache.fineract.infrastructure.core.service.PlatformEmailSendExceptio
 import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncoder;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
@@ -68,7 +69,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     private final UserDomainService userDomainService;
     private final PlatformPasswordEncoder platformPasswordEncoder;
     private final AppUserRepository appUserRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final RoleRepository roleRepository;
     private final UserDataValidator fromApiJsonDeserializer;
     private final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository;
@@ -84,7 +85,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final String officeIdParamName = "officeId";
             final Long officeId = command.longValueOfParameterNamed(officeIdParamName);
-            final Office userOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Office userOffice = requireOffice(officeId);
             final String[] roles = command.arrayValueOfParameterNamed("roles");
             final Set<Role> allRoles = assembleSetOfRoles(roles);
             final String staffIdParamName = "staffId";
@@ -163,7 +164,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             final Map<String, Object> changes = userToUpdate.update(command, this.platformPasswordEncoder);
             if (changes.containsKey("officeId")) {
                 final Long officeId = (Long) changes.get("officeId");
-                final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+                final Office office = requireOffice(officeId);
                 userToUpdate.changeOffice(office);
             }
             if (changes.containsKey("staffId")) {
@@ -273,13 +274,24 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         return ErrorHandler.getMappable(dve, "error.msg.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
     }
 
+    private Office requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final UserDomainService userDomainService, final PlatformPasswordEncoder platformPasswordEncoder, final AppUserRepository appUserRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final RoleRepository roleRepository, final UserDataValidator fromApiJsonDeserializer, final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffRepository staffRepository, final ConfigurationDomainService configurationDomainService) {
+        public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final UserDomainService userDomainService, final PlatformPasswordEncoder platformPasswordEncoder, final AppUserRepository appUserRepository, final OfficePersistablePort officePersistablePort, final RoleRepository roleRepository, final UserDataValidator fromApiJsonDeserializer, final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffRepository staffRepository, final ConfigurationDomainService configurationDomainService) {
         this.context = context;
         this.userDomainService = userDomainService;
         this.platformPasswordEncoder = platformPasswordEncoder;
         this.appUserRepository = appUserRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.roleRepository = roleRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.appUserPreviewPasswordRepository = appUserPreviewPasswordRepository;

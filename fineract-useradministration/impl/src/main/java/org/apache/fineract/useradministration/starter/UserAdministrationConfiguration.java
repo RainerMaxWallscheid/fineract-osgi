@@ -22,7 +22,7 @@ import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDoma
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncoder;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
@@ -73,11 +73,11 @@ public class UserAdministrationConfiguration {
     @ConditionalOnMissingBean(AppUserWritePlatformService.class)
     public AppUserWritePlatformService appUserWritePlatformService(PlatformSecurityContext context, UserDomainService userDomainService,
             PlatformPasswordEncoder platformPasswordEncoder, AppUserRepository appUserRepository,
-            OfficeRepositoryWrapper officeRepositoryWrapper, RoleRepository roleRepository, UserDataValidator fromApiJsonDeserializer,
+            OfficePersistablePort officePersistablePort, RoleRepository roleRepository, UserDataValidator fromApiJsonDeserializer,
             AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, StaffRepository staffRepository,
             ConfigurationDomainService configurationDomainService) {
         return new AppUserWritePlatformServiceJpaRepositoryImpl(context, userDomainService, platformPasswordEncoder, appUserRepository,
-                officeRepositoryWrapper, roleRepository, fromApiJsonDeserializer, appUserPreviewPasswordRepository, staffRepository,
+                officePersistablePort, roleRepository, fromApiJsonDeserializer, appUserPreviewPasswordRepository, staffRepository,
                 configurationDomainService);
     }
 
