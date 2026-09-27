@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.exception.OidcUserNotFoundException;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
 import org.apache.fineract.useradministration.domain.Role;
@@ -44,7 +44,7 @@ public class OidcAppUserResolutionServiceImpl implements OidcAppUserResolutionSe
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OidcAppUserResolutionServiceImpl.class);
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
-    private final OfficeRepository officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final FineractProperties fineractProperties;
     // Stateless encoder — safe to create once per class
     private static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -77,7 +77,14 @@ public class OidcAppUserResolutionServiceImpl implements OidcAppUserResolutionSe
     }
 
     private AppUser createUser(String username, String email, String firstName, String lastName, Set<String> requestedRoles, FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties oidcConfig) {
-        final Office headOffice = officeRepository.findById(fineractProperties.getDefaults().getOfficeId()).orElseThrow(() -> new IllegalStateException("Head office (id=1) not found — cannot auto-create OIDC user"));
+        final Long officeId = fineractProperties.getDefaults().getOfficeId();
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object persistable = this.officePersistablePort.persistableById(officeId);
+        if (!(persistable instanceof Office headOffice)) {
+            throw new IllegalStateException("Head office (id=1) not found — cannot auto-create OIDC user");
+        }
         String encodedPassword = PASSWORD_ENCODER.encode(new RandomPasswordGenerator(20).generate());
         User springUser = new User(username, encodedPassword, true, true, true, true, List.of(new SimpleGrantedAuthority("ROLE_USER")));
         Set<Role> roles = resolveRoles(oidcConfig.getDefaultRoles(), requestedRoles);
@@ -104,10 +111,10 @@ public class OidcAppUserResolutionServiceImpl implements OidcAppUserResolutionSe
     }
 
     @java.lang.SuppressWarnings("all")
-        public OidcAppUserResolutionServiceImpl(final AppUserRepository appUserRepository, final RoleRepository roleRepository, final OfficeRepository officeRepository, final FineractProperties fineractProperties) {
+        public OidcAppUserResolutionServiceImpl(final AppUserRepository appUserRepository, final RoleRepository roleRepository, final OfficePersistablePort officePersistablePort, final FineractProperties fineractProperties) {
         this.appUserRepository = appUserRepository;
         this.roleRepository = roleRepository;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.fineractProperties = fineractProperties;
     }
 }

@@ -25,14 +25,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.exception.OidcUserNotFoundException;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
 import org.apache.fineract.useradministration.domain.RoleRepository;
@@ -55,7 +54,7 @@ class OidcAppUserResolutionServiceImplTest {
     @Mock
     private RoleRepository roleRepository;
     @Mock
-    private OfficeRepository officeRepository;
+    private OfficePersistablePort officePersistablePort;
     @Mock
     private FineractProperties fineractProperties;
     @Mock
@@ -131,7 +130,7 @@ class OidcAppUserResolutionServiceImplTest {
         when(appUserRepository.findActiveUserByEmail("new@example.com")).thenReturn(null);
         when(oidcProps.isAutoCreateUser()).thenReturn(true);
         when(oidcProps.getDefaultRoles()).thenReturn("");
-        when(officeRepository.findById(1L)).thenReturn(Optional.of(headOffice));
+        when(officePersistablePort.persistableById(1L)).thenReturn(headOffice);
 
         AppUser savedUser = org.mockito.Mockito.mock(AppUser.class);
         when(appUserRepository.saveAndFlush(any(AppUser.class))).thenReturn(savedUser);
@@ -147,7 +146,7 @@ class OidcAppUserResolutionServiceImplTest {
         when(appUserRepository.findAppUserByName("newuser")).thenReturn(null);
         when(appUserRepository.findActiveUserByEmail(any())).thenReturn(null);
         when(oidcProps.isAutoCreateUser()).thenReturn(true);
-        when(officeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(officePersistablePort.persistableById(1L)).thenReturn(null);
 
         assertThatThrownBy(() ->
                 service.resolveOrCreate("newuser", "new@example.com", "New", "User", Set.of()))
