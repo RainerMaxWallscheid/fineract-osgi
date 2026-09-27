@@ -58,7 +58,6 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountSubStatusEnum;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.exception.TransactionBeforePivotDateNotAllowed;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -177,7 +176,7 @@ public class SavingsAccountTransactionDataValidator {
         }
     }
 
-    public void validateHoldAndAssembleForm(final String json, final SavingsAccount account, final AppUser createdUser, final boolean backdatedTxnsAllowedTill) {
+    public void validateHoldAndAssembleForm(final String json, final SavingsAccount account, final Object createdUser, final boolean backdatedTxnsAllowedTill) {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
