@@ -46,7 +46,7 @@ public interface LoanAssembler {
 
     Map<String, Object> updateFrom(JsonCommand command, Loan loan);
 
-    Map<String, Object> updateLoanApplicationAttributesForWithdrawal(Loan loan, JsonCommand command, AppUser currentUser);
+    Map<String, Object> updateLoanApplicationAttributesForWithdrawal(Loan loan, JsonCommand command, Object currentUser);
 
     Map<String, Object> updateLoanApplicationAttributesForRejection(Loan loan, JsonCommand command, AppUser currentUser);
 }

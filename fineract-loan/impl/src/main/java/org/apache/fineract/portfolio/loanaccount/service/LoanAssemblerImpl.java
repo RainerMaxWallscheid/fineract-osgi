@@ -823,7 +823,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     }
 
     @Override
-    public Map<String, Object> updateLoanApplicationAttributesForWithdrawal(Loan loan, JsonCommand command, AppUser currentUser) {
+    public Map<String, Object> updateLoanApplicationAttributesForWithdrawal(Loan loan, JsonCommand command, Object currentUser) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
         LocalDate withdrawnOn = command.localDateValueOfParameterNamed(Loan.WITHDRAWN_ON_DATE);
         if (withdrawnOn == null) {
