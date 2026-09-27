@@ -39,7 +39,8 @@ import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
 public class InternalClientInformationApiResource implements InitializingBean {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalClientInformationApiResource.class);
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final ToApiJsonSerializer<Map> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
@@ -78,16 +79,27 @@ public class InternalClientInformationApiResource implements InitializingBean {
         log.warn("Fetching client with {}", clientId);
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-        final Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = requireClient(clientId);
         Map<String, Object> auditFields = new HashMap<>(Map.of(CREATED_BY, client.getCreatedBy().orElse(null), CREATED_DATE, client.getCreatedDate().orElse(null), LAST_MODIFIED_BY, client.getLastModifiedBy().orElse(null), LAST_MODIFIED_DATE, client.getLastModifiedDate().orElse(null)));
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, auditFields);
     }
 
     @java.lang.SuppressWarnings("all")
-        public InternalClientInformationApiResource(final ClientRepositoryWrapper clientRepositoryWrapper, final ToApiJsonSerializer<Map> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper) {
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        public InternalClientInformationApiResource(final ClientActivePort clientActivePort, final ToApiJsonSerializer<Map> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper) {
+        this.clientActivePort = clientActivePort;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
+    }
+
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return persisted;
     }
 }
