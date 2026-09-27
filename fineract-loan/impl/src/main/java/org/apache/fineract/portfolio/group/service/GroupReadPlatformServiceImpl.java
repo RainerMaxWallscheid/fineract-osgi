@@ -111,7 +111,8 @@ public class GroupReadPlatformServiceImpl implements GroupReadPlatformService {
     private Long defaultToUsersOfficeIfNull(final Long officeId) {
         Long defaultOfficeId = officeId;
         if (defaultOfficeId == null) {
-            defaultOfficeId = this.context.authenticatedUser().getOffice().getId();
+            final Object currentUser = this.context.authenticatedUser();
+            defaultOfficeId = ((AppUser) currentUser).getOffice().getId();
         }
         return defaultOfficeId;
     }
