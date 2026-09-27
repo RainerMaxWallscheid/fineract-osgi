@@ -41,7 +41,8 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -52,7 +53,7 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryRunningBalanceUpdateServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final JournalEntryDataValidator dataValidator;
     private final FromJsonHelper fromApiJsonHelper;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
@@ -79,7 +80,9 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
         if (officeId == null) {
             updateRunningBalance();
         } else {
-            this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            if (this.officePersistablePort.persistableById(officeId) == null) {
+                throw new OfficeNotFoundException(officeId);
+            }
             String dateFinder = "select MIN(je.entry_date) as entityDate " + "from acc_gl_journal_entry  je " + "where je.is_running_balance_calculated=false  and je.office_id=?";
             try {
                 LocalDate entityDate = this.jdbcTemplate.queryForObject(dateFinder, LocalDate.class, officeId);
@@ -238,9 +241,9 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     }
 
     @java.lang.SuppressWarnings("all")
-        public JournalEntryRunningBalanceUpdateServiceImpl(final JdbcTemplate jdbcTemplate, final OfficeRepositoryWrapper officeRepositoryWrapper, final JournalEntryDataValidator dataValidator, final FromJsonHelper fromApiJsonHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final PlatformSecurityContext platformSecurityContext) {
+        public JournalEntryRunningBalanceUpdateServiceImpl(final JdbcTemplate jdbcTemplate, final OfficePersistablePort officePersistablePort, final JournalEntryDataValidator dataValidator, final FromJsonHelper fromApiJsonHelper, final DatabaseSpecificSQLGenerator sqlGenerator, final PlatformSecurityContext platformSecurityContext) {
         this.jdbcTemplate = jdbcTemplate;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.dataValidator = dataValidator;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.sqlGenerator = sqlGenerator;
