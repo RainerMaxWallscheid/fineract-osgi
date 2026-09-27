@@ -85,9 +85,9 @@ import org.apache.fineract.portfolio.client.exception.InvalidClientSavingProduct
 import org.apache.fineract.portfolio.client.exception.InvalidClientStateTransitionException;
 import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.group.exception.GroupMemberCountNotInPermissibleRangeException;
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
@@ -111,7 +111,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ClientNonPersonRepositoryWrapper clientNonPersonRepository;
     private final OfficePersistablePort officePersistablePort;
     private final NoteWritePlatformService noteWritePlatformService;
-    private final GroupRepository groupRepository;
+    private final GroupActivePort groupActivePort;
     private final ClientDataValidator fromApiJsonDeserializer;
     private final AccountNumberGenerator accountNumberGenerator;
     private final StaffRepositoryWrapper staffRepository;
@@ -207,7 +207,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Long groupId = command.longValueOfParameterNamed(ClientApiConstants.groupIdParamName);
             Group clientParentGroup = null;
             if (groupId != null) {
-                clientParentGroup = this.groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+                clientParentGroup = requireGroup(groupId);
             }
             Staff staff = null;
             final Long staffId = command.longValueOfParameterNamed(ClientApiConstants.staffIdParamName);
@@ -1019,11 +1019,22 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         return persisted;
     }
 
+    private Group requireGroup(final Long groupId) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object group = this.groupActivePort.persistableById(groupId);
+        if (!(group instanceof Group persisted)) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
             final OfficePersistablePort officePersistablePort, final NoteWritePlatformService noteWritePlatformService,
-            final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer,
+            final GroupActivePort groupActivePort, final ClientDataValidator fromApiJsonDeserializer,
             final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository,
             final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
             final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService,
@@ -1039,7 +1050,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.clientNonPersonRepository = clientNonPersonRepository;
         this.officePersistablePort = officePersistablePort;
         this.noteWritePlatformService = noteWritePlatformService;
-        this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.accountNumberGenerator = accountNumberGenerator;
         this.staffRepository = staffRepository;
