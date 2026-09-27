@@ -64,7 +64,8 @@ import org.apache.fineract.infrastructure.event.business.domain.client.ClientWit
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
@@ -108,7 +109,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final PlatformSecurityContext context;
     private final ClientRepositoryWrapper clientRepository;
     private final ClientNonPersonRepositoryWrapper clientNonPersonRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final NoteWritePlatformService noteWritePlatformService;
     private final GroupRepository groupRepository;
     private final ClientDataValidator fromApiJsonDeserializer;
@@ -202,7 +203,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Boolean isAddressEnabled = configurationDomainService.isAddressEnabled();
             final Long officeId = command.longValueOfParameterNamed(ClientApiConstants.officeIdParamName);
-            final Office clientOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Office clientOffice = requireOffice(officeId);
             final Long groupId = command.longValueOfParameterNamed(ClientApiConstants.groupIdParamName);
             Group clientParentGroup = null;
             if (groupId != null) {
@@ -1007,10 +1008,21 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 .withEntityExternalId(client.getExternalId()).build();
     }
 
+    private Office requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
-            final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteWritePlatformService noteWritePlatformService,
+            final OfficePersistablePort officePersistablePort, final NoteWritePlatformService noteWritePlatformService,
             final GroupRepository groupRepository, final ClientDataValidator fromApiJsonDeserializer,
             final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository,
             final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -1025,7 +1037,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientNonPersonRepository = clientNonPersonRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.noteWritePlatformService = noteWritePlatformService;
         this.groupRepository = groupRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
