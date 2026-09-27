@@ -78,7 +78,6 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -449,7 +448,7 @@ public class SavingsAccountAssembler {
      * chosen {@link SavingsProduct}.
      */
     public SavingsAccount assembleFrom(final Object client, final Object group, final Long productId, final LocalDate appliedonDate,
-            final AppUser appliedBy) {
+            final Object appliedBy) {
 
         AccountType accountType = AccountType.INVALID;
         final Long clientId = this.clientActivePort.id(client);
