@@ -43,8 +43,6 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
@@ -63,12 +61,12 @@ public class AccountingJournalEntryConfiguration {
     public AccountingProcessorHelper accountingProcessorHelper(JournalEntryRepository glJournalEntryRepository,
             ProductToGLAccountMappingRepository accountMappingRepository,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, GLClosureRepository closureRepository,
-            GLAccountPersistablePort glAccountPersistablePort, OfficeRepository officeRepository,
+            GLAccountPersistablePort glAccountPersistablePort,
             AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             BusinessEventNotifierService businessEventNotifierService,
             org.apache.fineract.portfolio.tax.moduleapi.TaxCatalogPort taxCatalogPort) {
         return new AccountingProcessorHelper(glJournalEntryRepository, accountMappingRepository, financialActivityAccountRepository,
-                closureRepository, glAccountPersistablePort, officeRepository, accountTransfersReadPlatformService,
+                closureRepository, glAccountPersistablePort, accountTransfersReadPlatformService,
                 chargeDefinitionPort,
                 businessEventNotifierService, taxCatalogPort);
     }

@@ -28,7 +28,6 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.journalentry.data.ChargePaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.ChargeTaxPaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanTransactionDTO;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,31 +52,31 @@ public class LoanCommonAccountingHelper {
         return result;
     }
 
-    public void createTaxLiabilityCreditEntries(final Office office, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final List<ChargeTaxPaymentDTO> taxPayments) {
+    public void createTaxLiabilityCreditEntries(final long officeId, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final List<ChargeTaxPaymentDTO> taxPayments) {
         final Map<Long, BigDecimal> taxByAccount = taxPayments.stream().collect(Collectors.groupingBy(ChargeTaxPaymentDTO::getCreditAccountId, Collectors.reducing(BigDecimal.ZERO, ChargeTaxPaymentDTO::getAmount, BigDecimal::add)));
         for (Map.Entry<Long, BigDecimal> entry : taxByAccount.entrySet()) {
-            this.helper.createCreditJournalEntryForLoanByGLAccountId(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), entry.getKey());
+            this.helper.createCreditJournalEntryForLoanByGLAccountId(officeId, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), entry.getKey());
         }
     }
 
-    public void createTaxLiabilityDebitEntries(final Office office, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final List<ChargeTaxPaymentDTO> taxPayments) {
+    public void createTaxLiabilityDebitEntries(final long officeId, final String currencyCode, final Long loanId, final String transactionId, final LocalDate transactionDate, final List<ChargeTaxPaymentDTO> taxPayments) {
         final Map<Long, BigDecimal> taxByAccount = taxPayments.stream().collect(Collectors.groupingBy(ChargeTaxPaymentDTO::getCreditAccountId, Collectors.reducing(BigDecimal.ZERO, ChargeTaxPaymentDTO::getAmount, BigDecimal::add)));
         for (Map.Entry<Long, BigDecimal> entry : taxByAccount.entrySet()) {
-            this.helper.createDebitJournalEntryForLoanByGLAccountId(office, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), entry.getKey());
+            this.helper.createDebitJournalEntryForLoanByGLAccountId(officeId, currencyCode, loanId, transactionId, transactionDate, entry.getValue(), entry.getKey());
         }
     }
 
-    public void createAccrualChargeJournalEntriesWithTax(final Office office, final String currencyCode, final Long loanProductId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal grossAmount, final List<ChargePaymentDTO> chargePayments, final List<ChargeTaxPaymentDTO> taxPayments, final int receivableAccountType, final int incomeAccountType, final boolean isAccrualAdjustment) {
+    public void createAccrualChargeJournalEntriesWithTax(final long officeId, final String currencyCode, final Long loanProductId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal grossAmount, final List<ChargePaymentDTO> chargePayments, final List<ChargeTaxPaymentDTO> taxPayments, final int receivableAccountType, final int incomeAccountType, final boolean isAccrualAdjustment) {
         final BigDecimal netAmount = grossAmount.subtract(sumTaxAmounts(taxPayments));
         final List<ChargePaymentDTO> netPayments = computeNetChargePayments(chargePayments, taxPayments);
         if (isAccrualAdjustment) {
-            this.helper.createCreditJournalEntryForLoanCharges(office, currencyCode, receivableAccountType, loanProductId, loanId, transactionId, transactionDate, grossAmount, chargePayments);
-            this.helper.createDebitJournalEntryForLoanCharges(office, currencyCode, incomeAccountType, loanProductId, loanId, transactionId, transactionDate, netAmount, netPayments);
-            createTaxLiabilityDebitEntries(office, currencyCode, loanId, transactionId, transactionDate, taxPayments);
+            this.helper.createCreditJournalEntryForLoanCharges(officeId, currencyCode, receivableAccountType, loanProductId, loanId, transactionId, transactionDate, grossAmount, chargePayments);
+            this.helper.createDebitJournalEntryForLoanCharges(officeId, currencyCode, incomeAccountType, loanProductId, loanId, transactionId, transactionDate, netAmount, netPayments);
+            createTaxLiabilityDebitEntries(officeId, currencyCode, loanId, transactionId, transactionDate, taxPayments);
         } else {
-            this.helper.createDebitJournalEntryForLoanCharges(office, currencyCode, receivableAccountType, loanProductId, loanId, transactionId, transactionDate, grossAmount, chargePayments);
-            this.helper.createCreditJournalEntryForLoanCharges(office, currencyCode, incomeAccountType, loanProductId, loanId, transactionId, transactionDate, netAmount, netPayments);
-            createTaxLiabilityCreditEntries(office, currencyCode, loanId, transactionId, transactionDate, taxPayments);
+            this.helper.createDebitJournalEntryForLoanCharges(officeId, currencyCode, receivableAccountType, loanProductId, loanId, transactionId, transactionDate, grossAmount, chargePayments);
+            this.helper.createCreditJournalEntryForLoanCharges(officeId, currencyCode, incomeAccountType, loanProductId, loanId, transactionId, transactionDate, netAmount, netPayments);
+            createTaxLiabilityCreditEntries(officeId, currencyCode, loanId, transactionId, transactionDate, taxPayments);
         }
     }
 

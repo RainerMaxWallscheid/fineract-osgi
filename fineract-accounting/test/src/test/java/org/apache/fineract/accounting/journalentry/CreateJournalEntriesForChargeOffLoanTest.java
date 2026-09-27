@@ -38,7 +38,6 @@ import org.apache.fineract.accounting.journalentry.service.AccrualBasedAccountin
 import org.apache.fineract.accounting.moduleapi.GLAccountAssociation;
 import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.junit.jupiter.api.AfterEach;
@@ -62,9 +61,6 @@ class CreateJournalEntriesForChargeOffLoanTest {
 
     @BeforeEach
     void setUp() {
-        Office office = Office.headOffice("Main Office", LocalDate.now(ZoneId.systemDefault()), null);
-        when(helper.getOfficeById(1L)).thenReturn(office);
-
         GLClosure mockClosure = mock(GLClosure.class);
         when(helper.getLatestClosureByBranch(1L)).thenReturn(mockClosure);
 
@@ -112,11 +108,10 @@ class CreateJournalEntriesForChargeOffLoanTest {
 
         verify(helper, times(1)).getChargeOffMappingByCodeValue(1L, PortfolioProductType.LOAN, chargeOffReasonId);
         verify(helper, times(1)).getLinkedGLAccountForLoanProduct(1L, AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(), 1L);
-        verify(helper, times(1)).createCreditJournalEntryForLoan(helper.getOfficeById(1L), "USD", AccrualAccountsForLoan.LOAN_PORTFOLIO, 1L,
-                null, 1L, "txn-123", LocalDate.now(ZoneId.systemDefault()), new BigDecimal("500.00"));
-        verify(helper, times(1)).createDebitJournalEntryForLoan(helper.getOfficeById(1L), "USD",
-                AccrualAccountsForLoan.CHARGE_OFF_EXPENSE.getValue(), 1L, null, 1L, "txn-123", LocalDate.now(ZoneId.systemDefault()),
-                new BigDecimal("500.00"));
+        verify(helper, times(1)).createCreditJournalEntryForLoan(1L, "USD", 1L, "txn-123", LocalDate.now(ZoneId.systemDefault()),
+                new BigDecimal("500.00"), loanPortfolioGLAccount);
+        verify(helper, times(1)).createDebitJournalEntryForLoan(1L, "USD", 1L, "txn-123", LocalDate.now(ZoneId.systemDefault()),
+                new BigDecimal("500.00"), chargeOffGLAccount);
     }
 
     @Test

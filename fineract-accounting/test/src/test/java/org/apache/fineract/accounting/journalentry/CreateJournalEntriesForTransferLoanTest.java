@@ -19,6 +19,7 @@
 package org.apache.fineract.accounting.journalentry;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,6 @@ import org.apache.fineract.accounting.journalentry.data.LoanDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanTransactionDTO;
 import org.apache.fineract.accounting.journalentry.service.AccountingProcessorHelper;
 import org.apache.fineract.accounting.journalentry.service.AccrualBasedAccountingProcessorForLoan;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,13 +62,9 @@ class CreateJournalEntriesForTransferLoanTest {
     private AccountingProcessorHelper helper;
     @InjectMocks
     private AccrualBasedAccountingProcessorForLoan processor;
-    private Office office;
 
     @BeforeEach
     void setUp() {
-        office = Office.headOffice("Transaction Office", TRANSACTION_DATE, null);
-        when(helper.getOfficeById(TRANSACTION_OFFICE_ID)).thenReturn(office);
-
         GLClosure mockClosure = mock(GLClosure.class);
         when(helper.getLatestClosureByBranch(TRANSACTION_OFFICE_ID)).thenReturn(mockClosure);
     }
@@ -80,7 +76,7 @@ class CreateJournalEntriesForTransferLoanTest {
 
         processor.createJournalEntriesForLoan(createLoanDTO(transactionType));
 
-        verify(helper).createJournalEntriesForLoan(office, CURRENCY_CODE, AccrualAccountsForLoan.TRANSFERS_SUSPENSE.getValue(),
+        verify(helper).createJournalEntriesForLoan(TRANSACTION_OFFICE_ID, CURRENCY_CODE, AccrualAccountsForLoan.TRANSFERS_SUSPENSE.getValue(),
                 AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(), LOAN_PRODUCT_ID, null, LOAN_ID, TRANSACTION_ID, TRANSACTION_DATE,
                 PRINCIPAL_AMOUNT);
     }
@@ -92,7 +88,7 @@ class CreateJournalEntriesForTransferLoanTest {
 
         processor.createJournalEntriesForLoan(createLoanDTO(transactionType));
 
-        verify(helper).createJournalEntriesForLoan(office, CURRENCY_CODE, AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(),
+        verify(helper).createJournalEntriesForLoan(TRANSACTION_OFFICE_ID, CURRENCY_CODE, AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(),
                 AccrualAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), LOAN_PRODUCT_ID, null, LOAN_ID, TRANSACTION_ID, TRANSACTION_DATE,
                 PRINCIPAL_AMOUNT);
     }
@@ -104,7 +100,7 @@ class CreateJournalEntriesForTransferLoanTest {
 
         processor.createJournalEntriesForLoan(createLoanDTO(transactionType));
 
-        verify(helper).createJournalEntriesForLoan(office, CURRENCY_CODE, AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(),
+        verify(helper).createJournalEntriesForLoan(TRANSACTION_OFFICE_ID, CURRENCY_CODE, AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(),
                 AccrualAccountsForLoan.TRANSFERS_SUSPENSE.getValue(), LOAN_PRODUCT_ID, null, LOAN_ID, TRANSACTION_ID, TRANSACTION_DATE,
                 PRINCIPAL_AMOUNT);
     }
@@ -116,7 +112,7 @@ class CreateJournalEntriesForTransferLoanTest {
 
         processor.createJournalEntriesForLoan(createLoanDTO(transactionType, null));
 
-        verify(helper, never()).createJournalEntriesForLoan(any(Office.class), anyString(), any(Integer.class), any(Integer.class),
+        verify(helper, never()).createJournalEntriesForLoan(anyLong(), anyString(), any(Integer.class), any(Integer.class),
                 any(Long.class), isNull(), any(Long.class), anyString(), any(LocalDate.class), any(BigDecimal.class));
     }
 
