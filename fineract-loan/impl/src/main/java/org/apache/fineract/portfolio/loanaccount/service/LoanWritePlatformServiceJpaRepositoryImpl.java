@@ -367,7 +367,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // validate actual disbursement date against meeting date
         ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, null);
         businessEventNotifierService.notifyPreBusinessEvent(new LoanDisbursalBusinessEvent(loan));
-        final AppUser currentUser = getAppUserIfPresent();
+        final AppUser currentUser = (AppUser) getAppUserIfPresent();
         final Map<String, Object> changes = new LinkedHashMap<>();
         final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         if (PaymentDetailAssociation.cashPayment(paymentDetail)) {
@@ -726,7 +726,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Override
     public Map<String, Object> bulkLoanDisbursal(final JsonCommand command, final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand,
             Boolean isAccountTransfer) {
-        final AppUser currentUser = getAppUserIfPresent();
+        final AppUser currentUser = (AppUser) getAppUserIfPresent();
         final SingleDisbursalCommand[] disbursalCommand = bulkDisbursalCommand.getDisburseTransactions();
         final Map<String, Object> changes = new LinkedHashMap<>();
         if (disbursalCommand == null) {
@@ -1386,7 +1386,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Transactional
     @Override
     public CommandProcessingResult writeOff(final Long loanId, final JsonCommand command) {
-        final AppUser currentUser = getAppUserIfPresent();
+        final AppUser currentUser = (AppUser) getAppUserIfPresent();
         this.loanTransactionValidator.validateTransactionWithNoAmount(command.json());
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put("transactionDate", command.stringValueOfParameterNamed("transactionDate"));
@@ -2410,8 +2410,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         }
     }
 
-    private AppUser getAppUserIfPresent() {
-        AppUser user = null;
+    private Object getAppUserIfPresent() {
+        Object user = null;
         if (this.context != null) {
             user = this.context.getAuthenticatedUserIfPresent();
         }
@@ -2507,7 +2507,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         changes.put(LoanApiConstants.dateFormatParameterName, command.dateFormat());
         final LocalDate transactionDate = command.localDateValueOfParameterNamed(LoanApiConstants.transactionDateParamName);
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, LoanApiConstants.externalIdParameterName);
-        final AppUser currentUser = getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         Loan loan = loanAssembler.assembleFrom(command.getLoanId());
         final Long loanId = loan.getId();
         if (!loan.isOpen()) {
