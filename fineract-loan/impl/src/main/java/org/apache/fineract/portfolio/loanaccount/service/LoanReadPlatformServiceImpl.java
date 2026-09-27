@@ -311,8 +311,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public Page<LoanAccountData> retrieveAll(final SearchParameters searchParameters) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final LoanMapper loanMapper = new LoanMapper(sqlGenerator, delinquencyReadPlatformService);
         final StringBuilder sqlBuilder = new StringBuilder(200);
