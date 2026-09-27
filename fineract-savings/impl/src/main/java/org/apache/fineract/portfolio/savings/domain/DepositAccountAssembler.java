@@ -102,7 +102,6 @@ import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.savings.exception.RecurringDepositProductNotFoundException;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -168,7 +167,7 @@ public class DepositAccountAssembler {
      * Assembles a new {@link SavingsAccount} from JSON details passed in request inheriting details where relevant from
      * chosen {@link SavingsProduct}.
      */
-    public SavingsAccount assembleFrom(final JsonCommand command, final AppUser submittedBy, final DepositAccountType depositAccountType) {
+    public SavingsAccount assembleFrom(final JsonCommand command, final Object submittedBy, final DepositAccountType depositAccountType) {
 
         final JsonElement element = command.parsedJson();
 
