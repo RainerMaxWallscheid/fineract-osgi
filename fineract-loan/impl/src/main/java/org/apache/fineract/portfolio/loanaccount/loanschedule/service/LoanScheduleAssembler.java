@@ -84,7 +84,6 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.exception.FloatingRateNotFoundException;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
@@ -153,7 +152,6 @@ public class LoanScheduleAssembler {
     private final CalendarRepository calendarRepository;
     private final HolidayRepository holidayRepository;
     private final ConfigurationDomainService configurationDomainService;
-    private final GroupRepositoryWrapper groupRepository;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final FloatingRatesReadPlatformService floatingRatesReadPlatformService;
     private final FloatingRatePort floatingRatePort;
@@ -1497,8 +1495,7 @@ public class LoanScheduleAssembler {
             final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository, final LoanChargeAssembler loanChargeAssembler,
             final LoanScheduleGeneratorFactory loanScheduleFactory, final AprCalculator aprCalculator,
             final CalendarRepository calendarRepository, final HolidayRepository holidayRepository,
-            final ConfigurationDomainService configurationDomainService, final GroupRepositoryWrapper groupRepository,
-            final WorkingDaysRepositoryWrapper workingDaysRepository,
+            final ConfigurationDomainService configurationDomainService, final WorkingDaysRepositoryWrapper workingDaysRepository,
             final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final FloatingRatePort floatingRatePort,
             final VariableLoanScheduleFromApiJsonValidator variableLoanScheduleFromApiJsonValidator,
             final CalendarInstanceLookupPort calendarInstanceRepository, final LoanUtilService loanUtilService,
@@ -1515,7 +1512,6 @@ public class LoanScheduleAssembler {
         this.calendarRepository = calendarRepository;
         this.holidayRepository = holidayRepository;
         this.configurationDomainService = configurationDomainService;
-        this.groupRepository = groupRepository;
         this.workingDaysRepository = workingDaysRepository;
         this.floatingRatesReadPlatformService = floatingRatesReadPlatformService;
         this.floatingRatePort = floatingRatePort;
