@@ -21,7 +21,10 @@ package org.apache.fineract.portfolio.client.adapter;
 import static java.util.Objects.nonNull;
 import java.util.Optional;
 import org.apache.fineract.infrastructure.documentmanagement.adapter.EntityImageIdAdapter;
+import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ class ClientImageIdAdapter implements EntityImageIdAdapter {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientImageIdAdapter.class);
     private static final String ENTITY_TYPE = "clients";
     private final ClientRepository repository;
+    private final ClientActivePort clientActivePort;
 
     @Override
     public boolean accept(String entityType) {
@@ -41,7 +45,20 @@ class ClientImageIdAdapter implements EntityImageIdAdapter {
     @Override
     @Transactional(readOnly = true)
     public Optional<ImageIdResult> get(Long entityId) {
-        return repository.findById(entityId).filter(client -> nonNull(client.getImageId())).map(client -> ImageIdResult.builder().id(client.getImageId()).displayName(client.getDisplayName()).build());
+        if (entityId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client;
+        try {
+            // persistableById throws when missing; image reads historically return empty.
+            client = this.clientActivePort.persistableById(entityId);
+        } catch (final ClientNotFoundException ex) {
+            return Optional.empty();
+        }
+        if (!(client instanceof Client persisted) || !nonNull(persisted.getImageId())) {
+            return Optional.empty();
+        }
+        return Optional.of(ImageIdResult.builder().id(persisted.getImageId()).displayName(persisted.getDisplayName()).build());
     }
 
     @Override
@@ -57,7 +74,8 @@ class ClientImageIdAdapter implements EntityImageIdAdapter {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientImageIdAdapter(final ClientRepository repository) {
+        public ClientImageIdAdapter(final ClientRepository repository, final ClientActivePort clientActivePort) {
         this.repository = repository;
+        this.clientActivePort = clientActivePort;
     }
 }
