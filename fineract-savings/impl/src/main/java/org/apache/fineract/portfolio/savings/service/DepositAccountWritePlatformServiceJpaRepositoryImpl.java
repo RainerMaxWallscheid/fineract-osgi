@@ -53,8 +53,6 @@ import org.apache.fineract.organisation.holiday.domain.HolidayRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.data.AccountTransferFundsData;
@@ -883,7 +881,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     }
 
     @Override
-    public SavingsAccountTransaction acceptSavingsTransfer(final Long accountId, final LocalDate transferDate, final Office acceptedInOffice, final Staff fieldOfficer, final DepositAccountType depositAccountType) {
+    public SavingsAccountTransaction acceptSavingsTransfer(final Long accountId, final LocalDate transferDate, final Object acceptedInOffice, final Object fieldOfficer, final DepositAccountType depositAccountType) {
         context.authenticatedUser();
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();

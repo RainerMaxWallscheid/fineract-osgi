@@ -21,8 +21,6 @@ package org.apache.fineract.portfolio.savings.service;
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
@@ -67,7 +65,7 @@ public interface DepositAccountWritePlatformService {
 
     void rejectSavingsTransfer(Long accountId, DepositAccountType depositAccountType);
 
-    SavingsAccountTransaction acceptSavingsTransfer(Long accountId, LocalDate transferDate, Office acceptedInOffice, Staff staff,
+    SavingsAccountTransaction acceptSavingsTransfer(Long accountId, LocalDate transferDate, Object acceptedInOffice, Object staff,
             DepositAccountType depositAccountType);
 
     CommandProcessingResult addSavingsAccountCharge(JsonCommand command, DepositAccountType depositAccountType);
