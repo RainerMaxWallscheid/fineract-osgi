@@ -22,17 +22,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.rate.domain.Rate;
-import org.apache.fineract.portfolio.rate.domain.RateRepositoryWrapper;
+import org.apache.fineract.portfolio.rate.exception.RateNotFoundException;
+import org.apache.fineract.portfolio.rate.moduleapi.RatePersistablePort;
 
 public class RateAssembler {
     /** Same JSON key as loan product catalog ({@code LoanProductConstants.RATES_PARAM_NAME}). */
     private static final String RATES_PARAM_NAME = "rates";
 
     private final FromJsonHelper fromApiJsonHelper;
-    private final RateRepositoryWrapper rateRepository;
+    private final RatePersistablePort ratePersistablePort;
 
     public List<Rate> fromParsedJson(final JsonElement element) {
         final List<Rate> rateItems = new ArrayList<>();
@@ -49,15 +52,43 @@ public class RateAssembler {
                         idList.add(rateId);
                     }
                 }
-                rateItems.addAll(rateRepository.findMultipleWithNotFoundDetection(idList));
+                rateItems.addAll(requireRates(idList));
             }
         }
         return rateItems;
     }
 
+    /**
+     * Same contract as leftover {@code findMultipleWithNotFoundDetection}: an empty list is empty, a null id or a
+     * missing id throws {@link RateNotFoundException} (not {@code IllegalArgumentException}), and duplicate ids are
+     * returned once.
+     */
+    private List<Rate> requireRates(final List<Long> rateIds) {
+        final List<Rate> rates = new ArrayList<>();
+        if (rateIds == null || rateIds.isEmpty()) {
+            return rates;
+        }
+        final Set<Long> seen = new HashSet<>();
+        for (final Long rateId : rateIds) {
+            final Rate rate = requireRate(rateId);
+            if (seen.add(this.ratePersistablePort.id(rate))) {
+                rates.add(rate);
+            }
+        }
+        return rates;
+    }
+
+    private Rate requireRate(final Long rateId) {
+        final Object rate = this.ratePersistablePort.persistableById(rateId);
+        if (!(rate instanceof Rate persisted)) {
+            throw new RateNotFoundException(rateId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public RateAssembler(final FromJsonHelper fromApiJsonHelper, final RateRepositoryWrapper rateRepository) {
+        public RateAssembler(final FromJsonHelper fromApiJsonHelper, final RatePersistablePort ratePersistablePort) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.rateRepository = rateRepository;
+        this.ratePersistablePort = ratePersistablePort;
     }
 }

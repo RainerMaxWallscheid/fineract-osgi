@@ -21,7 +21,7 @@ package org.apache.fineract.portfolio.rate.starter;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.rate.domain.RateRepository;
-import org.apache.fineract.portfolio.rate.domain.RateRepositoryWrapper;
+import org.apache.fineract.portfolio.rate.moduleapi.RatePersistablePort;
 import org.apache.fineract.portfolio.rate.serialization.RateDefinitionCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.rate.service.RateAssembler;
 import org.apache.fineract.portfolio.rate.service.RateReadService;
@@ -39,8 +39,8 @@ public class RateConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(RateAssembler.class)
-    public RateAssembler rateAssembler(FromJsonHelper fromApiJsonHelper, RateRepositoryWrapper rateRepository) {
-        return new RateAssembler(fromApiJsonHelper, rateRepository);
+    public RateAssembler rateAssembler(FromJsonHelper fromApiJsonHelper, RatePersistablePort ratePersistablePort) {
+        return new RateAssembler(fromApiJsonHelper, ratePersistablePort);
     }
 
     @Bean

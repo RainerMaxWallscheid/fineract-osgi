@@ -11,7 +11,7 @@ Floating Rates catalog — Wave 1 OSGi modularization (after charge)
 
 No `:fineract-rates` façade. Depend on `-api`; composition roots also take `-impl`.
 
-Rate approver assignment uses AppUserPersistablePort (not leftover AppUser repository). The core `Rate` association stays AppUser.
+Rate approver assignment uses AppUserPersistablePort (not leftover AppUser repository). Rate assembly uses RatePersistablePort.persistableById (not leftover Rate repository). The core `Rate` association stays AppUser.
 
 ### Module API
 
