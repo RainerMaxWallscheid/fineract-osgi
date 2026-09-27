@@ -24,6 +24,7 @@ import org.apache.fineract.accounting.glaccount.data.GLAccountJsonInputParams;
 import org.apache.fineract.accounting.glaccount.command.GLAccountCommand;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountDisableException;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountDuplicateException;
@@ -59,6 +60,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     private static final Logger LOG = LoggerFactory.getLogger(GLAccountWritePlatformServiceJpaRepositoryImpl.class);
     private static final String GL_ACCOUNT_ID = "glAccountId";
     private final GLAccountRepository glAccountRepository;
+    private final GLAccountPersistablePort glAccountPersistablePort;
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
     private final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -197,13 +199,21 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     private GLAccount validateParentGLAccount(final Long parentAccountId) {
         GLAccount parentGLAccount = null;
         if (parentAccountId != null) {
-            parentGLAccount = this.glAccountRepository.findById(parentAccountId).orElseThrow(() -> new GLAccountNotFoundException(parentAccountId));
+            parentGLAccount = requireGlAccount(parentAccountId);
             // ensure parent is not a detail account
             if (parentGLAccount.isDetailAccount()) {
                 throw new GLAccountInvalidParentException(parentAccountId);
             }
         }
         return parentGLAccount;
+    }
+
+    private GLAccount requireGlAccount(final Long glAccountId) {
+        final Object glAccount = this.glAccountPersistablePort.persistableById(glAccountId);
+        if (!(glAccount instanceof GLAccount persisted)) {
+            throw new GLAccountNotFoundException(glAccountId);
+        }
+        return persisted;
     }
 
     /**
@@ -251,8 +261,9 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccountWritePlatformServiceJpaRepositoryImpl(final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort, final JdbcTemplate jdbcTemplate) {
+        public GLAccountWritePlatformServiceJpaRepositoryImpl(final GLAccountRepository glAccountRepository, final GLAccountPersistablePort glAccountPersistablePort, final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort, final JdbcTemplate jdbcTemplate) {
         this.glAccountRepository = glAccountRepository;
+        this.glAccountPersistablePort = glAccountPersistablePort;
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;

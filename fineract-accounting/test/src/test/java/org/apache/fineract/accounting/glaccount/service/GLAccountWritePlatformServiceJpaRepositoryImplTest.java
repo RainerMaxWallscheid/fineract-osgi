@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+import org.apache.fineract.accounting.moduleapi.GLAccountPersistablePort;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
@@ -46,6 +47,9 @@ class GLAccountWritePlatformServiceJpaRepositoryImplTest {
 
     @Mock
     private GLAccountRepository glAccountRepository;
+
+    @Mock
+    private GLAccountPersistablePort glAccountPersistablePort;
 
     @Mock
     private JournalEntryRepository glJournalEntryRepository;
