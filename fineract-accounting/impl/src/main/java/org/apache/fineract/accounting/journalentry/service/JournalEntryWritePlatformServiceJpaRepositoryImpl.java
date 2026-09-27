@@ -75,8 +75,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
@@ -93,7 +93,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     private final GLClosureRepository glClosureRepository;
     private final GLAccountPersistablePort glAccountPersistablePort;
     private final JournalEntryRepository glJournalEntryRepository;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory;
     private final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory;
     private final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory;
@@ -117,7 +117,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
             journalEntryCommand.validateForCreate();
             // check office is valid
             final Long officeId = command.longValueOfParameterNamed(JournalEntryJsonInputParams.OFFICE_ID.getValue());
-            final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Object office = officeById(officeId);
             final Long accountRuleId = command.longValueOfParameterNamed(JournalEntryJsonInputParams.ACCOUNTING_RULE.getValue());
             final String currencyCode = command.stringValueOfParameterNamed(JournalEntryJsonInputParams.CURRENCY_CODE.getValue());
             validateBusinessRulesForJournalEntries(journalEntryCommand);
@@ -438,7 +438,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         checkDebitAndCreditAmounts(credits, debits);
     }
 
-    private void saveAllDebitOrCreditEntries(final JournalEntryCommand command, final Office office, final Object paymentDetail, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final String referenceNumber, final ExternalId externalAssetOwnerId) {
+    private void saveAllDebitOrCreditEntries(final JournalEntryCommand command, final Object office, final Object paymentDetail, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final String referenceNumber, final ExternalId externalAssetOwnerId) {
         final boolean manualEntry = true;
         this.organisationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
         for (final SingleDebitOrCreditEntryCommand singleDebitOrCreditEntryCommand : singleDebitOrCreditEntryCommands) {
@@ -487,7 +487,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
             validateJournalEntriesArePostedBefore(contraId);
             // check office is valid
             final Long officeId = command.longValueOfParameterNamed(JournalEntryJsonInputParams.OFFICE_ID.getValue());
-            final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Object office = officeById(officeId);
             final String currencyCode = command.stringValueOfParameterNamed(JournalEntryJsonInputParams.CURRENCY_CODE.getValue());
             validateBusinessRulesForJournalEntries(journalEntryCommand);
             /**
@@ -516,7 +516,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         }
     }
 
-    private void saveAllDebitOrCreditOpeningBalanceEntries(final JournalEntryCommand command, final Office office, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final Long contraAccountId) {
+    private void saveAllDebitOrCreditOpeningBalanceEntries(final JournalEntryCommand command, final Object office, final String currencyCode, final LocalDate transactionDate, final SingleDebitOrCreditEntryCommand[] singleDebitOrCreditEntryCommands, final String transactionId, final JournalEntryType type, final Long contraAccountId) {
         final boolean manualEntry = true;
         final Object contraAccount = glAccountById(contraAccountId);
         if (!GLAccountType.fromInt(this.glAccountPersistablePort.accountType(contraAccountId)).isEquityType()) {
@@ -572,7 +572,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     @java.lang.SuppressWarnings("all")
     public JournalEntryWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository,
             final GLAccountPersistablePort glAccountPersistablePort, final JournalEntryRepository glJournalEntryRepository,
-            final OfficeRepositoryWrapper officeRepositoryWrapper, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
+            final OfficePersistablePort officePersistablePort, final AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
             final AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory,
             final AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, final AccountingProcessorHelper helper,
             final JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, final AccountingRuleRepository accountingRuleRepository,
@@ -586,7 +586,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
         this.glClosureRepository = glClosureRepository;
         this.glAccountPersistablePort = glAccountPersistablePort;
         this.glJournalEntryRepository = glJournalEntryRepository;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.accountingProcessorForLoanFactory = accountingProcessorForLoanFactory;
         this.accountingProcessorForSavingsFactory = accountingProcessorForSavingsFactory;
         this.accountingProcessorForSharesFactory = accountingProcessorForSharesFactory;
@@ -612,6 +612,17 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
             throw new GLAccountNotFoundException(accountId);
         }
         return glAccount;
+    }
+
+    private Object officeById(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (office == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return office;
     }
 }
 

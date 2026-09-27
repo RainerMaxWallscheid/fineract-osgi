@@ -45,6 +45,7 @@ import org.apache.fineract.accounting.moduleapi.ExternalAssetOwnerJournalPort;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
@@ -86,7 +87,7 @@ public class AccountingJournalEntryConfiguration {
     @ConditionalOnMissingBean(JournalEntryWritePlatformService.class)
     public JournalEntryWritePlatformService journalEntryWritePlatformService(GLClosureRepository glClosureRepository,
             GLAccountPersistablePort glAccountPersistablePort, JournalEntryRepository glJournalEntryRepository,
-            OfficeRepositoryWrapper officeRepositoryWrapper, AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
+            OfficePersistablePort officePersistablePort, AccountingProcessorForLoanFactory accountingProcessorForLoanFactory,
             AccountingProcessorForSavingsFactory accountingProcessorForSavingsFactory,
             AccountingProcessorForSharesFactory accountingProcessorForSharesFactory, AccountingProcessorHelper helper,
             JournalEntryCommandFromApiJsonDeserializer fromApiJsonDeserializer, AccountingRuleRepository accountingRuleRepository,
@@ -97,7 +98,7 @@ public class AccountingJournalEntryConfiguration {
             ConfigurationReadPlatformService configurationReadPlatformService,
             ExternalAssetOwnerJournalPort externalAssetOwnerJournalPort) {
         return new JournalEntryWritePlatformServiceJpaRepositoryImpl(glClosureRepository, glAccountPersistablePort, glJournalEntryRepository,
-                officeRepositoryWrapper, accountingProcessorForLoanFactory, accountingProcessorForSavingsFactory,
+                officePersistablePort, accountingProcessorForLoanFactory, accountingProcessorForSavingsFactory,
                 accountingProcessorForSharesFactory, helper, fromApiJsonDeserializer, accountingRuleRepository,
                 glAccountReadPlatformService, organisationCurrencyRepository, context, paymentDetailWritePlatformService,
                 financialActivityAccountRepositoryWrapper, accountingProcessorForClientTransactions, configurationReadPlatformService,
