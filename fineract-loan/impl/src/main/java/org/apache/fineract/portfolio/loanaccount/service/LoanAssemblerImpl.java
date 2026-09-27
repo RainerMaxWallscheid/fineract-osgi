@@ -48,8 +48,8 @@ import org.apache.fineract.organisation.holiday.domain.HolidayRepository;
 import org.apache.fineract.organisation.holiday.domain.HolidayStatusType;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.organisation.staff.moduleapi.StaffRoleException;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDays;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
@@ -120,7 +120,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final LoanProductRepository loanProductRepository;
     private final GroupRepositoryWrapper groupRepository;
     private final FundRepository fundRepository;
-    private final StaffRepository staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanScheduleAssembler loanScheduleAssembler;
     private final LoanChargeAssembler loanChargeAssembler;
@@ -403,12 +403,20 @@ public class LoanAssemblerImpl implements LoanAssembler {
     public Staff findLoanOfficerByIdIfProvided(final Long loanOfficerId) {
         Staff staff = null;
         if (loanOfficerId != null) {
-            staff = this.staffRepository.findById(loanOfficerId).orElseThrow(() -> new StaffNotFoundException(loanOfficerId));
+            staff = requireStaff(loanOfficerId);
             if (!staff.isLoanOfficer()) {
                 throw new StaffRoleException(loanOfficerId, StaffRoleException.StaffRole.LOAN_OFFICER);
             }
         }
         return staff;
+    }
+
+    private Staff requireStaff(final Long staffId) {
+        final Object staff = this.staffPersistablePort.persistableById(staffId);
+        if (!(staff instanceof Staff persisted)) {
+            throw new StaffNotFoundException(staffId);
+        }
+        return persisted;
     }
 
     private void copyAdvancedPaymentRulesIfApplicable(String transactionProcessingStrategyCode, LoanProduct loanProduct,
@@ -842,7 +850,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     @java.lang.SuppressWarnings("all")
     public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository,
             final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository,
-            final FundRepository fundRepository, final StaffRepository staffRepository,
+            final FundRepository fundRepository, final StaffPersistablePort staffPersistablePort,
             final CodeValuePersistablePort codeValuePersistablePort, final LoanScheduleAssembler loanScheduleAssembler,
             final LoanChargeAssembler loanChargeAssembler, final LoanCollateralPort loanCollateralPort,
             final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
@@ -861,7 +869,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.loanProductRepository = loanProductRepository;
         this.groupRepository = groupRepository;
         this.fundRepository = fundRepository;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanScheduleAssembler = loanScheduleAssembler;
         this.loanChargeAssembler = loanChargeAssembler;
