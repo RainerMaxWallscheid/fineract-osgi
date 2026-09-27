@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
 import org.apache.fineract.accounting.journalentry.data.ClientTransactionDTO;
-import org.apache.fineract.organisation.office.domain.Office;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,11 +33,12 @@ public class CashBasedAccountingProcessorForClientTransactions implements Accoun
         if (clientTransactionDTO.isAccountingEnabled()) {
             final GLClosure latestGLClosure = this.helper.getLatestClosureByBranch(clientTransactionDTO.getOfficeId());
             final LocalDate transactionDate = clientTransactionDTO.getTransactionDate();
-            final Office office = this.helper.getOfficeById(clientTransactionDTO.getOfficeId());
+            // Unbox so a null office id still throws before a journal is stored.
+            final long officeId = clientTransactionDTO.getOfficeId();
             this.helper.checkForBranchClosures(latestGLClosure, transactionDate);
             /** Handle client payments **/
             if (clientTransactionDTO.isChargePayment()) {
-                createJournalEntriesForChargePayments(clientTransactionDTO, office);
+                createJournalEntriesForChargePayments(clientTransactionDTO, officeId);
             }
         }
     }
@@ -49,7 +49,7 @@ public class CashBasedAccountingProcessorForClientTransactions implements Accoun
      *
      * In case the loan transaction is a reversal, all debits are turned into credits and vice versa
      */
-    private void createJournalEntriesForChargePayments(final ClientTransactionDTO clientTransactionDTO, final Office office) {
+    private void createJournalEntriesForChargePayments(final ClientTransactionDTO clientTransactionDTO, final long officeId) {
         // client properties
         final Long clientId = clientTransactionDTO.getClientId();
         // transaction properties
@@ -59,12 +59,12 @@ public class CashBasedAccountingProcessorForClientTransactions implements Accoun
         final BigDecimal amount = clientTransactionDTO.getAmount();
         final boolean isReversal = clientTransactionDTO.isReversed();
         if (amount != null && !(amount.compareTo(BigDecimal.ZERO) == 0)) {
-            BigDecimal totalCreditedAmount = this.helper.createCreditJournalEntryOrReversalForClientPayments(office, currencyCode, clientId, transactionId, transactionDate, isReversal, clientTransactionDTO.getChargePayments());
+            BigDecimal totalCreditedAmount = this.helper.createCreditJournalEntryOrReversalForClientPayments(officeId, currencyCode, clientId, transactionId, transactionDate, isReversal, clientTransactionDTO.getChargePayments());
             /***
              * create a single Debit entry (or reversal) for the entire amount that was credited (accounting is turned
              * on at the level of for each charge that has been paid by this transaction)
              **/
-            this.helper.createDebitJournalEntryOrReversalForClientChargePayments(office, currencyCode, clientId, transactionId, transactionDate, totalCreditedAmount, isReversal);
+            this.helper.createDebitJournalEntryOrReversalForClientChargePayments(officeId, currencyCode, clientId, transactionId, transactionDate, totalCreditedAmount, isReversal);
         }
     }
 

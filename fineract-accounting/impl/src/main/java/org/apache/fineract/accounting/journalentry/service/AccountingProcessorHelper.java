@@ -722,7 +722,7 @@ public class AccountingProcessorHelper {
         createDebitJournalEntryForLoan(office, currencyCode, account, loanId, transactionId, transactionDate, amount);
     }
 
-    private void createCreditJournalEntryForClientPayments(final Office office, final String currencyCode, final Object account, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createCreditJournalEntryForClientPayments(final Object office, final String currencyCode, final Object account, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         String modifiedTransactionId = CLIENT_TRANSACTION_IDENTIFIER + transactionId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.CLIENT.getValue(), clientId, null, null, null, transactionId, null);
@@ -817,7 +817,7 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    private void createDebitJournalEntryForClientPayments(final Office office, final String currencyCode, final Object account, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createDebitJournalEntryForClientPayments(final Object office, final String currencyCode, final Object account, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         String modifiedTransactionId = CLIENT_TRANSACTION_IDENTIFIER + transactionId;
         final JournalEntry journalEntry = JournalEntry.createNew(office, null, account, currencyCode, modifiedTransactionId, manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.CLIENT.getValue(), clientId, null, null, null, transactionId, null);
@@ -1050,7 +1050,7 @@ public class AccountingProcessorHelper {
         return FinancialActivity.fromInt(accountMappingTypeId) != null;
     }
 
-    public BigDecimal createCreditJournalEntryOrReversalForClientPayments(final Office office, final String currencyCode, final Long clientId, final Long transactionId, final LocalDate transactionDate, final Boolean isReversal, final List<ClientChargePaymentDTO> clientChargePaymentDTOs) {
+    public BigDecimal createCreditJournalEntryOrReversalForClientPayments(final Object office, final String currencyCode, final Long clientId, final Long transactionId, final LocalDate transactionDate, final Boolean isReversal, final List<ClientChargePaymentDTO> clientChargePaymentDTOs) {
         /**
          * Map to track each account affected and the net credit to be made for a particular account
          * *
@@ -1083,7 +1083,7 @@ public class AccountingProcessorHelper {
         return totalCreditedAmount;
     }
 
-    public void createDebitJournalEntryOrReversalForClientChargePayments(final Office office, final String currencyCode, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createDebitJournalEntryOrReversalForClientChargePayments(final Object office, final String currencyCode, final Long clientId, final Long transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         final GLAccount account = leftoverGlAccount(financialActivityAccountRepository.findByFinancialActivityTypeWithNotFoundDetection(FinancialActivity.ASSET_FUND_SOURCE.getValue()).getGlAccountId());
         if (isReversal) {
             createCreditJournalEntryForClientPayments(office, currencyCode, account, clientId, transactionId, transactionDate, amount);
