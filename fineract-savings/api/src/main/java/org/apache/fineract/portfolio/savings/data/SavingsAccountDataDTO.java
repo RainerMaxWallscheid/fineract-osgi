@@ -20,23 +20,22 @@ package org.apache.fineract.portfolio.savings.data;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import org.apache.fineract.useradministration.domain.AppUser;
 
 public class SavingsAccountDataDTO {
 
     /**
-     * Client/group as {@code Object} so the savings-api DTO need not keep leftover
-     * {@code Client} / {@code Group} graphs (ADR-021).
+     * Client/group/applied-by as {@code Object} so the savings-api DTO need not keep leftover
+     * {@code Client} / {@code Group} / {@code AppUser} graphs (ADR-021).
      */
     private final Object client;
     private final Object group;
     private final Long savingsProductId;
     private final LocalDate applicationDate;
-    private final AppUser appliedBy;
+    private final Object appliedBy;
     private final DateTimeFormatter fmt;
 
     public SavingsAccountDataDTO(final Object client, final Object group, final Long savingsProductId, final LocalDate applicationDate,
-            final AppUser appliedBy, final DateTimeFormatter fmt) {
+            final Object appliedBy, final DateTimeFormatter fmt) {
         this.client = client;
         this.group = group;
         this.savingsProductId = savingsProductId;
@@ -61,7 +60,7 @@ public class SavingsAccountDataDTO {
         return this.applicationDate;
     }
 
-    public AppUser getAppliedBy() {
+    public Object getAppliedBy() {
         return this.appliedBy;
     }
 

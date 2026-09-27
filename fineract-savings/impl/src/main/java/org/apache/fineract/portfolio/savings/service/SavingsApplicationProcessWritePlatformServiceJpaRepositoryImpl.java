@@ -563,7 +563,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Override
     public CommandProcessingResult createActiveApplication(final SavingsAccountDataDTO savingsAccountDataDTO) {
         final CommandWrapper commandWrapper = new CommandWrapperBuilder().savingsAccountActivation(null).build();
-        boolean rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, savingsAccountDataDTO.getAppliedBy());
+        boolean rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, (AppUser) savingsAccountDataDTO.getAppliedBy());
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsAccountDataDTO.getClient(), savingsAccountDataDTO.getGroup(), savingsAccountDataDTO.getSavingsProduct(), savingsAccountDataDTO.getApplicationDate(), savingsAccountDataDTO.getAppliedBy());
         account.approveAndActivateApplication(savingsAccountDataDTO.getApplicationDate(), savingsAccountDataDTO.getAppliedBy());
         Money amountForDeposit = account.activateWithBalance();
