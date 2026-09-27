@@ -207,7 +207,7 @@ public class DepositAccountDomainServiceJpa implements DepositAccountDomainServi
 
     @Transactional
     @Override
-    public Long handleFDAccountMaturityClosure(final FixedDepositAccount account, final Object paymentDetail, final AppUser user, final DateTimeFormatter fmt, final LocalDate closedDate, final Integer onAccountClosureId, final Long toSavingsId, final String transferDescription, Map<String, Object> changes) {
+    public Long handleFDAccountMaturityClosure(final FixedDepositAccount account, final Object paymentDetail, final Object user, final DateTimeFormatter fmt, final LocalDate closedDate, final Integer onAccountClosureId, final Long toSavingsId, final String transferDescription, Map<String, Object> changes) {
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         boolean isRegularTransaction = false;
