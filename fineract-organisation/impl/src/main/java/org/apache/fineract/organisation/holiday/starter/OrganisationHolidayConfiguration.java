@@ -26,8 +26,7 @@ import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformServi
 import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformServiceImpl;
 import org.apache.fineract.organisation.holiday.service.HolidayWritePlatformService;
 import org.apache.fineract.organisation.holiday.service.HolidayWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -46,9 +45,9 @@ public class OrganisationHolidayConfiguration {
     @Bean
     @ConditionalOnMissingBean(HolidayWritePlatformService.class)
     public HolidayWritePlatformService holidayWritePlatformService(HolidayDataValidator fromApiJsonDeserializer,
-            HolidayRepositoryWrapper holidayRepository, PlatformSecurityContext context, OfficeRepositoryWrapper officeRepositoryWrapper,
-            OfficeRepository officeRepository, FromJsonHelper fromApiJsonHelper, WorkingDaysRepositoryWrapper daysRepositoryWrapper) {
+            HolidayRepositoryWrapper holidayRepository, PlatformSecurityContext context, OfficePersistablePort officePersistablePort,
+            FromJsonHelper fromApiJsonHelper, WorkingDaysRepositoryWrapper daysRepositoryWrapper) {
         return new HolidayWritePlatformServiceJpaRepositoryImpl(fromApiJsonDeserializer, holidayRepository, daysRepositoryWrapper, context,
-                officeRepositoryWrapper, officeRepository, fromApiJsonHelper);
+                officePersistablePort, fromApiJsonHelper);
     }
 }

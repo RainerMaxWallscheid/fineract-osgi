@@ -26,8 +26,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -43,9 +41,8 @@ import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.holiday.domain.HolidayRepositoryWrapper;
 import org.apache.fineract.organisation.holiday.exception.HolidayDateException;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepository;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDays;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.organisation.workingdays.service.WorkingDaysUtil;
@@ -60,8 +57,7 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     private final HolidayRepositoryWrapper holidayRepository;
     private final WorkingDaysRepositoryWrapper daysRepositoryWrapper;
     private final PlatformSecurityContext context;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
-    private final OfficeRepository officeRepository;
+    private final OfficePersistablePort officePersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
 
     @Transactional
@@ -148,19 +144,11 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
         final JsonObject topLevelJsonElement = this.fromApiJsonHelper.parse(command.json()).getAsJsonObject();
         if (topLevelJsonElement.has(HolidayApiConstants.officesParamName) && topLevelJsonElement.get(HolidayApiConstants.officesParamName).isJsonArray()) {
             final JsonArray array = topLevelJsonElement.get(HolidayApiConstants.officesParamName).getAsJsonArray();
-            Set<Long> officeIds = new HashSet<>(array.size());
-            for (int i = 0; i < array.size(); i++) {
-                officeIds.add(this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName, array.get(i).getAsJsonObject()));
-            }
-            Map<Long, Office> officeMap = this.officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
             offices = new HashSet<>(array.size());
             for (int i = 0; i < array.size(); i++) {
-                final Long officeId = this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName, array.get(i).getAsJsonObject());
-                final Office office = officeMap.get(officeId);
-                if (office == null) {
-                    throw new OfficeNotFoundException(officeId);
-                }
-                offices.add(office);
+                final Long officeId = this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName,
+                        array.get(i).getAsJsonObject());
+                offices.add(requireOffice(officeId));
             }
         }
         return offices;
@@ -221,14 +209,22 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
         }
     }
 
+    // findAllById does not call findById, so a null id is OfficeNotFoundException, not IAE.
+    private Office requireOffice(final Long officeId) {
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
-        public HolidayWritePlatformServiceJpaRepositoryImpl(final HolidayDataValidator fromApiJsonDeserializer, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper daysRepositoryWrapper, final PlatformSecurityContext context, final OfficeRepositoryWrapper officeRepositoryWrapper, final OfficeRepository officeRepository, final FromJsonHelper fromApiJsonHelper) {
+        public HolidayWritePlatformServiceJpaRepositoryImpl(final HolidayDataValidator fromApiJsonDeserializer, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper daysRepositoryWrapper, final PlatformSecurityContext context, final OfficePersistablePort officePersistablePort, final FromJsonHelper fromApiJsonHelper) {
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.holidayRepository = holidayRepository;
         this.daysRepositoryWrapper = daysRepositoryWrapper;
         this.context = context;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }
