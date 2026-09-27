@@ -53,8 +53,9 @@ import org.apache.fineract.infrastructure.event.business.domain.group.GroupsCrea
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.InvalidOfficeException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.service.AccountNumberGenerator;
@@ -98,7 +99,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private final PlatformSecurityContext context;
     private final GroupRepositoryWrapper groupRepository;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
-    private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final OfficePersistablePort officePersistablePort;
     private final StaffRepositoryWrapper staffRepository;
     private final NoteWritePlatformService noteWritePlatformService;
     private final GroupLevelRepository groupLevelRepository;
@@ -135,7 +136,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                 parentGroup = this.groupRepository.findOneWithNotFoundDetection(centerId);
                 officeId = parentGroup.officeId();
             }
-            final Office groupOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+            final Office groupOffice = requireOffice(officeId);
             final LocalDate activationDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.activationDateParamName);
             final GroupLevel groupLevel = this.groupLevelRepository.findById(groupingType.getId()).orElse(null);
             validateOfficeOpeningDateisAfterGroupOrCenterOpeningDate(groupOffice, groupLevel, activationDate);
@@ -808,10 +809,21 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         }
     }
 
+    private Office requireOffice(final Long officeId) {
+        if (officeId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (!(office instanceof Office persisted)) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final GroupRepositoryWrapper groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
-            final OfficeRepositoryWrapper officeRepositoryWrapper, final StaffRepositoryWrapper staffRepository,
+            final OfficePersistablePort officePersistablePort, final StaffRepositoryWrapper staffRepository,
             final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository,
             final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper,
             final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService,
@@ -822,7 +834,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         this.context = context;
         this.groupRepository = groupRepository;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
-        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officePersistablePort = officePersistablePort;
         this.staffRepository = staffRepository;
         this.noteWritePlatformService = noteWritePlatformService;
         this.groupLevelRepository = groupLevelRepository;
