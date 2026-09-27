@@ -36,7 +36,6 @@ import org.apache.fineract.portfolio.common.domain.DaysInMonthType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
-import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeCalculationType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeIncomeType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeStrategy;
@@ -70,7 +69,7 @@ public class LoanProductAssembler {
     private final LoanProductInterestRecalculationDetailsAssembler interestRecalculationDetailsAssembler;
     private final LoanProductGuaranteeDetailsAssembler guaranteeDetailsAssembler;
 
-    public LoanProduct assembleFromJson(final Fund fund, final String loanTransactionProcessingStrategy, final List<Long> productChargeIds,
+    public LoanProduct assembleFromJson(final Object fund, final String loanTransactionProcessingStrategy, final List<Long> productChargeIds,
             final JsonCommand command, final AprCalculator aprCalculator, Long floatingRateId, final List<Rate> productRates,
             List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules,
             List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules) {

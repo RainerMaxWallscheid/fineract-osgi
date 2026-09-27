@@ -108,7 +108,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command);
             validateInputDates(command);
-            final Fund fund = findFundByIdIfProvided(command.longValueOfParameterNamed("fundId"));
+            final Object fund = findFundByIdIfProvided(command.longValueOfParameterNamed("fundId"));
             final String loanTransactionProcessingStrategyCode = command.stringValueOfParameterNamed("transactionProcessingStrategyCode");
             final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
             final List<Long> charges = assembleListOfProductChargeIds(command, currencyCode);
@@ -155,20 +155,19 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         }
     }
 
-    private Fund findFundByIdIfProvided(final Long fundId) {
-        Fund fund = null;
-        if (fundId != null) {
-            fund = requireFund(fundId);
+    private Object findFundByIdIfProvided(final Long fundId) {
+        if (fundId == null) {
+            return null;
         }
-        return fund;
+        return requireFund(fundId);
     }
 
-    private Fund requireFund(final Long fundId) {
+    private Object requireFund(final Long fundId) {
         final Object fund = this.fundPersistablePort.persistableById(fundId);
-        if (!(fund instanceof Fund persisted)) {
+        if (!(fund instanceof Fund)) {
             throw new FundNotFoundException(fundId);
         }
-        return persisted;
+        return fund;
     }
 
     private DelinquencyBucket findDelinquencyBucketIdIfProvided(final Long delinquencyBucketId) {
@@ -201,7 +200,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             final Map<String, Object> changes = loanProductUpdateUtil.update(product, command, this.aprCalculator, floatingRateId);
             if (changes.containsKey("fundId")) {
                 final Long fundId = (Long) changes.get("fundId");
-                final Fund fund = findFundByIdIfProvided(fundId);
+                final Object fund = findFundByIdIfProvided(fundId);
                 product.setFund(fund);
             }
             if (changes.containsKey("delinquencyBucketId")) {
