@@ -35,7 +35,8 @@ import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumb
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -115,7 +116,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ClientDataValidator fromApiJsonDeserializer;
     private final AccountNumberGenerator accountNumberGenerator;
     private final StaffRepositoryWrapper staffRepository;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
     private SavingsProductExistencePort savingsProductExistencePort;
@@ -217,19 +218,17 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             CodeValue gender = null;
             final Long genderId = command.longValueOfParameterNamed(ClientApiConstants.genderIdParamName);
             if (genderId != null) {
-                gender = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.GENDER, genderId);
+                gender = requireCodeValue(ClientApiConstants.GENDER, genderId);
             }
             CodeValue clientType = null;
             final Long clientTypeId = command.longValueOfParameterNamed(ClientApiConstants.clientTypeIdParamName);
             if (clientTypeId != null) {
-                clientType = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_TYPE,
-                        clientTypeId);
+                clientType = requireCodeValue(ClientApiConstants.CLIENT_TYPE, clientTypeId);
             }
             CodeValue clientClassification = null;
             final Long clientClassificationId = command.longValueOfParameterNamed(ClientApiConstants.clientClassificationIdParamName);
             if (clientClassificationId != null) {
-                clientClassification = this.codeValueRepository
-                        .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_CLASSIFICATION, clientClassificationId);
+                clientClassification = requireCodeValue(ClientApiConstants.CLIENT_CLASSIFICATION, clientClassificationId);
             }
             final Long savingsProductId = command.longValueOfParameterNamed(ClientApiConstants.savingsProductIdParamName);
             if (savingsProductId != null) {
@@ -365,15 +364,15 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Long clientNonPersonConstitutionId = this.fromApiJsonHelper.extractLongNamed(ClientApiConstants.constitutionIdParamName,
                     clientNonPersonElement);
             if (clientNonPersonConstitutionId != null) {
-                clientNonPersonConstitution = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(
-                        ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION, clientNonPersonConstitutionId);
+                clientNonPersonConstitution = requireCodeValue(ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION,
+                        clientNonPersonConstitutionId);
             }
             CodeValue clientNonPersonMainBusinessLine = null;
             final Long clientNonPersonMainBusinessLineId = this.fromApiJsonHelper
                     .extractLongNamed(ClientApiConstants.mainBusinessLineIdParamName, clientNonPersonElement);
             if (clientNonPersonMainBusinessLineId != null) {
-                clientNonPersonMainBusinessLine = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(
-                        ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE, clientNonPersonMainBusinessLineId);
+                clientNonPersonMainBusinessLine = requireCodeValue(ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE,
+                        clientNonPersonMainBusinessLineId);
             }
             final ClientNonPerson newClientNonPerson = ClientNonPerson.createNew(client, clientNonPersonConstitution,
                     clientNonPersonMainBusinessLine, incorpNumber, incorpValidityTill, remarks);
@@ -519,7 +518,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final Long newValue = command.longValueOfParameterNamed(ClientApiConstants.genderIdParamName);
                 CodeValue gender = null;
                 if (newValue != null) {
-                    gender = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.GENDER, newValue);
+                    gender = requireCodeValue(ClientApiConstants.GENDER, newValue);
                 }
                 clientForUpdate.updateGender(gender);
             }
@@ -537,8 +536,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final Long newValue = command.longValueOfParameterNamed(ClientApiConstants.clientTypeIdParamName);
                 CodeValue newCodeVal = null;
                 if (newValue != null) {
-                    newCodeVal = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_TYPE,
-                            newValue);
+                    newCodeVal = requireCodeValue(ClientApiConstants.CLIENT_TYPE, newValue);
                 }
                 clientForUpdate.updateClientType(newCodeVal);
             }
@@ -546,8 +544,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final Long newValue = command.longValueOfParameterNamed(ClientApiConstants.clientClassificationIdParamName);
                 CodeValue newCodeVal = null;
                 if (newValue != null) {
-                    newCodeVal = this.codeValueRepository
-                            .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_CLASSIFICATION, newValue);
+                    newCodeVal = requireCodeValue(ClientApiConstants.CLIENT_CLASSIFICATION, newValue);
                 }
                 clientForUpdate.updateClientClassification(newCodeVal);
             }
@@ -582,8 +579,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                             clientNonPersonElement);
                     CodeValue constitution = null;
                     if (newValue != null) {
-                        constitution = this.codeValueRepository
-                                .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION, newValue);
+                        constitution = requireCodeValue(ClientApiConstants.CLIENT_NON_PERSON_CONSTITUTION, newValue);
                     }
                     clientNonPersonForUpdate.updateConstitution(constitution);
                 }
@@ -592,8 +588,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                             clientNonPersonElement);
                     CodeValue mainBusinessLine = null;
                     if (newValue != null) {
-                        mainBusinessLine = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(
-                                ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE, newValue);
+                        mainBusinessLine = requireCodeValue(ClientApiConstants.CLIENT_NON_PERSON_MAIN_BUSINESS_LINE, newValue);
                     }
                     clientNonPersonForUpdate.updateMainBusinessLine(mainBusinessLine);
                 }
@@ -764,8 +759,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             final LocalDate closureDate = command.localDateValueOfParameterNamed(ClientApiConstants.closureDateParamName);
             final Long closureReasonId = command.longValueOfParameterNamed(ClientApiConstants.closureReasonIdParamName);
-            final CodeValue closureReason = this.codeValueRepository
-                    .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_CLOSURE_REASON, closureReasonId);
+            final CodeValue closureReason = requireCodeValue(ClientApiConstants.CLIENT_CLOSURE_REASON, closureReasonId);
             if (ClientStatus.fromInt(client.getStatus()).isClosed()) {
                 final String errorMessage = "Client is already closed.";
                 throw new InvalidClientStateTransitionException("close", "is.already.closed", errorMessage);
@@ -877,8 +871,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate rejectionDate = command.localDateValueOfParameterNamed(ClientApiConstants.rejectionDateParamName);
         final Long rejectionReasonId = command.longValueOfParameterNamed(ClientApiConstants.rejectionReasonIdParamName);
-        final CodeValue rejectionReason = this.codeValueRepository
-                .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_REJECT_REASON, rejectionReasonId);
+        final CodeValue rejectionReason = requireCodeValue(ClientApiConstants.CLIENT_REJECT_REASON, rejectionReasonId);
         if (client.isNotPending()) {
             final String errorMessage = "Only clients pending activation may be withdrawn.";
             throw new InvalidClientStateTransitionException("rejection", "on.account.not.in.pending.activation.status", errorMessage,
@@ -907,8 +900,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate withdrawalDate = command.localDateValueOfParameterNamed(ClientApiConstants.withdrawalDateParamName);
         final Long withdrawalReasonId = command.longValueOfParameterNamed(ClientApiConstants.withdrawalReasonIdParamName);
-        final CodeValue withdrawalReason = this.codeValueRepository
-                .findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.CLIENT_WITHDRAW_REASON, withdrawalReasonId);
+        final CodeValue withdrawalReason = requireCodeValue(ClientApiConstants.CLIENT_WITHDRAW_REASON, withdrawalReasonId);
         if (client.isNotPending()) {
             final String errorMessage = "Only clients pending activation may be withdrawn.";
             throw new InvalidClientStateTransitionException("withdrawal", "on.account.not.in.pending.activation.status", errorMessage,
@@ -1030,13 +1022,21 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         return persisted;
     }
 
+    private CodeValue requireCodeValue(final String codeName, final Long codeValueId) {
+        final Object codeValue = this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
+        if (!(codeValue instanceof CodeValue persisted)) {
+            throw new CodeValueNotFoundException(codeName, codeValueId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
             final OfficePersistablePort officePersistablePort, final NoteWritePlatformService noteWritePlatformService,
             final GroupActivePort groupActivePort, final ClientDataValidator fromApiJsonDeserializer,
             final AccountNumberGenerator accountNumberGenerator, final StaffRepositoryWrapper staffRepository,
-            final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
+            final CodeValuePersistablePort codeValuePersistablePort, final LoanRepositoryWrapper loanRepositoryWrapper,
             final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService,
             final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService,
             final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper,
@@ -1054,7 +1054,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.accountNumberGenerator = accountNumberGenerator;
         this.staffRepository = staffRepository;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.savingsApplicationProcessWritePlatformService = savingsApplicationProcessWritePlatformService;
         this.commandProcessingService = commandProcessingService;
