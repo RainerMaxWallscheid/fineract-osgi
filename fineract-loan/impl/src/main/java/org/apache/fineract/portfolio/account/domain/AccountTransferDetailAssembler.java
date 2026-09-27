@@ -34,7 +34,8 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
@@ -45,17 +46,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountTransferDetailAssembler {
 
-    private final ClientRepositoryWrapper clientRepository;
+    private final ClientActivePort clientActivePort;
     private final OfficePersistablePort officePersistablePort;
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanAssembler loanAccountAssembler;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
     @Autowired
-    public AccountTransferDetailAssembler(final ClientRepositoryWrapper clientRepository,
-            final OfficePersistablePort officePersistablePort, final FromJsonHelper fromApiJsonHelper,
-            final LoanAssembler loanAccountAssembler) {
-        this.clientRepository = clientRepository;
+    public AccountTransferDetailAssembler(final ClientActivePort clientActivePort, final OfficePersistablePort officePersistablePort,
+            final FromJsonHelper fromApiJsonHelper, final LoanAssembler loanAccountAssembler) {
+        this.clientActivePort = clientActivePort;
         this.officePersistablePort = officePersistablePort;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanAccountAssembler = loanAccountAssembler;
@@ -96,11 +96,11 @@ public class AccountTransferDetailAssembler {
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
         final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
-        final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
+        final Client fromClient = requireClient(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
         final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
-        final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
+        final Client toClient = requireClient(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccountId, toOffice, toClient,
                 toSavingsAccountId, transfertype);
@@ -112,11 +112,11 @@ public class AccountTransferDetailAssembler {
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
         final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
-        final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
+        final Client fromClient = requireClient(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
         final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
-        final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
+        final Client toClient = requireClient(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
         return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccountId, toOffice, toClient, toLoanAccount,
                 transfertype);
@@ -128,11 +128,11 @@ public class AccountTransferDetailAssembler {
         final Long fromOfficeId = this.fromApiJsonHelper.extractLongNamed(fromOfficeIdParamName, element);
         final Long fromOffice = requireOffice(fromOfficeId);
         final Long fromClientId = this.fromApiJsonHelper.extractLongNamed(fromClientIdParamName, element);
-        final Client fromClient = this.clientRepository.findOneWithNotFoundDetection(fromClientId);
+        final Client fromClient = requireClient(fromClientId);
         final Long toOfficeId = this.fromApiJsonHelper.extractLongNamed(toOfficeIdParamName, element);
         final Long toOffice = requireOffice(toOfficeId);
         final Long toClientId = this.fromApiJsonHelper.extractLongNamed(toClientIdParamName, element);
-        final Client toClient = this.clientRepository.findOneWithNotFoundDetection(toClientId);
+        final Client toClient = requireClient(toClientId);
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
         return AccountTransferDetails.loanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccountId,
                 transfertype);
@@ -148,15 +148,26 @@ public class AccountTransferDetailAssembler {
         return officeId;
     }
 
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return persisted;
+    }
+
     public AccountTransferDetails assembleSavingsToLoanTransfer(final Long fromSavingsAccountId, final Loan toLoanAccount,
             Integer transferType) {
         final LinkedSavingsAccountView fromSavings = this.linkedSavingsAccountPort.requireById(fromSavingsAccountId);
         final Office fromOffice = (Office) this.linkedSavingsAccountPort.office(fromSavingsAccountId);
         final Client fromClient = fromSavings.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(fromSavings.getClientId());
+                : requireClient(fromSavings.getClientId());
         final Office toOffice = toLoanAccount.getOffice();
         final Client toClient = toLoanAccount.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(toLoanAccount.getClientId());
+                : requireClient(toLoanAccount.getClientId());
         return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccountId, toOffice, toClient, toLoanAccount,
                 transferType);
     }
@@ -167,10 +178,10 @@ public class AccountTransferDetailAssembler {
         final LinkedSavingsAccountView toSavings = this.linkedSavingsAccountPort.requireById(toSavingsAccountId);
         final Office fromOffice = (Office) this.linkedSavingsAccountPort.office(fromSavingsAccountId);
         final Client fromClient = fromSavings.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(fromSavings.getClientId());
+                : requireClient(fromSavings.getClientId());
         final Office toOffice = (Office) this.linkedSavingsAccountPort.office(toSavingsAccountId);
         final Client toClient = toSavings.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(toSavings.getClientId());
+                : requireClient(toSavings.getClientId());
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccountId, toOffice, toClient,
                 toSavingsAccountId, transferType);
     }
@@ -180,10 +191,10 @@ public class AccountTransferDetailAssembler {
         final LinkedSavingsAccountView toSavings = this.linkedSavingsAccountPort.requireById(toSavingsAccountId);
         final Office fromOffice = fromLoanAccount.getOffice();
         final Client fromClient = fromLoanAccount.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(fromLoanAccount.getClientId());
+                : requireClient(fromLoanAccount.getClientId());
         final Office toOffice = (Office) this.linkedSavingsAccountPort.office(toSavingsAccountId);
         final Client toClient = toSavings.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(toSavings.getClientId());
+                : requireClient(toSavings.getClientId());
         return AccountTransferDetails.loanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccountId,
                 transferType);
     }
@@ -191,10 +202,10 @@ public class AccountTransferDetailAssembler {
     public AccountTransferDetails assembleLoanToLoanTransfer(Loan fromLoanAccount, Loan toLoanAccount, Integer transferType) {
         final Office fromOffice = fromLoanAccount.getOffice();
         final Client fromClient = fromLoanAccount.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(fromLoanAccount.getClientId());
+                : requireClient(fromLoanAccount.getClientId());
         final Office toOffice = toLoanAccount.getOffice();
         final Client toClient = toLoanAccount.getClientId() == null ? null
-                : this.clientRepository.findOneWithNotFoundDetection(toLoanAccount.getClientId());
+                : requireClient(toLoanAccount.getClientId());
 
         return AccountTransferDetails.loanToLoanTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toLoanAccount,
                 transferType);
