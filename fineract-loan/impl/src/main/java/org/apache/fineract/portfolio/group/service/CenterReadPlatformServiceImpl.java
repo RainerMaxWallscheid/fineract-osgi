@@ -391,8 +391,8 @@ public class CenterReadPlatformServiceImpl implements CenterReadPlatformService 
     @Override
     public CenterData retrieveOne(final Long centerId) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
-            final String hierarchy = currentUser.getOffice().getHierarchy();
+            final Object currentUser = this.context.authenticatedUser();
+            final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
             final String hierarchySearchString = hierarchy + "%";
             final String sql = "select " + this.centerMapper.schema() + " where g.id = ? and o.hierarchy like ?";
             return this.jdbcTemplate.queryForObject(sql, this.centerMapper, new Object[] { centerId, hierarchySearchString }); // NOSONAR
