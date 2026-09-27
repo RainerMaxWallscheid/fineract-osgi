@@ -33,7 +33,9 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
+import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.account.domain.AccountAssociations;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationsRepository;
@@ -81,7 +83,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
 
     private static final Logger LOG = LoggerFactory.getLogger(GuarantorWritePlatformServiceJpaRepositoryIImpl.class);
 
-    private final StaffRepositoryWrapper staffRepositoryWrapper;
+    private final StaffPersistablePort staffPersistablePort;
     private final GroupRepositoryWrapper groupRepositoryWrapper;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final GuarantorRepository guarantorRepository;
@@ -92,7 +94,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
 
     @Autowired
     public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
-            final GuarantorRepository guarantorRepository, final StaffRepositoryWrapper staffRepositoryWrapper,
+            final GuarantorRepository guarantorRepository, final StaffPersistablePort staffPersistablePort,
             final GroupRepositoryWrapper groupRepositoryWrapper, final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
             final CodeValuePersistablePort codeValuePersistablePort, final AccountAssociationsRepository accountAssociationsRepository,
             final GuarantorDomainService guarantorDomainService) {
@@ -100,7 +102,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         this.groupRepositoryWrapper = groupRepositoryWrapper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.guarantorRepository = guarantorRepository;
-        this.staffRepositoryWrapper = staffRepositoryWrapper;
+        this.staffPersistablePort = staffPersistablePort;
         this.codeValuePersistablePort = codeValuePersistablePort;
         this.accountAssociationsRepository = accountAssociationsRepository;
         this.guarantorDomainService = guarantorDomainService;
@@ -157,7 +159,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                         /** Get the right guarantor based on guarantorType **/
                         String defaultUserMessage = null;
                         if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
-                            defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                            defaultUserMessage = requireStaff(entityId).getDisplayName();
                         } else if (guarantorTypeId.equals(GuarantorType.GROUP.getValue())) {
                             defaultUserMessage = this.groupRepositoryWrapper.findOneWithNotFoundDetection(entityId).getName();
                         } else {
@@ -248,7 +250,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                             && !guarantorForUpdate.getId().equals(guarantor.getId())) {
                         String defaultUserMessage = null;
                         if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
-                            defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                            defaultUserMessage = requireStaff(entityId).getDisplayName();
                         } else if (guarantorTypeId.equals(GuarantorType.GROUP.getValue())) {
                             defaultUserMessage = this.groupRepositoryWrapper.findOneWithNotFoundDetection(entityId).getName();
                         } else {
@@ -345,6 +347,17 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
     }
 
+    private Staff requireStaff(final Long staffId) {
+        if (staffId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object staff = this.staffPersistablePort.persistableById(staffId);
+        if (!(staff instanceof Staff persisted)) {
+            throw new StaffNotFoundException(staffId);
+        }
+        return persisted;
+    }
+
     private void validateGuarantorBusinessRules(final Guarantor guarantor) {
         // validate guarantor conditions
         if (guarantor.isExistingCustomer()) {
@@ -363,7 +376,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             }
 
         } else if (guarantor.isExistingEmployee()) {
-            this.staffRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
+            requireStaff(guarantor.getEntityId());
         } else if (guarantor.isExistingGroup()) {
             // check group exists
             this.groupRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
