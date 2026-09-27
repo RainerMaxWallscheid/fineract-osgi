@@ -53,8 +53,9 @@ import org.apache.fineract.portfolio.client.domain.ClientTransferDetails;
 import org.apache.fineract.portfolio.client.domain.ClientTransferDetailsRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientHasBeenClosedException;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
+import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -78,7 +79,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final OfficePersistablePort officePersistablePort;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
-    private final GroupRepositoryWrapper groupRepository;
+    private final GroupActivePort groupActivePort;
     private final LoanWritePlatformService loanWritePlatformService;
     private LinkedSavingsAccountPort linkedSavingsAccountPort;
 
@@ -100,9 +101,9 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     @Transactional
     public CommandProcessingResult transferClientsBetweenGroups(final Long sourceGroupId, final JsonCommand jsonCommand) {
         this.transfersDataValidator.validateForClientsTransferBetweenGroups(jsonCommand.json());
-        final Group sourceGroup = this.groupRepository.findOneWithNotFoundDetection(sourceGroupId);
+        final Group sourceGroup = requireGroup(sourceGroupId);
         final Long destinationGroupId = jsonCommand.longValueOfParameterNamed(TransferApiConstants.destinationGroupIdParamName);
-        final Group destinationGroup = this.groupRepository.findOneWithNotFoundDetection(destinationGroupId);
+        final Group destinationGroup = requireGroup(destinationGroupId);
         final Long staffId = jsonCommand.longValueOfParameterNamed(TransferApiConstants.newStaffIdParamName);
         final Boolean inheritDestinationGroupLoanOfficer = jsonCommand
                 .booleanObjectValueOfParameterNamed(TransferApiConstants.inheritDestinationGroupLoanOfficer);
@@ -358,7 +359,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
             staff = this.staffRepositoryWrapper.findByOfficeHierarchyWithNotFoundDetection(staffId, destinationOffice.getHierarchy());
         }
         if (transferEventType.isAcceptance() && destinationGroupId != null) {
-            destinationGroup = this.groupRepository.findByOfficeWithNotFoundDetection(destinationGroupId, destinationOffice);
+            destinationGroup = requireGroupInOffice(destinationGroupId, destinationOffice);
         }
         if (this.loanRepositoryWrapper.doNonClosedLoanAccountsExistForClient(client.getId())) {
             // get each individual loan for the client
@@ -486,6 +487,25 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         return clients;
     }
 
+    private Group requireGroup(final Long groupId) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object group = this.groupActivePort.persistableById(groupId);
+        if (!(group instanceof Group persisted)) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
+    }
+
+    private Group requireGroupInOffice(final Long groupId, final Office office) {
+        final Group group = requireGroup(groupId);
+        if (!group.getOffice().getId().equals(office.getId())) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return group;
+    }
+
     private void validateClientAwaitingTransferAcceptance(final Client client) {
         if (!client.isTransferInProgress()) {
             throw new ClientNotAwaitingTransferApprovalException(client.getId());
@@ -516,7 +536,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
     @java.lang.SuppressWarnings("all")
     public TransferWritePlatformServiceJpaRepositoryImpl(final ClientRepositoryWrapper clientRepositoryWrapper,
             final OfficePersistablePort officePersistablePort, final CalendarInstanceLookupPort calendarInstanceRepository,
-            final GroupRepositoryWrapper groupRepository, final LoanWritePlatformService loanWritePlatformService,
+            final GroupActivePort groupActivePort, final LoanWritePlatformService loanWritePlatformService,
             final LoanRepositoryWrapper loanRepositoryWrapper, final TransfersDataValidator transfersDataValidator,
             final StaffRepositoryWrapper staffRepositoryWrapper,
             final ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, final PlatformSecurityContext context,
@@ -525,7 +545,7 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.officePersistablePort = officePersistablePort;
         this.calendarInstanceRepository = calendarInstanceRepository;
-        this.groupRepository = groupRepository;
+        this.groupActivePort = groupActivePort;
         this.loanWritePlatformService = loanWritePlatformService;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.transfersDataValidator = transfersDataValidator;

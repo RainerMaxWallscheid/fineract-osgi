@@ -26,7 +26,7 @@ import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.service.CalendarInstanceLookupPort;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.ClientTransferDetailsRepositoryWrapper;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
+import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOfficerService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
@@ -44,13 +44,13 @@ public class TransferConfiguration {
     @ConditionalOnMissingBean(TransferWritePlatformService.class)
     public TransferWritePlatformService transferWritePlatformService(ClientRepositoryWrapper clientRepositoryWrapper,
             OfficePersistablePort officePersistablePort, CalendarInstanceLookupPort calendarInstanceRepository,
-            LoanWritePlatformService loanWritePlatformService, GroupRepositoryWrapper groupRepository,
+            LoanWritePlatformService loanWritePlatformService, GroupActivePort groupActivePort,
             LoanRepositoryWrapper loanRepositoryWrapper, TransfersDataValidator transfersDataValidator,
             StaffRepositoryWrapper staffRepositoryWrapper, ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper,
             PlatformSecurityContext context, LoanOfficerService loanOfficerService,
             TransactionBoundApplicationEventPublisher eventPublisher, BusinessEventNotifierService businessEventNotifierService) {
         return new TransferWritePlatformServiceJpaRepositoryImpl(clientRepositoryWrapper, officePersistablePort, calendarInstanceRepository,
-                groupRepository, loanWritePlatformService, loanRepositoryWrapper, transfersDataValidator, staffRepositoryWrapper,
+                groupActivePort, loanWritePlatformService, loanRepositoryWrapper, transfersDataValidator, staffRepositoryWrapper,
                 clientTransferDetailsRepositoryWrapper, context, loanOfficerService, eventPublisher, businessEventNotifierService);
     }
 }
