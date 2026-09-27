@@ -35,7 +35,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientFamilyMembers;
 import org.apache.fineract.portfolio.client.domain.ClientFamilyMembersRepository;
-import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.client.serialization.ClientFamilyMemberCommandFromApiJsonDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,19 +50,30 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
     private final PlatformSecurityContext context;
     private final CodeValueRepository codeValueRepository;
     private final ClientFamilyMembersRepository clientFamilyRepository;
-    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final ClientActivePort clientActivePort;
     private final ClientFamilyMemberCommandFromApiJsonDeserializer apiJsonDeserializer;
 
     @Autowired
     public ClientFamilyMembersWritePlatformServiceImpl(final PlatformSecurityContext context, final CodeValueRepository codeValueRepository,
-            final ClientFamilyMembersRepository clientFamilyRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
+            final ClientFamilyMembersRepository clientFamilyRepository, final ClientActivePort clientActivePort,
             final ClientFamilyMemberCommandFromApiJsonDeserializer apiJsonDeserializer) {
         this.context = context;
         this.codeValueRepository = codeValueRepository;
         this.clientFamilyRepository = clientFamilyRepository;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.clientActivePort = clientActivePort;
         this.apiJsonDeserializer = apiJsonDeserializer;
 
+    }
+
+    private Client requireClient(final Long clientId) {
+        if (clientId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object client = this.clientActivePort.persistableById(clientId);
+        if (!(client instanceof Client persisted)) {
+            throw new ClientNotFoundException(clientId);
+        }
+        return persisted;
     }
 
     @Override
@@ -87,7 +99,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
         this.context.authenticatedUser();
         apiJsonDeserializer.validateForCreate(clientId, command.json());
 
-        Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        Client client = requireClient(clientId);
         firstName = command.stringValueOfParameterNamed("firstName");
         middleName = command.stringValueOfParameterNamed("middleName");
         lastName = command.stringValueOfParameterNamed("lastName");
@@ -152,7 +164,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
 
         this.context.authenticatedUser();
 
-        final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+        final Client client = requireClient(clientId);
 
         ClientFamilyMembers familyMember = new ClientFamilyMembers();
 
