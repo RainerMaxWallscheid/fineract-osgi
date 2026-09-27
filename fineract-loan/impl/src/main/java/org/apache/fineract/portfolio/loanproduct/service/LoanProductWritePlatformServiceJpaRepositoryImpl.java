@@ -23,8 +23,10 @@ import com.google.gson.JsonObject;
 import jakarta.persistence.PersistenceException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.accounting.moduleapi.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -68,7 +70,8 @@ import org.apache.fineract.portfolio.loanproduct.exception.LoanProductDateExcept
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
 import org.apache.fineract.portfolio.rate.domain.Rate;
-import org.apache.fineract.portfolio.rate.domain.RateRepositoryWrapper;
+import org.apache.fineract.portfolio.rate.exception.RateNotFoundException;
+import org.apache.fineract.portfolio.rate.moduleapi.RatePersistablePort;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,7 +86,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final AprCalculator aprCalculator;
     private final FundPersistablePort fundPersistablePort;
     private final ChargeDefinitionPort chargeDefinitionPort;
-    private final RateRepositoryWrapper rateRepository;
+    private final RatePersistablePort ratePersistablePort;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
     private final OfficeProductRestrictionService fineractEntityAccessUtil;
     private final FloatingRatePort floatingRatePort;
@@ -341,10 +344,38 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                         idList.add(jsonObject.get("id").getAsLong());
                     }
                 }
-                rates.addAll(this.rateRepository.findMultipleWithNotFoundDetection(idList));
+                rates.addAll(requireRates(idList));
             }
         }
         return rates;
+    }
+
+    /**
+     * Same contract as leftover {@code findMultipleWithNotFoundDetection}: an empty list is empty, a null id or a
+     * missing id throws {@link RateNotFoundException} (not {@code IllegalArgumentException}), and duplicate ids are
+     * returned once.
+     */
+    private List<Rate> requireRates(final List<Long> rateIds) {
+        final List<Rate> rates = new ArrayList<>();
+        if (rateIds == null || rateIds.isEmpty()) {
+            return rates;
+        }
+        final Set<Long> seen = new HashSet<>();
+        for (final Long rateId : rateIds) {
+            final Rate rate = requireRate(rateId);
+            if (seen.add(this.ratePersistablePort.id(rate))) {
+                rates.add(rate);
+            }
+        }
+        return rates;
+    }
+
+    private Rate requireRate(final Long rateId) {
+        final Object rate = this.ratePersistablePort.persistableById(rateId);
+        if (!(rate instanceof Rate persisted)) {
+            throw new RateNotFoundException(rateId);
+        }
+        return persisted;
     }
 
     /*
@@ -397,7 +428,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository,
             final AprCalculator aprCalculator, final FundPersistablePort fundPersistablePort, final ChargeDefinitionPort chargeDefinitionPort,
-            final RateRepositoryWrapper rateRepository,
+            final RatePersistablePort ratePersistablePort,
             final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
             final OfficeProductRestrictionService fineractEntityAccessUtil, final FloatingRatePort floatingRatePort,
             final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService,
@@ -412,7 +443,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         this.aprCalculator = aprCalculator;
         this.fundPersistablePort = fundPersistablePort;
         this.chargeDefinitionPort = chargeDefinitionPort;
-        this.rateRepository = rateRepository;
+        this.ratePersistablePort = ratePersistablePort;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
         this.floatingRatePort = floatingRatePort;

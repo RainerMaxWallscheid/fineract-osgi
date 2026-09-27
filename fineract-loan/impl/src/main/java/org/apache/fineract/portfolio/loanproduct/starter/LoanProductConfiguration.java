@@ -44,7 +44,7 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatform
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductWritePlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.rate.domain.RateRepositoryWrapper;
+import org.apache.fineract.portfolio.rate.moduleapi.RatePersistablePort;
 import org.apache.fineract.portfolio.rate.service.RateReadService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -75,7 +75,7 @@ public class LoanProductConfiguration {
     @ConditionalOnMissingBean(LoanProductWritePlatformService.class)
     public LoanProductWritePlatformService loanProductWritePlatformService(PlatformSecurityContext context,
             LoanProductDataValidator fromApiJsonDeserializer, LoanProductRepository loanProductRepository, AprCalculator aprCalculator,
-            FundPersistablePort fundPersistablePort, ChargeDefinitionPort chargeDefinitionPort, RateRepositoryWrapper rateRepository,
+            FundPersistablePort fundPersistablePort, ChargeDefinitionPort chargeDefinitionPort, RatePersistablePort ratePersistablePort,
             ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
             OfficeProductRestrictionService fineractEntityAccessUtil, FloatingRatePort floatingRatePort,
             LoanRepositoryWrapper loanRepositoryWrapper, BusinessEventNotifierService businessEventNotifierService,
@@ -84,7 +84,7 @@ public class LoanProductConfiguration {
             AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, CreditAllocationsJsonParser creditAllocationsJsonParser,
             LoanProductAssembler loanProductAssembler, LoanProductUpdateUtil loanProductUpdateUtil) {
         return new LoanProductWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, loanProductRepository, aprCalculator,
-                fundPersistablePort, chargeDefinitionPort, rateRepository, accountMappingWritePlatformService, fineractEntityAccessUtil,
+                fundPersistablePort, chargeDefinitionPort, ratePersistablePort, accountMappingWritePlatformService, fineractEntityAccessUtil,
                 floatingRatePort, loanRepositoryWrapper, businessEventNotifierService, delinquencyBucketRepository,
                 loanRepaymentScheduleTransactionProcessorFactory, advancedPaymentJsonParser, creditAllocationsJsonParser,
                 loanProductAssembler, loanProductUpdateUtil);
