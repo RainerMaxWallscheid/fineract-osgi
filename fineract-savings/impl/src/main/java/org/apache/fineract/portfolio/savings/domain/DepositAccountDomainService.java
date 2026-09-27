@@ -50,7 +50,7 @@ public interface DepositAccountDomainService {
     Long handleRDAccountClosure(RecurringDepositAccount account, Object paymentDetail, Object user, JsonCommand command,
             Map<String, Object> changes);
 
-    Long handleFDAccountPreMatureClosure(FixedDepositAccount account, Object paymentDetail, AppUser user, JsonCommand command,
+    Long handleFDAccountPreMatureClosure(FixedDepositAccount account, Object paymentDetail, Object user, JsonCommand command,
             Map<String, Object> changes);
 
     Long handleRDAccountPreMatureClosure(RecurringDepositAccount account, Object paymentDetail, AppUser user, JsonCommand command,
