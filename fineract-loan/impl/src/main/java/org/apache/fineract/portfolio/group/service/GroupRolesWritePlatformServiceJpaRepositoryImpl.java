@@ -20,7 +20,8 @@ package org.apache.fineract.portfolio.group.service;
 
 import java.util.Map;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -48,7 +49,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     private final PlatformSecurityContext context;
     private final GroupActivePort groupActivePort;
     private final GroupRolesDataValidator fromApiJsonDeserializer;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final ClientRepositoryWrapper clientRepository;
     private final GroupRoleRepositoryWrapper groupRoleRepository;
 
@@ -58,7 +59,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreateGroupRole(command);
             final Long roleId = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
-            final CodeValue role = this.codeValueRepository.findOneWithNotFoundDetection(roleId);
+            final CodeValue role = requireCodeValue(roleId);
             final Long clientId = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             final Group group = requireGroup(command.getGroupId());
@@ -107,7 +108,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
                 final Long newValue = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
                 CodeValue role = null;
                 if (newValue != null) {
-                    role = this.codeValueRepository.findOneWithNotFoundDetection(newValue);
+                    role = requireCodeValue(newValue);
                 }
                 groupRole.updateRole(role);
             }
@@ -148,12 +149,12 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     @java.lang.SuppressWarnings("all")
     public GroupRolesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final GroupActivePort groupActivePort, final GroupRolesDataValidator fromApiJsonDeserializer,
-            final CodeValueRepositoryWrapper codeValueRepository, final ClientRepositoryWrapper clientRepository,
+            final CodeValuePersistablePort codeValuePersistablePort, final ClientRepositoryWrapper clientRepository,
             final GroupRoleRepositoryWrapper groupRoleRepository) {
         this.context = context;
         this.groupActivePort = groupActivePort;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.clientRepository = clientRepository;
         this.groupRoleRepository = groupRoleRepository;
     }
@@ -165,6 +166,17 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
         final Object group = this.groupActivePort.persistableById(groupId);
         if (!(group instanceof Group persisted)) {
             throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
+    }
+
+    private CodeValue requireCodeValue(final Long codeValueId) {
+        if (codeValueId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object codeValue = this.codeValuePersistablePort.persistableById(codeValueId);
+        if (!(codeValue instanceof CodeValue persisted)) {
+            throw new CodeValueNotFoundException(codeValueId);
         }
         return persisted;
     }

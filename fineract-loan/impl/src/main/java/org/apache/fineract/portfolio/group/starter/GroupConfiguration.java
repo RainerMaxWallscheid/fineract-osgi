@@ -22,6 +22,7 @@ package org.apache.fineract.portfolio.group.starter;
 import org.apache.fineract.commands.service.CommandProcessingService;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.PaginationParametersDataValidator;
@@ -132,9 +133,9 @@ public class GroupConfiguration {
     @ConditionalOnMissingBean(GroupRolesWritePlatformService.class)
     public GroupRolesWritePlatformService groupRolesWritePlatformService(PlatformSecurityContext context,
             GroupActivePort groupActivePort, GroupRolesDataValidator fromApiJsonDeserializer,
-            CodeValueRepositoryWrapper codeValueRepository, ClientRepositoryWrapper clientRepository,
+            CodeValuePersistablePort codeValuePersistablePort, ClientRepositoryWrapper clientRepository,
             GroupRoleRepositoryWrapper groupRoleRepository) {
-        return new GroupRolesWritePlatformServiceJpaRepositoryImpl(context, groupActivePort, fromApiJsonDeserializer, codeValueRepository,
-                clientRepository, groupRoleRepository);
+        return new GroupRolesWritePlatformServiceJpaRepositoryImpl(context, groupActivePort, fromApiJsonDeserializer,
+                codeValuePersistablePort, clientRepository, groupRoleRepository);
     }
 }
