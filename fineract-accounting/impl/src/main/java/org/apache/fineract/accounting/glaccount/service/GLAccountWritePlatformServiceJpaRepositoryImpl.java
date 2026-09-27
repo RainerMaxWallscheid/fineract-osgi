@@ -38,7 +38,8 @@ import org.apache.fineract.accounting.glaccount.serialization.GLAccountCommandFr
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -61,7 +62,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
     private final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final JdbcTemplate jdbcTemplate;
 
     @Transactional
@@ -219,28 +220,43 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     }
 
     private CodeValue retrieveTagId(final Long tagId, final GLAccountType accountType) {
-        CodeValue glAccountTagType = null;
-        if (accountType.isAssetType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME, tagId);
-        } else if (accountType.isLiabilityType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME, tagId);
-        } else if (accountType.isEquityType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EQUITY_TAG_OPTION_CODE_NAME, tagId);
-        } else if (accountType.isIncomeType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.INCOME_TAG_OPTION_CODE_NAME, tagId);
-        } else if (accountType.isExpenseType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EXPENSES_TAG_OPTION_CODE_NAME, tagId);
+        final String codeName = tagCodeName(accountType);
+        if (codeName == null) {
+            return null;
         }
-        return glAccountTagType;
+        return requireCodeValue(codeName, tagId);
+    }
+
+    private String tagCodeName(final GLAccountType accountType) {
+        if (accountType.isAssetType()) {
+            return AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME;
+        } else if (accountType.isLiabilityType()) {
+            return AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME;
+        } else if (accountType.isEquityType()) {
+            return AccountingConstants.EQUITY_TAG_OPTION_CODE_NAME;
+        } else if (accountType.isIncomeType()) {
+            return AccountingConstants.INCOME_TAG_OPTION_CODE_NAME;
+        } else if (accountType.isExpenseType()) {
+            return AccountingConstants.EXPENSES_TAG_OPTION_CODE_NAME;
+        }
+        return null;
+    }
+
+    private CodeValue requireCodeValue(final String codeName, final Long codeValueId) {
+        final Object codeValue = this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
+        if (!(codeValue instanceof CodeValue persisted)) {
+            throw new CodeValueNotFoundException(codeName, codeValueId);
+        }
+        return persisted;
     }
 
     @java.lang.SuppressWarnings("all")
-        public GLAccountWritePlatformServiceJpaRepositoryImpl(final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final JdbcTemplate jdbcTemplate) {
+        public GLAccountWritePlatformServiceJpaRepositoryImpl(final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValuePersistablePort codeValuePersistablePort, final JdbcTemplate jdbcTemplate) {
         this.glAccountRepository = glAccountRepository;
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.jdbcTemplate = jdbcTemplate;
     }
 }
