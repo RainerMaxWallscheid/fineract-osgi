@@ -47,8 +47,8 @@ import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketReposit
 import org.apache.fineract.portfolio.delinquency.exception.DelinquencyBucketNotFoundException;
 import org.apache.fineract.portfolio.floatingrates.moduleapi.FloatingRatePort;
 import org.apache.fineract.portfolio.fund.domain.Fund;
-import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
+import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeOffBehaviour;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleTransactionProcessorFactory;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -81,7 +81,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final LoanProductDataValidator fromApiJsonDeserializer;
     private final LoanProductRepository loanProductRepository;
     private final AprCalculator aprCalculator;
-    private final FundRepository fundRepository;
+    private final FundPersistablePort fundPersistablePort;
     private final ChargeDefinitionPort chargeDefinitionPort;
     private final RateRepositoryWrapper rateRepository;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
@@ -155,9 +155,17 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private Fund findFundByIdIfProvided(final Long fundId) {
         Fund fund = null;
         if (fundId != null) {
-            fund = this.fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId));
+            fund = requireFund(fundId);
         }
         return fund;
+    }
+
+    private Fund requireFund(final Long fundId) {
+        final Object fund = this.fundPersistablePort.persistableById(fundId);
+        if (!(fund instanceof Fund persisted)) {
+            throw new FundNotFoundException(fundId);
+        }
+        return persisted;
     }
 
     private DelinquencyBucket findDelinquencyBucketIdIfProvided(final Long delinquencyBucketId) {
@@ -388,7 +396,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     @java.lang.SuppressWarnings("all")
     public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository,
-            final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort,
+            final AprCalculator aprCalculator, final FundPersistablePort fundPersistablePort, final ChargeDefinitionPort chargeDefinitionPort,
             final RateRepositoryWrapper rateRepository,
             final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
             final OfficeProductRestrictionService fineractEntityAccessUtil, final FloatingRatePort floatingRatePort,
@@ -402,7 +410,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;
         this.aprCalculator = aprCalculator;
-        this.fundRepository = fundRepository;
+        this.fundPersistablePort = fundPersistablePort;
         this.chargeDefinitionPort = chargeDefinitionPort;
         this.rateRepository = rateRepository;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
