@@ -21,7 +21,9 @@ package org.apache.fineract.organisation.staff.adapter;
 import static java.util.Objects.nonNull;
 import java.util.Optional;
 import org.apache.fineract.infrastructure.documentmanagement.adapter.EntityImageIdAdapter;
+import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ class StaffImageIdAdapter implements EntityImageIdAdapter {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffImageIdAdapter.class);
     private static final String ENTITY_TYPE = "staff";
     private final StaffRepository repository;
+    private final StaffPersistablePort staffPersistablePort;
 
     @Override
     public boolean accept(String entityType) {
@@ -41,7 +44,14 @@ class StaffImageIdAdapter implements EntityImageIdAdapter {
     @Override
     @Transactional(readOnly = true)
     public Optional<ImageIdResult> get(Long entityId) {
-        return repository.findById(entityId).filter(staff -> nonNull(staff.getImageId())).map(staff -> ImageIdResult.builder().id(staff.getImageId()).displayName(staff.getDisplayName()).build());
+        if (entityId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object staff = this.staffPersistablePort.persistableById(entityId);
+        if (!(staff instanceof Staff persisted) || !nonNull(persisted.getImageId())) {
+            return Optional.empty();
+        }
+        return Optional.of(ImageIdResult.builder().id(persisted.getImageId()).displayName(persisted.getDisplayName()).build());
     }
 
     @Override
@@ -57,7 +67,8 @@ class StaffImageIdAdapter implements EntityImageIdAdapter {
     }
 
     @java.lang.SuppressWarnings("all")
-        public StaffImageIdAdapter(final StaffRepository repository) {
+        public StaffImageIdAdapter(final StaffRepository repository, final StaffPersistablePort staffPersistablePort) {
         this.repository = repository;
+        this.staffPersistablePort = staffPersistablePort;
     }
 }
