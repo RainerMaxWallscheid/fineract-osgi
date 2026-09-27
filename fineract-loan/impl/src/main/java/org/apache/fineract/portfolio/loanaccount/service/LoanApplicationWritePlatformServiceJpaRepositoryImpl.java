@@ -87,7 +87,6 @@ import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyTy
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.moduleapi.LinkedSavingsAccountPort;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -529,7 +528,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     @Transactional
     @Override
     public CommandProcessingResult approveApplication(final Long loanId, final JsonCommand command) {
-        final AppUser currentUser = getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         loanApplicationValidator.validateApproval(command, loanId);
         Pair<Loan, Map<String, Object>> loanAndChanges = loanScheduleAssembler.assembleLoanApproval(currentUser, command, loanId);
         final Loan loan = loanAndChanges.getLeft();
@@ -649,7 +648,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         entityDatatableChecksWritePlatformService.runTheCheckForProduct(loanId, EntityTables.LOAN.getName(), StatusEnum.REJECTED.getValue(),
                 EntityTables.LOAN.getForeignKeyColumnNameOnDatatable(), loan.productId());
         // loan application rejection
-        final AppUser currentUser = getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         loanLifecycleStateMachine.transition(LoanEvent.LOAN_REJECTED, loan);
         final Map<String, Object> changes = loanAssembler.updateLoanApplicationAttributesForRejection(loan, command, currentUser);
         if (!changes.isEmpty()) {
@@ -684,7 +683,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         entityDatatableChecksWritePlatformService.runTheCheckForProduct(loanId, EntityTables.LOAN.getName(),
                 StatusEnum.WITHDRAWN.getValue(), EntityTables.LOAN.getForeignKeyColumnNameOnDatatable(), loan.productId());
         // loan application withdrawal
-        final AppUser currentUser = getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         loanLifecycleStateMachine.transition(LoanEvent.LOAN_WITHDRAWN, loan);
         final Map<String, Object> changes = loanAssembler.updateLoanApplicationAttributesForWithdrawal(loan, command, currentUser);
         // Release attached collaterals
@@ -716,8 +715,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         return loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
     }
 
-    private AppUser getAppUserIfPresent() {
-        AppUser user = null;
+    private Object getAppUserIfPresent() {
+        Object user = null;
         if (this.context != null) {
             user = this.context.getAuthenticatedUserIfPresent();
         }
