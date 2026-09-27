@@ -390,7 +390,7 @@ public class AccountingProcessorHelper {
      * @param amount
      * @param isReversal
      */
-    public void createCashBasedJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createCashBasedJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         int accountTypeToDebitId = accountTypeToBeDebited;
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
@@ -482,7 +482,7 @@ public class AccountingProcessorHelper {
         createCreditJournalEntryForLoan(office, currencyCode, creditAccount, loanId, transactionId, transactionDate, amount);
     }
 
-    private void createJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToDebitId, final int accountTypeToCreditId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createJournalEntriesForSavings(final Object office, final String currencyCode, final int accountTypeToDebitId, final int accountTypeToCreditId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final GLAccount debitAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);
         final GLAccount creditAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToCreditId, paymentTypeId);
         createDebitJournalEntryForSavings(office, currencyCode, debitAccount, savingsId, transactionId, transactionDate, amount);
@@ -509,7 +509,7 @@ public class AccountingProcessorHelper {
      * @param isReversal
      * @param taxDetails
      */
-    public void createCashBasedJournalEntriesAndReversalsForSavingsTax(final Office office, final String currencyCode, final CashAccountsForSavings accountTypeToBeDebited, final CashAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal, final List<TaxPaymentDTO> taxDetails) {
+    public void createCashBasedJournalEntriesAndReversalsForSavingsTax(final Object office, final String currencyCode, final CashAccountsForSavings accountTypeToBeDebited, final CashAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal, final List<TaxPaymentDTO> taxDetails) {
         for (TaxPaymentDTO taxPaymentDTO : taxDetails) {
             if (taxPaymentDTO.getAmount() != null) {
                 if (taxPaymentDTO.getCreditAccountId() == null) {
@@ -522,7 +522,7 @@ public class AccountingProcessorHelper {
         createCashBasedDebitJournalEntriesAndReversalsForSavings(office, currencyCode, accountTypeToBeDebited.getValue(), savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount, isReversal);
     }
 
-    public void createAccrualBasedJournalEntriesAndReversalsForSavingsTax(final Office office, final String currencyCode, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeDebited, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal, final List<TaxPaymentDTO> taxDetails) {
+    public void createAccrualBasedJournalEntriesAndReversalsForSavingsTax(final Object office, final String currencyCode, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeDebited, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal, final List<TaxPaymentDTO> taxDetails) {
         for (TaxPaymentDTO taxPaymentDTO : taxDetails) {
             if (taxPaymentDTO.getAmount() != null) {
                 if (taxPaymentDTO.getCreditAccountId() == null) {
@@ -535,7 +535,7 @@ public class AccountingProcessorHelper {
         createAccrualBasedDebitJournalEntriesAndReversalsForSavings(office, currencyCode, accountTypeToBeDebited.getValue(), savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount, isReversal);
     }
 
-    public void createCashBasedDebitJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Integer accountTypeToBeDebited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createCashBasedDebitJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Integer accountTypeToBeDebited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         if (isReversal) {
             createCreditJournalEntriesForSavings(office, currencyCode, accountTypeToBeDebited, savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount);
@@ -544,7 +544,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createCashBasedCreditJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createCashBasedCreditJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         if (isReversal) {
             createDebitJournalEntriesForSavings(office, currencyCode, accountTypeToBeCredited, savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount);
@@ -553,7 +553,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createCashBasedCreditJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Long creditAccountId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createCashBasedCreditJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Long creditAccountId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         final Long accountId = requireGlAccountId(creditAccountId);
         if (isReversal) {
@@ -563,7 +563,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createAccrualBasedDebitJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Integer accountTypeToBeDebited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createAccrualBasedDebitJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Integer accountTypeToBeDebited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         if (isReversal) {
             createCreditJournalEntriesForSavings(office, currencyCode, accountTypeToBeDebited, savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount);
@@ -572,7 +572,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createAccrualBasedCreditJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createAccrualBasedCreditJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Integer accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         if (isReversal) {
             createDebitJournalEntriesForSavings(office, currencyCode, accountTypeToBeCredited, savingsProductId, paymentTypeId, savingsId, transactionId, transactionDate, amount);
@@ -581,7 +581,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createAccrualBasedBasedCreditJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode, final Long creditAccountId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
+    public void createAccrualBasedBasedCreditJournalEntriesAndReversalsForSavings(final Object office, final String currencyCode, final Long creditAccountId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount, final Boolean isReversal) {
         // reverse debits and credits for reversals
         final Long accountId = requireGlAccountId(creditAccountId);
         if (isReversal) {
@@ -591,12 +591,12 @@ public class AccountingProcessorHelper {
         }
     }
 
-    private void createDebitJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToDebitId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createDebitJournalEntriesForSavings(final Object office, final String currencyCode, final int accountTypeToDebitId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final GLAccount debitAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);
         createDebitJournalEntryForSavings(office, currencyCode, debitAccount, savingsId, transactionId, transactionDate, amount);
     }
 
-    private void createCreditJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToCreditId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createCreditJournalEntriesForSavings(final Object office, final String currencyCode, final int accountTypeToCreditId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final GLAccount creditAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToCreditId, paymentTypeId);
         createCreditJournalEntryForSavings(office, currencyCode, creditAccount, savingsId, transactionId, transactionDate, amount);
     }
@@ -653,7 +653,7 @@ public class AccountingProcessorHelper {
      * @param chargePaymentDTOs
      *            chargePaymentDTOs
      */
-    public void createCashBasedJournalEntriesAndReversalsForSavingsCharges(final Office office, final String currencyCode, final CashAccountsForSavings accountTypeToBeDebited, CashAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final Boolean isReversal, final List<ChargePaymentDTO> chargePaymentDTOs) {
+    public void createCashBasedJournalEntriesAndReversalsForSavingsCharges(final Object office, final String currencyCode, final CashAccountsForSavings accountTypeToBeDebited, CashAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final Boolean isReversal, final List<ChargePaymentDTO> chargePaymentDTOs) {
         // TODO Vishwas: Remove this validation, as and when appropriate Junit
         // tests are written for accounting
         if (chargePaymentDTOs.size() != 1) {
@@ -676,7 +676,7 @@ public class AccountingProcessorHelper {
         }
     }
 
-    public void createAccrualBasedJournalEntriesAndReversalsForSavingsCharges(final Office office, final String currencyCode, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeDebited, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final Boolean isReversal, final List<ChargePaymentDTO> chargePaymentDTOs) {
+    public void createAccrualBasedJournalEntriesAndReversalsForSavingsCharges(final Object office, final String currencyCode, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeDebited, final AccountingConstants.AccrualAccountsForSavings accountTypeToBeCredited, final Long savingsProductId, final Long paymentTypeId, final Long loanId, final String transactionId, final LocalDate transactionDate, final BigDecimal totalAmount, final Boolean isReversal, final List<ChargePaymentDTO> chargePaymentDTOs) {
         // TODO Vishwas: Remove this validation, as and when appropriate Junit
         // tests are written for accounting
         if (chargePaymentDTOs.size() != 1) {
@@ -729,7 +729,7 @@ public class AccountingProcessorHelper {
         persistJournalEntry(journalEntry);
     }
 
-    private void createCreditJournalEntryForSavings(final Office office, final String currencyCode, final Object account, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) throws DataAccessException {
+    private void createCreditJournalEntryForSavings(final Object office, final String currencyCode, final Object account, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) throws DataAccessException {
         final boolean manualEntry = false;
         Long savingsAccountTransactionId = null;
         String modifiedTransactionId = transactionId;
@@ -805,7 +805,7 @@ public class AccountingProcessorHelper {
         return leftoverGlAccount(accountMapping.getGlAccountId());
     }
 
-    private void createDebitJournalEntryForSavings(final Office office, final String currencyCode, final Object account, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
+    private void createDebitJournalEntryForSavings(final Object office, final String currencyCode, final Object account, final Long savingsId, final String transactionId, final LocalDate transactionDate, final BigDecimal amount) {
         final boolean manualEntry = false;
         Long savingsAccountTransactionId = null;
         String modifiedTransactionId = transactionId;
