@@ -1386,7 +1386,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Transactional
     @Override
     public CommandProcessingResult writeOff(final Long loanId, final JsonCommand command) {
-        final AppUser currentUser = (AppUser) getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         this.loanTransactionValidator.validateTransactionWithNoAmount(command.json());
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put("transactionDate", command.stringValueOfParameterNamed("transactionDate"));
@@ -2980,7 +2980,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     }
 
     private Optional<LoanTransaction> closeAsWrittenOff(final Loan loan, final JsonCommand command, final Map<String, Object> changes,
-            final AppUser currentUser, final ScheduleGeneratorDTO scheduleGeneratorDTO) {
+            final Object currentUser, final ScheduleGeneratorDTO scheduleGeneratorDTO) {
         closeDisbursements(loan, scheduleGeneratorDTO);
         final LocalDate writtenOffOnLocalDate = command.localDateValueOfParameterNamed(TRANSACTION_DATE);
         loan.setClosedOnDate(writtenOffOnLocalDate);
