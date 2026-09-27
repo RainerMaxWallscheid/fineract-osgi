@@ -132,7 +132,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
             final String accountNo = command.stringValueOfParameterNamed(GroupingTypesApiConstants.accountNoParamName);
             final String name = command.stringValueOfParameterNamed(GroupingTypesApiConstants.nameParamName);
             final String externalId = command.stringValueOfParameterNamed(GroupingTypesApiConstants.externalIdParamName);
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             Long officeId = null;
             Group parentGroup = null;
             if (centerId == null) {
@@ -161,7 +161,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                 submittedOnDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.submittedOnDateParamName);
             }
             final Group newGroup = Group.newGroup(groupOffice, staff, parentGroup, groupLevel, name, externalId, active, activationDate,
-                    clientMembers, groupMembers, submittedOnDate, currentUser, accountNo);
+                    clientMembers, groupMembers, submittedOnDate, (AppUser) currentUser, accountNo);
             boolean rollbackTransaction = false;
             if (newGroup.isActive()) {
                 this.groupRepository.saveAndFlush(newGroup);
@@ -171,15 +171,15 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
                 }
                 if (newGroup.isCenter()) {
                     final CommandWrapper commandWrapper = new CommandWrapperBuilder().activateCenter(null).build();
-                    rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, currentUser);
+                    rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, (AppUser) currentUser);
                 } else {
                     final CommandWrapper commandWrapper = new CommandWrapperBuilder().activateGroup(null).build();
-                    rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, currentUser);
+                    rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, (AppUser) currentUser);
                 }
             }
             if (!newGroup.isCenter() && newGroup.hasActiveClients()) {
                 final CommandWrapper commandWrapper = new CommandWrapperBuilder().associateClientsToGroup(newGroup.getId()).build();
-                rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, currentUser);
+                rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, (AppUser) currentUser);
             }
             this.groupRepository.save(newGroup);
             // Account Number generation
