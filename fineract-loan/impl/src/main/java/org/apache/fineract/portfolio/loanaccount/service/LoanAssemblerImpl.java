@@ -60,8 +60,8 @@ import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralPort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.fund.domain.Fund;
-import org.apache.fineract.portfolio.fund.domain.FundRepository;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
+import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -119,7 +119,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final LoanRepositoryWrapper loanRepository;
     private final LoanProductRepository loanProductRepository;
     private final GroupRepositoryWrapper groupRepository;
-    private final FundRepository fundRepository;
+    private final FundPersistablePort fundPersistablePort;
     private final StaffPersistablePort staffPersistablePort;
     private final CodeValuePersistablePort codeValuePersistablePort;
     private final LoanScheduleAssembler loanScheduleAssembler;
@@ -394,9 +394,17 @@ public class LoanAssemblerImpl implements LoanAssembler {
     public Fund findFundByIdIfProvided(final Long fundId) {
         Fund fund = null;
         if (fundId != null) {
-            fund = this.fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId));
+            fund = requireFund(fundId);
         }
         return fund;
+    }
+
+    private Fund requireFund(final Long fundId) {
+        final Object fund = this.fundPersistablePort.persistableById(fundId);
+        if (!(fund instanceof Fund persisted)) {
+            throw new FundNotFoundException(fundId);
+        }
+        return persisted;
     }
 
     @Override
@@ -850,7 +858,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
     @java.lang.SuppressWarnings("all")
     public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository,
             final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository,
-            final FundRepository fundRepository, final StaffPersistablePort staffPersistablePort,
+            final FundPersistablePort fundPersistablePort, final StaffPersistablePort staffPersistablePort,
             final CodeValuePersistablePort codeValuePersistablePort, final LoanScheduleAssembler loanScheduleAssembler,
             final LoanChargeAssembler loanChargeAssembler, final LoanCollateralPort loanCollateralPort,
             final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
@@ -868,7 +876,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.loanRepository = loanRepository;
         this.loanProductRepository = loanProductRepository;
         this.groupRepository = groupRepository;
-        this.fundRepository = fundRepository;
+        this.fundPersistablePort = fundPersistablePort;
         this.staffPersistablePort = staffPersistablePort;
         this.codeValuePersistablePort = codeValuePersistablePort;
         this.loanScheduleAssembler = loanScheduleAssembler;
