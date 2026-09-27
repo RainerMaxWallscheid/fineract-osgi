@@ -145,8 +145,8 @@ public class GroupReadPlatformServiceImpl implements GroupReadPlatformService {
 
     @Override
     public Collection<GroupGeneralData> retrieveAll(SearchParameters searchParameters, final PaginationParameters parameters) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select ");
