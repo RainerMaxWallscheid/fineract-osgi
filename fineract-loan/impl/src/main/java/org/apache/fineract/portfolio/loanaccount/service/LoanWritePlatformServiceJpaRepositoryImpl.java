@@ -1637,8 +1637,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
     @Transactional
     @Override
-    public LoanTransaction acceptLoanTransfer(final Loan loan, final LocalDate transferDate, final Office acceptedInOffice,
-            final Staff loanOfficer) {
+    public LoanTransaction acceptLoanTransfer(final Loan loan, final LocalDate transferDate, final Object acceptedInOffice,
+            final Object loanOfficer) {
         businessEventNotifierService.notifyPreBusinessEvent(new LoanAcceptTransferBusinessEvent(loan));
         ExternalId externalId = externalIdFactory.create();
         final LoanTransaction newTransferAcceptanceTransaction = LoanTransaction.approveTransfer(acceptedInOffice, loan, transferDate,

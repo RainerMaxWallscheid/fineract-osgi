@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
@@ -84,7 +82,7 @@ public interface LoanWritePlatformService {
 
     void rejectLoanTransfer(Loan loan);
 
-    LoanTransaction acceptLoanTransfer(Loan loan, LocalDate transferDate, Office acceptedInOffice, Staff loanOfficer);
+    LoanTransaction acceptLoanTransfer(Loan loan, LocalDate transferDate, Object acceptedInOffice, Object loanOfficer);
 
     CommandProcessingResult undoWriteOff(Long loanId);
 
