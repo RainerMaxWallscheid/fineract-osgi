@@ -60,10 +60,10 @@ public class NotificationConfiguration {
     @Bean
     @ConditionalOnMissingBean(UserNotificationService.class)
     public UserNotificationService userNotificationService(NotificationEventPublisher notificationEventPublisher,
-            AppUserRepository appUserRepository, FineractProperties fineractProperties,
+            AppUserRepository appUserRepository, AppUserPersistablePort appUserPersistablePort, FineractProperties fineractProperties,
             NotificationReadPlatformService notificationReadPlatformService,
             NotificationWritePlatformService notificationWritePlatformService) {
-        return new UserNotificationServiceImpl(notificationEventPublisher, appUserRepository, fineractProperties,
+        return new UserNotificationServiceImpl(notificationEventPublisher, appUserRepository, appUserPersistablePort, fineractProperties,
                 notificationReadPlatformService, notificationWritePlatformService);
     }
 }

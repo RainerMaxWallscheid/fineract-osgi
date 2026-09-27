@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -30,6 +31,7 @@ import org.apache.fineract.notification.data.NotificationData;
 import org.apache.fineract.notification.eventandlistener.NotificationEventPublisher;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.moduleapi.AppUserPersistablePort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +40,7 @@ public class UserNotificationServiceImpl implements UserNotificationService {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserNotificationServiceImpl.class);
     private final NotificationEventPublisher notificationEventPublisher;
     private final AppUserRepository appUserRepository;
+    private final AppUserPersistablePort appUserPersistablePort;
     private final FineractProperties fineractProperties;
     private final NotificationReadPlatformService notificationReadPlatformService;
     private final NotificationWritePlatformService notificationWritePlatformService;
@@ -74,7 +77,7 @@ public class UserNotificationServiceImpl implements UserNotificationService {
             if (notificationData.getOfficeId() != null) {
                 List<Long> tempUserIds = new ArrayList<>(userIds);
                 for (Long userId : tempUserIds) {
-                    AppUser appUser = appUserRepository.findById(userId).orElseThrow();
+                    AppUser appUser = requireAppUser(userId);
                     if (appUser.getOffice() == null || !Objects.equals(appUser.getOffice().getId(), notificationData.getOfficeId())) {
                         userIds.remove(userId);
                     }
@@ -92,6 +95,17 @@ public class UserNotificationServiceImpl implements UserNotificationService {
         return fineractProperties.getNotification().getUserNotificationSystem().isEnabled();
     }
 
+    private AppUser requireAppUser(final Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        final Object appUser = this.appUserPersistablePort.persistableById(userId);
+        if (!(appUser instanceof AppUser persisted)) {
+            throw new NoSuchElementException("No value present");
+        }
+        return persisted;
+    }
+
     private Set<Long> getNotifiableUserIds(Long officeId, String permission) {
         Collection<AppUser> users = appUserRepository.findByOfficeId(officeId);
         Collection<AppUser> usersWithPermission = users.stream().filter(aU -> aU.hasAnyPermission(permission, "ALL_FUNCTIONS")).toList();
@@ -99,9 +113,10 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public UserNotificationServiceImpl(final NotificationEventPublisher notificationEventPublisher, final AppUserRepository appUserRepository, final FineractProperties fineractProperties, final NotificationReadPlatformService notificationReadPlatformService, final NotificationWritePlatformService notificationWritePlatformService) {
+        public UserNotificationServiceImpl(final NotificationEventPublisher notificationEventPublisher, final AppUserRepository appUserRepository, final AppUserPersistablePort appUserPersistablePort, final FineractProperties fineractProperties, final NotificationReadPlatformService notificationReadPlatformService, final NotificationWritePlatformService notificationWritePlatformService) {
         this.notificationEventPublisher = notificationEventPublisher;
         this.appUserRepository = appUserRepository;
+        this.appUserPersistablePort = appUserPersistablePort;
         this.fineractProperties = fineractProperties;
         this.notificationReadPlatformService = notificationReadPlatformService;
         this.notificationWritePlatformService = notificationWritePlatformService;
