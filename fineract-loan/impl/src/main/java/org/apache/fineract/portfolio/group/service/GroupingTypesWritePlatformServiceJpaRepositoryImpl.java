@@ -36,7 +36,8 @@ import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumb
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
+import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -106,7 +107,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     private final GroupLevelRepository groupLevelRepository;
     private final GroupingTypesDataValidator fromApiJsonDeserializer;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
-    private final CodeValueRepositoryWrapper codeValueRepository;
+    private final CodeValuePersistablePort codeValuePersistablePort;
     private final CommandProcessingService commandProcessingService;
     private final CalendarInstanceLookupPort calendarInstanceRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -504,8 +505,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         final LocalDate closureDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.closureDateParamName);
         final Long closureReasonId = command.longValueOfParameterNamed(GroupingTypesApiConstants.closureReasonIdParamName);
         final AppUser currentUser = this.context.authenticatedUser();
-        final CodeValue closureReason = this.codeValueRepository
-                .findOneByCodeNameAndIdWithNotFoundDetection(GroupingTypesApiConstants.GROUP_CLOSURE_REASON, closureReasonId);
+        final CodeValue closureReason = requireCodeValue(GroupingTypesApiConstants.GROUP_CLOSURE_REASON, closureReasonId);
         if (group.hasActiveClients()) {
             final String errorMessage = group.getGroupLevel().getLevelName()
                     + " cannot be closed because of active clients associated with it.";
@@ -560,8 +560,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         final Group center = this.groupRepository.findOneWithNotFoundDetection(centerId);
         final LocalDate closureDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.closureDateParamName);
         final Long closureReasonId = command.longValueOfParameterNamed(GroupingTypesApiConstants.closureReasonIdParamName);
-        final CodeValue closureReason = this.codeValueRepository
-                .findOneByCodeNameAndIdWithNotFoundDetection(GroupingTypesApiConstants.CENTER_CLOSURE_REASON, closureReasonId);
+        final CodeValue closureReason = requireCodeValue(GroupingTypesApiConstants.CENTER_CLOSURE_REASON, closureReasonId);
         final AppUser currentUser = this.context.authenticatedUser();
         if (center.hasActiveGroups()) {
             final String errorMessage = center.getGroupLevel().getLevelName()
@@ -832,13 +831,21 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         return persisted;
     }
 
+    private CodeValue requireCodeValue(final String codeName, final Long codeValueId) {
+        final Object codeValue = this.codeValuePersistablePort.persistableByCodeNameAndId(codeName, codeValueId);
+        if (!(codeValue instanceof CodeValue persisted)) {
+            throw new CodeValueNotFoundException(codeName, codeValueId);
+        }
+        return persisted;
+    }
+
     @java.lang.SuppressWarnings("all")
     public GroupingTypesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final GroupRepositoryWrapper groupRepository, final ClientActivePort clientActivePort,
             final OfficePersistablePort officePersistablePort, final StaffRepositoryWrapper staffRepository,
             final NoteWritePlatformService noteWritePlatformService, final GroupLevelRepository groupLevelRepository,
             final GroupingTypesDataValidator fromApiJsonDeserializer, final LoanRepositoryWrapper loanRepositoryWrapper,
-            final CodeValueRepositoryWrapper codeValueRepository, final CommandProcessingService commandProcessingService,
+            final CodeValuePersistablePort codeValuePersistablePort, final CommandProcessingService commandProcessingService,
             final CalendarInstanceLookupPort calendarInstanceRepository, final ConfigurationDomainService configurationDomainService,
             final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final AccountNumberGenerator accountNumberGenerator,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
@@ -852,7 +859,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         this.groupLevelRepository = groupLevelRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.codeValueRepository = codeValueRepository;
+        this.codeValuePersistablePort = codeValuePersistablePort;
         this.commandProcessingService = commandProcessingService;
         this.calendarInstanceRepository = calendarInstanceRepository;
         this.configurationDomainService = configurationDomainService;

@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.group.starter;
 
 import org.apache.fineract.commands.service.CommandProcessingService;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
-import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.moduleapi.CodeValuePersistablePort;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -88,7 +87,7 @@ public class GroupConfiguration {
             OfficePersistablePort officePersistablePort, StaffRepositoryWrapper staffRepository,
             NoteWritePlatformService noteWritePlatformService, GroupLevelRepository groupLevelRepository,
             GroupingTypesDataValidator fromApiJsonDeserializer, LoanRepositoryWrapper loanRepositoryWrapper,
-            CodeValueRepositoryWrapper codeValueRepository, CommandProcessingService commandProcessingService,
+            CodeValuePersistablePort codeValuePersistablePort, CommandProcessingService commandProcessingService,
             CalendarInstanceLookupPort calendarInstanceRepository, ConfigurationDomainService configurationDomainService,
             AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, AccountNumberGenerator accountNumberGenerator,
             EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
@@ -97,7 +96,7 @@ public class GroupConfiguration {
     ) {
         return new GroupingTypesWritePlatformServiceJpaRepositoryImpl(context, groupRepository, clientActivePort,
                 officePersistablePort, staffRepository, noteWritePlatformService, groupLevelRepository, fromApiJsonDeserializer,
-                loanRepositoryWrapper, codeValueRepository, commandProcessingService, calendarInstanceRepository,
+                loanRepositoryWrapper, codeValuePersistablePort, commandProcessingService, calendarInstanceRepository,
                 configurationDomainService, accountNumberFormatRepository, accountNumberGenerator,
                 entityDatatableChecksWritePlatformService, businessEventNotifierService, loanOfficerService
 
