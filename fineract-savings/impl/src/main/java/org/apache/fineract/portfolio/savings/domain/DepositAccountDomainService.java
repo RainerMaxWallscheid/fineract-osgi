@@ -40,7 +40,7 @@ public interface DepositAccountDomainService {
     SavingsAccountTransaction handleSavingDeposit(SavingsAccount account, DateTimeFormatter fmt, LocalDate transactionDate,
             BigDecimal transactionAmount, Object paymentDetail, boolean isRegularTransaction);
 
-    Long handleFDAccountClosure(FixedDepositAccount account, Object paymentDetail, AppUser user, JsonCommand command,
+    Long handleFDAccountClosure(FixedDepositAccount account, Object paymentDetail, Object user, JsonCommand command,
             Map<String, Object> changes);
 
     @Transactional
