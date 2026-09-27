@@ -63,7 +63,7 @@ import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.fund.exception.FundNotFoundException;
 import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
+import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
@@ -118,7 +118,6 @@ public class LoanAssemblerImpl implements LoanAssembler {
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanRepositoryWrapper loanRepository;
     private final LoanProductRepository loanProductRepository;
-    private final GroupRepositoryWrapper groupRepository;
     private final FundPersistablePort fundPersistablePort;
     private final StaffPersistablePort staffPersistablePort;
     private final CodeValuePersistablePort codeValuePersistablePort;
@@ -228,7 +227,7 @@ public class LoanAssemblerImpl implements LoanAssembler {
             client = (Client) this.clientActivePort.persistableById(clientId);
         }
         if (groupId != null) {
-            group = this.groupRepository.findOneWithNotFoundDetection(groupId);
+            group = requireGroup(groupId);
         }
         final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", element);
         ExternalId externalId = externalIdFactory.create(externalIdStr);
@@ -397,6 +396,14 @@ public class LoanAssemblerImpl implements LoanAssembler {
             fund = requireFund(fundId);
         }
         return fund;
+    }
+
+    private Group requireGroup(final Long groupId) {
+        final Object group = this.groupActivePort.persistableById(groupId);
+        if (!(group instanceof Group persisted)) {
+            throw new GroupNotFoundException(groupId);
+        }
+        return persisted;
     }
 
     private Fund requireFund(final Long fundId) {
@@ -857,8 +864,8 @@ public class LoanAssemblerImpl implements LoanAssembler {
 
     @java.lang.SuppressWarnings("all")
     public LoanAssemblerImpl(final FromJsonHelper fromApiJsonHelper, final LoanRepositoryWrapper loanRepository,
-            final LoanProductRepository loanProductRepository, final GroupRepositoryWrapper groupRepository,
-            final FundPersistablePort fundPersistablePort, final StaffPersistablePort staffPersistablePort,
+            final LoanProductRepository loanProductRepository, final FundPersistablePort fundPersistablePort,
+            final StaffPersistablePort staffPersistablePort,
             final CodeValuePersistablePort codeValuePersistablePort, final LoanScheduleAssembler loanScheduleAssembler,
             final LoanChargeAssembler loanChargeAssembler, final LoanCollateralPort loanCollateralPort,
             final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
@@ -875,7 +882,6 @@ public class LoanAssemblerImpl implements LoanAssembler {
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanRepository = loanRepository;
         this.loanProductRepository = loanProductRepository;
-        this.groupRepository = groupRepository;
         this.fundPersistablePort = fundPersistablePort;
         this.staffPersistablePort = staffPersistablePort;
         this.codeValuePersistablePort = codeValuePersistablePort;

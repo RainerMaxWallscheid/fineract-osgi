@@ -60,7 +60,6 @@ import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatform
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
 import org.apache.fineract.portfolio.fund.moduleapi.FundPersistablePort;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
 import org.apache.fineract.portfolio.interestpauses.service.InterestPauseReadPlatformService;
 import org.apache.fineract.portfolio.interestpauses.service.InterestPauseReadPlatformServiceImpl;
@@ -248,7 +247,7 @@ public class LoanAccountConfiguration {
     @Bean
     @ConditionalOnMissingBean(LoanAssembler.class)
     public LoanAssembler loanAssembler(FromJsonHelper fromApiJsonHelper, LoanRepositoryWrapper loanRepository,
-            LoanProductRepository loanProductRepository, GroupRepositoryWrapper groupRepository, FundPersistablePort fundPersistablePort,
+            LoanProductRepository loanProductRepository, FundPersistablePort fundPersistablePort,
             StaffPersistablePort staffPersistablePort, CodeValuePersistablePort codeValuePersistablePort, LoanScheduleAssembler loanScheduleAssembler,
             LoanChargeAssembler loanChargeAssembler, LoanCollateralPort loanCollateralPort,
             LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
@@ -260,7 +259,7 @@ public class LoanAccountConfiguration {
             LoanDisbursementDetailsAssembler loanDisbursementDetailsAssembler, LoanChargeMapper loanChargeMapper,
             LoanAccrualsProcessingService loanAccrualsProcessingService, LoanDisbursementService loanDisbursementService,
             LoanChargeService loanChargeService, LoanOfficerService loanOfficerService, LoanScheduleComponent loanSchedule) {
-        return new LoanAssemblerImpl(fromApiJsonHelper, loanRepository, loanProductRepository, groupRepository, fundPersistablePort,
+        return new LoanAssemblerImpl(fromApiJsonHelper, loanRepository, loanProductRepository, fundPersistablePort,
                 staffPersistablePort, codeValuePersistablePort, loanScheduleAssembler, loanChargeAssembler, loanCollateralPort,
                 loanRepaymentScheduleTransactionProcessorFactory, holidayRepository, configurationDomainService, workingDaysRepository,
                 rateAssembler, externalIdFactory, accountNumberFormatRepository, glimRepository, accountNumberGenerator,
