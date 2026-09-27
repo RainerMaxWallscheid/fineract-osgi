@@ -60,6 +60,7 @@ jar {
                 'Import-Package': 'org.apache.fineract.useradministration.service,'
                         + 'org.apache.fineract.useradministration.data,'
                         + 'org.apache.fineract.organisation.office.moduleapi,'
+                        + 'org.apache.fineract.organisation.staff.moduleapi,'
                         + '*',
                 'Automatic-Module-Name': 'org.apache.fineract.useradministration.impl'
                 )

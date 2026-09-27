@@ -22,6 +22,7 @@ import jakarta.persistence.PersistenceException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -40,8 +41,8 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPassword;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPasswordRepository;
@@ -73,7 +74,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     private final RoleRepository roleRepository;
     private final UserDataValidator fromApiJsonDeserializer;
     private final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository;
-    private final StaffRepository staffRepository;
+    private final StaffPersistablePort staffPersistablePort;
     private final ConfigurationDomainService configurationDomainService;
 
     @Override
@@ -92,7 +93,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             final Long staffId = command.longValueOfParameterNamed(staffIdParamName);
             Staff linkedStaff;
             if (staffId != null) {
-                linkedStaff = this.staffRepository.findByOffice(staffId, userOffice.getId()).orElseThrow(() -> new StaffNotFoundException(staffId));
+                linkedStaff = requireStaffInOffice(staffId, userOffice.getId());
             } else {
                 linkedStaff = null;
             }
@@ -171,7 +172,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                 final Long staffId = (Long) changes.get("staffId");
                 Staff linkedStaff = null;
                 if (staffId != null) {
-                    linkedStaff = this.staffRepository.findByOffice(staffId, userToUpdate.getOffice().getId()).orElseThrow(() -> new StaffNotFoundException(staffId));
+                    linkedStaff = requireStaffInOffice(staffId, userToUpdate.getOffice().getId());
                 }
                 userToUpdate.changeStaff(linkedStaff);
             }
@@ -274,6 +275,15 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         return ErrorHandler.getMappable(dve, "error.msg.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
     }
 
+    private Staff requireStaffInOffice(final Long staffId, final Long officeId) {
+        final Object staff = this.staffPersistablePort.persistableById(staffId);
+        if (!(staff instanceof Staff persisted) || persisted.getOffice() == null
+                || !Objects.equals(persisted.getOffice().getId(), officeId)) {
+            throw new StaffNotFoundException(staffId);
+        }
+        return persisted;
+    }
+
     private Office requireOffice(final Long officeId) {
         if (officeId == null) {
             throw new IllegalArgumentException("The given id must not be null!");
@@ -286,7 +296,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     }
 
     @java.lang.SuppressWarnings("all")
-        public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final UserDomainService userDomainService, final PlatformPasswordEncoder platformPasswordEncoder, final AppUserRepository appUserRepository, final OfficePersistablePort officePersistablePort, final RoleRepository roleRepository, final UserDataValidator fromApiJsonDeserializer, final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffRepository staffRepository, final ConfigurationDomainService configurationDomainService) {
+        public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final UserDomainService userDomainService, final PlatformPasswordEncoder platformPasswordEncoder, final AppUserRepository appUserRepository, final OfficePersistablePort officePersistablePort, final RoleRepository roleRepository, final UserDataValidator fromApiJsonDeserializer, final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffPersistablePort staffPersistablePort, final ConfigurationDomainService configurationDomainService) {
         this.context = context;
         this.userDomainService = userDomainService;
         this.platformPasswordEncoder = platformPasswordEncoder;
@@ -295,7 +305,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         this.roleRepository = roleRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.appUserPreviewPasswordRepository = appUserPreviewPasswordRepository;
-        this.staffRepository = staffRepository;
+        this.staffPersistablePort = staffPersistablePort;
         this.configurationDomainService = configurationDomainService;
     }
 }

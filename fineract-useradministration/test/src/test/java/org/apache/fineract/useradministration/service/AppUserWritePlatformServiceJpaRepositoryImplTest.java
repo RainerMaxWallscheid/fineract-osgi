@@ -43,7 +43,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncod
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPassword;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPasswordRepository;
@@ -82,7 +82,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImplTest {
     @Mock
     private AppUserPreviousPasswordRepository appUserPreviewPasswordRepository;
     @Mock
-    private StaffRepository staffRepository;
+    private StaffPersistablePort staffPersistablePort;
     @Mock
     private ConfigurationDomainService configurationDomainService;
 

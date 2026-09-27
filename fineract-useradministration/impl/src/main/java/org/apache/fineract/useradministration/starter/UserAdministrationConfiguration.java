@@ -24,7 +24,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncod
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
-import org.apache.fineract.organisation.staff.domain.StaffRepository;
+import org.apache.fineract.organisation.staff.moduleapi.StaffPersistablePort;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.useradministration.data.PasswordPreferencesDataValidator;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPasswordRepository;
@@ -74,10 +74,10 @@ public class UserAdministrationConfiguration {
     public AppUserWritePlatformService appUserWritePlatformService(PlatformSecurityContext context, UserDomainService userDomainService,
             PlatformPasswordEncoder platformPasswordEncoder, AppUserRepository appUserRepository,
             OfficePersistablePort officePersistablePort, RoleRepository roleRepository, UserDataValidator fromApiJsonDeserializer,
-            AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, StaffRepository staffRepository,
+            AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, StaffPersistablePort staffPersistablePort,
             ConfigurationDomainService configurationDomainService) {
         return new AppUserWritePlatformServiceJpaRepositoryImpl(context, userDomainService, platformPasswordEncoder, appUserRepository,
-                officePersistablePort, roleRepository, fromApiJsonDeserializer, appUserPreviewPasswordRepository, staffRepository,
+                officePersistablePort, roleRepository, fromApiJsonDeserializer, appUserPreviewPasswordRepository, staffPersistablePort,
                 configurationDomainService);
     }
 
