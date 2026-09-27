@@ -72,8 +72,6 @@ import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateral
 import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
 import org.apache.fineract.portfolio.common.service.Validator;
-import org.apache.fineract.portfolio.group.domain.Group;
-import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.ClientNotInGroupException;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.group.moduleapi.GroupActivePort;
@@ -173,7 +171,6 @@ public final class LoanApplicationValidator {
     private final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
     private final ConfigurationDomainService configurationDomainService;
     private final LoanProductRepository loanProductRepository;
-    private final GroupRepositoryWrapper groupRepository;
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanProductDataValidator loanProductDataValidator;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
@@ -1724,13 +1721,10 @@ public final class LoanApplicationValidator {
                         officeJoiningDate);
             }
         }
-        if (groupId != null) {
-            Group group = groupRepository.findOneWithNotFoundDetection(groupId);
-            if (group != null && group.isActivatedAfter(submittedOnDate)) {
-                final String errorMessage = "The date on which a loan is submitted cannot be earlier than group\'s activation date.";
-                throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.group.activation.date", errorMessage,
-                        submittedOnDate, group.getActivationDate());
-            }
+        if (groupId != null && this.groupActivePort.isActivatedAfter(groupId, submittedOnDate)) {
+            final String errorMessage = "The date on which a loan is submitted cannot be earlier than group\'s activation date.";
+            throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.group.activation.date", errorMessage,
+                    submittedOnDate, this.groupActivePort.activationDate(groupId));
         }
         if (DateUtils.isAfter(submittedOnDate, expectedDisbursementDate)) {
             final String errorMessage = "The date on which a loan is submitted cannot be after its expected disbursement date: "
@@ -1997,7 +1991,7 @@ public final class LoanApplicationValidator {
             final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
             final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator,
             final ConfigurationDomainService configurationDomainService, final LoanProductRepository loanProductRepository,
-            final GroupRepositoryWrapper groupRepository, final LoanReadPlatformService loanReadPlatformService,
+            final LoanReadPlatformService loanReadPlatformService,
             final LoanProductDataValidator loanProductDataValidator,
             final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final OfficeProductRestrictionService officeProductRestrictionService, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -2013,7 +2007,6 @@ public final class LoanApplicationValidator {
         this.advancedPaymentAllocationsValidator = advancedPaymentAllocationsValidator;
         this.configurationDomainService = configurationDomainService;
         this.loanProductRepository = loanProductRepository;
-        this.groupRepository = groupRepository;
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanProductDataValidator = loanProductDataValidator;
         this.globalConfigurationRepository = globalConfigurationRepository;
