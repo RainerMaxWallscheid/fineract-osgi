@@ -26,8 +26,8 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.moduleapi.WorkingCapitalLoanJournalPort;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
+import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
+import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.springframework.stereotype.Service;
 
@@ -36,13 +36,13 @@ public class WorkingCapitalLoanJournalPortAdapter implements WorkingCapitalLoanJ
 
     private final AccountingProcessorHelper helper;
     private final JournalEntryRepository journalEntryRepository;
-    private final OfficeRepositoryWrapper officeRepository;
+    private final OfficePersistablePort officePersistablePort;
 
     public WorkingCapitalLoanJournalPortAdapter(final AccountingProcessorHelper helper,
-            final JournalEntryRepository journalEntryRepository, final OfficeRepositoryWrapper officeRepository) {
+            final JournalEntryRepository journalEntryRepository, final OfficePersistablePort officePersistablePort) {
         this.helper = helper;
         this.journalEntryRepository = journalEntryRepository;
-        this.officeRepository = officeRepository;
+        this.officePersistablePort = officePersistablePort;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class WorkingCapitalLoanJournalPortAdapter implements WorkingCapitalLoanJ
     @Override
     public void postCredit(final long officeId, final long productId, final String currencyCode, final int cashAccountType,
             final Long paymentTypeId, final long wcLoanId, final long wcTxnId, final LocalDate date, final BigDecimal amount) {
-        final Office office = this.officeRepository.findOneWithNotFoundDetection(officeId);
+        final Object office = officeById(officeId);
         final GLAccount account = this.helper.getLinkedGLAccountForWorkingCapitalLoanProduct(productId, cashAccountType, paymentTypeId);
         this.helper.createCreditJournalEntryForWorkingCapitalLoan(office, currencyCode, account, wcLoanId, wcTxnId, date, amount, null);
     }
@@ -61,7 +61,7 @@ public class WorkingCapitalLoanJournalPortAdapter implements WorkingCapitalLoanJ
     @Override
     public void postDebit(final long officeId, final long productId, final String currencyCode, final int cashAccountType,
             final Long paymentTypeId, final long wcLoanId, final long wcTxnId, final LocalDate date, final BigDecimal amount) {
-        final Office office = this.officeRepository.findOneWithNotFoundDetection(officeId);
+        final Object office = officeById(officeId);
         final GLAccount account = this.helper.getLinkedGLAccountForWorkingCapitalLoanProduct(productId, cashAccountType, paymentTypeId);
         this.helper.createDebitJournalEntryForWorkingCapitalLoan(office, currencyCode, account, wcLoanId, wcTxnId, date, amount, null);
     }
@@ -84,5 +84,13 @@ public class WorkingCapitalLoanJournalPortAdapter implements WorkingCapitalLoanJ
             journalEntry.setReversalJournalEntry(reversalEntry);
             this.helper.persistJournalEntry(journalEntry);
         }
+    }
+
+    private Object officeById(final long officeId) {
+        final Object office = this.officePersistablePort.persistableById(officeId);
+        if (office == null) {
+            throw new OfficeNotFoundException(officeId);
+        }
+        return office;
     }
 }
