@@ -507,7 +507,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         final Group group = this.groupRepository.findOneWithNotFoundDetection(groupId);
         final LocalDate closureDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.closureDateParamName);
         final Long closureReasonId = command.longValueOfParameterNamed(GroupingTypesApiConstants.closureReasonIdParamName);
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         final CodeValue closureReason = requireCodeValue(GroupingTypesApiConstants.GROUP_CLOSURE_REASON, closureReasonId);
         if (group.hasActiveClients()) {
             final String errorMessage = group.getGroupLevel().getLevelName()
@@ -518,7 +518,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         validateLoansAndSavingsForGroupOrCenterClose(group, closureDate);
         entityDatatableChecksWritePlatformService.runTheCheck(groupId, EntityTables.GROUP.getName(), StatusEnum.CLOSE.getValue(),
                 EntityTables.GROUP.getForeignKeyColumnNameOnDatatable(), null);
-        group.close(currentUser, closureReason, closureDate);
+        group.close((AppUser) currentUser, closureReason, closureDate);
         this.groupRepository.saveAndFlush(group);
         return //
         //
