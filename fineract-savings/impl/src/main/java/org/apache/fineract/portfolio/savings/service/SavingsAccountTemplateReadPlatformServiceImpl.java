@@ -95,8 +95,8 @@ public class SavingsAccountTemplateReadPlatformServiceImpl implements SavingsAcc
     public SavingsAccountData retrieveTemplate(final Long clientId, final Long groupId, final Long productId,
             final boolean staffInSelectedOfficeOnly) {
 
-        final AppUser loggedInUser = this.context.authenticatedUser();
-        Long officeId = loggedInUser.getOffice().getId();
+        final Object loggedInUser = this.context.authenticatedUser();
+        Long officeId = ((AppUser) loggedInUser).getOffice().getId();
 
         ClientData client = null;
         if (clientId != null) {
