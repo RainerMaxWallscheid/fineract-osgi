@@ -866,7 +866,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Override
     public CommandProcessingResult rejectClient(final Long entityId, final JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.fromApiJsonDeserializer.validateRejection(command);
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate rejectionDate = command.localDateValueOfParameterNamed(ClientApiConstants.rejectionDateParamName);
@@ -881,7 +881,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             throw new InvalidClientStateTransitionException("rejection", "date.cannot.before.client.submitted.date", errorMessage,
                     rejectionDate, client.getSubmittedOnDate());
         }
-        client.reject(currentUser, rejectionReason, rejectionDate);
+        client.reject((AppUser) currentUser, rejectionReason, rejectionDate);
         clientRepository.saveAndFlush(client);
         businessEventNotifierService.notifyPostBusinessEvent(new ClientRejectBusinessEvent(client));
         return //
