@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.service.database.RoutingDataSourc
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.savings.DepositAccountUtils;
 import org.apache.fineract.portfolio.savings.service.DepositAccountReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -53,7 +54,8 @@ public class GenerateRdScheduleTasklet implements Tasklet {
         final Collection<Map<String, Object>> scheduleDetails = depositAccountReadPlatformService.retriveDataForRDScheduleCreation();
         String insertSql = "INSERT INTO m_mandatory_savings_schedule (savings_account_id, duedate, installment, deposit_amount, completed_derived, " + CREATED_DATE_DB_FIELD + ", " + CREATED_BY_DB_FIELD + ", " + LAST_MODIFIED_DATE_DB_FIELD + ", " + LAST_MODIFIED_BY_DB_FIELD + ") " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         List<Object[]> params = new ArrayList<>();
-        Long userId = securityContext.authenticatedUser().getId();
+        Object currentUser = securityContext.authenticatedUser();
+        Long userId = ((AppUser) currentUser).getId();
         int iterations = 0;
         for (Map<String, Object> details : scheduleDetails) {
             Long count = (Long) details.get("futureInstallments");
