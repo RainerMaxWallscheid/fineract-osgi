@@ -895,7 +895,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Override
     public CommandProcessingResult withdrawClient(Long entityId, JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.fromApiJsonDeserializer.validateWithdrawn(command);
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate withdrawalDate = command.localDateValueOfParameterNamed(ClientApiConstants.withdrawalDateParamName);
@@ -910,7 +910,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             throw new InvalidClientStateTransitionException("withdrawal", "date.cannot.before.client.submitted.date", errorMessage,
                     withdrawalDate, client.getSubmittedOnDate());
         }
-        client.withdraw(currentUser, withdrawalReason, withdrawalDate);
+        client.withdraw((AppUser) currentUser, withdrawalReason, withdrawalDate);
         this.clientRepository.saveAndFlush(client);
         businessEventNotifierService.notifyPostBusinessEvent(new ClientWithdrawBusinessEvent(client));
         return //
