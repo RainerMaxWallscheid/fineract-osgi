@@ -569,7 +569,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult rejectApplication(final Long savingsId, final JsonCommand command, final DepositAccountType depositAccountType) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateRejection(command.json());
         final SavingsAccount savingsAccount = this.depositAccountAssembler.assembleFrom(savingsId, depositAccountType);
         checkClientOrGroupActive(savingsAccount);
