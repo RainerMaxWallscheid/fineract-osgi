@@ -642,8 +642,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
             final LocalDate activationDate = command.localDateValueOfParameterNamed("activationDate");
             runEntityDatatableCheck(clientId, client.getLegalForm());
-            final AppUser currentUser = this.context.authenticatedUser();
-            client.activate(currentUser, fmt, activationDate);
+            final Object currentUser = this.context.authenticatedUser();
+            client.activate((AppUser) currentUser, fmt, activationDate);
             CommandProcessingResult result = openSavingsAccount(client, fmt);
             clientRepository.saveAndFlush(client);
             businessEventNotifierService.notifyPostBusinessEvent(new ClientActivateBusinessEvent(client));
