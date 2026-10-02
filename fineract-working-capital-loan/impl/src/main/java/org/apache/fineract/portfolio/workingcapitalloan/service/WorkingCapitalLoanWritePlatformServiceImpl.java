@@ -126,7 +126,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
     public CommandProcessingResult approveApplication(final Long loanId, final JsonCommand command) {
         final WorkingCapitalLoan loan = this.loanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         this.validator.validateApproval(command.json(), loan);
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.stateMachine.transition(WorkingCapitalLoanEvent.LOAN_APPROVED, loan);
         // Approved date
         final LocalDate approvedOnDate = command.localDateValueOfParameterNamed(WorkingCapitalLoanConstants.approvedOnDateParamName);
@@ -164,7 +164,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put(WorkingCapitalLoanConstants.approvedOnDateParamName, approvedOnDate);
         changes.put("status", loan.getLoanStatus());
-        log.debug("Working capital loan {} approved by user {}", loanId, currentUser.getId());
+        log.debug("Working capital loan {} approved by user {}", loanId, ((AppUser) currentUser).getId());
         return  //
         //
         //
