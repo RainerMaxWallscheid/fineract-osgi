@@ -773,7 +773,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
 
     @Override
     public CommandProcessingResult prematureCloseFDAccount(final Long savingsId, final JsonCommand command) {
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         this.depositAccountTransactionDataValidator.validateClosing(command, DepositAccountType.FIXED_DEPOSIT, true);
         final Map<String, Object> changes = new LinkedHashMap<>();
         final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
