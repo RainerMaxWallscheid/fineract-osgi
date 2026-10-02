@@ -564,7 +564,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         final LocalDate closureDate = command.localDateValueOfParameterNamed(GroupingTypesApiConstants.closureDateParamName);
         final Long closureReasonId = command.longValueOfParameterNamed(GroupingTypesApiConstants.closureReasonIdParamName);
         final CodeValue closureReason = requireCodeValue(GroupingTypesApiConstants.CENTER_CLOSURE_REASON, closureReasonId);
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         if (center.hasActiveGroups()) {
             final String errorMessage = center.getGroupLevel().getLevelName()
                     + " cannot be closed because of active groups associated with it.";
@@ -574,7 +574,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
         validateLoansAndSavingsForGroupOrCenterClose(center, closureDate);
         entityDatatableChecksWritePlatformService.runTheCheck(centerId, EntityTables.GROUP.getName(), StatusEnum.ACTIVATE.getValue(),
                 EntityTables.GROUP.getForeignKeyColumnNameOnDatatable(), null);
-        center.close(currentUser, closureReason, closureDate);
+        center.close((AppUser) currentUser, closureReason, closureDate);
         this.groupRepository.saveAndFlush(center);
         return //
         //
