@@ -239,7 +239,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
             throw new PlatformApiDataValidationException("validation.msg.wc.loan.transition.not.allowed", "Disbursement is not allowed from current status " + loan.getLoanStatus(), "loanStatus");
         }
         this.validator.validateDisbursement(command.json(), loan);
-        final AppUser currentUser = this.context.getAuthenticatedUserIfPresent();
+        final Object currentUser = this.context.getAuthenticatedUserIfPresent();
         final LocalDate actualDisbursementDate = command.localDateValueOfParameterNamed(WorkingCapitalLoanConstants.actualDisbursementDateParamName);
         final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed(WorkingCapitalLoanConstants.transactionAmountParamName, command.parsedJson(), new HashSet<>());
         final Long classificationId = this.fromApiJsonHelper.extractLongNamed(WorkingCapitalLoanConstants.classificationIdParamName, command.parsedJson());
@@ -288,7 +288,7 @@ public class WorkingCapitalLoanWritePlatformServiceImpl implements WorkingCapita
         this.loanRepository.saveAndFlush(loan);
         changes.put("status", loan.getLoanStatus());
         handleNote(loan, command, changes);
-        log.debug("Working capital loan {} disbursed by user {}", loanId, currentUser != null ? currentUser.getId() : "system");
+        log.debug("Working capital loan {} disbursed by user {}", loanId, currentUser != null ? ((AppUser) currentUser).getId() : "system");
         return  //
         //
         //
