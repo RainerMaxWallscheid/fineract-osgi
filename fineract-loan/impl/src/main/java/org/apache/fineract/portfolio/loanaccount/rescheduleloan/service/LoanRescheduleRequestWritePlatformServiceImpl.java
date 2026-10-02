@@ -365,7 +365,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             // validate the request in the JsonCommand object passed as
             // parameter
             this.loanRescheduleRequestDataValidator.validateForApproveAction(jsonCommand, loanRescheduleRequest);
-            final AppUser appUser = this.platformSecurityContext.authenticatedUser();
+            final Object appUser = this.platformSecurityContext.authenticatedUser();
             final Map<String, Object> changes = new LinkedHashMap<>();
             LocalDate approvedOnDate = jsonCommand.localDateValueOfParameterNamed("approvedOnDate");
             final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(jsonCommand.dateFormat())
@@ -373,7 +373,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             changes.put("locale", jsonCommand.locale());
             changes.put("dateFormat", jsonCommand.dateFormat());
             changes.put("approvedOnDate", approvedOnDate.format(dateTimeFormatter));
-            changes.put("approvedByUserId", appUser.getId());
+            changes.put("approvedByUserId", ((AppUser) appUser).getId());
             Loan loan = loanRescheduleRequest.getLoan();
             ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan,
                     loanRescheduleRequest.getRescheduleFromDate());
