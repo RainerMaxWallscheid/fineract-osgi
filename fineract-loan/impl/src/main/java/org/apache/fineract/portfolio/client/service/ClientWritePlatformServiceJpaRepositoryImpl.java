@@ -200,7 +200,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Override
     public CommandProcessingResult createClient(final JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Boolean isAddressEnabled = configurationDomainService.isAddressEnabled();
             final Long officeId = command.longValueOfParameterNamed(ClientApiConstants.officeIdParamName);
@@ -276,7 +276,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
             final Long savingsAccountId = null;
             final ExternalId externalId = externalIdFactory.createFromCommand(command, ClientApiConstants.externalIdParamName);
-            final Client newClient = Client.instance(currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename,
+            final Client newClient = Client.instance((AppUser) currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename,
                     lastname, fullname, activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate,
                     savingsProductId, savingsAccountId, dataOfBirth, gender, clientType, clientClassification, legalForm.getValue(),
                     isStaff);
@@ -292,7 +292,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 validateParentGroupRulesBeforeClientActivation(newClient);
                 runEntityDatatableCheck(newClient.getId(), newClient.getLegalForm());
                 final CommandWrapper commandWrapper = new CommandWrapperBuilder().activateClient(null).build();
-                rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, currentUser);
+                rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, (AppUser) currentUser);
             }
             this.clientRepository.saveAndFlush(newClient);
             final Locale locale = command.extractLocale();
