@@ -624,7 +624,7 @@ public class ShareAccountDataSerializer {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-        AppUser approvedUser = this.platformSecurityContext.authenticatedUser();
+        Object approvedUser = this.platformSecurityContext.authenticatedUser();
         account.activate(activatedDate, approvedUser);
         handlechargesOnActivation(account);
         actualChanges.put(ShareAccountApiConstants.charges_paramname, activatedDate);
