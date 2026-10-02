@@ -70,6 +70,7 @@ import org.apache.fineract.portfolio.transfer.exception.ClientNotAwaitingTransfe
 import org.apache.fineract.portfolio.transfer.exception.ClientNotAwaitingTransferApprovalOrOnHoldException;
 import org.apache.fineract.portfolio.transfer.exception.TransferNotSupportedException;
 import org.apache.fineract.portfolio.transfer.exception.TransferNotSupportedException.TransferNotSupportedReason;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -449,9 +450,10 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
         }
         this.eventPublisher.publishEvent(NoteCreateRequest.builder().type(NoteType.CLIENT).resourceId(client.getId())
                 .note(jsonCommand.stringValueOfParameterNamed("note")).build());
+        final Object currentUser = this.context.authenticatedUser();
         this.clientTransferDetailsRepositoryWrapper
                 .save(ClientTransferDetails.instance(client.getId(), client.getOffice().getId(), destinationOffice.getId(), transferDate,
-                        transferEventType.getValue(), DateUtils.getBusinessLocalDate(), this.context.authenticatedUser().getId()));
+                        transferEventType.getValue(), DateUtils.getBusinessLocalDate(), ((AppUser) currentUser).getId()));
     }
 
     private void notifyClientTransferBusinessEvent(final Client client, final TransferEventType transferEventType) {
