@@ -590,7 +590,7 @@ public class ShareAccountDataSerializer {
     @SuppressWarnings("unused")
     public Map<String, Object> validateAndReject(JsonCommand jsonCommand, ShareAccount account) {
         Map<String, Object> actualChanges = new HashMap<>();
-        AppUser rejectedUser = this.platformSecurityContext.authenticatedUser();
+        Object rejectedUser = this.platformSecurityContext.authenticatedUser();
         LocalDate rejectedDate = DateUtils.getBusinessLocalDate();
         account.reject(rejectedDate, rejectedUser);
         actualChanges.put(ShareAccountApiConstants.charges_paramname, Boolean.TRUE);
