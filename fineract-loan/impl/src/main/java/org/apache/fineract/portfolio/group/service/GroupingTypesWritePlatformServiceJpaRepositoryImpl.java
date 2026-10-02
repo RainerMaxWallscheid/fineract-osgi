@@ -261,14 +261,14 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     public CommandProcessingResult activateGroupOrCenter(final Long groupId, final JsonCommand command) {
         try {
             this.fromApiJsonDeserializer.validateForActivation(command, GroupingTypesApiConstants.GROUP_RESOURCE_NAME);
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             final Group group = this.groupRepository.findOneWithNotFoundDetection(groupId);
             if (group.isGroup()) {
                 validateGroupRulesBeforeActivation(group);
             }
             final LocalDate activationDate = command.localDateValueOfParameterNamed("activationDate");
             validateOfficeOpeningDateisAfterGroupOrCenterOpeningDate(group.getOffice(), group.getGroupLevel(), activationDate);
-            group.activate(currentUser, activationDate);
+            group.activate((AppUser) currentUser, activationDate);
             this.groupRepository.saveAndFlush(group);
             return //
             //
