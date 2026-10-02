@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountSummaryData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Isolation;
@@ -104,7 +105,8 @@ public class SavingsSchedularInterestPoster {
     }
 
     private void batchUpdateJournalEntries(final List<SavingsAccountData> savingsAccountDataList, final HashMap<String, SavingsAccountTransactionData> savingsAccountTransactionDataHashMap) throws DataAccessException, NullPointerException {
-        Long userId = platformSecurityContext.authenticatedUser().getId();
+        Object currentUser = platformSecurityContext.authenticatedUser();
+        Long userId = ((AppUser) currentUser).getId();
         String queryForJGLUpdate = batchQueryForJournalEntries();
         List<Object[]> paramsForGLInsertion = new ArrayList<>();
         for (SavingsAccountData savingsAccountData : savingsAccountDataList) {
