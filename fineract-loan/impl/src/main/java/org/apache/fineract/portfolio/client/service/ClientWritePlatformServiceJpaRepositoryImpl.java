@@ -754,7 +754,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Override
     public CommandProcessingResult closeClient(final Long clientId, final JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateClose(command);
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             final LocalDate closureDate = command.localDateValueOfParameterNamed(ClientApiConstants.closureDateParamName);
@@ -794,7 +794,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final String errorMessage = "Client cannot be closed because of non-closed savings account.";
                 throw new InvalidClientStateTransitionException("close", "non-closed.savings.account", errorMessage);
             }
-            client.close(currentUser, closureReason, closureDate);
+            client.close((AppUser) currentUser, closureReason, closureDate);
             this.clientRepository.saveAndFlush(client);
             businessEventNotifierService.notifyPostBusinessEvent(new ClientCloseBusinessEvent(client));
             return //
