@@ -138,7 +138,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     public CommandProcessingResult submitApplication(final JsonCommand command) {
         try {
             this.savingsAccountDataValidator.validateForSubmit(command.json());
-            final AppUser submittedBy = this.context.authenticatedUser();
+            final Object submittedBy = this.context.authenticatedUser();
             final SavingsAccount account = this.savingAccountAssembler.assembleFrom(command, submittedBy);
             this.savingAccountRepository.save(account);
             String accountNumber = "";
