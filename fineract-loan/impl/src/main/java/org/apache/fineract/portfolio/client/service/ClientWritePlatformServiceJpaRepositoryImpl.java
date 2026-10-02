@@ -924,7 +924,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Override
     public CommandProcessingResult reActivateClient(Long entityId, JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.fromApiJsonDeserializer.validateReactivate(command);
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate reactivateDate = command.localDateValueOfParameterNamed(ClientApiConstants.reactivationDateParamName);
@@ -936,7 +936,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             throw new InvalidClientStateTransitionException("reactivation", "date.cannot.before.client.closed.date", errorMessage,
                     reactivateDate, client.getClosureDate());
         }
-        client.reActivate(currentUser, reactivateDate);
+        client.reActivate((AppUser) currentUser, reactivateDate);
         this.clientRepository.saveAndFlush(client);
         businessEventNotifierService.notifyPostBusinessEvent(new ClientReactivateBusinessEvent(client));
         return //
