@@ -144,7 +144,8 @@ public class SavingsSchedularInterestPoster {
         String queryForTransactionInsertion = batchQueryForTransactionInsertion();
         String queryForTransactionUpdate = batchQueryForTransactionsUpdate();
         LocalDate currentDate = DateUtils.getBusinessLocalDate();
-        Long userId = platformSecurityContext.authenticatedUser().getId();
+        Object currentUser = platformSecurityContext.authenticatedUser();
+        Long userId = ((AppUser) currentUser).getId();
         List<Object[]> paramsForSavingsSummary = new ArrayList<>();
         List<List<String>> perAccountRefNos = new ArrayList<>();
         List<List<Object[]>> perAccountInsertionParams = new ArrayList<>();
