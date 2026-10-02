@@ -367,12 +367,14 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         // validate actual disbursement date against meeting date
         ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, null);
         businessEventNotifierService.notifyPreBusinessEvent(new LoanDisbursalBusinessEvent(loan));
-        final AppUser currentUser = (AppUser) getAppUserIfPresent();
+        final Object currentUser = getAppUserIfPresent();
         final Map<String, Object> changes = new LinkedHashMap<>();
         final Object paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         if (PaymentDetailAssociation.cashPayment(paymentDetail)) {
             BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
-            final Long staffId = currentUser != null && currentUser.getStaff() != null ? currentUser.getStaff().getId() : null;
+            final Long staffId = currentUser != null && ((AppUser) currentUser).getStaff() != null
+                    ? ((AppUser) currentUser).getStaff().getId()
+                    : null;
             this.cashierTxnValidationPort.validateOnLoanDisbursal(staffId, loan.getCurrencyCode(), transactionAmount);
         }
         final boolean isPaymentTypeApplicableForDisbursementCharge = configurationDomainService
