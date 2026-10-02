@@ -521,7 +521,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult applicantWithdrawsFromApplication(final Long savingsId, final JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateApplicantWithdrawal(command.json());
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
