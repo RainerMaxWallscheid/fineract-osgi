@@ -835,7 +835,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
     @Override
     public CommandProcessingResult close(final Long savingsId, final JsonCommand command) {
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId, false);
         this.savingsAccountTransactionDataValidator.validateClosing(command, account);
         final boolean isLinkedWithAnyActiveLoan = this.accountAssociationsReadPlatformService.isLinkedWithAnyActiveAccount(savingsId);
