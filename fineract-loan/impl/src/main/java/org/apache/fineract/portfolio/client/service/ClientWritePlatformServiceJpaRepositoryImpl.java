@@ -950,7 +950,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Override
     public CommandProcessingResult undoRejection(Long entityId, JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.fromApiJsonDeserializer.validateUndoRejection(command);
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate undoRejectDate = command.localDateValueOfParameterNamed(ClientApiConstants.reopenedDateParamName);
@@ -962,7 +962,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             throw new InvalidClientStateTransitionException("reopened", "date.cannot.before.client.rejected.date", errorMessage,
                     undoRejectDate, client.getRejectedDate());
         }
-        client.reOpened(currentUser, undoRejectDate);
+        client.reOpened((AppUser) currentUser, undoRejectDate);
         this.clientRepository.saveAndFlush(client);
         businessEventNotifierService.notifyPostBusinessEvent(new ClientUndoRejectBusinessEvent(client));
         return //
