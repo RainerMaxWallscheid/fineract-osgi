@@ -532,7 +532,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             // validate the request in the JsonCommand object passed as
             // parameter
             this.loanRescheduleRequestDataValidator.validateForRejectAction(jsonCommand, loanRescheduleRequest);
-            final AppUser appUser = this.platformSecurityContext.authenticatedUser();
+            final Object appUser = this.platformSecurityContext.authenticatedUser();
             final Map<String, Object> changes = new LinkedHashMap<>();
             LocalDate rejectedOnDate = jsonCommand.localDateValueOfParameterNamed("rejectedOnDate");
             final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(jsonCommand.dateFormat())
@@ -540,7 +540,7 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
             changes.put("locale", jsonCommand.locale());
             changes.put("dateFormat", jsonCommand.dateFormat());
             changes.put("rejectedOnDate", rejectedOnDate.format(dateTimeFormatter));
-            changes.put("rejectedByUserId", appUser.getId());
+            changes.put("rejectedByUserId", ((AppUser) appUser).getId());
             if (!changes.isEmpty()) {
                 loanRescheduleRequest.reject(appUser, rejectedOnDate);
                 Set<LoanRescheduleRequestToTermVariationMapping> loanRescheduleRequestToTermVariationMappings = loanRescheduleRequest
