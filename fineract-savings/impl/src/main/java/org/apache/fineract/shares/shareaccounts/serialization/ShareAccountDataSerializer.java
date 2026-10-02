@@ -67,7 +67,6 @@ import org.apache.fineract.shares.shareaccounts.domain.ShareAccountStatusType;
 import org.apache.fineract.shares.shareaccounts.domain.ShareAccountTransaction;
 import org.apache.fineract.shares.shareproducts.domain.ShareProduct;
 import org.apache.fineract.shares.shareproducts.domain.ShareProductRepositoryWrapper;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1034,7 +1033,7 @@ public class ShareAccountDataSerializer {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
 
-        AppUser approvedUser = this.platformSecurityContext.authenticatedUser();
+        Object approvedUser = this.platformSecurityContext.authenticatedUser();
         final BigDecimal unitPrice = account.getShareProduct().deriveMarketPrice(DateUtils.getBusinessLocalDate());
         ShareAccountTransaction transaction = ShareAccountTransaction.createRedeemTransaction(closedDate, account.getTotalApprovedShares(),
                 unitPrice);
