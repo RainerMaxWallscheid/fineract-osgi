@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanRepaymentScheduleHistory;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanRepaymentScheduleHistoryRepository;
 import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanRescheduleRequest;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,10 +76,10 @@ public class LoanScheduleHistoryWritePlatformServiceImpl implements LoanSchedule
                 oldCreatedOnDate = (LocalDateTime) oldDates.get("created_date");
                 oldLastModifiedOnDate = (LocalDateTime) oldDates.get("lastmodified_date");
             }
-            final Long createdByUser = repaymentScheduleInstallment.getCreatedBy()
-                    .orElse(platformSecurityContext.authenticatedUser().getId());
-            final Long lastModifiedByUser = repaymentScheduleInstallment.getLastModifiedBy()
-                    .orElse(platformSecurityContext.authenticatedUser().getId());
+            final Object createdByUser = platformSecurityContext.authenticatedUser();
+            final Long createdByUserId = repaymentScheduleInstallment.getCreatedBy().orElse(((AppUser) createdByUser).getId());
+            final Object lastModifiedByUser = platformSecurityContext.authenticatedUser();
+            final Long lastModifiedByUserId = repaymentScheduleInstallment.getLastModifiedBy().orElse(((AppUser) lastModifiedByUser).getId());
             OffsetDateTime lastModifiedOnDate = DateUtils.getAuditOffsetDateTime();
             if (repaymentScheduleInstallment.getLastModifiedDate().isPresent()) {
                 lastModifiedOnDate = repaymentScheduleInstallment.getLastModifiedDate().get();
@@ -89,7 +90,7 @@ public class LoanScheduleHistoryWritePlatformServiceImpl implements LoanSchedule
             }
             LoanRepaymentScheduleHistory loanRepaymentScheduleHistory = LoanRepaymentScheduleHistory.instance(loan, loanRescheduleRequest,
                     installmentNumber, fromDate, dueDate, principal, interestCharged, feeChargesCharged, penaltyCharges, oldCreatedOnDate,
-                    createdByUser, lastModifiedByUser, oldLastModifiedOnDate, version, createdOnDate, lastModifiedOnDate);
+                    createdByUserId, lastModifiedByUserId, oldLastModifiedOnDate, version, createdOnDate, lastModifiedOnDate);
             loanRepaymentScheduleHistoryList.add(loanRepaymentScheduleHistory);
         }
         return loanRepaymentScheduleHistoryList;
