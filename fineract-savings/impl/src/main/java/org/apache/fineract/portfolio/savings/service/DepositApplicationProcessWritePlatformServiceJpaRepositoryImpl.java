@@ -515,7 +515,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult approveApplication(final Long savingsId, final JsonCommand command, final DepositAccountType depositAccountType) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateApproval(command.json());
         final SavingsAccount savingsAccount = this.depositAccountAssembler.assembleFrom(savingsId, depositAccountType);
         checkClientOrGroupActive(savingsAccount);
