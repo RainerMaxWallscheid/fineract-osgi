@@ -209,7 +209,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     public CommandProcessingResult submitRDApplication(final JsonCommand command) {
         try {
             this.depositAccountDataValidator.validateRecurringDepositForSubmit(command.json());
-            final AppUser submittedBy = this.context.authenticatedUser();
+            final Object submittedBy = this.context.authenticatedUser();
             final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
             final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
             final RecurringDepositAccount account = (RecurringDepositAccount) this.depositAccountAssembler.assembleFrom(command, submittedBy, DepositAccountType.RECURRING_DEPOSIT);
