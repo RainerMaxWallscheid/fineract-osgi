@@ -203,7 +203,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult activate(final Long savingsId, final JsonCommand command) {
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         this.savingsAccountTransactionDataValidator.validateActivation(command);
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(account);
