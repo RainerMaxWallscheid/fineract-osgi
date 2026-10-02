@@ -198,16 +198,16 @@ public class ShareAccountDataSerializer {
         final MonetaryCurrency currency = shareProduct.getCurrency();
         Set<ShareAccountCharge> charges = assembleListOfAccountCharges(element, currency.getCode());
 
-        AppUser submittedBy = platformSecurityContext.authenticatedUser();
-        AppUser approvedBy = null;
+        Object submittedBy = platformSecurityContext.authenticatedUser();
+        Object approvedBy = null;
         LocalDate approvedDate = null;
-        AppUser rejectedBy = null;
+        Object rejectedBy = null;
         LocalDate rejectedDate = null;
-        AppUser activatedBy = null;
+        Object activatedBy = null;
         LocalDate activatedDate = null;
-        AppUser closedBy = null;
+        Object closedBy = null;
         LocalDate closedDate = null;
-        AppUser modifiedBy = null;
+        Object modifiedBy = null;
         LocalDateTime modifiedDate = null;
         String accountNo = null;
         Long approvedShares = null;
