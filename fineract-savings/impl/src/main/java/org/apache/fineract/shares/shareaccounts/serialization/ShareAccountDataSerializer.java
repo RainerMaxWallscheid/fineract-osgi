@@ -492,7 +492,7 @@ public class ShareAccountDataSerializer {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
 
-        AppUser approvedUser = this.platformSecurityContext.authenticatedUser();
+        Object approvedUser = this.platformSecurityContext.authenticatedUser();
         account.approve(approvedDate, approvedUser);
         actualChanges.put(ShareAccountApiConstants.id_paramname, account.getId());
         updateTotalChargeDerived(account);
