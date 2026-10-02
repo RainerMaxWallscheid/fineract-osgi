@@ -392,7 +392,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult approveApplication(final Long savingsId, final JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateApproval(command.json());
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
