@@ -236,7 +236,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     @Override
     public CommandProcessingResult activateRDAccount(final Long savingsId, final JsonCommand command) {
         boolean isRegularTransaction = false;
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         final boolean postReversals = false;
