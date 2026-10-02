@@ -976,7 +976,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Override
     public CommandProcessingResult undoWithdrawal(Long entityId, JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.fromApiJsonDeserializer.validateUndoWithDrawn(command);
         final Client client = this.clientRepository.findOneWithNotFoundDetection(entityId);
         final LocalDate undoWithdrawalDate = command.localDateValueOfParameterNamed(ClientApiConstants.reopenedDateParamName);
@@ -988,7 +988,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             throw new InvalidClientStateTransitionException("reopened", "date.cannot.before.client.withdrawal.date", errorMessage,
                     undoWithdrawalDate, client.getWithdrawalDate());
         }
-        client.reOpened(currentUser, undoWithdrawalDate);
+        client.reOpened((AppUser) currentUser, undoWithdrawalDate);
         this.clientRepository.saveAndFlush(client);
         businessEventNotifierService.notifyPostBusinessEvent(new ClientUndoWithdrawBusinessEvent(client));
         return //
