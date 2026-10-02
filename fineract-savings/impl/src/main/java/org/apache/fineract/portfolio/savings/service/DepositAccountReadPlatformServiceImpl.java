@@ -257,8 +257,8 @@ public class DepositAccountReadPlatformServiceImpl
 
     @Override
     public Object retrieveTemplate(final DepositAccountType depositAccountType, final Long clientId, final Long groupId, final Long productId, final boolean staffInSelectedOfficeOnly) {
-        final AppUser loggedInUser = this.context.authenticatedUser();
-        Long officeId = loggedInUser.getOffice().getId();
+        final Object loggedInUser = this.context.authenticatedUser();
+        Long officeId = ((AppUser) loggedInUser).getOffice().getId();
         ClientData client = null;
         Collection<SavingsAccountData> savingsAccountDatas = null;
         if (clientId != null) {
