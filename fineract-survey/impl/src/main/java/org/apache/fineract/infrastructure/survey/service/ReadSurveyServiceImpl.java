@@ -128,7 +128,8 @@ public class ReadSurveyServiceImpl implements ReadSurveyService {
 
     private String retrieveAllSurveyNameSQL(String andClause) {
         // PERMITTED datatables
-        return "select cf.name from x_registered_table " + " join c_configuration cf on x_registered_table.registered_table_name = cf.name " + " where exists" + " (select \'f\'" + " from m_appuser_role ur " + " join m_role r on r.id = ur.role_id" + " left join m_role_permission rp on rp.role_id = r.id" + " left join m_permission p on p.id = rp.permission_id" + " where ur.appuser_id = " + this.context.authenticatedUser().getId() + " and (p.code in (\'ALL_FUNCTIONS\', \'ALL_FUNCTIONS_READ\') or p.code = concat(\'READ_\', registered_table_name))) " + " and x_registered_table.category = " + DataTableApiConstant.CATEGORY_PPI + andClause + " order by application_table_name, registered_table_name";
+        final Object user = this.context.authenticatedUser();
+        return "select cf.name from x_registered_table " + " join c_configuration cf on x_registered_table.registered_table_name = cf.name " + " where exists" + " (select \'f\'" + " from m_appuser_role ur " + " join m_role r on r.id = ur.role_id" + " left join m_role_permission rp on rp.role_id = r.id" + " left join m_permission p on p.id = rp.permission_id" + " where ur.appuser_id = " + ((AppUser) user).getId() + " and (p.code in (\'ALL_FUNCTIONS\', \'ALL_FUNCTIONS_READ\') or p.code = concat(\'READ_\', registered_table_name))) " + " and x_registered_table.category = " + DataTableApiConstant.CATEGORY_PPI + andClause + " order by application_table_name, registered_table_name";
     }
 
     private String retrievePermittedSurveyName(String surveyName) {
