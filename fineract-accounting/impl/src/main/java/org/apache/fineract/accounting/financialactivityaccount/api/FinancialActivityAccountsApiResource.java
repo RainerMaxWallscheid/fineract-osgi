@@ -100,7 +100,8 @@ public class FinancialActivityAccountsApiResource {
         financialactivityaccounts/1""")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FinancialActivityAccountsApiResourceSwagger.GetFinancialActivityAccountsResponse.class)))
     public FinancialActivityAccountData retreive(@PathParam("mappingId") @Parameter(description = "mappingId") final Long mappingId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         FinancialActivityAccountData financialActivityAccountData = financialActivityAccountReadPlatformService.retrieve(mappingId);
         if (settings.isTemplate()) {
