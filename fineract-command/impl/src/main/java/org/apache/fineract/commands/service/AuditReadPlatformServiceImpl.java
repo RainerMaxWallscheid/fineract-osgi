@@ -205,8 +205,8 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
 
     @Override
     public AuditData retrieveAuditEntry(final Long auditId) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final AuditMapper rm = new AuditMapper();
         final String sql = "select " + rm.schema(true, hierarchy) + " where aud.id = ? ";
         try {
