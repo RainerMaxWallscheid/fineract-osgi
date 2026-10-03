@@ -153,8 +153,8 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         sqlValidator.validate(parameters.getOrderBy());
         sqlValidator.validate(parameters.getSortOrder());
         this.paginationParametersDataValidator.validateParameterValues(parameters, supportedOrderByValues, "audits");
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final AuditMapper rm = new AuditMapper();
         final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ");
