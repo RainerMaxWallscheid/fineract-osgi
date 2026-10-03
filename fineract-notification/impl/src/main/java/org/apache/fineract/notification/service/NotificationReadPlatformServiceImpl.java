@@ -89,7 +89,8 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
 
     @Override
     public Page<NotificationData> getAllUnreadNotifications(final SearchParameters searchParameters) {
-        final Long appUserId = context.authenticatedUser().getId();
+        final Object user = context.authenticatedUser();
+        final Long appUserId = ((AppUser) user).getId();
         final Pageable pageable = toPageable(searchParameters);
         final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository.findUnreadNotificationDataByUserId(appUserId, pageable);
         return toFineractPage(springPage);
