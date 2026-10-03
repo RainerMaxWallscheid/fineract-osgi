@@ -158,8 +158,8 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     public CommandProcessingResult updateUser(final Long userId, final JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser(new CommandWrapperBuilder().updateUser(null).build());
-            this.fromApiJsonDeserializer.validateForUpdate(command.json(), currentUser);
+            final Object currentUser = this.context.authenticatedUser(new CommandWrapperBuilder().updateUser(null).build());
+            this.fromApiJsonDeserializer.validateForUpdate(command.json(), (AppUser) currentUser);
             final AppUser userToUpdate = this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
             final Map<String, Object> changes = userToUpdate.update(command, this.platformPasswordEncoder);
@@ -182,7 +182,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                 userToUpdate.updateRoles(allRoles);
             }
             if (!changes.isEmpty()) {
-                if ((changes.containsKey("password") || changes.containsKey("passwordEncoded")) && !currentUser.getId().equals(userId) && this.configurationDomainService.isForcePasswordResetOnFirstLoginEnabled()) {
+                if ((changes.containsKey("password") || changes.containsKey("passwordEncoded")) && !((AppUser) currentUser).getId().equals(userId) && this.configurationDomainService.isForcePasswordResetOnFirstLoginEnabled()) {
                     userToUpdate.updatePasswordResetRequired(true);
                 }
                 this.appUserRepository.saveAndFlush(userToUpdate);
