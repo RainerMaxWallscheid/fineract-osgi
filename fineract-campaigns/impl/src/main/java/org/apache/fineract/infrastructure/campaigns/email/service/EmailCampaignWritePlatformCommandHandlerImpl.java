@@ -259,7 +259,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Transactional
     @Override
     public CommandProcessingResult closeEmailCampaign(Long campaignId, JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.emailCampaignValidator.validateClosedDate(command.json());
         final EmailCampaign emailCampaign = this.emailCampaignRepository.findById(campaignId).orElseThrow(() -> new EmailCampaignNotFound(campaignId));
         final Locale locale = command.extractLocale();
