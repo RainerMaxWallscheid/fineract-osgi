@@ -175,7 +175,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     @Transactional
     @Override
     public boolean saveDatatables(final Integer status, final String entity, final Long entityId, final Long productId, final JsonArray datatableDatas) {
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         boolean isMakerCheckerEnabled = false;
         if (datatableDatas != null && datatableDatas.size() > 0) {
             for (JsonElement element : datatableDatas) {
@@ -188,7 +188,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
                     throw new PlatformApiDataValidationException(errors);
                 }
                 final String taskPermissionName = "CREATE_" + datatableName;
-                user.validateHasPermissionTo(taskPermissionName);
+                ((AppUser) user).validateHasPermissionTo(taskPermissionName);
                 if (this.configurationDomainService.isMakerCheckerEnabledForTask(taskPermissionName)) {
                     isMakerCheckerEnabled = true;
                 }
