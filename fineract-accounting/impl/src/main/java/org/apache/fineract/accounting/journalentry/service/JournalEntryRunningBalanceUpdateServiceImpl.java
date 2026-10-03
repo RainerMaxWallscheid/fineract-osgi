@@ -43,6 +43,7 @@ import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecific
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.organisation.office.moduleapi.OfficePersistablePort;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -151,7 +152,8 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
                 }
                 BigDecimal officeRunningBalance = calculateRunningBalance(entryData, officeRunningBalanceMap);
                 BigDecimal runningBalance = calculateRunningBalance(entryData, runningBalanceMap);
-                params.add(new Object[] {Boolean.TRUE, runningBalance, officeRunningBalance, platformSecurityContext.authenticatedUser().getId(), DateUtils.getAuditOffsetDateTime(), entryData.getId()});
+                final Object user = platformSecurityContext.authenticatedUser();
+                params.add(new Object[] {Boolean.TRUE, runningBalance, officeRunningBalance, ((AppUser) user).getId(), DateUtils.getAuditOffsetDateTime(), entryData.getId()});
                 batchIndex++;
                 if (batchIndex == batchUpdateSize || index == entryDataList.size() - 1) {
                     this.jdbcTemplate.batchUpdate(sql, params);
