@@ -188,10 +188,11 @@ public class LoanRescheduleRequestWritePlatformServiceImpl implements LoanResche
                 // string
                 adjustedDueDate = jsonCommand.localDateValueOfParameterNamed(RescheduleLoansApiConstants.adjustedDueDateParamName);
             }
+            final Object submittedByUser = this.platformSecurityContext.authenticatedUser();
             final LoanRescheduleRequest loanRescheduleRequest = LoanRescheduleRequest.instance(loan,
                     LoanStatus.SUBMITTED_AND_PENDING_APPROVAL.getValue(), rescheduleFromInstallment, rescheduleFromDate,
-                    recalculateInterest, rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate,
-                    this.platformSecurityContext.authenticatedUser(), null, null, null, null);
+                    recalculateInterest, rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate, submittedByUser,
+                    null, null, null, null);
             // update reschedule request to term variations mapping
             List<LoanRescheduleRequestToTermVariationMapping> loanRescheduleRequestToTermVariationMappings = new ArrayList<>();
             final Boolean isActive = false;
