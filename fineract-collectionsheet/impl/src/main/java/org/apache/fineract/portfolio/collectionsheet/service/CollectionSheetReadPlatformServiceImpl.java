@@ -331,8 +331,8 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
     @Override
     public JLGCollectionSheetData generateCenterCollectionSheet(final Long centerId, final JsonQuery query) {
         this.collectionSheetGenerateCommandFromApiJsonDeserializer.validateForGenerateCollectionSheet(query.json());
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String officeHierarchy = hierarchy + "%";
         final CenterData center = this.centerReadPlatformService.retrieveOne(centerId);
         final LocalDate transactionDate = query.localDateValueOfParameterNamed(transactionDateParamName);
