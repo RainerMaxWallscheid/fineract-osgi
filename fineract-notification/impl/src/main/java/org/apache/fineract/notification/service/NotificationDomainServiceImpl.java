@@ -25,6 +25,7 @@ import org.apache.fineract.infrastructure.event.business.moduleapi.PortfolioNoti
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanNotificationEventPort;
+import org.apache.fineract.useradministration.domain.AppUser;
 
 public class NotificationDomainServiceImpl implements NotificationDomainService {
     @java.lang.SuppressWarnings("all")
@@ -39,13 +40,20 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(ShareProductDividentsCreateBusinessEvent.class,
                 new ShareProductDividendCreatedListener());
-        loanNotificationEventPort.onLoanNotifications(notification -> buildNotification(notification.permission(), notification.objectType(),
-                notification.objectId(), notification.notificationContent(), notification.eventType(), context.authenticatedUser().getId(),
-                notification.officeId() != null ? notification.officeId() : context.authenticatedUser().getOffice().getId()));
-        portfolioNotificationEventPort.onNotifications(notification -> buildNotification(notification.permission(),
-                notification.objectType(), notification.objectId(), notification.notificationContent(), notification.eventType(),
-                context.authenticatedUser().getId(),
-                notification.officeId() != null ? notification.officeId() : context.authenticatedUser().getOffice().getId()));
+        loanNotificationEventPort.onLoanNotifications(notification -> {
+            final Object user = context.authenticatedUser();
+            final Object currentUser = context.authenticatedUser();
+            buildNotification(notification.permission(), notification.objectType(), notification.objectId(),
+                    notification.notificationContent(), notification.eventType(), ((AppUser) user).getId(),
+                    notification.officeId() != null ? notification.officeId() : ((AppUser) currentUser).getOffice().getId());
+        });
+        portfolioNotificationEventPort.onNotifications(notification -> {
+            final Object user = context.authenticatedUser();
+            final Object currentUser = context.authenticatedUser();
+            buildNotification(notification.permission(), notification.objectType(), notification.objectId(),
+                    notification.notificationContent(), notification.eventType(), ((AppUser) user).getId(),
+                    notification.officeId() != null ? notification.officeId() : ((AppUser) currentUser).getOffice().getId());
+        });
     }
 
     private final class ShareProductDividendCreatedListener implements BusinessEventListener<ShareProductDividentsCreateBusinessEvent> {
