@@ -253,8 +253,8 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     @Transactional
     public CommandProcessingResult deleteCashierAllocation(Long tellerId, Long cashierId, JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
-            final Cashier cashier = validateUserPriviledgeOnCashierAndRetrieve(currentUser, tellerId, cashierId);
+            final Object currentUser = this.context.authenticatedUser();
+            final Cashier cashier = validateUserPriviledgeOnCashierAndRetrieve((AppUser) currentUser, tellerId, cashierId);
             this.cashierRepository.delete(cashier);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleTellerDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
