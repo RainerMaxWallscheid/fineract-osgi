@@ -75,7 +75,8 @@ public class ReadSurveyServiceImpl implements ReadSurveyService {
         sqlValidator.validate(surveyName);
         final String sql = "select cf.enabled, application_table_name, registered_table_name, entity_subtype" + " from x_registered_table " + " left join c_configuration cf on x_registered_table.registered_table_name = cf.name " + " where exists" + " (select \'f\'" + " from m_appuser_role ur " + " join m_role r on r.id = ur.role_id" + " left join m_role_permission rp on rp.role_id = r.id" + " left join m_permission p on p.id = rp.permission_id" + " where ur.appuser_id = ? and registered_table_name=?" + " and (p.code in (\'ALL_FUNCTIONS\', \'ALL_FUNCTIONS_READ\') or p.code = concat(\'READ_\', registered_table_name))) " + " order by application_table_name, registered_table_name";
         SurveyDataTableData datatableData = null;
-        final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql, new Object[] {this.context.authenticatedUser().getId(), surveyName}); // NOSONAR
+        final Object user = this.context.authenticatedUser();
+        final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql, new Object[] {((AppUser) user).getId(), surveyName}); // NOSONAR
         if (rs.next()) {
             final String appTableName = rs.getString("application_table_name");
             final String registeredDatatableName = rs.getString("registered_table_name");
