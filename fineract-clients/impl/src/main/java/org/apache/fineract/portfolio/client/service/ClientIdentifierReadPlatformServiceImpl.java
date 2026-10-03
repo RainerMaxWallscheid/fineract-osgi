@@ -40,8 +40,8 @@ public class ClientIdentifierReadPlatformServiceImpl implements ClientIdentifier
 
     @Override
     public List<ClientIdentifierData> retrieveClientIdentifiers(final Long clientId) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final ClientIdentityMapper rm = new ClientIdentityMapper();
         String sql = "select " + rm.schema();
