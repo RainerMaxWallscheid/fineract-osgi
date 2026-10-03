@@ -87,7 +87,8 @@ public class FinancialActivityAccountsApiResource {
         financialactivityaccounts""")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FinancialActivityAccountsApiResourceSwagger.GetFinancialActivityAccountsResponse.class))))
     public List<FinancialActivityAccountData> retrieveAll() {
-        context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
         return financialActivityAccountReadPlatformService.retrieveAll();
     }
 
