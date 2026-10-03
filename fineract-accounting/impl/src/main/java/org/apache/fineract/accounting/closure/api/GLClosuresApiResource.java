@@ -104,7 +104,8 @@ public class GLClosuresApiResource {
     @AlternativeOperationId("retreiveClosure")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GLClosuresApiResourceSwagger.GetGlClosureResponse.class)))
     public GLClosureData retreiveClosure(@PathParam("glClosureId") @Parameter(description = "glClosureId") final Long glClosureId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final GLClosureData glClosureData = glClosureReadPlatformService.retrieveGLClosureById(glClosureId);
         if (settings.isTemplate()) {
