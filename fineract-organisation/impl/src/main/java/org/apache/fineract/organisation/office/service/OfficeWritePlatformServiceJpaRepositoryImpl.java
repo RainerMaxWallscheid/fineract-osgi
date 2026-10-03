@@ -95,16 +95,16 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')"), @CacheEvict(value = "officesById", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#officeId)")})
     public CommandProcessingResult updateOffice(final Long officeId, final JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
             Long parentId = null;
             if (command.parameterExists("parentId")) {
                 parentId = command.longValueOfParameterNamed("parentId");
             }
-            final Office office = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, officeId);
+            final Office office = validateUserPriviledgeOnOfficeAndRetrieve((AppUser) currentUser, officeId);
             final Map<String, Object> changes = office.update(command);
             if (changes.containsKey("parentId")) {
-                final Office parent = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, parentId);
+                final Office parent = validateUserPriviledgeOnOfficeAndRetrieve((AppUser) currentUser, parentId);
                 office.update(parent);
             }
             if (!changes.isEmpty()) {
