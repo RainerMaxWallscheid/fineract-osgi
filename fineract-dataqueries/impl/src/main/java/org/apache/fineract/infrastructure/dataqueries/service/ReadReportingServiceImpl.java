@@ -195,9 +195,9 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         final Map<String, String> paramFormatTypes = this.reportParameterTypeResolver.loadParamFormatTypes(name);
         String sql = getSql(name, type);
         // Step 1 — resolve server-controlled placeholders as plain strings (not user input)
-        final AppUser currentUser = this.context.authenticatedUser();
-        sql = this.genericDataService.replace(sql, "${currentUserHierarchy}", currentUser.getOffice().getHierarchy());
-        sql = this.genericDataService.replace(sql, "${currentUserId}", currentUser.getId().toString());
+        final Object currentUser = this.context.authenticatedUser();
+        sql = this.genericDataService.replace(sql, "${currentUserHierarchy}", ((AppUser) currentUser).getOffice().getHierarchy());
+        sql = this.genericDataService.replace(sql, "${currentUserId}", ((AppUser) currentUser).getId().toString());
         sql = this.genericDataService.replace(sql, "${currentDate}", sqlGenerator.currentBusinessDate());
         // Step 2 — replace SQL function aliases with tenant-aware equivalents (case-insensitive, literal match)
         sql = Pattern.compile(Pattern.quote("NOW()"), Pattern.CASE_INSENSITIVE).matcher(sql).replaceAll(Matcher.quoteReplacement(sqlGenerator.currentTenantDateTime()));
