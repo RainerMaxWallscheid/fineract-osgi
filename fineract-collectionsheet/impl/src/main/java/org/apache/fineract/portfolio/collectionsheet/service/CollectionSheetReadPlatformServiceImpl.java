@@ -257,8 +257,8 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
         if (!calendar.isValidRecurringDate(transactionDate, isSkipMeetingOnFirstDay, numberOfDays)) {
             throw new NotValidRecurringDateException("collectionsheet", "The date \'" + transactionDate + "\' is not a valid meeting date.", transactionDate);
         }
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String officeHierarchy = hierarchy + "%";
         final JLGCollectionSheetFaltDataMapper mapper = new JLGCollectionSheetFaltDataMapper(sqlGenerator);
         final SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("dueDate", transactionDateStr).addValue("groupId", group.getId()).addValue("officeHierarchy", officeHierarchy).addValue("entityTypeId", entityType.getValue());
