@@ -40,6 +40,8 @@ SMS campaign create uses Object user (not leftover AppUser).
 
 SMS campaign activation uses Object user (not leftover AppUser).
 
+SMS campaign closure uses Object user (not leftover AppUser).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```
