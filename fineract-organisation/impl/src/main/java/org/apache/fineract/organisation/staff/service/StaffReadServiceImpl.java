@@ -33,6 +33,7 @@ import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -138,7 +139,8 @@ public class StaffReadServiceImpl implements StaffReadService {
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
-        final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy() + "%";
         final Long defaultOfficeId = defaultToUsersOfficeIfNull(officeId);
         final String sql = "select " + LOOKUP_MAPPER.schema() + " where s.office_id = ? and s.is_active=true and o.hierarchy like ? ";
         return this.jdbcTemplate.query(sql, LOOKUP_MAPPER, defaultOfficeId, hierarchy); // NOSONAR
