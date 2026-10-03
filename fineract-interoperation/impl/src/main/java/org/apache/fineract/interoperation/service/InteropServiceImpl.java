@@ -56,6 +56,7 @@ import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.moduleapi.SavingsInteropPort;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -187,7 +188,8 @@ public class InteropServiceImpl implements InteropService {
     public InteropIdentifierAccountResponseData registerAccountIdentifier(@NonNull final InteropIdentifierType idType,
             @NonNull final String idValue, final String subIdOrType, @NonNull final JsonCommand command) {
         final InteropIdentifierRequestData request = dataValidator.validateAndParseCreateIdentifier(idType, idValue, subIdOrType, command);
-        return savingsInteropPort.registerIdentifier(request, securityContext.authenticatedUser().getUsername());
+        final Object user = securityContext.authenticatedUser();
+        return savingsInteropPort.registerIdentifier(request, ((AppUser) user).getUsername());
     }
 
     @NonNull
