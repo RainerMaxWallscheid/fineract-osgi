@@ -94,7 +94,8 @@ public class DatatableReadServiceImpl implements DatatableReadService {
         sqlValidator.validate(datatable);
         final String sql = "select application_table_name, registered_table_name, entity_subtype from x_registered_table " + " where exists (select \'f\' from m_appuser_role ur join m_role r on r.id = ur.role_id" + " left join m_role_permission rp on rp.role_id = r.id left join m_permission p on p.id = rp.permission_id" + " where ur.appuser_id = ? and registered_table_name=? and (p.code in (\'ALL_FUNCTIONS\', " + "\'ALL_FUNCTIONS_READ\') or p.code = concat(\'READ_\', registered_table_name))) " + " order by application_table_name, registered_table_name";
         DatatableData datatableData = null;
-        final SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, new Object[] {this.context.authenticatedUser().getId(), datatable}); // NOSONAR
+        final Object user = this.context.authenticatedUser();
+        final SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, new Object[] {((AppUser) user).getId(), datatable}); // NOSONAR
         if (rowSet.next()) {
             final String appTableName = rowSet.getString(APPLICATION_TABLE_NAME);
             final String registeredDatatableName = rowSet.getString("registered_table_name");
