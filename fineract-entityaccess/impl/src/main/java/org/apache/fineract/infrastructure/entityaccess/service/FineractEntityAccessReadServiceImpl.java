@@ -115,9 +115,9 @@ public class FineractEntityAccessReadServiceImpl implements FineractEntityAccess
     @Override
     public Collection<FineractEntityToEntityMappingData> retrieveEntityAccessFor(FineractEntityType firstEntityType, final Long relId,
             final Long fromEntityId, boolean includeAllSubOffices) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
 
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         String hierarchySearchString = null;
         if (includeAllSubOffices) {
             hierarchySearchString = "." + "%";
