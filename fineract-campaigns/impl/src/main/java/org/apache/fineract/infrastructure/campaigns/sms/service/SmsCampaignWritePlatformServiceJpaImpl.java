@@ -94,7 +94,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     @Override
     public CommandProcessingResult create(JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.smsCampaignValidator.validateCreate(command.json());
             final String campaignName = command.stringValueOfParameterNamed(SmsCampaignValidator.campaignName);
             if (this.smsCampaignRepository.existsByCampaignName(campaignName)) {
