@@ -69,7 +69,7 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
     public void checkConfigurationAndAddProductResrictionsForUserOffice(final FineractEntityAccessType fineractEntityAccessType,
             final Long productOrChargeId) {
 
-        AppUser thisUser = this.context.authenticatedUser();
+        Object thisUser = this.context.authenticatedUser();
 
         // check if the office specific products are enabled. If yes, then save
         // this product or charge against a specific office
@@ -85,7 +85,7 @@ public class FineractEntityAccessUtil implements OfficeProductRestrictionService
                     .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.RESTRICT_PRODUCTS_TO_USER_OFFICE);
 
             if (restrictToUserOfficeProperty.isEnabled()) {
-                final Long officeId = thisUser.getOffice().getId();
+                final Long officeId = ((AppUser) thisUser).getOffice().getId();
                 LocalDate startDateFormapping = null;
                 LocalDate endDateFormapping = null;
                 FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepositoryWrapper
