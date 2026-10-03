@@ -128,7 +128,8 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     public CommandProcessingResult changeUserPassword(final Long userId, final JsonCommand command) {
         try {
             this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build());
-            this.fromApiJsonDeserializer.validateForChangePassword(command.json(), this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build()));
+            final Object currentUser = this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build());
+            this.fromApiJsonDeserializer.validateForChangePassword(command.json(), (AppUser) currentUser);
             final AppUser userToUpdate = this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
             final Map<String, Object> changes = userToUpdate.changePassword(command, this.platformPasswordEncoder);
