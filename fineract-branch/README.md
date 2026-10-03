@@ -21,7 +21,7 @@ No `:fineract-branch` façade. Depend on `-api`; composition roots also take `-i
 
 Service impls + `OrganisationTellerConfiguration` live in **branch-impl**. Loan uses **`CashierTxnValidationPort`** only (no validator / domain types).
 
-Teller cashier allocation uses StaffPersistablePort (not leftover Staff repository). Teller office checks use OfficePersistablePort.persistableById and teller privilege checks use OfficePersistablePort.doesNotHaveAnOfficeInHierarchyWithId (not leftover Office repository).
+Teller cashier allocation uses StaffPersistablePort (not leftover Staff repository). Teller office checks use OfficePersistablePort.persistableById and teller privilege checks use OfficePersistablePort.doesNotHaveAnOfficeInHierarchyWithId (not leftover Office repository). Teller list office hierarchy uses Object user (not leftover AppUser).
 
 ### Consumers
 

@@ -176,8 +176,8 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
 
     @Cacheable(value = "tellers", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')")
     public Collection<TellerData> retrieveAllTellers(final boolean includeAllTellers) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         String hierarchySearchString = null;
         if (includeAllTellers) {
             hierarchySearchString = "." + "%";
