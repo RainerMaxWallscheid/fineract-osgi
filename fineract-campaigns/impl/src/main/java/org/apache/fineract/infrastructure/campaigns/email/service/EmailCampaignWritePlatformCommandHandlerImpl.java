@@ -87,7 +87,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Transactional
     @Override
     public CommandProcessingResult create(JsonCommand command) {
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         this.emailCampaignValidator.validateCreate(command.json());
         final Long businessRuleId = command.longValueOfParameterNamed(EmailCampaignValidator.businessRuleId);
         this.reportLookupPort.assertExists(businessRuleId);

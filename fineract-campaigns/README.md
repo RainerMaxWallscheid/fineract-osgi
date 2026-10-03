@@ -28,6 +28,8 @@ Email execute report run-as user uses AppUserPersistablePort (not leftover AppUs
 
 SMS campaign office hierarchy checks use OfficePersistablePort (not leftover Office repository).
 
+Email campaign create uses Object user (not leftover AppUser).
+
 ```bash
 ./gradlew :fineract-campaigns-api:jar :fineract-campaigns-impl:jar :fineract-campaigns-test:test
 ```
