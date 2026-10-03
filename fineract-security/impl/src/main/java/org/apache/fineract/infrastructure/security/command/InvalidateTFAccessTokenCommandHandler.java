@@ -58,8 +58,8 @@ public class InvalidateTFAccessTokenCommandHandler implements NewCommandSourceHa
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         validateJson(command.json());
-        final AppUser user = securityContext.authenticatedUser();
-        final TFAccessToken accessToken = twoFactorService.invalidateAccessToken(user, command);
+        final Object user = securityContext.authenticatedUser();
+        final TFAccessToken accessToken = twoFactorService.invalidateAccessToken((AppUser) user, command);
         return  //
         //
         //
