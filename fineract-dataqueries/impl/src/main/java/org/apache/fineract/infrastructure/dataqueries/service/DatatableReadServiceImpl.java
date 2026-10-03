@@ -38,6 +38,7 @@ import org.apache.fineract.infrastructure.security.service.SqlValidator;
 import org.apache.fineract.portfolio.search.data.AdvancedQueryData;
 import org.apache.fineract.portfolio.search.data.ColumnFilterData;
 import org.apache.fineract.portfolio.search.service.SearchUtil;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -68,9 +69,11 @@ public class DatatableReadServiceImpl implements DatatableReadService {
         Object[] params;
         if (appTable != null) {
             sql = sql + " and application_table_name like ? ";
-            params = new Object[] {this.context.authenticatedUser().getId(), appTable};
+            final Object user = this.context.authenticatedUser();
+            params = new Object[] {((AppUser) user).getId(), appTable};
         } else {
-            params = new Object[] {this.context.authenticatedUser().getId()};
+            final Object user = this.context.authenticatedUser();
+            params = new Object[] {((AppUser) user).getId()};
         }
         sql = sql + " order by application_table_name, registered_table_name";
         final List<DatatableData> datatables = new ArrayList<>();
