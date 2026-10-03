@@ -114,9 +114,9 @@ public class AccountingRuleApiResource {
         
         accountingrules""")
     public List<AccountingRuleData> retrieveAllAccountingRules(@Context final UriInfo uriInfo) {
-        final AppUser currentUser = context.authenticatedUser();
-        currentUser.validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         boolean isAssociationParametersExists = !associationParameters.isEmpty() && associationParameters.contains("all");
