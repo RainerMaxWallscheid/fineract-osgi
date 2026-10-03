@@ -180,7 +180,8 @@ public class StaffReadServiceImpl implements StaffReadService {
     private List<StaffData> retrieveAllStaff(final SQLBuilder extraCriteria) {
         final StaffMapper rm = new StaffMapper();
         String sql = "select " + rm.schema();
-        final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy() + "%";
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
