@@ -67,8 +67,8 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
 
     @Override
     public Collection<AppUserData> retrieveSearchTemplate() {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final AppUserLookupMapper mapper = new AppUserLookupMapper();
         final String sql = "select " + mapper.schema();
