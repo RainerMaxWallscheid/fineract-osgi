@@ -73,8 +73,8 @@ public class TwoFactorApiResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON})
     public String requestToken(@QueryParam("deliveryMethod") final String deliveryMethod, @QueryParam("extendedToken") @DefaultValue("false") boolean extendedAccessToken, @Context final UriInfo uriInfo) {
-        final AppUser user = context.authenticatedUser();
-        final OTPRequest request = twoFactorService.createNewOTPToken(user, deliveryMethod, extendedAccessToken);
+        final Object user = context.authenticatedUser();
+        final OTPRequest request = twoFactorService.createNewOTPToken((AppUser) user, deliveryMethod, extendedAccessToken);
         return this.otpRequestSerializer.serialize(request.getMetadata());
     }
 
