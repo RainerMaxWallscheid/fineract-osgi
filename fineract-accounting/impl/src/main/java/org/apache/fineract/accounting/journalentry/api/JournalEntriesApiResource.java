@@ -69,6 +69,7 @@ import org.apache.fineract.infrastructure.security.service.SqlValidator;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/journalentries")
@@ -95,7 +96,8 @@ public class JournalEntriesApiResource {
     @AlternativeOperationId("retrieveAll_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = JournalEntriesApiResourceSwagger.GetJournalEntriesTransactionIdResponse.class)))
     public String retrieveAll(@Context final UriInfo uriInfo, @QueryParam("officeId") @Parameter(description = "officeId") final Long officeId, @QueryParam("glAccountId") @Parameter(description = "glAccountId") final Long glAccountId, @QueryParam("manualEntriesOnly") @Parameter(description = "manualEntriesOnly") final Boolean onlyManualEntries, @QueryParam("fromDate") @Parameter(description = "fromDate") final DateParam fromDateParam, @QueryParam("toDate") @Parameter(description = "toDate") final DateParam toDateParam, @QueryParam("submittedOnDateFrom") @Parameter(description = "submittedOnDateFrom") final DateParam submittedOnDateFromParam, @QueryParam("submittedOnDateTo") @Parameter(description = "submittedOnDateTo") final DateParam submittedOnDateToParam, @QueryParam("transactionId") @Parameter(description = "transactionId") final String transactionId, @QueryParam("entityType") @Parameter(description = "entityType") final Integer entityType, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("locale") @Parameter(description = "locale") final String locale, @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String rawDateFormat, @QueryParam("loanId") @Parameter(description = "loanId") final Long loanId, @QueryParam("savingsId") @Parameter(description = "savingsId") final Long savingsId, @QueryParam("runningBalance") @Parameter(description = "runningBalance") final boolean runningBalance, @QueryParam("transactionDetails") @Parameter(description = "transactionDetails") final boolean transactionDetails) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final DateFormat dateFormat = StringUtils.isBlank(rawDateFormat) ? null : new DateFormat(rawDateFormat);
         LocalDate fromDate = null;
         if (fromDateParam != null) {
