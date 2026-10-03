@@ -79,10 +79,10 @@ public class ScorecardApiResource {
     @AlternativeOperationId("createScorecard_1")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public void createScorecard(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @Parameter(description = "scorecardData") final ScorecardData scorecardData) {
-        final AppUser appUser = this.securityContext.authenticatedUser();
+        final Object appUser = this.securityContext.authenticatedUser();
         final Survey survey = this.spmService.findById(surveyId);
         final Object client = findClient(scorecardData.getClientId());
-        this.scorecardService.createScorecard(ScorecardMapper.map(scorecardData, survey, appUser, client));
+        this.scorecardService.createScorecard(ScorecardMapper.map(scorecardData, survey, (AppUser) appUser, client));
     }
 
     @GET
