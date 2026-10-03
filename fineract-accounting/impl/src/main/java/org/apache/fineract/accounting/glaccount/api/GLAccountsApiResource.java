@@ -131,7 +131,8 @@ public class GLAccountsApiResource {
         """)
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = GLAccountsApiResourceSwagger.GetGLAccountsResponse.class))))
     public List<GLAccountData> retrieveAllAccounts(@QueryParam("type") @Parameter(description = "type") final Integer type, @QueryParam("searchParam") @Parameter(description = "searchParam") final String searchParam, @QueryParam("usage") @Parameter(description = "usage") final Integer usage, @QueryParam("manualEntriesAllowed") @Parameter(description = "manualEntriesAllowed") final Boolean manualEntriesAllowed, @QueryParam("disabled") @Parameter(description = "disabled") final Boolean disabled, @QueryParam("fetchRunningBalance") @Parameter(description = "fetchRunningBalance") final boolean runningBalance) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(false, runningBalance);
         return this.glAccountReadPlatformService.retrieveAllGLAccounts(type, searchParam, usage, manualEntriesAllowed, disabled, associationParametersData);
     }
