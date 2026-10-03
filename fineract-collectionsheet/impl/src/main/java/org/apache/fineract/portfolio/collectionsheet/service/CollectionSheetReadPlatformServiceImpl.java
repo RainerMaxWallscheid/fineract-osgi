@@ -499,8 +499,8 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
         this.collectionSheetGenerateCommandFromApiJsonDeserializer.validateForGenerateCollectionSheetOfIndividuals(query.json());
         final LocalDate transactionDate = query.localDateValueOfParameterNamed(transactionDateParamName);
         final String transactionDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String officeHierarchy = hierarchy + "%";
         final Long officeId = query.longValueOfParameterNamed(officeIdParamName);
         final Long staffId = query.longValueOfParameterNamed(staffIdParamName);
