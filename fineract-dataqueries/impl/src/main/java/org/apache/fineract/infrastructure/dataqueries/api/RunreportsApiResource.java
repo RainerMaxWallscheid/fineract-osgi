@@ -111,8 +111,8 @@ public class RunreportsApiResource {
         // Anyone can run a 'report' that is simply getting possible parameter
         // (dropdown listbox) values.
         if (!parameterType) {
-            final AppUser currentUser = this.context.authenticatedUser();
-            if (currentUser.hasNotPermissionForReport(reportName)) {
+            final Object currentUser = this.context.authenticatedUser();
+            if (((AppUser) currentUser).hasNotPermissionForReport(reportName)) {
                 throw new NoAuthorizationException("Not authorised to run report: " + reportName);
             }
         }
