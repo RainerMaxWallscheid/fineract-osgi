@@ -60,8 +60,10 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
         @Override
         public void onBusinessEvent(ShareProductDividentsCreateBusinessEvent event) {
             Long shareProductId = event.get();
+            final Object user = context.authenticatedUser();
+            final Object currentUser = context.authenticatedUser();
             buildNotification("READ_DIVIDEND_SHAREPRODUCT", "shareProduct", shareProductId, "Dividend posted to account", "dividendPosted",
-                    context.authenticatedUser().getId(), context.authenticatedUser().getOffice().getId());
+                    ((AppUser) user).getId(), ((AppUser) currentUser).getOffice().getId());
         }
     }
 
