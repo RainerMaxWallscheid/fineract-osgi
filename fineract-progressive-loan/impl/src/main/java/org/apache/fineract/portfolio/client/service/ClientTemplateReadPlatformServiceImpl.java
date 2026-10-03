@@ -46,6 +46,7 @@ import org.apache.fineract.portfolio.client.domain.LegalForm;
 import org.apache.fineract.portfolio.client.moduleapi.ClientEnumerations;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -108,7 +109,8 @@ public class ClientTemplateReadPlatformServiceImpl implements ClientTemplateRead
     private Long defaultToUsersOfficeIfNull(final Long officeId) {
         Long defaultOfficeId = officeId;
         if (defaultOfficeId == null) {
-            defaultOfficeId = this.context.authenticatedUser().getOffice().getId();
+            final Object currentUser = this.context.authenticatedUser();
+            defaultOfficeId = ((AppUser) currentUser).getOffice().getId();
         }
         return defaultOfficeId;
     }
