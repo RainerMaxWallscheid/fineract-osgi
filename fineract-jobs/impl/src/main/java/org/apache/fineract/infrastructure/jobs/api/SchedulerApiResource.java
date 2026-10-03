@@ -44,6 +44,7 @@ import org.apache.fineract.infrastructure.jobs.data.SchedulerDetailData;
 import org.apache.fineract.infrastructure.jobs.service.JobRegisterService;
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +91,8 @@ public class SchedulerApiResource {
     public Response changeSchedulerStatus(
             @QueryParam(SchedulerJobApiConstants.COMMAND) @Parameter(description = "command") final String commandParam) {
         // check the logged in user have permissions to update scheduler status
-        final boolean hasNotPermission = this.context.authenticatedUser().hasNotPermissionForAnyOf("ALL_FUNCTIONS", "UPDATE_SCHEDULER");
+        final Object user = this.context.authenticatedUser();
+        final boolean hasNotPermission = ((AppUser) user).hasNotPermissionForAnyOf("ALL_FUNCTIONS", "UPDATE_SCHEDULER");
         if (hasNotPermission) {
             final String authorizationMessage = "User has no authority to update scheduler status";
             throw new NoAuthorizationException(authorizationMessage);
