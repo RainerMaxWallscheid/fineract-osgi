@@ -44,6 +44,7 @@ import org.apache.fineract.infrastructure.documentmanagement.data.DocumentCreate
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentCreateResponse;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.tika.Tika;
@@ -163,7 +164,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         });
         // TODO: does it really make sense to use the current user's ID?
         // TODO: wouldn't it be better to use "entityType.name()" as entity name?
-        return writePlatformService.createDocument(DocumentCreateRequest.builder().entityId(this.securityContext.authenticatedUser().getId()).entityType("IMPORT").name(fileDetail.getFileName()).description(fileDetail.getFileName()).fileName(fileDetail.getFileName()).size(fileDetail.getSize()).type(fileType).stream(pipedInputStream).build());
+        final Object user = this.securityContext.authenticatedUser();
+        return writePlatformService.createDocument(DocumentCreateRequest.builder().entityId(((AppUser) user).getId()).entityType("IMPORT").name(fileDetail.getFileName()).description(fileDetail.getFileName()).fileName(fileDetail.getFileName()).size(fileDetail.getSize()).type(fileType).stream(pipedInputStream).build());
     }
 
     private Long publishEvent(final Integer primaryColumn, final FormDataContentDisposition fileDetail, final String fileType, final GlobalEntityType entityType, final Workbook workbook, final String locale, final String dateFormat) {
