@@ -63,7 +63,6 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.moduleapi.ClientActivePort;
 
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -340,7 +339,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Override
     public CommandProcessingResult reactivateEmailCampaign(final Long campaignId, JsonCommand command) {
         this.emailCampaignValidator.validateActivation(command.json());
-        final AppUser currentUser = this.context.authenticatedUser();
+        final Object currentUser = this.context.authenticatedUser();
         final EmailCampaign emailCampaign = this.emailCampaignRepository.findById(campaignId).orElseThrow(() -> new EmailCampaignNotFound(campaignId));
         final Locale locale = command.extractLocale();
         final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
