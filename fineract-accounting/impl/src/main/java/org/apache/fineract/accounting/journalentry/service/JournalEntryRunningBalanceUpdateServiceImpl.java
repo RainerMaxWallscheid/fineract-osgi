@@ -181,7 +181,8 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
         String sql = "UPDATE acc_gl_journal_entry SET office_running_balance=?, last_modified_by=?, last_modified_on_utc=? WHERE id=?";
         for (JournalEntryData entryData : entryDataList) {
             BigDecimal runningBalance = calculateRunningBalance(entryData, runningBalanceMap);
-            params.add(new Object[] {runningBalance, platformSecurityContext.authenticatedUser().getId(), DateUtils.getAuditOffsetDateTime(), entryData.getId()});
+            final Object user = platformSecurityContext.authenticatedUser();
+            params.add(new Object[] {runningBalance, ((AppUser) user).getId(), DateUtils.getAuditOffsetDateTime(), entryData.getId()});
         }
         this.jdbcTemplate.batchUpdate(sql, params);
     }
