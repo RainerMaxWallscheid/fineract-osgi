@@ -68,6 +68,7 @@ import org.apache.fineract.infrastructure.jobs.service.SchedulerJobRunnerReadSer
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/jobs")
@@ -194,7 +195,8 @@ public class SchedulerJobApiResource {
         // check the logged-in user have permissions to execute scheduler jobs
         Response response;
         if (fineractProperties.getMode().isBatchManagerEnabled()) {
-            final boolean hasNotPermission = context.authenticatedUser().hasNotPermissionForAnyOf("ALL_FUNCTIONS", "EXECUTEJOB_SCHEDULER");
+            final Object user = context.authenticatedUser();
+            final boolean hasNotPermission = ((AppUser) user).hasNotPermissionForAnyOf("ALL_FUNCTIONS", "EXECUTEJOB_SCHEDULER");
             if (hasNotPermission) {
                 final String authorizationMessage = "User has no authority to execute scheduler jobs";
                 throw new NoAuthorizationException(authorizationMessage);
