@@ -329,7 +329,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     @Transactional
     @Override
     public CommandProcessingResult activateSmsCampaign(Long campaignId, JsonCommand command) {
-        final AppUser currentUser = context.authenticatedUser();
+        final Object currentUser = context.authenticatedUser();
         this.smsCampaignValidator.validateActivation(command.json());
         final SmsCampaign smsCampaign = smsCampaignRepository.findById(campaignId).orElseThrow(() -> new SmsCampaignNotFound(campaignId));
         final Locale locale = command.extractLocale();
