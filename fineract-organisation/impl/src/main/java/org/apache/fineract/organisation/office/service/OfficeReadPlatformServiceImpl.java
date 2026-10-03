@@ -127,8 +127,8 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     @Override
     @Cacheable(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')")
     public Collection<OfficeData> retrieveAllOffices(final boolean includeAllOffices, final SearchParameters searchParameters) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = includeAllOffices ? "." + "%" : hierarchy + "%";
         final OfficeMapper rm = new OfficeMapper();
         final StringBuilder sqlBuilder = new StringBuilder(200);
