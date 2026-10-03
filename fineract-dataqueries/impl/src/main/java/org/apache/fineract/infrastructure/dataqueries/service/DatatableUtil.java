@@ -137,8 +137,8 @@ public class DatatableUtil {
     public String dataScopedSQL(@NonNull EntityTables entityTable, final Long appTableId, final List<Object> params) {
         // unfortunately have to, one way or another, be able to restrict data to the users office hierarchy. Here, a
         // few key tables are done. But if additional fields are needed on other tables the same pattern applies
-        final AppUser currentUser = this.context.authenticatedUser();
-        String officeHierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        String officeHierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         String hierarchyPattern = officeHierarchy + "%";
         // m_loan and m_savings_account are connected to an m_office through either an m_client or an m_group If both it
         // means it relates to an m_client that is in a group (still an m_client account)
