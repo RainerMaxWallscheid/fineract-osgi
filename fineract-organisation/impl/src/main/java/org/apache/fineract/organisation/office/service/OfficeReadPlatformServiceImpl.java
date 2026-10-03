@@ -212,8 +212,8 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public Collection<OfficeTransactionData> retrieveAllOfficeTransactions() {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final OfficeTransactionMapper rm = new OfficeTransactionMapper(sqlGenerator);
         final String sql = "select " + rm.schema() + " where (fromoff.hierarchy like ? or tooff.hierarchy like ?) order by ot.transaction_date, ot.id";
