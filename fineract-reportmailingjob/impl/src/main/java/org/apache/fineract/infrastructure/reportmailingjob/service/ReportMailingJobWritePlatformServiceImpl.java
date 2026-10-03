@@ -35,7 +35,6 @@ import org.apache.fineract.infrastructure.reportmailingjob.domain.ReportMailingJ
 import org.apache.fineract.infrastructure.reportmailingjob.validation.ReportMailingJobValidator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class ReportMailingJobWritePlatformServiceImpl implements ReportMailingJo
         try {
             this.reportMailingJobValidator.validateCreateRequest(jsonCommand);
 
-            final AppUser appUser = this.platformSecurityContext.authenticatedUser();
+            final Object appUser = this.platformSecurityContext.authenticatedUser();
             final Long stretchyReportId = jsonCommand.longValueOfParameterNamed(ReportMailingJobConstants.STRETCHY_REPORT_ID_PARAM_NAME);
             ensureStretchyReportExists(stretchyReportId);
 
