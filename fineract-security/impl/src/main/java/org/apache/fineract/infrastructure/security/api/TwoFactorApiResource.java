@@ -82,8 +82,8 @@ public class TwoFactorApiResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON})
     public String validate(@QueryParam("token") final String token) {
-        final AppUser user = context.authenticatedUser();
-        TFAccessToken accessToken = twoFactorService.createAccessTokenFromOTP(user, token);
+        final Object user = context.authenticatedUser();
+        TFAccessToken accessToken = twoFactorService.createAccessTokenFromOTP((AppUser) user, token);
         return accessTokenSerializer.serialize(accessToken.toTokenData());
     }
 
