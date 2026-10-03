@@ -190,12 +190,15 @@ public class FineractEntityAccessReadServiceImpl implements FineractEntityAccess
                 .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.OFFICE_SPECIFIC_PRODUCTS_ENABLED);
         if (property.isEnabled()) {
             if (fineractEntityType.equals(FineractEntityType.SAVINGS_PRODUCT)) {
-                inClause = getSQLQueryInClauseIDList_ForSavingsProductsForOffice(this.context.authenticatedUser().getOffice().getId(),
+                final Object user = this.context.authenticatedUser();
+                inClause = getSQLQueryInClauseIDList_ForSavingsProductsForOffice(((AppUser) user).getOffice().getId(),
                         false);
             } else if (fineractEntityType.equals(FineractEntityType.LOAN_PRODUCT)) {
-                inClause = getSQLQueryInClauseIDList_ForLoanProductsForOffice(this.context.authenticatedUser().getOffice().getId(), false);
+                final Object user = this.context.authenticatedUser();
+                inClause = getSQLQueryInClauseIDList_ForLoanProductsForOffice(((AppUser) user).getOffice().getId(), false);
             } else if (fineractEntityType.equals(FineractEntityType.CHARGE)) {
-                inClause = getSQLQueryInClauseIDList_ForChargesForOffice(this.context.authenticatedUser().getOffice().getId(), false);
+                final Object user = this.context.authenticatedUser();
+                inClause = getSQLQueryInClauseIDList_ForChargesForOffice(((AppUser) user).getOffice().getId(), false);
             }
         }
         return inClause;
