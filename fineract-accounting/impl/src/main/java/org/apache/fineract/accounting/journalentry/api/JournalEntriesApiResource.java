@@ -130,7 +130,8 @@ public class JournalEntriesApiResource {
     @Operation(summary = "Retrieve a single Entry", tags = {"Journal Entries"}, description = "Example Requests:\n" + "\n" + "journalentries/1\n" + "\n" + "\n" + "\n" + "journalentries/1?fields=officeName,glAccountId,entryType,amount\n" + "\n" + "journalentries/1?runningBalance=true\n" + "\n" + "journalentries/1?transactionDetails=true")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = JournalEntriesApiResourceSwagger.JournalEntryTransactionItem.class)))
     public String retrieveJournalEntryById(@PathParam("journalEntryId") @Parameter(description = "journalEntryId") final Long journalEntryId, @Context final UriInfo uriInfo, @QueryParam("runningBalance") @Parameter(description = "runningBalance") final boolean runningBalance, @QueryParam("transactionDetails") @Parameter(description = "transactionDetails") final boolean transactionDetails) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(transactionDetails, runningBalance);
         final JournalEntryData glJournalEntryData = this.journalEntryReadPlatformService.retrieveGLJournalEntryById(journalEntryId, associationParametersData);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
