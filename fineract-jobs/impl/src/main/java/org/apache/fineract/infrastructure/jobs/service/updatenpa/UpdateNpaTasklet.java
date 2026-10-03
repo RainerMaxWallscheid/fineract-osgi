@@ -41,7 +41,7 @@ public class UpdateNpaTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        AppUser user = context.getAuthenticatedUserIfPresent();
+        Object user = context.getAuthenticatedUserIfPresent();
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceServiceFactory.determineDataSourceService().retrieveDataSource());
         final StringBuilder resetNPASqlBuilder = new StringBuilder();
         resetNPASqlBuilder.append("update m_loan loan ");
@@ -52,7 +52,7 @@ public class UpdateNpaTasklet implements Tasklet {
         } else {
             resetNPASqlBuilder.append("set is_npa = false").append(", last_modified_by = ?, last_modified_on_utc = ? ").append(" FROM ").append(fromPart).append(wherePart);
         }
-        jdbcTemplate.update(resetNPASqlBuilder.toString(), user.getId(), DateUtils.getAuditOffsetDateTime());
+        jdbcTemplate.update(resetNPASqlBuilder.toString(), ((AppUser) user).getId(), DateUtils.getAuditOffsetDateTime());
         final StringBuilder updateSqlBuilder = new StringBuilder(900);
         fromPart = " (select loan.id " + " FROM m_loan_arrears_aging laa" + " INNER JOIN  m_loan loan on laa.loan_id = loan.id " + " INNER JOIN m_product_loan mpl on mpl.id = loan.product_id AND mpl.overdue_days_for_npa is not null " + "WHERE loan.loan_status_id = 300 and " + "laa.overdue_since_date_derived < " + sqlGenerator.subDate(sqlGenerator.currentBusinessDate(), "COALESCE(mpl.overdue_days_for_npa, 0)", "day") + " group by loan.id) as sl ";
         wherePart = " where ml.id=sl.id ";
@@ -62,7 +62,7 @@ public class UpdateNpaTasklet implements Tasklet {
         } else {
             updateSqlBuilder.append(" SET is_npa = true").append(", last_modified_by = ?, last_modified_on_utc = ? ").append(" FROM ").append(fromPart).append(wherePart);
         }
-        final int result = jdbcTemplate.update(updateSqlBuilder.toString(), user.getId(), DateUtils.getAuditOffsetDateTime());
+        final int result = jdbcTemplate.update(updateSqlBuilder.toString(), ((AppUser) user).getId(), DateUtils.getAuditOffsetDateTime());
         log.debug("{}: Records affected by updateNPA: {}", ThreadLocalContextUtil.getTenant().getName(), result);
         return RepeatStatus.FINISHED;
     }
