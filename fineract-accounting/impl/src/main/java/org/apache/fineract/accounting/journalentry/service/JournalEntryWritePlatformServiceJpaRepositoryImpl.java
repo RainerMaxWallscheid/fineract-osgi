@@ -462,9 +462,9 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
      * system clock..
      */
     private String generateTransactionId(final Long officeId) {
-        final AppUser user = this.context.authenticatedUser();
+        final Object user = this.context.authenticatedUser();
         final Long time = System.currentTimeMillis();
-        final String uniqueVal = String.valueOf(time) + user.getId() + officeId;
+        final String uniqueVal = String.valueOf(time) + ((AppUser) user).getId() + officeId;
         return Long.toHexString(Long.parseLong(uniqueVal));
     }
 
