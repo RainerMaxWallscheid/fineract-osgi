@@ -217,11 +217,11 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     @Transactional
     public CommandProcessingResult updateCashierAllocation(Long tellerId, Long cashierId, JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForAllocateCashier(command.json());
             final Long staffId = command.longValueOfParameterNamed("staffId");
             final Object staff = requiredStaff(staffId);
-            final Cashier cashier = validateUserPriviledgeOnCashierAndRetrieve(currentUser, tellerId, cashierId);
+            final Cashier cashier = validateUserPriviledgeOnCashierAndRetrieve((AppUser) currentUser, tellerId, cashierId);
             cashier.setStaff(staff);
             // TODO - check if staff office and teller office match
             final Map<String, Object> changes = cashier.update(command);
