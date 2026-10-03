@@ -98,7 +98,8 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
 
     @Override
     public Page<NotificationData> getAllNotifications(final SearchParameters searchParameters) {
-        final Long appUserId = context.authenticatedUser().getId();
+        final Object user = context.authenticatedUser();
+        final Long appUserId = ((AppUser) user).getId();
         final Pageable pageable = toPageable(searchParameters);
         // Use the new method that doesn't filter by isRead, avoiding the NULL parameter type issue
         final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository.findNotificationDataByUserId(appUserId, pageable);
