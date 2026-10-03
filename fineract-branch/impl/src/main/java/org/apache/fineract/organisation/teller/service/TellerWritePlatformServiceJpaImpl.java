@@ -97,9 +97,9 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
         try {
             final Long officeId = command.longValueOfParameterNamed("officeId");
             requireOffice(officeId);
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreateAndUpdateTeller(command.json());
-            final Teller teller = validateUserPriviledgeOnTellerAndRetrieve(currentUser, tellerId);
+            final Teller teller = validateUserPriviledgeOnTellerAndRetrieve((AppUser) currentUser, tellerId);
             final Map<String, Object> changes = teller.update(officeId, command);
             if (!changes.isEmpty()) {
                 this.tellerRepositoryWrapper.saveAndFlush(teller);
