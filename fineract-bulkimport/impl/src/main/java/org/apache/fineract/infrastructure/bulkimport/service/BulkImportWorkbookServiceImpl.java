@@ -169,12 +169,14 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     private Long publishEvent(final Integer primaryColumn, final FormDataContentDisposition fileDetail, final String fileType, final GlobalEntityType entityType, final Workbook workbook, final String locale, final String dateFormat) {
-        final var importDocument = ImportDocument.instance(null, DateUtils.getLocalDateTimeOfTenant(), entityType.getValue(), securityContext.authenticatedUser(), ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn));
+        final Object createdBy = securityContext.authenticatedUser();
+        final var importDocument = ImportDocument.instance(null, DateUtils.getLocalDateTimeOfTenant(), entityType.getValue(), createdBy, ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn));
         final var response = createDocument(workbook, fileDetail, fileType);
         importDocument.setDocumentId(response.getResourceId());
         // TODO: should we mark as "not yet processed by import handler"?
         importDocumentRepository.saveAndFlush(importDocument);
-        final var event = new BulkImportEvent(this, workbook, fileDetail.getFileName(), fileType, importDocument, locale, dateFormat, ThreadLocalContextUtil.getContext(), this.securityContext.authenticatedUser().getId());
+        final Object user = this.securityContext.authenticatedUser();
+        final var event = new BulkImportEvent(this, workbook, fileDetail.getFileName(), fileType, importDocument, locale, dateFormat, ThreadLocalContextUtil.getContext(), ((AppUser) user).getId());
         eventPublisher.publishEvent(event);
         return importDocument.getId();
     }
