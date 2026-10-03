@@ -160,7 +160,8 @@ public class StaffReadServiceImpl implements StaffReadService {
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
-        final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy() + "%";
         try {
             final StaffMapper rm = new StaffMapper();
             final String sql = "select " + rm.schema() + " where s.id = ? and o.hierarchy like ? ";
