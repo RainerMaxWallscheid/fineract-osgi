@@ -238,8 +238,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
     @Override
     public Collection<ClientData> retrieveActiveClientMembersOfGroup(final Long groupId) {
-        final AppUser currentUser = this.context.authenticatedUser();
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final Object currentUser = this.context.authenticatedUser();
+        final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
         final String sql = "select " + this.membersOfGroupMapper.schema()
                 + " where o.hierarchy like ? and pgc.group_id = ? and c.status_enum = ? ";
