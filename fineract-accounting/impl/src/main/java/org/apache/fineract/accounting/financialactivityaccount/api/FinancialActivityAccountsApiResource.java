@@ -50,6 +50,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/financialactivityaccounts")
@@ -74,7 +75,8 @@ public class FinancialActivityAccountsApiResource {
     @Path("template")
     @Produces({MediaType.APPLICATION_JSON})
     public FinancialActivityAccountData retrieveTemplate() {
-        context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FinancialActivityAccountsConstants.RESOURCE_NAME_FOR_PERMISSION);
         return financialActivityAccountReadPlatformService.getFinancialActivityAccountTemplate();
     }
 
