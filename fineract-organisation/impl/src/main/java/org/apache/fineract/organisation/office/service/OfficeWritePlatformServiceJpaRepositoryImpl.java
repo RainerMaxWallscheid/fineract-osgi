@@ -63,13 +63,13 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')")})
     public CommandProcessingResult createOffice(final JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             Long parentId = null;
             if (command.parameterExists("parentId")) {
                 parentId = command.longValueOfParameterNamed("parentId");
             }
-            final Office parent = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, parentId);
+            final Office parent = validateUserPriviledgeOnOfficeAndRetrieve((AppUser) currentUser, parentId);
             final Office office = Office.fromJson(parent, command);
             // pre save to generate id for use in office hierarchy
             this.officeRepositoryWrapper.saveAndFlush(office);
