@@ -54,6 +54,7 @@ import org.apache.fineract.infrastructure.jobs.exception.JobNotFoundException;
 import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.springbatch.SpringBatchJobConstants;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -223,7 +224,8 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
     }
 
     private boolean isBypassUser() {
-        return context.getAuthenticatedUserIfPresent().isBypassUser();
+        final Object user = context.getAuthenticatedUserIfPresent();
+        return ((AppUser) user).isBypassUser();
     }
 
     private void validateLoanIdsListSize(List<Long> loanIds) {
