@@ -58,7 +58,6 @@ import org.apache.fineract.organisation.provisioning.moduleapi.ProvisioningExist
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -154,7 +153,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         if (existingEntry != null) {
             throw new ProvisioningEntryAlreadyCreatedException(existingEntry.getId(), existingEntry.getCreatedDate());
         }
-        AppUser currentUser = this.platformSecurityContext.authenticatedUser();
+        Object currentUser = this.platformSecurityContext.authenticatedUser();
         ProvisioningEntry requestedEntry = new ProvisioningEntry().setCreatedBy(currentUser).setCreatedDate(date);
         Collection<LoanProductProvisioningEntry> entries = generateLoanProvisioningEntry(requestedEntry, date);
         requestedEntry.setProvisioningEntries(entries);
