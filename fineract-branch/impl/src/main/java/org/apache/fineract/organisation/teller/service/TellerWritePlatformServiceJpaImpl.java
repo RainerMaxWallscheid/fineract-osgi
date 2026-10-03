@@ -295,7 +295,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
 
     private CommandProcessingResult doTransactionForCashier(final Long cashierId, final CashierTxnType txnType, JsonCommand command) {
         try {
-            final AppUser currentUser = this.context.authenticatedUser();
+            final Object currentUser = this.context.authenticatedUser();
             final Cashier cashier = this.cashierRepository.findById(cashierId).orElseThrow(() -> new CashierNotFoundException(cashierId));
             this.fromApiJsonDeserializer.validateForCashTxnForCashier(command.json());
             // TODO: can we please remove this whole block?!? this is 20 lines of dead code!!!
@@ -328,7 +328,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             this.cashierTxnRepository.save(cashierTxn);
             final Long cashierOfficeId = cashier.getTeller().getOfficeId();
             final Long time = System.currentTimeMillis();
-            final String uniqueVal = String.valueOf(time) + currentUser.getId() + cashierOfficeId;
+            final String uniqueVal = String.valueOf(time) + ((AppUser) currentUser).getId() + cashierOfficeId;
             final String transactionId = Long.toHexString(Long.parseLong(uniqueVal));
             this.cashierJournalPort.postAllocateOrSettle(txnType.equals(CashierTxnType.ALLOCATE), cashierOfficeId,
                     cashierTxn.getCurrencyCode(), cashierTxn.getTxnDate(), cashierTxn.getTxnAmount(), cashierTxn.getTxnNote(),
