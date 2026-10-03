@@ -195,7 +195,8 @@ public class JournalEntriesApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Opening Balance", description = "Returns the opening balance for a specific office and currency.", tags = {"Journal Entries"})
     public String retrieveOpeningBalance(@Context final UriInfo uriInfo, @QueryParam("officeId") final Long officeId, @QueryParam("currencyCode") final String currencyCode) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final OfficeOpeningBalancesData officeOpeningBalancesData = this.journalEntryReadPlatformService.retrieveOfficeOpeningBalances(officeId, currencyCode);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.apiJsonSerializerService.serialize(settings, officeOpeningBalancesData);
