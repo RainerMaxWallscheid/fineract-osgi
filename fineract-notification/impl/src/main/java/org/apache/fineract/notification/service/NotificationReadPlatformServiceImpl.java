@@ -26,6 +26,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.notification.cache.CacheNotificationResponseHeader;
 import org.apache.fineract.notification.data.NotificationData;
 import org.apache.fineract.notification.domain.NotificationMapperRepository;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -81,7 +82,8 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
 
     @Override
     public void updateNotificationReadStatus() {
-        final Long appUserId = context.authenticatedUser().getId();
+        final Object user = context.authenticatedUser();
+        final Long appUserId = ((AppUser) user).getId();
         this.notificationMapperRepository.markUnreadNotificationsAsRead(appUserId);
     }
 
