@@ -40,6 +40,7 @@ import org.apache.fineract.organisation.provisioning.domain.ProvisioningCriteria
 import org.apache.fineract.organisation.provisioning.exception.ProvisioningCriteriaOverlappingDefinitionException;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanProductExistencePort;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
+import org.apache.fineract.useradministration.domain.AppUser;
 
 public class ProvisioningCriteriaAssembler {
     private final FromJsonHelper fromApiJsonHelper;
@@ -100,7 +101,9 @@ public class ProvisioningCriteriaAssembler {
 
     private ProvisioningCriteria createCriteria(final JsonElement jsonElement) {
         final String criteriaName = this.fromApiJsonHelper.extractStringNamed(ProvisioningCriteriaConstants.JSON_CRITERIANAME_PARAM, jsonElement);
-        ProvisioningCriteria criteria = new ProvisioningCriteria(criteriaName, platformSecurityContext.authenticatedUser(), DateUtils.getLocalDateTimeOfSystem(), platformSecurityContext.authenticatedUser(), DateUtils.getLocalDateTimeOfSystem());
+        final Object createdBy = platformSecurityContext.authenticatedUser();
+        final Object lastModifiedBy = platformSecurityContext.authenticatedUser();
+        ProvisioningCriteria criteria = new ProvisioningCriteria(criteriaName, (AppUser) createdBy, DateUtils.getLocalDateTimeOfSystem(), (AppUser) lastModifiedBy, DateUtils.getLocalDateTimeOfSystem());
         return criteria;
     }
 
