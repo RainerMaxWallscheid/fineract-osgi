@@ -468,11 +468,26 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateLoanRepaymentWorkbook(Long officeId, LookupMode lookupMode) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.FUNDS_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.PAYMENT_TYPE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CURRENCY_ENTITY_TYPE);
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.FUNDS_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.PAYMENT_TYPE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.CURRENCY_ENTITY_TYPE);
+        }
         // FINERACT-2668: the Extras (payment types) sheet is small and read back at import, so it is always built. The
         // clients/offices lookup sheets and the per-loan lookup table are tenant-wide and are NOT read at import (the
         // handler resolves the loan from the typed account number), so they are omittable — all or nothing:
