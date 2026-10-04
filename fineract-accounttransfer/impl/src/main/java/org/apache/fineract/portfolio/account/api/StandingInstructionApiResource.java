@@ -63,6 +63,7 @@ import org.apache.fineract.portfolio.account.data.request.StandingInstructionSea
 import org.apache.fineract.portfolio.account.data.request.StandingInstructionUpdatesRequest;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/standinginstructions")
@@ -84,7 +85,8 @@ public class StandingInstructionApiResource {
     @AlternativeOperationId("template_6")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StandingInstructionApiResourceSwagger.GetStandingInstructionsTemplateResponse.class)))
     public StandingInstructionData template(@BeanParam StandingInstructionSearchParam instructionParam) {
-        context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
         return standingInstructionReadPlatformService.retrieveTemplate(instructionParam.getFromOfficeId(), instructionParam.getFromClientId(), instructionParam.getFromAccountId(), instructionParam.getFromAccountType(), instructionParam.getToOfficeId(), instructionParam.getToClientId(), instructionParam.getToAccountId(), instructionParam.getToAccountType(), instructionParam.getTransferType());
     }
 
