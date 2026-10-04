@@ -126,7 +126,8 @@ public class SmsCampaignApiResource {
     @AlternativeOperationId("retrieveCampaign")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
     public SmsCampaignData retrieveCampaign(@PathParam("resourceId") final Long resourceId) {
-        platformSecurityContext.authenticatedUser().validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
+        final Object currentUser = platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
         return smsCampaignReadPlatformService.retrieveOne(resourceId);
     }
 
