@@ -51,6 +51,7 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -78,7 +79,8 @@ public class EmailCampaignApiResource {
     @Operation(summary = "Retrieve an email campaign", operationId = "retrieveOneEmailCampaign")
     @AlternativeOperationId("retrieveOneCampaign")
     public String retrieveOneCampaign(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         EmailCampaignData emailCampaignData = emailCampaignReadPlatformService.retrieveOne(resourceId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return emailCampaignDataDefaultToApiJsonSerializer.serialize(settings, emailCampaignData);
