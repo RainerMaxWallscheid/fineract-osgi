@@ -140,7 +140,8 @@ public class SmsCampaignApiResource {
     @AlternativeOperationId("retrieveAllEmails_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
     public Page<SmsCampaignData> retrieveAllEmails(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
-        platformSecurityContext.authenticatedUser().validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
+        final Object currentUser = platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         return smsCampaignReadPlatformService.retrieveAll(searchParameters);
     }
