@@ -127,7 +127,8 @@ public class CalendarsApiResource {
     @Operation(summary = "Retrieve Calendar Template", operationId = "retrieveTemplateCalendar")
     @AlternativeOperationId("retrieveNewCalendarDetails")
     public CalendarData retrieveNewCalendarDetails(@Context final UriInfo uriInfo, @PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return handleTemplate(readPlatformService.retrieveNewCalendarDetails());
     }
 
