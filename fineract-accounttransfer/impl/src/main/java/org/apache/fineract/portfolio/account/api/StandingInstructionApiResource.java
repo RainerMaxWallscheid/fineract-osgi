@@ -122,7 +122,8 @@ public class StandingInstructionApiResource {
     @AlternativeOperationId("retrieveAll_19")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StandingInstructionApiResourceSwagger.GetStandingInstructionsResponse.class)))
     public Page<StandingInstructionData> retrieveAll(@QueryParam("externalId") @Parameter(description = "externalId") final String externalId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("transferType") @Parameter(description = "transferType") final Integer transferType, @QueryParam("clientName") @Parameter(description = "clientName") final String clientName, @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("fromAccountId") @Parameter(description = "fromAccountId") final Long fromAccount, @QueryParam("fromAccountType") @Parameter(description = "fromAccountType") final Integer fromAccountType) {
-        context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
