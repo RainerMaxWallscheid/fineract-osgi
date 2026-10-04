@@ -141,7 +141,8 @@ public class StandingInstructionApiResource {
     @AlternativeOperationId("retrieveOne_10")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StandingInstructionApiResourceSwagger.GetStandingInstructionsStandingInstructionIdResponse.class)))
     public StandingInstructionData retrieveOne(@PathParam("standingInstructionId") @Parameter(description = "standingInstructionId") final Long standingInstructionId, @Context final UriInfo uriInfo, @QueryParam("externalId") @Parameter(description = "externalId") final String externalId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         StandingInstructionData standingInstructionData = standingInstructionReadPlatformService.retrieveOne(standingInstructionId);
