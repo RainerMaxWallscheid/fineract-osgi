@@ -46,6 +46,7 @@ import org.apache.fineract.portfolio.address.data.AddressData;
 import org.apache.fineract.portfolio.address.filter.ClientAddressSearchParam;
 import org.apache.fineract.portfolio.address.service.AddressReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientAddressRequest;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/client")
@@ -64,7 +65,8 @@ public class ClientAddressApiResource {
     @Operation(summary = "Retrieve client address template", operationId = "retrieveTemplateClientAddress")
     @AlternativeOperationId("getAddressesTemplate")
     public AddressData getAddressesTemplate() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveTemplate();
     }
 
