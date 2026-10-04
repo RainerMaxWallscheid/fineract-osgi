@@ -312,9 +312,18 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateCenterWorkbook(Long officeId, Long staffId) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.STAFF_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.GROUP_ENTITY_TYPE);
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.STAFF_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.GROUP_ENTITY_TYPE);
+        }
         List<OfficeData> offices = fetchOffices(officeId);
         List<StaffData> staff = fetchStaff(staffId);
         List<GroupGeneralData> groups = fetchGroups(officeId);
