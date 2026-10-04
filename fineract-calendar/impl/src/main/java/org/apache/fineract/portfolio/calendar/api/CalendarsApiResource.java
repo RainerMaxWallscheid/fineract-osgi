@@ -109,7 +109,8 @@ public class CalendarsApiResource {
     @Operation(summary = "Retrieve Calendars by Entity", operationId = "retrieveCalendarsByEntityId")
     @AlternativeOperationId("retrieveCalendarsByEntity")
     public List<CalendarData> retrieveCalendarsByEntity(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId, @Context final UriInfo uriInfo, @DefaultValue("all") @QueryParam("calendarType") final String calendarType) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         final List<CalendarData> calendarsData = new ArrayList<>();
         final List<Integer> calendarTypeOptions = CalendarUtils.createIntegerListFromQueryParameter(calendarType);
