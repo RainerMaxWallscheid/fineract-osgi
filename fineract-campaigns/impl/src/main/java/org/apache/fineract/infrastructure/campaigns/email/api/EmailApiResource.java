@@ -79,7 +79,8 @@ public class EmailApiResource {
     @Path("pendingEmail")
     @Operation(summary = "Retrieve pending email messages", operationId = "retrievePendingEmail")
     public String retrievePendingEmail(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
