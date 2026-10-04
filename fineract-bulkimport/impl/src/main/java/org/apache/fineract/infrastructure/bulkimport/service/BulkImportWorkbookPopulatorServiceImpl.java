@@ -805,11 +805,26 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateFixedDepositTransactionsWorkbook(Long officeId) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.FUNDS_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.PAYMENT_TYPE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CURRENCY_ENTITY_TYPE);
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.FUNDS_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.PAYMENT_TYPE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.CURRENCY_ENTITY_TYPE);
+        }
         List<OfficeData> offices = fetchOffices(officeId);
         List<ClientData> clients = fetchClients(officeId);
         List<FundData> funds = fetchFunds();
