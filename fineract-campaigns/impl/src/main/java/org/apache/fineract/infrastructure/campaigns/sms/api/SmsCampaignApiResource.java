@@ -60,6 +60,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/smscampaigns")
@@ -89,7 +90,8 @@ public class SmsCampaignApiResource {
     @AlternativeOperationId("template_2")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
     public SmsCampaignData template() {
-        platformSecurityContext.authenticatedUser().validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
+        final Object currentUser = platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
         return smsCampaignReadPlatformService.retrieveTemplate(CampaignType.SMS.name());
     }
 
