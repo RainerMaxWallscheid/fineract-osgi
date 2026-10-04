@@ -101,7 +101,8 @@ public class AccountingRuleApiResource {
         accountingrules/template""")
     @AlternativeOperationId("retrieveTemplate_1")
     public AccountingRuleData retrieveTemplate() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         return handleTemplate(null);
     }
 
