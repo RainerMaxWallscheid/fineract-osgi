@@ -41,6 +41,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.client.data.ClientFamilyMemberRequest;
 import org.apache.fineract.portfolio.client.data.ClientFamilyMembersData;
 import org.apache.fineract.portfolio.client.service.ClientFamilyMembersReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/clients/{clientId}/familymembers")
@@ -59,7 +60,8 @@ public class ClientFamilyMembersApiResource {
     @Operation(summary = "Retrieve a client family member", operationId = "retrieveOneClientFamilyMember")
     @AlternativeOperationId("getFamilyMember")
     public ClientFamilyMembersData getFamilyMember(@PathParam("familyMemberId") final Long familyMemberId, @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.getClientFamilyMember(clientId, familyMemberId);
     }
 
