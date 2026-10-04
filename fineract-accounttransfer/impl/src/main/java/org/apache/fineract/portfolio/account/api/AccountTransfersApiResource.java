@@ -102,7 +102,8 @@ public class AccountTransfersApiResource {
     @AlternativeOperationId("retrieveOne_9")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountTransfersApiResourceSwagger.GetAccountTransfersResponse.GetAccountTransfersPageItems.class)))
     public AccountTransferData retrieveOne(@PathParam("transferId") @Parameter(description = "transferId") final Long transferId) {
-        context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
         return accountTransfersReadPlatformService.retrieveOne(transferId);
     }
 
