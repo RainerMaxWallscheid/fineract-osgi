@@ -108,7 +108,8 @@ public class EmailApiResource {
     @Operation(summary = "Retrieve email messages by status", operationId = "retrieveAllEmailByStatus")
     public String retrieveAllEmailByStatus(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("status") final Integer status, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder, @QueryParam("fromDate") final DateParam fromDateParam, @QueryParam("toDate") final DateParam toDateParam, @QueryParam("locale") final String locale, @QueryParam("dateFormat") final String rawDateFormat, @Context final UriInfo uriInfo) {
         final DateFormat dateFormat = StringUtils.isBlank(rawDateFormat) ? null : new DateFormat(rawDateFormat);
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         LocalDate fromDate = null;
         if (fromDateParam != null) {
             fromDate = fromDateParam.getDate("fromDate", dateFormat, locale);
