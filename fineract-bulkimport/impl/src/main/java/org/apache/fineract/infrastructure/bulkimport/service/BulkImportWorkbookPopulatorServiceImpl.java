@@ -595,8 +595,14 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateSharedAccountsWorkbook(Long officeId) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.SHARED_ACCOUNT_ENTITY_TYPE);
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.SHARED_ACCOUNT_ENTITY_TYPE);
+        }
         List<ShareProductData> shareProductDataList = fetchSharedProducts();
         List<ChargeData> chargesForShares = fetchChargesForShares();
         List<ClientData> clientDataList = fetchClients(officeId);
