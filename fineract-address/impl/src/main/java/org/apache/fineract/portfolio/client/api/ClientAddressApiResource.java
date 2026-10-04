@@ -95,7 +95,8 @@ public class ClientAddressApiResource {
         clients/1/addresses?status=false,true&&type=1,2,3""")
     @AlternativeOperationId("getAddresses_1")
     public List<AddressData> getAddresses(@QueryParam("status") @Parameter(description = "status") final String status, @QueryParam("type") @Parameter(description = "type") final long addressTypeId, @PathParam("clientid") @Parameter(description = "clientId") final long clientid) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveBySearchParam(new ClientAddressSearchParam(clientid, addressTypeId, status));
     }
 
