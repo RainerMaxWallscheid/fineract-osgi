@@ -114,7 +114,8 @@ public class AccountTransfersApiResource {
     @AlternativeOperationId("templateRefundByTransfer")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountTransfersApiResourceSwagger.GetAccountTransfersTemplateRefundByTransferResponse.class)))
     public AccountTransferData templateRefundByTransfer(@BeanParam AccountTransSearchParam accountTransSearchParam) {
-        context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
         return accountTransfersReadPlatformService.retrieveRefundByTransferTemplate(accountTransSearchParam.getFromAccountId(), accountTransSearchParam.getFromClientId(), accountTransSearchParam.getFromAccountId(), accountTransSearchParam.getFromAccountType(), accountTransSearchParam.getToOfficeId(), accountTransSearchParam.getToClientId(), accountTransSearchParam.getToAccountId(), accountTransSearchParam.getToAccountType());
     }
 
