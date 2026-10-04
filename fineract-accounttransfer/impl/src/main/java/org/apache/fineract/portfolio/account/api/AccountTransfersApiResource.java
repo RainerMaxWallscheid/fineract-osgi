@@ -47,6 +47,7 @@ import org.apache.fineract.portfolio.account.data.AccountTransferData;
 import org.apache.fineract.portfolio.account.data.request.AccountTransSearchParam;
 import org.apache.fineract.portfolio.account.data.request.AccountTransferRequest;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/accounttransfers")
@@ -65,7 +66,8 @@ public class AccountTransfersApiResource {
     @AlternativeOperationId("template_5")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountTransfersApiResourceSwagger.GetAccountTransfersTemplateResponse.class)))
     public AccountTransferData template(@BeanParam AccountTransSearchParam accountTransSearchParam) {
-        context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
         return accountTransfersReadPlatformService.retrieveTemplate(accountTransSearchParam.getFromAccountId(), accountTransSearchParam.getFromClientId(), accountTransSearchParam.getFromAccountId(), accountTransSearchParam.getFromAccountType(), accountTransSearchParam.getToOfficeId(), accountTransSearchParam.getToClientId(), accountTransSearchParam.getToAccountId(), accountTransSearchParam.getToAccountType());
     }
 
