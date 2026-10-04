@@ -103,6 +103,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformS
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.shares.shareproducts.data.ShareProductData;
 import org.apache.fineract.useradministration.data.RoleData;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.service.RoleReadPlatformService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -222,8 +223,14 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateClientWorkbook(final String entityType, final Long officeId, final Long staffId) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.STAFF_ENTITY_TYPE);
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
+        }
+        {
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.STAFF_ENTITY_TYPE);
+        }
         List<OfficeData> offices = fetchOffices(officeId);
         List<StaffData> staff = fetchStaff(staffId);
         List<CodeValueData> clientTypeCodeValues = fetchCodeValuesByCodeName("ClientType");
