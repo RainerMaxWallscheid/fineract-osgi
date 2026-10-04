@@ -180,7 +180,8 @@ public class SmsCampaignApiResource {
     @Operation(summary = "Preview SMS Campaign message", operationId = "previewSmsCampaign")
     @AlternativeOperationId("preview_1")
     public CampaignPreviewData preview(SmsCampaignPreviewDto previewDto) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final String strPreviewDtoJson = toApiJsonSerializer.serialize(previewDto);
         final JsonElement parsedQuery = fromJsonHelper.parse(strPreviewDtoJson);
         final JsonQuery query = JsonQuery.from(strPreviewDtoJson, parsedQuery, fromJsonHelper);
