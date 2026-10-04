@@ -572,7 +572,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateOfficeWorkbook() {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
         List<OfficeData> offices = fetchOffices(null);
         return new OfficeWorkbookPopulator(offices);
     }
