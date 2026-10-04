@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/email/configuration")
@@ -56,7 +57,8 @@ public class EmailConfigurationApiResource {
     @Operation(summary = "List all email configurations", operationId = "retrieveAllEmailConfigurations")
     @AlternativeOperationId("retrieveAll_5")
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<EmailConfigurationData> configuration = this.emailConfigurationReadPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, configuration);
