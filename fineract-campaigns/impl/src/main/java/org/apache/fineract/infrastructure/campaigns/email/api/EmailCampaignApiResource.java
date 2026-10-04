@@ -91,7 +91,8 @@ public class EmailCampaignApiResource {
     @Operation(summary = "List all email campaigns", operationId = "retrieveAllEmailCampaigns")
     @AlternativeOperationId("retrieveAllCampaign")
     public String retrieveAllCampaign(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<EmailCampaignData> emailCampaignDataCollection = emailCampaignReadPlatformService.retrieveAllCampaign();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return emailCampaignDataDefaultToApiJsonSerializer.serialize(settings, emailCampaignDataCollection);
