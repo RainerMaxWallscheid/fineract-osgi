@@ -103,7 +103,8 @@ public class AccountNumberFormatsApiResource {
     @AlternativeOperationId("retrieveOne")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountNumberFormatsApiResourceSwagger.GetAccountNumberFormatsIdResponse.class)))
     public String retrieveOne(@Context final UriInfo uriInfo, @PathParam("accountNumberFormatId") @Parameter(description = "accountNumberFormatId") final Long accountNumberFormatId) {
-        this.context.authenticatedUser().validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         AccountNumberFormatData accountNumberFormatData = this.accountNumberFormatReadPlatformService.getAccountNumberFormat(accountNumberFormatId);
         if (settings.isTemplate()) {
