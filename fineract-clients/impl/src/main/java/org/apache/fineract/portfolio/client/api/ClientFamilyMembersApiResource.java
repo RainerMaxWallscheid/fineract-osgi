@@ -81,7 +81,8 @@ public class ClientFamilyMembersApiResource {
     @Operation(summary = "Retrieve client family member template", operationId = "retrieveTemplateClientFamilyMember")
     @AlternativeOperationId("getTemplate_2")
     public ClientFamilyMembersData getTemplate(@PathParam("clientId") final long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.retrieveTemplate();
     }
 
