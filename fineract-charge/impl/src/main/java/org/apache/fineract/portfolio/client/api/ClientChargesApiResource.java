@@ -102,7 +102,8 @@ public class ClientChargesApiResource {
     @Operation(summary = "Retrieve client charge template", operationId = "retrieveTemplateClientCharge")
     @AlternativeOperationId("retrieveTemplate_4")
     public String retrieveTemplate(@Context final UriInfo uriInfo, @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveAllChargesApplicableToClients();
         final ClientChargeData clientChargeData = ClientChargeData.template(chargeOptions);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
