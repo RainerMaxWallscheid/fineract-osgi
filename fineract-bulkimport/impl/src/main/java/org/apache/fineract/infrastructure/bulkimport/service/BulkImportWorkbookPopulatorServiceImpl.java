@@ -791,7 +791,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private WorkbookPopulator populateUserWorkbook(Long officeId, Long staffId) {
-        this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.USER_ENTITY_TYPE);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(TemplatePopulateImportConstants.USER_ENTITY_TYPE);
         List<OfficeData> offices = fetchOffices(officeId);
         List<StaffData> staff = fetchStaff(staffId);
         List<RoleData> roles = fetchRoles();
