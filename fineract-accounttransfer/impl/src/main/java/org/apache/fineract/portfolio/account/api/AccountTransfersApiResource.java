@@ -89,7 +89,8 @@ public class AccountTransfersApiResource {
     @AlternativeOperationId("retrieveAll_18")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountTransfersApiResourceSwagger.GetAccountTransfersResponse.class)))
     public Page<AccountTransferData> retrieveAll(@QueryParam("externalId") @Parameter(description = "externalId") final String externalId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(example = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("accountDetailId") @Parameter(description = "accountDetailId") final Long accountDetailId) {
-        context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         return accountTransfersReadPlatformService.retrieveAll(searchParameters, accountDetailId);
     }
