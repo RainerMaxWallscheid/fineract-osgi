@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.address.data.FieldConfigurationData;
 import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/fieldconfiguration/{entity}")
@@ -44,7 +45,8 @@ public class EntityFieldConfigurationApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieves the Entity Field Configuration", description = "It retrieves all the Entity Field Configuration")
     public List<FieldConfigurationData> getAddresses(@PathParam("entity") @Parameter(description = "entity") final String entityname) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformServicefld.retrieveFieldConfiguration(entityname);
     }
 
