@@ -166,7 +166,8 @@ public class EmailCampaignApiResource {
     @Operation(summary = "Retrieve email campaign template", operationId = "retrieveAllTemplatesEmailCampaign")
     @AlternativeOperationId("template_1")
     public String template(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<EmailBusinessRulesData> emailBusinessRulesDataCollection = emailCampaignReadPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, emailBusinessRulesDataCollection);
