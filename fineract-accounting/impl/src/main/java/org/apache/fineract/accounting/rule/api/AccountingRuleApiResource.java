@@ -135,7 +135,8 @@ public class AccountingRuleApiResource {
         accountingrules/1""")
     @AlternativeOperationId("retreiveAccountingRule")
     public AccountingRuleData retreiveAccountingRule(@PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final AccountingRuleData accountingRuleData = accountingRuleReadPlatformService.retrieveAccountingRuleById(accountingRuleId);
         return settings.isTemplate() ? handleTemplate(accountingRuleData) : accountingRuleData;
