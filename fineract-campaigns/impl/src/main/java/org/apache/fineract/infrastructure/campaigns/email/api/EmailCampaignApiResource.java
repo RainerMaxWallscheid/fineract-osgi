@@ -151,7 +151,8 @@ public class EmailCampaignApiResource {
     @Operation(summary = "Preview email campaign message", operationId = "previewEmailCampaign")
     @AlternativeOperationId("preview")
     public String preview(final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         PreviewCampaignMessage campaignMessage;
         final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
         final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
