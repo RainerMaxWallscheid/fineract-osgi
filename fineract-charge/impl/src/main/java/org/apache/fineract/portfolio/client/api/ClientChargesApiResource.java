@@ -60,6 +60,7 @@ import org.apache.fineract.portfolio.client.data.ClientChargeData;
 import org.apache.fineract.portfolio.client.data.ClientTransactionData;
 import org.apache.fineract.portfolio.client.service.ClientChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.service.ClientTransactionReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -80,7 +81,8 @@ public class ClientChargesApiResource {
     @Operation(summary = "List Client Charges", operationId = "retrieveAllClientCharges", description = "The list capability of client charges supports pagination." + "Example Requests:\n" + "clients/1/charges\n" + "\nclients/1/charges?offset=0&limit=5")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientChargesApiResourceSwagger.GetClientsClientIdChargesResponse.class)))
     public String retrieveAllClientCharges(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @DefaultValue(ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ALL) @QueryParam(ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS) @Parameter(description = "chargeStatus") final String chargeStatus, @QueryParam("pendingPayment") @Parameter(description = "pendingPayment") final Boolean pendingPayment, @Context final UriInfo uriInfo, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("offset") @Parameter(description = "offset") final Integer offset) {
-        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (!(is(chargeStatus, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ALL) || is(chargeStatus, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ACTIVE) || is(chargeStatus, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_INACTIVE))) {
             throw new UnrecognizedQueryParamException(ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS, chargeStatus, new Object[] {ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ALL, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ACTIVE, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_INACTIVE});
