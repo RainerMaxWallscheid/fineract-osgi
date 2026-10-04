@@ -120,7 +120,8 @@ public class ChargesApiResource {
         """)
     @AlternativeOperationId("retrieveNewChargeDetails")
     public ChargeData retrieveNewChargeDetails(@QueryParam("chargeAppliesTo") Long chargeAppliesTo, @QueryParam("chargeTimeType") Long chargeTimeType) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveNewChargeDetails(chargeAppliesTo, chargeTimeType);
     }
 
