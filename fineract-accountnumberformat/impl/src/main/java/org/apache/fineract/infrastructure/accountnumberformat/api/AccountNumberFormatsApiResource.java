@@ -89,7 +89,8 @@ public class AccountNumberFormatsApiResource {
     @AlternativeOperationId("retrieveAll_3")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccountNumberFormatsApiResourceSwagger.GetAccountNumberFormatsIdResponse.class))))
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
         final List<AccountNumberFormatData> accountNumberFormatData = this.accountNumberFormatReadPlatformService.getAllAccountNumberFormats();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, accountNumberFormatData, ACCOUNT_NUMBER_FORMAT_RESPONSE_DATA_PARAMETERS);
