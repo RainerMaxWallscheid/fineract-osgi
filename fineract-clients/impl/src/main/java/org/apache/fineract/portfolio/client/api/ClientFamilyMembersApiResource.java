@@ -70,7 +70,8 @@ public class ClientFamilyMembersApiResource {
     @Operation(summary = "List all client family members", operationId = "retrieveAllClientFamilyMembers")
     @AlternativeOperationId("getFamilyMembers")
     public List<ClientFamilyMembersData> getFamilyMembers(@PathParam("clientId") final long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.getClientFamilyMembers(clientId);
     }
 
