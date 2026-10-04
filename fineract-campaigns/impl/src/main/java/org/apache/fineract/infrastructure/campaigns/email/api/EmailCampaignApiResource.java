@@ -178,7 +178,8 @@ public class EmailCampaignApiResource {
     @Operation(summary = "Retrieve an email campaign template detail by ID", operationId = "retrieveOneTemplateEmailCampaign")
     @AlternativeOperationId("retrieveOneTemplate")
     public String retrieveOneTemplate(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final EmailBusinessRulesData emailBusinessRulesData = emailCampaignReadPlatformService.retrieveOneTemplate(resourceId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, emailBusinessRulesData);
