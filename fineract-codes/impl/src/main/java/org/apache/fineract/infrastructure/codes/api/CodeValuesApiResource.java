@@ -93,7 +93,8 @@ public class CodeValuesApiResource {
     @Operation(summary = "Retrieve a Code description", description = "Returns the details of a Code Value\n" + "\n" + "Example Requests:\n" + "\n" + "codes/1/codevalues/1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodeValuesApiResourceSwagger.GetCodeValuesDataResponse.class)))
     public String retrieveCodeValue(@Context final UriInfo uriInfo, @PathParam("codeValueId") @Parameter(description = "codeValueId") final Long codeValueId, @PathParam("codeId") @Parameter(description = "codeId") final Long codeId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final CodeValueData codeValue = this.readPlatformService.retrieveCodeValue(codeValueId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, codeValue, RESPONSE_DATA_PARAMETERS);
