@@ -70,7 +70,8 @@ public class AuditsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve an Audit Entry", description = "Example Requests:\n" + "\n" + "audits/20\n" + "audits/20?fields=madeOnDate,maker,processingResult")
     public AuditData retrieveAuditEntry(@PathParam("auditId") @Parameter final Long auditId) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return auditReadPlatformService.retrieveAuditEntry(auditId);
     }
 
