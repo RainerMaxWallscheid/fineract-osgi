@@ -86,7 +86,8 @@ public class CollateralsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List Loan Collaterals", description = "Example Requests:\n" + "\n" + "loans/1/collaterals\n" + "\n" + "\n" + "loans/1/collaterals?fields=value,description")
     public List<CollateralData> retrieveCollateralDetails(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         return this.collateralReadPlatformService.retrieveCollateralsForValidLoan(loanId);
     }
 
