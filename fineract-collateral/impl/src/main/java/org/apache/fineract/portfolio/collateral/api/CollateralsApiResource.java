@@ -55,6 +55,7 @@ import org.apache.fineract.portfolio.collateral.data.CollateralData;
 import org.apache.fineract.portfolio.collateral.data.LoansLoanIdCollateralsRequest;
 import org.apache.fineract.portfolio.collateral.data.LoansLoandIdCollateralsCollateralIdRequest;
 import org.apache.fineract.portfolio.collateral.service.CollateralReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loans/{loanId}/collaterals")
@@ -75,7 +76,8 @@ public class CollateralsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Collateral Details Template", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + "Field Defaults\n" + "Allowed Value Lists\n" + "Example Request:\n" + "\n" + "loans/1/collaterals/template")
     public CollateralData newCollateralTemplate(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final List<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("LoanCollateral");
         return CollateralData.template(codeValues);
     }
