@@ -90,7 +90,8 @@ public class ClientIdentifiersApiResource {
     @Operation(summary = "Retrieve Client Identifier Details Template", operationId = "retrieveTemplateClientIdentifier", description = "This is a convenience resource useful for building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + " Field Defaults\n" + " Allowed description Lists\n" + "\n\nExample Request:\n" + "clients/1/identifiers/template")
     @AlternativeOperationId("newClientIdentifierDetails")
     public ClientIdentifierData newClientIdentifierDetails(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final List<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("Customer Identifier");
         return ClientIdentifierData.template(codeValues);
     }
