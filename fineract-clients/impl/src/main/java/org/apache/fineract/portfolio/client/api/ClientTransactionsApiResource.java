@@ -86,7 +86,8 @@ public class ClientTransactionsApiResource {
     @Operation(summary = "Retrieve a Client Transaction", operationId = "retrieveClientTransaction", description = "Example Requests:\n" + "clients/1/transactions/1\n" + "\n" + "\n" + "clients/1/transactions/1?fields=id,officeName")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientTransactionsApiResourceSwagger.GetClientsClientIdTransactionsTransactionIdResponse.class)))
     public String retrieveClientTransaction(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("transactionId") @Parameter(description = "transactionId") final Long transactionId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         return getClientTransaction(clientId, transactionId, uriInfo);
     }
 
