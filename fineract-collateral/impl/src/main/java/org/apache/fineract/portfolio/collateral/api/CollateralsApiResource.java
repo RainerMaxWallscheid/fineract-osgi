@@ -97,7 +97,8 @@ public class CollateralsApiResource {
     @Operation(summary = "Retrieve a Collateral", description = "Example Requests:\n" + "\n" + "/loans/1/collaterals/1\n" + "\n" + "\n" + "/loans/1/collaterals/1?fields=description,description")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollateralsApiResourceSwagger.GetLoansLoanIdCollateralsResponse.class)))
     public String retrieveCollateralDetails(@Context final UriInfo uriInfo, @PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @PathParam("collateralId") @Parameter(description = "collateralId") final Long CollateralId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         CollateralData collateralData = this.collateralReadPlatformService.retrieveCollateral(loanId, CollateralId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
