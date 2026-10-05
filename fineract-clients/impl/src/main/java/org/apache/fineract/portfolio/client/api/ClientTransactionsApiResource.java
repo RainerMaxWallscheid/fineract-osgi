@@ -125,7 +125,8 @@ public class ClientTransactionsApiResource {
     @AlternativeOperationId("retrieveClientTransaction_2")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientTransactionsApiResourceSwagger.GetClientsClientIdTransactionsTransactionIdResponse.class)))
     public String retrieveClientTransaction(@PathParam("clientExternalId") @Parameter(description = "clientExternalId") final String clientExternalId, @PathParam("transactionId") @Parameter(description = "transactionId") final Long transactionId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         ExternalId clientExtId = ExternalIdFactory.produce(clientExternalId);
         Long clientId = resolveClientId(clientExtId);
         if (Objects.isNull(clientId)) {
