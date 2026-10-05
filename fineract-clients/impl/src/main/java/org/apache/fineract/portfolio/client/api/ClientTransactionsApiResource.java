@@ -108,7 +108,8 @@ public class ClientTransactionsApiResource {
     @AlternativeOperationId("retrieveAllClientTransactions_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientTransactionsApiResourceSwagger.GetClientsClientIdTransactionsResponse.class)))
     public String retrieveAllClientTransactions(@PathParam("clientExternalId") @Parameter(description = "clientExternalId") final String clientExternalId, @Context final UriInfo uriInfo, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         ExternalId clientExtId = ExternalIdFactory.produce(clientExternalId);
         Long clientId = resolveClientId(clientExtId);
         if (Objects.isNull(clientId)) {
