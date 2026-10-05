@@ -58,6 +58,7 @@ import org.apache.fineract.portfolio.client.data.ClientIdentifierRequest;
 import org.apache.fineract.portfolio.client.exception.DuplicateClientIdentifierException;
 import org.apache.fineract.portfolio.client.service.ClientIdentifierReadPlatformService;
 import org.apache.fineract.portfolio.client.moduleapi.ClientReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/clients/{clientId}/identifiers")
@@ -78,7 +79,8 @@ public class ClientIdentifiersApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all Identifiers for a Client", operationId = "retrieveAllClientIdentifiers", description = "Example Requests:\n" + "clients/1/identifiers\n" + "\n" + "\n" + "clients/1/identifiers?fields=documentKey,documentType,description")
     public List<ClientIdentifierData> retrieveAllClientIdentifiers(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.clientIdentifierReadPlatformService.retrieveClientIdentifiers(clientId);
     }
 
