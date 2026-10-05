@@ -154,7 +154,8 @@ public class CodeValuesApiResource {
     @Operation(summary = "Retrieve a Code description", description = "Returns the details of a Code Value\n" + "\n" + "Example Requests:\n" + "\n" + "codes/name/ADDRESS_TYPE/codevalues/1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodeValuesApiResourceSwagger.GetCodeValuesDataResponse.class)))
     public CodeValueData retrieveCodeValue(@Context final UriInfo uriInfo, @PathParam("codeName") @Parameter(description = "codeName") final String codeName, @PathParam("codeValueId") @Parameter(description = "codeValueId") final Long codeValueId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.retrieveCodeValue(codeName, codeValueId);
     }
 
