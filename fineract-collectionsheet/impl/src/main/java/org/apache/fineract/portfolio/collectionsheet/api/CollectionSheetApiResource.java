@@ -46,6 +46,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/collectionsheet")
@@ -68,7 +69,8 @@ public class CollectionSheetApiResource {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
         if (CommandParameterUtil.is(commandParam, GENERATE_COLLECTION_SHEET_COMMAND_VALUE)) {
-            this.context.authenticatedUser().validateHasReadPermission(CollectionSheetConstants.COLLECTIONSHEET_RESOURCE_NAME);
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasReadPermission(CollectionSheetConstants.COLLECTIONSHEET_RESOURCE_NAME);
             final JsonElement parsedQuery = this.fromJsonHelper.parse(payload);
             final JsonQuery query = JsonQuery.from(payload, parsedQuery, this.fromJsonHelper);
             return Response.ok(this.collectionSheetReadPlatformService.generateIndividualCollectionSheet(query)).build();
