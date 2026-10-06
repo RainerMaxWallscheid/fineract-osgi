@@ -106,7 +106,8 @@ public class CreditBureauConfigurationApiResource {
     @Path("/config/{organisationCreditBureauId}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getConfiguration(@PathParam("organisationCreditBureauId") final Long organisationCreditBureauId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<CreditBureauConfigurationData> configurationData = this.creditBureauConfiguration.readConfigurationByOrganisationCreditBureauId(organisationCreditBureauId);
         return this.toApiJsonSerializerReport.serialize(configurationData);
     }
