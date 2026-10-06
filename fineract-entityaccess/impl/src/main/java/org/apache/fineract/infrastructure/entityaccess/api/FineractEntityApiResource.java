@@ -77,7 +77,8 @@ public class FineractEntityApiResource {
     @Operation(operationId = "retrieveOne")
     @AlternativeOperationId("retrieveOne_4")
     public String retrieveOne(@PathParam("mapId") final Long mapId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
         final Collection<FineractEntityToEntityMappingData> entityToEntityMappings = this.readPlatformService.retrieveOneMapping(mapId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializerOfficeToLoanProducts.serialize(settings, entityToEntityMappings, FineractEntityApiResourceConstants.FETCH_ENTITY_TO_ENTITY_MAPPINGS);
