@@ -95,7 +95,8 @@ public class CreditBureauConfigurationApiResource {
     @Path("/organisationCreditBureau")
     @Produces({MediaType.APPLICATION_JSON})
     public String getOrganisationCreditBureau(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<OrganisationCreditBureauData> organisationCreditBureau = this.readPlatformServiceOrganisationCreditBureau.retrieveOrgCreditBureau();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializerOrganisationCreditBureau.serialize(settings, organisationCreditBureau, RESPONSE_DATA_PARAMETERS);
