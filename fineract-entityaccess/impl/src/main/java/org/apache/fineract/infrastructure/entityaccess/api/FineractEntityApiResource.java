@@ -44,6 +44,7 @@ import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelati
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/entitytoentitymapping")
@@ -63,7 +64,8 @@ public class FineractEntityApiResource {
     @Operation(operationId = "retrieveAll_3")
     @AlternativeOperationId("retrieveAll_7")
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
         final Collection<FineractEntityRelationData> entityMappings = this.readPlatformService.retrieveAllSupportedMappingTypes();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, entityMappings, FineractEntityApiResourceConstants.RESPONSE_DATA_PARAMETERS);
