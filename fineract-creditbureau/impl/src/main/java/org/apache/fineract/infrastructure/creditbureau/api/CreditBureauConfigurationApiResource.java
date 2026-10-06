@@ -127,7 +127,8 @@ public class CreditBureauConfigurationApiResource {
     @Path("/loanProduct/{loanProductId}")
     @Produces({MediaType.APPLICATION_JSON})
     public String fetchMappingByLoanProductId(@Context final UriInfo uriInfo, @PathParam("loanProductId") final Long loanProductId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final CreditBureauLoanProductMappingData creditBureauLoanProductMapping = this.readPlatformServiceCreditBureauLoanProduct.readMappingByLoanId(loanProductId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializerCreditBureauLoanProduct.serialize(settings, creditBureauLoanProductMapping, RESPONSE_DATA_PARAMETERS);
