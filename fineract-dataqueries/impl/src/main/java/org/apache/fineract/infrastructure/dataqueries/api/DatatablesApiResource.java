@@ -58,6 +58,7 @@ import org.apache.fineract.infrastructure.dataqueries.service.DatatableWriteServ
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.search.data.AdvancedQueryData;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -211,7 +212,8 @@ public class DatatablesApiResource {
     @Operation(summary = "Query Data Table values", description = "Query values from a registered data table.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = List.class)))
     public String queryValues(@PathParam("datatable") @Parameter(description = "datatable") final String datatable, @QueryParam("columnFilter") @Parameter(description = "columnFilter") final String columnFilter, @QueryParam("valueFilter") @Parameter(description = "valueFilter") final String valueFilter, @QueryParam("resultColumns") @Parameter(description = "resultColumns") final String resultColumns, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDatatableReadPermission(datatable);
         final List<JsonObject> result = this.datatableReadService.queryDataTable(datatable, columnFilter, valueFilter, resultColumns);
         return this.toApiJsonSerializer.serialize(result);
     }
