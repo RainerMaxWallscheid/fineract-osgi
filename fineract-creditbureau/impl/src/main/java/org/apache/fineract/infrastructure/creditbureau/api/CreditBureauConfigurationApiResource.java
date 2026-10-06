@@ -49,6 +49,7 @@ import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadC
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.creditbureau.service.OrganisationCreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/CreditBureauConfiguration")
@@ -72,7 +73,8 @@ public class CreditBureauConfigurationApiResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public String getCreditBureau(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<CreditBureauData> creditBureau = this.readPlatformService.retrieveCreditBureau();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, creditBureau, RESPONSE_DATA_PARAMETERS);
