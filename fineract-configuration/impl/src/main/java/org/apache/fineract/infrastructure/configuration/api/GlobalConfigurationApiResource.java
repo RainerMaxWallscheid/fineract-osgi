@@ -86,7 +86,8 @@ public class GlobalConfigurationApiResource {
     @AlternativeOperationId("retrieveOne_3")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GlobalConfigurationPropertyData.class)))
     public String retrieveOne(@PathParam("configId") @Parameter(description = "configId") final Long configId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final GlobalConfigurationPropertyData configurationData = this.readPlatformService.retrieveGlobalConfiguration(configId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.propertyDataJsonSerializer.serialize(settings, configurationData, RESPONSE_DATA_PARAMETERS);
