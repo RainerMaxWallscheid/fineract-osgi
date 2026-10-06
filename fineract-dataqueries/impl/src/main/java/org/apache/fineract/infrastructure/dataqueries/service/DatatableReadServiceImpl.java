@@ -126,7 +126,8 @@ public class DatatableReadServiceImpl implements DatatableReadService {
     @Override
     public Page<JsonObject> queryDataTableAdvanced(@NonNull String datatable, @NonNull PagedLocalRequest<AdvancedQueryData> pagedRequest) {
         datatable = datatableUtil.validateDatatableRegistered(datatable);
-        context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDatatableReadPermission(datatable);
         AdvancedQueryData request = pagedRequest.getRequest().orElseThrow();
         dataTableValidator.validateTableSearch(request);
         Map<String, ResultsetColumnHeaderData> headersByName = searchUtil.mapHeadersToName(genericDataService.fillResultsetColumnHeaders(datatable));
