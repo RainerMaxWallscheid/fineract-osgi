@@ -250,7 +250,8 @@ public class DatatablesApiResource {
     @AlternativeOperationId("getDatatable_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = String.class)))
     public String getDatatable(@PathParam("datatable") @Parameter(description = "datatable") final String datatable, @PathParam("apptableId") @Parameter(description = "apptableId") final Long apptableId, @QueryParam("order") @Parameter(description = "order") final String order, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDatatableReadPermission(datatable);
         final GenericResultsetData results = this.datatableReadService.retrieveDataTableGenericResultSet(datatable, apptableId, order, null);
         String json;
         final boolean genericResultSet = ApiParameterHelper.genericResultSet(uriInfo.getQueryParameters());
