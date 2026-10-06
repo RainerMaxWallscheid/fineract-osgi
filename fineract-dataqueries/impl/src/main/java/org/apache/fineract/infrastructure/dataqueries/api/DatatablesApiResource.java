@@ -270,7 +270,8 @@ public class DatatablesApiResource {
         Gets the entry (if it exists) for data tables that are one-to-many with the application table, by the datatable entry id. Returns the stored row as a JSON object keyed by column name.""")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = String.class)))
     public String getDatatableManyEntry(@PathParam("datatable") final String datatable, @PathParam("apptableId") final Long apptableId, @PathParam("datatableId") final Long datatableId, @QueryParam("order") final String order, @DefaultValue("false") @QueryParam("genericResultSet") @Parameter(in = ParameterIn.QUERY, name = "genericResultSet", description = "Optional flag to format the response") final boolean genericResultSet, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDatatableReadPermission(datatable);
         final GenericResultsetData results = this.datatableReadService.retrieveDataTableGenericResultSet(datatable, apptableId, order, datatableId);
         String json;
         if (genericResultSet) {
