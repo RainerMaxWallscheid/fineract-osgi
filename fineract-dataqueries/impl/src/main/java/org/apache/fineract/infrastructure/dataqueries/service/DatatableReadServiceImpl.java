@@ -188,7 +188,8 @@ public class DatatableReadServiceImpl implements DatatableReadService {
             return false;
         }
         datatable = datatableUtil.validateDatatableRegistered(datatable);
-        context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDatatableReadPermission(datatable);
         Map<String, ResultsetColumnHeaderData> headersByName = searchUtil.mapHeadersToName(genericDataService.fillResultsetColumnHeaders(datatable));
         List<String> thisSelectColumns = searchUtil.validateToJdbcColumnNames(resultColumns, headersByName, true);
         if (columnFilters != null) {
