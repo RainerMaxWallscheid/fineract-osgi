@@ -106,7 +106,8 @@ public class ReportsApiResource {
     @AlternativeOperationId("retrieveOfficeTemplate")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportsApiResourceSwagger.GetReportsTemplateResponse.class)))
     public String retrieveOfficeTemplate(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ReportData result = new ReportData();
         result.appendedTemplate(this.readReportingService.getAllowedParameters(), this.reportingProcessServiceProvider.findAllReportingTypes());
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
