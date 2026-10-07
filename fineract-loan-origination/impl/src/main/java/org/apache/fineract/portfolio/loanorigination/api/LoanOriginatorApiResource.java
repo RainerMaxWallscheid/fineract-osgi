@@ -88,7 +88,8 @@ public class LoanOriginatorApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorTemplateResponse.class)))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     public LoanOriginatorTemplateData retrieveLoanOriginatorTemplate() {
-        this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
         return this.loanOriginatorReadPlatformService.retrieveTemplate();
     }
 
