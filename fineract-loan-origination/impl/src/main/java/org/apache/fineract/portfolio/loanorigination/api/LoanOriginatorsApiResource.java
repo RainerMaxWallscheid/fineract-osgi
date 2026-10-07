@@ -83,7 +83,8 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Loan not found")
     public LoanOriginatorsResponse retrieveOriginatorsByLoanExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(LOAN_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(LOAN_RESOURCE_NAME);
         final Long loanId = this.loanReadPlatformService.getLoanIdByLoanExternalId(loanExternalId);
         return LoanOriginatorsResponse.of(this.loanOriginatorReadPlatformService.retrieveByLoanId(loanId));
     }
