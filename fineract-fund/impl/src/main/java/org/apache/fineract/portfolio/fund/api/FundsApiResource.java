@@ -47,6 +47,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.data.FundRequest;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/funds")
@@ -67,7 +68,8 @@ public class FundsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Funds", description = "Returns the list of funds.\n" + "\n" + "Example Requests:\n" + "\n" + "funds")
     public List<FundData> retrieveFunds() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllFunds();
     }
 
