@@ -549,7 +549,8 @@ public class ClientsApiResource {
     }
 
     private String retrieveClientAccounts(Long clientId, final String externalId, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
         ExternalId clientExternalId = ExternalIdFactory.produce(externalId);
         clientId = getResolvedClientId(clientId, clientExternalId);
         final AccountSummaryCollectionData clientAccount = accountDetailsReadPlatformService.retrieveClientAccountDetails(clientId);
