@@ -235,7 +235,8 @@ public class InteropApiResource {
     @Operation(summary = "Query Interoperation Quote", description = "")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropQuoteResponseData.class)))
     public String getQuote(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode, @PathParam("quoteCode") @Parameter(description = "quoteCode") String quoteCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_QUOTE);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ENTITY_NAME_QUOTE);
         InteropQuoteResponseData result = interopService.getQuote(transactionCode, quoteCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializer.serialize(settings, result);
