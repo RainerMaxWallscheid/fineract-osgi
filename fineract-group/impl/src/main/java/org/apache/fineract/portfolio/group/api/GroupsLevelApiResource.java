@@ -29,6 +29,7 @@ import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.group.data.GroupLevelData;
 import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/grouplevels")
@@ -43,7 +44,8 @@ public class GroupsLevelApiResource {
     @Operation(summary = "Retrieve All Group Levels", operationId = "retrieveAllGroupLevels")
     @AlternativeOperationId("retrieveAllGroups")
     public List<GroupLevelData> retrieveAllGroups() {
-        this.context.authenticatedUser().validateHasReadPermission("GROUP");
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission("GROUP");
         return this.groupLevelReadPlatformService.retrieveAllLevels();
     }
 
