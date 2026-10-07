@@ -89,7 +89,8 @@ public class FundsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a Fund", description = "Returns the details of a Fund.\n" + "\n" + "Example Requests:\n" + "\n" + "funds/1")
     public FundData retrieveFund(@PathParam("fundId") @Parameter(description = "fundId") final Long fundId) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveFund(fundId);
     }
 
