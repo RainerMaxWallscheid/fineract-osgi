@@ -88,7 +88,8 @@ public class FineractEntityApiResource {
     @Path("/{mapId}/{fromId}/{toId}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getEntityToEntityMappings(@PathParam("mapId") final Long mapId, @PathParam("fromId") final Long fromId, @PathParam("toId") final Long toId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
         final Collection<FineractEntityToEntityMappingData> entityToEntityMappings = this.readPlatformService.retrieveEntityToEntityMappings(mapId, fromId, toId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializerOfficeToLoanProducts.serialize(settings, entityToEntityMappings, FineractEntityApiResourceConstants.FETCH_ENTITY_TO_ENTITY_MAPPINGS);
