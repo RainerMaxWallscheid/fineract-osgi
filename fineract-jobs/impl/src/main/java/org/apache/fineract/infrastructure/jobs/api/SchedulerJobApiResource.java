@@ -176,7 +176,8 @@ public class SchedulerJobApiResource {
     }
 
     private String retrieveOne(@NotNull IdTypeResolver.IdType idType, String identifier, UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
         final JobDetailData jobDetailData = schedulerJobRunnerReadService.retrieveOne(idType, identifier);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, jobDetailData, JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
