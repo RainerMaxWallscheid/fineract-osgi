@@ -184,7 +184,8 @@ public class SchedulerJobApiResource {
     }
 
     private String retrieveHistory(@NotNull IdTypeResolver.IdType idType, String identifier, Integer offset, Integer limit, String orderBy, String sortOrder, UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
