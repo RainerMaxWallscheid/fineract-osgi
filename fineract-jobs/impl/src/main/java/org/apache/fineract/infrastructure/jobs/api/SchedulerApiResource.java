@@ -74,7 +74,8 @@ public class SchedulerApiResource {
     @AlternativeOperationId("retrieveStatus")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SchedulerApiResourceSwagger.GetSchedulerResponse.class)))
     public String retrieveStatus(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
         final boolean isSchedulerRunning = this.jobRegisterService.isSchedulerRunning();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final SchedulerDetailData schedulerDetailData = new SchedulerDetailData().setActive(isSchedulerRunning);
