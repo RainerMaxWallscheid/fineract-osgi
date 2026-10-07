@@ -43,6 +43,7 @@ import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanReadPlatformServi
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorMappingResponse;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorsResponse;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +67,8 @@ public class LoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Loan not found")
     public LoanOriginatorsResponse retrieveOriginatorsByLoanId(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(LOAN_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(LOAN_RESOURCE_NAME);
         if (!this.loanExistencePort.existsById(loanId)) {
             throw new LoanNotFoundException(loanId);
         }
