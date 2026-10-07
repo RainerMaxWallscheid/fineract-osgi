@@ -44,6 +44,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorTemplateData;
 import org.apache.fineract.portfolio.loanorigination.service.LoanOriginatorReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +76,8 @@ public class LoanOriginatorApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorsResponse.class))))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     public List<LoanOriginatorData> retrieveAll() {
-        this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
         return this.loanOriginatorReadPlatformService.retrieveAll();
     }
 
