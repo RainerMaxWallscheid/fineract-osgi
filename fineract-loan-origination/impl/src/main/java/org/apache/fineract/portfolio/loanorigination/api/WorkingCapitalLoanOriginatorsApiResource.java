@@ -43,6 +43,7 @@ import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorsRespons
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanOriginatorReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +66,8 @@ public class WorkingCapitalLoanOriginatorsApiResource {
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Loan not found")
     public LoanOriginatorsResponse retrieveOriginatorsByWorkingCapitalLoanId(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         if (!this.workingCapitalLoanExistencePort.existsById(loanId)) {
             throw new WorkingCapitalLoanNotFoundException(loanId);
         }
