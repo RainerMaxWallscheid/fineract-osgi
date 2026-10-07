@@ -91,7 +91,8 @@ public class SchedulerJobApiResource {
     @AlternativeOperationId("retrieveAll_8")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SchedulerJobApiResourceSwagger.GetJobsResponse.class))))
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SCHEDULER_RESOURCE_NAME);
         final List<JobDetailData> jobDetailDatas = this.schedulerJobRunnerReadService.findAllJobDetails();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, jobDetailDatas, JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
