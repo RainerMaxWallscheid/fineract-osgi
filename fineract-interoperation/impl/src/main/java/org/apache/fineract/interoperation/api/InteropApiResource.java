@@ -262,7 +262,8 @@ public class InteropApiResource {
     @Operation(summary = "Query Interoperation Transfer", description = "")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropTransferResponseData.class)))
     public String getTransfer(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode, @PathParam("transferCode") @Parameter(description = "transferCode") String transferCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_QUOTE);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ENTITY_NAME_QUOTE);
         InteropTransferResponseData result = interopService.getTransfer(transactionCode, transferCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializer.serialize(settings, result);
