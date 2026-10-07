@@ -68,6 +68,7 @@ import org.apache.fineract.interoperation.data.InteropTransferResponseData;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 import org.apache.fineract.interoperation.domain.InteropTransferActionType;
 import org.apache.fineract.interoperation.service.InteropService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 // api/v1/
 @Path("/v1/interoperation")
@@ -207,7 +208,8 @@ public class InteropApiResource {
     @Operation(summary = "Query Interoperation Transaction Request", description = "")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropTransactionRequestResponseData.class)))
     public String getTransactionRequest(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode, @PathParam("requestCode") @Parameter(description = "requestCode") String requestCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_REQUEST);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ENTITY_NAME_REQUEST);
         InteropTransactionRequestResponseData result = interopService.getTransactionRequest(transactionCode, requestCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return jsonSerializer.serialize(settings, result);
