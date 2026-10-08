@@ -224,7 +224,8 @@ public class DelinquencyApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.DeleteDelinquencyBucketResponse.class)))
     public CommandProcessingResult deleteDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId) {
-        securityContext.authenticatedUser().validateHasDeletePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasDeletePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyBucket(delinquencyBucketId).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
