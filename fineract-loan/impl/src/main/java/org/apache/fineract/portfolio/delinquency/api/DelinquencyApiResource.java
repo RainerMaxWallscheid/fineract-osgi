@@ -133,7 +133,8 @@ public class DelinquencyApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.DeleteDelinquencyRangeResponse.class)))
     public CommandProcessingResult deleteDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
-        securityContext.authenticatedUser().validateHasDeletePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasDeletePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyRange(delinquencyRangeId).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
