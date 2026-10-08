@@ -100,7 +100,8 @@ public class DelinquencyApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyRangeRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyRangeResponse.class)))
     public CommandProcessingResult createDelinquencyRange(final DelinquencyRangeRequest delinquencyRangeRequest) {
-        securityContext.authenticatedUser().validateHasCreatePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasCreatePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyRange()
                 .withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
