@@ -553,7 +553,8 @@ public class GroupsApiResource {
             @QueryParam("parentGSIMAccountNo") final String parentGSIMAccountNo, @QueryParam("parentGSIMId") final Long parentGSIMId,
             @Context final UriInfo uriInfo) {
         List<GSIMContainer> gsimContainer;
-        context.authenticatedUser().validateHasReadPermission("GROUP");
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission("GROUP");
         if (parentGSIMAccountNo == null && parentGSIMId != null) {
             gsimContainer = gsimReadPlatformService.findGsimAccountContainerbyGsimAccountId(parentGSIMId);
         } else if (parentGSIMAccountNo != null && parentGSIMId == null) {
