@@ -168,7 +168,8 @@ public class DelinquencyApiResource {
     public DelinquencyBucketResponse getDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
             @Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapBucket(this.readPlatformService.retrieveDelinquencyBucket(delinquencyBucketId));
     }
 
