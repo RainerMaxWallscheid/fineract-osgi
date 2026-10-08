@@ -118,7 +118,8 @@ public class DelinquencyApiResource {
     public CommandProcessingResult updateDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId,
             final DelinquencyRangeRequest delinquencyRangeRequest) {
-        securityContext.authenticatedUser().validateHasUpdatePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasUpdatePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyRange(delinquencyRangeId)
                 .withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
