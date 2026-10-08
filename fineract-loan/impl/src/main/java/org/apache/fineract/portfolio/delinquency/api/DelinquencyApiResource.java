@@ -86,7 +86,8 @@ public class DelinquencyApiResource {
     @AlternativeOperationId("getDelinquencyRange")
     public DelinquencyRangeResponse getDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
-        securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapRange(this.readPlatformService.retrieveDelinquencyRange(delinquencyRangeId));
     }
 
