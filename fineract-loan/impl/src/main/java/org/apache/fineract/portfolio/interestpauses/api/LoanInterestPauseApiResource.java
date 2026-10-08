@@ -125,7 +125,8 @@ public class LoanInterestPauseApiResource {
     @ApiResponse(responseCode = "204", description = "No Content")
     public Response deleteInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
-        this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteInterestPause(loanId, variationId).build();
         this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return Response.noContent().build();
