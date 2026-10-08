@@ -209,7 +209,8 @@ public class DelinquencyApiResource {
     public CommandProcessingResult updateDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
             final DelinquencyBucketRequest delinquencyBucketRequest) {
-        securityContext.authenticatedUser().validateHasUpdatePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasUpdatePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyBucket(delinquencyBucketId)
                 .withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
