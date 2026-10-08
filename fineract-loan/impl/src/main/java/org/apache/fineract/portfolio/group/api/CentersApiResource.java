@@ -236,7 +236,8 @@ public class CentersApiResource {
     public String retrieveOne(@Context final UriInfo uriInfo,
             @PathParam("centerId") @Parameter(description = "centerId") final Long centerId,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly) {
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         CalendarData collectionMeetingCalendar = null;
         Collection<GroupGeneralData> groups = null;
