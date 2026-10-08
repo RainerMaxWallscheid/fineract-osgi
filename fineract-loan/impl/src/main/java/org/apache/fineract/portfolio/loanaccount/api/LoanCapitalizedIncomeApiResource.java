@@ -184,7 +184,8 @@ public class LoanCapitalizedIncomeApiResource {
 
     private String retrieveCapitalizedIncomeAllocationData(final Long loanId, final String loanExternalIdStr, final Long loanTransactionId,
             final String loanTransactionExternalIdStr, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         final ExternalId loanTransactionExternalId = ExternalIdFactory.produce(loanTransactionExternalIdStr);
         final Long resolvedLoanId = loanId == null ? loanReadPlatformService.getResolvedLoanId(loanExternalId) : loanId;
