@@ -85,7 +85,8 @@ public class LoanInterestPauseApiResource {
     public CommandProcessingResult createInterestPauseByExternalId(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @RequestBody(required = true) final InterestPauseRequestDto request) {
-        this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createInterestPauseByExternalId(loanExternalId)
                 .withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
