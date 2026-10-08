@@ -191,7 +191,8 @@ public class DelinquencyApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyBucketRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyBucketResponse.class)))
     public CommandProcessingResult createDelinquencyBucket(final DelinquencyBucketRequest delinquencyBucketRequest) {
-        securityContext.authenticatedUser().validateHasCreatePermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasCreatePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyBucket()
                 .withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
