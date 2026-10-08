@@ -97,7 +97,8 @@ public class LoanCapitalizedIncomeApiResource {
     @Operation(summary = "Fetch the Capitalized Income related informations", operationId = "fetchCapitalizedIncomeDetails")
     public List<CapitalizedIncomeDetails> fetchCapitalizedIncomeDetails(
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return capitalizedIncomeBalanceReadService.fetchLoanCapitalizedIncomeDetails(loanId);
     }
 
