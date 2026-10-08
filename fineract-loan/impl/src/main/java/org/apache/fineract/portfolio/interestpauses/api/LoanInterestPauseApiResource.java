@@ -140,7 +140,8 @@ public class LoanInterestPauseApiResource {
     public Response deleteInterestPauseByExternalId(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @PathParam("variationId") @Parameter(description = "variationId") final Long variationId) {
-        this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteInterestPause(loanExternalId, variationId).build();
         this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return Response.noContent().build();
