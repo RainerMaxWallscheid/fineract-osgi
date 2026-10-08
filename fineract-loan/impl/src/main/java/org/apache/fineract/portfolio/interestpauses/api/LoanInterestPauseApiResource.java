@@ -113,7 +113,8 @@ public class LoanInterestPauseApiResource {
     @ApiResponse(responseCode = "200", description = "List of interest pause periods", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InterestPauseResponseDto.class))))
     public List<InterestPauseResponseDto> retrieveInterestPausesByExternalId(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.interestPauseReadPlatformService.retrieveInterestPauses(loanExternalId);
     }
 
