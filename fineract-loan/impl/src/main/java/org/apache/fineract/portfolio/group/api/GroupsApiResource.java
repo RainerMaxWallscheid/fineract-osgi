@@ -529,7 +529,8 @@ public class GroupsApiResource {
     @AlternativeOperationId("retrieveglimAccounts")
     public String retrieveglimAccounts(@PathParam("groupId") final Long groupId,
             @QueryParam("parentLoanAccountNo") final String parentLoanAccountNo, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission("GROUP");
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission("GROUP");
         List<GLIMContainer> glimContainer = Collections.emptyList();
         if (parentLoanAccountNo == null) {
             glimContainer = (List<GLIMContainer>) glimAccountInfoReadPlatformService.findGlimAccount(groupId);
