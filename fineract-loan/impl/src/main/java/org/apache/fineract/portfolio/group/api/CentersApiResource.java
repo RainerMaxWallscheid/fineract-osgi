@@ -190,7 +190,8 @@ public class CentersApiResource {
             @QueryParam("meetingDate") @Parameter(description = "meetingDate") final DateParam meetingDateParam,
             @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat,
             @QueryParam("locale") @Parameter(description = "locale") final String locale) {
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (meetingDateParam != null && officeId != null) {
             LocalDate meetingDate = meetingDateParam.getDate("meetingDate", new DateFormat(dateFormat), locale);
