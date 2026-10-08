@@ -144,7 +144,8 @@ public class DelinquencyApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Template for Delinquency Buckets", description = "", operationId = "getBucketTemplate")
     public DelinquencyBucketTemplateResponse getTemplate() {
-        securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DELINQUENCY_BUCKET);
         return handleTemplate();
     }
 
