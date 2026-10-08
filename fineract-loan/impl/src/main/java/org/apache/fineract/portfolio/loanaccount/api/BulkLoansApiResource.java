@@ -49,6 +49,7 @@ import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.loanaccount.data.BulkTransferLoanOfficerData;
 import org.apache.fineract.portfolio.loanaccount.data.StaffAccountSummaryCollectionData;
 import org.apache.fineract.portfolio.loanaccount.service.BulkLoansReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loans/loanreassignment")
@@ -78,7 +79,8 @@ public class BulkLoansApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String loanReassignmentTemplate(@QueryParam(OFFICE_ID) final Long officeId,
             @QueryParam(FROM_LOAN_OFFICER_ID) final Long loanOfficerId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOfficesForDropdown();
         Collection<StaffData> loanOfficers = null;
         StaffAccountSummaryCollectionData staffAccountSummaryCollectionData = null;
