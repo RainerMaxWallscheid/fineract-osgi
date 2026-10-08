@@ -175,7 +175,8 @@ public class LoanInterestPauseApiResource {
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @PathParam("variationId") @Parameter(description = "variationId") final Long variationId,
             @RequestBody(required = true) final InterestPauseRequestDto request) {
-        this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInterestPause(loanExternalId, variationId)
                 .withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
