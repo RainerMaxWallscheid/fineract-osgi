@@ -108,7 +108,8 @@ public class LoanCapitalizedIncomeApiResource {
     @Operation(summary = "Get the amortization details of Capitalized Income for a loan by external ID", operationId = "fetchCapitalizedIncomeDetailsByExternalId")
     public List<CapitalizedIncomeDetails> fetchCapitalizedIncomeDetailsByExternalId(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ExternalId externalId = ExternalIdFactory.produce(loanExternalId);
         final Long resolvedLoanId = loanReadPlatformService.getResolvedLoanId(externalId);
         return this.capitalizedIncomeBalanceReadService.fetchLoanCapitalizedIncomeDetails(resolvedLoanId);
