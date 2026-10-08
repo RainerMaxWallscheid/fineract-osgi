@@ -46,6 +46,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.interestpauses.data.InterestPauseRequestDto;
 import org.apache.fineract.portfolio.interestpauses.data.InterestPauseResponseDto;
 import org.apache.fineract.portfolio.interestpauses.service.InterestPauseReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loans")
@@ -68,7 +69,8 @@ public class LoanInterestPauseApiResource {
     @ApiResponse(responseCode = "200", description = "Command successfully processed", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
     public CommandProcessingResult createInterestPause(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @RequestBody(required = true) final InterestPauseRequestDto request) {
-        this.context.authenticatedUser().validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(MODIFY_RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createInterestPause(loanId).withJson(request.toJson()).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
