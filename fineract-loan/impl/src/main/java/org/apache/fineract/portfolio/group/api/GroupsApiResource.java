@@ -488,7 +488,8 @@ public class GroupsApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.GetGroupsGroupIdAccountsResponse.class)))
     public String retrieveAccounts(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission("GROUP");
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission("GROUP");
         final AccountSummaryCollectionData groupAccount = accountDetailsReadPlatformService.retrieveGroupAccountDetails(groupId);
         final Set<String> GROUP_ACCOUNTS_DATA_PARAMETERS = new HashSet<>(Arrays.asList("loanAccounts",
                 "groupLoanIndividualMonitoringAccounts", "savingsAccounts", "memberLoanAccounts", "memberSavingsAccounts"));
