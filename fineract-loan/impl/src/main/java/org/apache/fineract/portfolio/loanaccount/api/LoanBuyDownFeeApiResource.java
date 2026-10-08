@@ -85,7 +85,8 @@ public class LoanBuyDownFeeApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BuyDownFeeAmortizationDetails.class))))
     public List<BuyDownFeeAmortizationDetails> retrieveLoanBuyDownFeeAmortizationDetailsByExternalId(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ExternalId externalId = ExternalIdFactory.produce(loanExternalId);
         final Long resolvedLoanId = loanReadPlatformService.getResolvedLoanId(externalId);
         return this.buyDownFeeReadPlatformService.retrieveLoanBuyDownFeeAmortizationDetails(resolvedLoanId);
