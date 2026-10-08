@@ -47,6 +47,7 @@ import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.BuyDownFee
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.BuyDownFeeReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAmortizationAllocationService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loans")
@@ -72,7 +73,8 @@ public class LoanBuyDownFeeApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BuyDownFeeAmortizationDetails.class))))
     public List<BuyDownFeeAmortizationDetails> retrieveLoanBuyDownFeeAmortizationDetails(
             @PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.buyDownFeeReadPlatformService.retrieveLoanBuyDownFeeAmortizationDetails(loanId);
     }
 
