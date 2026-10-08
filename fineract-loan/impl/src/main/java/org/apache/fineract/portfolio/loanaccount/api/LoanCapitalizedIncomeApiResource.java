@@ -47,6 +47,7 @@ import org.apache.fineract.portfolio.loanaccount.progressiveloan.data.LoanCapita
 import org.apache.fineract.portfolio.loanaccount.progressiveloan.service.CapitalizedIncomeBalanceReadService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAmortizationAllocationService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loans")
@@ -71,7 +72,8 @@ public class LoanCapitalizedIncomeApiResource {
     @Operation(deprecated = true, summary = "Fetch the Capitalized Income related informations", operationId = "fetchLoanCapitalizedIncomeData")
     public LoanCapitalizedIncomeData fetchLoanCapitalizedIncomeData(
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return capitalizedIncomeBalanceReadService.fetchLoanCapitalizedIncomeData(loanId);
     }
 
