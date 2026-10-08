@@ -155,7 +155,8 @@ public class DelinquencyApiResource {
     @Operation(summary = "List all Delinquency Buckets", description = "", operationId = "getBuckets")
     @AlternativeOperationId("getDelinquencyBuckets")
     public List<DelinquencyBucketResponse> getDelinquencyBuckets() {
-        securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapBucket(this.readPlatformService.retrieveAllDelinquencyBuckets());
     }
 
