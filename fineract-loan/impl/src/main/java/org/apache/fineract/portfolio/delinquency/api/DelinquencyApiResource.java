@@ -53,6 +53,7 @@ import org.apache.fineract.portfolio.delinquency.domain.DelinquencyFrequencyType
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyMinimumPaymentType;
 import org.apache.fineract.portfolio.delinquency.mapper.DelinquencyResponseMapper;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/delinquency")
@@ -73,7 +74,8 @@ public class DelinquencyApiResource {
     @Operation(summary = "List all Delinquency Ranges", description = "", operationId = "getRanges")
     @AlternativeOperationId("getDelinquencyRanges")
     public List<DelinquencyRangeResponse> getDelinquencyRanges() {
-        securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapRange(this.readPlatformService.retrieveAllDelinquencyRanges());
     }
 
