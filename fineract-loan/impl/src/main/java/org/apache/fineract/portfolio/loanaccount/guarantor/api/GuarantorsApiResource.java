@@ -102,7 +102,8 @@ public class GuarantorsApiResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public List<GuarantorData> retrieveGuarantorDetails(@PathParam("loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         return this.guarantorReadPlatformService.retrieveGuarantorsForValidLoan(loanId);
     }
 
