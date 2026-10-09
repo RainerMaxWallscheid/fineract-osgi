@@ -484,7 +484,8 @@ public class LoanTransactionsApiResource {
 
     private Page<LoanTransactionData> retrieveTransactions(final Long loanId, final String loanExternalIdStr,
             final List<LoanTransactionApiConstants.TransactionType> excludedTypes, Pageable pageable, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanIdWithExistsCheck(loanId, loanExternalId);
         Set<LoanTransactionType> excludedTransactionTypes = new HashSet<>();
