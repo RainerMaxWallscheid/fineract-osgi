@@ -72,7 +72,8 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
 
     @Override
     public List<LoanPointInTimeData> retrieveLoansPointInTimeByExternalIds(RetrieveLoansPointInTimeExternalIdsRequest request) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         List<String> loanExternalIds = request.getExternalIds();
         DateParam dateParam = request.getDate();
         String dateFormat = request.getDateFormat();
