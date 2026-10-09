@@ -490,7 +490,8 @@ public class LoansApiResource {
             @QueryParam("associations") @Parameter(description = "associations") final String associations,
             @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @QueryParam("status") @Parameter(description = "status") final String status) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(accountNo);
