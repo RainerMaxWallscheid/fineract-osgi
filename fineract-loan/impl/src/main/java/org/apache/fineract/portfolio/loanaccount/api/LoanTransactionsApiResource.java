@@ -782,7 +782,8 @@ public class LoanTransactionsApiResource {
     public LoanScheduleData previewReAgeSchedule(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId,
             @Valid @BeanParam final ReAgePreviewRequest reAgePreviewRequest) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return loanReAgingService.previewReAge(null, loanExternalId, reAgePreviewRequest);
     }
 
