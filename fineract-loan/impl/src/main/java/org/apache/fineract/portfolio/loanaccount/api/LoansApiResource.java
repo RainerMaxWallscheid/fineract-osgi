@@ -626,7 +626,8 @@ public class LoansApiResource {
     @Path("glimAccount/{glimId}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getGlimRepaymentTemplate(@PathParam("glimId") final Long glimId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         Collection<GlimRepaymentTemplate> glimRepaymentTemplate = this.glimAccountInfoReadPlatformService.findglimRepaymentTemplate(glimId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.glimTemplateToApiJsonSerializer.serialize(settings, glimRepaymentTemplate, GLIM_ACCOUNTS_DATA_PARAMETERS);
