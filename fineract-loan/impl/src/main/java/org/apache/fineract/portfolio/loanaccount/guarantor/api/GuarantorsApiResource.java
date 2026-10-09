@@ -64,6 +64,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
@@ -89,7 +90,8 @@ public class GuarantorsApiResource {
     @Path("template")
     @Produces({ MediaType.APPLICATION_JSON })
     public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
         final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService
                 .retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
