@@ -603,7 +603,8 @@ public class LoanTransactionsApiResource {
 
     private String retrieveTransactionTemplate(Long loanId, String loanExternalIdStr, String commandParam, UriInfo uriInfo,
             DateFormat dateFormat, DateParam transactionDateParam, String locale, Long transactionId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanId == null ? loanReadPlatformService.getResolvedLoanId(loanExternalId) : loanId;
         LoanTransactionData transactionData;
