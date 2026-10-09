@@ -808,7 +808,8 @@ public class LoanTransactionsApiResource {
     public LoanScheduleData previewReAmortizationSchedule(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId,
             @Valid @BeanParam final ReAmortizationPreviewRequest reAmortizationPreviewRequest) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return loanReAmortizationService.previewReAmortization(null, loanExternalId, reAmortizationPreviewRequest);
     }
 
