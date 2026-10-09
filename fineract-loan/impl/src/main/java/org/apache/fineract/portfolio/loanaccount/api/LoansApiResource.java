@@ -1362,7 +1362,8 @@ public class LoansApiResource {
     }
 
     private List<LoanApprovedAmountHistoryData> getLoanApprovedAmountHistory(Long loanId, ExternalId loanExternalId) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         Long resolvedLoanId = loanId == null ? loanReadPlatformService.getResolvedLoanId(loanExternalId) : loanId;
         Pageable sortedByCreationDate = Pageable.unpaged(Sort.by("createdDate").ascending());
         return loanApprovedAmountHistoryRepository.findAllByLoanId(resolvedLoanId, sortedByCreationDate);
