@@ -160,7 +160,8 @@ public class GuarantorsApiResource {
     @Path("accounts/template")
     @Produces({ MediaType.APPLICATION_JSON })
     public GuarantorData accountsTemplate(@QueryParam("clientId") final Long clientId, @PathParam("loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         PortfolioAccountDTO portfolioAccountDTO = new PortfolioAccountDTO(PortfolioAccountType.SAVINGS.getValue(), clientId, null);
         Collection<PortfolioAccountData> accountLinkingOptions = null;
         if (this.loanReadPlatformService.isGuaranteeRequired(loanId)) {
