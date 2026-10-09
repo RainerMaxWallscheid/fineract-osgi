@@ -112,6 +112,7 @@ import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.rate.data.RateData;
 import org.apache.fineract.portfolio.rate.service.RateReadService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loanproducts")
@@ -201,11 +202,13 @@ public class LoanProductsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LoanProductsApiResourceSwagger.GetLoanProductsResponse.class)))) })
     public String retrieveAllLoanProducts(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (!associationParameters.isEmpty() && associationParameters.contains(PRODUCT_MIXES)) {
-            this.context.authenticatedUser().validateHasReadPermission(PRODUCTMIX);
+            final Object productMixUser = this.context.authenticatedUser();
+            ((AppUser) productMixUser).validateHasReadPermission(PRODUCTMIX);
             final Collection<ProductMixData> productMixes = this.productMixReadPlatformService.retrieveAllProductMixes();
             return this.productMixDataApiJsonSerializer.serialize(settings, productMixes, PRODUCT_MIX_DATA_PARAMETERS);
         }
