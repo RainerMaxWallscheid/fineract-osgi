@@ -1334,7 +1334,8 @@ public class LoansApiResource {
     }
 
     private String getLoanDelinquencyActions(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanId == null ? loanReadPlatformService.getResolvedLoanId(loanExternalId) : loanId;
         final Collection<LoanDelinquencyAction> delinquencyActions = this.delinquencyReadPlatformService
