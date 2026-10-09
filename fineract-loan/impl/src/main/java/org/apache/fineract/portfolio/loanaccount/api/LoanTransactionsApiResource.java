@@ -769,7 +769,8 @@ public class LoanTransactionsApiResource {
     @AlternativeOperationId("previewReAgeSchedule")
     public LoanScheduleData previewReAgeSchedule(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId,
             @Valid @BeanParam final ReAgePreviewRequest reAgePreviewRequest) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return loanReAgingService.previewReAge(loanId, null, reAgePreviewRequest);
     }
 
