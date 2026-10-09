@@ -31,6 +31,7 @@ import org.apache.fineract.portfolio.loanaccount.api.pointintime.data.RetrieveLo
 import org.apache.fineract.portfolio.loanaccount.data.LoanPointInTimeData;
 import org.apache.fineract.portfolio.loanaccount.service.LoanPointInTimeService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,7 +44,8 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
 
     @Override
     public LoanPointInTimeData retrieveLoanPointInTime(Long loanId, DateParam dateParam, String dateFormat, String locale) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return getLoanPointInTime(loanId, dateParam, dateFormat, locale);
     }
 
