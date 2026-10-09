@@ -163,7 +163,8 @@ public class RescheduleLoansApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RescheduleLoansApiResourceSwagger.GetLoanRescheduleRequestResponse.class))))
     public String retrieveAllRescheduleRequest(@Context final UriInfo uriInfo, @QueryParam("command") final String command,
             @QueryParam("loanId") Long loanId) {
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RescheduleLoansApiConstants.ENTITY_NAME);
+        final Object currentUser = this.platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RescheduleLoansApiConstants.ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (StringUtils.isNotBlank(command) && !RescheduleLoansApiConstants.commandParams.contains(command.toLowerCase())) {
             throw new UnrecognizedQueryParamException("command", command, RescheduleLoansApiConstants.allCommandParamName,
