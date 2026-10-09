@@ -795,7 +795,8 @@ public class LoanTransactionsApiResource {
     public LoanScheduleData previewReAmortizationSchedule(
             @PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId,
             @Valid @BeanParam final ReAmortizationPreviewRequest reAmortizationPreviewRequest) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return loanReAmortizationService.previewReAmortization(loanId, null, reAmortizationPreviewRequest);
     }
 
