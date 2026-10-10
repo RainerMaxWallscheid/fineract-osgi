@@ -46,6 +46,7 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.data.PasswordValidationPolicyData;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +66,8 @@ public class PasswordPreferencesApiResource {
     @Operation(summary = "List Password Preferences", operationId = "retrieveAllPasswordPreferences", description = "Returns the password policies and their current status (active/inactive).", tags = {"Password preferences"})
     @AlternativeOperationId("retrieve_1")
     public String retrieve(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
         final PasswordValidationPolicyData passwordValidationPolicyData = this.passwordValidationPolicyReadPlatformService.retrieveActiveValidationPolicy();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, passwordValidationPolicyData, PasswordPreferencesApiConstants.RESPONSE_DATA_PARAMETERS);
