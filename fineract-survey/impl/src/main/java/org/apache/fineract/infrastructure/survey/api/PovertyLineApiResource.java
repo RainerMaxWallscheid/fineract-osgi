@@ -61,7 +61,8 @@ public class PovertyLineApiResource {
     @Operation(operationId = "retrieveAll_7")
     @AlternativeOperationId("retrieveAll_13")
     public String retrieveAll(@PathParam("ppiName") final String ppiName, @PathParam("likelihoodId") final Long likelihoodId) {
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
         LikeliHoodPovertyLineData likeliHoodPovertyLineData = this.readService.retrieveForLikelihood(ppiName, likelihoodId);
         return this.likelihoodToApiJsonSerializer.serialize(likeliHoodPovertyLineData);
     }
