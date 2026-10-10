@@ -37,6 +37,7 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,7 +58,8 @@ public class LikelihoodApiResource {
     @Operation(operationId = "retrieveAll_5")
     @AlternativeOperationId("retrieveAll_11")
     public String retrieveAll(@PathParam("ppiName") final String ppiName) {
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
         List<LikelihoodData> likelihoodData = this.readService.retrieveAll(ppiName);
         return this.toApiJsonSerializer.serialize(likelihoodData);
     }
