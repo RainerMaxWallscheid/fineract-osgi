@@ -185,7 +185,8 @@ public class FixedDepositProductsApiResource {
     @AlternativeOperationId("retrieveOne_20")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.GetFixedDepositProductsProductIdResponse.class)))
     public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
         FixedDepositProductData fixedDepositProductData = (FixedDepositProductData) this.depositProductReadPlatformService.retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
         final Collection<ChargeData> charges = this.chargeReadPlatformService.retrieveSavingsProductCharges(productId);
         fixedDepositProductData = FixedDepositProductData.withCharges(fixedDepositProductData, charges);
