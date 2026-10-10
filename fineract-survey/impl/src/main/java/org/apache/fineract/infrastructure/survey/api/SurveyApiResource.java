@@ -125,7 +125,8 @@ public class SurveyApiResource {
     @Path("{surveyName}/{clientId}/{entryId}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getSurveyEntry(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId, @PathParam("entryId") final Long entryId) {
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
         final GenericResultsetData results = this.readSurveyService.retrieveSurveyEntry(surveyName, clientId, entryId);
         return this.genericDataService.generateJsonFromGenericResultsetData(results);
     }
