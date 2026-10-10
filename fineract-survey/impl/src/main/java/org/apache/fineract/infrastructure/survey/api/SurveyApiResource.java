@@ -85,7 +85,8 @@ public class SurveyApiResource {
     @AlternativeOperationId("retrieveSurvey")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class)))
     public String retrieveSurvey(@PathParam("surveyName") @Parameter(description = "surveyName") final String surveyName) {
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
         SurveyDataTableData surveys = this.readSurveyService.retrieveSurvey(surveyName);
         return this.toApiJsonSerializer.serialize(surveys);
     }
