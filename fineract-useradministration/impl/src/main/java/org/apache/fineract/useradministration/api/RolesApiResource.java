@@ -57,6 +57,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.useradministration.data.PermissionData;
 import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.data.RolePermissionsData;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.service.PermissionReadPlatformService;
 import org.apache.fineract.useradministration.service.RoleReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -95,7 +96,8 @@ public class RolesApiResource {
     @Operation(summary = "List Roles", operationId = "retrieveAllRoles", tags = {"Roles"}, description = "Example Requests:\n" + "\n" + "roles\n" + "\n" + "\n" + "roles?fields=name")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RolesApiResourceSwagger.GetRolesResponse.class))))})
     public String retrieveAllRoles(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Collection<RoleData> roles = this.roleReadPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, roles, RESPONSE_DATA_PARAMETERS);
