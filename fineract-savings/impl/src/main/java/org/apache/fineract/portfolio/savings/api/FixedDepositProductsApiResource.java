@@ -212,7 +212,8 @@ public class FixedDepositProductsApiResource {
     @Operation(summary = "Retrieve Fixed Deposit Product Template", operationId = "retrieveTemplateFixedDepositProduct")
     @AlternativeOperationId("retrieveTemplate_15")
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
         final FixedDepositProductData fixedDepositProduct = handleTemplateRelatedData(null);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, fixedDepositProduct, DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
