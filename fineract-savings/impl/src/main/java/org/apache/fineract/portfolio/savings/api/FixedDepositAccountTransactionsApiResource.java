@@ -112,7 +112,8 @@ public class FixedDepositAccountTransactionsApiResource {
     @Operation(summary = "Retrieve a fixed deposit account transaction", operationId = "retrieveOneFixedDepositAccountTransaction")
     @AlternativeOperationId("retrieveOne_18")
     public String retrieveOne(@PathParam("fixedDepositAccountId") final Long fixedDepositAccountId, @PathParam("transactionId") final Long transactionId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService.retrieveSavingsTransaction(fixedDepositAccountId, transactionId, DepositAccountType.FIXED_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
