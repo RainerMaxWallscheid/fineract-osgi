@@ -123,7 +123,8 @@ public class UsersApiResource {
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = UsersApiResourceSwagger.GetUsersTemplateResponse.class)))})
     @Produces({MediaType.APPLICATION_JSON})
     public String template(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final AppUserData user = this.readPlatformService.retrieveNewUserDetails();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, user, RESPONSE_DATA_PARAMETERS);
