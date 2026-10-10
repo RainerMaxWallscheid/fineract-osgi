@@ -157,7 +157,8 @@ public class HolidaysApiResource {
     @Operation(summary = "List Holidays", operationId = "retrieveAllHolidays", description = "Example Requests:\n" + "\n" + "holidays?officeId=1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = HolidaysApiResourceSwagger.GetHolidaysResponse.class))))
     public String retrieveAllHolidays(@Context final UriInfo uriInfo, @QueryParam("officeId") @Parameter(description = "officeId") final Long officeId, @QueryParam("fromDate") @Parameter(description = "fromDate") final DateParam fromDateParam, @QueryParam("toDate") @Parameter(description = "toDate") final DateParam toDateParam, @QueryParam("locale") @Parameter(description = "locale") final String locale, @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String rawDateFormat) {
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
         final DateFormat dateFormat = StringUtils.isBlank(rawDateFormat) ? null : new DateFormat(rawDateFormat);
         LocalDate fromDate = null;
         if (fromDateParam != null) {
