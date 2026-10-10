@@ -177,7 +177,8 @@ public class HolidaysApiResource {
     @Path("/template")
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveRepaymentScheduleUpdationTyeOptions(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
         return this.toApiJsonSerializer.serialize(this.holidayReadPlatformService.retrieveRepaymentScheduleUpdationTyeOptions());
     }
 
