@@ -181,7 +181,8 @@ public class RecurringDepositProductsApiResource {
     @Operation(summary = "Retrieve Recurring Deposit Product Template", operationId = "retrieveTemplateRecurringDepositProduct")
     @AlternativeOperationId("retrieveTemplate_17")
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
         final RecurringDepositProductData recurringDepositProduct = handleTemplateRelatedData(null);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, recurringDepositProduct, DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
