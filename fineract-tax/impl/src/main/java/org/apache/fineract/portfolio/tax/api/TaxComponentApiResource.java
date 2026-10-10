@@ -46,6 +46,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.tax.data.TaxComponentData;
 import org.apache.fineract.portfolio.tax.request.TaxComponentRequest;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/taxes/component")
@@ -63,7 +64,8 @@ public class TaxComponentApiResource {
     @Operation(summary = "List Tax Components", operationId = "retrieveAllTaxComponents", description = "List Tax Components")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class))))})
     public List<TaxComponentData> retrieveAllTaxComponents() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllTaxComponents();
     }
 
