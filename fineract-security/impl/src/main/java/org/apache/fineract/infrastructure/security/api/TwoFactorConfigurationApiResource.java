@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TwoFactorConfigurationService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +53,8 @@ public class TwoFactorConfigurationApiResource {
     @Operation(operationId = "retrieveAll_4")
     @AlternativeOperationId("retrieveAll_9")
     public String retrieveAll() {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         Map<String, Object> configurationMap = configurationService.retrieveAll();
         return toApiJsonSerializer.serialize(configurationMap);
     }
