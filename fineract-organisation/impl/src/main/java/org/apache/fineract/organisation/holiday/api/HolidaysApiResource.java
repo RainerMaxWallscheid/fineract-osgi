@@ -57,6 +57,7 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.holiday.data.HolidayData;
 import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/holidays")
@@ -114,7 +115,8 @@ public class HolidaysApiResource {
     @AlternativeOperationId("retrieveOne_7")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = HolidaysApiResourceSwagger.GetHolidaysResponse.class)))
     public String retrieveOne(@PathParam("holidayId") @Parameter(description = "holidayId") final Long holidayId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
         final HolidayData holidayData = this.holidayReadPlatformService.retrieveHoliday(holidayId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, holidayData, HOLIDAY_RESPONSE_DATA_PARAMETERS);
