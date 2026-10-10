@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.security.data.TenantOidcConfigData;
 import org.apache.fineract.infrastructure.security.domain.OidcFederationType;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TenantOidcConfigService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,7 +62,8 @@ public class TenantOidcConfigApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Retrieve OIDC configuration for a tenant", description = "Returns the current OIDC/IdP configuration for the given tenant. " + "The clientSecret is never included in the response.")
     public String retrieve(@Parameter(description = "tenantId") @PathParam("tenantId") String tenantId) {
-        context.authenticatedUser().validateHasPermissionTo(PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasPermissionTo(PERMISSION);
         TenantOidcConfig config = tenantOidcConfigService.findByTenantId(tenantId).orElseThrow(() -> new ResourceNotFoundException("tenantOidcConfig.not.found", "No OIDC configuration found for tenant: " + tenantId, new Object[] {tenantId}));
         return apiJsonSerializer.serialize(TenantOidcConfigData.from(config));
     }
