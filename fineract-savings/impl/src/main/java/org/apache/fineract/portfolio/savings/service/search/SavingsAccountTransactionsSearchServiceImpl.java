@@ -158,7 +158,8 @@ public class SavingsAccountTransactionsSearchServiceImpl implements SavingsAccou
 
     @Override
     public Page<JsonObject> queryAdvanced(@NonNull Long savingsId, @NonNull PagedLocalRequest<AdvancedQueryRequest> pagedRequest) {
-        context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SAVINGS_ACCOUNT_RESOURCE_NAME);
         String apptable = EntityTables.SAVINGS_TRANSACTION.getApptableName();
         AdvancedQueryRequest queryRequest = pagedRequest.getRequest().orElseThrow();
         dataTableValidator.validateTableSearch(queryRequest);
