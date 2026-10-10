@@ -80,7 +80,8 @@ public class TaxGroupApiResource {
     @AlternativeOperationId("retrieveTaxGroup")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.GetTaxesGroupResponse.class)))
     public TaxGroupData retrieveTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return settings.isTemplate() ? readPlatformService.retrieveTaxGroupWithTemplate(taxGroupId) : readPlatformService.retrieveTaxGroupData(taxGroupId);
     }
