@@ -60,6 +60,7 @@ import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/savingsaccounts/{savingsAccountId}/charges")
@@ -82,7 +83,8 @@ public class SavingsAccountChargesApiResource {
     @Operation(summary = "List Savings Charges", operationId = "retrieveAllSavingsAccountCharges", description = "Lists Savings Charges\n\n" + "Example Requests:\n" + "\n" + "savingsaccounts/1/charges\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=all\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=inactive\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=active\n" + "\n" + "savingsaccounts/1/charges?fields=name,amountOrPercentage")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesResponse.class))))})
     public String retrieveAllSavingsAccountCharges(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @DefaultValue("all") @QueryParam("chargeStatus") @Parameter(description = "chargeStatus") final String chargeStatus, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
         if (!(is(chargeStatus, "all") || is(chargeStatus, "active") || is(chargeStatus, "inactive"))) {
             throw new UnrecognizedQueryParamException("status", chargeStatus, new Object[] {"all", "active", "inactive"});
         }
