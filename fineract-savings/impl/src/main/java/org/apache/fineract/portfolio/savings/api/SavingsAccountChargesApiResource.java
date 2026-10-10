@@ -115,7 +115,8 @@ public class SavingsAccountChargesApiResource {
     @AlternativeOperationId("retrieveSavingsAccountCharge")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class)))})
     public String retrieveSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
         final SavingsAccountChargeData savingsAccountCharge = this.savingsAccountChargeReadPlatformService.retrieveSavingsAccountChargeDetails(savingsAccountChargeId, savingsAccountId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, savingsAccountCharge, SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
