@@ -70,7 +70,8 @@ public class LikelihoodApiResource {
     @Operation(operationId = "retrieve_1")
     @AlternativeOperationId("retrieve")
     public String retrieve(@PathParam("likelihoodId") final Long likelihoodId, @PathParam("ppiName") final String ppiName) {
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
         LikelihoodData likelihoodData = this.readService.retrieve(likelihoodId);
         return this.toApiJsonSerializer.serialize(likelihoodData);
     }
