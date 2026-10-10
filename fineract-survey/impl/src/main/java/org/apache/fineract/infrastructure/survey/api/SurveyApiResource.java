@@ -49,6 +49,7 @@ import org.apache.fineract.infrastructure.survey.data.ClientScoresOverview;
 import org.apache.fineract.infrastructure.survey.data.SurveyData;
 import org.apache.fineract.infrastructure.survey.data.SurveyDataTableData;
 import org.apache.fineract.infrastructure.survey.service.ReadSurveyService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,7 +72,8 @@ public class SurveyApiResource {
     @AlternativeOperationId("retrieveSurveys")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class))))
     public String retrieveSurveys() {
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
         List<SurveyDataTableData> surveys = this.readSurveyService.retrieveAllSurveys();
         return this.toApiJsonSerializer.serialize(surveys);
     }
