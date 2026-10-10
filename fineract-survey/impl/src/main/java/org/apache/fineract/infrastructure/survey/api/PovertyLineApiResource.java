@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.infrastructure.survey.data.LikeliHoodPovertyLineData;
 import org.apache.fineract.infrastructure.survey.data.PpiPovertyLineData;
 import org.apache.fineract.infrastructure.survey.service.PovertyLineService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/povertyLine")
@@ -48,7 +49,8 @@ public class PovertyLineApiResource {
     @Operation(operationId = "retrieveAll_6")
     @AlternativeOperationId("retrieveAll_12")
     public String retrieveAll(@PathParam("ppiName") final String ppiName) {
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
         PpiPovertyLineData povertyLine = this.readService.retrieveAll(ppiName);
         return this.toApiJsonSerializer.serialize(povertyLine);
     }
