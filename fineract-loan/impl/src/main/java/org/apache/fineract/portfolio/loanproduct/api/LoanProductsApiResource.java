@@ -283,7 +283,8 @@ public class LoanProductsApiResource {
     public String retrieveLoanProductDetails(
             @PathParam("externalProductId") @Parameter(description = "externalProductId") final String externalProductId,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId externalId = ExternalIdFactory.produce(externalProductId);
         Long productId = resolveProductId(externalId);
         if (Objects.isNull(productId)) {
