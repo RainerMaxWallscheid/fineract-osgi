@@ -57,6 +57,7 @@ import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.DepositsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/fixeddepositaccounts/{fixedDepositAccountId}/transactions")
@@ -83,7 +84,8 @@ public class FixedDepositAccountTransactionsApiResource {
     public String retrieveTemplate(@PathParam("fixedDepositAccountId") final Long fixedDepositAccountId, 
     // @QueryParam("command") final String commandParam,
     @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         SavingsAccountTransactionData savingsAccount = this.savingsAccountReadPlatformService.retrieveDepositTransactionTemplate(fixedDepositAccountId, DepositAccountType.FIXED_DEPOSIT);
         final Collection<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
         savingsAccount = SavingsAccountTransactionData.templateOnTop(savingsAccount, paymentTypeOptions);
