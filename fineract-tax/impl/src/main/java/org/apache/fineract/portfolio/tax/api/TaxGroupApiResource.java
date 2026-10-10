@@ -49,6 +49,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.request.TaxGroupRequest;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/taxes/group")
@@ -67,7 +68,8 @@ public class TaxGroupApiResource {
     @Operation(summary = "List Tax Group", operationId = "retrieveAllTaxGroups", description = "List Tax Group")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxGroupApiResourceSwagger.GetTaxesGroupResponse.class))))
     public List<TaxGroupData> retrieveAllTaxGroups() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllTaxGroups();
     }
 
