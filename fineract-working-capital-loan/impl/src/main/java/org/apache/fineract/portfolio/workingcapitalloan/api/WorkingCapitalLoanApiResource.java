@@ -336,7 +336,8 @@ public class WorkingCapitalLoanApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanRateChangeHistoryByExternalId", summary = "Retrieve rate change history for a Working Capital Loan by external id", description = "Returns all rate change records for the loan, ordered by most recent first.")
     public List<WorkingCapitalLoanPeriodPaymentRateChangeData> getRateChangeHistoryByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Long resolvedLoanId = readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalId));
         if (resolvedLoanId == null) {
             throw new WorkingCapitalLoanNotFoundException(ExternalIdFactory.produce(loanExternalId));
