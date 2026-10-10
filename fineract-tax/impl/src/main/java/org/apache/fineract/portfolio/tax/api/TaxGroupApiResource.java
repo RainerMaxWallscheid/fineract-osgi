@@ -92,7 +92,8 @@ public class TaxGroupApiResource {
     @Operation(summary = "Retrieve Tax Group Template", operationId = "retrieveTemplateTaxGroup")
     @AlternativeOperationId("retrieveTemplate_22")
     public TaxGroupData retrieveTemplate() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveTaxGroupTemplate();
     }
 
