@@ -46,6 +46,7 @@ import org.apache.fineract.shares.shareaccounts.data.ShareAccountDividendData;
 import org.apache.fineract.shares.shareaccounts.service.ShareAccountDividendReadPlatformService;
 import org.apache.fineract.shares.shareproducts.data.ShareProductDividendPayOutData;
 import org.apache.fineract.shares.shareproducts.service.ShareProductDividendReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/shareproduct/{productId}/dividend")
@@ -67,7 +68,8 @@ public class ShareDividendApiResource {
     @Operation(summary = "List all share dividends", operationId = "retrieveAllShareDividends")
     @AlternativeOperationId("retrieveAll_39")
     public String retrieveAll(@PathParam("productId") final Long productId, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder, @QueryParam("status") final Integer status) {
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
