@@ -160,7 +160,8 @@ public class OfficesApiResource {
     @Operation(summary = "Retrieve an Office using external id", operationId = "retrieveOneOfficeByExternalId", description = "Example Requests:\n" + "\n" + "offices/external-id/asd123\n" + "\n" + "\n" + "offices/external-id/asd123?template=true\n" + "\n" + "\n" + "offices/external-id/asd123?fields=id,name,parentName")
     @AlternativeOperationId("retrieveOfficeByExternalId")
     public OfficesApiResourceSwagger.GetOfficesResponse retrieveOfficeByExternalId(@PathParam("externalId") @Parameter(description = "externalId") final String externalId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         OfficeData office = readPlatformService.retrieveOfficeWithExternalId(ExternalIdFactory.produce(externalId));
         if (settings.isTemplate()) {
