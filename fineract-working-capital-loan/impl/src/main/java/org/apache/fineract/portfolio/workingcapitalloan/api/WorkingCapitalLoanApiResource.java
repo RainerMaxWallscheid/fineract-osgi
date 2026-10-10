@@ -91,7 +91,8 @@ public class WorkingCapitalLoanApiResource {
     @Operation(operationId = "retrieveAllWorkingCapitalLoans", summary = "List Working Capital Loans", description = "Uses Spring Data pagination: page, size, sort (e.g. sort=id,asc or sort=accountNumber,desc). " + "Filter by clientId, externalId, status, accountNo. Response: content, totalElements, totalPages, size, number.")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanApiResourceSwagger.GetWorkingCapitalLoansPagedResponse.class)))})
     public Page<WorkingCapitalLoanData> retrieveAll(@QueryParam("externalId") @Parameter(description = "externalId") final String externalId, @QueryParam("accountNo") @Parameter(description = "accountNo") final String accountNo, @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("status") @Parameter(description = "status") final String status, @Parameter(hidden = true) @Pagination(maximumSize = 200) final Pageable pageable) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.retrieveAllPaged(pageable, clientId, externalId, status, accountNo);
     }
 
