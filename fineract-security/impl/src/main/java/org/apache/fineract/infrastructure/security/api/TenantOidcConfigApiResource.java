@@ -85,7 +85,8 @@ public class TenantOidcConfigApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Update OIDC configuration for a tenant", description = "Updates the existing OIDC/IdP configuration for the given tenant. " + "If clientSecret is omitted in the request body, the existing encrypted secret is preserved.")
     public String update(@Parameter(description = "tenantId") @PathParam("tenantId") String tenantId, String requestBody) {
-        context.authenticatedUser().validateHasPermissionTo(PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasPermissionTo(PERMISSION);
         TenantOidcConfig existing = tenantOidcConfigService.findByTenantId(tenantId).orElseThrow(() -> new ResourceNotFoundException("tenantOidcConfig.not.found", "No OIDC configuration found for tenant: " + tenantId, new Object[] {tenantId}));
         TenantOidcConfig updated = parseRequest(tenantId, requestBody, existing);
         TenantOidcConfig saved = tenantOidcConfigService.save(updated);
