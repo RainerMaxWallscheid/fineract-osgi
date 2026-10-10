@@ -143,7 +143,8 @@ public class OfficesApiResource {
     @AlternativeOperationId("retrieveOffice")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesResponse.class)))
     public String retrieveOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         OfficeData office = readPlatformService.retrieveOffice(officeId);
         if (settings.isTemplate()) {
