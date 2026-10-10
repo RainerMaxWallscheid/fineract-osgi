@@ -116,7 +116,8 @@ public class RecurringDepositAccountTransactionsApiResource {
     @AlternativeOperationId("retrieveOne_21")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RecurringDepositAccountTransactionsApiResourceSwagger.GetRecurringDepositAccountsRecurringDepositAccountIdTransactionsTransactionIdResponse.class)))})
     public String retrieveOne(@PathParam("recurringDepositAccountId") @Parameter(description = "recurringDepositAccountId") final Long recurringDepositAccountId, @PathParam("transactionId") @Parameter(description = "transactionId") final Long transactionId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService.retrieveSavingsTransaction(recurringDepositAccountId, transactionId, DepositAccountType.RECURRING_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
