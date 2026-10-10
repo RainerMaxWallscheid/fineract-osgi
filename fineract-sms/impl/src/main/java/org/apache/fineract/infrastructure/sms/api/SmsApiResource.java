@@ -94,7 +94,8 @@ public class SmsApiResource {
     @Path("{campaignId}/messageByStatus")
     @Operation(summary = "Retrieve SMS messages by status", operationId = "retrieveAllSmsByStatus")
     public Page<SmsData> retrieveAllSmsByStatus(@PathParam("campaignId") final Long campaignId, @BeanParam SmsRequestParam smsRequestParam) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final SearchParameters searchParameters = SearchParameters.builder().limit(smsRequestParam.getLimit()).offset(smsRequestParam.getOffset()).orderBy(smsRequestParam.getOrderBy()).sortOrder(smsRequestParam.getSortOrder()).build();
         final DateFormat dateFormat = Optional.ofNullable(smsRequestParam.getRawDateFormat()).map(DateFormat::new).orElse(null);
         final LocalDate fromDate = Optional.ofNullable(smsRequestParam.getFromDate()).map(fromDateParam -> fromDateParam.getDate(FROM_DATE_PARAM, dateFormat, smsRequestParam.getLocale())).orElse(null);
