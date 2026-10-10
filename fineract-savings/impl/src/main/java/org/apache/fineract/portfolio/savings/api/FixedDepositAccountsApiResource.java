@@ -367,7 +367,8 @@ public class FixedDepositAccountsApiResource {
     @Path("{accountId}/template")
     @Produces({MediaType.APPLICATION_JSON})
     public String accountClosureTemplate(@PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         FixedDepositAccountData account = null;
         if (is(commandParam, "close")) {
             account = (FixedDepositAccountData) this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.FIXED_DEPOSIT, accountId);
