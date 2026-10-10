@@ -87,7 +87,8 @@ public class TaxComponentApiResource {
     @Operation(summary = "Retrieve Tax Component Template", operationId = "retrieveTemplateTaxComponent")
     @AlternativeOperationId("retrieveTemplate_21")
     public TaxComponentData retrieveTemplate() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveTaxComponentTemplate();
     }
 
