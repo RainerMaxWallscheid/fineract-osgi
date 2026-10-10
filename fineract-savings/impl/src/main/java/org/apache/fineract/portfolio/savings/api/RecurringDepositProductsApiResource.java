@@ -81,6 +81,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatform
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -138,7 +139,8 @@ public class RecurringDepositProductsApiResource {
     @AlternativeOperationId("retrieveAll_32")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecurringDepositProductsApiResourceSwagger.GetRecurringDepositProductsResponse.class))))})
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
         @SuppressWarnings({"unchecked", "rawtypes"})
         final Collection<RecurringDepositProductData> products = (Collection) this.depositProductReadPlatformService.retrieveAll(DepositAccountType.RECURRING_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
