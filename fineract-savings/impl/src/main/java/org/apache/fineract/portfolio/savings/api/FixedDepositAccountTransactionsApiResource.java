@@ -99,7 +99,8 @@ public class FixedDepositAccountTransactionsApiResource {
     @Operation(summary = "List fixed deposit account transactions", operationId = "retrieveAllFixedDepositAccountTransactions")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FixedDepositAccountTransactionsApiResourceSwagger.GetFixedDepositAccountsAccountIdTransactionsResponse.class))))})
     public String retrieveAll(@PathParam("fixedDepositAccountId") final Long fixedDepositAccountId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         final Collection<SavingsAccountTransactionData> transactions = this.savingsAccountReadPlatformService.retrieveAllTransactions(fixedDepositAccountId, DepositAccountType.FIXED_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, transactions, FIXED_DEPOSIT_TRANSACTION_RESPONSE_DATA_PARAMETERS);
