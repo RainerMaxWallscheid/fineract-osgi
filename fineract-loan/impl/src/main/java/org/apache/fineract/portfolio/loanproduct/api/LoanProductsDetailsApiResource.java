@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBasicDetailsData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadBasicDetailsService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/loanproducts")
@@ -48,7 +49,8 @@ public class LoanProductsDetailsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "List Loan Products with basic details", operationId = "retrieveAllLoanProductsDetails", description = "Lists Loan Products with basic details to be listed")
     public Collection<LoanProductBasicDetailsData> fetchProducts(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         Collection<LoanProductBasicDetailsData> products = new ArrayList<>();
         loanProductReadBasicDetailsServices.forEach(service -> products.addAll(service.retrieveProducts()));
         return products;
