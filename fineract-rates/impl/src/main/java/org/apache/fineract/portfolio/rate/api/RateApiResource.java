@@ -83,7 +83,8 @@ public class RateApiResource {
     @Operation(summary = "List all rates", operationId = "retrieveAllRates")
     @AlternativeOperationId("getAllRates")
     public List<RateData> getAllRates() {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllRates();
     }
 
