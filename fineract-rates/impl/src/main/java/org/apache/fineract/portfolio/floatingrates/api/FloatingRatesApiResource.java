@@ -86,7 +86,8 @@ public class FloatingRatesApiResource {
     @Operation(summary = "Retrieve Floating Rate", operationId = "retrieveOneFloatingRate", description = "Retrieves Floating Rate")
     @AlternativeOperationId("retrieveOne_13")
     public FloatingRateData retrieveOne(@PathParam("floatingRateId") @Parameter(description = "floatingRateId") final Long floatingRateId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME);
         return floatingRatesReadPlatformService.retrieveOne(floatingRateId);
     }
 
