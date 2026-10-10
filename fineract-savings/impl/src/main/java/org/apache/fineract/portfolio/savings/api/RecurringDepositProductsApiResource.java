@@ -154,7 +154,8 @@ public class RecurringDepositProductsApiResource {
     @AlternativeOperationId("retrieveOne_23")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RecurringDepositProductsApiResourceSwagger.GetRecurringDepositProductsProductIdResponse.class)))})
     public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
         RecurringDepositProductData recurringDepositProductData = (RecurringDepositProductData) this.depositProductReadPlatformService.retrieveOne(DepositAccountType.RECURRING_DEPOSIT, productId);
         final Collection<ChargeData> charges = this.chargeReadPlatformService.retrieveSavingsProductCharges(productId);
         recurringDepositProductData = RecurringDepositProductData.withCharges(recurringDepositProductData, charges);
