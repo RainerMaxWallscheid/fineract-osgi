@@ -293,7 +293,8 @@ public class RecurringDepositAccountsApiResource {
     @Operation(summary = "Retrieve recurring deposit account closure template", operationId = "accountClosureTemplateRecurringDepositAccount")
     @AlternativeOperationId("accountClosureTemplate_1")
     public String accountClosureTemplate(@PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
         RecurringDepositAccountData account = null;
         if (is(commandParam, "close")) {
             account = (RecurringDepositAccountData) this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.RECURRING_DEPOSIT, accountId);
