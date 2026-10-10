@@ -47,6 +47,7 @@ import org.apache.fineract.portfolio.search.data.ColumnFilterData;
 import org.apache.fineract.portfolio.search.data.TableQueryData;
 import org.apache.fineract.portfolio.search.data.TransactionSearchRequest;
 import org.apache.fineract.portfolio.search.service.SearchUtil;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -70,7 +71,8 @@ public class SavingsAccountTransactionsSearchServiceImpl implements SavingsAccou
 
     @Override
     public Page<SavingsAccountTransactionData> searchTransactions(@NonNull Long savingsId, @NonNull TransactionSearchRequest searchParameters) {
-        context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SAVINGS_ACCOUNT_RESOURCE_NAME);
         String apptable = EntityTables.SAVINGS_TRANSACTION.getApptableName();
         Map<String, ResultsetColumnHeaderData> headersByName = searchUtil.mapHeadersToName(genericDataService.fillResultsetColumnHeaders(apptable));
         PageRequest pageable = searchParameters.getPageable();
