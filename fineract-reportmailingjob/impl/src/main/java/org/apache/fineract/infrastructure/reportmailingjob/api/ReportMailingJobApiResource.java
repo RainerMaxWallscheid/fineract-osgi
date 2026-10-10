@@ -53,6 +53,7 @@ import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJob
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobReadPlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/" + ReportMailingJobConstants.REPORT_MAILING_JOB_RESOURCE_NAME)
@@ -110,7 +111,8 @@ public class ReportMailingJobApiResource {
     @AlternativeOperationId("retrieveReportMailingJob")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsResponse.class)))
     public String retrieveReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId, @Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
+        final Object currentUser = this.platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         ReportMailingJobData reportMailingJobData = this.reportMailingJobReadPlatformService.retrieveReportMailingJob(entityId);
         if (settings.isTemplate()) {
