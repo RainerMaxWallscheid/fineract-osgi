@@ -50,6 +50,7 @@ import org.apache.fineract.infrastructure.sms.data.request.SmsCreationRequest;
 import org.apache.fineract.infrastructure.sms.data.request.SmsUpdateRequest;
 import org.apache.fineract.infrastructure.sms.param.SmsRequestParam;
 import org.apache.fineract.infrastructure.sms.service.SmsReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/sms")
@@ -67,7 +68,8 @@ public class SmsApiResource {
     @Operation(summary = "List all SMS messages", operationId = "retrieveAllSms")
     @AlternativeOperationId("retrieveAll_10")
     public List<SmsData> retrieveAll() {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAll();
     }
 
