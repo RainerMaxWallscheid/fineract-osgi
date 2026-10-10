@@ -226,10 +226,12 @@ public class LoanProductsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanProductsApiResourceSwagger.GetLoanProductsTemplateResponse.class))) })
     public String retrieveTemplate(@Context final UriInfo uriInfo,
             @QueryParam("isProductMixTemplate") @Parameter(description = "isProductMixTemplate") final boolean isProductMixTemplate) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (isProductMixTemplate) {
-            this.context.authenticatedUser().validateHasReadPermission(PRODUCTMIX);
+            final Object productMixUser = this.context.authenticatedUser();
+            ((AppUser) productMixUser).validateHasReadPermission(PRODUCTMIX);
             final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAvailableLoanProductsForMix();
             final ProductMixData productMixData = ProductMixData.builder().productOptions(productOptions).build();
             return this.productMixDataApiJsonSerializer.serialize(settings, productMixData, PRODUCT_MIX_DATA_PARAMETERS);
