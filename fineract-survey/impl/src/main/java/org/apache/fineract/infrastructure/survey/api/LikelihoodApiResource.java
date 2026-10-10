@@ -83,7 +83,8 @@ public class LikelihoodApiResource {
     @Operation(operationId = "update_2")
     @AlternativeOperationId("update_4")
     public String update(@PathParam("likelihoodId") final Long likelihoodId, final String apiRequestBodyAsJson, @PathParam("ppiName") final String ppiName) {
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
         final CommandWrapper commandRequest =  //
         //
         //
