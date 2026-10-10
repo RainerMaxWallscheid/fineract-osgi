@@ -51,6 +51,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanB
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanBreachActionReadService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans")
@@ -95,7 +96,8 @@ public class WorkingCapitalLoanBreachActionApiResource {
     @Operation(summary = "Retrieve Breach Actions", description = "Retrieves all breach actions for a Working Capital loan")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanBreachActionData.class))))})
     public List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readService.retrieveBreachActions(loanId);
     }
 
