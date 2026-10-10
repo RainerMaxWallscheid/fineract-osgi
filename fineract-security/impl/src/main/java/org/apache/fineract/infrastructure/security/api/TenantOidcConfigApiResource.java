@@ -97,7 +97,8 @@ public class TenantOidcConfigApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Delete OIDC configuration for a tenant", description = "Removes the OIDC/IdP configuration for the given tenant. " + "After deletion, authentication via this tenant\'s IdP will no longer work.")
     public String delete(@Parameter(description = "tenantId") @PathParam("tenantId") String tenantId) {
-        context.authenticatedUser().validateHasPermissionTo(PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasPermissionTo(PERMISSION);
         tenantOidcConfigService.findByTenantId(tenantId).orElseThrow(() -> new ResourceNotFoundException("tenantOidcConfig.not.found", "No OIDC configuration found for tenant: " + tenantId, new Object[] {tenantId}));
         tenantOidcConfigService.deleteByTenantId(tenantId);
         return "{}";
