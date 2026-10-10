@@ -191,7 +191,8 @@ public class WorkingCapitalLoanApiResource {
     }
 
     private List<WorkingCapitalLoanDelinquencyTagHistoryData> getDelinquencyRangeScheduleTagHistory(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission("DELINQUENCY_TAGS");
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission("DELINQUENCY_TAGS");
         final Long resolvedLoanId = loanId == null ? readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalIdStr)) : loanId;
         return workingCapitalLoanDelinquencyReadPlatformService.retrieveDelinquencyRangeScheduleTagHistory(resolvedLoanId);
     }
