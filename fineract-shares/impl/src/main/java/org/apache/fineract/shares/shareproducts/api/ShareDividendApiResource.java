@@ -83,7 +83,8 @@ public class ShareDividendApiResource {
     @Operation(summary = "Retrieve a share dividend", operationId = "retrieveOneShareDividend")
     @AlternativeOperationId("retrieveDividendDetails")
     public String retrieveDividendDetails(@PathParam("dividendId") final Long dividendId, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder, @QueryParam("accountNo") final String accountNo, @PathParam("productId") final Long productId) {
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.platformSecurityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(accountNo);
