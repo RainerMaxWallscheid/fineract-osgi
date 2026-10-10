@@ -134,7 +134,8 @@ public class SavingsAccountTransactionsApiResource {
     }
 
     private String retrieveOne(final Long savingsId, final String savingsExternalIdStr, final Long transactionId, final String transactionExternalIdStr, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
         final Long resolvedSavingsId = getResolvedSavingsId(savingsId, ExternalIdFactory.produce(savingsExternalIdStr));
         final Long resolvedTransactionId = getResolvedSavingsTransactionId(resolvedSavingsId, transactionId, ExternalIdFactory.produce(transactionExternalIdStr));
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService.retrieveSavingsTransaction(resolvedSavingsId, resolvedTransactionId, DepositAccountType.SAVINGS_DEPOSIT);
