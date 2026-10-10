@@ -73,7 +73,8 @@ public class TenantOidcConfigApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create OIDC configuration for a tenant", description = "Creates a new OIDC/IdP configuration for the given tenant. " + "The clientSecret is encrypted at rest and never returned in responses. " + "The issuerUri must be globally unique across all tenants.")
     public String create(@Parameter(description = "tenantId") @PathParam("tenantId") String tenantId, String requestBody) {
-        context.authenticatedUser().validateHasPermissionTo(PERMISSION);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasPermissionTo(PERMISSION);
         TenantOidcConfig config = parseRequest(tenantId, requestBody, null);
         TenantOidcConfig saved = tenantOidcConfigService.save(config);
         return apiJsonSerializer.serialize(TenantOidcConfigData.from(saved));
