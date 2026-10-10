@@ -73,6 +73,7 @@ import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundExc
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountTemplateReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
@@ -100,7 +101,8 @@ public class SavingsAccountsApiResource {
     @AlternativeOperationId("template_14")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountsApiResourceSwagger.GetSavingsAccountsTemplateResponse.class)))
     public String template(@QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("groupId") @Parameter(description = "groupId") final Long groupId, @QueryParam("productId") @Parameter(description = "productId") final Long productId, @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        final Object currentUser = context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
         final SavingsAccountData savingsAccount = savingsAccountTemplateReadPlatformService.retrieveTemplate(clientId, groupId, productId, staffInSelectedOfficeOnly);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, savingsAccount, SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
