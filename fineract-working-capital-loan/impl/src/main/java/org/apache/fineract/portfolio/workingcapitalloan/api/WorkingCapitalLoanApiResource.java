@@ -326,7 +326,8 @@ public class WorkingCapitalLoanApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanRateChangeHistoryById", summary = "Retrieve rate change history for a Working Capital Loan", description = "Returns all rate change records for the loan, ordered by most recent first.")
     public List<WorkingCapitalLoanPeriodPaymentRateChangeData> getRateChangeHistoryById(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.rateChangeReadService.retrieveRateChangeHistory(loanId);
     }
 
