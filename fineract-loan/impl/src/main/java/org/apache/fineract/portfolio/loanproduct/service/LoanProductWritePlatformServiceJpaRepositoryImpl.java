@@ -105,7 +105,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     @Override
     public CommandProcessingResult createLoanProduct(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command);
             validateInputDates(command);
             final Object fund = findFundByIdIfProvided(command.longValueOfParameterNamed("fundId"));
