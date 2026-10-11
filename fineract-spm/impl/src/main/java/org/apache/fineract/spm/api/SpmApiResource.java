@@ -98,7 +98,7 @@ public class SpmApiResource {
     @Operation(summary = "Create a Survey", description = "Adds a new survey to collect client related data.\n" + "\n" + "Mandatory Fields\n" + "\n" + "countryCode, key, name, questions, responses, sequenceNo, text, description")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public String createSurvey(@Parameter(description = "Create survey") final SurveyData surveyData) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final Survey survey = SurveyMapper.map(surveyData, new Survey());
         this.spmService.createSurvey(survey);
         return getResponse(survey.getId());
