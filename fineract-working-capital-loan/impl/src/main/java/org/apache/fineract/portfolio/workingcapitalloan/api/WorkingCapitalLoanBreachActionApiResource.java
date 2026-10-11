@@ -114,10 +114,12 @@ public class WorkingCapitalLoanBreachActionApiResource {
     private CommandProcessingResult executeBreachAction(final Long loanId, final String apiRequestBodyAsJson) {
         final String action = extractAction(apiRequestBodyAsJson);
         if (isResetAction(action)) {
-            this.context.authenticatedUser().validateHasCreatePermission(RESET_RESOURCE_NAME_FOR_PERMISSIONS);
+            final Object currentUser = this.context.authenticatedUser();
+            ((AppUser) currentUser).validateHasCreatePermission(RESET_RESOURCE_NAME_FOR_PERMISSIONS);
         }
         if (isDisableOrEnableAction(action)) {
-            this.context.authenticatedUser().validateHasCreatePermission(DISABLE_RESOURCE_NAME_FOR_PERMISSIONS);
+            final Object productMixUser = this.context.authenticatedUser();
+            ((AppUser) productMixUser).validateHasCreatePermission(DISABLE_RESOURCE_NAME_FOR_PERMISSIONS);
         }
         final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson).createWorkingCapitalLoanBreachAction(loanId).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
