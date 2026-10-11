@@ -75,7 +75,7 @@ public class ConfigurationReadPlatformServiceImpl implements ConfigurationReadPl
     @Override
     public GlobalConfigurationPropertyData retrieveGlobalConfiguration(final String name) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         GlobalConfigurationProperty globalConfigurationProperty = configurationRepositoryWrapper.findOneByNameWithNotFoundDetection(name);
 
