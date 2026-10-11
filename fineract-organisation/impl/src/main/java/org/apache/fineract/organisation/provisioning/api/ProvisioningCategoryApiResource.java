@@ -53,7 +53,7 @@ public class ProvisioningCategoryApiResource {
     @Operation(operationId = "retrieveAll_8")
     @AlternativeOperationId("retrieveAll_15")
     public List<ProvisioningCategoryData> retrieveAll() {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return provisioningCategoryReadPlatformService.retrieveAllProvisionCategories();
     }
 
