@@ -192,7 +192,7 @@ public class CreditReportWritePlatformServiceImpl implements CreditReportWritePl
     @Override
     public CommandProcessingResult deleteCreditReport(Long creditBureauId, JsonCommand command) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         String creditBureauName = getCreditBureauName(creditBureauId);
         CreditReport creditReport = null;
