@@ -227,7 +227,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public OfficeTransactionData retrieveNewOfficeTransactionDetails() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
         return OfficeTransactionData.template(LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), parentLookups, currencyOptions);
