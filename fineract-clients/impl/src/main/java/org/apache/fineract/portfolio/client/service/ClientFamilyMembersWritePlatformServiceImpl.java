@@ -373,7 +373,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
 
     @Override
     public CommandProcessingResult deleteFamilyMember(Long clientFamilyMemberId, JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         apiJsonDeserializer.validateForDelete(clientFamilyMemberId);
 
