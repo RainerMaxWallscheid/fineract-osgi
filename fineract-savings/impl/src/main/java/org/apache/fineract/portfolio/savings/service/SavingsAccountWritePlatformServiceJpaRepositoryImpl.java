@@ -1303,7 +1303,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult assignFieldOfficer(Long savingsAccountId, JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         Staff fromSavingsOfficer = null;
         Staff toSavingsOfficer = null;
