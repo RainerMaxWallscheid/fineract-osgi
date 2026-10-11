@@ -34,7 +34,7 @@ public class LookupTableService {
     }
 
     public List<LookupTable> findBySurvey(final Survey survey) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.lookupTableRepository.findBySurvey(survey);
     }
 
