@@ -362,7 +362,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 
     protected void publishHookEvent(final String entityName, final String actionName, JsonCommand command, final Object result) {
         try {
-            final AppUser appUser = context.authenticatedUser(CommandWrapper.wrap(actionName, entityName, null, null));
+            final Object appUser = context.authenticatedUser(CommandWrapper.wrap(actionName, entityName, null, null));
             final HookEventSource hookEventSource = new HookEventSource(entityName, actionName);
             // TODO: Add support for publishing array events
             if (command.json() != null) {
@@ -401,7 +401,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
                 }
                 reqmap.put("timestamp", Instant.now().toString());
                 final String serializedResult = toApiJsonSerializer.serialize(reqmap);
-                final HookEvent applicationEvent = new HookEvent(hookEventSource, serializedResult, appUser, ThreadLocalContextUtil.getContext());
+                final HookEvent applicationEvent = new HookEvent(hookEventSource, serializedResult, (AppUser) appUser, ThreadLocalContextUtil.getContext());
                 eventPublisher.publishEvent(applicationEvent);
             }
         } catch (Exception e) {
