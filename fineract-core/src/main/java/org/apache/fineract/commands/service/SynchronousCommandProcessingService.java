@@ -377,7 +377,8 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
                 Map<String, Object> reqmap = new HashMap<>();
                 reqmap.put("entityName", entityName);
                 reqmap.put("actionName", actionName);
-                reqmap.put("createdBy", context.authenticatedUser().getId());
+                final Object user = context.authenticatedUser();
+                reqmap.put("createdBy", ((AppUser) user).getId());
                 reqmap.put("createdByName", context.authenticatedUser().getUsername());
                 reqmap.put("createdByFullName", context.authenticatedUser().getDisplayName());
                 reqmap.put("request", myMap);
