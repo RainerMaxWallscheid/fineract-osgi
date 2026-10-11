@@ -158,7 +158,7 @@ public class GSIMReadPlatformServiceImpl implements GSIMReadPlatformService {
 
     @Override
     public Collection<GroupSavingsIndividualMonitoringAccountData> findGSIMAccountsByGroupId(String groupId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final GSIMMapper rm = new GSIMMapper();
         final String sql = "select " + rm.schema() + " where gsim.group_id=?";
         return this.jdbcTemplate.query(sql, rm, new Object[] {Long.parseLong(groupId)}); // NOSONAR
