@@ -86,7 +86,7 @@ public class SpmApiResource {
     @Operation(summary = "Retrieve a Survey", description = "")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyData.class)))})
     public SurveyData findSurvey(@PathParam("id") @Parameter(description = "Enter id") final Long id) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final Survey survey = this.spmService.findById(id);
         return SurveyMapper.map(survey);
     }
