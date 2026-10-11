@@ -89,7 +89,7 @@ public class CreditBureauLoanProductMappingReadPlatformServiceImpl implements Cr
 
     @Override
     public Collection<CreditBureauLoanProductMappingData> readCreditBureauLoanProductMapping() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CreditBureauLoanProductMapper rm = new CreditBureauLoanProductMapper();
         final String sql = "select " + rm.schema() + " order by cblp.id";
