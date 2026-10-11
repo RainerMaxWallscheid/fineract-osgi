@@ -126,7 +126,7 @@ public class DepositAccountReadPlatformServiceImpl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Collection<?> retrieveAll(final DepositAccountType depositAccountType, final PaginationParameters paginationParameters) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.paginationParametersDataValidator.validateParameterValues(paginationParameters, supportedOrderByValues, depositAccountType.resourceName());
         final StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("select ");
