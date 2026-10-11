@@ -49,7 +49,7 @@ public class SpmService {
     }
 
     public Survey findById(final Long id) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.surveyRepository.findById(id).orElseThrow(() -> new SurveyNotFoundException(id));
     }
 
