@@ -79,7 +79,7 @@ public class CreditBureauReadConfigurationServiceImpl implements CreditBureauRea
 
     @Override
     public Map<String, String> retrieveConfigMap(long id) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CbConfigMapper rm = new CbConfigMapper();
         final String sql = "select " + rm.schema() + " where cbconfig.organisation_creditbureau_id= ?";
