@@ -59,7 +59,7 @@ public class WriteLikelihoodServiceImpl implements WriteLikelihoodService {
     @Override
     public CommandProcessingResult update(Long likelihoodId, JsonCommand command) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         try {
 
