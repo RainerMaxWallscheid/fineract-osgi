@@ -60,7 +60,7 @@ public class NotificationApiResource {
     @Operation(summary = "Retrieve all Notifications", description = "Returns a paginated list of notifications for the authenticated user, with optional filtering by read status.", tags = {"Notification"})
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = NotificationApiResourceSwagger.GetNotificationsResponse.class)))
     public String getAllNotifications(@Context final UriInfo uriInfo, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("isRead") @Parameter(description = "isRead") final boolean isRead) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Page<NotificationData> notificationData;
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
