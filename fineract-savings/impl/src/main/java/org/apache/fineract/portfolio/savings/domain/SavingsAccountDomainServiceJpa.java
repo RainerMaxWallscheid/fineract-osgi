@@ -173,7 +173,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final Object paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType, final boolean backdatedTxnsAllowedTill) {
-        context.authenticatedUser();
+        context.isAuthenticated();
         account.validateForAccountBlock();
         account.validateForCreditBlock();
 
