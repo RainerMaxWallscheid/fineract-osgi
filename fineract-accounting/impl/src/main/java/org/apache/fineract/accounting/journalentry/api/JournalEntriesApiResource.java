@@ -182,7 +182,7 @@ public class JournalEntriesApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Journal Entries for Provisioning", description = "Returns journal entries related to provisioning entries based on entry ID.", tags = {"Journal Entries"})
     public String retrieveJournalEntries(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("entryId") final Long entryId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         String transactionId = "P" + entryId;
         SearchParameters params = SearchParameters.builder().limit(limit).offset(offset).build();
         Page<JournalEntryData> entries = this.journalEntryReadPlatformService.retrieveAll(params, null, null, null, null, null, null, transactionId, PortfolioProductType.PROVISIONING.getValue(), null);
