@@ -118,7 +118,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
     @Override
     public CommandProcessingResult update(final Long productId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final SavingsProduct product = this.savingProductRepository.findById(productId).orElseThrow(() -> new SavingsProductNotFoundException(productId));
             this.fromApiJsonDataValidator.validateForUpdate(command.json(), product);
             final Map<String, Object> changes = product.update(command);
