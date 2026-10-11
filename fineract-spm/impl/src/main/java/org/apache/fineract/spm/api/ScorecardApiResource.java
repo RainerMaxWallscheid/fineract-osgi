@@ -65,7 +65,7 @@ public class ScorecardApiResource {
     @Operation(summary = "List all Scorecard entries", description = "List all Scorecard entries for a survey.")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Scorecard.class))))})
     public List<ScorecardData> findBySurvey(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         this.spmService.findById(surveyId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardBySurvey(surveyId);
     }
