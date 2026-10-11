@@ -51,7 +51,7 @@ public class RateReadServiceImpl implements RateReadService {
     @Override
     public RateData retrieveOne(Long rateId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final RateMapper rm = new RateMapper();
             final String sql = "select " + rm.rateSchema() + " where r.id = ?";
             final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {rateId}); // NOSONAR
