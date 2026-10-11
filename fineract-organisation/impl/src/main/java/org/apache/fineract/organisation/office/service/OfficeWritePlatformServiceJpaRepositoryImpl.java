@@ -165,7 +165,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     @Transactional
     @Override
     public CommandProcessingResult deleteOfficeTransaction(final Long transactionId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.officeTransactionRepository.deleteById(transactionId);
         return  //
         //
