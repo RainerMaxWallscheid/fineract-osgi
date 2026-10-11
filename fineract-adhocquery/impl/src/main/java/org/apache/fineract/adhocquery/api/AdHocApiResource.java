@@ -88,7 +88,7 @@ public class AdHocApiResource {
     @Path("{adHocId}")
     @Produces({MediaType.APPLICATION_JSON})
     public AdHocData retrieveAdHocQuery(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return adHocReadPlatformService.retrieveOne(adHocId);
     }
 
