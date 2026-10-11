@@ -92,7 +92,7 @@ public class LookupTableApiResource {
     @Operation(summary = "Create a Lookup Table entry", description = "Add a new entry to a survey.\n" + "\n" + "Mandatory Fields\n" + "key, score, validFrom, validTo")
     @ApiResponse(responseCode = "200", description = "OK")
     public void createLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, final LookupTableData lookupTableData) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final Survey survey = findSurvey(surveyId);
         this.lookupTableService.createLookupTable(LookupTableMapper.map(lookupTableData, survey));
     }
