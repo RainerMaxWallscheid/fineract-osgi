@@ -993,7 +993,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     @Transactional
     @Override
     public CommandProcessingResult waiveCharge(final Long savingsAccountId, final Long savingsAccountChargeId, @SuppressWarnings("unused") final DepositAccountType depositAccountType) {
-        context.authenticatedUser();
+        context.isAuthenticated();
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService.isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
         final SavingsAccountCharge savingsAccountCharge = this.savingsAccountChargeRepository.findOneWithNotFoundDetection(savingsAccountChargeId, savingsAccountId);
