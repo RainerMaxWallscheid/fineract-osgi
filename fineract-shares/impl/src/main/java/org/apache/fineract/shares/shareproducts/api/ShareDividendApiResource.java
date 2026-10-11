@@ -113,7 +113,7 @@ public class ShareDividendApiResource {
     @AlternativeOperationId("updateDividendDetail")
     public String updateDividendDetail(@PathParam("productId") final Long productId, @PathParam("dividendId") final Long dividendId, @QueryParam("command") final String commandParam, final String apiRequestBodyAsJson) {
         CommandWrapper commandWrapper;
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         if (is(commandParam, APPROVE)) {
             commandWrapper = new CommandWrapperBuilder().approveShareProductDividendPayoutCommand(productId, dividendId).withJson(apiRequestBodyAsJson).build();
         } else {
