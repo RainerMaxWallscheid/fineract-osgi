@@ -103,7 +103,8 @@ public class WorkingCapitalNearBreachApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "deleteWorkingCapitalNearBreach", summary = "Delete Working Capital Near Breach")
     public CommandProcessingResult delete(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId) {
-        this.context.authenticatedUser().validateHasDeletePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasDeletePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteWorkingCapitalNearBreach(breachId).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
