@@ -113,7 +113,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 
     @Override
     public CommandProcessingResult updateClientAddress(final Long clientId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         boolean is_address_update = false;
         this.fromApiJsonDeserializer.validateForUpdate(command.json());
         final long addressId = command.longValueOfParameterNamed("addressId");
