@@ -108,7 +108,7 @@ public class SmsCampaignApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CommandWrapper.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
     public CommandProcessingResult createCampaign(@Parameter(hidden = true) final SmsCampaignCreationDto smsCampaignCreationDto) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         // Flatten composed DTO: Gson does not honour Jackson @JsonUnwrapped.
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createSmsCampaign()
                 .withJson(toApiJsonSerializer.serialize(smsCampaignCreationDto.toCommandMap())).build();
