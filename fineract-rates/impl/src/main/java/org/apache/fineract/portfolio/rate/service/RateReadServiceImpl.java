@@ -64,7 +64,7 @@ public class RateReadServiceImpl implements RateReadService {
     @Override
     public RateData retrieveByName(String name) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final RateMapper rm = new RateMapper();
             final String sql = "select " + rm.rateSchema() + " where r.name = ?";
             final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {name}); // NOSONAR
