@@ -104,7 +104,7 @@ public class DepositAccountInterestRateChartReadPlatformServiceImpl implements D
 
     @Override
     public DepositAccountInterestRateChartData retrieveOneWithSlabsOnAccountId(Long accountId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         StringBuilder sql = new StringBuilder();
         sql.append("select ");
         sql.append(this.chartExtractor.schema());
