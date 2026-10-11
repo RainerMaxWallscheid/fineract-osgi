@@ -71,7 +71,7 @@ public class CollateralReadPlatformServiceImpl implements CollateralReadPlatform
 
     @Override
     public List<CollateralData> retrieveCollaterals(final Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final CollateralMapper rm = new CollateralMapper();
         final String sql = "select " + rm.schema() + " where lc.loan_id=? order by id ASC";
         return this.jdbcTemplate.query(sql, rm, new Object[] {loanId}); // NOSONAR
