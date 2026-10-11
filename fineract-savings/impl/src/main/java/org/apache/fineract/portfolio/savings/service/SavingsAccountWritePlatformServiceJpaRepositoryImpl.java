@@ -1515,7 +1515,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult releaseAmount(final Long savingsId, final Long savingsTransactionId, final JsonCommand command) {
-        context.authenticatedUser();
+        context.isAuthenticated();
         this.savingsAccountTransactionDataValidator.validateReleaseAmount(command);
         SavingsAccountTransaction holdTransaction = this.savingsAccountTransactionRepository.findOneByIdAndSavingsAccountId(savingsTransactionId, savingsId);
         if (holdTransaction == null) {
