@@ -1246,7 +1246,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
     @Override
     public CommandProcessingResult inactivateCharge(final Long savingsAccountId, final Long savingsAccountChargeId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final SavingsAccountCharge savingsAccountCharge = this.savingsAccountChargeRepository.findOneWithNotFoundDetection(savingsAccountChargeId, savingsAccountId);
         final SavingsAccount account = savingsAccountCharge.savingsAccount();
         this.savingAccountAssembler.assignSavingAccountHelpers(account);
