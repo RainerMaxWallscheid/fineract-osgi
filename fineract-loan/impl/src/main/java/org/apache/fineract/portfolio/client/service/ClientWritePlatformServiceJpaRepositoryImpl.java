@@ -686,7 +686,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Transactional
     @Override
     public CommandProcessingResult unassignClientStaff(final Long clientId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         this.fromApiJsonDeserializer.validateForUnassignStaff(command.json());
         final Client clientForUpdate = this.clientRepository.findOneWithNotFoundDetection(clientId);
