@@ -65,7 +65,7 @@ public class CodeReadPlatformServiceImpl implements CodeReadPlatformService {
     @Override
     @Cacheable(value = "codes", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('CD')")
     public Collection<CodeData> retrieveAllCodes() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CodeMapper rm = new CodeMapper();
         final String sql = "select " + rm.schema() + " order by c.code_name";
