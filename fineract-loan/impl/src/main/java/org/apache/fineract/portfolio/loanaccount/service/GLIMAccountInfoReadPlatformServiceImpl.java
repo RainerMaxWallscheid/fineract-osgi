@@ -97,7 +97,7 @@ public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoRe
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountByGroupIdandAccountNo(String groupId, String accountNo) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         GLIMMapper rm = new GLIMMapper();
         final String sql = "select " + rm.schema() + " where glim.group_id=? and glim.account_number=?";
         return this.jdbcTemplate.query(sql, rm, groupId, accountNo); // NOSONAR
