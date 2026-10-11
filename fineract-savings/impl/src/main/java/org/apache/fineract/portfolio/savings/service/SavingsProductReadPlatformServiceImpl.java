@@ -75,7 +75,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     @Override
     public SavingsProductData retrieveOne(final Long savingProductId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.id = ? and sp.deposit_type_enum = ?";
             return this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper,  // NOSONAR
             new Object[] {savingProductId, DepositAccountType.SAVINGS_DEPOSIT.getValue()});
