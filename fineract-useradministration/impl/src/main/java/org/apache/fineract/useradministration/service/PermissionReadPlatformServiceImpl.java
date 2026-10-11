@@ -45,7 +45,7 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
 
     @Override
     public Collection<PermissionData> retrieveAllMakerCheckerablePermissions() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final PermissionUsageDataMapper mapper = new PermissionUsageDataMapper(sqlGenerator);
         final String sql = mapper.makerCheckerablePermissionSchema();
         log.debug("retrieveAllMakerCheckerablePermissions: {}", sql);
