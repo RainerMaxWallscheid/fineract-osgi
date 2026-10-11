@@ -82,7 +82,7 @@ public class AdHocWritePlatformServiceJpaRepositoryImpl implements AdHocWritePla
     @Override
     public CommandProcessingResult updateAdHocQuery(final Long adHocId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.adHocCommandFromApiJsonDeserializer.validateForUpdate(command.json());
             final AdHoc adHoc = this.adHocRepository.findById(adHocId).orElseThrow(() -> new AdHocNotFoundException(adHocId));
             final Map<String, Object> changes = adHoc.update(command);
