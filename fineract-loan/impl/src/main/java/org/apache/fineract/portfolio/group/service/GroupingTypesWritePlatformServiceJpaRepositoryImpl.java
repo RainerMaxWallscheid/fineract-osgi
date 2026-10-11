@@ -431,7 +431,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
 
     @Override
     public CommandProcessingResult assignGroupOrCenterStaff(final Long groupId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         this.fromApiJsonDeserializer.validateForAssignStaff(command.json());
         final Group groupForUpdate = this.groupRepository.findOneWithNotFoundDetection(groupId);
