@@ -1919,7 +1919,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanTransactionData retrieveLoanForeclosureTemplate(final Long loanId, final LocalDate transactionDate) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
         loanForeclosureValidator.validateForForeclosure(loan, transactionDate);
         final MonetaryCurrency currency = loan.getCurrency();
