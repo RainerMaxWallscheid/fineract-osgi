@@ -323,7 +323,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
 
     private CommandProcessingResult updateGroupingType(final Long groupId, final JsonCommand command, final GroupTypes groupingType) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final Group groupForUpdate = this.groupRepository.findOneWithNotFoundDetection(groupId);
             final Long officeId = groupForUpdate.officeId();
             final Office groupOffice = groupForUpdate.getOffice();
