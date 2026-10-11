@@ -55,7 +55,7 @@ public class FundReadPlatformServiceImpl implements FundReadPlatformService {
     @Override
     @Cacheable(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'fn\')")
     public List<FundData> retrieveAllFunds() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final FundMapper rm = new FundMapper();
         final String sql = "select " + rm.schema() + " order by f.name";
         return this.jdbcTemplate.query(sql, rm); // NOSONAR
