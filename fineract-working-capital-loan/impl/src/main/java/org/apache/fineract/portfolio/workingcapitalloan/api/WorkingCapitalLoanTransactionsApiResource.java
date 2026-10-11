@@ -89,7 +89,8 @@ public class WorkingCapitalLoanTransactionsApiResource {
     @Operation(operationId = "retrieveWorkingCapitalLoanTransactionsByExternalId", summary = "Retrieve transactions by loan external id", description = "Retrieves transactions of a Working Capital Loan by loan external id.")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanTransactionsApiResourceSwagger.GetWorkingCapitalLoanTransactionsResponse.class)))})
     public Page<WorkingCapitalLoanTransactionData> retrieveTransactionsByExternalLoanId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId, @Parameter(hidden = true) @Pagination final Pageable pageable) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.transactionReadPlatformService.retrieveTransactions(ExternalIdFactory.produce(loanExternalId), pageable);
     }
 
