@@ -56,6 +56,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapital
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanTransactionRepository;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanTransactionReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -77,7 +78,8 @@ public class WorkingCapitalLoanTransactionsApiResource {
     @Operation(operationId = "retrieveWorkingCapitalLoanTransactionsById", summary = "Retrieve transactions", description = "Retrieves transactions of a Working Capital Loan.\n\nExample: working-capital-loans/1/transactions")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanTransactionsApiResourceSwagger.GetWorkingCapitalLoanTransactionsResponse.class)))})
     public Page<WorkingCapitalLoanTransactionData> retrieveTransactionsByLoanId(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId, @Parameter(hidden = true) @Pagination final Pageable pageable) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.transactionReadPlatformService.retrieveTransactions(loanId, pageable);
     }
 
