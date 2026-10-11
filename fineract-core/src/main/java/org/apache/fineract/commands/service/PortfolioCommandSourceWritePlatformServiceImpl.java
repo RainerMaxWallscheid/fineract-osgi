@@ -65,7 +65,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
         {
             // if not user changing their own details - check user has
             // permission to perform specific task.
-            this.context.authenticatedUser(wrapper).validateHasPermissionTo(wrapper.getTaskPermissionName());
+            ((AppUser) user).validateHasPermissionTo(wrapper.getTaskPermissionName());
         }
         validateIsUpdateAllowed();
         final String json = wrapper.getJson();
