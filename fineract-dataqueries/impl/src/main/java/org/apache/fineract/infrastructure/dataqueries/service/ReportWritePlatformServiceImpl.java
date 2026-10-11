@@ -83,7 +83,7 @@ public class ReportWritePlatformServiceImpl implements ReportWritePlatformServic
     public CommandProcessingResult createReport(final JsonCommand command) {
 
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             this.fromApiJsonDeserializer.validate(command.json());
 
