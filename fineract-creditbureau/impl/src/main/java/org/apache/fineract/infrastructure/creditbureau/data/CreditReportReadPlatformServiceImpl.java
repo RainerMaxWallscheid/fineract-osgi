@@ -61,7 +61,7 @@ public class CreditReportReadPlatformServiceImpl implements CreditReportReadPlat
     @Override
     public Collection<CreditReportData> retrieveCreditReportDetails(Long creditBureauId) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CreditReportDataMapper rm = new CreditReportDataMapper();
         final String sql = " select " + rm.schema() + " where c.creditBureauId = ? ";
