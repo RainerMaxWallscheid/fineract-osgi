@@ -116,7 +116,7 @@ public class ProvisioningEntriesApiResource {
     @Operation(summary = "Retrieve Provisioning Entries Loan Products Given a Query", operationId = "retrieveProvisioningEntriesLoanProducts")
     @AlternativeOperationId("retrieveProviioningEntries")
     public Page<LoanProductProvisioningEntryData> retrieveProviioningEntries(@QueryParam("entryId") final Long entryId, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("officeId") final Long officeId, @QueryParam("productId") final Long productId, @QueryParam("categoryId") final Long categoryId) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         final SearchParameters params = SearchParameters.builder().limit(limit).offset(offset).provisioningEntryId(entryId).officeId(officeId).productId(productId).categoryId(categoryId).build();
         return provisioningEntriesReadPlatformService.retrieveProvisioningEntries(params);
     }
