@@ -726,7 +726,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
 
     @Override
     public Collection<LoanProductData> retrieveAllowedProductsForMix(final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final LoanProductLookupMapper rm = new LoanProductLookupMapper(sqlGenerator);
         String sql = "Select " + rm.schema() + " where ";
         // Check if branch specific products are enabled. If yes, fetch only
