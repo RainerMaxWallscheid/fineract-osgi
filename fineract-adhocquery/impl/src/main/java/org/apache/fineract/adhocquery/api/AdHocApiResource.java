@@ -72,7 +72,7 @@ public class AdHocApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Path("template")
     public AdHocData template() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return adHocReadPlatformService.retrieveNewAdHocDetails();
     }
 
