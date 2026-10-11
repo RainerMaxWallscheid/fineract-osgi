@@ -59,7 +59,7 @@ public class CollateralWritePlatformServiceJpaRepositoryImpl implements Collater
     @Transactional
     @Override
     public CommandProcessingResult addCollateral(final Long loanId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final CollateralCommand collateralCommand = this.collateralCommandFromApiJsonDeserializer.commandFromApiJson(command.json());
         collateralCommand.validateForCreate();
         try {
