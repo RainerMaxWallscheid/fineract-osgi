@@ -55,7 +55,7 @@ public class ConfigurationReadPlatformServiceImpl implements ConfigurationReadPl
     @Override
     public GlobalConfigurationData retrieveGlobalConfiguration(final boolean survey) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         String sql = "SELECT c.id, c.name, c.enabled, c.value, c.date_value, c.description,c.string_value, c.is_trap_door FROM c_configuration c ";
 
