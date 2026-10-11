@@ -103,7 +103,7 @@ public class ScorecardApiResource {
     @Operation(operationId = "findByClient")
     @AlternativeOperationId("findByClient_1")
     public List<ScorecardData> findByClient(@PathParam("clientId") final Long clientId) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         findClient(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardByClient(clientId);
     }
