@@ -162,7 +162,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
         Long age = null;
         Boolean isDependent = false;
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final Client client = requireClient(clientId);
 
