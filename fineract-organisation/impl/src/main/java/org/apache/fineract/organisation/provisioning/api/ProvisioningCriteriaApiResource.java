@@ -78,7 +78,7 @@ public class ProvisioningCriteriaApiResource {
     @AlternativeOperationId("retrieveProvisioningCriteria")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningCriteriaApiResourceSwagger.GetProvisioningCriteriaCriteriaIdResponse.class)))
     public ProvisioningCriteriaData retrieveProvisioningCriteria(@PathParam("criteriaId") @Parameter(description = "criteriaId") final Long criteriaId, @Context final UriInfo uriInfo) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         ProvisioningCriteriaData criteria = provisioningCriteriaReadPlatformService.retrieveProvisioningCriteria(criteriaId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
