@@ -106,7 +106,7 @@ public class ProvisioningEntriesApiResource {
     @Operation(summary = "Retrieves a Provisioning Entry Metadata", operationId = "retrieveOneProvisioningEntry", description = "Returns the metadata of a generated Provisioning Entry.")
     @AlternativeOperationId("retrieveProvisioningEntry")
     public ProvisioningEntryData retrieveProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return provisioningEntriesReadPlatformService.retrieveProvisioningEntryData(entryId);
     }
 
