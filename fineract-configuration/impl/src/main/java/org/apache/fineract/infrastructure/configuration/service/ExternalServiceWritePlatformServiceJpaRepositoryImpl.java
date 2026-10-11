@@ -50,7 +50,7 @@ public class ExternalServiceWritePlatformServiceJpaRepositoryImpl implements Ext
     @Override
     public CommandProcessingResult updateExternalServicesProperties(String externalServiceName, JsonCommand command) {
         // TODO Auto-generated method stub
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.fromApiJsonDeserializer.validateForUpdate(command.json(), externalServiceName);
         Set<String> keyName = this.fromApiJsonDeserializer.getNameKeys(command.json());
         ExternalServicesData external = this.readPlatformService.getExternalServiceDetailsByServiceName(externalServiceName);
