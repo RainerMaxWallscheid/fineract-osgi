@@ -40,7 +40,7 @@ public class BulkLoansReadPlatformServiceImpl implements BulkLoansReadPlatformSe
 
     @Override
     public StaffAccountSummaryCollectionData retrieveLoanOfficerAccountSummary(final Long loanOfficerId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final StaffClientMapper staffClientMapper = new StaffClientMapper();
         final String clientSql = "select distinct " + staffClientMapper.schema() + " and c.status_enum=?";
         final StaffGroupMapper staffGroupMapper = new StaffGroupMapper();
