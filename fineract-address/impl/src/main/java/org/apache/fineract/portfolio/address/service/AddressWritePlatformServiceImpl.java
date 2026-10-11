@@ -49,7 +49,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
     @Override
     public CommandProcessingResult addClientAddress(final Long clientId, final Long addressTypeId, final JsonCommand command) {
         JsonObject jsonObject = command.parsedJson().getAsJsonObject();
-        context.authenticatedUser();
+        context.isAuthenticated();
         fromApiJsonDeserializer.validateForCreate(jsonObject.toString(), false);
         if (addressTypeId == null) {
             throw new IllegalArgumentException("The given id must not be null!");
