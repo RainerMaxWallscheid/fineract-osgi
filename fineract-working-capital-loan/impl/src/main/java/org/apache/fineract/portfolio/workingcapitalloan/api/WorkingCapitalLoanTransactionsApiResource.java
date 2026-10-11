@@ -100,7 +100,8 @@ public class WorkingCapitalLoanTransactionsApiResource {
     @Operation(operationId = "retrieveWorkingCapitalLoanTransactionById", summary = "Retrieve a transaction", description = "Retrieves a single Working Capital Loan transaction.\n\nExample: working-capital-loans/1/transactions/1")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanTransactionsApiResourceSwagger.GetWorkingCapitalLoanTransactionIdResponse.class)))})
     public WorkingCapitalLoanTransactionData retrieveTransactionByLoanIdAndTransactionId(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId, @PathParam("transactionId") @Parameter(description = "transactionId", required = true) final Long transactionId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.transactionReadPlatformService.retrieveTransaction(loanId, transactionId);
     }
 
