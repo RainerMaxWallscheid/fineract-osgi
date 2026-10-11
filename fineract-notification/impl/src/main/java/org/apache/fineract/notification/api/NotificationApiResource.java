@@ -80,7 +80,7 @@ public class NotificationApiResource {
     @Operation(summary = "Update Notification Read Status", operationId = "updateNotificationReadStatus", description = "Updates the read status of all notifications for the authenticated user.", tags = {"Notification"})
     @AlternativeOperationId("update_5")
     public void update() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.notificationReadPlatformService.updateNotificationReadStatus();
     }
 
