@@ -46,7 +46,7 @@ public class GroupRolesReadPlatformServiceImpl implements GroupRolesReadPlatform
     @Override
     public GroupRoleData retrieveGroupRole(final Long groupId, final Long roleId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final GroupRolesDataMapper mapper = new GroupRolesDataMapper();
             final String sql = "Select " + mapper.schema() + " where role.group_id=? and role.id=?";
             return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { groupId, roleId }); // NOSONAR
