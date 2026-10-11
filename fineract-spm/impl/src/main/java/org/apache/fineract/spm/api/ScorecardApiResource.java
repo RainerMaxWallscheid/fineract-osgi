@@ -90,7 +90,7 @@ public class ScorecardApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     public List<ScorecardData> findBySurveyAndClient(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @PathParam("clientId") @Parameter(description = "Enter clientId") final Long clientId) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         this.spmService.findById(surveyId);
         findClient(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardBySurveyAndClient(surveyId, clientId);
