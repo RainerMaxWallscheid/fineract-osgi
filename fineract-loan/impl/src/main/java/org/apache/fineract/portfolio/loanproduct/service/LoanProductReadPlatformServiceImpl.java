@@ -140,7 +140,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
 
     @Override
     public Collection<LoanProductData> retrieveAllLoanProducts() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final LoanProductMapper rm = new LoanProductMapper(null, null, null, null, null, null);
         String sql = "select " + rm.loanProductSchema();
         // Check if branch specific products are enabled. If yes, fetch only
