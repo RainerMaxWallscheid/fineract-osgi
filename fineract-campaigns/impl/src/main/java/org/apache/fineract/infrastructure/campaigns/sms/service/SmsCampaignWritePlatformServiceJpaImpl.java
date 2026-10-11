@@ -123,7 +123,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     @Override
     public CommandProcessingResult update(final Long resourceId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.smsCampaignValidator.validateForUpdate(command.json());
             final SmsCampaign smsCampaign = this.smsCampaignRepository.findById(resourceId).orElseThrow(() -> new SmsCampaignNotFound(resourceId));
             if (smsCampaign.isActive()) {
