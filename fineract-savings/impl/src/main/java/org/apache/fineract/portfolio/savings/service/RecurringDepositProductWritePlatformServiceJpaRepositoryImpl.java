@@ -129,7 +129,7 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId).orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
         this.recurringDepositProductRepository.delete(product);
         return  //
