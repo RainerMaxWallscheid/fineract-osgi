@@ -92,7 +92,7 @@ public class BatchApiResource {
     @RequestBody(required = true, content = @Content(array = @ArraySchema(schema = @Schema(implementation = BatchRequest.class, description = "request body"))))
     @ApiResponse(responseCode = "200", description = "Success", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BatchResponse.class))))
     public List<BatchResponse> handleBatchRequests(@DefaultValue("false") @QueryParam("enclosingTransaction") @Parameter(description = "enclosingTransaction", required = false) final boolean enclosingTransaction, @Parameter(hidden = true) List<BatchRequest> requestList, @Context UriInfo uriInfo) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         // Converts request array into BatchRequest List
         validateRequestMethodsAllowedOnInstanceType(requestList);
         // If the request is to be handled as a Transaction. All requests will
