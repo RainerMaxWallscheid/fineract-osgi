@@ -453,7 +453,7 @@ public class DatatableWriteServiceImpl implements DatatableWriteService {
     @Override
     public void deleteDatatable(final String datatableName) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             datatableUtil.validateDatatableName(datatableName);
             assertDataTableEmpty(datatableName);
             deregisterDatatable(datatableName);
