@@ -99,7 +99,7 @@ public class ShareDividendApiResource {
     @Operation(summary = "Create a share dividend", operationId = "createShareDividend")
     @AlternativeOperationId("createDividendDetail")
     public String createDividendDetail(@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         CommandWrapper commandWrapper = new CommandWrapperBuilder().createShareProductDividendPayoutCommand(productId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
