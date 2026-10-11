@@ -98,15 +98,15 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
         if (!commandSource.isAwaitingApproval()) {
             throw new CommandNotAwaitingApprovalException(makerCheckerId);
         }
-        AppUser appUser = this.context.authenticatedUser();
+        final Object appUser = this.context.authenticatedUser();
         String permissionCode = commandSource.getPermissionCode();
-        appUser.validateHasCheckerPermissionTo(permissionCode);
-        if (!configurationService.isSameMakerCheckerEnabled() && !appUser.isCheckerSuperUser()) {
+        ((AppUser) appUser).validateHasCheckerPermissionTo(permissionCode);
+        if (!configurationService.isSameMakerCheckerEnabled() && !((AppUser) appUser).isCheckerSuperUser()) {
             AppUser maker = commandSource.getMaker();
             if (maker == null) {
                 throw new UnsupportedCommandException(permissionCode, "Maker user is missing.");
             }
-            if (Objects.equals(appUser.getId(), maker.getId())) {
+            if (Objects.equals(((AppUser) appUser).getId(), maker.getId())) {
                 throw new UnsupportedCommandException(permissionCode, "Can not be checked by the same user.");
             }
         }
