@@ -192,7 +192,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public OfficeData retrieveNewOfficeTemplate() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return OfficeData.template(null, LocalDate.now(DateUtils.getDateTimeZoneOfTenant()));
     }
 
