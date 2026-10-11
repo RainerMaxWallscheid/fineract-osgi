@@ -206,7 +206,7 @@ public class DepositAccountReadPlatformServiceImpl
     @Override
     public Object retrieveOneWithClosureTemplate(final DepositAccountType depositAccountType, final Long accountId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             Collection<EnumOptionData> onAccountClosureOptions = SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.values());
             final Collection<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
             if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
