@@ -174,7 +174,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     @Cacheable(value = "officesById", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#officeId)")
     public OfficeData retrieveOffice(final Long officeId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final OfficeMapper rm = new OfficeMapper();
             final String sql = "select " + rm.officeSchema() + " where o.id = ?";
             final OfficeData selectedOffice = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {officeId}); // NOSONAR
