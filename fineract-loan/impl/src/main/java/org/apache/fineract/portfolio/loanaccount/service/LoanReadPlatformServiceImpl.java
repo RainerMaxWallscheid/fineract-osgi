@@ -380,7 +380,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanAccountData retrieveTemplateWithClientAndProductDetails(final Long clientId, final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final ClientData clientAccount = this.clientReadPlatformService.retrieveOne(clientId);
         final LocalDate expectedDisbursementDate = DateUtils.getBusinessLocalDate();
         LoanAccountData loanDetails = new LoanAccountData().withClientData(clientAccount)
