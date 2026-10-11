@@ -237,7 +237,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public List<LoanAccountData> retrieveGLIMChildLoansByGLIMParentAccount(String parentloanAccountNumber) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final LoanMapper rm = new LoanMapper(sqlGenerator, delinquencyReadPlatformService);
         final String sql = "select " + rm.loanSchema()
                 + " left join glim_parent_child_mapping as glim on glim.glim_child_account_id=l.account_no "
