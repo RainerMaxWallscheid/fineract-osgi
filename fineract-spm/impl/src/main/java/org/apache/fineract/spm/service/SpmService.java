@@ -95,7 +95,7 @@ public class SpmService {
     }
 
     public void deactivateSurvey(final Long id) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final Survey survey = findById(id);
         final LocalDate dateTime = getStartOfToday().minusDays(1);
         survey.setValidTo(dateTime);
