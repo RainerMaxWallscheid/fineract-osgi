@@ -124,7 +124,7 @@ public class GSIMReadPlatformServiceImpl implements GSIMReadPlatformService {
 
     @Override
     public List<GSIMContainer> findGsimAccountContainerbyGsimAccountId(Long parentAccountId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         GroupSavingsIndividualMonitoringAccountData gsimAccount = findGSIMAccountByGSIMId(parentAccountId);
         // List<LoanAccountSummaryData> glimAccounts =
         // retrieveLoanAccountDetails(loanWhereClauseForGroupAndLoanType, new
