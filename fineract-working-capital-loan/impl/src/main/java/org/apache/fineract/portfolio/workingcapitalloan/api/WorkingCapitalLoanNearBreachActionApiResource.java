@@ -99,7 +99,8 @@ public class WorkingCapitalLoanNearBreachActionApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanNearBreachActionsByExternalId", summary = "Retrieve near breach actions for a Working Capital Loan by external id", description = "Returns all near breach action records for the loan, ordered by most recent first.")
     public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Long resolvedLoanId = readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalId));
         if (resolvedLoanId == null) {
             throw new WorkingCapitalLoanNotFoundException(ExternalIdFactory.produce(loanExternalId));
