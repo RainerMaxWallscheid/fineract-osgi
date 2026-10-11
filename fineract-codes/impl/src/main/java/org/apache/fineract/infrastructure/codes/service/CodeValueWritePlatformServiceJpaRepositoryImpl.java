@@ -147,7 +147,7 @@ public class CodeValueWritePlatformServiceJpaRepositoryImpl implements CodeValue
     public CommandProcessingResult deleteCodeValue(final Long codeId, final Long codeValueId) {
 
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final Code code = this.codeRepository.findById(codeId).orElseThrow(() -> new CodeNotFoundException(codeId));
 
