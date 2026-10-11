@@ -76,7 +76,7 @@ public class RateReadServiceImpl implements RateReadService {
 
     @Override
     public List<RateData> retrieveLoanApplicableRates() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final RateMapper rm = new RateMapper();
         final String sql = "select " + rm.rateSchema() + " where r.active = ? and product_apply=?";
         return this.jdbcTemplate.query(sql, rm, new Object[] {true, RateAppliesTo.LOAN.getValue()}); // NOSONAR
