@@ -143,7 +143,8 @@ public class WorkingCapitalLoanTransactionsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveWorkingCapitalLoanActionTemplate", summary = "Retrieve Working Capital Loan action template", description = "Returns loan data for applying the proper loan action")
     public WorkingCapitalLoanCommandTemplateData retrieveWorkingCapitalLoanTemplate(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId, @QueryParam("templateType") @Parameter(description = "templateType") final String templateType, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return handleLoanTransactionTemplate(loanId, null, templateType);
     }
 
