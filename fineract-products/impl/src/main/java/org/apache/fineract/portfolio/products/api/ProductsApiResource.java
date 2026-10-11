@@ -153,7 +153,7 @@ public class ProductsApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PutProductsTypeProductIdRequest.class)))
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PutProductsTypeProductIdResponse.class)))})
     public String updateProduct(@PathParam("type") @Parameter(description = "type") final String productType, @PathParam("productId") @Parameter(description = "productId") final Long productId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProduct(productType, productId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
