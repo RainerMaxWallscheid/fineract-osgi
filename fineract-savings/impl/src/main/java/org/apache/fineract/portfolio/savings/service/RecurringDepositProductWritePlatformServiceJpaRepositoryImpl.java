@@ -84,7 +84,7 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
     @Override
     public CommandProcessingResult update(final Long productId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDataValidator.validateForRecurringDepositUpdate(command.json());
             final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId).orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
             final Map<String, Object> changes = product.update(command);
