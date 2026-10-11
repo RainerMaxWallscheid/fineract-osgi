@@ -134,7 +134,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     @Transactional
     @Override
     public CommandProcessingResult officeTransaction(final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.moneyTransferCommandFromApiJsonDeserializer.validateOfficeTransfer(command.json());
         Long officeId = null;
         Office fromOffice = null;
