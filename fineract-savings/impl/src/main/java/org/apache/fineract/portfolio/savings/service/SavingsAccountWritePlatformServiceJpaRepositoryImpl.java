@@ -980,7 +980,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult addSavingsAccountCharge(final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(SAVINGS_ACCOUNT_RESOURCE_NAME);
         final Long savingsAccountId = command.getSavingsId();
