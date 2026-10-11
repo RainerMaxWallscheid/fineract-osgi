@@ -96,7 +96,7 @@ public class ProvisioningEntriesApiResource {
     @RequestBody(content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PutProvisioningEntriesRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PutProvisioningEntriesResponse.class)))
     public CommandProcessingResult modifyProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId, @QueryParam("command") @Parameter(description = "command=createjournalentry\ncommand=recreateprovisioningentry") final String commandParam, @Parameter(hidden = true) String provisionCommandRequest) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return getResultByCommandParam(commandParam, entryId, provisionCommandRequest);
     }
 
