@@ -36,6 +36,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDelinquencyRangeScheduleData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDelinquencyRangeScheduleService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans/{loanId}/delinquency-range-schedule")
@@ -52,7 +53,8 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleApiResource {
     @Operation(summary = "Retrieve Delinquency Range Schedule", description = "Retrieves the delinquency range schedule periods for a Working Capital loan")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyRangeScheduleData.class))))})
     public List<WorkingCapitalLoanDelinquencyRangeScheduleData> retrieveDelinquencyRangeSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return rangeScheduleService.retrieveRangeSchedule(loanId);
     }
 
