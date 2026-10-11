@@ -139,7 +139,7 @@ public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoRe
 
     @Override
     public Collection<GlimRepaymentTemplate> findglimRepaymentTemplate(final Long glimId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         GLIMRepaymentMapper rm = new GLIMRepaymentMapper();
         final String sql = "select " + rm.schema() + " where glim.id=?";
         return this.jdbcTemplate.query(sql, rm, glimId); // NOSONAR
