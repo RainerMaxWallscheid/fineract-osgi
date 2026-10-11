@@ -92,7 +92,7 @@ public class ClientChargeReadPlatformServiceImpl implements ClientChargeReadPlat
     @Override
     public ClientChargeData retrieveClientCharge(Long clientId, Long clientChargeId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final ClientChargeMapper rm = new ClientChargeMapper();
             final String sql = "select " + rm.schema() + " where cc.client_id=? and cc.id=? ";
             return this.jdbcTemplate.queryForObject(sql, rm, clientId, clientChargeId); // NOSONAR
