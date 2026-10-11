@@ -1034,7 +1034,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     @Transactional
     @Override
     public CommandProcessingResult deleteSavingsAccountCharge(final Long savingsAccountId, final Long savingsAccountChargeId, @SuppressWarnings("unused") final JsonCommand command, final DepositAccountType depositAccountType) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final SavingsAccount savingsAccount = this.depositAccountAssembler.assembleFrom(savingsAccountId, depositAccountType);
         checkClientOrGroupActive(savingsAccount);
         final SavingsAccountCharge savingsAccountCharge = this.savingsAccountChargeRepository.findOneWithNotFoundDetection(savingsAccountChargeId, savingsAccountId);
