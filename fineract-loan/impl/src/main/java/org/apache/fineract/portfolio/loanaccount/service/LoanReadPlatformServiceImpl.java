@@ -229,7 +229,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
     @Override
     public LoanAccountData retrieveLoanByLoanAccount(String loanAccountNumber) {
         // final AppUser currentUser = this.context.authenticatedUser();
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final LoanMapper rm = new LoanMapper(sqlGenerator, delinquencyReadPlatformService);
         final String sql = "select " + rm.loanSchema() + " where l.account_no=?";
         return this.jdbcTemplate.queryForObject(sql, rm, loanAccountNumber); // NOSONAR
