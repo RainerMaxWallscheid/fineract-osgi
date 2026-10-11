@@ -79,7 +79,7 @@ public class AccountsApiResource {
     @AlternativeOperationId("template_7")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.GetAccountsTypeTemplateResponse.class)))
     public ShareAccountData template(@PathParam("type") @Parameter(description = "type") final String accountType, @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("productId") @Parameter(description = "productId") final Long productId) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         return shareAccountReadPlatformService.retrieveTemplate(clientId, productId);
     }
 
