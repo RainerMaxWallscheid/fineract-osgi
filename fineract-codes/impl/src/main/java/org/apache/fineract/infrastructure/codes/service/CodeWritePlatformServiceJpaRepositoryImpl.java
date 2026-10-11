@@ -64,7 +64,7 @@ public class CodeWritePlatformServiceJpaRepositoryImpl implements CodeWritePlatf
     public CommandProcessingResult createCode(final JsonCommand command) {
 
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             this.fromApiJsonDeserializer.validateForCreate(command.json());
 
