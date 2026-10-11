@@ -42,7 +42,7 @@ public class RateReadServiceImpl implements RateReadService {
 
     @Override
     public List<RateData> retrieveAllRates() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final RateMapper rm = new RateMapper();
         final String sql = "select " + rm.rateSchema();
         return this.jdbcTemplate.query(sql, rm); // NOSONAR
