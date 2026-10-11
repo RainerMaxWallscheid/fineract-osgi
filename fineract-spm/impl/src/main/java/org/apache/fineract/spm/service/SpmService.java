@@ -39,7 +39,7 @@ public class SpmService {
     private final SurveyValidator surveyValidator;
 
     public List<Survey> fetchValidSurveys() {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.surveyRepository.fetchActiveSurveys(DateUtils.getLocalDateOfTenant());
     }
 
