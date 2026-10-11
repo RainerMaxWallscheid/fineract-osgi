@@ -54,6 +54,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
 import org.apache.fineract.portfolio.workingcapitalloan.serialization.WorkingCapitalLoanChargeConstants;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanChargeReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans")
@@ -202,7 +203,8 @@ public class WorkingCapitalLoanChargesApiResource {
     }
 
     private WorkingCapitalLoanChargeData retrieveWorkingCapitalLoanCharge(final Long loanId, final String loanExternalIdStr, final Long loanChargeId, final String loanChargeExternalIdStr) {
-        securityContext.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanConstants.WCL_RESOURCE_NAME);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(WorkingCapitalLoanConstants.WCL_RESOURCE_NAME);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         ExternalId loanChargeExternalId = ExternalIdFactory.produce(loanChargeExternalIdStr);
         Long resolvedLoanId = loanId == null ? workingCapitalLoanRepository.findIdByExternalId(loanExternalId) : loanId;
