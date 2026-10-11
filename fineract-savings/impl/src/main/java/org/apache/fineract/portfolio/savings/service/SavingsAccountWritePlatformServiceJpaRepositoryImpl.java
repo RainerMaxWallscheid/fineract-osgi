@@ -1336,7 +1336,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult unassignFieldOfficer(Long savingsAccountId, JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Map<String, Object> actualChanges = new LinkedHashMap<>(5);
         this.fromApiJsonDeserializer.validateForUnAssignSavingsOfficer(command.json());
         final SavingsAccount savingsForUpdate = this.savingAccountRepositoryWrapper.findOneWithNotFoundDetection(savingsAccountId);
