@@ -139,7 +139,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
 
     @Override
     public CommandProcessingResult deleteRole(final Long ruleId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final GroupRole groupRole = this.groupRoleRepository.findOneWithNotFoundDetection(ruleId);
         this.groupRoleRepository.delete(groupRole);
         return //
