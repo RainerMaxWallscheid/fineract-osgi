@@ -150,7 +150,8 @@ public class WorkingCapitalLoanProductApiResource {
     @Operation(summary = "Retrieve a Working Capital Loan Product", operationId = "retrieveOneWorkingCapitalLoanProductByExternalId", description = "Retrieves a Working Capital Loan Product by external ID\n\n" + "Example Requests:\n" + "\n" + "workingcapitalloanproducts/external-id/2075e308-d4a8-44d9-8203-f5a947b8c2f4")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanProductApiResourceSwagger.GetWorkingCapitalLoanProductsProductIdResponse.class)))})
     public WorkingCapitalLoanProductData retrieveWorkingCapitalLoanProductDetails(@PathParam("externalProductId") @Parameter(description = "externalProductId") final String externalProductId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ExternalId externalId = ExternalIdFactory.produce(externalProductId);
         final Long productId = resolveProductId(externalId);
         if (productId == null) {
