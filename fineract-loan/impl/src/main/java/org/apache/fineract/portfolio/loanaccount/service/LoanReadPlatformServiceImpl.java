@@ -266,7 +266,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
             final RepaymentScheduleRelatedLoanData repaymentScheduleRelatedLoanData, Collection<DisbursementData> disbursementData,
             Collection<LoanTransactionRepaymentPeriodData> capitalizedIncomeData, boolean isInterestRecalculationEnabled,
             LoanScheduleType loanScheduleType) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return loanRepaymentScheduleService.findLoanScheduleData(loanId, repaymentScheduleRelatedLoanData, disbursementData,
                 capitalizedIncomeData, isInterestRecalculationEnabled, loanScheduleType);
     }
