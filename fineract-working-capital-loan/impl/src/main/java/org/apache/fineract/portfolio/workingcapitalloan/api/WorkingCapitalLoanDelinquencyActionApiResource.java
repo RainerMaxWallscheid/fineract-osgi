@@ -94,7 +94,8 @@ public class WorkingCapitalLoanDelinquencyActionApiResource {
     @Operation(summary = "Retrieve Delinquency Actions", description = "Retrieves all delinquency actions for a Working Capital loan")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionData.class))))})
     public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readService.retrieveDelinquencyActions(loanId);
     }
 
