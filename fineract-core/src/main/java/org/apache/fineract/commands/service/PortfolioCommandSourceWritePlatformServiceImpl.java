@@ -121,8 +121,8 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     public Long rejectEntry(final Long makerCheckerId) {
         final CommandSource commandSourceInput = validateMakerCheckerTransaction(makerCheckerId);
         validateIsUpdateAllowed();
-        final AppUser maker = this.context.authenticatedUser();
-        commandSourceInput.markAsRejected(maker);
+        final Object maker = this.context.authenticatedUser();
+        commandSourceInput.markAsRejected((AppUser) maker);
         this.commandSourceRepository.save(commandSourceInput);
         if (cleanupServices != null) {
             for (CleanupService cleanupService : cleanupServices) {
