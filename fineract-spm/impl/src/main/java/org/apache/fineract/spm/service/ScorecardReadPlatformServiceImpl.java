@@ -99,7 +99,7 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
 
     @Override
     public Collection<ScorecardData> retrieveScorecardBySurvey(Long surveyId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         ScorecardMapper scm = new ScorecardMapper();
         String sql = "select " + scm.schema() + " where sc.survey_id = ? " + " group by sc.survey_id, sc.client_id, sc.id ";
         Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] {surveyId}); // NOSONAR
