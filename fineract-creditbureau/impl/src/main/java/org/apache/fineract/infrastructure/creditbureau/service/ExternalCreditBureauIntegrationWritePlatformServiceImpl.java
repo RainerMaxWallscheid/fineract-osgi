@@ -188,7 +188,7 @@ public class ExternalCreditBureauIntegrationWritePlatformServiceImpl implements 
     @Transactional
     @Override
     public CreditBureauReportData getCreditReportFromExternalCredit(final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         String nrcId = command.stringValueOfParameterNamed("NRC");
         String bureauID = command.stringValueOfParameterNamed("creditBureauID");
         Integer creditBureauId = Integer.parseInt(bureauID);
