@@ -183,7 +183,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     @Override
     public CommandProcessingResult updateLoanProduct(final Long loanProductId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final LoanProduct product = this.loanProductRepository.findById(loanProductId)
                     .orElseThrow(() -> new LoanProductNotFoundException(loanProductId));
             this.fromApiJsonDeserializer.validateForUpdate(command, product);
