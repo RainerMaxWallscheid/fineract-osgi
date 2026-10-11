@@ -183,7 +183,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public Collection<ImportData> getImports(GlobalEntityType type) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final ImportMapper rm = new ImportMapper();
         final String sql = "select " + rm.schema() + " order by i.id desc";
         return this.jdbcTemplate.query(sql, rm, type.getValue());
