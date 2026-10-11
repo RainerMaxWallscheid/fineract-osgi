@@ -61,7 +61,7 @@ public class CreditBureauConfigurationWritePlatformServiceImpl implements Credit
     @Transactional
     @Override
     public CommandProcessingResult addCreditBureauConfiguration(Long creditBureauId, JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         this.fromApiJsonDeserializer.validateForCreate(command.json(), creditBureauId);
 
