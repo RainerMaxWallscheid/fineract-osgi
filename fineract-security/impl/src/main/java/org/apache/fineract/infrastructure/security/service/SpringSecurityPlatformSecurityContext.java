@@ -120,7 +120,8 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
 
     @Override
     public String officeHierarchy() {
-        return authenticatedUser().getOffice().getHierarchy();
+        final Object user = authenticatedUser();
+        return ((AppUser) user).getOffice().getHierarchy();
     }
 
     @Override
