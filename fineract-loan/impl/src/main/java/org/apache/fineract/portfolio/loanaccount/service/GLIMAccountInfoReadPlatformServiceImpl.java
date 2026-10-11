@@ -122,7 +122,7 @@ public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoRe
 
     @Override
     public Collection<GLIMContainer> findGlimAccountbyGroupAndAccount(Long groupId, String accountNo) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         Collection<GroupLoanIndividualMonitoringAccountData> glimInfo = findGlimAccountByGroupIdandAccountNo(groupId + "", accountNo + "");
         // List<LoanAccountSummaryData> glimAccounts =
         // retrieveLoanAccountDetails(loanWhereClauseForGroupAndLoanType, new
