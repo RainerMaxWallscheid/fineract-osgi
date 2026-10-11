@@ -166,7 +166,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     @Override
     public CommandProcessingResult allocateCashierToTeller(final Long tellerId, JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             Long hourStartTime;
             Long minStartTime;
             Long hourEndTime;
