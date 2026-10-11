@@ -1835,7 +1835,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanTransactionData retrieveCreditBalanceRefundTemplate(Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Collection<PaymentTypeData> paymentOptions = null;
         final BigDecimal netDisbursal = null;
         final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
