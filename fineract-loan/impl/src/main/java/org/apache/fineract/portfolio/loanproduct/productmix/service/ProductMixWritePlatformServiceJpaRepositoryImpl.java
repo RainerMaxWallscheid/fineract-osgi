@@ -100,7 +100,7 @@ public class ProductMixWritePlatformServiceJpaRepositoryImpl implements ProductM
     @Override
     public ProductMixUpdateResponse updateProductMix(final ProductMixUpdateRequest request) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final Long productId = request.getProductId();
             final List<Long> restrictedProducts = request.getRestrictedProducts();
