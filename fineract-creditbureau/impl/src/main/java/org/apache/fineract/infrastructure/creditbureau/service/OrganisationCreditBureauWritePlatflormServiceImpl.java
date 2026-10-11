@@ -73,7 +73,7 @@ public class OrganisationCreditBureauWritePlatflormServiceImpl implements Organi
     @Transactional
     @Override
     public CommandProcessingResult updateCreditBureau(JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.fromApiJsonDeserializer.validateForUpdate(command.json());
 
         final long creditbureauID = command.longValueOfParameterNamed("creditBureauId");
