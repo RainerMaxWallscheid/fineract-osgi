@@ -64,7 +64,7 @@ public class AdHocApiResource {
     @Operation(operationId = "retrieveAll_1")
     @AlternativeOperationId("retrieveAll_2")
     public List<AdHocData> retrieveAll() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return adHocReadPlatformService.retrieveAllAdHocQuery();
     }
 
