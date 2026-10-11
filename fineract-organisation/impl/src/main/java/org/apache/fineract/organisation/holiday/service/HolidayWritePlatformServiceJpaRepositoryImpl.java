@@ -88,7 +88,7 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     @Override
     public CommandProcessingResult updateHoliday(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
             final Holiday holiday = this.holidayRepository.findOneWithNotFoundDetection(command.entityId());
             Map<String, Object> changes = holiday.update(command);
