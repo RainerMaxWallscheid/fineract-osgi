@@ -82,7 +82,7 @@ public class CreditBureauConfigurationWritePlatformServiceImpl implements Credit
     @Override
     public CommandProcessingResult updateCreditBureauConfiguration(Long configurationId, JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
 
