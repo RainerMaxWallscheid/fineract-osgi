@@ -143,7 +143,7 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
     @Override
     public List<AddressData> retrieveAddressbyStatus(final long clientid, final String status) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         boolean temp = Boolean.parseBoolean(status);
         final AddMapper rm = new AddMapper();
         final String sql = "select " + rm.schema() + " and ca.client_id=? and ca.is_active=?";
