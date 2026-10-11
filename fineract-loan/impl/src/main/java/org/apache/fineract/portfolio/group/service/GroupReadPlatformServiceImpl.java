@@ -209,7 +209,7 @@ public class GroupReadPlatformServiceImpl implements GroupReadPlatformService {
 
     @Override
     public Collection<GroupGeneralData> retrieveGroupsForLookup(final Long officeId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final GroupLookupDataMapper rm = new GroupLookupDataMapper();
         final String sql = "Select " + rm.schema() + " and g.office_id=?";
         return this.jdbcTemplate.query(sql, rm, officeId); // NOSONAR
