@@ -39,7 +39,7 @@ public class LookupTableService {
     }
 
     public List<LookupTable> createLookupTable(final List<LookupTable> lookupTable) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.lookupTableRepository.saveAll(lookupTable);
     }
 
