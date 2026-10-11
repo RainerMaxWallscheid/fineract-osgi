@@ -541,7 +541,7 @@ public class DepositApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult undoApplicationApproval(final Long savingsId, final JsonCommand command, final DepositAccountType depositAccountType) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateForUndo(command.json());
         final SavingsAccount savingsAccount = this.depositAccountAssembler.assembleFrom(savingsId, depositAccountType);
         checkClientOrGroupActive(savingsAccount);
