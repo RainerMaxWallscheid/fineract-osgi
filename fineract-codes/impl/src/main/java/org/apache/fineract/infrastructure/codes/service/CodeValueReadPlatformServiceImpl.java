@@ -94,7 +94,7 @@ public class CodeValueReadPlatformServiceImpl implements CodeValueReadPlatformSe
     @Override
     public List<CodeValueData> retrieveAllCodeValues(String codeName) {
         // TODO: review whether it is needed.
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return codeValueMapper.map(codeValueRepository.findByCodeName(codeName));
     }
 
