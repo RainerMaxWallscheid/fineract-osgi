@@ -80,7 +80,7 @@ public class ProvisioningCategoryApiResource {
     @Path("{categoryId}")
     @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult deleteProvisioningCategory(@PathParam("categoryId") final Long categoryId) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteProvisioningCategory(categoryId).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
