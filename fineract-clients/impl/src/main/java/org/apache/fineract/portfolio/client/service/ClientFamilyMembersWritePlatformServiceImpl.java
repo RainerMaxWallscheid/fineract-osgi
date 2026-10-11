@@ -96,7 +96,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
         Boolean isDependent = false;
         LocalDate dateOfBirth = null;
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         apiJsonDeserializer.validateForCreate(clientId, command.json());
 
         Client client = requireClient(clientId);
