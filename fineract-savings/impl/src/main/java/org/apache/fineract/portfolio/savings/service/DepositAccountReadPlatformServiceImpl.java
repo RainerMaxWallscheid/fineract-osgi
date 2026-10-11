@@ -185,7 +185,7 @@ public class DepositAccountReadPlatformServiceImpl
     @Override
     public Object retrieveOne(final DepositAccountType depositAccountType, final Long accountId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("select ");
             if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
