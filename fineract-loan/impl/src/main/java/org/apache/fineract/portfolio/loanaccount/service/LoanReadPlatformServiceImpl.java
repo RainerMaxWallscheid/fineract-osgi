@@ -571,7 +571,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanTransactionData retrieveNewClosureDetails() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final BigDecimal outstandingLoanBalance = null;
         final LoanTransactionEnumData transactionType = LoanEnumerations.transactionType(LoanTransactionType.WRITEOFF);
         final BigDecimal unrecognizedIncomePortion = null;
