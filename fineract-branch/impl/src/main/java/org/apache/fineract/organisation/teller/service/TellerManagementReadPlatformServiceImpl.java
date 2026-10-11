@@ -175,7 +175,12 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
         return null;
     }
 
-    @Cacheable(value = "tellers", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')")
+    public String authenticatedUserOfficeHierarchy() {
+        final Object currentUser = this.context.authenticatedUser();
+        return ((AppUser) currentUser).getOffice().getHierarchy();
+    }
+
+    @Cacheable(value = "tellers", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy()+\'of\')")
     public Collection<TellerData> retrieveAllTellers(final boolean includeAllTellers) {
         final Object currentUser = this.context.authenticatedUser();
         final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
