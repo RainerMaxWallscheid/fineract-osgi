@@ -44,6 +44,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedExce
 import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.workingcapitalloan.moduleapi.WorkingCapitalLoanExistencePort;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Conditional;
@@ -91,7 +92,8 @@ public class WorkingCapitalLoanCOBFilterHelperImpl extends COBFilterApiMatcher i
 
     @Override
     public boolean isBypassUser() {
-        return context.authenticatedUser().isBypassUser();
+        final Object user = context.authenticatedUser();
+        return ((AppUser) user).isBypassUser();
     }
 
     private boolean isLoanHardLocked(Long... loanIds) {
