@@ -129,7 +129,7 @@ public class FixedDepositProductWritePlatformServiceJpaRepositoryImpl implements
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final FixedDepositProduct product = this.fixedDepositProductRepository.findById(productId).orElseThrow(() -> new FixedDepositProductNotFoundException(productId));
         this.fixedDepositProductRepository.delete(product);
         return  //
