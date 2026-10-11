@@ -117,7 +117,7 @@ public class ProvisioningCriteriaApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ProvisioningCriteriaApiResourceSwagger.PutProvisioningCriteriaRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningCriteriaApiResourceSwagger.PutProvisioningCriteriaResponse.class)))
     public CommandProcessingResult updateProvisioningCriteria(@PathParam("criteriaId") @Parameter(description = "criteriaId") final Long criteriaId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningCriteria(criteriaId).withJson(apiRequestBodyAsJson).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
