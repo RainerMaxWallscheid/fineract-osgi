@@ -54,7 +54,8 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
         boolean isApprovedByChecker = false;
         // check if is update of own account details
-        if (wrapper.isChangeOfOwnUserDetails(this.context.authenticatedUser(wrapper).getId())) {
+        final Object user = this.context.authenticatedUser(wrapper);
+        if (wrapper.isChangeOfOwnUserDetails(((AppUser) user).getId())) {
             // then allow this operation to proceed.
             // maker checker doesnt mean anything here.
             isApprovedByChecker = true; // set to true in case permissions have
