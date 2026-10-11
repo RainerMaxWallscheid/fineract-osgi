@@ -630,7 +630,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanTransactionData retrieveLoanTransaction(final Long loanId, final Long transactionId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         try {
             final LoanTransactionsMapper rm = createLoanTransactionsMapper();
             final String sql = "select " + rm.loanPaymentsSchema() + " where l.id = ? and tr.id = ? ";
