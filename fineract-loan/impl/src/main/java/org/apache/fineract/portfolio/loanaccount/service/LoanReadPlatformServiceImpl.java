@@ -609,7 +609,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public Integer retrieveNumberOfRepayments(final Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return this.loanRepositoryWrapper.getNumberOfRepayments(loanId);
     }
 
