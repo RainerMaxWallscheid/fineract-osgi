@@ -67,7 +67,7 @@ public class ProvisioningCriteriaApiResource {
     @Operation(operationId = "retrieveTemplate_1")
     @AlternativeOperationId("retrieveTemplate_3")
     public ProvisioningCriteriaData retrieveTemplate() {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return provisioningCriteriaReadPlatformService.retrievePrivisiongCriteriaTemplate();
     }
 
