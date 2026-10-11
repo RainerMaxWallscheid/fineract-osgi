@@ -128,7 +128,7 @@ public class ProvisioningCriteriaApiResource {
     @Operation(summary = "Deletes Provisioning Criteria", operationId = "deleteProvisioningCriteria", description = "Deletes Provisioning Criteria")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningCriteriaApiResourceSwagger.DeleteProvisioningCriteriaResponse.class)))
     public CommandProcessingResult deleteProvisioningCriteria(@PathParam("criteriaId") @Parameter(description = "criteriaId") final Long criteriaId) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteProvisioningCriteria(criteriaId).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
