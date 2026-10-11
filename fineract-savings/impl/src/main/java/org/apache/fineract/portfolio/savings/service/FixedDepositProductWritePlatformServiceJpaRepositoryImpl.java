@@ -84,7 +84,7 @@ public class FixedDepositProductWritePlatformServiceJpaRepositoryImpl implements
     @Override
     public CommandProcessingResult update(final Long productId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDataValidator.validateForFixedDepositUpdate(command.json());
             final FixedDepositProduct product = this.fixedDepositProductRepository.findById(productId).orElseThrow(() -> new FixedDepositProductNotFoundException(productId));
             final Map<String, Object> changes = product.update(command);
