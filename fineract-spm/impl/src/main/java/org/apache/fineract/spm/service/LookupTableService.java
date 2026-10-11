@@ -29,7 +29,7 @@ public class LookupTableService {
     private final LookupTableRepository lookupTableRepository;
 
     public List<LookupTable> findByKey(final String key) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.lookupTableRepository.findByKey(key);
     }
 
