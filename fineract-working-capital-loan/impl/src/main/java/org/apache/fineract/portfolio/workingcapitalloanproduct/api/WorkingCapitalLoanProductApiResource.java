@@ -92,7 +92,8 @@ public class WorkingCapitalLoanProductApiResource {
     @Operation(summary = "Retrieve Working Capital Loan Product Details Template", operationId = "retrieveTemplateWorkingCapitalLoanProduct", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "workingcapitalloanproducts/template")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanProductApiResourceSwagger.GetWorkingCapitalLoanProductsTemplateResponse.class)))})
     public WorkingCapitalLoanProductData retrieveTemplate() {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.retrieveNewWorkingCapitalLoanProductDetails();
     }
 
