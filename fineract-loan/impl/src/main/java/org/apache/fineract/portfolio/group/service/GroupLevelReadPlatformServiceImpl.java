@@ -36,7 +36,7 @@ public class GroupLevelReadPlatformServiceImpl implements GroupLevelReadPlatform
 
     @Override
     public List<GroupLevelData> retrieveAllLevels() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final GroupLevelDataMapper rm = new GroupLevelDataMapper();
         final String sql = "select " + rm.groupLevelSchema();
         return this.jdbcTemplate.query(sql, rm); // NOSONAR
