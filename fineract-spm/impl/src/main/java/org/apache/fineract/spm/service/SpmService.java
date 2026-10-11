@@ -103,7 +103,7 @@ public class SpmService {
     }
 
     public void activateSurvey(final Long id) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final Survey survey = findById(id);
         LocalDate validFrom = getStartOfToday();
         survey.setValidFrom(validFrom);
