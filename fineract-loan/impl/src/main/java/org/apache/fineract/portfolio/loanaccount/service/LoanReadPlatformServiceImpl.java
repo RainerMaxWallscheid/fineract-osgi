@@ -274,7 +274,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
     @Override
     public Collection<LoanTransactionData> retrieveLoanTransactions(final Long loanId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final LoanTransactionsMapper rm = createLoanTransactionsMapper();
             // retrieve all loan transactions that are not invalid and have not
             // been 'contra'ed by another transaction
