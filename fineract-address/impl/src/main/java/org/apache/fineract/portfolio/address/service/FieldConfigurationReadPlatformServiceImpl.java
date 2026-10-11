@@ -74,7 +74,7 @@ public class FieldConfigurationReadPlatformServiceImpl implements FieldConfigura
 
     @Override
     public List<FieldConfigurationData> retrieveFieldConfigurationList(final String entity) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final FieldMapper rm = new FieldMapper();
         final String sql = "select " + rm.schema() + " where fld.entity=?";
