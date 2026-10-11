@@ -222,7 +222,8 @@ public class WorkingCapitalLoanChargesApiResource {
     }
 
     private List<WorkingCapitalLoanChargeData> retrieveAllLoanCharges(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanConstants.WCL_RESOURCE_NAME);
+        final Object currentUser = securityContext.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(WorkingCapitalLoanConstants.WCL_RESOURCE_NAME);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanId == null ? workingCapitalLoanRepository.findIdByExternalId(loanExternalId) : loanId;
         return loanChargeReadPlatformService.retrieveLoanCharges(resolvedLoanId);
