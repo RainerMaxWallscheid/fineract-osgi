@@ -54,8 +54,13 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
         return this.context;
     }
 
+    public String authenticatedUserOfficeHierarchy() {
+        final Object currentUser = this.context.authenticatedUser();
+        return ((AppUser) currentUser).getOffice().getHierarchy();
+    }
+
     @Override
-    @Cacheable(value = "users", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy())")
+    @Cacheable(value = "users", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy())")
     public Collection<AppUserData> retrieveAllUsers() {
         final Object currentUser = this.context.authenticatedUser();
         final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
