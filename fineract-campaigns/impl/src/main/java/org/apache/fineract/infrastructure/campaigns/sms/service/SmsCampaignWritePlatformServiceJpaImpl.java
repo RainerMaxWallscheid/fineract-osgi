@@ -420,7 +420,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     @Override
     public CampaignPreviewData previewMessage(final JsonQuery query) {
         CampaignPreviewData campaignMessage = null;
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.smsCampaignValidator.validatePreviewMessage(query.json());
         final JsonElement smsParamsElement = this.fromJsonHelper.extractJsonObjectNamed(SmsCampaignValidator.paramValue, query.parsedJson());
         String smsParams = smsParamsElement.toString();
