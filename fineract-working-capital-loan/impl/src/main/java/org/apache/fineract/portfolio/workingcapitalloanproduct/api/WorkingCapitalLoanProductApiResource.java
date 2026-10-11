@@ -52,6 +52,7 @@ import org.apache.fineract.portfolio.workingcapitalloanproduct.WorkingCapitalLoa
 import org.apache.fineract.portfolio.workingcapitalloanproduct.data.WorkingCapitalLoanProductData;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.exception.WorkingCapitalLoanProductNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.service.WorkingCapitalLoanProductReadPlatformService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loan-products")
@@ -80,7 +81,8 @@ public class WorkingCapitalLoanProductApiResource {
     @Operation(operationId = "retrieveAllWorkingCapitalLoanProducts", summary = "List Working Capital Loan Products", description = "Lists all Working Capital Loan Products")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanProductApiResourceSwagger.GetWorkingCapitalLoanProductsResponse.class))))})
     public List<WorkingCapitalLoanProductData> retrieveAllWorkingCapitalLoanProducts() {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformService.retrieveAllWorkingCapitalLoanProducts();
     }
 
