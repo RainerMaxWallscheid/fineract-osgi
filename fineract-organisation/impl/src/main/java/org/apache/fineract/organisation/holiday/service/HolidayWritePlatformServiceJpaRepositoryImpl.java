@@ -118,7 +118,7 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     @Transactional
     @Override
     public CommandProcessingResult activateHoliday(final Long holidayId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Holiday holiday = this.holidayRepository.findOneWithNotFoundDetection(holidayId);
         holiday.activate();
         this.holidayRepository.saveAndFlush(holiday);
