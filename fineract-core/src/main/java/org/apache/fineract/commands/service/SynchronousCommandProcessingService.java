@@ -379,7 +379,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
                 reqmap.put("actionName", actionName);
                 final Object user = context.authenticatedUser();
                 reqmap.put("createdBy", ((AppUser) user).getId());
-                reqmap.put("createdByName", context.authenticatedUser().getUsername());
+                reqmap.put("createdByName", ((AppUser) user).getUsername());
                 reqmap.put("createdByFullName", context.authenticatedUser().getDisplayName());
                 reqmap.put("request", myMap);
                 if (result instanceof CommandProcessingResult) {
