@@ -143,7 +143,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long resourceId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final EmailCampaign emailCampaign = this.emailCampaignRepository.findById(resourceId).orElseThrow(() -> new EmailCampaignNotFound(resourceId));
         if (emailCampaign.isActive()) {
             throw new EmailCampaignMustBeClosedToBeDeletedException(emailCampaign.getId());
