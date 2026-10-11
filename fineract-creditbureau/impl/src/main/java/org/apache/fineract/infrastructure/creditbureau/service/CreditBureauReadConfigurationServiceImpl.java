@@ -68,7 +68,7 @@ public class CreditBureauReadConfigurationServiceImpl implements CreditBureauRea
     @Override
     public Collection<CreditBureauConfigurationData> readConfigurationByOrganisationCreditBureauId(long id) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CbConfigMapper rm = new CbConfigMapper();
         final String sql = "select " + rm.schema() + " where cbconfig.organisation_creditbureau_id=?";
