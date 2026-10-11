@@ -279,7 +279,7 @@ public class ClientFamilyMembersWritePlatformServiceImpl implements ClientFamily
         Boolean isDependent = false;
         // long clientFamilyMemberId=0;
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         apiJsonDeserializer.validateForUpdate(familyMemberId, command.json());
 
