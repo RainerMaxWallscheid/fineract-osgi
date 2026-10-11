@@ -81,7 +81,7 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
     @Override
     public Object retrieveOne(final DepositAccountType depositAccountType, final Long fixedDepositProductId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
                 final StringBuilder sqlBuilder = new StringBuilder(400);
                 sqlBuilder.append("select ");
