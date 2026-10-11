@@ -48,7 +48,7 @@ public class FundWritePlatformServiceJpaRepositoryImpl implements FundWritePlatf
     @CacheEvict(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'fn\')")
     public CommandProcessingResult createFund(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Fund fund = Fund.fromJson(command);
             this.fundRepository.saveAndFlush(fund);
