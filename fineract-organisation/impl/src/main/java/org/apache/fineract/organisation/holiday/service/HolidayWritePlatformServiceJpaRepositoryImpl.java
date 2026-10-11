@@ -64,7 +64,7 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     @Override
     public CommandProcessingResult createHoliday(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             validateInputDates(command);
             final Set<Office> offices = getSelectedOffices(command);
