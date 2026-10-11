@@ -63,7 +63,7 @@ public class RepaymentWithPostDatedChecksApiResource {
     @Operation(summary = "Get All Post Dated Checks", description = "Get All Post dated Checks")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class))))})
     public String getPostDatedChecks(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final List<PostDatedChecksData> postDatedChecksDataList = this.repaymentWithPostDatedChecksReadPlatformService.getPostDatedChecks(loanId);
         return this.apiJsonSerializer.serialize(postDatedChecksDataList);
     }
