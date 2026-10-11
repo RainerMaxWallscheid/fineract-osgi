@@ -403,7 +403,7 @@ public class GroupingTypesWritePlatformServiceJpaRepositoryImpl implements Group
     @Transactional
     @Override
     public CommandProcessingResult unassignGroupOrCenterStaff(final Long grouptId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Map<String, Object> actualChanges = new LinkedHashMap<>(9);
         this.fromApiJsonDeserializer.validateForUnassignStaff(command.json());
         final Group groupForUpdate = this.groupRepository.findOneWithNotFoundDetection(grouptId);
