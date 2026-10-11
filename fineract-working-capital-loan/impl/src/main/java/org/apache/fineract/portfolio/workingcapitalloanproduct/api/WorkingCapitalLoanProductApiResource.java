@@ -103,7 +103,8 @@ public class WorkingCapitalLoanProductApiResource {
     @Operation(summary = "Retrieve a Working Capital Loan Product", operationId = "retrieveOneWorkingCapitalLoanProduct", description = "Retrieves a Working Capital Loan Product\n\n" + "Example Requests:\n" + "\n" + "workingcapitalloanproducts/1\n" + "\n" + "\n" + "workingcapitalloanproducts/1?template=true\n" + "\n" + "\n" + "workingcapitalloanproducts/1?fields=name,description,principal")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanProductApiResourceSwagger.GetWorkingCapitalLoanProductsProductIdResponse.class)))})
     public WorkingCapitalLoanProductData retrieveWorkingCapitalLoanProductDetails(@PathParam("productId") @Parameter(description = "productId") final Long productId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return getWorkingCapitalLoanProductDetails(productId, uriInfo);
     }
 
