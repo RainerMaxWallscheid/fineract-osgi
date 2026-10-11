@@ -234,7 +234,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
 
     @Override
     public Collection<SavingsProductData> retrieveAllForCurrency(String currencyCode) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.currency_code= ? ";
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
