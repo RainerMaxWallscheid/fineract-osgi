@@ -160,7 +160,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     }
 
     @Override
-    @Cacheable(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')")
+    @Cacheable(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy()+\'ofd\')")
     public Collection<OfficeData> retrieveAllOfficesForDropdown() {
         final Object currentUser = this.context.authenticatedUser();
         final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
