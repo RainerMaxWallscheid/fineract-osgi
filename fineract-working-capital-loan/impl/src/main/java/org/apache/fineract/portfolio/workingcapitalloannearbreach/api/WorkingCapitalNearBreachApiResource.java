@@ -79,7 +79,8 @@ public class WorkingCapitalNearBreachApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createWorkingCapitalNearBreach", summary = "Create Working Capital Near Breach")
     public CommandProcessingResult create(final WorkingCapitalNearBreachRequest request) {
-        this.context.authenticatedUser().validateHasCreatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasCreatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createWorkingCapitalNearBreach().withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
