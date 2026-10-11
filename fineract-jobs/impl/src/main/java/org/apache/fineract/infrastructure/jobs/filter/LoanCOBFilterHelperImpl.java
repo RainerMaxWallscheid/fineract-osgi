@@ -45,6 +45,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanIdsHardLockedExce
 import org.apache.fineract.infrastructure.jobs.service.InlineExecutorService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.moduleapi.LoanExistencePort;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Conditional;
@@ -107,7 +108,8 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
 
     @Override
     public boolean isBypassUser() {
-        return context.authenticatedUser().isBypassUser();
+        final Object user = context.authenticatedUser();
+        return ((AppUser) user).isBypassUser();
     }
 
     private List<Long> getGlimChildLoanIds(Long loanIdFromRequest) {
