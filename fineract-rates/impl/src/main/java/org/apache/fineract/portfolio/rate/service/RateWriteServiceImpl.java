@@ -52,7 +52,7 @@ public class RateWriteServiceImpl implements RateWriteService {
     @Override
     public CommandProcessingResult createRate(JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final Long approveUserId = command.longValueOfParameterNamed(approveUserIdParamName);
             Object approveUser = null;
