@@ -308,7 +308,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Override
     public PreviewCampaignMessage previewMessage(final JsonQuery query) {
         PreviewCampaignMessage campaignMessage = null;
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.emailCampaignValidator.validatePreviewMessage(query.json());
         final String emailParams = this.fromJsonHelper.extractStringNamed("paramValue", query.parsedJson());
         final String textMessageTemplate = this.fromJsonHelper.extractStringNamed("emailMessage", query.parsedJson());
