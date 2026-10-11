@@ -63,7 +63,7 @@ public class CodeValueReadPlatformServiceImpl implements CodeValueReadPlatformSe
     @Override
     @Cacheable(value = "code_values", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#code+\'cv\')")
     public List<CodeValueData> retrieveCodeValuesByCode(final String code) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final CodeValueDataMapper rm = new CodeValueDataMapper();
         final String sql = "select " + rm.schema() + "where c.code_name like ? and cv.is_active = true order by position";
         return this.jdbcTemplate.query(sql, rm, new Object[] {code}); // NOSONAR
