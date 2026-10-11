@@ -42,6 +42,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanN
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanNearBreachActionReadService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans")
@@ -88,7 +89,8 @@ public class WorkingCapitalLoanNearBreachActionApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanNearBreachActionsById", summary = "Retrieve near breach actions for a Working Capital Loan", description = "Returns all near breach action records for the loan, ordered by most recent first.")
     public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsById(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.nearBreachActionReadService.retrieveNearBreachActions(loanId);
     }
 
