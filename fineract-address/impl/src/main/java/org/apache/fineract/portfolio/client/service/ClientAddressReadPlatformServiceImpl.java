@@ -62,7 +62,7 @@ public class ClientAddressReadPlatformServiceImpl implements ClientAddressReadPl
 
     @Override
     public Collection<ClientAddressData> retrieveClientAddrConfiguration(final String entity) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final ClientAddrMapper rm = new ClientAddrMapper();
         final String sql = "select " + rm.schema() + " where fld.entity=?";
