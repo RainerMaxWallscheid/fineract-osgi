@@ -44,7 +44,7 @@ public class SpmService {
     }
 
     public List<Survey> fetchAllSurveys() {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.surveyRepository.fetchAllSurveys();
     }
 
