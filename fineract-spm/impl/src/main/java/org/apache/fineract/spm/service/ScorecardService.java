@@ -29,7 +29,7 @@ public class ScorecardService {
     private final ScorecardRepository scorecardRepository;
 
     public List<Scorecard> createScorecard(final List<Scorecard> scorecards) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.scorecardRepository.saveAll(scorecards);
     }
 
