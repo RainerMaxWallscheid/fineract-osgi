@@ -83,7 +83,7 @@ public class ProvisioningEntriesApiResource {
     @RequestBody(content = @Content(schema = @Schema(implementation = ProvisionEntryRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PostProvisioningEntriesResponse.class)))
     public CommandProcessingResult createProvisioningEntries(@Parameter(hidden = true) ProvisionEntryRequest provisionEntryRequest) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         CommandWrapper commandWrapper = new CommandWrapperBuilder().createProvisioningEntries().withJson(toApiJsonSerializer.serialize(provisionEntryRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandWrapper);
     }
