@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanBreachScheduleData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanBreachScheduleService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans/{loanId}/breach-schedule")
@@ -46,7 +47,8 @@ public class WorkingCapitalLoanBreachScheduleApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Breach Schedule", description = "Retrieves the breach schedule periods for a Working Capital loan")
     public List<WorkingCapitalLoanBreachScheduleData> retrieveBreachSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return breachScheduleService.retrieveBreachSchedule(loanId);
     }
 
