@@ -100,7 +100,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     @Override
     public CommandProcessingResult updateRole(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForUpdateRole(command);
             final Group group = requireGroup(command.getGroupId());
             final GroupRole groupRole = this.groupRoleRepository.findOneWithNotFoundDetection(command.entityId());
