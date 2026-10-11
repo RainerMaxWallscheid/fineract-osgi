@@ -54,7 +54,7 @@ public class ProductMixReadPlatformServiceImpl implements ProductMixReadPlatform
     public ProductMixData retrieveLoanProductMixDetails(final Long productId) {
         try {
 
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final ProductMixDataExtractor extractor = new ProductMixDataExtractor(this.loanProductReadPlatformService, productId);
 
