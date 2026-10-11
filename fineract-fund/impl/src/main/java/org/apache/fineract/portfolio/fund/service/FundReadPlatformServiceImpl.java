@@ -64,7 +64,7 @@ public class FundReadPlatformServiceImpl implements FundReadPlatformService {
     @Override
     public FundData retrieveFund(final Long fundId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final FundMapper rm = new FundMapper();
             final String sql = "select " + rm.schema() + " where f.id = ?";
             final FundData selectedFund = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {fundId}); // NOSONAR
