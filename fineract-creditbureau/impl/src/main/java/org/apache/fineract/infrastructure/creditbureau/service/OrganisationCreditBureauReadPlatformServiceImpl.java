@@ -79,7 +79,7 @@ public class OrganisationCreditBureauReadPlatformServiceImpl implements Organisa
 
     @Override
     public OrganisationCreditBureauData retrieveOrgCreditBureauById(long orgCbId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final OrganisationCreditBureauMapper rm = new OrganisationCreditBureauMapper();
         final String sql = "select " + rm.schema() + " and ocb.id=?";
