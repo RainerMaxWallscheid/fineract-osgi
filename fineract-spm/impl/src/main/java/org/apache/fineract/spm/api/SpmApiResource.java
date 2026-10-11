@@ -63,7 +63,7 @@ public class SpmApiResource {
     @AlternativeOperationId("fetchAllSurveys_1")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyData.class))))})
     public List<SurveyData> fetchAllSurveys(@QueryParam("isActive") final Boolean isActive) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         final List<SurveyData> result = new ArrayList<>();
         List<Survey> surveys = null;
         if (isActive != null && isActive) {
