@@ -76,7 +76,7 @@ public class CodeReadPlatformServiceImpl implements CodeReadPlatformService {
     @Override
     public CodeData retrieveCode(final Long codeId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final CodeMapper rm = new CodeMapper();
             final String sql = "select " + rm.schema() + " where c.id = ?";
