@@ -54,7 +54,7 @@ public class SpmService {
     }
 
     public Survey createSurvey(final Survey survey) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         this.surveyValidator.validate(survey);
         final Survey previousSurvey = this.surveyRepository.findByKey(survey.getKey(), DateUtils.getLocalDateOfTenant());
         if (previousSurvey != null) {
