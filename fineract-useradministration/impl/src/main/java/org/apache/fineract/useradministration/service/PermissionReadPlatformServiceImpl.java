@@ -36,7 +36,7 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
 
     @Override
     public Collection<PermissionData> retrieveAllPermissions() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final PermissionUsageDataMapper mapper = new PermissionUsageDataMapper(sqlGenerator);
         final String sql = mapper.permissionSchema();
         log.debug("retrieveAllPermissions: {}", sql);
