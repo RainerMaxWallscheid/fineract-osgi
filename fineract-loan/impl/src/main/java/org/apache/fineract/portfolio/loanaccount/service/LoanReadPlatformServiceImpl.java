@@ -508,7 +508,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
     @Override
     public LoanTransactionData retrieveLoanPrePaymentTemplate(final LoanTransactionType repaymentTransactionType, final Long loanId,
             LocalDate onDate) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.loanUtilService.validateRepaymentTransactionType(repaymentTransactionType);
         final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
         final MonetaryCurrency currency = loan.getCurrency();
