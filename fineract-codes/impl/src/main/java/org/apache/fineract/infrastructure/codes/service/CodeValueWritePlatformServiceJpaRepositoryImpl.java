@@ -115,7 +115,7 @@ public class CodeValueWritePlatformServiceJpaRepositoryImpl implements CodeValue
     public CommandProcessingResult updateCodeValue(final Long codeValueId, final JsonCommand command) {
 
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
 
