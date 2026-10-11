@@ -125,7 +125,7 @@ public class AccountsApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PostAccountsTypeAccountIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PostAccountsTypeAccountIdResponse.class)))
     public CommandProcessingResult handleCommands(@PathParam("type") @Parameter(description = "type") final String accountType, @PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, accountId, commandParam).withJson(apiRequestBodyAsJson).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
     }
