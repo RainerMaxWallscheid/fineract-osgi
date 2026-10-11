@@ -91,7 +91,8 @@ public class WorkingCapitalNearBreachApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "updateWorkingCapitalNearBreach", summary = "Update Working Capital Near Breach")
     public CommandProcessingResult update(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId, final WorkingCapitalNearBreachRequest request) {
-        this.context.authenticatedUser().validateHasUpdatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasUpdatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateWorkingCapitalNearBreach(breachId).withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
