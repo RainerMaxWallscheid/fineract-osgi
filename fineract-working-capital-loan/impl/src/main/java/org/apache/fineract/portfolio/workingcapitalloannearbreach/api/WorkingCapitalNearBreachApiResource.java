@@ -41,6 +41,7 @@ import org.apache.fineract.portfolio.workingcapitalloannearbreach.data.WorkingCa
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.data.WorkingCapitalNearBreachRequest;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.service.WorkingCapitalNearBreachReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.WorkingCapitalLoanProductConstants;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -57,7 +58,8 @@ public class WorkingCapitalNearBreachApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAllWorkingCapitalNearBreaches", summary = "List Working Capital Near Breaches")
     public List<WorkingCapitalNearBreachData> retrieveAll() {
-        this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         return this.breachReadPlatformService.retrieveAll();
     }
 
