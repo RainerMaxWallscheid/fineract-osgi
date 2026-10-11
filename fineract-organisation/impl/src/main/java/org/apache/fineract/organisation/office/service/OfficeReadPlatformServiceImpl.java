@@ -124,8 +124,13 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         }
     }
 
+    public String authenticatedUserOfficeHierarchy() {
+        final Object currentUser = this.context.authenticatedUser();
+        return ((AppUser) currentUser).getOffice().getHierarchy();
+    }
+
     @Override
-    @Cacheable(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')")
+    @Cacheable(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy()+\'of\')")
     public Collection<OfficeData> retrieveAllOffices(final boolean includeAllOffices, final SearchParameters searchParameters) {
         final Object currentUser = this.context.authenticatedUser();
         final String hierarchy = ((AppUser) currentUser).getOffice().getHierarchy();
