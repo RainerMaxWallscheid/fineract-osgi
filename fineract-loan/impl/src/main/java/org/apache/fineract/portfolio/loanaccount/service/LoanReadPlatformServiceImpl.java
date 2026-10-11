@@ -407,7 +407,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanAccountData retrieveTemplateWithCompleteGroupAndProductDetails(final Long groupId, final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         GroupGeneralData groupAccount = this.groupReadPlatformService.retrieveOne(groupId);
         // get group associations
         final Collection<ClientData> membersOfGroup = this.clientReadPlatformService.retrieveClientMembersOfGroup(groupId);
