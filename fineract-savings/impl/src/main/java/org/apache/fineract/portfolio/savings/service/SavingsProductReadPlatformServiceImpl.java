@@ -46,7 +46,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
 
     @Override
     public Collection<SavingsProductData> retrieveAll() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         String sql = "select " + this.savingsProductRowMapper.schema() + "where sp.deposit_type_enum = ?";
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
