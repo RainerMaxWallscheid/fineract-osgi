@@ -39,7 +39,7 @@ public class ScorecardService {
     }
 
     public List<Scorecard> findBySurveyAndClientId(final Survey survey, final Long clientId) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         return this.scorecardRepository.findBySurveyAndClientId(survey, clientId);
     }
 
