@@ -1051,7 +1051,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
 
     @Override
     public CommandProcessingResult payCharge(final Long savingsAccountId, final Long savingsAccountChargeId, final JsonCommand command, @SuppressWarnings("unused") final DepositAccountType depositAccountType) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.savingsAccountChargeDataValidator.validatePayCharge(command.json());
         final Locale locale = command.extractLocale();
         final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
