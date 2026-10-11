@@ -57,7 +57,7 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
     @Override
     public CommandProcessingResult createRole(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreateGroupRole(command);
             final Long roleId = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
             final CodeValue role = requireCodeValue(roleId);
