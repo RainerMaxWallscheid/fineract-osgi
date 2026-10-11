@@ -47,7 +47,7 @@ public class AdHocWritePlatformServiceJpaRepositoryImpl implements AdHocWritePla
     @Override
     public CommandProcessingResult createAdHocQuery(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.adHocCommandFromApiJsonDeserializer.validateForCreate(command.json());
             String commandQuery = command.stringValueOfParameterNamed(AdHocJsonInputParams.QUERY.getValue());
             sqlValidator.validate("adhoc", commandQuery);
