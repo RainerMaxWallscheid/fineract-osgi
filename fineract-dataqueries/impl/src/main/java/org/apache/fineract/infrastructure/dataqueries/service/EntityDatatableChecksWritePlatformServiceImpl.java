@@ -69,7 +69,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     @Override
     public CommandProcessingResult createCheck(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             // check if the datatable is linked to the entity
             String datatableName = command.stringValueOfParameterNamed("datatableName");
