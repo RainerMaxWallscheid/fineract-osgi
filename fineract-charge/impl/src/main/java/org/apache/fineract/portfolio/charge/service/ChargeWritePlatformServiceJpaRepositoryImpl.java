@@ -67,7 +67,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     @CacheEvict(value = "charges", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'ch\')")
     public CommandProcessingResult createCharge(final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             // Retrieve linked GLAccount for Client charges (if present)
             final Long glAccountId = command.longValueOfParameterNamed(ChargesApiConstants.glAccountIdParamName);
