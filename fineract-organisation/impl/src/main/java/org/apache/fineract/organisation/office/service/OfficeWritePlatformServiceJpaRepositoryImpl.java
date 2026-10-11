@@ -58,9 +58,14 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     private final OfficeTransactionRepository officeTransactionRepository;
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
 
+    public String authenticatedUserOfficeHierarchy() {
+        final Object currentUser = this.context.authenticatedUser();
+        return ((AppUser) currentUser).getOffice().getHierarchy();
+    }
+
     @Transactional
     @Override
-    @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')")})
+    @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.authenticatedUserOfficeHierarchy()+\'ofd\')")})
     public CommandProcessingResult createOffice(final JsonCommand command) {
         try {
             final Object currentUser = this.context.authenticatedUser();
