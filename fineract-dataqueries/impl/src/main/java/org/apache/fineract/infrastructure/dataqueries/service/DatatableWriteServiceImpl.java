@@ -283,7 +283,7 @@ public class DatatableWriteServiceImpl implements DatatableWriteService {
     @Override
     public void updateDatatable(final String datatableName, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
             final JsonElement element = this.fromJsonHelper.parse(command.json());
             final JsonArray changeColumns = this.fromJsonHelper.extractJsonArrayNamed(API_PARAM_CHANGECOLUMNS, element);
