@@ -113,7 +113,7 @@ public class EmailCampaignWritePlatformCommandHandlerImpl implements EmailCampai
     @Override
     public CommandProcessingResult update(final Long resourceId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.emailCampaignValidator.validateForUpdate(command.json());
             final EmailCampaign emailCampaign = this.emailCampaignRepository.findById(resourceId).orElseThrow(() -> new EmailCampaignNotFound(resourceId));
             if (emailCampaign.isActive()) {
