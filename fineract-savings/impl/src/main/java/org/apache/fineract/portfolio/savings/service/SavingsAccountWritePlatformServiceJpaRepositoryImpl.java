@@ -264,7 +264,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult deposit(final Long savingsId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.savingsAccountTransactionDataValidator.validate(command);
         boolean isGsim = false;
         final boolean backdatedTxnsAllowedTill = this.savingAccountAssembler.getPivotConfigStatus();
