@@ -55,7 +55,7 @@ public class OrganisationCreditBureauWritePlatflormServiceImpl implements Organi
 
     @Override
     public CommandProcessingResult addOrganisationCreditBureau(Long creditBureauId, JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.fromApiJsonDeserializer.validateForCreate(command.json(), creditBureauId);
 
         final CreditBureau creditBureau = this.creditBureauRepository.getReferenceById(creditBureauId);
