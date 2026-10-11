@@ -46,6 +46,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanD
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanApplicationReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDelinquencyActionReadService;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/working-capital-loans")
@@ -66,7 +67,8 @@ public class WorkingCapitalLoanDelinquencyActionApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionRequest.class)))
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionResponse.class))), @ApiResponse(responseCode = "400", description = "Bad Request"), @ApiResponse(responseCode = "404", description = "Working Capital Loan not found")})
     public CommandProcessingResult createDelinquencyAction(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        this.context.authenticatedUser().validateHasCreatePermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasCreatePermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final CommandWrapper commandRequest =  //
         //
         //
