@@ -46,6 +46,7 @@ import org.apache.fineract.portfolio.workingcapitalloanbreach.data.WorkingCapita
 import org.apache.fineract.portfolio.workingcapitalloanbreach.data.WorkingCapitalBreachTemplateResponse;
 import org.apache.fineract.portfolio.workingcapitalloanbreach.service.WorkingCapitalBreachReadPlatformService;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.WorkingCapitalLoanProductConstants;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -64,7 +65,8 @@ public class WorkingCapitalBreachApiResource {
     @Operation(operationId = "retrieveWorkingCapitalBreachTemplate", summary = "Retrieve Working Capital Breach template", description = "Returns breach options for frequency type and amount calculation type.")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalBreachTemplateResponse.class)))})
     public WorkingCapitalBreachTemplateResponse retrieveTemplate() {
-        this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
+        final Object currentUser = this.context.authenticatedUser();
+        ((AppUser) currentUser).validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         return this.breachReadPlatformService.retrieveTemplate();
     }
 
