@@ -125,7 +125,7 @@ public class ProvisioningEntriesApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all Provisioning Entries Metadata", operationId = "retrieveAllProvisioningEntries")
     public Page<ProvisioningEntryData> retrieveAllProvisioningEntries(@QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return provisioningEntriesReadPlatformService.retrieveAllProvisioningEntries(offset, limit);
     }
 
