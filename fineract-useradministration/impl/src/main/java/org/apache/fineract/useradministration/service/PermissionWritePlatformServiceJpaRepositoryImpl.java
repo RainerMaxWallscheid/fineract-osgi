@@ -43,7 +43,7 @@ public class PermissionWritePlatformServiceJpaRepositoryImpl implements Permissi
     @Transactional
     @Override
     public CommandProcessingResult updateMakerCheckerPermissions(final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Collection<Permission> allPermissions = this.permissionRepository.findAll();
         final PermissionsCommand permissionsCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
         final Map<String, Boolean> commandPermissions = permissionsCommand.getPermissions();
