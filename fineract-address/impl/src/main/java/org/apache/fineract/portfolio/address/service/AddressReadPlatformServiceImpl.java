@@ -126,7 +126,7 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
     @Override
     public List<AddressData> retrieveAddressbyType(final long clientid, final long typeid) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final AddMapper rm = new AddMapper();
         final String sql = "select " + rm.schema() + " and ca.client_id=? and ca.address_type_id=?";
         return this.jdbcTemplate.query(sql, rm, new Object[] {clientid, typeid}); // NOSONAR
