@@ -63,7 +63,7 @@ public class CreditBureauReadPlatformServiceImpl implements CreditBureauReadPlat
 
     @Override
     public Collection<CreditBureauData> retrieveCreditBureau() {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final CBMapper rm = new CBMapper();
         final String sql = "select " + rm.schema() + " order by id";
