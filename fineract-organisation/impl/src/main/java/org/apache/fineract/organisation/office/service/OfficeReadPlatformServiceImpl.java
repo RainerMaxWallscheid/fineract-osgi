@@ -198,7 +198,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public Collection<OfficeData> retrieveAllowedParents(final Long officeId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Collection<OfficeData> filterParentLookups = new ArrayList<>();
         if (isNotHeadOffice(officeId)) {
             final Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
