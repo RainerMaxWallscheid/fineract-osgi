@@ -88,7 +88,7 @@ public class CreditBureauLoanProductMappingWritePlatformServiceImpl implements C
     @Override
     public CommandProcessingResult updateCreditBureauLoanProductMapping(JsonCommand command) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.fromApiJsonDeserializer.validateForUpdate(command.json());
 
         final Long mappingid = command.longValueOfParameterNamed("creditbureauLoanProductMappingId");
