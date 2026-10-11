@@ -170,7 +170,7 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
     @Override
     public SavingsAccountChargeData retrieveSavingsAccountChargeDetails(final Long id, final Long savingsAccountId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final SavingsAccountChargeMapper rm = new SavingsAccountChargeMapper();
 
