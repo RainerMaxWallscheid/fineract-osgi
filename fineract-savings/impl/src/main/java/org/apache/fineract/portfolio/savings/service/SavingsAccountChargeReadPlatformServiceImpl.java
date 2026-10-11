@@ -184,7 +184,7 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
 
     @Override
     public Collection<SavingsAccountChargeData> retrieveSavingsAccountCharges(final Long loanId, final String status) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final SavingsAccountChargeMapper rm = new SavingsAccountChargeMapper();
         final StringBuilder sqlBuilder = new StringBuilder();
