@@ -94,7 +94,7 @@ public class ClientFamilyMembersReadPlatformServiceImpl implements ClientFamilyM
     @Override
     public List<ClientFamilyMembersData> getClientFamilyMembers(long clientId) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final ClientFamilyMembersMapper rm = new ClientFamilyMembersMapper();
         final String sql = "select " + rm.schema() + " where fmb.client_id=?";
