@@ -73,7 +73,7 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
     @Override
     public CommandProcessingResult addClientIdentifier(final Long clientId, final JsonCommand command) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final ClientIdentifierCommand clientIdentifierCommand = this.clientIdentifierCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json());
         clientIdentifierCommand.validateForCreate();
