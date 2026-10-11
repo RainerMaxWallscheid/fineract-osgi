@@ -71,7 +71,7 @@ public class ProvisioningCategoryApiResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult updateProvisioningCategory(@PathParam("categoryId") final Long categoryId, final String apiRequestBodyAsJson) {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningCategory(categoryId).withJson(apiRequestBodyAsJson).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
