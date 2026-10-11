@@ -122,7 +122,7 @@ public class CodeWritePlatformServiceJpaRepositoryImpl implements CodeWritePlatf
     @CacheEvict(value = "codes", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('CD')")
     public CommandProcessingResult deleteCode(final Long codeId) {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final Code code = retrieveCodeBy(codeId);
         if (code.isSystemDefined()) {
