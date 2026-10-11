@@ -82,7 +82,7 @@ public class RateWriteServiceImpl implements RateWriteService {
     @Override
     public CommandProcessingResult updateRate(final Long rateId, final JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final Rate rateToUpdate = this.rateRepository.findById(rateId).orElseThrow(() -> new RateNotFoundException(rateId));
             final Map<String, Object> changes = rateToUpdate.update(command);
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
