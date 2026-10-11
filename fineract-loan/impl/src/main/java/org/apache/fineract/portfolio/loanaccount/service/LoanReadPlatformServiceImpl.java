@@ -497,7 +497,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public LoanTransactionData retrieveLoanTransactionTemplate(final Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final RepaymentTransactionTemplateMapper mapper = new RepaymentTransactionTemplateMapper(sqlGenerator);
         LoanTransactionData loanTransactionData = this.jdbcTemplate.queryForObject("select " + mapper.schema(), mapper, // NOSONAR
                 LoanTransactionType.REPAYMENT.getValue(), LoanTransactionType.DOWN_PAYMENT.getValue(), loanId);
