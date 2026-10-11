@@ -117,7 +117,7 @@ public class CreditBureauIntegrationApiResource {
     @Path("creditReport/{creditBureauId}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getSavedCreditReport(@PathParam("creditBureauId") @Parameter(description = "creditBureauId") final Long creditBureauId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Collection<CreditReportData> creditReport = this.creditReportReadPlatformService.retrieveCreditReportDetails(creditBureauId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, creditReport, RESPONSE_DATA_PARAMETERS);
