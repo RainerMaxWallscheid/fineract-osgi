@@ -159,7 +159,7 @@ public class SmsCampaignWritePlatformServiceJpaImpl implements SmsCampaignWriteP
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long resourceId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final SmsCampaign smsCampaign = this.smsCampaignRepository.findById(resourceId).orElseThrow(() -> new SmsCampaignNotFound(resourceId));
         if (smsCampaign.isActive()) {
             throw new SmsCampaignMustBeClosedToBeDeletedException(smsCampaign.getId());
