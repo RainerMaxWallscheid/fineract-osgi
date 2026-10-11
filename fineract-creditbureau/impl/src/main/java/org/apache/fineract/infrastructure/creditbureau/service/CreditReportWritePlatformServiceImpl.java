@@ -152,7 +152,7 @@ public class CreditReportWritePlatformServiceImpl implements CreditReportWritePl
     public CommandProcessingResult saveCreditReport(Long creditBureauId, String nationalId, JsonCommand command) {
 
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             String creditBureauName = getCreditBureauName(creditBureauId);
             CreditReport creditReport = null;
