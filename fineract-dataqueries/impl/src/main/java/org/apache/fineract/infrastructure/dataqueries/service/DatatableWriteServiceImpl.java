@@ -189,7 +189,7 @@ public class DatatableWriteServiceImpl implements DatatableWriteService {
     public CommandProcessingResult createDatatable(final JsonCommand command) {
         String datatableName = null;
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final JsonElement element = this.fromJsonHelper.parse(command.json());
             final JsonArray columns = this.fromJsonHelper.extractJsonArrayNamed(API_PARAM_COLUMNS, element);
