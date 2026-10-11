@@ -443,7 +443,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult undoApplicationApproval(final Long savingsId, final JsonCommand command) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         this.savingsAccountApplicationTransitionApiJsonValidator.validateForUndo(command.json());
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
