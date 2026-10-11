@@ -163,7 +163,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long productId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final SavingsProduct product = this.savingProductRepository.findById(productId).orElseThrow(() -> new SavingsProductNotFoundException(productId));
         this.savingProductRepository.delete(product);
         return  //
