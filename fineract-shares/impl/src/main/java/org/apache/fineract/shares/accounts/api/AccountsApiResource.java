@@ -139,7 +139,7 @@ public class AccountsApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PutAccountsTypeAccountIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PutAccountsTypeAccountIdResponse.class)))
     public CommandProcessingResult updateAccount(@PathParam("type") @Parameter(description = "type") final String accountType, @PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @Parameter(hidden = true) AccountRequest accountRequest) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAccount(accountType, accountId).withJson(toApiJsonSerializer.serialize(accountRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
