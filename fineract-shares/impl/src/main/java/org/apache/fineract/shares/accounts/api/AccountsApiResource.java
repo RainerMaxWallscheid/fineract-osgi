@@ -111,7 +111,7 @@ public class AccountsApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = AccountRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PostAccountsTypeResponse.class)))
     public CommandProcessingResult createAccount(@PathParam("type") @Parameter(description = "type") final String accountType, @Parameter(hidden = true) AccountRequest accountRequest) {
-        this.platformSecurityContext.authenticatedUser();
+        this.platformSecurityContext.isAuthenticated();
         CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccount(accountType).withJson(toApiJsonSerializer.serialize(accountRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
     }
