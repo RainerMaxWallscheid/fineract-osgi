@@ -66,7 +66,7 @@ public class ClientTemplateReadPlatformServiceImpl implements ClientTemplateRead
 
     @Override
     public ClientData retrieveTemplate(final Long officeId, final boolean staffInSelectedOfficeOnly) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final Long defaultOfficeId = defaultToUsersOfficeIfNull(officeId);
         AddressData address = null;
         final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOfficesForDropdown();
