@@ -125,7 +125,7 @@ public class SpmApiResource {
     @Operation(summary = "Deactivate Survey", description = "")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public void activateOrDeactivateSurvey(@PathParam("id") final Long id, @QueryParam("command") final String command) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         if (command != null && command.equalsIgnoreCase("activate")) {
             this.spmService.activateSurvey(id);
         } else if (command != null && command.equalsIgnoreCase("deactivate")) {
