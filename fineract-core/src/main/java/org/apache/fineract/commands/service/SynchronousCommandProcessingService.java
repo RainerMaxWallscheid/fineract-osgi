@@ -122,12 +122,12 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
             idempotencyKey = idempotencyKeyResolver.resolve(wrapper);
         }
         exceptionWhenTheRequestAlreadyProcessed(wrapper, idempotencyKey, isRetry);
-        AppUser user = context.authenticatedUser(wrapper);
+        final Object user = context.authenticatedUser(wrapper);
         if (commandSource == null) {
             if (isEnclosingTransaction) {
-                commandSource = commandSourceService.getInitialCommandSource(wrapper, command, user, idempotencyKey);
+                commandSource = commandSourceService.getInitialCommandSource(wrapper, command, (AppUser) user, idempotencyKey);
             } else {
-                commandSource = commandSourceService.saveInitial(wrapper, command, user, idempotencyKey);
+                commandSource = commandSourceService.saveInitial(wrapper, command, (AppUser) user, idempotencyKey);
                 commandId = commandSource.getId();
             }
         }
@@ -136,7 +136,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
             storeCommandIdInContext(commandSource); // Store command id as a request attribute
         }
         setIdempotencyKeyStoreFlag(true);
-        return executeCommandInTransaction(executionContext, commandSource, user, isEnclosingTransaction);
+        return executeCommandInTransaction(executionContext, commandSource, (AppUser) user, isEnclosingTransaction);
     }
 
     private CommandProcessingResult executeCommandInTransaction(CommandExecutionContext executionContext, CommandSource commandSource, AppUser user, boolean isEnclosingTransaction) {
