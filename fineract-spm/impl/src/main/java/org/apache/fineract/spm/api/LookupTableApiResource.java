@@ -76,7 +76,7 @@ public class LookupTableApiResource {
     @Operation(summary = "Retrieve a Lookup Table entry", description = "Retrieve a Lookup Table entry for a survey.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LookupTableData.class)))
     public LookupTableData findLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @PathParam("key") @Parameter(description = "Enter key") final String key) {
-        this.securityContext.authenticatedUser();
+        this.securityContext.isAuthenticated();
         findSurvey(surveyId);
         final List<LookupTable> lookupTables = this.lookupTableService.findByKey(key);
         if (lookupTables == null || lookupTables.isEmpty()) {
