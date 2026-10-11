@@ -173,7 +173,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
 
     @Override
     public Collection<LoanProductData> retrieveAllLoanProductsForLookup(final boolean activeOnly) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final LoanProductLookupMapper rm = new LoanProductLookupMapper(sqlGenerator);
         String sql = "select ";
         if (activeOnly) {
