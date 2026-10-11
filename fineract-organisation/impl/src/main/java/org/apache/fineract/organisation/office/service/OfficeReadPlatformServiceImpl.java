@@ -186,7 +186,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public OfficeData retrieveOfficeWithExternalId(ExternalId externalId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         return officeRepository.findByExternalId(externalId).map(officeDataMapper::toOfficeData).orElseThrow(() -> new OfficeNotFoundException(externalId));
     }
 
