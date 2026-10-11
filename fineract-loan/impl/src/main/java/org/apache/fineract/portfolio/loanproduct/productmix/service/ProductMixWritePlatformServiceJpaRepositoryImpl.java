@@ -142,7 +142,7 @@ public class ProductMixWritePlatformServiceJpaRepositoryImpl implements ProductM
     @Override
     public ProductMixDeleteResponse deleteProductMix(final ProductMixDeleteRequest request) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
 
             final Long productId = request.getProductId();
             final Map<String, Object> changes = new LinkedHashMap<>();
