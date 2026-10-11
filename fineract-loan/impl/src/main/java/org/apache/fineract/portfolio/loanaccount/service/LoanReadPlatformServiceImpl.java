@@ -615,7 +615,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
     @Override
     public List<LoanRepaymentScheduleInstallmentData> getRepaymentDataResponse(final Long loanId) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final List<LoanRepaymentScheduleInstallment> loanRepaymentScheduleInstallments = this.loanRepositoryWrapper
                 .getLoanRepaymentScheduleInstallments(loanId);
         List<LoanRepaymentScheduleInstallmentData> loanRepaymentScheduleInstallmentData = new ArrayList<>();
