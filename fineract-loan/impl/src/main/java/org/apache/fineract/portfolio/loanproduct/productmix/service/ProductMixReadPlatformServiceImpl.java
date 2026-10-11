@@ -72,7 +72,7 @@ public class ProductMixReadPlatformServiceImpl implements ProductMixReadPlatform
     @Override
     public Collection<ProductMixData> retrieveAllProductMixes() {
 
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
 
         final ProductMixDataExtractor extractor = new ProductMixDataExtractor(this.loanProductReadPlatformService, null);
 
