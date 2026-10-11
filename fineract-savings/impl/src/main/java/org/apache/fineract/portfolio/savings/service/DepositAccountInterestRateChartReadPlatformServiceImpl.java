@@ -63,7 +63,7 @@ public class DepositAccountInterestRateChartReadPlatformServiceImpl implements D
     @Override
     public DepositAccountInterestRateChartData retrieveOne(Long chartId) {
         try {
-            this.context.authenticatedUser();
+            this.context.isAuthenticated();
             final String sql = "select " + CHART_ROW_MAPPER.schema() + " where irc.id = ? ";
             return this.jdbcTemplate.queryForObject(sql, CHART_ROW_MAPPER, new Object[] {chartId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
