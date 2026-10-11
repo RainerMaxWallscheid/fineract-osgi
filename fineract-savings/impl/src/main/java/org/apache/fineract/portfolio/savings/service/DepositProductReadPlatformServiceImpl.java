@@ -52,7 +52,7 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
     @Override
     @SuppressWarnings("unchecked")
     public Collection<?> retrieveAll(final DepositAccountType depositAccountType) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("select ");
