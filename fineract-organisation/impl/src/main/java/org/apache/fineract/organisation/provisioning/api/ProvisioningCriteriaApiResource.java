@@ -93,7 +93,7 @@ public class ProvisioningCriteriaApiResource {
     @AlternativeOperationId("retrieveAllProvisioningCriterias")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProvisioningCriteriaApiResourceSwagger.GetProvisioningCriteriaResponse.class))))
     public List<ProvisioningCriteriaData> retrieveAllProvisioningCriterias() {
-        platformSecurityContext.authenticatedUser();
+        platformSecurityContext.isAuthenticated();
         return provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias();
     }
 
