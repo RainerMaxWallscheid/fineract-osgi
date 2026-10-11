@@ -73,7 +73,7 @@ public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformServic
 
     @Override
     public Collection<HolidayData> retrieveAllHolidaysBySearchParamerters(final Long officeId, final LocalDate fromDate, final LocalDate toDate) {
-        this.context.authenticatedUser();
+        this.context.isAuthenticated();
         final DateTimeFormatter df = DateUtils.DEFAULT_DATE_FORMATTER;
         final Object[] objectArray = new Object[3];
         int arrayPos = 0;
