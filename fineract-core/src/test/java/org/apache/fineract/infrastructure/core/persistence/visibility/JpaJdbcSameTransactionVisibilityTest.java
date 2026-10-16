@@ -19,6 +19,8 @@
 package org.apache.fineract.infrastructure.core.persistence.visibility;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
@@ -32,7 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
+import org.apache.fineract.infrastructure.core.config.SpringJdbcDatabase;
+import org.apache.fineract.infrastructure.core.config.jpa.SpringDatabaseTransaction;
 import org.apache.fineract.infrastructure.core.persistence.ExtendedJpaTransactionManager;
+import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
+import org.apache.fineract.infrastructure.core.service.JdbcDatabase;
+import org.apache.fineract.infrastructure.core.service.PaginationHelper;
+import org.apache.fineract.infrastructure.core.service.JdbcDatabase;
+import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -73,6 +82,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * </ul>
  *
  * <p>
+ * The same two checks also run through {@link JdbcDatabase} ({@link SpringJdbcDatabase} on that {@link JdbcTemplate}).
+ * The port must report the same {@code pg_backend_pid()} as EclipseLink and must see the uncommitted row.
+ * {@code fetchPage} is not called; its {@link PaginationHelper} is a mock.
+ *
+ * <p>
  * Requires a Docker daemon; the whole class is skipped automatically when Docker is unavailable.
  */
 @Testcontainers(disabledWithoutDocker = true)
@@ -109,6 +123,11 @@ public class JpaJdbcSameTransactionVisibilityTest {
                 so it can read the JPA transaction's uncommitted writes""").isEqualTo(result.jdbcBackendPid());
         assertThat(result.jdbcCountInsideTransaction())
                 .as("sharing the connection, JdbcTemplate sees the flushed-but-uncommitted JPA row in the same transaction").isEqualTo(1);
+        assertThat(result.jpaBackendPid()).as("""
+                JdbcDatabase must run on the same physical PostgreSQL backend as EclipseLink,
+                so bundle reads see the JPA transaction's uncommitted writes""").isEqualTo(result.portBackendPid());
+        assertThat(result.portCountInsideTransaction())
+                .as("JdbcDatabase sees the flushed-but-uncommitted JPA row in the same transaction").isEqualTo(1);
     }
 
     @Test
@@ -120,6 +139,44 @@ public class JpaJdbcSameTransactionVisibilityTest {
                 .isEqualTo(result.jdbcBackendPid());
         assertThat(result.jdbcCountInsideTransaction())
                 .as("sharing the connection, JdbcTemplate sees the flushed-but-uncommitted JPA row in the same transaction").isEqualTo(1);
+        assertThat(result.jpaBackendPid()).as("with the DataSource bound, JdbcDatabase shares EclipseLink's physical connection")
+                .isEqualTo(result.portBackendPid());
+        assertThat(result.portCountInsideTransaction())
+                .as("JdbcDatabase sees the flushed-but-uncommitted JPA row in the same transaction").isEqualTo(1);
+    }
+
+    @Test
+    public void callNewCommitsWhileOuterTransactionRollsBack() {
+        Fixture fixture = createFixture(false);
+        DatabaseTransaction transactions = new SpringDatabaseTransaction(fixture.transactionTemplate().getTransactionManager());
+
+        assertThatThrownBy(() -> transactions.call(() -> {
+            EntityManager outer = EntityManagerFactoryUtils.getTransactionalEntityManager(fixture.entityManagerFactoryBean().getObject());
+            assertThat(outer).isNotNull();
+            outer.persist(new VisibilityProbe(1L, "outer"));
+            outer.flush();
+            assertThat(countViaSeparateRawConnection(fixture.dataSource())).isZero();
+
+            transactions.callNew(() -> {
+                EntityManager inner = EntityManagerFactoryUtils
+                        .getTransactionalEntityManager(fixture.entityManagerFactoryBean().getObject());
+                assertThat(inner).isNotNull();
+                inner.persist(new VisibilityProbe(2L, "inner"));
+                inner.flush();
+                assertThat(countViaJdbc(fixture.jdbcTemplate()))
+                        .as("callNew uses its own connection and does not see the uncommitted outer row").isEqualTo(1);
+                return null;
+            });
+
+            assertThat(countViaSeparateRawConnection(fixture.dataSource()))
+                    .as("callNew committed before the outer transaction").isEqualTo(1);
+            assertThat(countViaJdbc(fixture.jdbcTemplate()))
+                    .as("the outer connection still sees its uncommitted row and the committed callNew row").isEqualTo(2);
+            throw new OuterRollback();
+        })).isInstanceOf(OuterRollback.class);
+
+        assertThat(countViaSeparateRawConnection(fixture.dataSource()))
+                .as("rolling back the outer transaction leaves only the callNew row").isEqualTo(1);
     }
 
     /**
@@ -135,6 +192,7 @@ public class JpaJdbcSameTransactionVisibilityTest {
                         + "this proves the JPA write is still uncommitted and was NOT committed early")
                 .isZero();
         assertThat(result.jdbcCountAfterCommit()).as("after commit the row is visible to everyone").isEqualTo(1);
+        assertThat(result.portCountAfterCommit()).as("after commit the row is visible through JdbcDatabase").isEqualTo(1);
     }
 
     private ScenarioResult runScenario(Fixture fixture) {
@@ -143,6 +201,8 @@ public class JpaJdbcSameTransactionVisibilityTest {
         int[] separateRawCount = new int[1];
         long[] jpaPid = new long[1];
         long[] jdbcPid = new long[1];
+        int[] portCountInside = new int[1];
+        long[] portPid = new long[1];
 
         // Guard: the transaction is actually driven by the real ExtendedJpaTransactionManager, not some other manager.
         assertThat(fixture.transactionTemplate().getTransactionManager())
@@ -168,17 +228,28 @@ public class JpaJdbcSameTransactionVisibilityTest {
             Long pid = fixture.jdbcTemplate().queryForObject("select pg_backend_pid()", Long.class);
             jdbcPid[0] = pid == null ? -1L : pid;
 
+            portCountInside[0] = countViaPort(fixture.jdbcDatabase());
+            Long portPidValue = fixture.jdbcDatabase().queryForObject("select pg_backend_pid()", Long.class);
+            portPid[0] = portPidValue == null ? -1L : portPidValue;
+
             separateRawCount[0] = countViaSeparateRawConnection(fixture.dataSource());
         });
 
         int jdbcCountAfterCommit = countViaJdbc(fixture.jdbcTemplate());
-        return new ScenarioResult(jpaCount[0], jdbcCountInside[0], separateRawCount[0], jdbcCountAfterCommit, jpaPid[0], jdbcPid[0]);
+        int portCountAfterCommit = countViaPort(fixture.jdbcDatabase());
+        return new ScenarioResult(jpaCount[0], jdbcCountInside[0], separateRawCount[0], jdbcCountAfterCommit, jpaPid[0], jdbcPid[0],
+                portCountInside[0], portCountAfterCommit, portPid[0]);
     }
 
     private static int countViaJdbc(JdbcTemplate jdbcTemplate) {
         // EclipseLink DDL generation creates the table as a delimited (case-sensitive) lowercase identifier
         // "visibility_probe"; quoting it here matches that exactly regardless of the database's identifier folding.
         Integer count = jdbcTemplate.queryForObject("select count(*) from \"visibility_probe\"", Integer.class);
+        return count == null ? 0 : count;
+    }
+
+    private static int countViaPort(JdbcDatabase jdbcDatabase) {
+        Integer count = jdbcDatabase.queryForObject("select count(*) from \"visibility_probe\"", Integer.class);
         return count == null ? 0 : count;
     }
 
@@ -214,7 +285,10 @@ public class JpaJdbcSameTransactionVisibilityTest {
         }
         transactionManager.afterPropertiesSet();
 
-        return new Fixture(dataSource, emfBean, new TransactionTemplate(transactionManager), new JdbcTemplate(dataSource));
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        // fetchPage is not part of this scenario, so the SQL-generator collaborator stays unused.
+        JdbcDatabase jdbcDatabase = new SpringJdbcDatabase(jdbcTemplate, mock(PaginationHelper.class));
+        return new Fixture(dataSource, emfBean, new TransactionTemplate(transactionManager), jdbcTemplate, jdbcDatabase);
     }
 
     private DataSource createDataSource() {
@@ -242,10 +316,16 @@ public class JpaJdbcSameTransactionVisibilityTest {
     }
 
     private record Fixture(DataSource dataSource, LocalContainerEntityManagerFactoryBean entityManagerFactoryBean,
-            TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate) {
+            TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, JdbcDatabase jdbcDatabase) {
     }
 
     private record ScenarioResult(long jpaCountInsideTransaction, int jdbcCountInsideTransaction,
-            int separateRawConnectionCountInsideTransaction, int jdbcCountAfterCommit, long jpaBackendPid, long jdbcBackendPid) {
+            int separateRawConnectionCountInsideTransaction, int jdbcCountAfterCommit, long jpaBackendPid, long jdbcBackendPid,
+            int portCountInsideTransaction, int portCountAfterCommit, long portBackendPid) {
+    }
+
+    private static final class OuterRollback extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
     }
 }

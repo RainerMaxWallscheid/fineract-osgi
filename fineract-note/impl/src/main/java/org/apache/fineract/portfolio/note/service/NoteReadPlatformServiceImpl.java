@@ -27,24 +27,24 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
+import org.apache.fineract.infrastructure.core.exception.JdbcEmptyResultException;
+import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
+import org.apache.fineract.infrastructure.core.service.JdbcDatabase;
+import org.apache.fineract.infrastructure.core.service.JdbcRowMapper;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 public class NoteReadPlatformServiceImpl implements NoteReadPlatformService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteReadPlatformServiceImpl.class);
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcDatabase jdbcDatabase;
+    private final DatabaseTransaction databaseTransaction;
 
 
-    private static final class NoteMapper implements RowMapper<NoteData> {
+    private static final class NoteMapper implements JdbcRowMapper<NoteData> {
         public String schema() {
             return " select n.id as id, n.client_id as clientId, n.group_id as groupId, n.loan_id as loanId, n.loan_transaction_id as transactionId, " + " n.note_type_enum as noteTypeEnum, n.note as note, n.created_date as createdDate, n.created_by as createdById, " + "  n.created_on_utc as createdDateUtc, n.last_modified_on_utc as lastModifiedDateUtc, " + " cb.username as createdBy, n.lastmodified_date as lastModifiedDate, n.last_modified_by as lastModifiedById, mb.username as modifiedBy " + " from m_note n left join m_appuser cb on cb.id=n.created_by left join m_appuser mb on mb.id=n.last_modified_by ";
         }
@@ -75,6 +75,10 @@ public class NoteReadPlatformServiceImpl implements NoteReadPlatformService {
 
     @Override
     public NoteData retrieveNote(final Long noteId, final Long resourceId, final Integer noteTypeId) {
+        return this.databaseTransaction.callReadOnly(() -> loadNote(noteId, resourceId, noteTypeId));
+    }
+
+    private NoteData loadNote(final Long noteId, final Long resourceId, final Integer noteTypeId) {
         final NoteType noteType = NoteType.fromInt(noteTypeId);
         try {
             final NoteMapper rm = new NoteMapper();
@@ -84,20 +88,24 @@ public class NoteReadPlatformServiceImpl implements NoteReadPlatformService {
                 conditionSql = " and " + conditionSql;
             }
             final String sql = rm.schema() + " where n.id = ? " + conditionSql + " order by n.created_date DESC";
-            return this.jdbcTemplate.queryForObject(sql, rm, paramList.toArray()); // NOSONAR
-        } catch (final EmptyResultDataAccessException e) {
+            return this.jdbcDatabase.queryForObject(sql, rm, paramList.toArray()); // NOSONAR
+        } catch (final JdbcEmptyResultException e) {
             throw new NoteNotFoundException(noteId, resourceId, noteType.name().toLowerCase(), e);
         }
     }
 
     @Override
     public List<NoteData> retrieveNotesByResource(final Long resourceId, final Integer noteTypeId) {
+        return this.databaseTransaction.callReadOnly(() -> loadNotesByResource(resourceId, noteTypeId));
+    }
+
+    private List<NoteData> loadNotesByResource(final Long resourceId, final Integer noteTypeId) {
         final NoteType noteType = NoteType.fromInt(noteTypeId);
         final NoteMapper rm = new NoteMapper();
         List<Object> paramList = new ArrayList<>(Arrays.asList(resourceId));
         final String conditionSql = getResourceCondition(noteType, paramList);
         final String sql = rm.schema() + " where " + conditionSql + " order by n.created_date DESC";
-        return this.jdbcTemplate.query(sql, rm, paramList.toArray()); // NOSONAR
+        return this.jdbcDatabase.query(sql, rm, paramList.toArray()); // NOSONAR
     }
 
     public static String getResourceCondition(final NoteType noteType, List<Object> paramList) {
@@ -136,8 +144,8 @@ public class NoteReadPlatformServiceImpl implements NoteReadPlatformService {
         return conditionSql;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public NoteReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public NoteReadPlatformServiceImpl(final JdbcDatabase jdbcDatabase, final DatabaseTransaction databaseTransaction) {
+        this.jdbcDatabase = jdbcDatabase;
+        this.databaseTransaction = databaseTransaction;
     }
 }

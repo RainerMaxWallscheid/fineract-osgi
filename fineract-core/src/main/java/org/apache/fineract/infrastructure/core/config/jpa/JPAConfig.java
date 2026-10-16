@@ -19,6 +19,7 @@
 
 package org.apache.fineract.infrastructure.core.config.jpa;
 
+import jakarta.persistence.EntityManagerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,10 +29,12 @@ import javax.sql.DataSource;
 import org.apache.fineract.infrastructure.core.auditing.JpaAuditingHandlerRegistrar;
 import org.apache.fineract.infrastructure.core.domain.AuditorAwareImpl;
 import org.apache.fineract.infrastructure.core.persistence.DatabaseSelectingPersistenceUnitPostProcessor;
+import org.apache.fineract.infrastructure.core.service.JpaSession;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseTypeResolver;
 import org.apache.fineract.infrastructure.core.service.database.RoutingDataSource;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryBuilderCustomizer;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -44,6 +47,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -130,6 +134,12 @@ public class JPAConfig extends JpaBaseConfiguration {
     @Bean
     public AuditorAware<Long> auditorAware() {
         return new AuditorAwareImpl();
+    }
+
+    @Bean
+    public JpaSession jpaSession(@Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory,
+            @Qualifier("jpaAuditingHandler") ObjectProvider<AuditingHandler> auditingHandler) {
+        return new SpringJpaSession(entityManagerFactory, auditingHandler);
     }
 
 }

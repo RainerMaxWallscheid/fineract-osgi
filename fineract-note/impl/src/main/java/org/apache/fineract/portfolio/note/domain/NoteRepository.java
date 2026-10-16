@@ -19,13 +19,19 @@
 package org.apache.fineract.portfolio.note.domain;
 
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface NoteRepository extends JpaRepository<Note, Long>, JpaSpecificationExecutor<Note> {
+/**
+ * Note persistence used by the write service. Not a Spring Data repository.
+ */
+public interface NoteRepository {
+
+    Note save(Note note);
+
+    Note saveAndFlush(Note note);
+
+    void delete(Note note);
+
+    void deleteAllInBatch(Iterable<Note> notes);
 
     List<Note> findByLoanId(Long loanId);
 
@@ -41,17 +47,11 @@ public interface NoteRepository extends JpaRepository<Note, Long>, JpaSpecificat
 
     Note findByLoanTransactionIdAndId(Long loanTransactionId, Long id);
 
-    List<Note> findBySavingsAccountId(Long savingsAccountId);
-
     Note findBySavingsAccountIdAndId(Long savingsAccountId, Long id);
-
-    @Query("select note from Note note where note.savingsTransactionId = :savingsTransactionId")
-    List<Note> findBySavingsTransactionId(@Param("savingsTransactionId") Long savingsTransactionId);
 
     Note findBySavingsTransactionIdAndId(Long savingsTransactionId, Long id);
 
     Note findByShareAccountIdAndId(Long shareAccountId, Long id);
 
-    @Modifying
     void deleteAllBySavingsAccountId(Long savingsAccountId);
 }

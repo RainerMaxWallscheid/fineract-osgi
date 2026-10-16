@@ -25,6 +25,8 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.persistence.ExtendedJpaTransactionManager;
 import org.apache.fineract.infrastructure.core.persistence.TransactionLifecycleCallback;
+import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers;
 import org.springframework.context.annotation.Bean;
@@ -59,5 +61,10 @@ public class JpaTransactionConfig {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         transactionTemplate.setPropagationBehavior(PROPAGATION_REQUIRES_NEW);
         return transactionTemplate;
+    }
+
+    @Bean
+    public DatabaseTransaction databaseTransaction(@Qualifier("transactionManager") PlatformTransactionManager transactionManager) {
+        return new SpringDatabaseTransaction(transactionManager);
     }
 }

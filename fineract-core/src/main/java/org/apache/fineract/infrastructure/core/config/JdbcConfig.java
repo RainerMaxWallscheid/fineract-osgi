@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.core.config;
 
+import org.apache.fineract.infrastructure.core.service.JdbcDatabase;
+import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.database.RoutingDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,5 +43,10 @@ public class JdbcConfig {
     @Bean
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate(RoutingDataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public JdbcDatabase jdbcDatabase(JdbcTemplate jdbcTemplate, PaginationHelper paginationHelper) {
+        return new SpringJdbcDatabase(jdbcTemplate, paginationHelper);
     }
 }

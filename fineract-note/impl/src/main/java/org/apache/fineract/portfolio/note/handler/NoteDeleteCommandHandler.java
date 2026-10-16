@@ -21,23 +21,23 @@ package org.apache.fineract.portfolio.note.handler;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
+import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
 import org.apache.fineract.portfolio.note.data.NoteDeleteResponse;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class NoteDeleteCommandHandler implements CommandHandler<NoteDeleteRequest, NoteDeleteResponse> {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteDeleteCommandHandler.class);
     private final NoteWritePlatformService writePlatformService;
+    private final DatabaseTransaction databaseTransaction;
 
     @Retry(name = "commandNoteDelete", fallbackMethod = "fallback")
     @Override
-    @Transactional
     public NoteDeleteResponse handle(Command<NoteDeleteRequest> command) {
-        return writePlatformService.deleteNote(command.getPayload());
+        return this.databaseTransaction.call(() -> writePlatformService.deleteNote(command.getPayload()));
     }
 
     @Override
@@ -46,8 +46,9 @@ public class NoteDeleteCommandHandler implements CommandHandler<NoteDeleteReques
         return CommandHandler.super.fallback(command, t);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public NoteDeleteCommandHandler(final NoteWritePlatformService writePlatformService) {
+    public NoteDeleteCommandHandler(final NoteWritePlatformService writePlatformService,
+            final DatabaseTransaction databaseTransaction) {
         this.writePlatformService = writePlatformService;
+        this.databaseTransaction = databaseTransaction;
     }
 }

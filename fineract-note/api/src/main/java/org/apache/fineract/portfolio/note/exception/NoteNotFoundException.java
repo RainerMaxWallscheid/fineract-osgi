@@ -19,7 +19,7 @@
 package org.apache.fineract.portfolio.note.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.apache.fineract.infrastructure.core.exception.JdbcEmptyResultException;
 
 /**
  * A {@link RuntimeException} thrown when note resources are not found.
@@ -35,7 +35,7 @@ public class NoteNotFoundException extends AbstractPlatformResourceNotFoundExcep
                 "Note with identifier " + id + " does not exist for " + resource + " with identifier " + resourceId, id, resourceId);
     }
 
-    public NoteNotFoundException(Long id, Long resourceId, String resource, EmptyResultDataAccessException e) {
+    public NoteNotFoundException(Long id, Long resourceId, String resource, JdbcEmptyResultException e) {
         super("error.msg." + resource + ".note.id.invalid",
                 "Note with identifier " + id + " does not exist for " + resource + " with identifier " + resourceId, id, resourceId, e);
     }

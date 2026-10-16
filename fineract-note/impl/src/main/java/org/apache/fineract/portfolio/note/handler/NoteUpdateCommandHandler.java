@@ -21,23 +21,23 @@ package org.apache.fineract.portfolio.note.handler;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
+import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
 import org.apache.fineract.portfolio.note.data.NoteUpdateRequest;
 import org.apache.fineract.portfolio.note.data.NoteUpdateResponse;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class NoteUpdateCommandHandler implements CommandHandler<NoteUpdateRequest, NoteUpdateResponse> {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteUpdateCommandHandler.class);
     private final NoteWritePlatformService writePlatformService;
+    private final DatabaseTransaction databaseTransaction;
 
     @Retry(name = "commandNoteUpdate", fallbackMethod = "fallback")
     @Override
-    @Transactional
     public NoteUpdateResponse handle(Command<NoteUpdateRequest> command) {
-        return writePlatformService.updateNote(command.getPayload());
+        return this.databaseTransaction.call(() -> writePlatformService.updateNote(command.getPayload()));
     }
 
     @Override
@@ -46,8 +46,9 @@ public class NoteUpdateCommandHandler implements CommandHandler<NoteUpdateReques
         return CommandHandler.super.fallback(command, t);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public NoteUpdateCommandHandler(final NoteWritePlatformService writePlatformService) {
+    public NoteUpdateCommandHandler(final NoteWritePlatformService writePlatformService,
+            final DatabaseTransaction databaseTransaction) {
         this.writePlatformService = writePlatformService;
+        this.databaseTransaction = databaseTransaction;
     }
 }
