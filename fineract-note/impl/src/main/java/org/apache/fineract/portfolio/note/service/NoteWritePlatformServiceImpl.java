@@ -35,12 +35,7 @@ import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteNotFoundException;
 import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
 
-@Service
-@ConditionalOnMissingBean(value = NoteWritePlatformService.class, ignored = NoteWritePlatformServiceImpl.class)
 public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteWritePlatformServiceImpl.class);
@@ -50,11 +45,11 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
     private final GroupActivePort groupActivePort;
     private final LoanExistencePort loanExistencePort;
     private final SavingsAccountExistencePort savingsAccountExistencePort;
-    private final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
+    private final ShareAccountNoteSupport shareAccountNoteSupport;
 
     public NoteWritePlatformServiceImpl(final NoteRepository noteRepository, final ClientActivePort clientActivePort,
             final GroupActivePort groupActivePort, final LoanExistencePort loanExistencePort,
-            final SavingsAccountExistencePort savingsAccountExistencePort, final ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport) {
+            final SavingsAccountExistencePort savingsAccountExistencePort, final ShareAccountNoteSupport shareAccountNoteSupport) {
         this.noteRepository = noteRepository;
         this.clientActivePort = clientActivePort;
         this.groupActivePort = groupActivePort;
@@ -101,11 +96,10 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 officeId = ref.officeId();
             }
             case SHARE_ACCOUNT -> {
-                final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
-                if (support == null) {
+                if (shareAccountNoteSupport == null) {
                     throw new NoteResourceNotSupportedException(request.getType().getApiUrl());
                 }
-                final var ref = support.require(request.getResourceId());
+                final var ref = shareAccountNoteSupport.require(request.getResourceId());
                 note = noteRepository.saveAndFlush(Note.shareNote(ref.shareAccountId(), ref.clientId(), request.getNote()));
                 officeId = ref.officeId();
             }
@@ -214,11 +208,10 @@ public class NoteWritePlatformServiceImpl implements NoteWritePlatformService {
                 officeId = ref.officeId();
             }
             case SHARE_ACCOUNT -> {
-                final ShareAccountNoteSupport support = shareAccountNoteSupport.getIfAvailable();
-                if (support == null) {
+                if (shareAccountNoteSupport == null) {
                     break;
                 }
-                final var ref = support.require(resourceId);
+                final var ref = shareAccountNoteSupport.require(resourceId);
                 note = noteRepository.findByShareAccountIdAndId(ref.shareAccountId(), noteId);
                 officeId = ref.officeId();
             }

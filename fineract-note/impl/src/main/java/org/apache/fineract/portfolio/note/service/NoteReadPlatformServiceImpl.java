@@ -34,9 +34,7 @@ import org.apache.fineract.infrastructure.core.service.JdbcRowMapper;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteNotFoundException;
-import org.springframework.stereotype.Service;
 
-@Service
 public class NoteReadPlatformServiceImpl implements NoteReadPlatformService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteReadPlatformServiceImpl.class);

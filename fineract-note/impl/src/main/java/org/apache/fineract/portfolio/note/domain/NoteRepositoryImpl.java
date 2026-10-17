@@ -25,11 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.fineract.infrastructure.core.service.JpaSession;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
-@Component
-@ConditionalOnMissingBean(value = NoteRepository.class, ignored = NoteRepositoryImpl.class)
 public class NoteRepositoryImpl implements NoteRepository {
 
     private final JpaSession jpaSession;

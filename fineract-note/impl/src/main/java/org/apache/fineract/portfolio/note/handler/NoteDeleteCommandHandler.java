@@ -25,9 +25,7 @@ import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
 import org.apache.fineract.portfolio.note.data.NoteDeleteResponse;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.springframework.stereotype.Component;
 
-@Component
 public class NoteDeleteCommandHandler implements CommandHandler<NoteDeleteRequest, NoteDeleteResponse> {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteDeleteCommandHandler.class);

@@ -25,9 +25,7 @@ import org.apache.fineract.infrastructure.core.service.DatabaseTransaction;
 import org.apache.fineract.portfolio.note.data.NoteUpdateRequest;
 import org.apache.fineract.portfolio.note.data.NoteUpdateResponse;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.springframework.stereotype.Component;
 
-@Component
 public class NoteUpdateCommandHandler implements CommandHandler<NoteUpdateRequest, NoteUpdateResponse> {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteUpdateCommandHandler.class);

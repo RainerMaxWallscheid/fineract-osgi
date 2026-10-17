@@ -27,28 +27,21 @@ import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
 
-/** Spring ↔ OSGi bridge for note ports. */
-@Component
-public class NoteOsgiServiceRegistrar implements InitializingBean, DisposableBean {
+/** Publishes the winning note ports when this class was loaded from an Equinox bundle. */
+public class NoteOsgiServiceRegistrar {
 
     private static final Logger LOG = LoggerFactory.getLogger(NoteOsgiServiceRegistrar.class);
 
-    private final ObjectProvider<NoteReadPlatformService> read;
-    private final ObjectProvider<NoteWritePlatformService> write;
+    private final NoteReadPlatformService read;
+    private final NoteWritePlatformService write;
     private final List<Object> registrations = new ArrayList<>();
 
-    public NoteOsgiServiceRegistrar(final ObjectProvider<NoteReadPlatformService> read,
-            final ObjectProvider<NoteWritePlatformService> write) {
+    public NoteOsgiServiceRegistrar(final NoteReadPlatformService read, final NoteWritePlatformService write) {
         this.read = read;
         this.write = write;
     }
 
-    @Override
     public void afterPropertiesSet() {
         try {
             final Class<?> frameworkUtil = Class.forName("org.osgi.framework.FrameworkUtil");
@@ -61,8 +54,8 @@ public class NoteOsgiServiceRegistrar implements InitializingBean, DisposableBea
             if (context == null) {
                 return;
             }
-            register(context, NoteReadPlatformService.class, read.getIfAvailable());
-            register(context, NoteWritePlatformService.class, write.getIfAvailable());
+            register(context, NoteReadPlatformService.class, read);
+            register(context, NoteWritePlatformService.class, write);
             LOG.info("Registered {} note OSGi service(s)", registrations.size());
         } catch (final ClassNotFoundException ex) {
             LOG.debug("OSGi framework classes not present; Spring-only note wiring");
@@ -82,7 +75,6 @@ public class NoteOsgiServiceRegistrar implements InitializingBean, DisposableBea
         registrations.add(registration);
     }
 
-    @Override
     public void destroy() {
         for (final Object registration : registrations) {
             try {

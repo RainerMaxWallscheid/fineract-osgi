@@ -20,27 +20,21 @@ package org.apache.fineract.portfolio.note.listener;
 
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
-@Component
-class NoteListener {
+public class NoteListener {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteListener.class);
     private final NoteWritePlatformService noteWritePlatformService;
 
-    @EventListener
-    void onCreate(NoteCreateRequest request) {
+    public void onCreate(NoteCreateRequest request) {
         noteWritePlatformService.createNote(request);
     }
 
-    @EventListener
-    void onUpdate(NoteCreateRequest request) {
+    public void onUpdate(NoteCreateRequest request) {
         noteWritePlatformService.createNote(request);
     }
 
-    @EventListener
-    void onDelete(NoteCreateRequest request) {
+    public void onDelete(NoteCreateRequest request) {
         noteWritePlatformService.createNote(request);
     }
 

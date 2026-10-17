@@ -42,7 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.ObjectProvider;
 
 @ExtendWith(MockitoExtension.class)
 class NoteWritePlatformServiceImplTest {
@@ -58,8 +57,6 @@ class NoteWritePlatformServiceImplTest {
     @Mock
     private SavingsAccountExistencePort savingsAccountExistencePort;
     @Mock
-    private ObjectProvider<ShareAccountNoteSupport> shareAccountNoteSupport;
-    @Mock
     private ShareAccountNoteSupport shareSupport;
     @Mock
     private Note note;
@@ -69,13 +66,12 @@ class NoteWritePlatformServiceImplTest {
     @BeforeEach
     void setUp() {
         subject = new NoteWritePlatformServiceImpl(noteRepository, clientActivePort, groupActivePort, loanExistencePort,
-                savingsAccountExistencePort, shareAccountNoteSupport);
+                savingsAccountExistencePort, shareSupport);
     }
 
     @Test
     void createNoteShouldSupportShareAccount() {
         NoteCreateRequest request = NoteCreateRequest.builder().resourceId(10L).type(NoteType.SHARE_ACCOUNT).note("share note").build();
-        when(shareAccountNoteSupport.getIfAvailable()).thenReturn(shareSupport);
         when(shareSupport.require(10L)).thenReturn(new ShareAccountNoteSupport.ShareAccountNoteRef(10L, 5L, 7L));
         when(noteRepository.saveAndFlush(any(Note.class))).thenReturn(note);
         when(note.getId()).thenReturn(101L);
@@ -106,7 +102,6 @@ class NoteWritePlatformServiceImplTest {
     @Test
     void updateNoteShouldSupportShareAccount() {
         NoteUpdateRequest request = NoteUpdateRequest.builder().id(9L).resourceId(10L).type(NoteType.SHARE_ACCOUNT).note("updated").build();
-        when(shareAccountNoteSupport.getIfAvailable()).thenReturn(shareSupport);
         when(shareSupport.require(10L)).thenReturn(new ShareAccountNoteSupport.ShareAccountNoteRef(10L, 5L, 7L));
         when(noteRepository.findByShareAccountIdAndId(10L, 9L)).thenReturn(note);
         when(note.getNote()).thenReturn("old");

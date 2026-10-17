@@ -46,11 +46,9 @@ import org.apache.fineract.portfolio.note.data.NoteUpdateResponse;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
-import org.springframework.stereotype.Component;
 
 @Path("/v1/{resourceType:.+}/{resourceId}/notes")
 @Produces({MediaType.APPLICATION_JSON})
-@Component
 @Tag(name = "Notes", description = """
     Notes API allows to enter notes for supported resources.
     """)
